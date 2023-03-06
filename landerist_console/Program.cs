@@ -39,7 +39,7 @@ namespace landerist_console
         private static void Run()
         {
             //CsvParser.InsertWebsites();
-            Scraper.SetRealUri();
+            //Scraper.SetRealUriToAll();
             //Scraper.UpdateRobotsAndIpAddress();
         }
 

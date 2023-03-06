@@ -8,11 +8,26 @@ namespace landerist_library.Websites
 
         public static List<Website> GetAll()
         {
-            var dataTable = GetDataTable();
+            var dataTable = GetDataTableAll();
             return ParseWebsites(dataTable);
         }
 
-        private static DataTable GetDataTable()
+        public static List<Website> GetStatusCodeNotOk()
+        {
+            var dataTable = GetDataTableStatusCodeNotOk();
+            return ParseWebsites(dataTable);
+        }
+
+        private static DataTable GetDataTableStatusCodeNotOk()
+        {
+            string query = 
+                "SELECT * " +
+                "FROM " + TABLE_WEBSITES  + " " +
+                "WHERE [StatusCode] <> 200 ";
+            return new Database().QueryTable(query);
+        }
+        
+        private static DataTable GetDataTableAll()
         {
             string query = "SELECT * FROM " + TABLE_WEBSITES;
             return new Database().QueryTable(query);

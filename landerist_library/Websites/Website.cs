@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Net;
 
 namespace landerist_library.Websites
 {
@@ -11,6 +12,8 @@ namespace landerist_library.Websites
         public string? RobotsTxt { get; set; }
 
         public string? IpAddress { get; set; }
+
+        public short? StatusCode { get; set; }
 
         public Website(Uri uri)
         {
@@ -25,13 +28,14 @@ namespace landerist_library.Websites
             Domain = dataRow["Domain"].ToString()!;
             RobotsTxt = dataRow["RobotsTxt"].ToString();
             IpAddress = dataRow["IpAddress"].ToString();
+            StatusCode = dataRow["StatusCode"] is DBNull ? null : (short)dataRow["StatusCode"];
         }
 
         public bool Insert()
         {
             string query =
                 "INSERT INTO " + TABLE_WEBSITES + " " +
-                "VALUES (@Uri, @Domain, NULL, NULL)";
+                "VALUES (@Uri, @Domain, NULL, NULL, NULL)";
 
             return new Database().Query(query, new Dictionary<string, object> {
                 {"Uri", Uri.ToString() },
@@ -80,28 +84,50 @@ namespace landerist_library.Websites
         {
             Uri = uri;
             var newDomain = uri.Host;
-
             string query =
                 "UPDATE " + TABLE_WEBSITES + " " +
-                "SET Uri =  '" + Uri.ToString() + "', Domain = '" + newDomain + "' " +
-                "WHERE Domain = '" + Domain + "'";
+                "SET Uri =  @Uri, Domain  = @NewDomain " +
+                "WHERE Domain = @Domain";
 
-            //string query =
-            //    "UPDATE " + TABLE_WEBSITES + " " +
-            //    "SET Uri =  @Uri, @Domain  = @NewDomain " +
-            //    "WHERE Domain = @Domain";
+            var dataBase = new Database();
 
-            //bool success = new Database().Query(query, new Dictionary<string, object> {
-            //    {"Uri", Uri.ToString() },
-            //    {"Domain", Domain },
-            //    {"NewDomain", newDomain },
-            //});
-            bool success = new Database().Query(query);
+            bool success = dataBase.Query(query, new Dictionary<string, object> {
+                {"Uri", Uri.ToString() },
+                {"Domain", Domain },
+                {"NewDomain", newDomain },
+            });
+
+            if (!success) // newDomain is already in database
+            {
+                success = dataBase.Query(query, new Dictionary<string, object> {
+                    {"Uri", Uri.ToString() },
+                    {"Domain", newDomain },
+                    {"NewDomain", newDomain },
+            });
+            }
             if (success)
             {
                 Domain = newDomain;
             }
             return success;
+        }
+
+        public bool UpdateUriStatusCode(short statusCode)
+        {
+            StatusCode = statusCode;
+            if (StatusCode == null)
+            {
+                return true;
+            }
+            string query =
+                "UPDATE " + TABLE_WEBSITES + " " +
+                "SET StatusCode =  @StatusCode " +
+                "WHERE Domain = @Domain";
+
+            return new Database().Query(query, new Dictionary<string, object> {
+                {"StatusCode", StatusCode },
+                {"Domain", Domain }
+            });
         }
     }
 }

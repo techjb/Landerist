@@ -1,13 +1,25 @@
 ﻿using landerist_library.Websites;
+using System;
 using System.Net;
 
 namespace landerist_library.Scraper
 {
     public class Scraper
     {
-        public static void SetRealUri()
+        private const string UserAgentChrome = "Mozilla/5.0 (compatible; AcmeInc/1.0)";
+        public static void SetRealUriToAll()
         {
             var websites = Websites.Websites.GetAll();
+            SetRealUri(websites);
+        }
+
+        public static void SetRealUriStatusCodeNotOk()
+        {
+
+        }
+
+        private static void SetRealUri(List<Website> websites)
+        {
             int total = websites.Count;
             int counter = 0;
             int erros = 0;
@@ -15,32 +27,48 @@ namespace landerist_library.Scraper
             Parallel.ForEach(websites,
                 //new ParallelOptions() { MaxDegreeOfParallelism = 1}, 
                 website =>
-            {
-                lock (sync)
                 {
-                    counter++;
-                }
-                double progressPercentage = Math.Round((double)counter * 100 / total, 2);
-                Console.WriteLine(counter + "/" + total + " (" + progressPercentage + "%) " +
-                    "Errors: " + erros + " " + website.Uri.ToString());
-                try
-                {
-                    SetRealUri(website);
-                }
-                catch
-                {
-                    erros++;
-                }
 
-            });
+                    //if (!website.Uri.Equals("https://www.inmolaseras.es/"))
+                    //{
+                    //    return;
+                    //}
+                    lock (sync)
+                    {
+                        counter++;
+                    }
+                    double progressPercentage = Math.Round((double)counter * 100 / total, 2);
+                    Console.WriteLine(counter + "/" + total + " (" + progressPercentage + "%) " +
+                        "Errors: " + erros + " " + website.Uri.ToString());
+                    try
+                    {
+                        SetRealUri(website);
+                    }
+                    catch (Exception exception)
+                    {
+                        //var uri = website.Uri;
+                        erros++;
+                    }
+
+                });
         }
+
 
         private static void SetRealUri(Website website)
         {
-            using var client = new HttpClient();
-            var response = client.GetAsync(website.Uri).GetAwaiter().GetResult();
+            HttpClientHandler handler = new()
+            {
+                AllowAutoRedirect = false
+            };
 
-            if (response.StatusCode.Equals(HttpStatusCode.PermanentRedirect)
+            using var client = new HttpClient(handler);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgentChrome);
+            HttpRequestMessage request = new(HttpMethod.Head, website.Uri);
+
+            var response = client.SendAsync(request).GetAwaiter().GetResult();
+            var statusCode = response.StatusCode;
+            if (response.StatusCode.Equals(HttpStatusCode.Found)
+                || response.StatusCode.Equals(HttpStatusCode.PermanentRedirect)
                 || response.StatusCode.Equals(HttpStatusCode.TemporaryRedirect)
                 || response.StatusCode.Equals(HttpStatusCode.Moved)
                 || response.StatusCode.Equals(HttpStatusCode.MovedPermanently)
@@ -51,6 +79,7 @@ namespace landerist_library.Scraper
                     website.UpdateUri(response.Headers.Location);
                 }
             }
+            website.UpdateUriStatusCode((short)statusCode);
         }
 
         public static void UpdateRobotsAndIpAddress()
@@ -67,11 +96,11 @@ namespace landerist_library.Scraper
                 }
                 double progressPercentage = Math.Round((double)counter * 100 / total, 2);
                 Console.WriteLine(counter + "/" + total + " (" + progressPercentage + "%) " + website.Uri.ToString());
-                _ = UpdateRobotsAndIpAddressAsync(website);
+                UpdateRobotsAndIpAddressAsync(website);
             });
         }
 
-        private static async Task UpdateRobotsAndIpAddressAsync(Website website)
+        private static void UpdateRobotsAndIpAddressAsync(Website website)
         {
             string ipAddress = GetIpAddress(website);
             if (!ipAddress.Equals(string.Empty))
@@ -88,28 +117,37 @@ namespace landerist_library.Scraper
 
         private static string GetIpAddress(Website website)
         {
-            IPAddress[] ipAddresses = Dns.GetHostAddresses(website.Domain);
-            if (ipAddresses.Length != 1)
+            try
             {
-                return string.Empty;
+                IPAddress[] ipAddresses = Dns.GetHostAddresses(website.Domain);
+                if (ipAddresses.Length > 0)
+                {
+                    return ipAddresses[0].ToString();
+                }                
             }
-            return ipAddresses[0].ToString();
+            catch { }
+            return string.Empty;
+            
         }
 
         public static string GetRobotsTxtAsync(Website website)
         {
             var httpClient = new HttpClient();
             var robotsTxtUrl = new Uri(website.Uri, "/robots.txt");
-            var response = httpClient.GetAsync(robotsTxtUrl).GetAwaiter().GetResult();
+            try
+            {
+                var response = httpClient.GetAsync(robotsTxtUrl).GetAwaiter().GetResult();
+                if (response.IsSuccessStatusCode)
+                {
+                    return response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                }
+            }
+            catch (Exception ex)
+            {
 
-            if (response.IsSuccessStatusCode)
-            {
-                return response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
             }
-            else
-            {
-                return string.Empty;
-            }
+
+            return string.Empty;
         }
     }
 }

@@ -8,8 +8,8 @@ namespace landerist_library
     {
         #region Private Variables
 
-        private readonly SqlConnection SqlConnection;
-        private readonly SqlCommand SqlCommand;
+        private SqlConnection SqlConnection;
+        private SqlCommand SqlCommand;
         private readonly SqlDataAdapter SqlDataAdapter;
         private readonly StringBuilder StringBuilder = new();
         private int StackCounter = 0;
@@ -29,12 +29,7 @@ namespace landerist_library
         {
             SqlDataAdapter = new SqlDataAdapter();
             ConnectionString = connectionString;
-            SqlConnection = new SqlConnection(ConnectionString);
-            SqlCommand = new SqlCommand
-            {
-                Connection = SqlConnection,
-                CommandTimeout = TimeOut
-            };
+            //InitialiceConnection();
         }
 
         public Database(string userId, string pw, string databaseName) :
@@ -51,15 +46,15 @@ namespace landerist_library
 
         #region Private Methods
 
-        //private void InitialiceConnection()
-        //{
-        //    SqlConnection = new SqlConnection(ConnectionString);
-        //    SqlCommand = new SqlCommand
-        //    {
-        //        Connection = SqlConnection,
-        //        CommandTimeout = TimeOut
-        //    };
-        //}
+        private void InitialiceConnection()
+        {
+            SqlConnection = new SqlConnection(ConnectionString);
+            SqlCommand = new SqlCommand
+            {
+                Connection = SqlConnection,
+                CommandTimeout = TimeOut
+            };
+        }
 
         private void CloseConnection()
         {
@@ -94,7 +89,7 @@ namespace landerist_library
 
         private void Init(string query)
         {
-            //InitialiceConnection();
+            InitialiceConnection();
             SqlCommand.CommandText = query;
         }
 
