@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33205.214
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "landerist_console", "landerist_console\landerist_console.csproj", "{AF6B51BE-C241-4ADE-AB98-DD1D9C4CB529}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "landerist_library", "landerist_library\landerist_library.csproj", "{E1D8529F-29D0-4C46-97EA-871D472A566C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AF6B51BE-C241-4ADE-AB98-DD1D9C4CB529}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF6B51BE-C241-4ADE-AB98-DD1D9C4CB529}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF6B51BE-C241-4ADE-AB98-DD1D9C4CB529}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF6B51BE-C241-4ADE-AB98-DD1D9C4CB529}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1D8529F-29D0-4C46-97EA-871D472A566C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1D8529F-29D0-4C46-97EA-871D472A566C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1D8529F-29D0-4C46-97EA-871D472A566C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1D8529F-29D0-4C46-97EA-871D472A566C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F392E95A-422C-40BC-A9C9-32A571641854}
+	EndGlobalSection
+EndGlobal
