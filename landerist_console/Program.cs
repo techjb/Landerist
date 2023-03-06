@@ -1,5 +1,6 @@
 ﻿using landerist_library;
 using landerist_library.Csv;
+using landerist_library.Scraper;
 
 namespace landerist_console
 {
@@ -37,7 +38,9 @@ namespace landerist_console
 
         private static void Run()
         {
-            CsvParser.InsertWebsites();
+            //CsvParser.InsertWebsites();
+            Scraper.SetRealUri();
+            //Scraper.UpdateRobotsAndIpAddress();
         }
 
         private static void EndBeep()
