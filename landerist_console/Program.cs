@@ -1,6 +1,7 @@
 ﻿using landerist_library;
-using landerist_library.Csv;
+using landerist_library.Inserter;
 using landerist_library.Scraper;
+using landerist_library.Websites;
 
 namespace landerist_console
 {
@@ -38,9 +39,13 @@ namespace landerist_console
 
         private static void Run()
         {
-            //CsvParser.InsertWebsites();
-            //Scraper.SetRealUriToAll();
-            //Scraper.UpdateRobotsAndIpAddress();
+            //new UrisInserter().FromCsv();
+            //new Websites().SetHttpStatusCodesToAll();
+            //new Websites().SetHttpStatusCodesToNull();
+            //new Websites().InsertUpdateUrisFromNotOk();
+            //new Websites().SetHttpStatusCodesToAll();            
+            //new Websites().SetRobotsTxtToHttpStatusCodeOk();
+            //new Websites().SetIpAdressToAll();            
         }
 
         private static void EndBeep()

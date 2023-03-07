@@ -13,7 +13,7 @@ namespace landerist_library.Websites
 
         public string? IpAddress { get; set; }
 
-        public short? StatusCode { get; set; }
+        public short? HttpStatusCode { get; set; }
 
         public Website(Uri uri)
         {
@@ -28,7 +28,7 @@ namespace landerist_library.Websites
             Domain = dataRow["Domain"].ToString()!;
             RobotsTxt = dataRow["RobotsTxt"].ToString();
             IpAddress = dataRow["IpAddress"].ToString();
-            StatusCode = dataRow["StatusCode"] is DBNull ? null : (short)dataRow["StatusCode"];
+            HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
         }
 
         public bool Insert()
@@ -83,51 +83,88 @@ namespace landerist_library.Websites
         public bool UpdateUri(Uri uri)
         {
             Uri = uri;
-            var newDomain = uri.Host;
+
             string query =
                 "UPDATE " + TABLE_WEBSITES + " " +
-                "SET Uri =  @Uri, Domain  = @NewDomain " +
+                "SET Uri =  @Uri " +
                 "WHERE Domain = @Domain";
 
-            var dataBase = new Database();
-
-            bool success = dataBase.Query(query, new Dictionary<string, object> {
+            return new Database().Query(query, new Dictionary<string, object> {
                 {"Uri", Uri.ToString() },
                 {"Domain", Domain },
-                {"NewDomain", newDomain },
             });
-
-            if (!success) // newDomain is already in database
-            {
-                success = dataBase.Query(query, new Dictionary<string, object> {
-                    {"Uri", Uri.ToString() },
-                    {"Domain", newDomain },
-                    {"NewDomain", newDomain },
-            });
-            }
-            if (success)
-            {
-                Domain = newDomain;
-            }
-            return success;
         }
 
-        public bool UpdateUriStatusCode(short statusCode)
+        public bool UpdateHttpStatusCode(short httpStatusCode)
         {
-            StatusCode = statusCode;
-            if (StatusCode == null)
+            HttpStatusCode = httpStatusCode;
+            if (HttpStatusCode == null)
             {
                 return true;
             }
             string query =
                 "UPDATE " + TABLE_WEBSITES + " " +
-                "SET StatusCode =  @StatusCode " +
+                "SET HttpStatusCode =  @HttpStatusCode " +
                 "WHERE Domain = @Domain";
 
             return new Database().Query(query, new Dictionary<string, object> {
-                {"StatusCode", StatusCode },
+                {"HttpStatusCode", HttpStatusCode },
                 {"Domain", Domain }
             });
+        }
+
+        public void SetHttpStatusCode()
+        {
+            HttpClientHandler handler = new()
+            {
+                AllowAutoRedirect = false
+            };
+            using var client = new HttpClient(handler);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd(Scraper.Scraper.UserAgentChrome);
+            HttpRequestMessage request = new(HttpMethod.Head, Uri);
+
+            var response = client.SendAsync(request).GetAwaiter().GetResult();
+            var statusCode = response.StatusCode;            
+            UpdateHttpStatusCode((short)statusCode);
+        }
+
+        public Uri? GetLocation()
+        {
+            HttpClientHandler handler = new()
+            {
+                AllowAutoRedirect = false
+            };
+
+            using var client = new HttpClient(handler);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd(Scraper.Scraper.UserAgentChrome);
+            HttpRequestMessage request = new(HttpMethod.Head, Uri);
+
+            var response = client.SendAsync(request).GetAwaiter().GetResult();
+            return response.Headers.Location;            
+        }
+
+        public bool SetRobotsTxt()
+        {
+            var httpClient = new HttpClient();
+            var robotsTxtUrl = new Uri(Uri, "/robots.txt");
+            var response = httpClient.GetAsync(robotsTxtUrl).GetAwaiter().GetResult();
+            if (response.IsSuccessStatusCode)
+            {
+                string robotsTxt = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                return UpdateRobotsTxt(robotsTxt);
+            }
+            return false;
+        }
+
+        public bool SetIpAddress()
+        {
+            IPAddress[] ipAddresses = Dns.GetHostAddresses(Domain);
+            if (ipAddresses.Length.Equals(0))
+            {
+                return false;
+            }
+            var ipAdress = ipAddresses[0].ToString();
+            return UpdateIpAddress(ipAdress);
         }
     }
 }

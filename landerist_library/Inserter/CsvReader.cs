@@ -1,56 +1,13 @@
 ﻿using System.Data;
 using System.Text;
 using System.Text.RegularExpressions;
-using landerist_library.Websites;
 
 
-namespace landerist_library.Csv
+namespace landerist_library.Inserter
 {
-    public class CsvParser
+    public class CsvReader
     {
-        public static void InsertWebsites()
-        {
-            string file = @"E:\Landerist\Csv\Base_de_datos\Excel\Pedido_completo.csv";
-            Console.WriteLine("Reading " + file);
-            DataTable dataTable = ReadFileWithStreamReader(file, ';');
-            int inserted = 0;
-            int errors = 0;
-            Console.WriteLine("Inserting websites ..");
-            foreach (DataRow row in dataTable.Rows)
-            {
-                string url = row["SITIO WEB"].ToString() ?? string.Empty;
-                if (url.Equals(string.Empty))
-                {
-                    continue;
-                }
-                if (InsertWebsite(url))
-                {
-                    inserted++;
-                }
-                else
-                {
-                    errors++;
-                }
-            }
-            Console.WriteLine("Inserted: " + inserted + " Error: " + errors);
-        }
-
-        public static bool InsertWebsite(string url)
-        {
-            try
-            {
-                Uri uri = new(url);
-                Website website = new(uri);
-                return website.Insert();
-            }
-            catch
-            {
-
-            }
-            return false;
-        }
-
-        public static DataTable ReadFileWithStreamReader(string fileName, char separator)
+        public static DataTable ReadFile(string fileName, char separator)
         {
             DataTable dataTable = new();
 
