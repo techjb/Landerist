@@ -3,10 +3,8 @@ using System.Data;
 
 namespace landerist_library.Websites
 {
-    public class Websites
+    public class Websites: WebBase
     {
-        protected const string TABLE_WEBSITES = "[WEBSITES]";
-
         public static List<Website> GetAll()
         {
             var dataTable = GetDataTableAll();
@@ -33,7 +31,7 @@ namespace landerist_library.Websites
 
         private static DataTable GetDataTableAll()
         {
-            string query = "SELECT * FROM " + TABLE_WEBSITES;
+            string query = "SELECT * FROM " + WEBSITES;
             return new Database().QueryTable(query);
         }
 
@@ -41,7 +39,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT * " +
-                "FROM " + TABLE_WEBSITES + " " +
+                "FROM " + WEBSITES + " " +
                 "WHERE [HttpStatusCode] = 200";
             return new Database().QueryTable(query);
         }
@@ -50,7 +48,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT * " +
-                "FROM " + TABLE_WEBSITES + " " +
+                "FROM " + WEBSITES + " " +
                 "WHERE [HttpStatusCode] <> 200 AND [HttpStatusCode] IS NOT NULL";
             return new Database().QueryTable(query);
         }
@@ -59,7 +57,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT * " +
-                "FROM " + TABLE_WEBSITES + " " +
+                "FROM " + WEBSITES + " " +
                 "WHERE [HttpStatusCode] IS NULL";
             return new Database().QueryTable(query);
         }
@@ -79,7 +77,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT Uri " +
-                "FROM " + TABLE_WEBSITES;
+                "FROM " + WEBSITES;
             return new Database().QueryHashSet(query);
         }
 

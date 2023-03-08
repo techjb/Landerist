@@ -34,7 +34,7 @@ namespace landerist_library.Websites
         public bool Insert()
         {
             string query =
-                "INSERT INTO " + TABLE_WEBSITES + " " +
+                "INSERT INTO " + WEBSITES + " " +
                 "VALUES (@Uri, @Domain, NULL, NULL, NULL)";
 
             return new Database().Query(query, new Dictionary<string, object> {
@@ -52,7 +52,7 @@ namespace landerist_library.Websites
             }
 
             string query =
-                "UPDATE " + TABLE_WEBSITES + " " +
+                "UPDATE " + WEBSITES + " " +
                 "SET RobotsTxt =  @RobotsTxt " +
                 "WHERE Domain = @Domain";
 
@@ -70,7 +70,7 @@ namespace landerist_library.Websites
                 return true;
             }
             string query =
-                "UPDATE " + TABLE_WEBSITES + " " +
+                "UPDATE " + WEBSITES + " " +
                 "SET IpAddress =  @IpAddress " +
                 "WHERE Domain = @Domain";
 
@@ -85,7 +85,7 @@ namespace landerist_library.Websites
             Uri = uri;
 
             string query =
-                "UPDATE " + TABLE_WEBSITES + " " +
+                "UPDATE " + WEBSITES + " " +
                 "SET Uri =  @Uri " +
                 "WHERE Domain = @Domain";
 
@@ -103,7 +103,7 @@ namespace landerist_library.Websites
                 return true;
             }
             string query =
-                "UPDATE " + TABLE_WEBSITES + " " +
+                "UPDATE " + WEBSITES + " " +
                 "SET HttpStatusCode =  @HttpStatusCode " +
                 "WHERE Domain = @Domain";
 
