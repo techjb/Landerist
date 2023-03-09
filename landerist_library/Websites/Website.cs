@@ -185,19 +185,9 @@ namespace landerist_library.Websites
                 try
                 {
                     Robots ??= Robots.Load(RobotsTxt);
-                    string text = Robots.Raw.Replace("\\n", " ");
-                    //uri = new Uri("https://www.gsa.es/sdfa/dsfa?sdaf=were");
-                    //var l = uri.LocalPath;
-                    //var p = uri.PathAndQuery;
-                    //var a = uri.AbsolutePath;
-                    bool cannAccess =  Robots.IsPathAllowed(Scraper.Scraper.UserAgentChrome, uri.PathAndQuery);
-                    if (!cannAccess)
-                    {
-
-                    }
-                    return cannAccess;
+                    return  Robots.IsPathAllowed(Scraper.Scraper.UserAgentChrome, uri.PathAndQuery);
                 }
-                catch (Exception ex)
+                catch
                 {
 
                 }
