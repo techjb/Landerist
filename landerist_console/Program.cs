@@ -45,7 +45,8 @@ namespace landerist_console
             //new Websites().InsertUpdateUrisFromNotOk();
             //new Websites().SetHttpStatusCodesToAll();            
             //new Websites().SetRobotsTxtToHttpStatusCodeOk();
-            //new Websites().SetIpAdressToAll();            
+            //new Websites().SetIpAdressToAll();
+            new Websites().CountCanAccesToMainUri();        
         }
 
         private static void EndBeep()

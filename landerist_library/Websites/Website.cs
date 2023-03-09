@@ -1,4 +1,6 @@
-﻿using System.Data;
+﻿using Com.Bekijkhet.RobotsTxt;
+using System.Data;
+using System.IO;
 using System.Net;
 
 namespace landerist_library.Websites
@@ -14,6 +16,8 @@ namespace landerist_library.Websites
         public string? IpAddress { get; set; }
 
         public short? HttpStatusCode { get; set; }
+
+        private Robots Robots = null;
 
         public Website(Uri uri)
         {
@@ -124,7 +128,7 @@ namespace landerist_library.Websites
             HttpRequestMessage request = new(HttpMethod.Head, Uri);
 
             var response = client.SendAsync(request).GetAwaiter().GetResult();
-            var statusCode = response.StatusCode;            
+            var statusCode = response.StatusCode;
             UpdateHttpStatusCode((short)statusCode);
         }
 
@@ -140,7 +144,7 @@ namespace landerist_library.Websites
             HttpRequestMessage request = new(HttpMethod.Head, Uri);
 
             var response = client.SendAsync(request).GetAwaiter().GetResult();
-            return response.Headers.Location;            
+            return response.Headers.Location;
         }
 
         public bool SetRobotsTxt()
@@ -165,6 +169,40 @@ namespace landerist_library.Websites
             }
             var ipAdress = ipAddresses[0].ToString();
             return UpdateIpAddress(ipAdress);
+        }
+
+
+        public bool CanAccessMainUri()
+        {
+            return CanAccessUri(Uri);
+        }
+
+
+        public bool CanAccessUri(Uri uri)
+        {
+            if (RobotsTxt != null)
+            {
+                try
+                {
+                    Robots ??= Robots.Load(RobotsTxt);
+                    string text = Robots.Raw.Replace("\\n", " ");
+                    //uri = new Uri("https://www.gsa.es/sdfa/dsfa?sdaf=were");
+                    //var l = uri.LocalPath;
+                    //var p = uri.PathAndQuery;
+                    //var a = uri.AbsolutePath;
+                    bool cannAccess =  Robots.IsPathAllowed(Scraper.Scraper.UserAgentChrome, uri.PathAndQuery);
+                    if (!cannAccess)
+                    {
+
+                    }
+                    return cannAccess;
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }
+            return true;
         }
     }
 }

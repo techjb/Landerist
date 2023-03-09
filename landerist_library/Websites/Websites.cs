@@ -11,19 +11,19 @@ namespace landerist_library.Websites
             return ParseWebsites(dataTable);
         }
 
-        public static List<Website> GetHttpStatusCodeOk()
+        public static List<Website> GetStatusCodeOk()
         {
             var dataTable = ToDataTableHttpStatusCodeOk();
             return ParseWebsites(dataTable);
         }
 
-        public static List<Website> GetHttpStatusCodeNotOk()
+        public static List<Website> GetStatusCodeNotOk()
         {
             var dataTable = ToDataTableHttpStatusCodeNotOk();
             return ParseWebsites(dataTable);
         }
 
-        public static List<Website> GetHttpStatusCodeNull()
+        public static List<Website> GetStatusCodeNull()
         {
             var dataTable = ToDataTableHttpStatusCodeNull();
             return ParseWebsites(dataTable);
@@ -89,7 +89,7 @@ namespace landerist_library.Websites
 
         public void SetHttpStatusCodesToNull()
         {
-            var websites = GetHttpStatusCodeNull();
+            var websites = GetStatusCodeNull();
             SetHttpStatusCodes(websites);
         }
 
@@ -123,7 +123,7 @@ namespace landerist_library.Websites
 
         public void InsertUpdateUrisFromNotOk()
         {
-            var websites = GetHttpStatusCodeNotOk();
+            var websites = GetStatusCodeNotOk();
             InsertUpdateUris(websites);
         }
 
@@ -182,7 +182,7 @@ namespace landerist_library.Websites
 
         public void SetRobotsTxtToHttpStatusCodeOk()
         {
-            var websites = GetHttpStatusCodeOk();
+            var websites = GetStatusCodeOk();
             SetRobotsTxt(websites);
         }
 
@@ -264,6 +264,26 @@ namespace landerist_library.Websites
                     Console.WriteLine(counter + "/" + total + " (" + progressPercentage + "%) " +
                         "Success: " + successed + " Errors: " + errors + " " + website.Uri.ToString());
                 });
+        }
+
+        public void CountCanAccesToMainUri()
+        {
+            var websites = GetStatusCodeOk();
+            int counterYes = 0;
+            int counterNo = 0;
+            foreach(var website in websites)
+            {
+                bool canAccess = website.CanAccessMainUri();
+                if(canAccess)
+                {
+                    counterYes++;
+                }
+                else
+                {
+                    counterNo++;
+                }
+                Console.WriteLine("Yes: " + counterYes + " No: " + counterNo + " " + website.Uri);
+            }
         }
     }
 }
