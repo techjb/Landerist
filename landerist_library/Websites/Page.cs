@@ -1,45 +1,71 @@
 ﻿using System.Data;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace landerist_library.Websites
 {
     internal class Page : WebBase
     {
-        public Guid PageGuid { get; set; }        
-
-        public string Domain { get; set; }
+        public string Host { get; set; }
 
         public Uri Uri { get; set; }
+
+        public string UriHash { get; set; }
 
         public DateTime Inserted { get; set; }
 
         public DateTime Updated { get; set; }
 
-        public bool? IsAdvertisement { get; set; } = null;
+        public short? HttpStatusCode { get; set; }
+
+        public string? ResponseBody { get; set; }
+
+        public bool? IsAdvertisement { get; set; }
+
+
+        public Page(Website website) : this(website.MainUri) { }
+        public Page(Uri uri)
+        {
+            Host = uri.Host;
+            Uri = uri;
+            UriHash = CalculateHash(uri);
+            Inserted = DateTime.Now;
+            Updated = DateTime.Now;
+        }
+
+        private static string CalculateHash(Uri uri)
+        {
+            string text = uri.ToString();
+            byte[] bytes = Encoding.UTF8.GetBytes(text);
+            byte[] hash = SHA256.Create().ComputeHash(bytes);
+            return BitConverter.ToString(hash).Replace("-", "");
+        }
 
         public Page(DataRow dataRow)
         {
-            PageGuid = (Guid)dataRow["PageGuid"];
-            Domain = dataRow["Domain"].ToString()!;
+            Host = dataRow["Host"].ToString()!;
             string uriString = dataRow["Uri"].ToString()!;
             Uri = new Uri(uriString);
-            IsAdvertisement = dataRow["IsAdvertisement"] is DBNull ? null : (bool)dataRow["IsAdvertisement"];
+            UriHash = dataRow["UriHash"].ToString()!;
             Inserted = (DateTime)dataRow["Inserted"];
             Updated = (DateTime)dataRow["Updated"];
+            HttpStatusCode = dataRow["IsAdvertisement"] is DBNull ? null : (short)dataRow["IsAdvertisement"];
+            ResponseBody = dataRow["ResponseBody"] is DBNull ? null : dataRow["ResponseBody"].ToString();
+            IsAdvertisement = dataRow["IsAdvertisement"] is DBNull ? null : (bool)dataRow["IsAdvertisement"];
         }
 
         public bool Insert()
         {
             string query =
                 "INSERT INTO " + PAGES + " " +
-                "VALUES(@Domain, @Uri, @Inserted, @Updated, @IsAdvertisement)";
+                "VALUES(@Host, @Uri, @UriHash, @Inserted, @Updated, NULL, NULL, NULL)";
 
             return new Database().Query(query, new Dictionary<string, object> {
-                {"PageGuid", PageGuid },
-                {"Domain", Domain },
-                {"Uri", Uri },
+                {"Host", Host },
+                {"Uri", Uri.ToString() },
+                {"UriHash", UriHash },
                 {"Inserted", Inserted },
-                {"Updated", Updated },
-                {"IsAdvertisement", IsAdvertisement },
+                {"Updated", Updated }
             });
         }
     }

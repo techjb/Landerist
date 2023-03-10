@@ -70,7 +70,11 @@ namespace landerist_library.Inserter
                     return false;
                 }
                 InsertedUris.Add(uri.ToString());
-                Website website = new(uri);
+                Website website = new()
+                {
+                    MainUri = uri,
+                    Host = uri.Host,
+                };
                 return website.Insert();
             }
             catch

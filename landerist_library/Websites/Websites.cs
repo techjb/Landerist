@@ -5,7 +5,7 @@ namespace landerist_library.Websites
 {
     public class Websites: WebBase
     {
-        public static List<Website> GetAll()
+        public static List<Website> AllWebsites()
         {
             var dataTable = GetDataTableAll();
             return ParseWebsites(dataTable);
@@ -62,6 +62,24 @@ namespace landerist_library.Websites
             return new Database().QueryTable(query);
         }
 
+        public static Website? GetWebsite(string host)
+        {
+            string query =
+                "SELECT TOP 1 * " +
+                "FROM " + WEBSITES + " " +
+                "WHERE Host = @Host";
+
+            DataTable dataTable = new Database().QueryTable(query, new Dictionary<string, object> {
+                {"Host", host }
+            });
+
+            if (dataTable.Rows.Count.Equals(1))
+            {
+                return new Website(dataTable.Rows[0]);
+            }
+            return null;
+        }
+
         private static List<Website> ParseWebsites(DataTable dataTable)
         {
             var list = new List<Website>();
@@ -83,7 +101,7 @@ namespace landerist_library.Websites
 
         public void SetHttpStatusCodesToAll()
         {
-            var websites = GetAll();
+            var websites = AllWebsites();
             SetHttpStatusCodes(websites);
         }
 
@@ -109,7 +127,7 @@ namespace landerist_library.Websites
                     }
                     double progressPercentage = Math.Round((double)counter * 100 / total, 2);
                     Console.WriteLine(counter + "/" + total + " (" + progressPercentage + "%) " +
-                        "Errors: " + erros + " " + website.Uri.ToString());
+                        "Errors: " + erros + " " + website.MainUri.ToString());
                     try
                     {
                         website.SetHttpStatusCode();
@@ -144,18 +162,18 @@ namespace landerist_library.Websites
                     }
                     double progressPercentage = Math.Round((double)counter * 100 / total, 2);
                     Console.WriteLine(counter + "/" + total + " (" + progressPercentage + "%) " +
-                        "Uris: " + uris.Count + " " + "Errors: " + errors + " " + website.Uri.ToString());
+                        "Uris: " + uris.Count + " " + "Errors: " + errors + " " + website.MainUri.ToString());
                     try
                     {
-                        var uri = website.GetLocation();
+                        var uri = website.GetResponseLocation();
                         if (uri == null)
                         {
                             return;
                         }
 
-                        if (uri.Host.Equals(website.Domain))
+                        if (uri.Host.Equals(website.Host))
                         {
-                            website.UpdateUri(uri);
+                            website.UpdateMainUri(uri);
                             return;
                         }
                         if (!uris.Contains(uri))
@@ -176,7 +194,7 @@ namespace landerist_library.Websites
 
         public void SetRobotsTxtToAll()
         {
-            var websites = GetAll();
+            var websites = AllWebsites();
             SetRobotsTxt(websites);
         }
 
@@ -218,13 +236,13 @@ namespace landerist_library.Websites
                 }
                 double progressPercentage = Math.Round((double)counter * 100 / total, 2);
                 Console.WriteLine(counter + "/" + total + " (" + progressPercentage + "%) " +
-                    "Success: " + successed + " Errors: " + errors + " " + website.Uri.ToString());
+                    "Success: " + successed + " Errors: " + errors + " " + website.MainUri.ToString());
             });
         }
 
         public void SetIpAdressToAll()
         {
-            var websites = GetAll();
+            var websites = AllWebsites();
             SetIpAdress(websites);
         }
 
@@ -262,7 +280,7 @@ namespace landerist_library.Websites
                     }
                     double progressPercentage = Math.Round((double)counter * 100 / total, 2);
                     Console.WriteLine(counter + "/" + total + " (" + progressPercentage + "%) " +
-                        "Success: " + successed + " Errors: " + errors + " " + website.Uri.ToString());
+                        "Success: " + successed + " Errors: " + errors + " " + website.MainUri.ToString());
                 });
         }
 
@@ -282,7 +300,48 @@ namespace landerist_library.Websites
                 {
                     counterNo++;
                 }
-                Console.WriteLine("Yes: " + counterYes + " No: " + counterNo + " " + website.Uri);
+                Console.WriteLine("Yes: " + counterYes + " No: " + counterNo + " " + website.MainUri);
+            }
+        }
+
+        public void CountRobotsSiteMaps()
+        {
+            var websites = GetStatusCodeOk();
+            int counter = 0;
+            foreach (var website in websites)
+            {
+                counter += website.CountRobotsSiteMaps();
+                Console.WriteLine("SiteMaps: " + counter);
+            }
+        }
+
+        public void CalculateHashes()
+        {
+            var websites = GetStatusCodeOk();            
+            foreach (var website in websites)
+            {
+                var page = new Page(website.MainUri);               
+                Console.WriteLine(page.UriHash + " " + page.Uri);
+            }
+        }
+
+        public void InsertMainPages()
+        {
+            var websites = GetStatusCodeOk();
+            int inserted = 0;
+            int errors = 0;
+            foreach (var website in websites)
+            {
+                var page = new Page(website);
+                if (page.Insert())
+                {
+                    inserted++;
+                }
+                else
+                {
+                    errors++;
+                }
+                Console.WriteLine("Inserted: " + inserted + " Errors: "+ errors +" From: " + websites.Count);
             }
         }
     }

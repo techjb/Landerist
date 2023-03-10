@@ -40,13 +40,19 @@ namespace landerist_console
         private static void Run()
         {
             //new UrisInserter().FromCsv();
+
             //new Websites().SetHttpStatusCodesToAll();
             //new Websites().SetHttpStatusCodesToNull();
             //new Websites().InsertUpdateUrisFromNotOk();
             //new Websites().SetHttpStatusCodesToAll();            
             //new Websites().SetRobotsTxtToHttpStatusCodeOk();
-            //new Websites().SetIpAdressToAll();
-            new Websites().CountCanAccesToMainUri();        
+            //new Websites().SetIpAdressToAll();            
+            //new Websites().CountCanAccesToMainUri();
+            //new Websites().CountRobotsSiteMaps();
+            //new Websites().CalculateHashes();
+            //new Websites().InsertMainPages();
+
+            new Scraper().AllPages();
         }
 
         private static void EndBeep()

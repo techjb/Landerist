@@ -10,31 +10,44 @@ namespace landerist_library.Websites
 {
     internal class Pages : WebBase
     {
-        private readonly Website Website;
-
-        private readonly List<Page> ListPages = new();
-
-
-        public Pages(Website website)
+        public Pages()
         {
-            Website = website;
+
         }
 
-        private void LoadPages()
+        public List<Page> GetAll()
         {
             string query =
-                "SELECT * FROM " + PAGES + " " +
+                "SELECT * " +
+                "FROM " + PAGES + " ";
+
+            DataTable dataTable = new Database().QueryTable(query);
+            return GetPages(dataTable);
+        }
+
+        public List<Page> GetPages(Website website)
+        {
+            string query =
+                "SELECT * " +
+                "FROM " + PAGES + " " +
                 "WHERE [Domain] = @Domain";
 
             DataTable dataTable = new Database().QueryTable(query, new Dictionary<string, object> {
-                {"Domain", Website.Domain }
+                {"Domain", website.Host }
             });
 
+            return GetPages(dataTable);
+        }
+
+        private List<Page> GetPages(DataTable dataTable)
+        {
+            List<Page> pages = new();
             foreach (DataRow dataRow in dataTable.Rows)
             {
                 Page page = new(dataRow);
-                ListPages.Add(page);
+                pages.Add(page);
             }
+            return pages;
         }
     }
 }

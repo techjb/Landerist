@@ -1,4 +1,5 @@
 ﻿using Com.Bekijkhet.RobotsTxt;
+using System;
 using System.Data;
 using System.IO;
 using System.Net;
@@ -7,9 +8,9 @@ namespace landerist_library.Websites
 {
     public class Website : Websites
     {
-        public Uri Uri { get; set; }
+        public Uri? MainUri { get; set; }
 
-        public string Domain { get; set; } = string.Empty;
+        public string Host { get; set; } = string.Empty;
 
         public string? RobotsTxt { get; set; }
 
@@ -17,19 +18,24 @@ namespace landerist_library.Websites
 
         public short? HttpStatusCode { get; set; }
 
-        private Robots Robots = null;
+        
+        private Robots? Robots = null;
 
-        public Website(Uri uri)
+        public Website()
         {
-            Uri = uri;
-            Domain = uri.Host;
+
         }
 
         public Website(DataRow dataRow)
         {
-            string uriString = dataRow["Uri"].ToString()!;
-            Uri = new(uriString);
-            Domain = dataRow["Domain"].ToString()!;
+            Load(dataRow);
+        }
+
+        private void Load(DataRow dataRow)
+        {
+            string mainUriString = dataRow["MainUri"].ToString()!;
+            MainUri = new(mainUriString);
+            Host = dataRow["Host"].ToString()!;
             RobotsTxt = dataRow["RobotsTxt"].ToString();
             IpAddress = dataRow["IpAddress"].ToString();
             HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
@@ -39,11 +45,11 @@ namespace landerist_library.Websites
         {
             string query =
                 "INSERT INTO " + WEBSITES + " " +
-                "VALUES (@Uri, @Domain, NULL, NULL, NULL)";
+                "VALUES (@MainUri, @Host, NULL, NULL, NULL)";
 
             return new Database().Query(query, new Dictionary<string, object> {
-                {"Uri", Uri.ToString() },
-                {"Domain", Domain }
+                {"MainUri", MainUri.ToString() },
+                {"Host", Host }
             });
         }
 
@@ -58,11 +64,11 @@ namespace landerist_library.Websites
             string query =
                 "UPDATE " + WEBSITES + " " +
                 "SET RobotsTxt =  @RobotsTxt " +
-                "WHERE Domain = @Domain";
+                "WHERE Host = @Host";
 
             return new Database().Query(query, new Dictionary<string, object> {
                 {"RobotsTxt", RobotsTxt },
-                {"Domain", Domain }
+                {"Host", Host }
             });
         }
 
@@ -76,26 +82,26 @@ namespace landerist_library.Websites
             string query =
                 "UPDATE " + WEBSITES + " " +
                 "SET IpAddress =  @IpAddress " +
-                "WHERE Domain = @Domain";
+                "WHERE Host = @Host";
 
             return new Database().Query(query, new Dictionary<string, object> {
                 {"IpAddress", IpAddress },
-                {"Domain", Domain }
+                {"Host", Host }
             });
         }
 
-        public bool UpdateUri(Uri uri)
+        public bool UpdateMainUri(Uri mainUri)
         {
-            Uri = uri;
+            MainUri = mainUri;
 
             string query =
                 "UPDATE " + WEBSITES + " " +
-                "SET Uri =  @Uri " +
-                "WHERE Domain = @Domain";
+                "SET MainUri =  @MainUri " +
+                "WHERE Host = @Host";
 
             return new Database().Query(query, new Dictionary<string, object> {
-                {"Uri", Uri.ToString() },
-                {"Domain", Domain },
+                {"MainUri", MainUri.ToString() },
+                {"Host", Host },
             });
         }
 
@@ -109,11 +115,11 @@ namespace landerist_library.Websites
             string query =
                 "UPDATE " + WEBSITES + " " +
                 "SET HttpStatusCode =  @HttpStatusCode " +
-                "WHERE Domain = @Domain";
+                "WHERE Host = @Host";
 
             return new Database().Query(query, new Dictionary<string, object> {
                 {"HttpStatusCode", HttpStatusCode },
-                {"Domain", Domain }
+                {"Host", Host }
             });
         }
 
@@ -124,15 +130,15 @@ namespace landerist_library.Websites
                 AllowAutoRedirect = false
             };
             using var client = new HttpClient(handler);
-            client.DefaultRequestHeaders.UserAgent.ParseAdd(Scraper.Scraper.UserAgentChrome);
-            HttpRequestMessage request = new(HttpMethod.Head, Uri);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd(Scraper.ScraperBase.UserAgentChrome);
+            HttpRequestMessage request = new(HttpMethod.Head, MainUri);
 
             var response = client.SendAsync(request).GetAwaiter().GetResult();
             var statusCode = response.StatusCode;
             UpdateHttpStatusCode((short)statusCode);
         }
 
-        public Uri? GetLocation()
+        public Uri? GetResponseLocation()
         {
             HttpClientHandler handler = new()
             {
@@ -140,8 +146,8 @@ namespace landerist_library.Websites
             };
 
             using var client = new HttpClient(handler);
-            client.DefaultRequestHeaders.UserAgent.ParseAdd(Scraper.Scraper.UserAgentChrome);
-            HttpRequestMessage request = new(HttpMethod.Head, Uri);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd(Scraper.ScraperBase.UserAgentChrome);
+            HttpRequestMessage request = new(HttpMethod.Head, MainUri);
 
             var response = client.SendAsync(request).GetAwaiter().GetResult();
             return response.Headers.Location;
@@ -150,7 +156,7 @@ namespace landerist_library.Websites
         public bool SetRobotsTxt()
         {
             var httpClient = new HttpClient();
-            var robotsTxtUrl = new Uri(Uri, "/robots.txt");
+            var robotsTxtUrl = new Uri(MainUri, "/robots.txt");
             var response = httpClient.GetAsync(robotsTxtUrl).GetAwaiter().GetResult();
             if (response.IsSuccessStatusCode)
             {
@@ -162,7 +168,7 @@ namespace landerist_library.Websites
 
         public bool SetIpAddress()
         {
-            IPAddress[] ipAddresses = Dns.GetHostAddresses(Domain);
+            IPAddress[] ipAddresses = Dns.GetHostAddresses(Host);
             if (ipAddresses.Length.Equals(0))
             {
                 return false;
@@ -174,25 +180,41 @@ namespace landerist_library.Websites
 
         public bool CanAccessMainUri()
         {
-            return CanAccessUri(Uri);
+            return CanAccess(MainUri);
         }
 
 
-        public bool CanAccessUri(Uri uri)
+        public bool CanAccess(Uri uri)
         {
             if (RobotsTxt != null)
             {
-                try
-                {
-                    Robots ??= Robots.Load(RobotsTxt);
-                    return  Robots.IsPathAllowed(Scraper.Scraper.UserAgentChrome, uri.PathAndQuery);
-                }
-                catch
-                {
-
-                }
+                Robots ??= Robots.Load(RobotsTxt);
+                return Robots.IsPathAllowed(Scraper.ScraperBase.UserAgentChrome, uri.PathAndQuery);
             }
             return true;
+        }
+
+        public int CountRobotsSiteMaps()
+        {
+            if (RobotsTxt != null)
+            {
+                Robots ??= Robots.Load(RobotsTxt);
+                if (Robots.Sitemaps != null)
+                {
+                    return Robots.Sitemaps.Count;
+                }
+            }
+            return 0;
+        }
+
+        public long CrawlDelay()
+        {
+            if (RobotsTxt != null)
+            {
+                Robots ??= Robots.Load(RobotsTxt);
+                return Robots.CrawlDelay(Scraper.ScraperBase.UserAgentChrome);
+            }
+            return 0;
         }
     }
 }
