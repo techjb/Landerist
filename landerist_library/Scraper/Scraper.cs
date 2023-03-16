@@ -10,9 +10,9 @@ namespace landerist_library.Scraper
 {
     public class Scraper : ScraperBase
     {
-        private Blocker Blocker = new();
+        private readonly Blocker Blocker = new();
 
-        private object SyncBlocker = new();
+        private readonly object SyncBlocker = new();
 
         private readonly Dictionary<string, Website> DictionaryWebsites = new();
 
@@ -20,9 +20,15 @@ namespace landerist_library.Scraper
 
         private int Counter = 0;
 
+        private int Suceess = 0;
+
+        private int Errors = 0;
+
         private int TotalPages = 0;
 
-        private object SyncCounter = new();
+        private readonly object SyncCounter = new();
+
+        private readonly object SyncSuccessErrros = new();
 
         public Scraper()
         {
@@ -47,14 +53,26 @@ namespace landerist_library.Scraper
 
         private void ScrapePages(List<Page> pages)
         {
-            PendingPages = new();
+            PendingPages.Clear();
 
-            Parallel.ForEach(pages, 
-                new ParallelOptions() { MaxDegreeOfParallelism = 1 }, 
+            Parallel.ForEach(pages,
+                //new ParallelOptions() { MaxDegreeOfParallelism = 1 }, 
                 page =>
             {
-                ScrapePage(page);
-                Console.WriteLine("Scrapped: " + Counter + "/" + TotalPages + " Pending: " + PendingPages.Count);
+                bool success = ScrapePage(page);
+                lock (SyncSuccessErrros)
+                {
+                    if(success)
+                    {
+                        Suceess++;
+                    }
+                    else
+                    {
+                        Errors++;
+                    }
+                }
+                Console.WriteLine("Scrapped: " + Counter + "/" + TotalPages + " Pending: " + PendingPages.Count + " " +
+                    "Success: " + Suceess + " Errors: " + Errors);
             });
 
             if (PendingPages.Count > 0)
@@ -79,7 +97,6 @@ namespace landerist_library.Scraper
             }
             lock (SyncBlocker)
             {
-                Blocker.Clean();
                 Blocker.Add(website);
             }
             lock (SyncCounter)
@@ -87,7 +104,7 @@ namespace landerist_library.Scraper
                 Counter++;
             }
 
-            return true;
+            return page.SetBodyAndStatusCode();
         }
     }
 }

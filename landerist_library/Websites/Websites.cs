@@ -304,7 +304,7 @@ namespace landerist_library.Websites
             }
         }
 
-        public void CountRobotsSiteMaps()
+        public void CountSiteMaps()
         {
             var websites = GetStatusCodeOk();
             int counter = 0;

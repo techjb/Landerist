@@ -49,7 +49,7 @@ namespace landerist_library.Websites
             UriHash = dataRow["UriHash"].ToString()!;
             Inserted = (DateTime)dataRow["Inserted"];
             Updated = (DateTime)dataRow["Updated"];
-            HttpStatusCode = dataRow["IsAdvertisement"] is DBNull ? null : (short)dataRow["IsAdvertisement"];
+            HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
             ResponseBody = dataRow["ResponseBody"] is DBNull ? null : dataRow["ResponseBody"].ToString();
             IsAdvertisement = dataRow["IsAdvertisement"] is DBNull ? null : (bool)dataRow["IsAdvertisement"];
         }
@@ -67,6 +67,48 @@ namespace landerist_library.Websites
                 {"Inserted", Inserted },
                 {"Updated", Updated }
             });
+        }
+
+        public bool Update()
+        {
+            string query =
+                "UPDATE " + PAGES + " SET " +
+                "[Updated] = @Updated, " +
+                "[HttpStatusCode] = @HttpStatusCode, " +
+                "[ResponseBody] = @ResponseBody " +
+                "WHERE [UriHash] = @UriHash";
+
+            return new Database().Query(query, new Dictionary<string, object> {
+                {"UriHash", UriHash },
+                {"Updated", Updated },
+                {"HttpStatusCode", HttpStatusCode },
+                {"ResponseBody", ResponseBody },
+            });
+        }
+
+        public bool SetBodyAndStatusCode()
+        {
+            try
+            {
+                HttpClientHandler handler = new()
+                {
+                    AllowAutoRedirect = false
+                };
+                using var client = new HttpClient(handler);
+                client.DefaultRequestHeaders.UserAgent.ParseAdd(Scraper.ScraperBase.UserAgentChrome);
+                HttpRequestMessage request = new(HttpMethod.Get, Uri);
+
+                var response = client.SendAsync(request).GetAwaiter().GetResult();
+                
+                ResponseBody = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                HttpStatusCode = (short)response.StatusCode;
+
+                return Update();
+            }
+            catch
+            {
+                return false;
+            }   
         }
     }
 }
