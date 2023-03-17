@@ -136,7 +136,7 @@ namespace landerist_library.Websites
                     .Where(href => !string.IsNullOrWhiteSpace(href))
                     .ToList();
 
-                AddNewPages(links);
+                InsertNewPages(links);
             }
             catch(Exception ex)
             {
@@ -144,22 +144,33 @@ namespace landerist_library.Websites
             }
         }
 
-        private void AddNewPages(List<string> links)
+        private void InsertNewPages(List<string> links)
         {
-            links = links.Distinct().ToList();
-            foreach(var link in links)
+            var pages = GetPages(links);
+            foreach(var page in pages )
             {
-                var uri = new Uri(Uri, link);                                
-                if(!uri.Host.Equals(Host)
-                    || uri.Equals(Uri))
-                {
-                    continue;
-                }
-                Page page = new(uri);
                 page.Insert();
             }
         }
         
+
+        private List<Page> GetPages(List<string> links)
+        {
+            links = links.Distinct().ToList();
+            List<Page> pages = new();
+            foreach (var link in links)
+            {
+                var uri = new Uri(Uri, link);
+                if (!uri.Host.Equals(Host)
+                    || uri.Equals(Uri))
+                {
+                    continue;
+                }
+                Page page = new(uri);                
+                pages.Add(page);
+            }
+            return pages;
+        }
 
         private void SetIsAdvertisement()
         {
