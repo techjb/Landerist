@@ -16,7 +16,7 @@ namespace landerist_library.Scraper
 
         private readonly Dictionary<string, Website> DictionaryWebsites = new();
 
-        private List<Page> PendingPages = new();
+        private readonly List<Page> PendingPages = new();
 
         private int Counter = 0;
 
@@ -56,55 +56,76 @@ namespace landerist_library.Scraper
             PendingPages.Clear();
 
             Parallel.ForEach(pages,
-                //new ParallelOptions() { MaxDegreeOfParallelism = 1 }, 
+                new ParallelOptions() { MaxDegreeOfParallelism = 1 }, 
                 page =>
             {
-                bool success = ScrapePage(page);
-                lock (SyncSuccessErrros)
-                {
-                    if(success)
-                    {
-                        Suceess++;
-                    }
-                    else
-                    {
-                        Errors++;
-                    }
-                }
-                Console.WriteLine("Scrapped: " + Counter + "/" + TotalPages + " Pending: " + PendingPages.Count + " " +
+                ScrapePage(page);
+                Console.WriteLine(
+                    "Scrapped: " + Counter + "/" + TotalPages + " Pending: " + PendingPages.Count + " " +
                     "Success: " + Suceess + " Errors: " + Errors);
             });
 
             if (PendingPages.Count > 0)
             {
-                Thread.Sleep(Blocker.BlockSecconds * 1000);
+                Thread.Sleep(2000);
                 ScrapePages(PendingPages);
             }
         }
 
-        private bool ScrapePage(Page page)
+        private void ScrapePage(Page page)
         {
+            IncreaseCounter();            
             if (!DictionaryWebsites.ContainsKey(page.Host))
             {
-                return false;
+                return;
             }
+
             var website = DictionaryWebsites[page.Host];
+            if (!website.CanAccess(page.Uri))
+            {
+                return;
+            }
 
             if (!Blocker.CanScrape(website))
             {
                 PendingPages.Add(page);
-                return false;
-            }
-            lock (SyncBlocker)
-            {
-                Blocker.Add(website);
-            }
+                return;
+            }           
+
+            AddToBlocker(website);
+            bool sucess = page.Process();
+            AddSuccessError(sucess);
+        }
+
+        private void IncreaseCounter()
+        {
             lock (SyncCounter)
             {
                 Counter++;
             }
+        }
 
-            return page.SetBodyAndStatusCode();
+        private void AddToBlocker(Website website)
+        {
+            lock (SyncBlocker)
+            {
+                Blocker.Add(website);
+            }
+        }
+
+        private void AddSuccessError(bool success)
+        {
+            lock (SyncSuccessErrros)
+            {
+                if (success)
+                {
+                    Suceess++;
+                }
+                else
+                {
+                    Errors++;
+                }
+            }
         }
     }
 }

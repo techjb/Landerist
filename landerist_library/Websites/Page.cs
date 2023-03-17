@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Security.Cryptography;
 using System.Text;
+using HtmlAgilityPack;
 
 namespace landerist_library.Websites
 {
@@ -71,6 +72,8 @@ namespace landerist_library.Websites
 
         public bool Update()
         {
+            Updated = DateTime.Now;
+
             string query =
                 "UPDATE " + PAGES + " SET " +
                 "[Updated] = @Updated, " +
@@ -83,32 +86,84 @@ namespace landerist_library.Websites
                 {"Updated", Updated },
                 {"HttpStatusCode", HttpStatusCode },
                 {"ResponseBody", ResponseBody },
+                {"IsAdvertisement", IsAdvertisement },
             });
         }
 
-        public bool SetBodyAndStatusCode()
+        public bool Process()
         {
+            if (DownloadPage())
+            {
+                ExtractNewPages();
+                SetIsAdvertisement();
+            }
+            return Update();
+        }
+
+        private bool DownloadPage()
+        {
+            HttpClientHandler handler = new()
+            {
+                AllowAutoRedirect = false
+            };
+            using var client = new HttpClient(handler);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd(Scraper.ScraperBase.UserAgentChrome);
+            HttpRequestMessage request = new(HttpMethod.Get, Uri);
+
             try
             {
-                HttpClientHandler handler = new()
-                {
-                    AllowAutoRedirect = false
-                };
-                using var client = new HttpClient(handler);
-                client.DefaultRequestHeaders.UserAgent.ParseAdd(Scraper.ScraperBase.UserAgentChrome);
-                HttpRequestMessage request = new(HttpMethod.Get, Uri);
-
                 var response = client.SendAsync(request).GetAwaiter().GetResult();
-                
                 ResponseBody = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                 HttpStatusCode = (short)response.StatusCode;
-
-                return Update();
+                return response.IsSuccessStatusCode;
             }
             catch
             {
                 return false;
-            }   
+            }
+        }
+
+        private void ExtractNewPages()
+        {
+            try
+            {
+                HtmlDocument htmlDoc = new();
+                htmlDoc.LoadHtml(ResponseBody);
+
+                var links = htmlDoc.DocumentNode.Descendants("a")
+                    .Where(a => !a.Attributes["rel"]?.Value.Contains("nofollow") ?? true)
+                    .Select(a => a.Attributes["href"]?.Value)
+                    .Where(href => !string.IsNullOrWhiteSpace(href))
+                    .ToList();
+
+                AddNewPages(links);
+            }
+            catch(Exception ex)
+            {
+
+            }
+        }
+
+        private void AddNewPages(List<string> links)
+        {
+            links = links.Distinct().ToList();
+            foreach(var link in links)
+            {
+                var uri = new Uri(Uri, link);                                
+                if(!uri.Host.Equals(Host)
+                    || uri.Equals(Uri))
+                {
+                    continue;
+                }
+                Page page = new(uri);
+                page.Insert();
+            }
+        }
+        
+
+        private void SetIsAdvertisement()
+        {
+
         }
     }
 }
