@@ -1,14 +1,12 @@
 ﻿using Com.Bekijkhet.RobotsTxt;
-using System;
 using System.Data;
-using System.IO;
 using System.Net;
 
 namespace landerist_library.Websites
 {
     public class Website : Websites
     {
-        public Uri? MainUri { get; set; }
+        public Uri MainUri { get; set; }
 
         public string Host { get; set; } = string.Empty;
 
@@ -23,7 +21,7 @@ namespace landerist_library.Websites
 
         public Website()
         {
-
+            MainUri = new Uri(string.Empty);
         }
 
         public Website(DataRow dataRow)

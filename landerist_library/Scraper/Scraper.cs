@@ -1,10 +1,4 @@
 ﻿using landerist_library.Websites;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace landerist_library.Scraper
 {
@@ -93,7 +87,7 @@ namespace landerist_library.Scraper
             }           
 
             AddToBlocker(website);
-            bool sucess = page.Process();
+            bool sucess = page.Process(website);
             AddSuccessError(sucess);
         }
 
