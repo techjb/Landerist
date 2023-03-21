@@ -214,5 +214,19 @@ namespace landerist_library.Websites
             }
             return 0;
         }
+
+        public bool Remove()
+        {
+            Pages.Remove(this);
+
+            string query =
+               "DELETE FROM " + WEBSITES + " " +
+               "WHERE [Host] = @Host";
+
+            return new Database().Query(query, new Dictionary<string, object> {
+                {"MainUri", MainUri.ToString() },
+                {"Host", Host }
+            });
+        }
     }
 }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data;
 
 namespace landerist_library.Websites
 {
@@ -48,6 +42,17 @@ namespace landerist_library.Websites
                 pages.Add(page);
             }
             return pages;
+        }
+
+        public static bool Remove(Website website)
+        {
+            string query =
+               "DELETE FROM " + PAGES + " " +
+               "WHERE [Host] = @Host";
+
+            return new Database().Query(query, new Dictionary<string, object> {
+                {"Host", website.Host }
+            });
         }
     }
 }

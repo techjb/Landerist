@@ -344,5 +344,20 @@ namespace landerist_library.Websites
                 Console.WriteLine("Inserted: " + inserted + " Errors: "+ errors +" From: " + websites.Count);
             }
         }
+
+        public void RemoveBlockedHosts()
+        {
+            var websites = AllWebsites();
+            int counter = 0;
+            foreach(var website in websites)
+            {
+                if (BlockedHosts.IsBlocked(website.MainUri))
+                {
+                    website.Remove();
+                    counter++;
+                }
+            }
+            Console.WriteLine("Blocked: " + counter);
+        }
     }
 }

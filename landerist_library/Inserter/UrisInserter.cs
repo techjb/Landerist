@@ -65,6 +65,11 @@ namespace landerist_library.Inserter
         {
             try
             {
+                if (BlockedHosts.IsBlocked(uri))
+                {
+                    return false;
+                }
+
                 if (InsertedUris.Contains(uri.ToString()))
                 {
                     return false;
