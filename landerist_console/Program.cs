@@ -53,7 +53,7 @@ namespace landerist_console
             //new Websites().InsertMainPages();
 
             //new Scraper().AllPages();
-            new Websites().RemoveBlockedHosts();
+            //new Websites().RemoveBlockedHosts();
         }
 
         private static void EndBeep()
