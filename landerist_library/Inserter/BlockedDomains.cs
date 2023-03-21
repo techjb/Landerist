@@ -1,8 +1,8 @@
 ﻿namespace landerist_library.Inserter
 {
-    internal class BlockedHosts
+    internal class BlockedDomains
     {
-        private static readonly HashSet<string> Hosts = new ()
+        private static readonly HashSet<string> Domains = new ()
         {
             "idealista.com",
             "fotocasa.es",
@@ -58,9 +58,9 @@
         public static bool IsBlocked(Uri uri)
         {
             string[] parts = uri.Host.Split('.');  
-            string domain = parts[parts.Length - 2] + "." + parts[parts.Length - 1];
+            string domain = parts[^2] + "." + parts[^1];
 
-            return Hosts.Contains(domain, StringComparer.OrdinalIgnoreCase);
+            return Domains.Contains(domain, StringComparer.OrdinalIgnoreCase);
         }
     }
 }

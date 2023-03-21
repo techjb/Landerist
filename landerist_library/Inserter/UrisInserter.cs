@@ -65,7 +65,7 @@ namespace landerist_library.Inserter
         {
             try
             {
-                if (BlockedHosts.IsBlocked(uri))
+                if (BlockedDomains.IsBlocked(uri))
                 {
                     return false;
                 }

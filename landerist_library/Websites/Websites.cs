@@ -345,13 +345,13 @@ namespace landerist_library.Websites
             }
         }
 
-        public void RemoveBlockedHosts()
+        public void RemoveBlockedDomains()
         {
             var websites = AllWebsites();
             int counter = 0;
             foreach(var website in websites)
             {
-                if (BlockedHosts.IsBlocked(website.MainUri))
+                if (BlockedDomains.IsBlocked(website.MainUri))
                 {
                     website.Remove();
                     counter++;

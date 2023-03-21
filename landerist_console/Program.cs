@@ -40,7 +40,7 @@ namespace landerist_console
         private static void Run()
         {
             //new UrisInserter().FromCsv();
-            //new Websites().RemoveBlockedHosts();
+            //new Websites().RemoveBlockedDomains();
 
             //new Websites().SetHttpStatusCodesToAll();
             //new Websites().SetHttpStatusCodesToNull();
