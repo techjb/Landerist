@@ -231,9 +231,6 @@ namespace landerist_library.Websites
 
             }
             return text;
-
         }
-
-
     }
 }

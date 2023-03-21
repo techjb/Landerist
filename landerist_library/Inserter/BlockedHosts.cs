@@ -2,7 +2,7 @@
 {
     internal class BlockedHosts
     {
-        private static HashSet<string> Hosts = new ()
+        private static readonly HashSet<string> Hosts = new ()
         {
             "idealista.com",
             "fotocasa.es",

@@ -40,6 +40,7 @@ namespace landerist_console
         private static void Run()
         {
             //new UrisInserter().FromCsv();
+            //new Websites().RemoveBlockedHosts();
 
             //new Websites().SetHttpStatusCodesToAll();
             //new Websites().SetHttpStatusCodesToNull();
@@ -53,7 +54,7 @@ namespace landerist_console
             //new Websites().InsertMainPages();
 
             //new Scraper().AllPages();
-            //new Websites().RemoveBlockedHosts();
+
         }
 
         private static void EndBeep()

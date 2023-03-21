@@ -6,8 +6,7 @@ namespace landerist_library.Scraper
     public class ChatGPT
     {
         private readonly OpenAiClient OpenAiClient = new(Config.OPENAI_API_KEY);
-
-        string systemText =
+        readonly string systemText =
             "Eres un clasificador de textos. Si el texto introducido contiene los datos de venta o alquiler " +
             "de un sólo inmueble, con su tipología, precio y localización, responde 'si'. " +
             "Responde 'no' en caso contrario. Si no lo sabes responde 'null'. Solo responde con una palabra.";
