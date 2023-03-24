@@ -1,6 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 
 namespace landerist_orels
 {
@@ -16,7 +14,7 @@ namespace landerist_orels
         public DateTime updated { get; set; } = DateTime.Now;
 
         [JsonProperty(Order = 4)]
-        public List<Listing> listings = new List<Listing>();
+        public List<Listing> listings = new();
 
         public void AddListing(Listing listing)
         {
