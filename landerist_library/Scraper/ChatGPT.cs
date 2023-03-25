@@ -37,7 +37,7 @@ namespace landerist_library.Scraper
                     return false;
                 }
             }
-            catch (Exception ex)
+            catch //(Exception ex)
             {
 
             }

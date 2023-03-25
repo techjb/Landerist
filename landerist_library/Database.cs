@@ -67,11 +67,11 @@ namespace landerist_library
             SqlCommand.Dispose();
         }
 
-        private void AddParameters(IDictionary<string, object>? parameters = null)
+        private void AddParameters(IDictionary<string, object?>? parameters = null)
         {
             if (parameters != null)
             {
-                foreach (KeyValuePair<string, object> item in parameters)
+                foreach (KeyValuePair<string, object?> item in parameters)
                 {
                     string key = item.Key;
                     SqlCommand.Parameters.AddWithValue("@" + key, item.Value ?? DBNull.Value);
@@ -93,14 +93,14 @@ namespace landerist_library
             SqlCommand.CommandText = query;
         }
 
-        private void Init(string query, IDictionary<string, object>? parameters = null)
+        private void Init(string query, IDictionary<string, object?>? parameters = null)
         {
             Init(query);
             AddParameters(parameters);
             SqlConnection.Open();
         }
 
-        private void Init(string query, IDictionary<string, object>? parameters = null,
+        private void Init(string query, IDictionary<string, object?>? parameters = null,
             SqlParameter[]? sqlParameters = null)
         {
             Init(query);
@@ -152,7 +152,7 @@ namespace landerist_library
 
         public bool Query(string query, string parameterName, object parameterValue)
         {
-            var dictionary = new Dictionary<string, object> {
+            var dictionary = new Dictionary<string, object?> {
                 {
                     parameterName, parameterValue
                 }
@@ -160,7 +160,7 @@ namespace landerist_library
             return Query(query, dictionary);
         }
 
-        public bool Query(string query, IDictionary<string, object>? parameters = null)
+        public bool Query(string query, IDictionary<string, object?>? parameters = null)
         {
             bool result = false;
             try
@@ -194,7 +194,7 @@ namespace landerist_library
             return result;
         }
 
-        public bool QueryBool(string query, IDictionary<string, object>? parameters = null)
+        public bool QueryBool(string query, IDictionary<string, object?>? parameters = null)
         {
             bool result = false;
             try
@@ -214,7 +214,7 @@ namespace landerist_library
             return result;
         }
 
-        public int QueryInt(string query, IDictionary<string, object>? parameters = null)
+        public int QueryInt(string query, IDictionary<string, object?>? parameters = null)
         {
             int result = 0;
             try
@@ -234,7 +234,7 @@ namespace landerist_library
             return result;
         }
 
-        public long QueryLong(string query, IDictionary<string, object>? parameters = null)
+        public long QueryLong(string query, IDictionary<string, object?>? parameters = null)
         {
             long result = 0;
             try
@@ -254,7 +254,7 @@ namespace landerist_library
             return result;
         }
 
-        public string QueryString(string query, IDictionary<string, object>? parameters = null)
+        public string QueryString(string query, IDictionary<string, object?>? parameters = null)
         {
             string result = string.Empty;
             try
@@ -271,7 +271,7 @@ namespace landerist_library
             return result;
         }
 
-        public Guid QueryGuid(string query, IDictionary<string, object>? parameters = null)
+        public Guid QueryGuid(string query, IDictionary<string, object?>? parameters = null)
         {
             Guid result = Guid.Empty;
             try
@@ -291,15 +291,15 @@ namespace landerist_library
             return result;
         }
 
-        public DataTable QueryTable(string query, string parameterName, object parameterValue)
+        public DataTable QueryTable(string query, string parameterName, object? parameterValue)
         {
-            return QueryTable(query, new Dictionary<string, object> {
+            return QueryTable(query, new Dictionary<string, object?> {
                 { parameterName, parameterValue } }
             );
         }
 
         public DataTable QueryTable(string query,
-            IDictionary<string, object>? parameters = null, SqlParameter[]? sqlParameters = null)
+            IDictionary<string, object?>? parameters = null, SqlParameter[]? sqlParameters = null)
         {
             DataTable dataTable = new();
             try
@@ -318,7 +318,7 @@ namespace landerist_library
         }
 
         public DataSet QueryDataSet(string query,
-            IDictionary<string, object>? parameters = null, SqlParameter[]? sqlParameters = null)
+            IDictionary<string, object?>? parameters = null, SqlParameter[]? sqlParameters = null)
         {
             DataSet dataSet = new();
             try
@@ -338,7 +338,7 @@ namespace landerist_library
         }
 
         public List<string> QueryListString(string query,
-            IDictionary<string, object>? parameters = null,
+            IDictionary<string, object?>? parameters = null,
             SqlParameter[]? sqlParameters = null)
         {
             List<string> list = new();
@@ -363,7 +363,7 @@ namespace landerist_library
         }
 
         public List<int> QueryListInt(string query,
-            IDictionary<string, object>? parameters = null,
+            IDictionary<string, object?>? parameters = null,
             SqlParameter[]? sqlParameters = null)
         {
             List<int> list = new();
@@ -388,7 +388,7 @@ namespace landerist_library
         }
 
         public HashSet<string> QueryHashSet(string query,
-            IDictionary<string, object>? parameters = null, SqlParameter[]? sqlParameters = null)
+            IDictionary<string, object?>? parameters = null, SqlParameter[]? sqlParameters = null)
         {
             HashSet<string> hashSet = new();
             try

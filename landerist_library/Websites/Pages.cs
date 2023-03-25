@@ -26,7 +26,7 @@ namespace landerist_library.Websites
                 "FROM " + PAGES + " " +
                 "WHERE [Domain] = @Domain";
 
-            DataTable dataTable = new Database().QueryTable(query, new Dictionary<string, object> {
+            DataTable dataTable = new Database().QueryTable(query, new Dictionary<string, object?> {
                 {"Domain", website.Host }
             });
 
@@ -50,7 +50,7 @@ namespace landerist_library.Websites
                "DELETE FROM " + PAGES + " " +
                "WHERE [Host] = @Host";
 
-            return new Database().Query(query, new Dictionary<string, object> {
+            return new Database().Query(query, new Dictionary<string, object?> {
                 {"Host", website.Host }
             });
         }

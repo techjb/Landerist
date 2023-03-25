@@ -27,7 +27,7 @@ namespace landerist_library.Websites
 
         private Website? Website;
 
-        private HtmlDocument HtmlDocument = null;
+        private HtmlDocument? HtmlDocument = null;
 
         public Page(Website website) : this(website.MainUri)
         {
@@ -69,7 +69,7 @@ namespace landerist_library.Websites
                 "INSERT INTO " + PAGES + " " +
                 "VALUES(@Host, @Uri, @UriHash, @Inserted, NULL, NULL, NULL, NULL)";
 
-            return new Database().Query(query, new Dictionary<string, object> {
+            return new Database().Query(query, new Dictionary<string, object?> {
                 {"Host", Host },
                 {"Uri", Uri.ToString() },
                 {"UriHash", UriHash },
@@ -89,7 +89,7 @@ namespace landerist_library.Websites
                 "[IsAdvertisement] = @IsAdvertisement " +
                 "WHERE [UriHash] = @UriHash";
 
-            return new Database().Query(query, new Dictionary<string, object> {
+            return new Database().Query(query, new Dictionary<string, object?> {
                 {"UriHash", UriHash },
                 {"Updated", Updated },
                 {"HttpStatusCode", HttpStatusCode==null?DBNull.Value: HttpStatusCode},
@@ -140,6 +140,10 @@ namespace landerist_library.Websites
             try
             {
                 LoadHtmlDocument();
+                if (HtmlDocument == null)
+                {
+                    return;
+                }
                 var links = HtmlDocument.DocumentNode.Descendants("a")
                     .Where(a => !a.Attributes["rel"]?.Value.Contains("nofollow") ?? true)
                     .Select(a => a.Attributes["href"]?.Value)
@@ -215,6 +219,10 @@ namespace landerist_library.Websites
             try
             {
                 LoadHtmlDocument();
+                if (HtmlDocument == null)
+                {
+                    return text;
+                }
                 var visibleNodes = HtmlDocument.DocumentNode.DescendantsAndSelf().Where(
                     n => n.NodeType == HtmlNodeType.Text && 
                     n.ParentNode.Name != "script" &&

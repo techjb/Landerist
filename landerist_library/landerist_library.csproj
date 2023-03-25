@@ -13,4 +13,8 @@
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\landerist_orels\landerist_orels.csproj" />
+  </ItemGroup>
+
 </Project>

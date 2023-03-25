@@ -1,7 +1,8 @@
 ﻿using Newtonsoft.Json;
-using System.Reflection;
+using System;
+using System.Collections.Generic;
 
-namespace landerist_orels
+namespace landerist_orels.ES
 {
     public enum ListingStatus
     {
@@ -11,13 +12,8 @@ namespace landerist_orels
 
     public enum Operation
     {
-        buy,
         sell,
         rent,
-        holiday_rent,
-        share,
-        auction,
-        transfer
     }
 
     public enum PropertyType
@@ -47,7 +43,7 @@ namespace landerist_orels
         buildable,
         non_building
     }
-    
+
     public enum ConstructionStatus
     {
         @new,
@@ -96,46 +92,46 @@ namespace landerist_orels
         public PropertyType propertyType { get; set; }
 
         [JsonProperty(Order = 7)]
-        public PropertySubtype? propertySubType { get; set; }
+        public PropertySubtype? propertySubtype { get; set; }
 
         [JsonProperty(Order = 8)]
-        public List<Media>? media { get; set; }
+        public List<Media> media { get; set; }
 
         [JsonProperty(Order = 9)]
-        public Price? price { get; set; }
+        public Price price { get; set; }
 
         [JsonProperty(Order = 10)]
-        public string? description { get; set; }
+        public string description { get; set; }
 
         [JsonProperty(Order = 11)]
-        public string? dataSourceName { get; set; }
+        public string dataSourceName { get; set; }
 
         [JsonProperty(Order = 12)]
-        public string? dataSourceGuid { get; set; }
+        public string dataSourceGuid { get; set; }
 
         [JsonProperty(Order = 13)]
         public DateTime? dataSourceUpdate { get; set; }
 
         [JsonProperty(Order = 14)]
-        public Uri? dataSourceUrl { get; set; }
+        public Uri dataSourceUrl { get; set; }
 
         [JsonProperty(Order = 15)]
-        public string? contactName { get; set; }
+        public string contactName { get; set; }
 
         [JsonProperty(Order = 16)]
-        public string? contactPhone { get; set; }
+        public string contactPhone { get; set; }
 
         [JsonProperty(Order = 17)]
-        public string? contactEmail { get; set; }
+        public string contactEmail { get; set; }
 
         [JsonProperty(Order = 18)]
-        public Uri? contactUrl { get; set; }
+        public Uri contactUrl { get; set; }
 
         [JsonProperty(Order = 19)]
-        public string? contactOther { get; set; }
+        public string contactOther { get; set; }
 
         [JsonProperty(Order = 20)]
-        public string? address { get; set; }
+        public string address { get; set; }
 
         [JsonProperty(Order = 21)]
         public double? latitude { get; set; }
@@ -147,7 +143,7 @@ namespace landerist_orels
         public bool? locationIsAccurate { get; set; }
 
         [JsonProperty(Order = 24)]
-        public string? cadastralReference { get; set; }
+        public string cadastralReference { get; set; }
 
         [JsonProperty(Order = 25)]
         public double? propertySize { get; set; }
@@ -165,7 +161,7 @@ namespace landerist_orels
         public int? floors { get; set; }
 
         [JsonProperty(Order = 30)]
-        public string? floor { get; set; }
+        public string floor { get; set; }
 
         [JsonProperty(Order = 31)]
         public int? bedrooms { get; set; }
@@ -178,15 +174,20 @@ namespace landerist_orels
 
         [JsonProperty(Order = 34)]
 
-        public List<Feature>? features;
+        public List<Feature> features;
 
         public void AddMedia(Media media)
         {
             if (this.media == null)
             {
-                this.media = new();
+                this.media = new List<Media>();
             }
             this.media.Add(media);
+        }
+
+        public void AddFeature(Feature feature)
+        {
+            AddFeature(true, feature);
         }
 
         public void AddFeature(bool? value, Feature feature)
@@ -195,7 +196,7 @@ namespace landerist_orels
             {
                 if (features == null)
                 {
-                    features = new();
+                    features = new List<Feature>();
                 }
                 features.Add(feature);
             }

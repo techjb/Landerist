@@ -1,18 +1,20 @@
 ﻿using Newtonsoft.Json;
+using System;
 
-namespace landerist_orels
+namespace landerist_orels.ES
 {
     public enum MediaType
     {
-        image, 
-        video, 
-        floorplan, 
+        image,
+        video,
+        floor_plan,
+        text,
         other
     }
     public class Media
     {
         [JsonProperty(Order = 1)]
-        public MediaType type { get; set; }
+        public MediaType? mediaType { get; set; }
 
         [JsonProperty(Order = 2)]
         public string title { get; set; }

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace landerist_orels
+namespace landerist_orels.ES
 {
     public enum Currency
     {

@@ -24,7 +24,7 @@ namespace landerist_library.Websites
             MainUri = new Uri(string.Empty);
         }
 
-        public Website(DataRow dataRow)
+        public Website(DataRow dataRow): this()
         {
             Load(dataRow);
         }
@@ -45,7 +45,7 @@ namespace landerist_library.Websites
                 "INSERT INTO " + WEBSITES + " " +
                 "VALUES (@MainUri, @Host, NULL, NULL, NULL)";
 
-            return new Database().Query(query, new Dictionary<string, object> {
+            return new Database().Query(query, new Dictionary<string, object?> {
                 {"MainUri", MainUri.ToString() },
                 {"Host", Host }
             });
@@ -64,7 +64,7 @@ namespace landerist_library.Websites
                 "SET RobotsTxt =  @RobotsTxt " +
                 "WHERE Host = @Host";
 
-            return new Database().Query(query, new Dictionary<string, object> {
+            return new Database().Query(query, new Dictionary<string, object?> {
                 {"RobotsTxt", RobotsTxt },
                 {"Host", Host }
             });
@@ -82,7 +82,7 @@ namespace landerist_library.Websites
                 "SET IpAddress =  @IpAddress " +
                 "WHERE Host = @Host";
 
-            return new Database().Query(query, new Dictionary<string, object> {
+            return new Database().Query(query, new Dictionary<string, object?> {
                 {"IpAddress", IpAddress },
                 {"Host", Host }
             });
@@ -97,7 +97,7 @@ namespace landerist_library.Websites
                 "SET MainUri =  @MainUri " +
                 "WHERE Host = @Host";
 
-            return new Database().Query(query, new Dictionary<string, object> {
+            return new Database().Query(query, new Dictionary<string, object?> {
                 {"MainUri", MainUri.ToString() },
                 {"Host", Host },
             });
@@ -115,7 +115,7 @@ namespace landerist_library.Websites
                 "SET HttpStatusCode =  @HttpStatusCode " +
                 "WHERE Host = @Host";
 
-            return new Database().Query(query, new Dictionary<string, object> {
+            return new Database().Query(query, new Dictionary<string, object?> {
                 {"HttpStatusCode", HttpStatusCode },
                 {"Host", Host }
             });
@@ -223,7 +223,7 @@ namespace landerist_library.Websites
                "DELETE FROM " + WEBSITES + " " +
                "WHERE [Host] = @Host";
 
-            return new Database().Query(query, new Dictionary<string, object> {
+            return new Database().Query(query, new Dictionary<string, object?> {
                 {"MainUri", MainUri.ToString() },
                 {"Host", Host }
             });
