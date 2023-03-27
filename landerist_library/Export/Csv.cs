@@ -1,4 +1,6 @@
-﻿namespace landerist_library.Export
+﻿using System.IO.Compression;
+
+namespace landerist_library.Export
 {
     public class Csv
     {
@@ -6,26 +8,47 @@
 
         private const string FILE_NAME_MEDIA = "ES_MEDIA.csv";
 
-        public Csv() 
-        { 
+        private const string ZIP_FILE = "listings.csv.zip";
+
+        public Csv()
+        {
 
         }
 
-        public bool Export()
+        public bool Export(bool makeZip)
         {
-            return ExportListings() && ExportMedia();
+            var success = ExportListings() && ExportMedia();
+            if (makeZip)
+            {
+                return MakeZip();
+            }
+            return success;
+        }
+
+        private bool MakeZip()
+        {
+            var csvListings = GetFilePath(FILE_NAME_LISTINGS);
+            var csvMedia = GetFilePath(FILE_NAME_MEDIA);
+            var zipFile = GetFilePath(ZIP_FILE);
+            var files = new string[] { csvListings, csvMedia };            
+            return new Zip().Export(files, zipFile);
         }
 
         private bool ExportListings()
         {
-            string fileName = Config.EXPORT_DIRECTORY + FILE_NAME_LISTINGS;
-            return Export(ES.Listings.TABLE_ES_LISTINGS, fileName);
+            string filePath = GetFilePath(FILE_NAME_LISTINGS);
+            return Export(ES.Listings.TABLE_ES_LISTINGS, filePath);
+        }
+
+        private string GetFilePath(string fileName)
+        {
+            return Config.EXPORT_DIRECTORY + fileName;
         }
 
         private bool ExportMedia()
         {
-            string fileName = Config.EXPORT_DIRECTORY + FILE_NAME_MEDIA;
-            return Export(ES.Media.TABLE_ES_MEDIA, fileName);
+            string filePath = GetFilePath(FILE_NAME_MEDIA);
+            return Export(ES.Media.TABLE_ES_MEDIA, filePath);
         }
 
         private bool Export(string tableName, string fileName)
