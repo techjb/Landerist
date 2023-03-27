@@ -21,7 +21,6 @@ namespace landerist_orels.ES
             {
                 AddListing(listing);
             }
-
         }
 
         public void AddListing(Listing listing)

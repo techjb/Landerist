@@ -35,6 +35,7 @@ namespace landerist_library.ES
             {
                 { "listingGuid", listing.guid }
             });
+
             foreach (DataRow dataRow in dataTable.Rows)
             {
                 var media = GetMedia(dataRow);
