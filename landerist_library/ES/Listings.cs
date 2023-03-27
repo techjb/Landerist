@@ -24,7 +24,7 @@ namespace landerist_library.ES
             string query =
                 "INSERT INTO " + TABLE_ES_LISTINGS + " " +
                 "VALUES( " +
-                "@guid ,@listingStatus ,@listingDate ,@unlistingDate ,@operation ,@propertyType ,@propertySubtype ,@priceAmount ,@description ,@dataSourceName ,@dataSourceGuid ,@dataSourceUpdate ,@dataSourceUrl ,@contactName ,@contactPhone ,@contactEmail ,@contactUrl ,@contactOther ,@address ,@latitude ,@longitude ,@locationIsAccurate ,@cadastralReference ,@propertySize ,@landSize ,@constructionYear ,@constructionStatus ,@floors ,@floor ,@bedrooms ,@bathrooms ,@parkings ,@terrace ,@garden ,@garage ,@motorbikeGarage ,@pool ,@lift ,@disabledAccess ,@storageRoom ,@furnished ,@nonFurnished ,@heating ,@airConditioning ,@petsAllowed ,@securitySystems " +
+                "@guid, @listingStatus, @listingDate, @unlistingDate, @operation, @propertyType, @propertySubtype, @priceAmount, @priceCurrency, @description, @dataSourceName, @dataSourceGuid, @dataSourceUpdate, @dataSourceUrl, @contactName, @contactPhone, @contactEmail, @contactUrl, @contactOther, @address, @latitude, @longitude, @locationIsAccurate, @cadastralReference, @propertySize, @landSize, @constructionYear, @constructionStatus, @floors, @floor, @bedrooms, @bathrooms, @parkings, @terrace, @garden, @garage, @motorbikeGarage, @pool, @lift, @disabledAccess, @storageRoom, @furnished, @nonFurnished, @heating, @airConditioning, @petsAllowed, @securitySystems " +
                 ")";
 
             return new Database().Query(query, new Dictionary<string, object?> {
@@ -36,6 +36,7 @@ namespace landerist_library.ES
                 {"propertyType", listing.propertyType },
                 {"propertySubType", listing.propertySubtype},
                 {"priceAmount", listing.price.amount },
+                {"priceCurrency", listing.price.currency },
                 {"description", listing.description },
                 {"dataSourceName", listing.dataSourceName },
                 {"dataSourceGuid", listing.dataSourceGuid },
@@ -110,7 +111,10 @@ namespace landerist_library.ES
                 operation = (Operation)dataRow["operation"],
                 propertyType = (PropertyType)dataRow["propertyType"],
                 propertySubtype = dataRow["propertySubtype"] is DBNull ? null : (PropertySubtype)dataRow["propertySubtype"],
-                price = dataRow["priceAmount"] is DBNull ? null : new Price() { amount = Convert.ToDecimal(dataRow["priceAmount"]) },
+                price = dataRow["priceAmount"] is DBNull ? null : new Price() { 
+                    amount = Convert.ToDecimal(dataRow["priceAmount"]) ,
+                    currency = (Currency)dataRow["priceCurrency"]
+                },
                 description = dataRow["description"] is DBNull ? null : (string)dataRow["description"],
                 dataSourceName = dataRow["dataSourceName"] is DBNull ? null : (string)dataRow["dataSourceName"],
                 dataSourceGuid = dataRow["dataSourceGuid"] is DBNull ? null : (string)dataRow["dataSourceGuid"],
