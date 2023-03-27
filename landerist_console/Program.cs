@@ -57,7 +57,8 @@ namespace landerist_console
 
             //new Scraper().AllPages();
 
-            new Csv().Export();
+            //new Csv().Export();
+            //new Json().Export();
 
         }
 

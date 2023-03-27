@@ -15,6 +15,15 @@ namespace landerist_orels.ES
         [JsonProperty(Order = 3)]
         public List<Listing> listings = new List<Listing>();
 
+        public Schema(List<Listing> listings)
+        {
+            foreach(Listing listing in listings)
+            {
+                AddListing(listing);
+            }
+
+        }
+
         public void AddListing(Listing listing)
         {
             if (!listings.Contains(listing))
