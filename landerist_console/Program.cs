@@ -2,6 +2,8 @@
 using landerist_library.Inserter;
 using landerist_library.Scraper;
 using landerist_library.Websites;
+using landerist_library.Export;
+using System.Reflection.Metadata;
 
 namespace landerist_console
 {
@@ -54,6 +56,8 @@ namespace landerist_console
             //new Websites().InsertMainPages();
 
             //new Scraper().AllPages();
+
+            new Csv().Export();
 
         }
 

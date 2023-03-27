@@ -4,7 +4,7 @@ namespace landerist_library.Scraper
 {
     public class Scraper : ScraperBase
     {
-        private readonly Blocker Blocker = new();
+        private readonly TempBlocker TempBlocker = new();
 
         private readonly object SyncBlocker = new();
 
@@ -80,7 +80,7 @@ namespace landerist_library.Scraper
                 return;
             }
 
-            if (!Blocker.CanScrape(website))
+            if (TempBlocker.IsBlocked(website))
             {
                 PendingPages.Add(page);
                 return;
@@ -103,7 +103,7 @@ namespace landerist_library.Scraper
         {
             lock (SyncBlocker)
             {
-                Blocker.Add(website);
+                TempBlocker.Add(website);
             }
         }
 

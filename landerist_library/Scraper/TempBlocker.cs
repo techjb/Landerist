@@ -2,22 +2,18 @@
 
 namespace landerist_library.Scraper
 {
-    public class Blocker
+    public class TempBlocker
     {
-        private readonly Dictionary<string, DateTime> IpBlocker = new ();
+        private readonly Dictionary<string, DateTime> IpBlocker = new();
 
-        private readonly Dictionary<string, DateTime> HostBlocker = new ();
+        private readonly Dictionary<string, DateTime> HostBlocker = new();
 
         public const int BlockSecconds = 10;
 
-        public bool CanScrape(Website website)
+        public bool IsBlocked(Website website)
         {
-            bool isIpBlocked = IsBlocked(IpBlocker, website.IpAddress);
-            if (isIpBlocked)
-            {
-                return false;
-            }
-            return !IsBlocked(HostBlocker, website.Host);
+            return IsBlocked(IpBlocker, website.IpAddress) ||
+                IsBlocked(HostBlocker, website.Host);
         }
 
         private bool IsBlocked(Dictionary<string, DateTime> keyValuePairs, string? key)
@@ -38,12 +34,12 @@ namespace landerist_library.Scraper
 
         private void Add(Dictionary<string, DateTime> keyValuePairs, string? key)
         {
-            if(key == null)
+            if (key == null)
             {
                 return;
             }
 
-            if(keyValuePairs.ContainsKey(key))
+            if (keyValuePairs.ContainsKey(key))
             {
                 keyValuePairs[key] = DateTime.Now;
             }

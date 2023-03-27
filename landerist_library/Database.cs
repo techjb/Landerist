@@ -18,9 +18,10 @@ namespace landerist_library
 
         #endregion Private Variables
 
+
         #region Constructors
 
-        public Database(): this(Config.DATABASE_USER, Config.DATABASE_PW, "Landerist")
+        public Database(): this(Config.DATABASE_USER, Config.DATABASE_PW, Config.DATABASE_NAME)
         {
 
         }
@@ -87,15 +88,21 @@ namespace landerist_library
             }
         }
 
-        private void Init(string query)
+        private void InitConnectionAndComand(string query)
         {
             InitialiceConnection();
             SqlCommand.CommandText = query;
         }
 
+        private void Init(string query)
+        {
+            InitConnectionAndComand(query);
+            SqlConnection.Open();
+        }
+
         private void Init(string query, IDictionary<string, object?>? parameters = null)
         {
-            Init(query);
+            InitConnectionAndComand(query);
             AddParameters(parameters);
             SqlConnection.Open();
         }
@@ -103,7 +110,7 @@ namespace landerist_library
         private void Init(string query, IDictionary<string, object?>? parameters = null,
             SqlParameter[]? sqlParameters = null)
         {
-            Init(query);
+            InitConnectionAndComand(query);
             AddParameters(parameters);
             AddParameters(sqlParameters);
             SqlConnection.Open();
@@ -111,7 +118,7 @@ namespace landerist_library
 
         private void Init(string query, SqlParameter[]? sqlParameters = null)
         {
-            Init(query);
+            InitConnectionAndComand(query);
             AddParameters(sqlParameters);
             SqlConnection.Open();
         }
