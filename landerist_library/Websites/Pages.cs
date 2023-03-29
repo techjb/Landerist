@@ -2,8 +2,10 @@
 
 namespace landerist_library.Websites
 {
-    internal class Pages : WebBase
+    internal class Pages
     {
+        public const string TABLE_PAGES = "[PAGES]";
+
         public Pages()
         {
 
@@ -11,9 +13,10 @@ namespace landerist_library.Websites
 
         public List<Page> GetAll()
         {
+            Console.WriteLine("Reading all pages");
             string query =
                 "SELECT * " +
-                "FROM " + PAGES + " ";
+                "FROM " + TABLE_PAGES + " ";
 
             DataTable dataTable = new Database().QueryTable(query);
             return GetPages(dataTable);
@@ -23,7 +26,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT * " +
-                "FROM " + PAGES + " " +
+                "FROM " + TABLE_PAGES + " " +
                 "WHERE [Domain] = @Domain";
 
             DataTable dataTable = new Database().QueryTable(query, new Dictionary<string, object?> {
@@ -47,7 +50,7 @@ namespace landerist_library.Websites
         public static bool Remove(Website website)
         {
             string query =
-               "DELETE FROM " + PAGES + " " +
+               "DELETE FROM " + TABLE_PAGES + " " +
                "WHERE [Host] = @Host";
 
             return new Database().Query(query, new Dictionary<string, object?> {

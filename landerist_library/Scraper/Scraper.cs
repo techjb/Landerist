@@ -2,7 +2,7 @@
 
 namespace landerist_library.Scraper
 {
-    public class Scraper : ScraperBase
+    public class Scraper 
     {
         private readonly TempBlocker TempBlocker = new();
 
@@ -14,7 +14,7 @@ namespace landerist_library.Scraper
 
         private int Counter = 0;
 
-        private int Suceess = 0;
+        private int Sucess = 0;
 
         private int Errors = 0;
 
@@ -56,7 +56,7 @@ namespace landerist_library.Scraper
                 ScrapePage(page);
                 Console.WriteLine(
                     "Scrapped: " + Counter + "/" + TotalPages + " Pending: " + PendingPages.Count + " " +
-                    "Success: " + Suceess + " Errors: " + Errors);
+                    "Success: " + Sucess + " Errors: " + Errors);
             });
 
             if (PendingPages.Count > 0)
@@ -113,7 +113,7 @@ namespace landerist_library.Scraper
             {
                 if (success)
                 {
-                    Suceess++;
+                    Sucess++;
                 }
                 else
                 {

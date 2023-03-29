@@ -55,7 +55,7 @@ namespace landerist_console
             //new Websites().CalculateHashes();
             //new Websites().InsertMainPages();
 
-            //new Scraper().AllPages();
+            new Scraper().AllPages();
 
             //new Csv().Export(true);
             //new Json().Export(true);

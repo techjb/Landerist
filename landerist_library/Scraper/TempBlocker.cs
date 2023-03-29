@@ -34,7 +34,7 @@ namespace landerist_library.Scraper
 
         private void Add(Dictionary<string, DateTime> keyValuePairs, string? key)
         {
-            if (key == null)
+            if (key == null || key.Trim().Equals(string.Empty))
             {
                 return;
             }

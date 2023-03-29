@@ -6,7 +6,7 @@ using landerist_library.Scraper;
 
 namespace landerist_library.Websites
 {
-    internal class Page : WebBase
+    internal class Page: Pages
     {
         public string Host { get; set; }
 
@@ -33,6 +33,7 @@ namespace landerist_library.Websites
         {
             Website = website;
         }
+
         public Page(Uri uri)
         {
             Host = uri.Host;
@@ -57,7 +58,7 @@ namespace landerist_library.Websites
             Uri = new Uri(uriString);
             UriHash = dataRow["UriHash"].ToString()!;
             Inserted = (DateTime)dataRow["Inserted"];
-            Updated = dataRow["Updated"] is DBNull? null : (DateTime)dataRow["Updated"];
+            Updated = dataRow["Updated"] is DBNull ? null : (DateTime)dataRow["Updated"];
             HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
             ResponseBody = dataRow["ResponseBody"] is DBNull ? null : dataRow["ResponseBody"].ToString();
             IsAdvertisement = dataRow["IsAdvertisement"] is DBNull ? null : (bool)dataRow["IsAdvertisement"];
@@ -66,7 +67,7 @@ namespace landerist_library.Websites
         public bool Insert()
         {
             string query =
-                "INSERT INTO " + PAGES + " " +
+                "INSERT INTO " + TABLE_PAGES + " " +
                 "VALUES(@Host, @Uri, @UriHash, @Inserted, NULL, NULL, NULL, NULL)";
 
             return new Database().Query(query, new Dictionary<string, object?> {
@@ -82,7 +83,7 @@ namespace landerist_library.Websites
             Updated = DateTime.Now;
 
             string query =
-                "UPDATE " + PAGES + " SET " +
+                "UPDATE " + TABLE_PAGES + " SET " +
                 "[Updated] = @Updated, " +
                 "[HttpStatusCode] = @HttpStatusCode, " +
                 "[ResponseBody] = @ResponseBody, " +
@@ -92,16 +93,17 @@ namespace landerist_library.Websites
             return new Database().Query(query, new Dictionary<string, object?> {
                 {"UriHash", UriHash },
                 {"Updated", Updated },
-                {"HttpStatusCode", HttpStatusCode==null?DBNull.Value: HttpStatusCode},
-                {"ResponseBody", ResponseBody==null?DBNull.Value: ResponseBody },
-                {"IsAdvertisement", IsAdvertisement==null?DBNull.Value: IsAdvertisement },
+                {"HttpStatusCode", HttpStatusCode},
+                {"ResponseBody", ResponseBody},
+                {"IsAdvertisement", IsAdvertisement },
             });
         }
 
         public bool Process(Website website)
         {
-            Website = website;
-            if (DownloadPage())
+            Website = website;            
+            var task = Task.Run(async () => await DownloadPage());
+            if (task.Result)
             {
                 InsertNewPages();
                 SetIsAdvertisement();
@@ -109,7 +111,7 @@ namespace landerist_library.Websites
             return Update();
         }
 
-        private bool DownloadPage()
+        private async Task<bool> DownloadPage()
         {
             HttpStatusCode = null;
             ResponseBody = null;
@@ -119,14 +121,14 @@ namespace landerist_library.Websites
                 AllowAutoRedirect = false
             };
             using var client = new HttpClient(handler);
-            client.DefaultRequestHeaders.UserAgent.ParseAdd(Scraper.ScraperBase.UserAgentChrome);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
+            
             HttpRequestMessage request = new(HttpMethod.Get, Uri);
-
             try
             {
-                var response = client.SendAsync(request).GetAwaiter().GetResult();
+                var response = await client.SendAsync(request);
                 HttpStatusCode = (short)response.StatusCode;
-                ResponseBody = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                ResponseBody = await response.Content.ReadAsStringAsync();
                 return response.IsSuccessStatusCode;
             }
             catch
@@ -163,11 +165,19 @@ namespace landerist_library.Websites
 
         private void LoadHtmlDocument()
         {
-            if (HtmlDocument == null)
+            if (HtmlDocument != null)
             {
-                HtmlDocument = new();
+                return;      
+            }
+            HtmlDocument = new();
+            try
+            {
                 HtmlDocument.LoadHtml(ResponseBody);
-            }            
+            }
+            catch
+            {
+
+            }
         }
 
         private void InsertNewLinks(List<string?> links)
@@ -186,7 +196,7 @@ namespace landerist_library.Websites
             List<Page> pages = new();
             foreach (var link in links)
             {
-                if (!Uri.TryCreate(Uri, link, out Uri? uri))
+                if (!Uri.TryCreate(Uri, link, out Uri? uri))                
                 {
                     continue;
                 }
@@ -210,7 +220,7 @@ namespace landerist_library.Websites
             if (responseBodyText.Length < 16000)
             {
                 IsAdvertisement = new ChatGPT().IsAdvertisement(responseBodyText).Result;
-            }            
+            }
         }
 
         private string GetResponseBodyText()
@@ -224,15 +234,15 @@ namespace landerist_library.Websites
                     return text;
                 }
                 var visibleNodes = HtmlDocument.DocumentNode.DescendantsAndSelf().Where(
-                    n => n.NodeType == HtmlNodeType.Text && 
+                    n => n.NodeType == HtmlNodeType.Text &&
                     n.ParentNode.Name != "script" &&
                     n.ParentNode.Name != "nav" &&
                     n.ParentNode.Name != "footer" &&
-                    n.ParentNode.Name != "style" && 
+                    n.ParentNode.Name != "style" &&
                     n.ParentNode.Name != "head")
                     .Where(n => !string.IsNullOrWhiteSpace(n.InnerHtml));
 
-                text = string.Join(Environment.NewLine, visibleNodes.Select(n => n.InnerHtml.Trim()));                
+                text = string.Join(Environment.NewLine, visibleNodes.Select(n => n.InnerHtml.Trim()));
             }
             catch
             {

@@ -21,7 +21,7 @@ namespace landerist_library.Websites
 
         public Website()
         {
-            MainUri = new Uri(string.Empty);
+            MainUri = new Uri("about:blank", UriKind.RelativeOrAbsolute);
         }
 
         public Website(DataRow dataRow): this()
@@ -42,7 +42,7 @@ namespace landerist_library.Websites
         public bool Insert()
         {
             string query =
-                "INSERT INTO " + WEBSITES + " " +
+                "INSERT INTO " + TABLE_WEBSITES + " " +
                 "VALUES (@MainUri, @Host, NULL, NULL, NULL)";
 
             return new Database().Query(query, new Dictionary<string, object?> {
@@ -60,7 +60,7 @@ namespace landerist_library.Websites
             }
 
             string query =
-                "UPDATE " + WEBSITES + " " +
+                "UPDATE " + TABLE_WEBSITES + " " +
                 "SET RobotsTxt =  @RobotsTxt " +
                 "WHERE Host = @Host";
 
@@ -78,7 +78,7 @@ namespace landerist_library.Websites
                 return true;
             }
             string query =
-                "UPDATE " + WEBSITES + " " +
+                "UPDATE " + TABLE_WEBSITES + " " +
                 "SET IpAddress =  @IpAddress " +
                 "WHERE Host = @Host";
 
@@ -93,7 +93,7 @@ namespace landerist_library.Websites
             MainUri = mainUri;
 
             string query =
-                "UPDATE " + WEBSITES + " " +
+                "UPDATE " + TABLE_WEBSITES + " " +
                 "SET MainUri =  @MainUri " +
                 "WHERE Host = @Host";
 
@@ -111,7 +111,7 @@ namespace landerist_library.Websites
                 return true;
             }
             string query =
-                "UPDATE " + WEBSITES + " " +
+                "UPDATE " + TABLE_WEBSITES + " " +
                 "SET HttpStatusCode =  @HttpStatusCode " +
                 "WHERE Host = @Host";
 
@@ -128,7 +128,7 @@ namespace landerist_library.Websites
                 AllowAutoRedirect = false
             };
             using var client = new HttpClient(handler);
-            client.DefaultRequestHeaders.UserAgent.ParseAdd(Scraper.ScraperBase.UserAgentChrome);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
             HttpRequestMessage request = new(HttpMethod.Head, MainUri);
 
             var response = client.SendAsync(request).GetAwaiter().GetResult();
@@ -144,7 +144,7 @@ namespace landerist_library.Websites
             };
 
             using var client = new HttpClient(handler);
-            client.DefaultRequestHeaders.UserAgent.ParseAdd(Scraper.ScraperBase.UserAgentChrome);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
             HttpRequestMessage request = new(HttpMethod.Head, MainUri);
 
             var response = client.SendAsync(request).GetAwaiter().GetResult();
@@ -187,7 +187,7 @@ namespace landerist_library.Websites
             if (RobotsTxt != null)
             {
                 Robots ??= Robots.Load(RobotsTxt);
-                return Robots.IsPathAllowed(Scraper.ScraperBase.UserAgentChrome, uri.PathAndQuery);
+                return Robots.IsPathAllowed(Config.USER_AGENT, uri.PathAndQuery);
             }
             return true;
         }
@@ -210,7 +210,7 @@ namespace landerist_library.Websites
             if (RobotsTxt != null)
             {
                 Robots ??= Robots.Load(RobotsTxt);
-                return Robots.CrawlDelay(Scraper.ScraperBase.UserAgentChrome);
+                return Robots.CrawlDelay(Config.USER_AGENT);
             }
             return 0;
         }
@@ -220,7 +220,7 @@ namespace landerist_library.Websites
             Pages.Remove(this);
 
             string query =
-               "DELETE FROM " + WEBSITES + " " +
+               "DELETE FROM " + TABLE_WEBSITES + " " +
                "WHERE [Host] = @Host";
 
             return new Database().Query(query, new Dictionary<string, object?> {
