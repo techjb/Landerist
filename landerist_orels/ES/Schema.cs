@@ -13,22 +13,11 @@ namespace landerist_orels.ES
         public DateTime created { get; set; } = DateTime.Now;
 
         [JsonProperty(Order = 3)]
-        public List<Listing> listings = new List<Listing>();
+        public SortedSet<Listing> listings = new SortedSet<Listing>();
 
-        public Schema(List<Listing> listings)
+        public Schema(SortedSet<Listing> listings)
         {
-            foreach(Listing listing in listings)
-            {
-                AddListing(listing);
-            }
-        }
-
-        public void AddListing(Listing listing)
-        {
-            if (!listings.Contains(listing))
-            {
-                listings.Add(listing);
-            }
+            this.listings = listings;
         }
     }
 }

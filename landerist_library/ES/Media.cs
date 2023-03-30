@@ -24,7 +24,7 @@ namespace landerist_library.ES
             }
         }
 
-        public static void LoadListingMedia(Listing listing)
+        public static SortedSet<landerist_orels.ES.Media> GetMedia(Listing listing)
         {
             string query =
                 "SELECT * " +
@@ -36,11 +36,13 @@ namespace landerist_library.ES
                 { "listingGuid", listing.guid }
             });
 
+            SortedSet<landerist_orels.ES.Media> medias = new();
             foreach (DataRow dataRow in dataTable.Rows)
             {
                 var media = GetMedia(dataRow);
-                listing.AddMedia(media);
+                medias.Add(media);
             }
+            return medias;
         }
 
         private static landerist_orels.ES.Media GetMedia(DataRow dataRow)

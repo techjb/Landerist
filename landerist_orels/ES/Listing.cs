@@ -95,7 +95,7 @@ namespace landerist_orels.ES
         public PropertySubtype? propertySubtype { get; set; }
 
         [JsonProperty(Order = 8)]
-        public List<Media> media { get; set; }
+        public SortedSet<Media> media { get; set; }
 
         [JsonProperty(Order = 9)]
         public Price price { get; set; }
@@ -176,13 +176,31 @@ namespace landerist_orels.ES
 
         public List<Feature> features;
 
+        private void InitMedia()
+        {
+            if (media == null)
+            {
+                media = new SortedSet<Media>();
+            }
+        }
         public void AddMedia(Media media)
         {
-            if (this.media == null)
+            if (media == null)
             {
-                this.media = new List<Media>();
+                return;
             }
+            InitMedia();
             this.media.Add(media);
+        }
+
+        public void SetMedia(SortedSet<Media> media)
+        {
+            if(media == null || media.Count.Equals(0))
+            {
+                return;
+            }
+            InitMedia();
+            this.media = media;
         }
 
         public void AddFeature(Feature feature)

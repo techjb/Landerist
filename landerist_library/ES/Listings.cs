@@ -79,7 +79,7 @@ namespace landerist_library.ES
         }
 
        
-        public List<Listing> GetAll(bool loadMedia)
+        public SortedSet<Listing> GetAll(bool loadMedia)
         {
             string query =
                 "SELECT * " +
@@ -87,13 +87,14 @@ namespace landerist_library.ES
 
             DataTable dataTable = new Database().QueryTable(query);
 
-            List<Listing> listings = new();
+            SortedSet<Listing> listings = new();
             foreach (DataRow dataRow in dataTable.Rows)
             {
                 var listing = GetListing(dataRow);
                 if (loadMedia)
                 {
-                    Media.LoadListingMedia(listing);
+                    var media = Media.GetMedia(listing);
+                    listing.SetMedia(media);
                 }                
                 listings.Add(listing);
             }
