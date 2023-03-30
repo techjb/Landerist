@@ -292,7 +292,7 @@ namespace landerist_library.Websites
             int counterNo = 0;
             foreach(var website in websites)
             {
-                bool canAccess = website.CanAccessMainUri();
+                bool canAccess = website.IsPathAllowedToMainUri();
                 if(canAccess)
                 {
                     counterYes++;
@@ -333,8 +333,7 @@ namespace landerist_library.Websites
             int errors = 0;
             foreach (var website in websites)
             {
-                var page = new Page(website);
-                if (page.Insert())
+                if (website.InsertMainPage())
                 {
                     inserted++;
                 }

@@ -6,7 +6,7 @@ using landerist_library.Scraper;
 
 namespace landerist_library.Websites
 {
-    internal class Page: Pages
+    public class Page: Pages
     {
         public string Host { get; set; }
 
@@ -27,7 +27,10 @@ namespace landerist_library.Websites
 
         private Website? Website;
 
+
         private HtmlDocument? HtmlDocument = null;
+
+        private string? ResponseBodyText = null;
 
         public Page(Website website) : this(website.MainUri)
         {
@@ -41,17 +44,22 @@ namespace landerist_library.Websites
             UriHash = CalculateHash(uri);
             Inserted = DateTime.Now;
             Updated = DateTime.Now;
+
+            var dataRow = GetDataRow();
+            if (dataRow != null)
+            {
+                Load(dataRow);
+            }
         }
 
-        private static string CalculateHash(Uri uri)
-        {
-            string text = uri.ToString();
-            byte[] bytes = Encoding.UTF8.GetBytes(text);
-            byte[] hash = SHA256.Create().ComputeHash(bytes);
-            return BitConverter.ToString(hash).Replace("-", "");
-        }
+      
 
         public Page(DataRow dataRow)
+        {
+            Load(dataRow);
+        }
+
+        private void Load(DataRow dataRow)
         {
             Host = dataRow["Host"].ToString()!;
             string uriString = dataRow["Uri"].ToString()!;
@@ -62,6 +70,33 @@ namespace landerist_library.Websites
             HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
             ResponseBody = dataRow["ResponseBody"] is DBNull ? null : dataRow["ResponseBody"].ToString();
             IsAdvertisement = dataRow["IsAdvertisement"] is DBNull ? null : (bool)dataRow["IsAdvertisement"];
+        }
+
+        public DataRow? GetDataRow()
+        {
+            string query = 
+                "SELECT * " +
+                "FROM " + TABLE_PAGES + " " +
+                "WHERE [UriHash] = @UriHash";
+
+            var dataTable = new Database().QueryTable(query, new Dictionary<string, object?> {
+                {"UriHash", UriHash }
+            });
+
+            if (dataTable.Rows.Count > 0)
+            {
+                return dataTable.Rows[0];
+            }
+            return null;
+
+        }
+
+        private static string CalculateHash(Uri uri)
+        {
+            string text = uri.ToString();
+            byte[] bytes = Encoding.UTF8.GetBytes(text);
+            byte[] hash = SHA256.Create().ComputeHash(bytes);
+            return BitConverter.ToString(hash).Replace("-", "");
         }
 
         public bool Insert()
@@ -99,7 +134,7 @@ namespace landerist_library.Websites
             });
         }
 
-        public bool Process(Website website)
+        public bool Scrape(Website website)
         {
             Website = website;            
             var task = Task.Run(async () => await DownloadPage());
@@ -204,7 +239,7 @@ namespace landerist_library.Websites
                 {
                     continue;
                 }
-                if (Website != null && !Website.CanAccess(uri))
+                if (Website != null && !Website.IsPathAllowed(uri))
                 {
                     continue;
                 }
@@ -216,39 +251,59 @@ namespace landerist_library.Websites
 
         private void SetIsAdvertisement()
         {
-            var responseBodyText = GetResponseBodyText();
-            if (responseBodyText.Length < 16000)
+            SetResponseBodyText();
+            if (ResponseBodyText !=null && ResponseBodyText.Length < 16000)
             {
-                IsAdvertisement = new ChatGPT().IsAdvertisement(responseBodyText).Result;
+                IsAdvertisement = new ChatGPT().IsAdvertisement(ResponseBodyText).Result;
             }
         }
 
-        private string GetResponseBodyText()
+        private void SetResponseBodyText()
         {
-            string text = string.Empty;
+            if (ResponseBodyText != null)
+            {
+                return;
+            }
+            
             try
             {
                 LoadHtmlDocument();
-                if (HtmlDocument == null)
-                {
-                    return text;
-                }
-                var visibleNodes = HtmlDocument.DocumentNode.DescendantsAndSelf().Where(
-                    n => n.NodeType == HtmlNodeType.Text &&
-                    n.ParentNode.Name != "script" &&
-                    n.ParentNode.Name != "nav" &&
-                    n.ParentNode.Name != "footer" &&
-                    n.ParentNode.Name != "style" &&
-                    n.ParentNode.Name != "head")
-                    .Where(n => !string.IsNullOrWhiteSpace(n.InnerHtml));
-
-                text = string.Join(Environment.NewLine, visibleNodes.Select(n => n.InnerHtml.Trim()));
+                RemoveResponseBodyNodes();
+                SetResponseBodyTextVisible();
             }
             catch
             {
 
             }
-            return text;
+        }
+
+        private void RemoveResponseBodyNodes()
+        {
+            if (HtmlDocument == null)
+            {
+                return;
+            }
+            var xPath = "//script | //nav | //footer | //style | //head";
+            var nodesToRemove = HtmlDocument.DocumentNode.SelectNodes(xPath).ToList();
+
+            foreach (var node in nodesToRemove)
+            {
+                node.Remove();
+            }
+        }
+
+        private void SetResponseBodyTextVisible()
+        {
+            if (HtmlDocument == null)
+            {
+                return;
+            }
+            var visibleNodes = HtmlDocument.DocumentNode.DescendantsAndSelf().Where(
+                   n => n.NodeType == HtmlNodeType.Text)
+                   .Where(n => !string.IsNullOrWhiteSpace(n.InnerHtml));
+
+            var visibleText = visibleNodes.Select(n => n.InnerHtml.Trim());
+            ResponseBodyText = string.Join(Environment.NewLine, visibleText);
         }
     }
 }

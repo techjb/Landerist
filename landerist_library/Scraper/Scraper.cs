@@ -66,7 +66,13 @@ namespace landerist_library.Scraper
             }
         }
 
-        private void ScrapePage(Page page)
+        public void ScrapeMainPage(Website website)
+        {
+            var page = new Page(website);
+            ScrapePage(page);
+        }
+
+        public void ScrapePage(Page page)
         {
             IncreaseCounter();            
             if (!DictionaryWebsites.ContainsKey(page.Host))
@@ -75,7 +81,7 @@ namespace landerist_library.Scraper
             }
 
             var website = DictionaryWebsites[page.Host];
-            if (!website.CanAccess(page.Uri))
+            if (!website.IsPathAllowed(page.Uri))
             {
                 return;
             }
@@ -87,7 +93,7 @@ namespace landerist_library.Scraper
             }           
 
             AddToBlocker(website);
-            bool sucess = page.Process(website);
+            bool sucess = page.Scrape(website);
             AddSuccessError(sucess);
         }
 

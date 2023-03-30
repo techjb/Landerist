@@ -4,6 +4,7 @@ using landerist_library.Scraper;
 using landerist_library.Websites;
 using landerist_library.Export;
 using System.Reflection.Metadata;
+using System.Text;
 
 namespace landerist_console
 {
@@ -41,10 +42,12 @@ namespace landerist_console
 
         private static void Run()
         {
+            var uri = new Uri("https://www.goolzoom.com");
+
+            //new UrisInserter().Insert(uri);
             //new UrisInserter().FromCsv();
             //new Websites().RemoveBlockedDomains();
 
-            //new Websites().SetHttpStatusCodesToAll();
             //new Websites().SetHttpStatusCodesToNull();
             //new Websites().InsertUpdateUrisFromNotOk();
             //new Websites().SetHttpStatusCodesToAll();            
@@ -55,7 +58,14 @@ namespace landerist_console
             //new Websites().CalculateHashes();
             //new Websites().InsertMainPages();
 
-            new Scraper().AllPages();
+            var website = new Website(uri);
+            //website.SetHttpStatusCode();
+            //website.SetRobotsTxt();
+            //website.SetIpAddress();
+            //website.InsertMainPage();
+            new Scraper().ScrapeMainPage(website);
+
+            //new Scraper().AllPages();
 
             //new Csv().Export(true);
             //new Json().Export(true);

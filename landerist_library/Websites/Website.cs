@@ -24,9 +24,38 @@ namespace landerist_library.Websites
             MainUri = new Uri("about:blank", UriKind.RelativeOrAbsolute);
         }
 
+        public Website(Uri mainUri):this()
+        {
+            MainUri = mainUri;
+            Host = mainUri.Host;
+            var dataRow = GetDataRow();
+            if (dataRow != null)
+            {
+                Load(dataRow);
+            }
+        }
+
         public Website(DataRow dataRow): this()
         {
             Load(dataRow);
+        }
+
+        private DataRow? GetDataRow()
+        {
+            string query = 
+                "SELECT * " +
+                "FROM " + TABLE_WEBSITES + " " +
+                "WHERE [MainUri] = @MainUri";
+
+            var dataTable = new Database().QueryTable(query, new Dictionary<string, object?> {
+                {"MainUri", MainUri.ToString() }                
+            });
+
+            if(dataTable.Rows.Count > 0)
+            {
+                return dataTable.Rows[0];
+            }
+            return null;
         }
 
         private void Load(DataRow dataRow)
@@ -175,14 +204,12 @@ namespace landerist_library.Websites
             return UpdateIpAddress(ipAdress);
         }
 
-
-        public bool CanAccessMainUri()
+        public bool IsPathAllowedToMainUri()
         {
-            return CanAccess(MainUri);
+            return IsPathAllowed(MainUri);
         }
 
-
-        public bool CanAccess(Uri uri)
+        public bool IsPathAllowed(Uri uri)
         {
             if (RobotsTxt != null)
             {
@@ -227,6 +254,12 @@ namespace landerist_library.Websites
                 {"MainUri", MainUri.ToString() },
                 {"Host", Host }
             });
+        }
+
+        public bool InsertMainPage()
+        {
+            var page = new Page(this);
+            return page.Insert();
         }
     }
 }

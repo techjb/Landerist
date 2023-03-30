@@ -32,14 +32,37 @@ namespace landerist_library.Inserter
                     if (!uris.Contains(uri))
                     {
                         uris.Add(uri);
-                    }                    
+                    }
                 }
                 catch { }
             }
             Insert(uris);
         }
 
+        public void Insert(string url)
+        {
+            if (Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
+            {
+                Insert(uri);
+            }
+        }
+
+        public void Insert(Uri uri)
+        {
+            var list = new List<Uri>()
+            {
+                uri
+            };
+            Insert(list);
+        }
+
         public void Insert(List<Uri> uris)
+        {
+            HashSet<Uri> hashSet = new(uris);
+            Insert(hashSet);
+        }
+
+        public void Insert(HashSet<Uri> uris)
         {
             int inserted = 0;
             int errors = 0;
@@ -74,13 +97,17 @@ namespace landerist_library.Inserter
                 {
                     return false;
                 }
-                InsertedUris.Add(uri.ToString());
+                
                 Website website = new()
                 {
                     MainUri = uri,
                     Host = uri.Host,
                 };
-                return website.Insert();
+                if (website.Insert())
+                {
+                    InsertedUris.Add(uri.ToString());
+                    return true;
+                }
             }
             catch
             {

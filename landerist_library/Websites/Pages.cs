@@ -2,7 +2,7 @@
 
 namespace landerist_library.Websites
 {
-    internal class Pages
+    public class Pages
     {
         public const string TABLE_PAGES = "[PAGES]";
 
