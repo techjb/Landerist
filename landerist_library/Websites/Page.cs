@@ -6,7 +6,7 @@ using landerist_library.Scraper;
 
 namespace landerist_library.Websites
 {
-    public class Page: Pages
+    public class Page : Pages
     {
         public string Host { get; set; }
 
@@ -52,7 +52,7 @@ namespace landerist_library.Websites
             }
         }
 
-      
+
 
         public Page(DataRow dataRow)
         {
@@ -74,7 +74,7 @@ namespace landerist_library.Websites
 
         public DataRow? GetDataRow()
         {
-            string query = 
+            string query =
                 "SELECT * " +
                 "FROM " + TABLE_PAGES + " " +
                 "WHERE [UriHash] = @UriHash";
@@ -136,7 +136,7 @@ namespace landerist_library.Websites
 
         public bool Scrape(Website website)
         {
-            Website = website;            
+            Website = website;
             var task = Task.Run(async () => await DownloadPage());
             if (task.Result)
             {
@@ -157,7 +157,7 @@ namespace landerist_library.Websites
             };
             using var client = new HttpClient(handler);
             client.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
-            
+
             HttpRequestMessage request = new(HttpMethod.Get, Uri);
             try
             {
@@ -202,7 +202,7 @@ namespace landerist_library.Websites
         {
             if (HtmlDocument != null)
             {
-                return;      
+                return;
             }
             HtmlDocument = new();
             try
@@ -231,7 +231,7 @@ namespace landerist_library.Websites
             List<Page> pages = new();
             foreach (var link in links)
             {
-                if (!Uri.TryCreate(Uri, link, out Uri? uri))                
+                if (!Uri.TryCreate(Uri, link, out Uri? uri))
                 {
                     continue;
                 }
@@ -252,7 +252,7 @@ namespace landerist_library.Websites
         private void SetIsAdvertisement()
         {
             SetResponseBodyText();
-            if (ResponseBodyText !=null && ResponseBodyText.Length < 16000)
+            if (ResponseBodyText != null && ResponseBodyText.Length < 16000)
             {
                 IsAdvertisement = new ChatGPT().IsAdvertisement(ResponseBodyText).Result;
             }
@@ -264,7 +264,7 @@ namespace landerist_library.Websites
             {
                 return;
             }
-            
+
             try
             {
                 LoadHtmlDocument();
@@ -283,9 +283,12 @@ namespace landerist_library.Websites
             {
                 return;
             }
-            var xPath = "//script | //nav | //footer | //style | //head";
-            var nodesToRemove = HtmlDocument.DocumentNode.SelectNodes(xPath).ToList();
+            var xPath =
+                "//script | //nav | //footer | //style | //head | " +
+                "//form | //a | //code | //canvas | //input | //meta | //option | " +
+                "//select | //progress | //svg | //textarea";
 
+            var nodesToRemove = HtmlDocument.DocumentNode.SelectNodes(xPath).ToList();
             foreach (var node in nodesToRemove)
             {
                 node.Remove();
