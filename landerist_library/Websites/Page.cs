@@ -25,10 +25,10 @@ namespace landerist_library.Websites
         public bool? IsListing { get; set; }
 
 
-        private Website? Website;
+        public Website? Website;
 
 
-        private HtmlDocument? HtmlDocument = null;
+        public HtmlDocument? HtmlDocument = null;
 
 
         public Page(Website website) : this(website.MainUri)
@@ -175,7 +175,7 @@ namespace landerist_library.Websites
             {
                 return;
             }
-            var pages = new HtmlToPages(HtmlDocument, Website, Uri).GetPages();
+            var pages = new PageExtractor(this).GetPages();
             Insert(pages);
         }
 
