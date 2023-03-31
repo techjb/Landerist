@@ -11,7 +11,7 @@ namespace landerist_library.Scraper
             "de un sólo inmueble, con su tipología, precio y localización, responde 'si'. " +
             "Responde 'no' en caso contrario. Si no lo sabes responde 'null'. Solo responde con una palabra.";
 
-        public async Task<bool?> IsAdvertisement(string responseBodyText)
+        public async Task<bool?> IsListing(string responseBodyText)
         {
             var userMessage = Dialog.StartAsSystem(systemText).ThenUser(responseBodyText);
             ChatCompletionRequest chatCompletionRequest = new()

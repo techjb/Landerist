@@ -57,5 +57,13 @@ namespace landerist_library.Websites
                 {"Host", website.Host }
             });
         }
+
+        public static void Insert(List<Page> pages)
+        {
+            foreach (var page in pages)
+            {
+                page.Insert();
+            }
+        }
     }
 }
