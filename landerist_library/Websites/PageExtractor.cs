@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Linq;
 
 namespace landerist_library.Websites
 {
@@ -6,13 +7,13 @@ namespace landerist_library.Websites
     {
         private readonly Page Page;
 
-        private readonly List<Page> Pages = new();
+        private readonly SortedSet<Page> Pages = new();
         public PageExtractor(Page page)
         {
             Page = page;
         }
 
-        public List<Page> GetPages()
+        public SortedSet<Page> GetPages()
         {
             if(Page.HtmlDocument == null)
             {
@@ -42,7 +43,7 @@ namespace landerist_library.Websites
             foreach (var link in links)
             {
                 var page = GetPage(link);
-                if(page != null)
+                if(page != null && !Pages.Contains(page))
                 {
                     Pages.Add(page);
                 }                
@@ -59,7 +60,7 @@ namespace landerist_library.Websites
             {
                 return null;
             }
-            UriBuilder uriBuilder = new UriBuilder(uri)
+            UriBuilder uriBuilder = new(uri)
             {
                 Fragment = "",
             };            

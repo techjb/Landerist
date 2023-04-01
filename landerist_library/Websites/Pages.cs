@@ -58,7 +58,7 @@ namespace landerist_library.Websites
             });
         }
 
-        public static void Insert(List<Page> pages)
+        public static void Insert(SortedSet<Page> pages)
         {
             foreach (var page in pages)
             {
