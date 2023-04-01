@@ -1,4 +1,6 @@
-﻿namespace landerist_library.Websites
+﻿using System.Globalization;
+
+namespace landerist_library.Websites
 {
     public class PageExtractor
     {
@@ -12,24 +14,24 @@
 
         public List<Page> GetPages()
         {
-            if (Page.HtmlDocument != null)
+            if(Page.HtmlDocument == null)
             {
-                try
-                {
-                    var links = Page.HtmlDocument.DocumentNode.Descendants("a")
-                       .Where(a => !a.Attributes["rel"]?.Value.Contains("nofollow") ?? true)
-                       .Select(a => a.Attributes["href"]?.Value)
-                       .Where(href => !string.IsNullOrWhiteSpace(href))
-                       .ToList();
-
-                    if (links != null)
-                    {
-                        GetPages(links);
-                    }
-
-                }
-                catch { }
+                return Pages;
             }
+            try
+            {
+                var links = Page.HtmlDocument.DocumentNode.Descendants("a")
+                   .Where(a => !a.Attributes["rel"]?.Value.Contains("nofollow") ?? true)
+                   .Select(a => a.Attributes["href"]?.Value)
+                   .Where(href => !string.IsNullOrWhiteSpace(href))
+                   .ToList();
+
+                if (links != null)
+                {
+                    GetPages(links);
+                }
+            }
+            catch { }
 
             return Pages;
         }
@@ -39,21 +41,38 @@
             links = links.Distinct().ToList();
             foreach (var link in links)
             {
-                if (!Uri.TryCreate(Page.Uri, link, out Uri? uri))
+                var page = GetPage(link);
+                if(page != null)
                 {
-                    continue;
-                }
-                if (!uri.Host.Equals(Page.Host) || uri.Equals(Page.Uri))
-                {
-                    continue;
-                }
-                if (Page.Website != null && !Page.Website.IsPathAllowed(uri))
-                {
-                    continue;
-                }
-                Page page = new(uri);
-                Pages.Add(page);
+                    Pages.Add(page);
+                }                
             }
+        }
+
+        private Page? GetPage(string? link)
+        {
+            if (link == null)
+            {
+                return null;
+            }
+            if (!Uri.TryCreate(Page.Uri, link, out Uri? uri))
+            {
+                return null;
+            }
+            UriBuilder uriBuilder = new UriBuilder(uri)
+            {
+                Fragment = "",
+            };            
+            uri = uriBuilder.Uri;
+            if (!uri.Host.Equals(Page.Host) || uri.Equals(Page.Uri))
+            {
+                return null;
+            }
+            if (Page.Website != null && !Page.Website.IsPathAllowed(uri))
+            {
+                return null;
+            }
+            return new Page(uri);
         }
     }
 }

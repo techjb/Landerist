@@ -42,9 +42,10 @@ namespace landerist_console
 
         private static void Run()
         {
-            var uri = new Uri("https://www.goolzoom.com");
-
+            //var uri = new Uri("https://www.goolzoom.com");
+            var uri = new Uri("https://www.saroga.es/");
             //new UrisInserter().Insert(uri);
+
             //new UrisInserter().FromCsv();
             //new Websites().RemoveBlockedDomains();
 
@@ -59,6 +60,7 @@ namespace landerist_console
             //new Websites().InsertMainPages();
 
             var website = new Website(uri);
+            //website.Remove();
             //website.SetHttpStatusCode();
             //website.SetRobotsTxt();
             //website.SetIpAddress();

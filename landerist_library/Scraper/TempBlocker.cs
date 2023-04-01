@@ -8,7 +8,9 @@ namespace landerist_library.Scraper
 
         private readonly Dictionary<string, DateTime> HostBlocker = new();
 
-        public const int BlockSecconds = 10;
+        private const int MinSecconds = 10;
+
+        private const int MaxSecconds = 20;
 
         public bool IsBlocked(Website website)
         {
@@ -20,19 +22,41 @@ namespace landerist_library.Scraper
         {
             if (key != null && keyValuePairs.ContainsKey(key))
             {
-                var value = keyValuePairs[key];
-                return value > DateTime.Now.AddSeconds(-BlockSecconds);
+                var blockUntil = keyValuePairs[key];
+                return blockUntil > DateTime.Now;
             }
             return false;
         }
 
         public void Add(Website website)
         {
-            Add(IpBlocker, website.IpAddress);
-            Add(HostBlocker, website.Host);
+            var ipBlockUntil = CalculateBlockUntil();
+            Add(IpBlocker, website.IpAddress, ipBlockUntil);
+
+            var hostBlockUntil = CalculateBlockUntil(website);
+            Add(HostBlocker, website.Host, hostBlockUntil);
         }
 
-        private void Add(Dictionary<string, DateTime> keyValuePairs, string? key)
+        private DateTime CalculateBlockUntil()
+        {
+            int secconds = RandomSecconds();
+            return DateTime.Now.AddSeconds(secconds);
+        }
+
+        private DateTime CalculateBlockUntil(Website website)
+        {
+            int randomSecconds = RandomSecconds();
+            long crawDelay = website.CrawlDelay();
+            int secconds = Math.Max(randomSecconds, (int)crawDelay);
+            return DateTime.Now.AddSeconds(secconds);
+        }
+
+        private int RandomSecconds()
+        {
+            return new Random().Next(MinSecconds, MaxSecconds); ;
+        }
+
+        private void Add(Dictionary<string, DateTime> keyValuePairs, string? key, DateTime blockUntil)
         {
             if (key == null || key.Trim().Equals(string.Empty))
             {
@@ -41,11 +65,11 @@ namespace landerist_library.Scraper
 
             if (keyValuePairs.ContainsKey(key))
             {
-                keyValuePairs[key] = DateTime.Now;
+                keyValuePairs[key] = blockUntil;
             }
             else
             {
-                keyValuePairs.Add(key, DateTime.Now);
+                keyValuePairs.Add(key, blockUntil);
             }
         }
 
@@ -59,7 +83,8 @@ namespace landerist_library.Scraper
         {
             foreach (var key in keyValuePairs.Keys.ToList())
             {
-                if (keyValuePairs[key] < DateTime.Now.AddSeconds(-BlockSecconds))
+                var blockUntil = keyValuePairs[key];
+                if (blockUntil < DateTime.Now)
                 {
                     keyValuePairs.Remove(key);
                 }
