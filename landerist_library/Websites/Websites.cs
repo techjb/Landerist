@@ -292,7 +292,7 @@ namespace landerist_library.Websites
             int counterNo = 0;
             foreach(var website in websites)
             {
-                bool canAccess = website.IsPathAllowedToMainUri();
+                bool canAccess = website.IsMainUriAllowed();
                 if(canAccess)
                 {
                     counterYes++;

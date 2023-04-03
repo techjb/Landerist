@@ -81,7 +81,7 @@ namespace landerist_library.Scrape
             }
 
             var website = DictionaryWebsites[page.Host];
-            if (!website.IsPathAllowed(page.Uri))
+            if (!website.IsUriAllowed(page.Uri))
             {
                 return;
             }

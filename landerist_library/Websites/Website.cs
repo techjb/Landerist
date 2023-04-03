@@ -204,12 +204,12 @@ namespace landerist_library.Websites
             return UpdateIpAddress(ipAdress);
         }
 
-        public bool IsPathAllowedToMainUri()
+        public bool IsMainUriAllowed()
         {
-            return IsPathAllowed(MainUri);
+            return IsUriAllowed(MainUri);
         }
 
-        public bool IsPathAllowed(Uri uri)
+        public bool IsUriAllowed(Uri uri)
         {
             if (RobotsTxt != null)
             {

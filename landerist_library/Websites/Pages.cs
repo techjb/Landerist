@@ -58,10 +58,11 @@ namespace landerist_library.Websites
             });
         }
 
-        public static void Insert(SortedSet<Page> pages)
+        public static void Insert(List<Uri> uris)
         {
-            foreach (var page in pages)
+            foreach (var uri in uris)
             {
+                var page = new Page(uri);
                 page.Insert();
             }
         }

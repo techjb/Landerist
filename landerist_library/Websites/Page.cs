@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using HtmlAgilityPack;
+using landerist_library.Index;
 using landerist_library.Scrape;
 
 namespace landerist_library.Websites
@@ -174,8 +175,8 @@ namespace landerist_library.Websites
             {
                 return;
             }
-            var pages = new PageExtractor(this).GetPages();
-            Insert(pages);
+            var uris = new Indexer(this).GetUris();
+            Insert(uris);
         }
 
         private void LoadHtmlDocument()
