@@ -42,11 +42,16 @@ namespace landerist_console
 
         private static void Run()
         {
-            //var uri = new Uri("https://www.goolzoom.com");
-            var uri = new Uri("https://www.saroga.es/");
+
+            //var uri = new Uri("https://www.saroga.es/");
+            //var uri = new Uri("https://mabelan.es/");
+            //var uri = new Uri("https://www.saguar.immo/");
+            //var uri = new Uri("https://www.inmolocalgestion.com/");
+            var uri = new Uri("https://www.expimad.com/");
             var website = new Website(uri);
-            //website.Remove();
-            
+            //website.Remove(); return;
+
+
             //new UrisInserter().Insert(uri);
             //new UrisInserter().FromCsv();
             //new Websites().RemoveBlockedDomains();
@@ -68,7 +73,8 @@ namespace landerist_console
             //website.InsertMainPage();
 
             new Scraper().ScrapeMainPage(website);
-            //new Scrape().ScrapeAllPages();
+            //new Scraper().ScrapePages(website);
+            //new Scraper().ScrapeAllPages();
 
             //new Csv().Export(true);
             //new Json().Export(true);

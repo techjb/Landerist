@@ -26,8 +26,7 @@ namespace landerist_library.Index
             "empleo",
             "localizacion",
             "dondeestamos",
-            "valoracion",
-            "valorar",
+            "valora",
             "actualidad",
             "articulos",
             "blog",
@@ -38,6 +37,11 @@ namespace landerist_library.Index
             "empleo",
             "publicatuinmueble",
             "favorit",
+            "experiencia",
+            "donaciones",
+            "quierovender",
+            "rgpd",
+
         };
 
         public static bool Contains(Uri uri)

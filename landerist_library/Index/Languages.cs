@@ -25,7 +25,7 @@
             "yi", "yo", "za", "zu"
         };
 
-        public static bool Contains(Uri uri)
+        public static bool Contains(Uri uri, string allowedLanguage)
         {
             string absolutePath = uri.AbsolutePath;
             string[] pathComponents = absolutePath.Substring(0, absolutePath.LastIndexOf('/')).Split('/');
@@ -40,6 +40,11 @@
                 if (path.Contains('-'))
                 {
                     language = path.Split('-')[0];
+                }
+
+                if (string.Equals(language, allowedLanguage, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
                 }
                 if (Iso6391Codes.Contains(language))
                 {

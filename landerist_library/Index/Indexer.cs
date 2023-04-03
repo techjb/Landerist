@@ -6,7 +6,7 @@ namespace landerist_library.Index
     {
         private readonly Page Page;
 
-        private readonly List<Uri> Uris = new();        
+        private readonly List<Uri> Uris = new();
 
         public Indexer(Page page)
         {
@@ -32,8 +32,8 @@ namespace landerist_library.Index
                     GetUris(links);
                 }
             }
-            catch (Exception ex) 
-            { 
+            catch (Exception ex)
+            {
 
             }
             return Uris;
@@ -44,11 +44,26 @@ namespace landerist_library.Index
             links = links.Distinct().ToList();
             foreach (var link in links)
             {
+                if (link != null)
+                {
+                    AddUri(link);
+                }                                
+            }
+        }
+
+        private void AddUri(string link)
+        {
+            try
+            {
                 var uri = GetUri(link);
                 if (uri != null && !Uris.Contains(uri))
                 {
                     Uris.Add(uri);
                 }
+            }
+            catch(Exception ex)
+            {
+
             }
         }
 
@@ -59,6 +74,10 @@ namespace landerist_library.Index
                 return null;
             }
             if (!Uri.TryCreate(Page.Uri, link, out Uri? uri))
+            {
+                return null;
+            }
+            if (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)
             {
                 return null;
             }
@@ -79,7 +98,7 @@ namespace landerist_library.Index
             {
                 return null;
             }
-            if (Languages.Contains(uri))
+            if (Languages.Contains(uri, "es"))
             {
                 return null;
             }
