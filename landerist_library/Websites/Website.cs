@@ -1,6 +1,7 @@
 ﻿using Com.Bekijkhet.RobotsTxt;
 using System.Data;
 using System.Net;
+using System.Reflection.Metadata.Ecma335;
 
 namespace landerist_library.Websites
 {
@@ -260,6 +261,11 @@ namespace landerist_library.Websites
         {
             var page = new Page(this);
             return page.Insert();
+        }
+
+        public List<Page> GetPages()
+        {
+            return new Pages().GetPages(this);
         }
     }
 }

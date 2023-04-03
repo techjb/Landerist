@@ -68,7 +68,7 @@ namespace landerist_console
             //website.InsertMainPage();
 
             new Scraper().ScrapeMainPage(website);
-            //new Scrape().AllPages();
+            //new Scrape().ScrapeAllPages();
 
             //new Csv().Export(true);
             //new Json().Export(true);

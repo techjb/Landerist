@@ -38,10 +38,22 @@ namespace landerist_library.Scrape
             }
         }
 
-        public void AllPages()
+        public void ScrapeAllPages()
         {
             var pages = new Pages().GetAll();
             TotalPages = pages.Count;
+            ScrapePages(pages);
+        }
+
+        public void ScrapeMainPage(Website website)
+        {
+            var page = new Page(website);
+            ScrapePage(page);
+        }
+
+        public void ScrapePages(Website website)
+        {
+            var pages = website.GetPages();
             ScrapePages(pages);
         }
 
@@ -50,26 +62,20 @@ namespace landerist_library.Scrape
             PendingPages.Clear();
 
             Parallel.ForEach(pages,
-                new ParallelOptions() { MaxDegreeOfParallelism = 1 }, 
+                new ParallelOptions() { MaxDegreeOfParallelism = 1 },
                 page =>
-            {
-                ScrapePage(page);
-                Console.WriteLine(
-                    "Scrapped: " + Counter + "/" + TotalPages + " Pending: " + PendingPages.Count + " " +
-                    "Success: " + Sucess + " Errors: " + Errors);
-            });
+                {
+                    ScrapePage(page);
+                    Console.WriteLine(
+                        "Scrapped: " + Counter + "/" + TotalPages + " Pending: " + PendingPages.Count + " " +
+                        "Success: " + Sucess + " Errors: " + Errors);
+                });
 
             if (PendingPages.Count > 0)
             {
                 Thread.Sleep(2000);
                 ScrapePages(PendingPages);
             }
-        }
-
-        public void ScrapeMainPage(Website website)
-        {
-            var page = new Page(website);
-            ScrapePage(page);
         }
 
         public void ScrapePage(Page page)
