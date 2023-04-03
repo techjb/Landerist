@@ -25,10 +25,11 @@
             "yi", "yo", "za", "zu"
         };
 
-        public static bool Contains(Uri uri, string allowedLanguage)
+        public static bool ContainsNotAllowed(Uri uri, string allowedLanguage)
         {
             string absolutePath = uri.AbsolutePath;
-            string[] pathComponents = absolutePath.Substring(0, absolutePath.LastIndexOf('/')).Split('/');
+            //string[] pathComponents = absolutePath.Substring(0, absolutePath.LastIndexOf('/')).Split('/');
+            string[] pathComponents = absolutePath.Split('/');
 
             foreach (string path in pathComponents)
             {

@@ -43,11 +43,11 @@ namespace landerist_console
         private static void Run()
         {
 
-            //var uri = new Uri("https://www.saroga.es/");
+            var uri = new Uri("https://www.saroga.es/");
             //var uri = new Uri("https://mabelan.es/");
             //var uri = new Uri("https://www.saguar.immo/");
             //var uri = new Uri("https://www.inmolocalgestion.com/");
-            var uri = new Uri("https://www.expimad.com/");
+            //var uri = new Uri("https://www.expimad.com/");
             var website = new Website(uri);
             //website.Remove(); return;
 
@@ -72,13 +72,12 @@ namespace landerist_console
             //website.SetIpAddress();
             //website.InsertMainPage();
 
-            new Scraper().ScrapeMainPage(website);
+            //new Scraper().ScrapeMainPage(website);
             //new Scraper().ScrapePages(website);
             //new Scraper().ScrapeAllPages();
 
             //new Csv().Export(true);
             //new Json().Export(true);
-
         }
 
         private static void EndBeep()

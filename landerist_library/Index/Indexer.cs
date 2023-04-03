@@ -98,7 +98,7 @@ namespace landerist_library.Index
             {
                 return null;
             }
-            if (Languages.Contains(uri, "es"))
+            if (Languages.ContainsNotAllowed(uri, "es"))
             {
                 return null;
             }

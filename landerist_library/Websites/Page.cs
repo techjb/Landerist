@@ -137,7 +137,7 @@ namespace landerist_library.Websites
             if (task.Result)
             {
                 InsertPages();
-                //GetListing();
+                GetListing();
             }
             return Update();
         }
@@ -200,7 +200,7 @@ namespace landerist_library.Websites
         private void GetListing()
         {
             var ResponseBodyText = GetResponseBodyText();
-            if (ResponseBodyText != null && ResponseBodyText.Length < 16000)
+            if (ResponseBodyText != null && ResponseBodyText.Length < ChatGPT.MAX_REQUEST_LENGTH)
             {
                 IsListing = new ChatGPT().IsListing(ResponseBodyText).Result;
             }

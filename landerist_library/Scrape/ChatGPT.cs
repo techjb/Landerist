@@ -5,6 +5,9 @@ namespace landerist_library.Scrape
 {
     public class ChatGPT
     {
+
+        public static readonly int MAX_REQUEST_LENGTH = 16000;
+
         private readonly OpenAiClient OpenAiClient = new(Config.OPENAI_API_KEY);
         readonly string systemText =
             "Eres un clasificador de textos. Si el texto introducido contiene los datos de venta o alquiler " +
