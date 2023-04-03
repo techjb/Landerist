@@ -1,6 +1,6 @@
 ﻿using landerist_library.Websites;
 
-namespace landerist_library.Scraper
+namespace landerist_library.Scrape
 {
     public class TempBlocker
     {

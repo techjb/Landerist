@@ -1,4 +1,4 @@
-﻿namespace landerist_library.Inserter
+﻿namespace landerist_library.Insert
 {
     internal class BlockedDomains
     {

@@ -1,4 +1,4 @@
-﻿using landerist_library.Inserter;
+﻿using landerist_library.Insert;
 using System.Data;
 
 namespace landerist_library.Websites

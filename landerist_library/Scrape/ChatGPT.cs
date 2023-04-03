@@ -1,7 +1,7 @@
 ﻿using OpenAI;
 using OpenAI.Models.ChatCompletion;
 
-namespace landerist_library.Scraper
+namespace landerist_library.Scrape
 {
     public class ChatGPT
     {

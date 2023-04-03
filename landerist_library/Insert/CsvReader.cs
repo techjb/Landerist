@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 
-namespace landerist_library.Inserter
+namespace landerist_library.Insert
 {
     public class CsvReader
     {

@@ -1,6 +1,6 @@
 ﻿using landerist_library.Websites;
 
-namespace landerist_library.Scraper
+namespace landerist_library.Scrape
 {
     public class Scraper 
     {
@@ -93,7 +93,8 @@ namespace landerist_library.Scraper
             }           
 
             AddToBlocker(website);
-            bool sucess = page.Scrape(website);
+            page.Website = website;
+            bool sucess = page.Scrape();
             AddSuccessError(sucess);
         }
 

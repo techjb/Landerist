@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using HtmlAgilityPack;
-using landerist_library.Scraper;
+using landerist_library.Scrape;
 
 namespace landerist_library.Websites
 {
@@ -130,9 +130,8 @@ namespace landerist_library.Websites
             });
         }
 
-        public bool Scrape(Website website)
+        public bool Scrape()
         {
-            Website = website;
             var task = Task.Run(async () => await Download());
             if (task.Result)
             {

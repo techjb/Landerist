@@ -1,7 +1,7 @@
 ﻿using landerist_library.Websites;
 using System.Data;
 
-namespace landerist_library.Inserter
+namespace landerist_library.Insert
 {
     public class UrisInserter
     {
