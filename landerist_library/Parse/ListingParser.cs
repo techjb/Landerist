@@ -25,7 +25,7 @@ namespace landerist_library.Parse
             {
                 RequestListing();
             }
-            return new Tuple<bool?, Listing?>(IsListing, Listing);
+            return Tuple.Create(IsListing, Listing);
         }
 
         public bool CanRequestListing()
@@ -56,6 +56,7 @@ namespace landerist_library.Parse
                 }
                 else
                 {
+
                     // parse
                     IsListing = true;
                 }
