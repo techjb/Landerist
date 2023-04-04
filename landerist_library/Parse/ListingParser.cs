@@ -1,5 +1,6 @@
 ﻿using landerist_library.Websites;
 using landerist_orels.ES;
+using Newtonsoft.Json;
 
 namespace landerist_library.Parse
 {
@@ -56,11 +57,26 @@ namespace landerist_library.Parse
                 }
                 else
                 {
+                    ParseListing(task.Result);
+                }
+            }
+        }
 
-                    // parse
+        private void ParseListing(string json)
+        {            
+            try
+            {
+                ListingResponse? listingResponse = JsonConvert.DeserializeObject<ListingResponse>(json);
+                if (listingResponse != null)
+                {
+                    Listing = listingResponse.ToListing(Page);
                     IsListing = true;
                 }
             }
+            catch
+            {
+                
+            }            
         }
     }
 }
