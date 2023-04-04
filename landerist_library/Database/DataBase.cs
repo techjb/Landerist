@@ -2,9 +2,9 @@
 using System.Data.SqlClient;
 using System.Text;
 
-namespace landerist_library
+namespace landerist_library.Database
 {
-    public class Database
+    public class DataBase
     {
         #region Private Variables
 
@@ -18,22 +18,21 @@ namespace landerist_library
 
         #endregion Private Variables
 
-
         #region Constructors
 
-        public Database(): this(Config.DATABASE_USER, Config.DATABASE_PW, Config.DATABASE_NAME)
+        public DataBase() : this(Config.DATABASE_USER, Config.DATABASE_PW, Config.DATABASE_NAME)
         {
 
         }
 
-        public Database(string connectionString)
+        public DataBase(string connectionString)
         {
             SqlDataAdapter = new SqlDataAdapter();
             ConnectionString = connectionString;
             //InitialiceConnection();
         }
 
-        public Database(string userId, string pw, string databaseName) :
+        public DataBase(string userId, string pw, string databaseName) :
             this("User ID=" + userId + ";" +
                 "Password=" + pw + ";" +
                 "Initial Catalog=" + databaseName + ";" +

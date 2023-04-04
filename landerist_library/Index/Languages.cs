@@ -28,7 +28,6 @@
         public static bool ContainsNotAllowed(Uri uri, string allowedLanguage)
         {
             string absolutePath = uri.AbsolutePath;
-            //string[] pathComponents = absolutePath.Substring(0, absolutePath.LastIndexOf('/')).Split('/');
             string[] pathComponents = absolutePath.Split('/');
 
             foreach (string path in pathComponents)

@@ -1,4 +1,5 @@
-﻿using landerist_orels.ES;
+﻿using landerist_library.Database;
+using landerist_orels.ES;
 using System.Data;
 
 namespace landerist_library.ES
@@ -27,7 +28,7 @@ namespace landerist_library.ES
                 "@guid, @listingStatus, @listingDate, @unlistingDate, @operation, @propertyType, @propertySubtype, @priceAmount, @priceCurrency, @description, @dataSourceName, @dataSourceGuid, @dataSourceUpdate, @dataSourceUrl, @contactName, @contactPhone, @contactEmail, @contactUrl, @contactOther, @address, @latitude, @longitude, @locationIsAccurate, @cadastralReference, @propertySize, @landSize, @constructionYear, @constructionStatus, @floors, @floor, @bedrooms, @bathrooms, @parkings, @terrace, @garden, @garage, @motorbikeGarage, @pool, @lift, @disabledAccess, @storageRoom, @furnished, @nonFurnished, @heating, @airConditioning, @petsAllowed, @securitySystems " +
                 ")";
 
-            return new Database().Query(query, new Dictionary<string, object?> {
+            return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"guid", listing.guid },
                 {"listingStatus", listing.listingStatus },
                 {"listingDate", listing.listingDate},
@@ -85,7 +86,7 @@ namespace landerist_library.ES
                 "SELECT * " +
                 "FROM " + TABLE_ES_LISTINGS;
 
-            DataTable dataTable = new Database().QueryTable(query);
+            DataTable dataTable = new DataBase().QueryTable(query);
 
             SortedSet<Listing> listings = new();
             foreach (DataRow dataRow in dataTable.Rows)

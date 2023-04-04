@@ -1,4 +1,5 @@
-﻿using System.IO.Compression;
+﻿using landerist_library.Database;
+using System.IO.Compression;
 
 namespace landerist_library.Export
 {
@@ -60,7 +61,7 @@ namespace landerist_library.Export
                "EXEC xp_cmdshell " +
                "'bcp \"SELECT * FROM " + tableName + ";\" queryout \"" + fileName + "\" -T -c -t,';  ";
 
-            return new Database().Query(query);
+            return new DataBase().Query(query);
         }
     }
 }

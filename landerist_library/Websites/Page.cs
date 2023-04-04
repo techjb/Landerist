@@ -2,7 +2,9 @@
 using System.Security.Cryptography;
 using System.Text;
 using HtmlAgilityPack;
+using landerist_library.Database;
 using landerist_library.Index;
+using landerist_library.Parse;
 using landerist_library.Scrape;
 
 namespace landerist_library.Websites
@@ -77,7 +79,7 @@ namespace landerist_library.Websites
                 "FROM " + TABLE_PAGES + " " +
                 "WHERE [UriHash] = @UriHash";
 
-            var dataTable = new Database().QueryTable(query, new Dictionary<string, object?> {
+            var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"UriHash", UriHash }
             });
 
@@ -102,7 +104,7 @@ namespace landerist_library.Websites
                 "INSERT INTO " + TABLE_PAGES + " " +
                 "VALUES(@Host, @Uri, @UriHash, @Inserted, NULL, NULL, NULL, NULL)";
 
-            return new Database().Query(query, new Dictionary<string, object?> {
+            return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"Host", Host },
                 {"Uri", Uri.ToString() },
                 {"UriHash", UriHash },
@@ -122,7 +124,7 @@ namespace landerist_library.Websites
                 "[IsListing] = @IsListing " +
                 "WHERE [UriHash] = @UriHash";
 
-            return new Database().Query(query, new Dictionary<string, object?> {
+            return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"UriHash", UriHash },
                 {"Updated", Updated },
                 {"HttpStatusCode", HttpStatusCode},
@@ -179,13 +181,12 @@ namespace landerist_library.Websites
             Insert(uris);
         }
 
-        private void LoadHtmlDocument()
+        public void LoadHtmlDocument()
         {
             if (HtmlDocument != null)
             {
                 return;
             }
-
             try
             {
                 HtmlDocument = new();
@@ -199,21 +200,22 @@ namespace landerist_library.Websites
 
         private void GetListing()
         {
-            var ResponseBodyText = GetResponseBodyText();
-            if (ResponseBodyText != null && ResponseBodyText.Length < ChatGPT.MAX_REQUEST_LENGTH)
+            var listingParser = new ListingParser(this).GetListing();
+            IsListing = listingParser.Item1;
+            var listing = listingParser.Item2;
+            if (listing != null)
             {
-                IsListing = new ChatGPT().IsListing(ResponseBodyText).Result;
+                new ES.Listings().Insert(listing);
             }
         }
 
-        private string? GetResponseBodyText()
+        public bool IsMainPage()
         {
-            LoadHtmlDocument();
-            if (HtmlDocument != null)
+            if (Website == null)
             {
-                return new HtmlToText(HtmlDocument).GetText();
+                return false;
             }
-            return null;
+            return Uri.Equals(Website.MainUri);
         }
     }
 }

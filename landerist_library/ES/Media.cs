@@ -1,4 +1,5 @@
-﻿using landerist_orels.ES;
+﻿using landerist_library.Database;
+using landerist_orels.ES;
 using System.Data;
 
 namespace landerist_library.ES
@@ -15,7 +16,7 @@ namespace landerist_library.ES
                     "INSERT INTO " + TABLE_ES_MEDIA + " " +
                     "VALUES(@ListingGuid ,@MediaType ,@Title ,@Url)";
 
-                new Database().Query(query, new Dictionary<string, object?> {
+                new DataBase().Query(query, new Dictionary<string, object?> {
                     {"listingGuid", listing.guid },
                     {"mediaType", media.mediaType },
                     {"title", media.title },
@@ -31,7 +32,7 @@ namespace landerist_library.ES
                 "FROM " + TABLE_ES_MEDIA + " " +
                 "WHERE [listingGuid] = @listingGuid";
 
-            DataTable dataTable = new Database().QueryTable(query, new Dictionary<string, object?>()
+            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>()
             {
                 { "listingGuid", listing.guid }
             });

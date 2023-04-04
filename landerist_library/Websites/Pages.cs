@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using landerist_library.Database;
+using System.Data;
 
 namespace landerist_library.Websites
 {
@@ -18,7 +19,7 @@ namespace landerist_library.Websites
                 "SELECT * " +
                 "FROM " + TABLE_PAGES + " ";
 
-            DataTable dataTable = new Database().QueryTable(query);
+            DataTable dataTable = new DataBase().QueryTable(query);
             return GetPages(dataTable);
         }
 
@@ -29,7 +30,7 @@ namespace landerist_library.Websites
                 "FROM " + TABLE_PAGES + " " +
                 "WHERE [Domain] = @Domain";
 
-            DataTable dataTable = new Database().QueryTable(query, new Dictionary<string, object?> {
+            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"Domain", website.Host }
             });
 
@@ -53,7 +54,7 @@ namespace landerist_library.Websites
                "DELETE FROM " + TABLE_PAGES + " " +
                "WHERE [Host] = @Host";
 
-            return new Database().Query(query, new Dictionary<string, object?> {
+            return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"Host", website.Host }
             });
         }

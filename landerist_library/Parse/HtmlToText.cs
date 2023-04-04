@@ -1,6 +1,6 @@
 ﻿using HtmlAgilityPack;
 
-namespace landerist_library.Websites
+namespace landerist_library.Parse
 {
     public class HtmlToText
     {
@@ -12,7 +12,7 @@ namespace landerist_library.Websites
         {
             HtmlDocument = htmlDocument;
         }
-        
+
         public string GetText()
         {
             try
@@ -20,7 +20,7 @@ namespace landerist_library.Websites
                 RemoveResponseBodyNodes();
                 SetResponseBodyTextVisible();
             }
-            catch { }            
+            catch { }
             return HtmlText;
         }
 

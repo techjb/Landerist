@@ -1,4 +1,5 @@
 ﻿using Com.Bekijkhet.RobotsTxt;
+using landerist_library.Database;
 using System.Data;
 using System.Net;
 using System.Reflection.Metadata.Ecma335;
@@ -48,7 +49,7 @@ namespace landerist_library.Websites
                 "FROM " + TABLE_WEBSITES + " " +
                 "WHERE [MainUri] = @MainUri";
 
-            var dataTable = new Database().QueryTable(query, new Dictionary<string, object?> {
+            var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"MainUri", MainUri.ToString() }                
             });
 
@@ -75,7 +76,7 @@ namespace landerist_library.Websites
                 "INSERT INTO " + TABLE_WEBSITES + " " +
                 "VALUES (@MainUri, @Host, NULL, NULL, NULL)";
 
-            return new Database().Query(query, new Dictionary<string, object?> {
+            return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"MainUri", MainUri.ToString() },
                 {"Host", Host }
             });
@@ -94,7 +95,7 @@ namespace landerist_library.Websites
                 "SET RobotsTxt =  @RobotsTxt " +
                 "WHERE Host = @Host";
 
-            return new Database().Query(query, new Dictionary<string, object?> {
+            return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"RobotsTxt", RobotsTxt },
                 {"Host", Host }
             });
@@ -112,7 +113,7 @@ namespace landerist_library.Websites
                 "SET IpAddress =  @IpAddress " +
                 "WHERE Host = @Host";
 
-            return new Database().Query(query, new Dictionary<string, object?> {
+            return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"IpAddress", IpAddress },
                 {"Host", Host }
             });
@@ -127,7 +128,7 @@ namespace landerist_library.Websites
                 "SET MainUri =  @MainUri " +
                 "WHERE Host = @Host";
 
-            return new Database().Query(query, new Dictionary<string, object?> {
+            return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"MainUri", MainUri.ToString() },
                 {"Host", Host },
             });
@@ -145,7 +146,7 @@ namespace landerist_library.Websites
                 "SET HttpStatusCode =  @HttpStatusCode " +
                 "WHERE Host = @Host";
 
-            return new Database().Query(query, new Dictionary<string, object?> {
+            return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"HttpStatusCode", HttpStatusCode },
                 {"Host", Host }
             });
@@ -251,7 +252,7 @@ namespace landerist_library.Websites
                "DELETE FROM " + TABLE_WEBSITES + " " +
                "WHERE [Host] = @Host";
 
-            return new Database().Query(query, new Dictionary<string, object?> {
+            return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"MainUri", MainUri.ToString() },
                 {"Host", Host }
             });

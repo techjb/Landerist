@@ -1,4 +1,5 @@
-﻿using landerist_library.Insert;
+﻿using landerist_library.Database;
+using landerist_library.Insert;
 using System.Data;
 
 namespace landerist_library.Websites
@@ -33,7 +34,7 @@ namespace landerist_library.Websites
         private static DataTable GetDataTableAll()
         {
             string query = "SELECT * FROM " + TABLE_WEBSITES;
-            return new Database().QueryTable(query);
+            return new DataBase().QueryTable(query);
         }
 
         private static DataTable ToDataTableHttpStatusCodeOk()
@@ -42,7 +43,7 @@ namespace landerist_library.Websites
                 "SELECT * " +
                 "FROM " + TABLE_WEBSITES + " " +
                 "WHERE [HttpStatusCode] = 200";
-            return new Database().QueryTable(query);
+            return new DataBase().QueryTable(query);
         }
 
         private static DataTable ToDataTableHttpStatusCodeNotOk()
@@ -51,7 +52,7 @@ namespace landerist_library.Websites
                 "SELECT * " +
                 "FROM " + TABLE_WEBSITES + " " +
                 "WHERE [HttpStatusCode] <> 200 AND [HttpStatusCode] IS NOT NULL";
-            return new Database().QueryTable(query);
+            return new DataBase().QueryTable(query);
         }
 
         private static DataTable ToDataTableHttpStatusCodeNull()
@@ -60,7 +61,7 @@ namespace landerist_library.Websites
                 "SELECT * " +
                 "FROM " + TABLE_WEBSITES + " " +
                 "WHERE [HttpStatusCode] IS NULL";
-            return new Database().QueryTable(query);
+            return new DataBase().QueryTable(query);
         }
 
         public static Website? GetWebsite(string host)
@@ -70,7 +71,7 @@ namespace landerist_library.Websites
                 "FROM " + TABLE_WEBSITES + " " +
                 "WHERE Host = @Host";
 
-            DataTable dataTable = new Database().QueryTable(query, new Dictionary<string, object?> {
+            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"Host", host }
             });
 
@@ -97,7 +98,7 @@ namespace landerist_library.Websites
             string query =
                 "SELECT Uri " +
                 "FROM " + TABLE_WEBSITES;
-            return new Database().QueryHashSet(query);
+            return new DataBase().QueryHashSet(query);
         }
 
         public void SetHttpStatusCodesToAll()
