@@ -47,7 +47,7 @@ namespace landerist_library.Scrape
 
         public void ScrapeMainPage(Website website)
         {
-            var page = new Page(website);
+            var page = new Page(website, website.MainUri);
             ScrapePage(page);
         }
 
@@ -98,8 +98,7 @@ namespace landerist_library.Scrape
                 return;
             }           
 
-            AddToBlocker(website);
-            page.Website = website;
+            AddToBlocker(website);            
             bool sucess = page.Scrape();
             AddSuccessError(sucess);
         }

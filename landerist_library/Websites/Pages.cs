@@ -34,15 +34,15 @@ namespace landerist_library.Websites
                 {"Domain", website.Host }
             });
 
-            return GetPages(dataTable);
+            return GetPages(website, dataTable);
         }
 
-        private List<Page> GetPages(DataTable dataTable)
+        private List<Page> GetPages(Website website, DataTable dataTable)
         {
             List<Page> pages = new();
             foreach (DataRow dataRow in dataTable.Rows)
             {
-                Page page = new(dataRow);
+                Page page = new(website, dataRow);
                 pages.Add(page);
             }
             return pages;
@@ -59,11 +59,11 @@ namespace landerist_library.Websites
             });
         }
 
-        public static void Insert(List<Uri> uris)
+        public static void Insert(Website website, List<Uri> uris)
         {
             foreach (var uri in uris)
             {
-                var page = new Page(uri);
+                var page = new Page(website, uri);
                 page.Insert();
             }
         }

@@ -35,7 +35,7 @@ namespace landerist_library.Parse
 
         public int? NúmeroDePlantasDelEdificio { get; set; } = null;
 
-        public int? PlantaDelInmueble { get; set; } = null;
+        public string? PlantaDelInmueble { get; set; } = null;
 
         public int? NúmeroDeDormitorios { get; set; } = null;
 
@@ -43,7 +43,34 @@ namespace landerist_library.Parse
 
         public int? NúmeroDeParkings { get; set; } = null;
 
-        public string? Características { get; set; } = null;
+        public bool? TieneTerraza { get; set; } = null;
+
+        public bool? TieneJardín { get; set; } = null;
+
+        public bool? TieneGaraje { get; set; } = null;
+
+        public bool? TieneGarajeParaMoto { get; set; } = null;
+
+        public bool? TienePiscina { get; set; } = null;
+
+        public bool? TieneAscensor { get; set; } = null;
+
+        public bool? TieneAccesoParaDiscapacitados { get; set; } = null;
+
+        public bool? TieneTrastero { get; set; } = null;
+
+        public bool? EstáAmueblado { get; set; } = null;
+
+        public bool? NoEstáAmueblado { get; set; } = null;
+
+        public bool? TienCalefácción { get; set; } = null;
+
+        public bool? TienAireAcondicionado { get; set; } = null;
+
+        public bool? PermiteMascotas { get; set; } = null;
+
+        public bool? TieneSistemasDeSeguridad { get; set; } = null;
+
 
 
         private const string OPERACION_VENTA = "venta";
@@ -90,6 +117,14 @@ namespace landerist_library.Parse
 
         private const string SUBTIPO_DE_INMUEBLE_PARCELA_NO_URBANIZABLE = "parcela_no_urbanizable";
 
+        private const string ESTADO_DE_LA_CONSTRUCCIÓN_OBRA_NUEVA = "obra_nueva";
+
+        private const string ESTADO_DE_LA_CONSTRUCCIÓN_BUENO = "buen_estado";
+
+        private const string ESTADO_DE_LA_CONSTRUCCIÓN_A_REFORMAR = "a_reformar";
+
+        private const string ESTADO_DE_LA_CONSTRUCCIÓN_EN_RUINAS = "en_ruinas";
+
 
         public Listing? ToListing(Page page)
         {
@@ -105,6 +140,24 @@ namespace landerist_library.Parse
                 operation = GetOperation(),
                 propertyType = GetPropertyType(),
                 propertySubtype = GetPropertySubtype(),
+                price = GetPropertyPrice(),
+                description = GetDescription(),
+                dataSourceName = GetDataSourceName(page),
+                dataSourceGuid = GetDataSourceGuid(),
+                dataSourceUpdate = GetDataSourceUpdate(),
+                dataSourceUrl = GetDataSourceUrl(page),
+                address = GetAddress(),
+                cadastralReference = GetCadastralReference(),
+                propertySize = GetPropertySize(),
+                landSize = GetLandSize(),
+                constructionYear = GetConstrunctionYear(),
+                constructionStatus = GetConstructionStatus(),
+                floors = GetFloors(),
+                floor = GetFloor(),
+                bedrooms = GetBedrooms(),
+                bathrooms = GetBathrooms(),
+                parkings = GetParkings(),
+                features = GetFeatures()
             };
             return listing;
         }
@@ -286,7 +339,6 @@ namespace landerist_library.Parse
                 case PropertyType.land:
                     {
                         return IsValidSubtypeLand(propertySubtypeNonNull);
-
                     }
                 default: break;
             }
@@ -312,6 +364,142 @@ namespace landerist_library.Parse
                 propertySubtype.Equals(PropertySubtype.developed) ||
                 propertySubtype.Equals(PropertySubtype.buildable) ||
                 propertySubtype.Equals(PropertySubtype.non_building);
+        }
+
+        private Price? GetPropertyPrice()
+        {
+            if (PrecioDelAnuncio == null)
+            {
+                return null;
+            }
+            return new Price()
+            {
+                amount = (decimal)PrecioDelAnuncio
+            };
+        }
+
+        private string? GetDescription()
+        {
+            return DescripciónDelAnuncio;
+        }
+
+        private string GetDataSourceName(Page page)
+        {
+            return page.Website.Host;
+        }
+
+        private string? GetDataSourceGuid()
+        {
+            return ReferenciaDelAnuncio;
+        }
+
+        private DateTime GetDataSourceUpdate()
+        {
+            return DateTime.Now;
+        }
+
+        private Uri GetDataSourceUrl(Page page)
+        {
+            return page.Uri;
+        }
+
+        private string? GetAddress()
+        {
+            return DirecciónDelInmueble;
+        }
+
+        private string? GetCadastralReference()
+        {
+            return RererenciaCatastral;
+        }
+
+        private double? GetPropertySize()
+        {
+            return TamañoDelInmueble;
+        }
+
+        private double? GetLandSize()
+        {
+            return TamañoDeLaParcela;
+        }
+
+        private int? GetConstrunctionYear()
+        {
+            return AñoDeConstrucción;
+        }
+
+        private ConstructionStatus? GetConstructionStatus()
+        {
+            if (EstadoDeLaConstrucción == null)
+            {
+                return null;
+            }
+            switch (EstadoDeLaConstrucción)
+            {
+                case ESTADO_DE_LA_CONSTRUCCIÓN_OBRA_NUEVA: return ConstructionStatus.@new;
+                case ESTADO_DE_LA_CONSTRUCCIÓN_BUENO: return ConstructionStatus.good;
+                case ESTADO_DE_LA_CONSTRUCCIÓN_A_REFORMAR: return ConstructionStatus.for_renovation;
+                case ESTADO_DE_LA_CONSTRUCCIÓN_EN_RUINAS: return ConstructionStatus.refurbished;
+                default: return null;
+            }
+        }
+
+        private int? GetFloors()
+        {
+            return NúmeroDePlantasDelEdificio;
+        }
+
+        private string? GetFloor()
+        {
+            return PlantaDelInmueble;
+        }
+
+        private int? GetBedrooms()
+        {
+            return NúmeroDeDormitorios;
+        }
+
+        private int? GetBathrooms()
+        {
+            return NúmeroDeBaños;
+        }
+
+        private int? GetParkings()
+        {
+            return NúmeroDeParkings;
+        }
+
+        private List<Feature> GetFeatures()
+        {
+            var features = new List<Feature>();
+            AddFeature(features, TieneTerraza, Feature.terrace);
+            AddFeature(features, TieneJardín, Feature.garden);
+            AddFeature(features, TieneGaraje, Feature.garage);
+            AddFeature(features, TieneGarajeParaMoto, Feature.motorbike_garage);
+            AddFeature(features, TienePiscina, Feature.pool);
+            AddFeature(features, TieneAscensor, Feature.lift);
+            AddFeature(features, TieneAccesoParaDiscapacitados, Feature.disabled_access);
+            AddFeature(features, TieneTrastero, Feature.storage_room);
+            AddFeature(features, EstáAmueblado, Feature.furnished);
+            AddFeature(features, NoEstáAmueblado, Feature.non_furnished);
+            AddFeature(features, TienCalefácción, Feature.heating);
+            AddFeature(features, PermiteMascotas, Feature.pets_allowed);
+            AddFeature(features, TieneSistemasDeSeguridad, Feature.security_systems);
+            return features;
+        }
+
+        private void AddFeature(List<Feature> features, bool? value, Feature feature)
+        {
+            if (value != null)
+            {
+                if ((bool)value)
+                {
+                    if (!features.Contains(feature))
+                    {
+                        features.Add(feature);
+                    }
+                }
+            }
         }
     }
 }

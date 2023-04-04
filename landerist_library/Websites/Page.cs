@@ -5,7 +5,6 @@ using HtmlAgilityPack;
 using landerist_library.Database;
 using landerist_library.Index;
 using landerist_library.Parse;
-using landerist_library.Scrape;
 
 namespace landerist_library.Websites
 {
@@ -28,19 +27,14 @@ namespace landerist_library.Websites
         public bool? IsListing { get; set; }
 
 
-        public Website? Website;
+        public Website Website;
 
 
         public HtmlDocument? HtmlDocument = null;
 
-
-        public Page(Website website) : this(website.MainUri)
+        public Page(Website website, Uri uri)
         {
             Website = website;
-        }
-
-        public Page(Uri uri)
-        {
             Host = uri.Host;
             Uri = uri;
             UriHash = CalculateHash(uri);
@@ -54,8 +48,9 @@ namespace landerist_library.Websites
             }
         }
 
-        public Page(DataRow dataRow)
+        public Page(Website website, DataRow dataRow)
         {
+            Website = website;
             Load(dataRow);
         }
 
@@ -178,7 +173,7 @@ namespace landerist_library.Websites
                 return;
             }
             var uris = new Indexer(this).GetUris();
-            Insert(uris);
+            Insert(Website, uris);
         }
 
         public void LoadHtmlDocument()
