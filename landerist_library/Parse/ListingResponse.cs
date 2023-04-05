@@ -72,7 +72,6 @@ namespace landerist_library.Parse
         public bool? TieneSistemasDeSeguridad { get; set; } = null;
 
 
-
         private const string OPERACION_VENTA = "venta";
 
         private const string OPERACION_ALQUILER = "alquiler";
@@ -124,7 +123,6 @@ namespace landerist_library.Parse
         private const string ESTADO_DE_LA_CONSTRUCCIÓN_A_REFORMAR = "a_reformar";
 
         private const string ESTADO_DE_LA_CONSTRUCCIÓN_EN_RUINAS = "en_ruinas";
-
 
         public Listing? ToListing(Page page)
         {
@@ -199,7 +197,7 @@ namespace landerist_library.Parse
         }
 
 
-        private ListingStatus GetListingStatus()
+        private static ListingStatus GetListingStatus()
         {
             return ListingStatus.published;
         }
@@ -345,7 +343,7 @@ namespace landerist_library.Parse
             return false;
         }
 
-        private bool IsValidSubtypeHome(PropertySubtype propertySubtype)
+        private static bool IsValidSubtypeHome(PropertySubtype propertySubtype)
         {
             return
                 propertySubtype.Equals(PropertySubtype.flat) ||
@@ -358,7 +356,7 @@ namespace landerist_library.Parse
                 propertySubtype.Equals(PropertySubtype.terraced);
         }
 
-        private bool IsValidSubtypeLand(PropertySubtype propertySubtype)
+        private static bool IsValidSubtypeLand(PropertySubtype propertySubtype)
         {
             return
                 propertySubtype.Equals(PropertySubtype.developed) ||
@@ -383,7 +381,7 @@ namespace landerist_library.Parse
             return DescripciónDelAnuncio;
         }
 
-        private string GetDataSourceName(Page page)
+        private static string GetDataSourceName(Page page)
         {
             return page.Website.Host;
         }
@@ -393,12 +391,12 @@ namespace landerist_library.Parse
             return ReferenciaDelAnuncio;
         }
 
-        private DateTime GetDataSourceUpdate()
+        private static DateTime GetDataSourceUpdate()
         {
             return DateTime.Now;
         }
 
-        private Uri GetDataSourceUrl(Page page)
+        private static Uri GetDataSourceUrl(Page page)
         {
             return page.Uri;
         }
@@ -488,7 +486,7 @@ namespace landerist_library.Parse
             return features;
         }
 
-        private void AddFeature(List<Feature> features, bool? value, Feature feature)
+        private static void AddFeature(List<Feature> features, bool? value, Feature feature)
         {
             if (value != null)
             {
@@ -501,5 +499,51 @@ namespace landerist_library.Parse
                 }
             }
         }
+
+        public static string GetSchema()
+        {
+            List<string> list = new();
+            AddSchemaProperty(list, nameof(FechaDePublicación));
+            AddSchemaProperty(list, nameof(TipoDeOperacion), new string[] {
+                OPERACION_VENTA, OPERACION_ALQUILER
+            });
+            AddSchemaProperty(list, nameof(TipoDeInmueble), new string[] {
+                TIPO_DE_INMUEBLE_VIVIENDA,
+                TIPO_DE_INMUEBLE_DORMITORIO,
+                TIPO_DE_INMUEBLE_LOCALCOMERCIAL,
+                TIPO_DE_INMUEBLE_NAVE_INDUSTRIAL,
+                TIPO_DE_INMUEBLE_GARAJE,
+                TIPO_DE_INMUEBLE_TRASTERO,
+                TIPO_DE_INMUEBLE_OFICINA,
+                TIPO_DE_INMUEBLE_PARCELA,
+                TIPO_DE_INMUEBLE_EDIFICIO
+            });
+
+            return
+                "{" +
+                    "\"type\": \"object\"," +
+                    " \"additionalProperties\": false," +
+                    "\"properties\": {" + string.Join(",", list.ToArray()) + "}" +
+                "}";
+        }
+
+
+        public static void AddSchemaProperty(List<string> list, string name)
+        {
+            AddSchemaProperty(list, name, Array.Empty<string>());
+        }
+
+        public static void AddSchemaProperty(List<string> list, string name, string[] enums)
+        {
+            string enumsProperty = string.Empty;
+            if (enums.Length > 0)
+            {
+                enumsProperty = ", \"enum\":[\"" + string.Join("\",\"", enums) + "\"]";
+            }
+            string property = "\"" + name + "\": {\"type\": \"string\"" + enumsProperty + "}";
+            list.Add(property);
+        }
+
+
     }
 }

@@ -54,7 +54,17 @@ namespace landerist_library.Parse
             //return text.Length < MAX_TEXT_LENGTH;
 
             //https://github.com/dluc/openai-tools
-            return GPT3Tokenizer.Encode(text).Count < MAX_TOKENS;            
+            int textTokens = GPT3Tokenizer.Encode(text).Count;
+
+            string requestMessage = GetRequestMessage();
+            int requestMessageTokens = GPT3Tokenizer.Encode(requestMessage).Count;
+            int totalTokens = textTokens + requestMessageTokens;
+            return totalTokens < MAX_TOKENS;
+        }
+
+        public static string GetRequestMessage()
+        {
+            return SystemMessage  + " " + ListingResponse.GetSchema();
         }
     }
 }
