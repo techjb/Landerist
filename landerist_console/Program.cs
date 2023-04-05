@@ -79,10 +79,6 @@ namespace landerist_console
 
             //new Csv().Export(true);
             //new Json().Export(true);
-
-            string text = "Lorem ipsum dolor sit amet consectetur adipiscing elit sapien feugiat rhoncus dis condimentum dapibus rutrum fermentum, parturient porttitor hac platea gravida laoreet penatibus nisl orci nec hendrerit fames varius mi. Varius felis pretium cubilia vivamus interdum libero dignissim, torquent sociosqu sagittis in bibendum taciti placerat, curabitur parturient maecenas fames primis blandit. Magna praesent euismod scelerisque erat suspendisse cubilia tempus vulputate class ornare, quam imperdiet ante enim mi eu faucibus hendrerit inceptos, consequat vitae orci ligula magnis integer ultrices molestie feugiat.";
-            var Characters = text.Length;
-            var tokens = ChatGPT.IsTextAllowed(text);
         }
 
         private static void EndBeep()
