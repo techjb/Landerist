@@ -33,7 +33,7 @@ namespace landerist_library.Parse
         {
             return 
                 !ResponseBodyText.Equals(string.Empty) &&
-                ResponseBodyText.Length < ChatGPT.MAX_REQUEST_LENGTH &&
+                ChatGPT.IsTextAllowed(ResponseBodyText) &&
                 !Page.IsMainPage();
         }
 

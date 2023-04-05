@@ -5,6 +5,7 @@ using HtmlAgilityPack;
 using landerist_library.Database;
 using landerist_library.Index;
 using landerist_library.Parse;
+using landerist_library.Scrape;
 
 namespace landerist_library.Websites
 {
@@ -32,6 +33,10 @@ namespace landerist_library.Websites
 
         public HtmlDocument? HtmlDocument = null;
 
+        public Page(Website website) : this(website, website.MainUri) 
+        { 
+
+        }
         public Page(Website website, Uri uri)
         {
             Website = website;
@@ -126,6 +131,15 @@ namespace landerist_library.Websites
                 {"ResponseBody", ResponseBody},
                 {"IsListing", IsListing },
             });
+        }
+
+        public bool CanScrape()
+        {
+            if (!Website.IsUriAllowed(Uri))
+            {
+                return false;
+            }
+            return true;
         }
 
         public bool Scrape()

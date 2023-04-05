@@ -12,15 +12,14 @@ namespace landerist_library.Websites
 
         }
 
-        public List<Page> GetAll()
+        public DataTable GetAll()
         {
             Console.WriteLine("Reading all pages");
             string query =
                 "SELECT * " +
                 "FROM " + TABLE_PAGES + " ";
 
-            DataTable dataTable = new DataBase().QueryTable(query);
-            return GetPages(dataTable);
+            return new DataBase().QueryTable(query);            
         }
 
         public List<Page> GetPages(Website website)

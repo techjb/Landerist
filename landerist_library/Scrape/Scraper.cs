@@ -1,14 +1,13 @@
 ﻿using landerist_library.Websites;
+using System.Data;
 
 namespace landerist_library.Scrape
 {
-    public class Scraper 
+    public class Scraper
     {
         private readonly TempBlocker TempBlocker = new();
 
         private readonly object SyncBlocker = new();
-
-        private readonly Dictionary<string, Website> DictionaryWebsites = new();
 
         private readonly List<Page> PendingPages = new();
 
@@ -26,28 +25,38 @@ namespace landerist_library.Scrape
 
         public Scraper()
         {
-            InitDictionary();
-        }
 
-        private void InitDictionary()
-        {
-            var websites = Websites.Websites.GetStatusCodeOk();
-            foreach (var website in websites)
-            {
-                DictionaryWebsites.Add(website.Host, website);
-            }
         }
 
         public void ScrapeAllPages()
         {
-            var pages = new Pages().GetAll();
+            var dictionary = Websites.Websites.GetDicionaryStatusCodeOk();
+            var dataTable = new Pages().GetAll();
+            var pages = GetPages(dictionary, dataTable);
             TotalPages = pages.Count;
             ScrapePages(pages);
         }
 
+        private List<Page> GetPages(Dictionary<string, Website> dictionary, DataTable dataTable)
+        {
+            List<Page> pages = new();
+            foreach (DataRow dataRow in dataTable.Rows)
+            {
+                var host = (string)dataRow["host"];
+                if (!dictionary.ContainsKey(host))
+                {
+                    continue;
+                }
+                var website = dictionary[host];
+                Page page = new(website, dataRow);
+                pages.Add(page);
+            }
+            return pages;
+        }
+
         public void ScrapeMainPage(Website website)
         {
-            var page = new Page(website, website.MainUri);
+            var page = new Page(website);
             ScrapePage(page);
         }
 
@@ -80,25 +89,18 @@ namespace landerist_library.Scrape
 
         public void ScrapePage(Page page)
         {
-            IncreaseCounter();            
-            if (!DictionaryWebsites.ContainsKey(page.Host))
+            IncreaseCounter();
+            if (!page.CanScrape())
             {
                 return;
             }
 
-            var website = DictionaryWebsites[page.Host];
-            if (!website.IsUriAllowed(page.Uri))
-            {
-                return;
-            }
-
-            if (TempBlocker.IsBlocked(website))
+            if (TempBlocker.IsBlocked(page.Website))
             {
                 PendingPages.Add(page);
                 return;
-            }           
-
-            AddToBlocker(website);            
+            }
+            AddToBlocker(page);
             bool sucess = page.Scrape();
             AddSuccessError(sucess);
         }
@@ -111,11 +113,11 @@ namespace landerist_library.Scrape
             }
         }
 
-        private void AddToBlocker(Website website)
+        private void AddToBlocker(Page page)
         {
             lock (SyncBlocker)
             {
-                TempBlocker.Add(website);
+                TempBlocker.Add(page.Website);
             }
         }
 

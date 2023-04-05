@@ -13,6 +13,17 @@ namespace landerist_library.Websites
             return ParseWebsites(dataTable);
         }
 
+        public static Dictionary<string, Website> GetDicionaryStatusCodeOk()
+        {
+            Dictionary<string, Website> dictionary = new();
+            var websites = GetStatusCodeOk();
+            foreach (var website in websites)
+            {
+                dictionary.Add(website.Host, website);
+            }
+            return dictionary;
+        }
+
         public static List<Website> GetStatusCodeOk()
         {
             var dataTable = ToDataTableHttpStatusCodeOk();
@@ -291,10 +302,10 @@ namespace landerist_library.Websites
             var websites = GetStatusCodeOk();
             int counterYes = 0;
             int counterNo = 0;
-            foreach(var website in websites)
+            foreach (var website in websites)
             {
                 bool canAccess = website.IsMainUriAllowed();
-                if(canAccess)
+                if (canAccess)
                 {
                     counterYes++;
                 }
@@ -317,16 +328,6 @@ namespace landerist_library.Websites
             }
         }
 
-        public void CalculateHashes()
-        {
-            var websites = GetStatusCodeOk();            
-            foreach (var website in websites)
-            {
-                var page = new Page(website.MainUri);               
-                Console.WriteLine(page.UriHash + " " + page.Uri);
-            }
-        }
-
         public void InsertMainPages()
         {
             var websites = GetStatusCodeOk();
@@ -342,7 +343,7 @@ namespace landerist_library.Websites
                 {
                     errors++;
                 }
-                Console.WriteLine("Inserted: " + inserted + " Errors: "+ errors +" From: " + websites.Count);
+                Console.WriteLine("Inserted: " + inserted + " Errors: " + errors + " From: " + websites.Count);
             }
         }
 
@@ -350,7 +351,7 @@ namespace landerist_library.Websites
         {
             var websites = AllWebsites();
             int counter = 0;
-            foreach(var website in websites)
+            foreach (var website in websites)
             {
                 if (BlockedDomains.IsBlocked(website.MainUri))
                 {
