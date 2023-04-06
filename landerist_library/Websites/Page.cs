@@ -5,7 +5,6 @@ using HtmlAgilityPack;
 using landerist_library.Database;
 using landerist_library.Index;
 using landerist_library.Parse;
-using landerist_library.Scrape;
 
 namespace landerist_library.Websites
 {
@@ -225,6 +224,32 @@ namespace landerist_library.Websites
                 return false;
             }
             return Uri.Equals(Website.MainUri);
+        }
+
+        public bool LanguageIs(string language)
+        {
+            LoadHtmlDocument();
+            if (HtmlDocument != null)
+            {
+                var htmlNode = HtmlDocument.DocumentNode.SelectSingleNode("//html");
+                if (htmlNode != null)
+                {
+                    var langAttribute = htmlNode.Attributes["lang"];
+                    if (langAttribute != null)
+                    {
+                        string value = langAttribute.Value;
+                        if (value.Contains("-"))
+                        {
+                            value = value.Split('-')[0];
+                        }
+                        if (!value.Equals(language, StringComparison.OrdinalIgnoreCase))
+                        {
+                            return false;
+                        }                        
+                    }
+                }
+            }
+            return true;
         }
     }
 }

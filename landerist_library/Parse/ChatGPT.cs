@@ -8,12 +8,12 @@ namespace landerist_library.Parse
     public class ChatGPT
     {
 
-        // Para GPT-3.5-Turbo es 4096
-        // Para GPT-4-8K es 8192
-        // Para GPT-4-32K es 32768
+        // GPT-3.5-Turbo: 4096
+        // GPT-4-8K: 8192
+        // GPT-4-32K: 32768
         public static readonly int MAX_TOKENS = 4096;
 
-        public static readonly int MAX_TEXT_LENGTH = 16000;
+        //public static readonly int MAX_TEXT_LENGTH = 16000;
 
         private const string SystemMessage =
             "Eres un clasificador de textos. Si el texto introducido contiene los datos de venta o alquiler " +
@@ -28,16 +28,16 @@ namespace landerist_library.Parse
             var chatRequest = new ChatRequest()
             {
                 Model = Model.ChatGPTTurbo,
-                Temperature = 0.1,
+                Temperature = 0,
                 //MaxTokens = 50,
             };
             Conversation = openAIAPI.Chat.CreateConversation(chatRequest);
             Conversation.AppendSystemMessage(SystemMessage);
         }
 
-        public async Task<string?> GetListing(string ResponseBodyText)
+        public async Task<string?> GetResponse(string userInput)
         {
-            Conversation.AppendUserInput(ResponseBodyText);
+            Conversation.AppendUserInput(userInput);
             try
             {
                 return await Conversation.GetResponseFromChatbotAsync();
@@ -48,23 +48,19 @@ namespace landerist_library.Parse
             }
         }
 
-        public static bool IsTextAllowed(string text)
+        public static bool IsRequestAllowed(string request)
         {
-            // más simple, pero peor.
-            //return text.Length < MAX_TEXT_LENGTH;
-
             //https://github.com/dluc/openai-tools
-            int textTokens = GPT3Tokenizer.Encode(text).Count;
-
-            string requestMessage = GetRequestMessage();
-            int requestMessageTokens = GPT3Tokenizer.Encode(requestMessage).Count;
-            int totalTokens = textTokens + requestMessageTokens;
+            int userTokens = GPT3Tokenizer.Encode(request).Count;
+            string systemMessage = GetSystemMessage();
+            int systemTokens = GPT3Tokenizer.Encode(systemMessage).Count;
+            int totalTokens = userTokens + systemTokens;
             return totalTokens < MAX_TOKENS;
         }
 
-        public static string GetRequestMessage()
+        public static string GetSystemMessage()
         {
-            return SystemMessage  + " " + ListingResponse.GetSchema();
+            return SystemMessage  + Environment.NewLine + ListingResponseSchema.GetSchema();
         }
     }
 }

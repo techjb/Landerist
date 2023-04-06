@@ -33,8 +33,10 @@ namespace landerist_library.Parse
         {
             return 
                 !ResponseBodyText.Equals(string.Empty) &&
-                ChatGPT.IsTextAllowed(ResponseBodyText) &&
-                !Page.IsMainPage();
+                ChatGPT.IsRequestAllowed(ResponseBodyText) &&
+                !Page.IsMainPage()
+                //Page.LanguageIs("es") // permitimos cualquier lenguage.
+                ;
         }
 
         private void SetResponseBodyText()
@@ -48,7 +50,7 @@ namespace landerist_library.Parse
 
         private void RequestListing()
         {
-            var task = Task.Run(async () => await new ChatGPT().GetListing(ResponseBodyText));
+            var task = Task.Run(async () => await new ChatGPT().GetResponse(ResponseBodyText));
             if (task.Result != null)
             {
                 if (task.Result.Equals("no"))

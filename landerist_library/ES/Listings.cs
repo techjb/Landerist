@@ -30,23 +30,23 @@ namespace landerist_library.ES
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"guid", listing.guid },
-                {"listingStatus", listing.listingStatus },
+                {"listingStatus", listing.listingStatus.ToString() },
                 {"listingDate", listing.listingDate},
                 {"unlistingDate", listing.unlistingDate},
-                {"operation", listing.operation },
-                {"propertyType", listing.propertyType },
-                {"propertySubType", listing.propertySubtype},
-                {"priceAmount", listing.price.amount },
-                {"priceCurrency", listing.price.currency },
+                {"operation", listing.operation.ToString() },
+                {"propertyType", listing.propertyType.ToString() },
+                {"propertySubType", listing.propertySubtype?.ToString()},
+                {"priceAmount", listing.price?.amount },
+                {"priceCurrency", listing.price?.currency},
                 {"description", listing.description },
                 {"dataSourceName", listing.dataSourceName },
                 {"dataSourceGuid", listing.dataSourceGuid },
                 {"dataSourceUpdate", listing.dataSourceUpdate},
-                {"dataSourceUrl", listing.dataSourceUrl },
+                {"dataSourceUrl", listing.dataSourceUrl?.ToString() },
                 {"contactName", listing.contactName },
                 {"contactPhone", listing.contactPhone },
                 {"contactEmail", listing.contactEmail },
-                {"contactUrl", listing.contactUrl },
+                {"contactUrl", listing.contactUrl?.ToString() },
                 {"contactOther", listing.contactOther },
                 {"address", listing.address },
                 {"latitude", listing.latitude},
@@ -56,7 +56,7 @@ namespace landerist_library.ES
                 {"propertySize", listing.propertySize},
                 {"landSize", listing.landSize},
                 {"constructionYear", listing.constructionYear},
-                {"constructionStatus", listing.constructionStatus},
+                {"constructionStatus", listing.constructionStatus?.ToString()},
                 {"floors", listing.floors},
                 {"floor", listing.floor },
                 {"bedrooms", listing.bedrooms },
@@ -79,7 +79,7 @@ namespace landerist_library.ES
             });
         }
 
-       
+
         public SortedSet<Listing> GetAll(bool loadMedia)
         {
             string query =
@@ -96,7 +96,7 @@ namespace landerist_library.ES
                 {
                     var media = Media.GetMedia(listing);
                     listing.SetMedia(media);
-                }                
+                }
                 listings.Add(listing);
             }
             return listings;
@@ -113,8 +113,9 @@ namespace landerist_library.ES
                 operation = (Operation)dataRow["operation"],
                 propertyType = (PropertyType)dataRow["propertyType"],
                 propertySubtype = dataRow["propertySubtype"] is DBNull ? null : (PropertySubtype)dataRow["propertySubtype"],
-                price = dataRow["priceAmount"] is DBNull ? null : new Price() { 
-                    amount = Convert.ToDecimal(dataRow["priceAmount"]) ,
+                price = dataRow["priceAmount"] is DBNull ? null : new Price()
+                {
+                    amount = Convert.ToDecimal(dataRow["priceAmount"]),
                     currency = (Currency)dataRow["priceCurrency"]
                 },
                 description = dataRow["description"] is DBNull ? null : (string)dataRow["description"],
@@ -142,7 +143,7 @@ namespace landerist_library.ES
                 bathrooms = dataRow["bathrooms"] is DBNull ? null : (int)dataRow["bathrooms"],
                 parkings = dataRow["parkings"] is DBNull ? null : (int)dataRow["parkings"],
             };
-            
+
             AddFeature(listing, dataRow, "terrace", Feature.terrace);
             AddFeature(listing, dataRow, "garden", Feature.garden);
             AddFeature(listing, dataRow, "garage", Feature.garage);
@@ -163,13 +164,13 @@ namespace landerist_library.ES
 
         private void AddFeature(Listing listing, DataRow dataRow, string rowName, Feature feature)
         {
-            if(dataRow[rowName] is DBNull)
+            if (dataRow[rowName] is DBNull)
             {
                 return;
             }
 
             var value = (bool?)dataRow[rowName];
-            listing.AddFeature(value, feature);            
+            listing.AddFeature(value, feature);
         }
     }
 }

@@ -98,7 +98,7 @@ namespace landerist_orels.ES
         public SortedSet<Media> media { get; set; }
 
         [JsonProperty(Order = 9)]
-        public Price price { get; set; }
+        public Price price { get; set; } = null;
 
         [JsonProperty(Order = 10)]
         public string description { get; set; }

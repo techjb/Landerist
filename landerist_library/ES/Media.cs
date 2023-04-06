@@ -10,6 +10,11 @@ namespace landerist_library.ES
 
         public static void Insert(Listing listing)
         {
+            if (listing.media == null)
+            {
+                return;
+            }
+
             foreach (var media in listing.media)
             {
                 string query =

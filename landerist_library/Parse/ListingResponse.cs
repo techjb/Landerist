@@ -1,128 +1,162 @@
 ﻿using landerist_library.Websites;
 using landerist_orels.ES;
+using Newtonsoft.Json;
 
 namespace landerist_library.Parse
 {
-    internal class ListingResponse
+    public class ListingResponse
     {
+        [JsonProperty("fecha de publicación")]
         public string? FechaDePublicación { get; set; } = null;
 
+        [JsonProperty("tipo de operación")]
         public string? TipoDeOperacion { get; set; } = null;
 
+        [JsonProperty("tipo de inmueble")]
         public string? TipoDeInmueble { get; set; } = null;
 
+        [JsonProperty("subtipo de inmueble")]
         public string? SubtipoDeInmueble { get; set; } = null;
 
+        [JsonProperty("precio del anuncio")]
         public decimal? PrecioDelAnuncio { get; set; } = null;
 
+        [JsonProperty("descripción del anuncio")]
         public string? DescripciónDelAnuncio { get; set; } = null;
 
+        [JsonProperty("nombre de la fuente del dato")]
         public string? NombreDeLaFuenteDelDato { get; set; } = null;
 
+        [JsonProperty("referencia del anuncio")]
         public string? ReferenciaDelAnuncio { get; set; } = null;
 
+        [JsonProperty("dirección del inmueble")]
         public string? DirecciónDelInmueble { get; set; } = null;
 
+        [JsonProperty("referencia catastral")]
         public string? RererenciaCatastral { get; set; } = null;
 
-        public int? TamañoDelInmueble { get; set; } = null;
+        [JsonProperty("metros cuadrados del inmueble")]
+        public double? TamañoDelInmueble { get; set; } = null;
 
-        public int? TamañoDeLaParcela { get; set; } = null;
+        [JsonProperty("metros cuadrados de la parcela")]
+        public double? TamañoDeLaParcela { get; set; } = null;
 
-        public int? AñoDeConstrucción { get; set; } = null;
+        [JsonProperty("año de construcción")]
+        public double? AñoDeConstrucción { get; set; } = null;
 
+        [JsonProperty("estado del inmueble")]
         public string? EstadoDeLaConstrucción { get; set; } = null;
 
-        public int? NúmeroDePlantasDelEdificio { get; set; } = null;
+        [JsonProperty("plantas del edificio")]
+        public double? PlantasDelEdificio { get; set; } = null;
 
+        [JsonProperty("planta del inmueble")]
         public string? PlantaDelInmueble { get; set; } = null;
 
-        public int? NúmeroDeDormitorios { get; set; } = null;
+        [JsonProperty("número de dormitorios")]
+        public double? NúmeroDeDormitorios { get; set; } = null;
 
-        public int? NúmeroDeBaños { get; set; } = null;
+        [JsonProperty("número de baños")]
+        public double? NúmeroDeBaños { get; set; } = null;
 
-        public int? NúmeroDeParkings { get; set; } = null;
+        [JsonProperty("número de parkings")]
+        public double? NúmeroDeParkings { get; set; } = null;
 
+        [JsonProperty("tiene terraza")]
         public bool? TieneTerraza { get; set; } = null;
 
+        [JsonProperty("tiene jardín")]
         public bool? TieneJardín { get; set; } = null;
 
+        [JsonProperty("tiene garaje")]
         public bool? TieneGaraje { get; set; } = null;
+        
+        [JsonProperty("tiene parking para moto")]
+        public bool? TieneParkingParaMoto { get; set; } = null;
 
-        public bool? TieneGarajeParaMoto { get; set; } = null;
-
+        [JsonProperty("tiene piscina")]
         public bool? TienePiscina { get; set; } = null;
 
+        [JsonProperty("tiene ascensor")]
         public bool? TieneAscensor { get; set; } = null;
 
+        [JsonProperty("tiene acceso para discapacitados")]
         public bool? TieneAccesoParaDiscapacitados { get; set; } = null;
 
+        [JsonProperty("tiene trastero")]
         public bool? TieneTrastero { get; set; } = null;
 
+        [JsonProperty("está amueblado")]
         public bool? EstáAmueblado { get; set; } = null;
 
+        [JsonProperty("no está amueblado")]
         public bool? NoEstáAmueblado { get; set; } = null;
 
+        [JsonProperty("tiene calefacción")]
         public bool? TienCalefácción { get; set; } = null;
 
+        [JsonProperty("tiene aire acondicionado")]
         public bool? TienAireAcondicionado { get; set; } = null;
 
+        [JsonProperty("permite mascotas")]
         public bool? PermiteMascotas { get; set; } = null;
 
+        [JsonProperty("tiene sistemas de seguridad")]
         public bool? TieneSistemasDeSeguridad { get; set; } = null;
 
 
-        private const string OPERACION_VENTA = "venta";
+        protected const string OPERACION_VENTA = "venta";
 
-        private const string OPERACION_ALQUILER = "alquiler";
+        protected const string OPERACION_ALQUILER = "alquiler";
 
-        private const string TIPO_DE_INMUEBLE_VIVIENDA = "vivienda";
+        protected const string TIPO_DE_INMUEBLE_VIVIENDA = "vivienda";
 
-        private const string TIPO_DE_INMUEBLE_DORMITORIO = "dormitorio";
+        protected const string TIPO_DE_INMUEBLE_DORMITORIO = "dormitorio";
 
-        private const string TIPO_DE_INMUEBLE_LOCALCOMERCIAL = "local_comercial";
+        protected const string TIPO_DE_INMUEBLE_LOCAL_COMERCIAL = "local comercial";
 
-        private const string TIPO_DE_INMUEBLE_NAVE_INDUSTRIAL = "nave_industrial";
+        protected const string TIPO_DE_INMUEBLE_NAVE_INDUSTRIAL = "nave industrial";
 
-        private const string TIPO_DE_INMUEBLE_GARAJE = "garaje";
+        protected const string TIPO_DE_INMUEBLE_GARAJE = "garaje";
 
-        private const string TIPO_DE_INMUEBLE_TRASTERO = "trastero";
+        protected const string TIPO_DE_INMUEBLE_TRASTERO = "trastero";
 
-        private const string TIPO_DE_INMUEBLE_OFICINA = "oficina";
+        protected const string TIPO_DE_INMUEBLE_OFICINA = "oficina";
 
-        private const string TIPO_DE_INMUEBLE_PARCELA = "terreno_o_parcela";
+        protected const string TIPO_DE_INMUEBLE_PARCELA = "terreno o parcela";
 
-        private const string TIPO_DE_INMUEBLE_EDIFICIO = "edificio";
+        protected const string TIPO_DE_INMUEBLE_EDIFICIO = "edificio";
 
-        private const string SUBTIPO_DE_INMUEBLE_PISO = "piso";
+        protected const string SUBTIPO_DE_INMUEBLE_PISO = "piso";
 
-        private const string SUBTIPO_DE_INMUEBLE_APARTAMENTO = "apartamento";
+        protected const string SUBTIPO_DE_INMUEBLE_APARTAMENTO = "apartamento";
 
-        private const string SUBTIPO_DE_INMUEBLE_ÁTICO = "ático";
+        protected const string SUBTIPO_DE_INMUEBLE_ÁTICO = "ático";
 
-        private const string SUBTIPO_DE_INMUEBLE_BUNGALOW = "bungalow";
+        protected const string SUBTIPO_DE_INMUEBLE_BUNGALOW = "bungalow";
 
-        private const string SUBTIPO_DE_INMUEBLE_DUPLEX = "dúplex";
+        protected const string SUBTIPO_DE_INMUEBLE_DUPLEX = "dúplex";
 
-        private const string SUBTIPO_DE_INMUEBLE_CHALET_INDEPENDIENTE = "chalet_independiente";
+        protected const string SUBTIPO_DE_INMUEBLE_CHALET_INDEPENDIENTE = "chalet independiente";
 
-        private const string SUBTIPO_DE_INMUEBLE_CHALET_PAREADO = "chalet_pareado";
+        protected const string SUBTIPO_DE_INMUEBLE_CHALET_PAREADO = "chalet pareado";
 
-        private const string SUBTIPO_DE_INMUEBLE_CHALET_ADOSADO = "chalet_adosado";
+        protected const string SUBTIPO_DE_INMUEBLE_CHALET_ADOSADO = "chalet adosado";
 
-        private const string SUBTIPO_DE_INMUEBLE_PARCELA_URBANA = "parcela_urbana";
+        protected const string SUBTIPO_DE_INMUEBLE_PARCELA_URBANA = "parcela urbana";
 
-        private const string SUBTIPO_DE_INMUEBLE_PARCELA_URBANIZABLE = "parcela_urbanizable";
+        protected const string SUBTIPO_DE_INMUEBLE_PARCELA_URBANIZABLE = "parcela urbanizable";
 
-        private const string SUBTIPO_DE_INMUEBLE_PARCELA_NO_URBANIZABLE = "parcela_no_urbanizable";
+        protected const string SUBTIPO_DE_INMUEBLE_PARCELA_NO_URBANIZABLE = "parcela no urbanizable";
 
-        private const string ESTADO_DE_LA_CONSTRUCCIÓN_OBRA_NUEVA = "obra_nueva";
+        protected const string ESTADO_DE_LA_CONSTRUCCIÓN_OBRA_NUEVA = "obra nueva";
 
-        private const string ESTADO_DE_LA_CONSTRUCCIÓN_BUENO = "buen_estado";
+        protected const string ESTADO_DE_LA_CONSTRUCCIÓN_BUENO = "buen estado";
 
-        private const string ESTADO_DE_LA_CONSTRUCCIÓN_A_REFORMAR = "a_reformar";
+        protected const string ESTADO_DE_LA_CONSTRUCCIÓN_A_REFORMAR = "a reformar";
 
-        private const string ESTADO_DE_LA_CONSTRUCCIÓN_EN_RUINAS = "en_ruinas";
+        protected const string ESTADO_DE_LA_CONSTRUCCIÓN_EN_RUINAS = "en ruinas";
 
         public Listing? ToListing(Page page)
         {
@@ -185,7 +219,7 @@ namespace landerist_library.Parse
                 return
                     TipoDeInmueble.Equals(TIPO_DE_INMUEBLE_VIVIENDA) ||
                     TipoDeInmueble.Equals(TIPO_DE_INMUEBLE_DORMITORIO) ||
-                    TipoDeInmueble.Equals(TIPO_DE_INMUEBLE_LOCALCOMERCIAL) ||
+                    TipoDeInmueble.Equals(TIPO_DE_INMUEBLE_LOCAL_COMERCIAL) ||
                     TipoDeInmueble.Equals(TIPO_DE_INMUEBLE_NAVE_INDUSTRIAL) ||
                     TipoDeInmueble.Equals(TIPO_DE_INMUEBLE_GARAJE) ||
                     TipoDeInmueble.Equals(TIPO_DE_INMUEBLE_TRASTERO) ||
@@ -232,7 +266,7 @@ namespace landerist_library.Parse
             {
                 case TIPO_DE_INMUEBLE_VIVIENDA: return PropertyType.home;
                 case TIPO_DE_INMUEBLE_DORMITORIO: return PropertyType.room;
-                case TIPO_DE_INMUEBLE_LOCALCOMERCIAL: return PropertyType.premise;
+                case TIPO_DE_INMUEBLE_LOCAL_COMERCIAL: return PropertyType.premise;
                 case TIPO_DE_INMUEBLE_NAVE_INDUSTRIAL: return PropertyType.industrial;
                 case TIPO_DE_INMUEBLE_GARAJE: return PropertyType.garage;
                 case TIPO_DE_INMUEBLE_TRASTERO: return PropertyType.storage;
@@ -423,7 +457,7 @@ namespace landerist_library.Parse
 
         private int? GetConstrunctionYear()
         {
-            return AñoDeConstrucción;
+            return (int?)AñoDeConstrucción;
         }
 
         private ConstructionStatus? GetConstructionStatus()
@@ -444,7 +478,7 @@ namespace landerist_library.Parse
 
         private int? GetFloors()
         {
-            return NúmeroDePlantasDelEdificio;
+            return (int?)PlantasDelEdificio;
         }
 
         private string? GetFloor()
@@ -454,17 +488,17 @@ namespace landerist_library.Parse
 
         private int? GetBedrooms()
         {
-            return NúmeroDeDormitorios;
+            return (int?)NúmeroDeDormitorios;
         }
 
         private int? GetBathrooms()
         {
-            return NúmeroDeBaños;
+            return (int?)NúmeroDeBaños;
         }
 
         private int? GetParkings()
         {
-            return NúmeroDeParkings;
+            return (int?)NúmeroDeParkings;
         }
 
         private List<Feature> GetFeatures()
@@ -473,7 +507,7 @@ namespace landerist_library.Parse
             AddFeature(features, TieneTerraza, Feature.terrace);
             AddFeature(features, TieneJardín, Feature.garden);
             AddFeature(features, TieneGaraje, Feature.garage);
-            AddFeature(features, TieneGarajeParaMoto, Feature.motorbike_garage);
+            AddFeature(features, TieneParkingParaMoto, Feature.motorbike_garage);
             AddFeature(features, TienePiscina, Feature.pool);
             AddFeature(features, TieneAscensor, Feature.lift);
             AddFeature(features, TieneAccesoParaDiscapacitados, Feature.disabled_access);
@@ -499,51 +533,5 @@ namespace landerist_library.Parse
                 }
             }
         }
-
-        public static string GetSchema()
-        {
-            List<string> list = new();
-            AddSchemaProperty(list, nameof(FechaDePublicación));
-            AddSchemaProperty(list, nameof(TipoDeOperacion), new string[] {
-                OPERACION_VENTA, OPERACION_ALQUILER
-            });
-            AddSchemaProperty(list, nameof(TipoDeInmueble), new string[] {
-                TIPO_DE_INMUEBLE_VIVIENDA,
-                TIPO_DE_INMUEBLE_DORMITORIO,
-                TIPO_DE_INMUEBLE_LOCALCOMERCIAL,
-                TIPO_DE_INMUEBLE_NAVE_INDUSTRIAL,
-                TIPO_DE_INMUEBLE_GARAJE,
-                TIPO_DE_INMUEBLE_TRASTERO,
-                TIPO_DE_INMUEBLE_OFICINA,
-                TIPO_DE_INMUEBLE_PARCELA,
-                TIPO_DE_INMUEBLE_EDIFICIO
-            });
-
-            return
-                "{" +
-                    "\"type\": \"object\"," +
-                    " \"additionalProperties\": false," +
-                    "\"properties\": {" + string.Join(",", list.ToArray()) + "}" +
-                "}";
-        }
-
-
-        public static void AddSchemaProperty(List<string> list, string name)
-        {
-            AddSchemaProperty(list, name, Array.Empty<string>());
-        }
-
-        public static void AddSchemaProperty(List<string> list, string name, string[] enums)
-        {
-            string enumsProperty = string.Empty;
-            if (enums.Length > 0)
-            {
-                enumsProperty = ", \"enum\":[\"" + string.Join("\",\"", enums) + "\"]";
-            }
-            string property = "\"" + name + "\": {\"type\": \"string\"" + enumsProperty + "}";
-            list.Add(property);
-        }
-
-
     }
 }

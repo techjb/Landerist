@@ -6,6 +6,7 @@ using landerist_library.Export;
 using System.Reflection.Metadata;
 using System.Text;
 using landerist_library.Parse;
+using Newtonsoft.Json;
 
 namespace landerist_console
 {
@@ -49,9 +50,9 @@ namespace landerist_console
             //var uri = new Uri("https://www.saguar.immo/");
             //var uri = new Uri("https://www.inmolocalgestion.com/");
             //var uri = new Uri("https://www.expimad.com/");
+            
             var website = new Website(uri);
             //website.Remove(); return;
-
 
             //new UrisInserter().Insert(uri);
             //new UrisInserter().FromCsv();
@@ -79,6 +80,14 @@ namespace landerist_console
 
             //new Csv().Export(true);
             //new Json().Export(true);
+
+            //string squema = ListingResponseSchema.GetSchema();            
+            //ChatGPT.IsRequestAllowed("tseaadsf");
+
+            string json = "{\"fecha de publicación\": \"ABCDEFGHIJKLMNOPQRS\",\"tipo de operación\": \"venta\",\"tipo de inmueble\": \"edificio\",\"subtipo de inmueble\": \"chalet independiente\",\"precio del anuncio\": 0.0,\"descripción del anuncio\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZA\",\"referencia del anuncio\": \"ABCDE\",\"dirección del inmueble\": \"ABCDEFGHIJKLMNOPQRSTUVWXY\",\"referencia catastral\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZA\",\"metros cuadrados del inmueble\": 0.0,\"metros cuadrados de la parcela\": 0.0,\"año de construcción\": 0.0,\"estado del inmueble\": \"a reformar\",\"plantas del edificio\": 0.0,\"planta del inmueble\": \"ABCD\",\"número de dormitorios\": 0.0,\"número de baños\": 0.0,\"número de parkings\": 0.0,\"tiene terraza\": true,\"tiene jardín\": true,\"tiene garaje\": true,\"tiene parking para moto\": true,\"tiene piscina\": false,\"tiene ascensor\": true,\"tiene acceso para discapacitados\": true,\"tiene trastero\": true,\"está amueblado\": true,\"no está amueblado\": false,\"tiene calefacción\": false,\"tiene aire acondicionado\": false,\"permite mascotas\": false,\"tiene sistemas de seguridad\": false}";
+            ListingResponse? listingResponse = JsonConvert.DeserializeObject<ListingResponse>(json);
+            var listing = listingResponse.ToListing(new Page(website));
+            new landerist_library.ES.Listings().Insert(listing);
         }
 
         private static void EndBeep()
