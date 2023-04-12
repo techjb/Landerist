@@ -180,7 +180,7 @@ namespace landerist_orels.ES
         {
             if (media == null)
             {
-                media = new SortedSet<Media>();
+                media = new SortedSet<Media>(new MediaComparer());
             }
         }
         public void AddMedia(Media media)
