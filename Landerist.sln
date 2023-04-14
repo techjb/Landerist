@@ -7,7 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "landerist_console", "lander
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "landerist_library", "landerist_library\landerist_library.csproj", "{E1D8529F-29D0-4C46-97EA-871D472A566C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "landerist_orels", "landerist_orels\landerist_orels.csproj", "{8616AAA8-B0FF-47FA-A18E-AF96178989B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "landerist_orels", "landerist_orels\landerist_orels.csproj", "{8616AAA8-B0FF-47FA-A18E-AF96178989B5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FFCD9829-BEB3-4EAE-9EA2-D4A4BCD70DEB}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
