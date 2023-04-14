@@ -1,6 +1,7 @@
 ﻿using landerist_library.Websites;
 using landerist_orels.ES;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace landerist_library.Parse
 {
@@ -19,7 +20,7 @@ namespace landerist_library.Parse
             Page = page;
         }
 
-        public Tuple<bool?,Listing?> GetListing()
+        public Tuple<bool?, Listing?> GetListing()
         {
             SetResponseBodyText();
             if (ListingIsAllowed())
@@ -31,7 +32,7 @@ namespace landerist_library.Parse
 
         public bool ListingIsAllowed()
         {
-            return 
+            return
                 !ResponseBodyText.Equals(string.Empty) &&
                 ChatGPT.IsRequestAllowed(ResponseBodyText)
                 //Page.LanguageIs("es") // permitimos cualquier lenguage.
@@ -49,22 +50,15 @@ namespace landerist_library.Parse
 
         private void RequestListing()
         {
-            var task = Task.Run(async () => await new ChatGPT().GetResponse(ResponseBodyText));
-            if (task.Result != null)
+            var result = new ChatGPT().GetResponse(ResponseBodyText);
+            if (result != null)
             {
-                if (task.Result.Equals("no"))
-                {
-                    IsListing = false;
-                }
-                else
-                {
-                    ParseListing(task.Result);
-                }
+                ParseListing(result);
             }
         }
 
         private void ParseListing(string json)
-        {            
+        {
             try
             {
                 ListingResponse? listingResponse = JsonConvert.DeserializeObject<ListingResponse>(json);
@@ -76,8 +70,8 @@ namespace landerist_library.Parse
             }
             catch
             {
-                
-            }            
+
+            }
         }
     }
 }

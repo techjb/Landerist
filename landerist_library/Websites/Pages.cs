@@ -27,10 +27,10 @@ namespace landerist_library.Websites
             string query =
                 "SELECT * " +
                 "FROM " + TABLE_PAGES + " " +
-                "WHERE [Domain] = @Domain";
+                "WHERE [Host] = @Host";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"Domain", website.Host }
+                {"Host", website.Host }
             });
 
             return GetPages(website, dataTable);

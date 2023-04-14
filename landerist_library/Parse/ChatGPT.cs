@@ -15,9 +15,7 @@ namespace landerist_library.Parse
         public static readonly int MAX_TOKENS = 4096;
 
         private const string SystemMessage =
-            "Eres un clasificador de textos. Si el texto introducido contiene los datos de venta o alquiler " +
-            "de un sólo inmueble, con su tipología, precio y localización, responde \"si\". " +
-            "Responde \"no\" en caso contrario. Si no lo sabes responde \"null\". Solo responde con una palabra.";
+            "Eres un servidor de información que únicamente responde en formato JSON";
 
         private readonly Conversation Conversation;
 
@@ -34,12 +32,15 @@ namespace landerist_library.Parse
             Conversation.AppendSystemMessage(SystemMessage);
         }
 
-        public async Task<string?> GetResponse(string userInput)
+        public string? GetResponse(string userInput)
         {
+            userInput = ParseUserInput(userInput);
             Conversation.AppendUserInput(userInput);
             try
             {
-                return await Conversation.GetResponseFromChatbotAsync();
+
+                string response = Task.Run(async () => await Conversation.GetResponseFromChatbotAsync()).Result; ;
+                return response;
             }
             catch
             {
@@ -47,19 +48,28 @@ namespace landerist_library.Parse
             }
         }
 
+        public static string ParseUserInput(string userIput)
+        {
+            return
+                "Dado el siguiente texto:\n" +
+                "----\n" +
+                userIput + "\n" +
+                "----\n" +
+                "Proporciona una representación JSON que siga estrictamente este esquema:\n" +
+                ListingResponseSchema.GetSchema() + "\n" +
+                "Cuando no encuentras alguno de los campos, escribe null";
+        }
+
         public static bool IsRequestAllowed(string request)
         {
             //https://github.com/dluc/openai-tools
-            string systemMessage = GetSystemMessage();
-            int systemTokens = GPT3Tokenizer.Encode(systemMessage).Count;
-            int userTokens = GPT3Tokenizer.Encode(request).Count;            
+            int systemTokens = GPT3Tokenizer.Encode(SystemMessage).Count;
+
+            request = ParseUserInput(request);
+            int userTokens = GPT3Tokenizer.Encode(request).Count;
+
             int totalTokens = systemTokens + userTokens;
             return totalTokens < MAX_TOKENS;
-        }
-
-        public static string GetSystemMessage()
-        {
-            return SystemMessage  + Environment.NewLine + ListingResponseSchema.GetSchema();
         }
     }
 }

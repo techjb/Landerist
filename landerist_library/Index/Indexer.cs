@@ -1,4 +1,6 @@
 ﻿using landerist_library.Websites;
+using System;
+using System.Linq;
 
 namespace landerist_library.Index
 {
@@ -7,6 +9,9 @@ namespace landerist_library.Index
         private readonly Page Page;
 
         private readonly List<Uri> Uris = new();
+
+        private static readonly string[] MultimediaExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".mp3", ".mp4", ".avi", ".mov", ".mkv", ".flv", ".ogg", ".webm" };
+
 
         public Indexer(Page page)
         {
@@ -47,7 +52,7 @@ namespace landerist_library.Index
                 if (link != null)
                 {
                     AddUri(link);
-                }                                
+                }
             }
         }
 
@@ -61,7 +66,7 @@ namespace landerist_library.Index
                     Uris.Add(uri);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
 
             }
@@ -98,6 +103,10 @@ namespace landerist_library.Index
             {
                 return null;
             }
+            if (IsMultimediaPage(uri))
+            {
+                return null;                    
+            }
             if (Languages.ContainsNotAllowed(uri, "es"))
             {
                 return null;
@@ -106,11 +115,38 @@ namespace landerist_library.Index
             {
                 return null;
             }
-            if (Page.Website != null && !Page.Website.IsUriAllowed(uri))
+            if (Page.Website != null)
             {
-                return null;
+                if (!Page.Website.IsUriAllowed(uri))
+                {
+                    return null;
+                }
+                if (Page.Website.MainUri.Equals(uri))
+                {
+                    return null;
+                }
             }
             return uri;
+        }
+
+        private bool IsMultimediaPage(Uri uri)
+        {
+            var path = uri.AbsolutePath.ToLower();
+            var extension = Path.GetExtension(path);
+
+            return MultimediaExtensions.Contains(extension);
+        }
+
+        private bool IsImage(string ext)
+        {
+            string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff" };
+            return Array.Exists(imageExtensions, e => e == ext);
+        }
+
+        private bool IsMultimedia(string ext)
+        {
+            string[] multimediaExtensions = { ".mp4", ".mp3", ".wav", ".avi", ".mkv", ".mov", ".flv", ".wmv" };
+            return Array.Exists(multimediaExtensions, e => e == ext);
         }
     }
 }
