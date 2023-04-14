@@ -1,7 +1,4 @@
-﻿using landerist_orels.ES;
-using System.Diagnostics.Contracts;
-
-namespace landerist_library.Index
+﻿namespace landerist_library.Index
 {
     internal class ProhibitedWords
     {

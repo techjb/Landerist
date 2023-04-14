@@ -1,15 +1,14 @@
-﻿using landerist_library.Database;
-using landerist_orels.ES;
+﻿using landerist_orels.ES;
 using System.Data;
 
-namespace landerist_library.ES
+namespace landerist_library.Database
 {
-    public class Listings
+    public class ES_Listings
     {
 
         public static string TABLE_ES_LISTINGS = "[ES_LISTINGS]";
 
-        public Listings()
+        public ES_Listings()
         {
 
         }
@@ -17,7 +16,7 @@ namespace landerist_library.ES
         public void Insert(Listing listing)
         {
             InsertData(listing);
-            Media.Insert(listing);
+            ES_Media.Insert(listing);
         }
 
         private bool InsertData(Listing listing)
@@ -94,7 +93,7 @@ namespace landerist_library.ES
                 var listing = GetListing(dataRow);
                 if (loadMedia)
                 {
-                    var media = Media.GetMedia(listing);
+                    var media = ES_Media.GetMedia(listing);
                     listing.SetMedia(media);
                 }
                 listings.Add(listing);

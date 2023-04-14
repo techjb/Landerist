@@ -1,5 +1,5 @@
-﻿using landerist_library.Database;
-using System.IO.Compression;
+﻿using landerist_library.Configuration;
+using landerist_library.Database;
 
 namespace landerist_library.Export
 {
@@ -38,7 +38,7 @@ namespace landerist_library.Export
         private bool ExportListings()
         {
             string filePath = GetFilePath(FILE_NAME_LISTINGS);
-            return Export(ES.Listings.TABLE_ES_LISTINGS, filePath);
+            return Export(ES_Listings.TABLE_ES_LISTINGS, filePath);
         }
 
         private string GetFilePath(string fileName)
@@ -49,7 +49,7 @@ namespace landerist_library.Export
         private bool ExportMedia()
         {
             string filePath = GetFilePath(FILE_NAME_MEDIA);
-            return Export(ES.Media.TABLE_ES_MEDIA, filePath);
+            return Export(ES_Media.TABLE_ES_MEDIA, filePath);
         }
 
         private bool Export(string tableName, string fileName)

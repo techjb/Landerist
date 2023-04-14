@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using HtmlAgilityPack;
+using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Index;
 using landerist_library.Parse;
@@ -208,13 +209,22 @@ namespace landerist_library.Websites
 
         private void GetListing()
         {
+            if (!CanRequestListing())
+            {
+                return;
+            }
             var listingParser = new ListingParser(this).GetListing();
             IsListing = listingParser.Item1;
             var listing = listingParser.Item2;
             if (listing != null)
             {
-                new ES.Listings().Insert(listing);
+                new ES_Listings().Insert(listing);
             }
+        }
+
+        private bool CanRequestListing()
+        {
+            return !IsMainPage();
         }
 
         public bool IsMainPage()

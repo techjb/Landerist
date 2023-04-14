@@ -22,19 +22,18 @@ namespace landerist_library.Parse
         public Tuple<bool?,Listing?> GetListing()
         {
             SetResponseBodyText();
-            if (CanRequestListing())
+            if (ListingIsAllowed())
             {
                 RequestListing();
             }
             return Tuple.Create(IsListing, Listing);
         }
 
-        public bool CanRequestListing()
+        public bool ListingIsAllowed()
         {
             return 
                 !ResponseBodyText.Equals(string.Empty) &&
-                ChatGPT.IsRequestAllowed(ResponseBodyText) &&
-                !Page.IsMainPage()
+                ChatGPT.IsRequestAllowed(ResponseBodyText)
                 //Page.LanguageIs("es") // permitimos cualquier lenguage.
                 ;
         }

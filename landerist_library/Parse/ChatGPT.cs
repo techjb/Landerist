@@ -2,6 +2,7 @@
 using OpenAI_API.Chat;
 using OpenAI_API.Models;
 using AI.Dev.OpenAI.GPT;
+using landerist_library.Configuration;
 
 namespace landerist_library.Parse
 {
@@ -12,8 +13,6 @@ namespace landerist_library.Parse
         // GPT-4-8K: 8192
         // GPT-4-32K: 32768
         public static readonly int MAX_TOKENS = 4096;
-
-        //public static readonly int MAX_TEXT_LENGTH = 16000;
 
         private const string SystemMessage =
             "Eres un clasificador de textos. Si el texto introducido contiene los datos de venta o alquiler " +
@@ -51,10 +50,10 @@ namespace landerist_library.Parse
         public static bool IsRequestAllowed(string request)
         {
             //https://github.com/dluc/openai-tools
-            int userTokens = GPT3Tokenizer.Encode(request).Count;
             string systemMessage = GetSystemMessage();
             int systemTokens = GPT3Tokenizer.Encode(systemMessage).Count;
-            int totalTokens = userTokens + systemTokens;
+            int userTokens = GPT3Tokenizer.Encode(request).Count;            
+            int totalTokens = systemTokens + userTokens;
             return totalTokens < MAX_TOKENS;
         }
 

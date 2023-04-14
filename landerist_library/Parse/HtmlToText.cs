@@ -21,7 +21,7 @@ namespace landerist_library.Parse
                 SetResponseBodyTextVisible();
             }
             catch { }
-            return HtmlText;
+            return HtmlText.Trim();
         }
 
 

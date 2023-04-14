@@ -1,5 +1,4 @@
-﻿using landerist_library;
-using landerist_library.Insert;
+﻿using landerist_library.Insert;
 using landerist_library.Scrape;
 using landerist_library.Websites;
 using landerist_library.Export;
@@ -7,6 +6,7 @@ using System.Reflection.Metadata;
 using System.Text;
 using landerist_library.Parse;
 using Newtonsoft.Json;
+using landerist_library.Configuration;
 
 namespace landerist_console
 {
@@ -75,7 +75,7 @@ namespace landerist_console
             //website.InsertMainPage();
 
             //new Scraper().ScrapeMainPage(website);
-            //new Scraper().ScrapePages(website);
+            new Scraper().ScrapePages(website);
             //new Scraper().ScrapeAllPages();
 
             //new Csv().Export(true);

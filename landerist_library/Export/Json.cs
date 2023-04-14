@@ -1,7 +1,8 @@
 ﻿using Newtonsoft.Json.Converters;
 using Newtonsoft.Json;
 using landerist_orels.ES;
-using landerist_library.ES;
+using landerist_library.Database;
+using landerist_library.Configuration;
 
 namespace landerist_library.Export
 {
@@ -13,7 +14,7 @@ namespace landerist_library.Export
 
         public bool Export(bool makeZip)
         {
-            var listings = new Listings().GetAll(true);
+            var listings = new ES_Listings().GetAll(true);
             var schema = new Schema(listings);
             var jsonSereializerSettings = new JsonSerializerSettings
             {

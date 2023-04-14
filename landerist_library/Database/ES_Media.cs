@@ -1,10 +1,9 @@
-﻿using landerist_library.Database;
-using landerist_orels.ES;
+﻿using landerist_orels.ES;
 using System.Data;
 
-namespace landerist_library.ES
+namespace landerist_library.Database
 {
-    public class Media
+    public class ES_Media
     {
         public static string TABLE_ES_MEDIA = "[ES_MEDIA]";
 
@@ -30,7 +29,7 @@ namespace landerist_library.ES
             }
         }
 
-        public static SortedSet<landerist_orels.ES.Media> GetMedia(Listing listing)
+        public static SortedSet<Media> GetMedia(Listing listing)
         {
             string query =
                 "SELECT * " +
@@ -42,7 +41,7 @@ namespace landerist_library.ES
                 { "listingGuid", listing.guid }
             });
 
-            SortedSet<landerist_orels.ES.Media> medias = new();
+            SortedSet<Media> medias = new();
             foreach (DataRow dataRow in dataTable.Rows)
             {
                 var media = GetMedia(dataRow);
@@ -51,9 +50,9 @@ namespace landerist_library.ES
             return medias;
         }
 
-        private static landerist_orels.ES.Media GetMedia(DataRow dataRow)
+        private static Media GetMedia(DataRow dataRow)
         {
-            return new landerist_orels.ES.Media()
+            return new Media()
             {
                 mediaType = dataRow["mediaType"] is DBNull ? null : (MediaType)dataRow["mediaType"],
                 title = dataRow["title"] is DBNull ? null : (string)dataRow["title"],
