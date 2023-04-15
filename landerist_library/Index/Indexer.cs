@@ -1,6 +1,4 @@
 ﻿using landerist_library.Websites;
-using System;
-using System.Linq;
 
 namespace landerist_library.Index
 {
@@ -11,6 +9,8 @@ namespace landerist_library.Index
         private readonly List<Uri> Uris = new();
 
         private static readonly string[] MultimediaExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".mp3", ".mp4", ".avi", ".mov", ".mkv", ".flv", ".ogg", ".webm" };
+
+        private static readonly string[] WebPageExtensions = { ".htm", ".html", ".xhtml", ".asp", ".aspx", ".php", ".jsp", ".cshtml", ".vbhtml", "razor" };
 
 
         public Indexer(Page page)
@@ -103,9 +103,9 @@ namespace landerist_library.Index
             {
                 return null;
             }
-            if (IsMultimediaPage(uri))
+            if (!IsWebPage(uri))
             {
-                return null;                    
+                return null;
             }
             if (Languages.ContainsNotAllowed(uri, "es"))
             {
@@ -137,16 +137,10 @@ namespace landerist_library.Index
             return MultimediaExtensions.Contains(extension);
         }
 
-        private bool IsImage(string ext)
+        public static bool IsWebPage(Uri uri)
         {
-            string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff" };
-            return Array.Exists(imageExtensions, e => e == ext);
-        }
-
-        private bool IsMultimedia(string ext)
-        {
-            string[] multimediaExtensions = { ".mp4", ".mp3", ".wav", ".avi", ".mkv", ".mov", ".flv", ".wmv" };
-            return Array.Exists(multimediaExtensions, e => e == ext);
+            string extension = Path.GetExtension(uri.AbsolutePath).Trim().ToLower();
+            return extension.Equals(string.Empty) || WebPageExtensions.Contains(extension);
         }
     }
 }

@@ -36,7 +36,7 @@ namespace landerist_library.Database
                 {"propertyType", listing.propertyType.ToString() },
                 {"propertySubType", listing.propertySubtype?.ToString()},
                 {"priceAmount", listing.price?.amount },
-                {"priceCurrency", listing.price?.currency},
+                {"priceCurrency", listing.price?.currency.ToString()},
                 {"description", listing.description },
                 {"dataSourceName", listing.dataSourceName },
                 {"dataSourceGuid", listing.dataSourceGuid },

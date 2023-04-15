@@ -24,7 +24,7 @@ namespace landerist_library.Parse
             OpenAIAPI openAIAPI = new(Config.OPENAI_API_KEY);
             var chatRequest = new ChatRequest()
             {
-                Model = Model.ChatGPTTurbo,
+                Model = Model.ChatGPTTurbo,                
                 Temperature = 0,
                 //MaxTokens = 50,
             };
@@ -39,7 +39,7 @@ namespace landerist_library.Parse
             try
             {
 
-                string response = Task.Run(async () => await Conversation.GetResponseFromChatbotAsync()).Result; ;
+                string response = Task.Run(async () => await Conversation.GetResponseFromChatbotAsync()).Result;
                 return response;
             }
             catch
@@ -57,7 +57,7 @@ namespace landerist_library.Parse
                 "----\n" +
                 "Proporciona una representación JSON que siga estrictamente este esquema:\n" +
                 ListingResponseSchema.GetSchema() + "\n" +
-                "Cuando no encuentras alguno de los campos, escribe null";
+                "Escribe null en los campos que falten.\n";
         }
 
         public static bool IsRequestAllowed(string request)

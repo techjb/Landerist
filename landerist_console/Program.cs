@@ -44,14 +44,18 @@ namespace landerist_console
 
         private static void Run()
         {
+            var uriPage1 = new Uri("https://www.saroga.es/inmueble/chalet-independiente-satelites-majadahonda/");
+            var uriPage2 = new Uri("https://www.saroga.es/inmueble/piso-4-dormitorios-avenida-europa-pozuelo/");
 
             var uri = new Uri("https://www.saroga.es/");
             //var uri = new Uri("https://mabelan.es/");
             //var uri = new Uri("https://www.saguar.immo/");
             //var uri = new Uri("https://www.inmolocalgestion.com/");
             //var uri = new Uri("https://www.expimad.com/");
-            
+
             var website = new Website(uri);
+            var page = new Page(website, uriPage1);
+
             //website.Remove(); return;
 
             //new UrisInserter().Insert(uri);
@@ -75,7 +79,8 @@ namespace landerist_console
             //website.InsertMainPage();
 
             //new Scraper().ScrapeMainPage(website);
-            new Scraper().ScrapePages(website);
+            //new Scraper().ScrapePages(website);
+            new Scraper().ScrapePage(page);
             //new Scraper().ScrapeAllPages();
 
             //new Csv().Export(true);

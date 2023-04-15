@@ -65,7 +65,10 @@ namespace landerist_library.Parse
                 if (listingResponse != null)
                 {
                     Listing = listingResponse.ToListing(Page);
-                    IsListing = true;
+                    if (Listing != null)
+                    {
+                        IsListing = true;
+                    }
                 }
             }
             catch
