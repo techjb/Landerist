@@ -32,7 +32,6 @@ namespace landerist_library.Parse
 
         public string? GetResponse(string userInput)
         {
-            userInput = ParseUserInput(userInput);
             Conversation.AppendUserInput(userInput);
             try
             {
@@ -44,20 +43,6 @@ namespace landerist_library.Parse
             {
                 return null;
             }
-        }
-
-        public static string ParseUserInput(string userIput)
-        {
-            return userIput;
-
-            return
-                "Dado el siguiente texto:\n\n" +
-                "------\n" +
-                userIput + "\n" +
-                "------\n\n" +
-                "Proporciona una representación JSON que siga estrictamente este esquema:\n\n" +
-                ListingResponseSchema.GetSchema() + "\n\n" +                
-                "Escribe null en los campos que falten.";
         }
 
         private static string GetSystemMessage()
@@ -74,7 +59,6 @@ namespace landerist_library.Parse
             var systemMessage = GetSystemMessage();
             int systemTokens = GPT3Tokenizer.Encode(systemMessage).Count;
 
-            request = ParseUserInput(request);
             int userTokens = GPT3Tokenizer.Encode(request).Count;
 
             int totalTokens = systemTokens + userTokens;

@@ -19,6 +19,7 @@
             "noticias",
             "tasacion",
             "empresa",
+            "nuestraempresa",
             "trabaja",
             "empleo",
             "localizacion",
@@ -47,10 +48,11 @@
                .Replace("-", string.Empty)
                .Replace("_", string.Empty)
                .Replace("/", string.Empty)
+               .ToLower()
                ;
             foreach(string word in ES)
             {
-                if (absolutePath.Contains(word))
+                if (absolutePath.StartsWith(word))
                 {
                     return true;
                 }
