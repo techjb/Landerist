@@ -34,7 +34,7 @@ namespace landerist_library.Parse
             var xPath =
                 "//script | //nav | //footer | //style | //head | " +
                 "//form | //a | //code | //canvas | //input | //meta | //option | " +
-                "//select | //progress | //svg | //textarea";
+                "//select | //progress | //svg | //textarea | //del";
 
             var nodesToRemove = HtmlDocument.DocumentNode.SelectNodes(xPath).ToList();
             foreach (var node in nodesToRemove)

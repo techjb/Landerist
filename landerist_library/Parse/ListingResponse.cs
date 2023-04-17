@@ -15,7 +15,7 @@ namespace landerist_library.Parse
         [JsonProperty("tipo de inmueble")]
         public string? TipoDeInmueble { get; set; } = null;
 
-        [JsonProperty("subtipo de inmueble")]
+        [JsonProperty("subtipo")]
         public string? SubtipoDeInmueble { get; set; } = null;
 
         [JsonProperty("precio del anuncio")]

@@ -273,5 +273,10 @@ namespace landerist_library.Websites
         {
             return new Pages().GetNonScrapedPages(this);
         }
+
+        public List<Page> GetUnknowIsListingPages()
+        {
+            return new Pages().GetUnknowIsListingPages(this);
+        }
     }
 }

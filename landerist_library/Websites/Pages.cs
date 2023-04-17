@@ -50,6 +50,20 @@ namespace landerist_library.Websites
             return GetPages(website, dataTable);
         }
 
+        public List<Page> GetUnknowIsListingPages(Website website)
+        {
+            string query =
+                "SELECT * " +
+                "FROM " + TABLE_PAGES + " " +
+                "WHERE [Host] = @Host AND [IsListing] IS NULL";
+
+            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+                {"Host", website.Host }
+            });
+
+            return GetPages(website, dataTable);
+        }
+
         private List<Page> GetPages(Website website, DataTable dataTable)
         {
             List<Page> pages = new();

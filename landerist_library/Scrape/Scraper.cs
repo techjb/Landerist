@@ -17,8 +17,6 @@ namespace landerist_library.Scrape
 
         private int Errors = 0;
 
-        private int TotalPages = 0;
-
         private readonly object SyncCounter = new();
 
         private readonly object SyncSuccessErrros = new();
@@ -32,8 +30,7 @@ namespace landerist_library.Scrape
         {
             var dictionary = Websites.Websites.GetDicionaryStatusCodeOk();
             var dataTable = new Pages().GetAll();
-            var pages = GetPages(dictionary, dataTable);
-            TotalPages = pages.Count;
+            var pages = GetPages(dictionary, dataTable);            
             ScrapePages(pages);
         }
 
@@ -77,10 +74,16 @@ namespace landerist_library.Scrape
             ScrapeNonScrapped(website);
         }
 
+        public void ScrapeUnknowIsListing(Website website)
+        {
+            var pages = website.GetUnknowIsListingPages();
+            ScrapePages(pages);
+        }
+
         private void ScrapePages(List<Page> pages)
         {
             PendingPages.Clear();
-
+            int TotalPages = pages.Count;
             Parallel.ForEach(pages,
                 //new ParallelOptions() { MaxDegreeOfParallelism = 3 },
                 page =>
