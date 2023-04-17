@@ -218,6 +218,7 @@ namespace landerist_library.Websites
             var listing = listingParser.Item2;
             if (listing != null)
             {
+                new MediaParser(this).AddMedia(listing);
                 new ES_Listings().Insert(listing);
             }
         }

@@ -1,7 +1,6 @@
 ﻿using landerist_library.Websites;
 using landerist_orels.ES;
 using Newtonsoft.Json;
-using System.Threading.Tasks;
 
 namespace landerist_library.Parse
 {
@@ -23,19 +22,18 @@ namespace landerist_library.Parse
         public Tuple<bool?, Listing?> GetListing()
         {
             SetResponseBodyText();
-            if (ListingIsAllowed())
+            if (ListingIsPermited())
             {
                 RequestListing();
             }
             return Tuple.Create(IsListing, Listing);
         }
 
-        public bool ListingIsAllowed()
+        public bool ListingIsPermited()
         {
             return
                 !ResponseBodyText.Equals(string.Empty) &&
                 ChatGPT.IsLengthAllowed(ResponseBodyText)
-                //Page.LanguageIs("es") // permitimos cualquier lenguage.
                 ;
         }
 

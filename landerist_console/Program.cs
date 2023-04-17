@@ -83,7 +83,7 @@ namespace landerist_console
             //new Scraper().ScrapeMainPage(website);
             //new Scraper().ScrapeNonScrapped(website);
             //new Scraper().ScrapeUnknowIsListing(website);
-            //new Scraper().ScrapePage(page);
+            new Scraper().ScrapePage(page);
             //new Scraper().ScrapeAllPages();
 
             //new Csv().Export(true);

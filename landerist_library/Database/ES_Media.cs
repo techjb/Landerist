@@ -24,7 +24,7 @@ namespace landerist_library.Database
                     {"listingGuid", listing.guid },
                     {"mediaType", media.mediaType },
                     {"title", media.title },
-                    {"url", media.url},
+                    {"url", media.url?.ToString()},
                 });
             }
         }
