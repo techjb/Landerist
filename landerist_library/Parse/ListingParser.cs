@@ -34,7 +34,7 @@ namespace landerist_library.Parse
         {
             return
                 !ResponseBodyText.Equals(string.Empty) &&
-                ChatGPT.IsRequestAllowed(ResponseBodyText)
+                ChatGPT.IsLengthAllowed(ResponseBodyText)
                 //Page.LanguageIs("es") // permitimos cualquier lenguage.
                 ;
         }
@@ -59,21 +59,22 @@ namespace landerist_library.Parse
 
         private void ParseListing(string json)
         {
+            ListingResponse? listingResponse = null;
             try
             {
-                ListingResponse? listingResponse = JsonConvert.DeserializeObject<ListingResponse>(json);
-                if (listingResponse != null)
-                {
-                    Listing = listingResponse.ToListing(Page);
-                    if (Listing != null)
-                    {
-                        IsListing = true;
-                    }
-                }
+                listingResponse = JsonConvert.DeserializeObject<ListingResponse>(json);
             }
             catch
             {
 
+            }
+            if (listingResponse != null)
+            {
+                Listing = listingResponse.ToListing(Page);
+                if (Listing != null)
+                {
+                    IsListing = true;
+                }
             }
         }
     }

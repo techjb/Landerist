@@ -46,6 +46,7 @@ namespace landerist_console
         {
             var uriPage1 = new Uri("https://www.saroga.es/inmueble/chalet-independiente-satelites-majadahonda/");
             var uriPage2 = new Uri("https://www.saroga.es/inmueble/piso-4-dormitorios-avenida-europa-pozuelo/");
+            var uriPage3 = new Uri("https://www.saroga.es/inmueble/piso-monte-pilar-majadahonda/");
 
             var uri = new Uri("https://www.saroga.es/");
             //var uri = new Uri("https://mabelan.es/");
@@ -54,7 +55,7 @@ namespace landerist_console
             //var uri = new Uri("https://www.expimad.com/");
 
             var website = new Website(uri);
-            var page = new Page(website, uriPage1);
+            //var page = new Page(website, uriPage3);
 
             //website.Remove(); return;
 
@@ -79,15 +80,15 @@ namespace landerist_console
             //website.InsertMainPage();
 
             //new Scraper().ScrapeMainPage(website);
-            //new Scraper().ScrapePages(website);
-            new Scraper().ScrapePage(page);
+            new Scraper().ScrapeNonScrapped(website);
+            //new Scraper().ScrapePage(page);
             //new Scraper().ScrapeAllPages();
 
             //new Csv().Export(true);
             //new Json().Export(true);
 
             //string squema = ListingResponseSchema.GetSchema();            
-            //ChatGPT.IsRequestAllowed("tseaadsf");
+            //ChatGPT.IsLengthAllowed("tseaadsf");
 
             //string json = "{\"fecha de publicación\": \"ABCDEFGHIJKLMNOPQRS\",\"tipo de operación\": \"venta\",\"tipo de inmueble\": \"edificio\",\"subtipo de inmueble\": \"chalet independiente\",\"precio del anuncio\": 0.0,\"descripción del anuncio\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZA\",\"referencia del anuncio\": \"ABCDE\",\"dirección del inmueble\": \"ABCDEFGHIJKLMNOPQRSTUVWXY\",\"referencia catastral\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZA\",\"metros cuadrados del inmueble\": 0.0,\"metros cuadrados de la parcela\": 0.0,\"año de construcción\": 0.0,\"estado del inmueble\": \"a reformar\",\"plantas del edificio\": 0.0,\"planta del inmueble\": \"ABCD\",\"número de dormitorios\": 0.0,\"número de baños\": 0.0,\"número de parkings\": 0.0,\"tiene terraza\": true,\"tiene jardín\": true,\"tiene garaje\": true,\"tiene parking para moto\": true,\"tiene piscina\": false,\"tiene ascensor\": true,\"tiene acceso para discapacitados\": true,\"tiene trastero\": true,\"está amueblado\": true,\"no está amueblado\": false,\"tiene calefacción\": false,\"tiene aire acondicionado\": false,\"permite mascotas\": false,\"tiene sistemas de seguridad\": false}";
             //ListingResponse? listingResponse = JsonConvert.DeserializeObject<ListingResponse>(json);

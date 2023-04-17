@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Net.Http.Headers;
 using System.Reflection;
 
 namespace landerist_library.Parse
@@ -11,7 +13,8 @@ namespace landerist_library.Parse
 
             AddStringProperty(list, nameof(FechaDePublicación));
             AddEnumProperty(list, nameof(TipoDeOperacion), new string[] {
-                OPERACION_VENTA, OPERACION_ALQUILER
+                OPERACION_VENTA, 
+                OPERACION_ALQUILER
             });
             AddEnumProperty(list, nameof(TipoDeInmueble), new string[] {
                 TIPO_DE_INMUEBLE_VIVIENDA,
@@ -73,12 +76,22 @@ namespace landerist_library.Parse
             AddBooleanProperty(list, nameof(PermiteMascotas));
             AddBooleanProperty(list, nameof(TieneSistemasDeSeguridad));
 
-            return
-                "{" +
-                    "\"type\": \"object\"," +
-                    " \"additionalProperties\": false," +
-                    "\"properties\": {" + string.Join(",", list.ToArray()) + "}" +
-                "}";
+            //return
+            //"{" +
+            //    "\"type\": \"object\"," +
+            //    " \"additionalProperties\": false," +
+            //    "\"properties\": {" + string.Join(",", list.ToArray()) + "}" +
+            //"}";
+
+            string json = "{" + string.Join(",", list.ToArray()) + "}";
+            //json = Format(json);
+            return json;
+        }
+
+        private static string Format(string json)
+        {
+            JObject jObject = JObject.Parse(json);
+            return jObject.ToString(Formatting.Indented);
         }
 
 
@@ -102,15 +115,28 @@ namespace landerist_library.Parse
             AddProperty(list, name, "string", enums);
         }
 
+        //private static void AddProperty(List<string> list, string name, string type, string[] enums)
+        //{
+        //    string enumsProperty = string.Empty;
+        //    if (enums.Length > 0)
+        //    {
+        //        enumsProperty = ", \"enum\":[\"" + string.Join("\",\"", enums) + "\"]";
+        //        //enumsProperty = ", \"values\":[\"" + string.Join("\",\"", enums) + "\"]";                
+        //    }
+        //    name = GetJsonName(name);
+        //    string property = "\"" + name + "\": {\"type\": \"" + type + "\"" + enumsProperty + "}";            
+        //    list.Add(property);
+        //}
+
         private static void AddProperty(List<string> list, string name, string type, string[] enums)
         {
-            string enumsProperty = string.Empty;
+            type = "\"" + type + "\"";
             if (enums.Length > 0)
             {
-                enumsProperty = ", \"enum\":[\"" + string.Join("\",\"", enums) + "\"]";
+                type += " //  ('" + string.Join("', '", enums) + "') ";
             }
             name = GetJsonName(name);
-            string property = "\"" + name + "\": {\"type\": \"" + type + "\"" + enumsProperty + "}";
+            string property = "\"" + name + "\": " + type + "";
             list.Add(property);
         }
 

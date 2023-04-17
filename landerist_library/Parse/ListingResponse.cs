@@ -114,9 +114,9 @@ namespace landerist_library.Parse
 
         protected const string TIPO_DE_INMUEBLE_DORMITORIO = "dormitorio";
 
-        protected const string TIPO_DE_INMUEBLE_LOCAL_COMERCIAL = "local comercial";
+        protected const string TIPO_DE_INMUEBLE_LOCAL_COMERCIAL = "local_comercial";
 
-        protected const string TIPO_DE_INMUEBLE_NAVE_INDUSTRIAL = "nave industrial";
+        protected const string TIPO_DE_INMUEBLE_NAVE_INDUSTRIAL = "nave_industrial";
 
         protected const string TIPO_DE_INMUEBLE_GARAJE = "garaje";
 
@@ -124,7 +124,7 @@ namespace landerist_library.Parse
 
         protected const string TIPO_DE_INMUEBLE_OFICINA = "oficina";
 
-        protected const string TIPO_DE_INMUEBLE_PARCELA = "terreno o parcela";
+        protected const string TIPO_DE_INMUEBLE_PARCELA = "terreno_o_parcela";
 
         protected const string TIPO_DE_INMUEBLE_EDIFICIO = "edificio";
 
@@ -138,25 +138,25 @@ namespace landerist_library.Parse
 
         protected const string SUBTIPO_DE_INMUEBLE_DUPLEX = "dúplex";
 
-        protected const string SUBTIPO_DE_INMUEBLE_CHALET_INDEPENDIENTE = "chalet independiente";
+        protected const string SUBTIPO_DE_INMUEBLE_CHALET_INDEPENDIENTE = "chalet_independiente";
 
-        protected const string SUBTIPO_DE_INMUEBLE_CHALET_PAREADO = "chalet pareado";
+        protected const string SUBTIPO_DE_INMUEBLE_CHALET_PAREADO = "chalet_pareado";
 
-        protected const string SUBTIPO_DE_INMUEBLE_CHALET_ADOSADO = "chalet adosado";
+        protected const string SUBTIPO_DE_INMUEBLE_CHALET_ADOSADO = "chalet_adosado";
 
-        protected const string SUBTIPO_DE_INMUEBLE_PARCELA_URBANA = "parcela urbana";
+        protected const string SUBTIPO_DE_INMUEBLE_PARCELA_URBANA = "parcela_urbana";
 
-        protected const string SUBTIPO_DE_INMUEBLE_PARCELA_URBANIZABLE = "parcela urbanizable";
+        protected const string SUBTIPO_DE_INMUEBLE_PARCELA_URBANIZABLE = "parcela_urbanizable";
 
-        protected const string SUBTIPO_DE_INMUEBLE_PARCELA_NO_URBANIZABLE = "parcela no urbanizable";
+        protected const string SUBTIPO_DE_INMUEBLE_PARCELA_NO_URBANIZABLE = "parcela_no_urbanizable";
 
-        protected const string ESTADO_DE_LA_CONSTRUCCIÓN_OBRA_NUEVA = "obra nueva";
+        protected const string ESTADO_DE_LA_CONSTRUCCIÓN_OBRA_NUEVA = "obra_nueva";
 
-        protected const string ESTADO_DE_LA_CONSTRUCCIÓN_BUENO = "buen estado";
+        protected const string ESTADO_DE_LA_CONSTRUCCIÓN_BUENO = "buen_estado";
 
-        protected const string ESTADO_DE_LA_CONSTRUCCIÓN_A_REFORMAR = "a reformar";
+        protected const string ESTADO_DE_LA_CONSTRUCCIÓN_A_REFORMAR = "a_reformar";
 
-        protected const string ESTADO_DE_LA_CONSTRUCCIÓN_EN_RUINAS = "en ruinas";
+        protected const string ESTADO_DE_LA_CONSTRUCCIÓN_EN_RUINAS = "en_ruinas";
 
         public Listing? ToListing(Page page)
         {

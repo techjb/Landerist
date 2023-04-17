@@ -14,9 +14,6 @@ namespace landerist_library.Parse
         // GPT-4-32K: 32768
         public static readonly int MAX_TOKENS = 4096;
 
-        private const string SystemMessage =
-            "Eres un servidor de información que únicamente responde en formato JSON";
-
         private readonly Conversation Conversation;
 
         public ChatGPT()
@@ -29,7 +26,8 @@ namespace landerist_library.Parse
                 //MaxTokens = 50,
             };
             Conversation = openAIAPI.Chat.CreateConversation(chatRequest);
-            Conversation.AppendSystemMessage(SystemMessage);
+            var systemMessage = GetSystemMessage();
+            Conversation.AppendSystemMessage(systemMessage);
         }
 
         public string? GetResponse(string userInput)
@@ -50,20 +48,31 @@ namespace landerist_library.Parse
 
         public static string ParseUserInput(string userIput)
         {
+            return userIput;
+
             return
-                "Dado el siguiente texto:\n" +
-                "----\n" +
+                "Dado el siguiente texto:\n\n" +
+                "------\n" +
                 userIput + "\n" +
-                "----\n" +
-                "Proporciona una representación JSON que siga estrictamente este esquema:\n" +
-                ListingResponseSchema.GetSchema() + "\n" +
-                "Escribe null en los campos que falten.\n";
+                "------\n\n" +
+                "Proporciona una representación JSON que siga estrictamente este esquema:\n\n" +
+                ListingResponseSchema.GetSchema() + "\n\n" +                
+                "Escribe null en los campos que falten.";
         }
 
-        public static bool IsRequestAllowed(string request)
+        private static string GetSystemMessage()
+        {
+            return 
+                "Proporciona una representación JSON que siga estrictamente este esquema:\n\n" +
+                ListingResponseSchema.GetSchema() + "\n\n" +
+                "Escribe null en los campos que falten.";
+        }
+
+        public static bool IsLengthAllowed(string request)
         {
             //https://github.com/dluc/openai-tools
-            int systemTokens = GPT3Tokenizer.Encode(SystemMessage).Count;
+            var systemMessage = GetSystemMessage();
+            int systemTokens = GPT3Tokenizer.Encode(systemMessage).Count;
 
             request = ParseUserInput(request);
             int userTokens = GPT3Tokenizer.Encode(request).Count;

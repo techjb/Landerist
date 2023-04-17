@@ -64,6 +64,17 @@ namespace landerist_library.Scrape
         {
             var pages = website.GetPages();
             ScrapePages(pages);
+        }        
+
+        public void ScrapeNonScrapped(Website website)
+        {
+            var pages = website.GetNonScrapedPages();
+            if(pages.Count == 0)
+            {
+                return;
+            }
+            ScrapePages(pages);
+            ScrapeNonScrapped(website);
         }
 
         private void ScrapePages(List<Page> pages)
@@ -71,7 +82,7 @@ namespace landerist_library.Scrape
             PendingPages.Clear();
 
             Parallel.ForEach(pages,
-                new ParallelOptions() { MaxDegreeOfParallelism = 1 },
+                //new ParallelOptions() { MaxDegreeOfParallelism = 3 },
                 page =>
                 {
                     ScrapePage(page);
@@ -83,7 +94,8 @@ namespace landerist_library.Scrape
             if (PendingPages.Count > 0)
             {
                 Thread.Sleep(2000);
-                ScrapePages(PendingPages);
+                List<Page> newList = new(PendingPages);
+                ScrapePages(newList);
             }
         }
 
