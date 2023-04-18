@@ -10,6 +10,8 @@ namespace landerist_library.Parse
 
         private readonly Listing Listing;
 
+        private bool LocationFound = false;
+
         public LocationParser(Page page, Listing listing)
         {
 
@@ -34,7 +36,8 @@ namespace landerist_library.Parse
                 var srcAttribute = iframe.GetAttributeValue("src", string.Empty);
                 try
                 {
-                    if (TryParseGoogleMaps(srcAttribute))
+                    TryParseGoogleMaps(srcAttribute);
+                    if (LocationFound)
                     {
                         break;
                     }
@@ -46,7 +49,7 @@ namespace landerist_library.Parse
             }
         }
 
-        private bool TryParseGoogleMaps(string srcAttribute)
+        private void TryParseGoogleMaps(string srcAttribute)
         {
             if (srcAttribute.Contains("https://www.google.com/maps/embed?pb=") &&
                     srcAttribute.Contains("!2d") &&
@@ -65,10 +68,9 @@ namespace landerist_library.Parse
                 {
                     Listing.longitude = longitude;
                     Listing.latitude = latitude;
-                    return true;
+                    LocationFound = true;
                 }
             }
-            return false;
         }
     }
 }
