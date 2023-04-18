@@ -35,7 +35,6 @@ namespace landerist_library.Parse
             Conversation.AppendUserInput(userInput);
             try
             {
-
                 string response = Task.Run(async () => await Conversation.GetResponseFromChatbotAsync()).Result;
                 return response;
             }

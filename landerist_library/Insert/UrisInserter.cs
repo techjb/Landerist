@@ -62,7 +62,7 @@ namespace landerist_library.Insert
             Insert(hashSet);
         }
 
-        public void Insert(HashSet<Uri> uris)
+        private void Insert(HashSet<Uri> uris)
         {
             int inserted = 0;
             int errors = 0;
@@ -75,6 +75,7 @@ namespace landerist_library.Insert
                 if (InsertWebsite(uri))
                 {
                     inserted++;
+                    InitWebsite(uri);
                 }
                 else
                 {
@@ -114,6 +115,16 @@ namespace landerist_library.Insert
 
             }
             return false;
+        }
+
+        public void InitWebsite(Uri uri)
+        {
+            Website website = new(uri);
+
+            website.SetHttpStatusCode();
+            website.SetRobotsTxt();
+            website.SetIpAddress();
+            website.InsertMainPage();
         }
     }
 }

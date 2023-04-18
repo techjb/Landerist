@@ -7,6 +7,7 @@ using System.Text;
 using landerist_library.Parse;
 using Newtonsoft.Json;
 using landerist_library.Configuration;
+using System;
 
 namespace landerist_console
 {
@@ -44,10 +45,10 @@ namespace landerist_console
 
         private static void Run()
         {
-            var uriPage1 = new Uri("https://www.saroga.es/inmueble/chalet-independiente-satelites-majadahonda/");
-            var uriPage2 = new Uri("https://www.saroga.es/inmueble/piso-4-dormitorios-avenida-europa-pozuelo/");
-            var uriPage3 = new Uri("https://www.saroga.es/inmueble/piso-monte-pilar-majadahonda/");
-            var uriPage4 = new Uri("https://www.saroga.es/inmueble/chalet-independiente-satelites-majadahonda/");
+            //var uriPage1 = new Uri("https://www.saroga.es/inmueble/chalet-independiente-satelites-majadahonda/");
+            //var uriPage2 = new Uri("https://www.saroga.es/inmueble/piso-4-dormitorios-avenida-europa-pozuelo/");
+            //var uriPage3 = new Uri("https://www.saroga.es/inmueble/piso-monte-pilar-majadahonda/");
+            var uriPage4 = new Uri("https://www.saroga.es/inmueble/apartamento-majadahonda/");
 
             var uri = new Uri("https://www.saroga.es/");
             //var uri = new Uri("https://mabelan.es/");
@@ -56,7 +57,7 @@ namespace landerist_console
             //var uri = new Uri("https://www.expimad.com/");
 
             var website = new Website(uri);
-            var page = new Page(website, uriPage1);
+            var page = new Page(website, uriPage4);
 
             //website.Remove(); return;
 
@@ -74,15 +75,9 @@ namespace landerist_console
             //new Websites().CalculateHashes();
             //new Websites().InsertMainPages();
 
-
-            //website.SetHttpStatusCode();
-            //website.SetRobotsTxt();
-            //website.SetIpAddress();
-            //website.InsertMainPage();
-
             //new Scraper().ScrapeMainPage(website);
-            //new Scraper().ScrapeNonScrapped(website);
-            //new Scraper().ScrapeUnknowIsListing(website);
+            //new Scraper().ScrapeNonScrapped(uri);
+            //new Scraper().ScrapeUnknowIsListing(uri);            
             new Scraper().ScrapePage(page);
             //new Scraper().ScrapeAllPages();
 

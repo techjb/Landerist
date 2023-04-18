@@ -17,8 +17,7 @@ namespace landerist_library.Parse
         }
 
         public void AddMedia(Listing listing)
-        {
-           
+        {           
             if (Page.HtmlDocument == null)
             {
                 return;

@@ -1,4 +1,5 @@
-﻿using landerist_library.Websites;
+﻿using HtmlAgilityPack;
+using landerist_library.Websites;
 using landerist_orels.ES;
 using System.Globalization;
 
@@ -25,36 +26,41 @@ namespace landerist_library.Parse
             {
                 return;
             }
-            GetLocationGoogleMaps();
+            GetLocationGoogleMaps(Page.HtmlDocument);
         }
 
-        private void GetLocationGoogleMaps()
+        private void GetLocationGoogleMaps(HtmlDocument htmlDocument)
         {
-            var iframes = Page.HtmlDocument!.DocumentNode.Descendants("iframe");
+            var iframes = htmlDocument.DocumentNode.Descendants("iframe");
+            if (iframes == null)
+            {
+                return;
+            }
             foreach (var iframe in iframes)
             {
                 var srcAttribute = iframe.GetAttributeValue("src", string.Empty);
-                try
+                if (string.IsNullOrEmpty(srcAttribute))
                 {
-                    TryParseGoogleMaps(srcAttribute);
-                    if (LocationFound)
-                    {
-                        break;
-                    }
+                    continue;
                 }
-                catch (Exception ex)
+                TryParseGoogleMaps(srcAttribute);
+                if (LocationFound)
                 {
-
+                    break;
                 }
             }
         }
 
         private void TryParseGoogleMaps(string srcAttribute)
         {
-            if (srcAttribute.Contains("https://www.google.com/maps/embed?pb=") &&
-                    srcAttribute.Contains("!2d") &&
-                    srcAttribute.Contains("!3d")
-                    )
+            if (!srcAttribute.Contains("https://www.google.com/maps/embed?pb=") &&
+                !srcAttribute.Contains("!2d") &&
+                !srcAttribute.Contains("!3d"))
+            {
+                return;
+            }
+
+            try
             {
                 var lng = srcAttribute[(srcAttribute.IndexOf("!2d") + 3)..];
                 lng = lng[..lng.IndexOf("!3d")];
@@ -67,9 +73,13 @@ namespace landerist_library.Parse
                     )
                 {
                     Listing.longitude = longitude;
-                    Listing.latitude = latitude;
+                    Listing.latitude = latitude;                    
                     LocationFound = true;
                 }
+            }
+            catch (Exception ex)
+            {
+
             }
         }
     }
