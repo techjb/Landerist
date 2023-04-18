@@ -8,55 +8,101 @@ namespace landerist_library.Parse
     {
         private readonly Page Page;
 
+        private readonly SortedSet<Media> Medias = new(new MediaComparer());
+
         public MediaParser(Page page)
         {
-            Page = page;
+            Page = page;            
+            RemoveResponseBodyNodes();
         }
 
         public void AddMedia(Listing listing)
         {
-            Page.LoadHtmlDocument();
+           
             if (Page.HtmlDocument == null)
             {
                 return;
             }
-            var mediaImages = GetImages(Page.HtmlDocument);
-            listing.SetMedia(mediaImages);
-
+            GetImages(Page.HtmlDocument);
+            listing.SetMedia(Medias);
         }
 
-        private SortedSet<Media> GetImages(HtmlDocument htmlDocument)
+        private void RemoveResponseBodyNodes()
         {
-            SortedSet<Media> medias = new(new MediaComparer());
-            var imageNodes = htmlDocument.DocumentNode.SelectNodes("//img");
-            if (imageNodes != null)
+            Page.LoadHtmlDocument(true);
+            if (Page.HtmlDocument == null)
             {
-                foreach (var imgNode in imageNodes)
+                return;
+            }
+            var xPath =
+                "//script | //nav | //footer | //style | //head | " +
+                "//form | //code | //canvas | //input | //meta | //option | " +
+                "//select | //progress | //svg | //textarea | //del";
+
+            var nodesToRemove = Page.HtmlDocument.DocumentNode.SelectNodes(xPath).ToList();
+            foreach (var node in nodesToRemove)
+            {
+                node.Remove();
+            }
+        }
+
+        private void GetImages(HtmlDocument htmlDocument)
+        {
+            GetImagesSrc(htmlDocument);
+            GetImagesA(htmlDocument);
+        }
+
+        private void GetImagesSrc(HtmlDocument htmlDocument)
+        {
+            var imageNodes = htmlDocument.DocumentNode.SelectNodes("//img");
+            ParseImages(imageNodes, "src");
+        }
+
+        private void GetImagesA(HtmlDocument htmlDocument)
+        {
+            var imageNodes = htmlDocument.DocumentNode.SelectNodes("//a");
+            ParseImages(imageNodes, "href");
+        }
+
+        private void ParseImages(HtmlNodeCollection? nodeCollection, string attributeValue)
+        {
+            if (nodeCollection == null)
+            {
+                return;
+            }
+            foreach (var node in nodeCollection)
+            {
+                var media = ParseImage(node, attributeValue);
+                if (media != null)
                 {
-                    var media = GetMedia(imgNode);
-                    if (media != null)
-                    {
-                        medias.Add(media);
-                    }
+                    Medias.Add(media);
                 }
             }
-
-            return medias;
         }
 
-        private Media? GetMedia(HtmlNode imgNode)
+        private Media? ParseImage(HtmlNode imgNode, string name)
         {
-            string src = imgNode.GetAttributeValue("src", null);
-            if (string.IsNullOrEmpty(src))
+            string attributeValue = imgNode.GetAttributeValue(name, null);
+            if (string.IsNullOrEmpty(attributeValue))
             {
                 return null;
             }
-            if (!Uri.TryCreate(Page.Uri, src, out Uri? uri))
+            if (!Uri.TryCreate(Page.Uri, attributeValue, out Uri? uri))
             {
                 return null;
             }
-            string title = imgNode.GetAttributeValue("title", null);
-            
+            string title = imgNode.GetAttributeValue("alt", null);
+            if (string.IsNullOrEmpty(title))
+            {
+                title = imgNode.GetAttributeValue("title", null);
+            }
+
+            string extension = Path.GetExtension(attributeValue).ToLower();
+            if (extension != ".jpg" && extension != ".jpeg")
+            {
+                return null;
+            }
+
             return new Media()
             {
                 mediaType = MediaType.image,

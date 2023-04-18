@@ -190,9 +190,9 @@ namespace landerist_library.Websites
             Insert(Website, uris);
         }
 
-        public void LoadHtmlDocument()
+        public void LoadHtmlDocument(bool forceReload = false)
         {
-            if (HtmlDocument != null)
+            if (HtmlDocument != null && !forceReload)
             {
                 return;
             }
@@ -219,6 +219,7 @@ namespace landerist_library.Websites
             if (listing != null)
             {
                 new MediaParser(this).AddMedia(listing);
+                new LocationParser(this, listing).SetLocation();
                 new ES_Listings().Insert(listing);
             }
         }

@@ -43,7 +43,7 @@ namespace landerist_library.Insert
                     var text = rows[i];
                     if (text.StartsWith("\"") && text.EndsWith("\"") && text.Length > 2)
                     {
-                        text = text.Substring(1, text.Length - 2);
+                        text = text[1..^1];
                     }
                     dataRow[i] = text;
                 }

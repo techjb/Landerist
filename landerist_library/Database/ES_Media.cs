@@ -22,7 +22,7 @@ namespace landerist_library.Database
 
                 new DataBase().Query(query, new Dictionary<string, object?> {
                     {"listingGuid", listing.guid },
-                    {"mediaType", media.mediaType },
+                    {"mediaType", media.mediaType.ToString() },
                     {"title", media.title },
                     {"url", media.url?.ToString()},
                 });
