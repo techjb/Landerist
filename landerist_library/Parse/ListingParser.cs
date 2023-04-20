@@ -12,8 +12,6 @@ namespace landerist_library.Parse
 
         private Listing? Listing = null;
 
-        private string ResponseBodyText = string.Empty;
-
         public ListingParser(Page page)
         {
             Page = page;
@@ -22,19 +20,18 @@ namespace landerist_library.Parse
         public Tuple<bool?, Listing?> GetListing()
         {
             SetResponseBodyText();
-            if (ListingIsPermited())
+            if (RequestListingIsPermited())
             {
                 RequestListing();
             }
             return Tuple.Create(IsListing, Listing);
         }
 
-        public bool ListingIsPermited()
+        public bool RequestListingIsPermited()
         {
             return
-                !ResponseBodyText.Equals(string.Empty) &&
-                ChatGPT.IsLengthAllowed(ResponseBodyText)
-                ;
+                !string.IsNullOrEmpty(Page.ResponseBodyText) &&
+                ChatGPT.IsLengthAllowed(Page.ResponseBodyText);
         }
 
         private void SetResponseBodyText()
@@ -42,38 +39,38 @@ namespace landerist_library.Parse
             Page.LoadHtmlDocument();
             if (Page.HtmlDocument != null)
             {
-                ResponseBodyText = new HtmlToText(Page.HtmlDocument).GetText();
+                Page.ResponseBodyText = new HtmlToText(Page.HtmlDocument).GetText();
             }
         }
 
         private void RequestListing()
         {
-            var result = new ChatGPT().GetResponse(ResponseBodyText);
-            if (result != null)
+            if (!string.IsNullOrEmpty(Page.ResponseBodyText))
             {
-                ParseListing(result);
+                var result = new ChatGPT().GetResponse(Page.ResponseBodyText);
+                if (result != null)
+                {
+                    ParseListing(result);
+                }
             }
         }
 
         private void ParseListing(string json)
         {
-            ListingResponse? listingResponse = null;
+            IsListing = false;
             try
             {
-                listingResponse = JsonConvert.DeserializeObject<ListingResponse>(json);
+                ListingResponse? listingResponse = JsonConvert.DeserializeObject<ListingResponse>(json);
+                if (listingResponse != null)
+                {
+                    Listing = listingResponse.ToListing(Page);
+                    IsListing = Listing != null;
+                }
             }
             catch
             {
-
-            }
-            if (listingResponse != null)
-            {
-                Listing = listingResponse.ToListing(Page);
-                if (Listing != null)
-                {
-                    IsListing = true;
-                }
-            }
+                
+            }   
         }
     }
 }

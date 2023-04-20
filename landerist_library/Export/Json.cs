@@ -30,6 +30,7 @@ namespace landerist_library.Export
             if (makeZip)
             {
                 string zipFile = Config.EXPORT_DIRECTORY + ZIP_FILE_NAME;
+                File.Delete(zipFile);
                 return new Zip().Export(jsonFile, zipFile);
             }
             return true;

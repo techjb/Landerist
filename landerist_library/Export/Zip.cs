@@ -24,7 +24,7 @@ namespace landerist_library.Export
 
                 foreach(string file in files)
                 {
-                    if(File.Exists(file))
+                    if(!File.Exists(file))
                     {
                         return false;
                     }

@@ -87,7 +87,7 @@ namespace landerist_library.Database
 
             DataTable dataTable = new DataBase().QueryTable(query);
 
-            SortedSet<Listing> listings = new();
+            SortedSet<Listing> listings = new(new ListingComparer());
             foreach (DataRow dataRow in dataTable.Rows)
             {
                 var listing = GetListing(dataRow);
@@ -103,19 +103,23 @@ namespace landerist_library.Database
 
         public Listing GetListing(DataRow dataRow)
         {
-            var listing = new Listing
+            Enum.TryParse((string)dataRow["listingStatus"], out ListingStatus listingStatus);
+            Enum.TryParse((string)dataRow["operation"], out Operation operation);
+            Enum.TryParse((string)dataRow["propertyType"], out PropertyType propertyType);
+
+            Listing listing = new()
             {
                 guid = (string)dataRow["guid"],
-                listingStatus = (ListingStatus)dataRow["listingStatus"],
+                listingStatus = listingStatus,
                 listingDate = dataRow["listingDate"] is DBNull ? null : (DateTime)dataRow["listingDate"],
                 unlistingDate = dataRow["unlistingDate"] is DBNull ? null : (DateTime)dataRow["unlistingDate"],
-                operation = (Operation)dataRow["operation"],
-                propertyType = (PropertyType)dataRow["propertyType"],
-                propertySubtype = dataRow["propertySubtype"] is DBNull ? null : (PropertySubtype)dataRow["propertySubtype"],
+                operation = operation,
+                propertyType = propertyType,
+                propertySubtype = dataRow["propertySubtype"] is DBNull ? null : (PropertySubtype)Enum.Parse(typeof(PropertySubtype), dataRow["propertySubtype"].ToString()!),
                 price = dataRow["priceAmount"] is DBNull ? null : new Price()
                 {
                     amount = Convert.ToDecimal(dataRow["priceAmount"]),
-                    currency = (Currency)dataRow["priceCurrency"]
+                    currency = (Currency)Enum.Parse(typeof(Currency), dataRow["priceCurrency"].ToString()!)
                 },
                 description = dataRow["description"] is DBNull ? null : (string)dataRow["description"],
                 dataSourceName = dataRow["dataSourceName"] is DBNull ? null : (string)dataRow["dataSourceName"],
@@ -134,13 +138,13 @@ namespace landerist_library.Database
                 cadastralReference = dataRow["cadastralReference"] is DBNull ? null : (string)dataRow["cadastralReference"],
                 propertySize = dataRow["propertySize"] is DBNull ? null : (double)dataRow["propertySize"],
                 landSize = dataRow["landSize"] is DBNull ? null : (double)dataRow["landSize"],
-                constructionYear = dataRow["constructionYear"] is DBNull ? null : (int)dataRow["constructionYear"],
-                constructionStatus = dataRow["constructionStatus"] is DBNull ? null : (ConstructionStatus)dataRow["constructionStatus"],
-                floors = dataRow["floors"] is DBNull ? null : (int)dataRow["floors"],
+                constructionYear = dataRow["constructionYear"] is DBNull ? null : (short)dataRow["constructionYear"],
+                constructionStatus = dataRow["constructionStatus"] is DBNull ? null : (ConstructionStatus)Enum.Parse(typeof(ConstructionStatus), dataRow["constructionStatus"].ToString()!),
+                floors = dataRow["floors"] is DBNull ? null : (short)dataRow["floors"],
                 floor = dataRow["floor"] is DBNull ? null : (string)dataRow["floor"],
-                bedrooms = dataRow["bedrooms"] is DBNull ? null : (int)dataRow["bedrooms"],
-                bathrooms = dataRow["bathrooms"] is DBNull ? null : (int)dataRow["bathrooms"],
-                parkings = dataRow["parkings"] is DBNull ? null : (int)dataRow["parkings"],
+                bedrooms = dataRow["bedrooms"] is DBNull ? null : (short)dataRow["bedrooms"],
+                bathrooms = dataRow["bathrooms"] is DBNull ? null : (short)dataRow["bathrooms"],
+                parkings = dataRow["parkings"] is DBNull ? null : (short)dataRow["parkings"],
             };
 
             AddFeature(listing, dataRow, "terrace", Feature.terrace);

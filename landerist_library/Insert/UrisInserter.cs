@@ -117,7 +117,7 @@ namespace landerist_library.Insert
             return false;
         }
 
-        public static void InitWebsite(Uri uri)
+        private static void InitWebsite(Uri uri)
         {
             Website website = new(uri);
 

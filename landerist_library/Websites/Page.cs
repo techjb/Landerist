@@ -25,6 +25,8 @@ namespace landerist_library.Websites
 
         public string? ResponseBody { get; set; }
 
+        public string? ResponseBodyText { get; set; }
+
         public bool? IsListing { get; set; }
 
 
@@ -33,8 +35,8 @@ namespace landerist_library.Websites
 
         public HtmlDocument? HtmlDocument = null;
 
-        public Page(Website website) : this(website, website.MainUri) 
-        { 
+        public Page(Website website) : this(website, website.MainUri)
+        {
 
         }
         public Page(Website website, Uri uri)
@@ -68,7 +70,7 @@ namespace landerist_library.Websites
             Inserted = (DateTime)dataRow["Inserted"];
             Updated = dataRow["Updated"] is DBNull ? null : (DateTime)dataRow["Updated"];
             HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
-            ResponseBody = dataRow["ResponseBody"] is DBNull ? null : dataRow["ResponseBody"].ToString();
+            ResponseBodyText = dataRow["ResponseBodyText"] is DBNull ? null : dataRow["ResponseBodyText"].ToString();
             IsListing = dataRow["IsListing"] is DBNull ? null : (bool)dataRow["IsListing"];
         }
 
@@ -120,7 +122,7 @@ namespace landerist_library.Websites
                 "UPDATE " + TABLE_PAGES + " SET " +
                 "[Updated] = @Updated, " +
                 "[HttpStatusCode] = @HttpStatusCode, " +
-                "[ResponseBody] = @ResponseBody, " +
+                "[ResponseBodyText] = @ResponseBodyText, " +
                 "[IsListing] = @IsListing " +
                 "WHERE [UriHash] = @UriHash";
 
@@ -128,7 +130,7 @@ namespace landerist_library.Websites
                 {"UriHash", UriHash },
                 {"Updated", Updated },
                 {"HttpStatusCode", HttpStatusCode},
-                {"ResponseBody", ResponseBody},
+                {"ResponseBodyText", ResponseBodyText},
                 {"IsListing", IsListing },
             });
         }
@@ -157,6 +159,7 @@ namespace landerist_library.Websites
         {
             HttpStatusCode = null;
             ResponseBody = null;
+            ResponseBodyText = null;
 
             HttpClientHandler handler = new()
             {
@@ -257,7 +260,7 @@ namespace landerist_library.Websites
                         if (!value.Equals(language, StringComparison.OrdinalIgnoreCase))
                         {
                             return false;
-                        }                        
+                        }
                     }
                 }
             }

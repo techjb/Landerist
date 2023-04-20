@@ -17,15 +17,15 @@ namespace landerist_library.Parse
         {
             try
             {
-                RemoveResponseBodyNodes();
-                SetResponseBodyTextVisible();
+                RemoveNodes();
+                GetVisibleText();
             }
             catch { }
             return HtmlText.Trim();
         }
 
 
-        private void RemoveResponseBodyNodes()
+        private void RemoveNodes()
         {
             if (HtmlDocument == null)
             {
@@ -43,7 +43,7 @@ namespace landerist_library.Parse
             }
         }
 
-        private void SetResponseBodyTextVisible()
+        private void GetVisibleText()
         {
             if (HtmlDocument == null)
             {
@@ -51,9 +51,12 @@ namespace landerist_library.Parse
             }
             var visibleNodes = HtmlDocument.DocumentNode.DescendantsAndSelf().Where(
                    n => n.NodeType == HtmlNodeType.Text)
-                   .Where(n => !string.IsNullOrWhiteSpace(n.InnerHtml));
+                   .Where(n => !string.IsNullOrWhiteSpace(n.InnerHtml))
+                   .Where(n => !n.InnerHtml.Trim().ToLower().Equals("&nbsp;"))
+                   ;
 
             var visibleText = visibleNodes.Select(n => n.InnerHtml.Trim());
+            
             HtmlText = string.Join(Environment.NewLine, visibleText);
         }
     }

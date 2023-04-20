@@ -41,7 +41,7 @@ namespace landerist_library.Database
                 { "listingGuid", listing.guid }
             });
 
-            SortedSet<Media> medias = new();
+            SortedSet<Media> medias = new(new MediaComparer());
             foreach (DataRow dataRow in dataTable.Rows)
             {
                 var media = GetMedia(dataRow);
@@ -54,7 +54,7 @@ namespace landerist_library.Database
         {
             return new Media()
             {
-                mediaType = dataRow["mediaType"] is DBNull ? null : (MediaType)dataRow["mediaType"],
+                mediaType = dataRow["mediaType"] is DBNull ? null : (MediaType)Enum.Parse(typeof(MediaType), dataRow["mediaType"].ToString()!),
                 title = dataRow["title"] is DBNull ? null : (string)dataRow["title"],
                 url = new Uri((string)dataRow["url"])
             };

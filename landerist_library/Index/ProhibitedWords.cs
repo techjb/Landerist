@@ -5,7 +5,9 @@
         private static readonly HashSet<string> ES = new(StringComparer.OrdinalIgnoreCase)
         {
             "contact",
+            "politica",
             "privacidad",
+            "avisolegal",
             "legal",
             "filosofia",
             "nosotros",
@@ -39,7 +41,7 @@
             "donaciones",
             "quierovender",
             "rgpd",
-
+            
         };
 
         public static bool Contains(Uri uri)
