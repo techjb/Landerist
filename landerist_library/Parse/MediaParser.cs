@@ -1,6 +1,10 @@
 ﻿using landerist_library.Websites;
 using landerist_orels.ES;
 using HtmlAgilityPack;
+using System.Text.RegularExpressions;
+using System;
+using System.Xml.Linq;
+using System.Reflection.Metadata.Ecma335;
 
 namespace landerist_library.Parse
 {
@@ -12,21 +16,22 @@ namespace landerist_library.Parse
 
         public MediaParser(Page page)
         {
-            Page = page;            
-            RemoveResponseBodyNodes();
+            Page = page;
+            InitResponseBody();
         }
 
         public void AddMedia(Listing listing)
-        {           
+        {
             if (Page.HtmlDocument == null)
             {
                 return;
             }
             GetImages(Page.HtmlDocument);
+            GetVideos(Page.HtmlDocument);
             listing.SetMedia(Medias);
         }
 
-        private void RemoveResponseBodyNodes()
+        private void InitResponseBody()
         {
             Page.LoadHtmlDocument(true);
             if (Page.HtmlDocument == null)
@@ -108,6 +113,46 @@ namespace landerist_library.Parse
                 url = uri,
                 title = title,
             };
+        }
+
+        private void GetVideos(HtmlDocument htmlDocument)
+        {
+            HtmlNodeCollection linkNodes = htmlDocument.DocumentNode.SelectNodes("//a[@href]");
+            GetYoutubeVideos(linkNodes, "href");
+
+            linkNodes = htmlDocument.DocumentNode.SelectNodes("//iframe[@src]");            
+            GetYoutubeVideos(linkNodes, "src");
+        }
+
+        private void GetYoutubeVideos(HtmlNodeCollection linkNodes, string attributeName)
+        {
+            if (linkNodes == null)
+            {
+                return;
+            }
+
+            Regex regex = new(@"(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:embed\/|watch\?v=)|youtu\.be\/)([\w\d_-]+)");
+            foreach (HtmlNode linkNode in linkNodes)
+            {
+                string attributeValue = linkNode.GetAttributeValue(attributeName, string.Empty);
+                Match match = regex.Match(attributeValue);
+                if (!match.Success)
+                {
+                    continue;
+                }
+                if (Uri.TryCreate(attributeValue, UriKind.Absolute, out Uri? uri))
+                {
+                    if (uri != null)
+                    {
+                        var media = new Media()
+                        {
+                            mediaType = MediaType.video,
+                            url = uri
+                        };
+                        Medias.Add(media);
+                    }
+                }
+            }
         }
     }
 }

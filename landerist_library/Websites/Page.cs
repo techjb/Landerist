@@ -39,6 +39,12 @@ namespace landerist_library.Websites
         {
 
         }
+        
+        public Page(Website website, string url): this(website, new Uri(url))
+        {
+
+        }
+
         public Page(Website website, Uri uri)
         {
             Website = website;
