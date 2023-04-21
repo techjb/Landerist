@@ -60,7 +60,7 @@ namespace landerist_library.Parse
             }
             catch(Exception exception) 
             {
-                Logs.Log.WriteLogErrors(Page.Uri, exception);
+                //Logs.Log.WriteLogErrors(Page.Uri, exception);
             }   
         }
     }

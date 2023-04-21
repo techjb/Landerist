@@ -75,15 +75,7 @@ namespace landerist_library.Parse
             AddBooleanProperty(list, nameof(PermiteMascotas));
             AddBooleanProperty(list, nameof(TieneSistemasDeSeguridad));
 
-            //return
-            //"{" +
-            //    "\"type\": \"object\"," +
-            //    " \"additionalProperties\": false," +
-            //    "\"properties\": {" + string.Join(",", list.ToArray()) + "}" +
-            //"}";
-
             string json = "{" + string.Join(",", list.ToArray()) + "}";
-            //json = Format(json);
             return json;
         }
 
@@ -114,25 +106,12 @@ namespace landerist_library.Parse
             AddProperty(list, name, "string", enums);
         }
 
-        //private static void AddProperty(List<string> list, string name, string type, string[] enums)
-        //{
-        //    string enumsProperty = string.Empty;
-        //    if (enums.Length > 0)
-        //    {
-        //        enumsProperty = ", \"enum\":[\"" + string.Join("\",\"", enums) + "\"]";
-        //        //enumsProperty = ", \"values\":[\"" + string.Join("\",\"", enums) + "\"]";                
-        //    }
-        //    name = GetJsonName(name);
-        //    string property = "\"" + name + "\": {\"type\": \"" + type + "\"" + enumsProperty + "}";            
-        //    list.Add(property);
-        //}
-
         private static void AddProperty(List<string> list, string name, string type, string[] enums)
         {
             type = "\"" + type + "\"";
             if (enums.Length > 0)
             {
-                type += " //  ('" + string.Join("', '", enums) + "') ";
+                type += " // ('" + string.Join("', '", enums) + "') ";
             }
             name = GetJsonName(name);
             string property = "\"" + name + "\": " + type + "";

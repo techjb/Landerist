@@ -1,11 +1,8 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using System.Security.Cryptography;
 using System.Text;
 using HtmlAgilityPack;
-using landerist_library.Configuration;
 using landerist_library.Database;
-using landerist_library.Index;
 using landerist_library.Parse;
 
 namespace landerist_library.Websites
@@ -151,56 +148,7 @@ namespace landerist_library.Websites
             return true;
         }
 
-        public bool Scrape()
-        {
-            var task = Task.Run(async () => await Download());
-            if (task.Result)
-            {
-                InsertPages();
-                GetListing();
-            }
-            return Update();
-        }
-
-        private async Task<bool> Download()
-        {
-            HttpStatusCode = null;
-            ResponseBody = null;
-            ResponseBodyText = null;
-
-            HttpClientHandler handler = new()
-            {
-                AllowAutoRedirect = false
-            };
-            using var client = new HttpClient(handler);
-            client.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
-
-            HttpRequestMessage request = new(HttpMethod.Get, Uri);
-            try
-            {
-                var response = await client.SendAsync(request);
-                HttpStatusCode = (short)response.StatusCode;
-                ResponseBody = await response.Content.ReadAsStringAsync();
-                return response.IsSuccessStatusCode;
-            }
-            catch(Exception exception) 
-            {
-                Logs.Log.WriteLogErrors(Uri, exception);
-                return false;
-            }
-        }
-
-        private void InsertPages()
-        {
-            LoadHtmlDocument();
-            if (HtmlDocument == null || Website == null)
-            {
-                return;
-            }
-            var uris = new Indexer(this).GetUris();
-            Insert(Website, uris);
-        }
-
+        
         public void LoadHtmlDocument(bool forceReload = false)
         {
             if (HtmlDocument != null && !forceReload)
@@ -219,24 +167,7 @@ namespace landerist_library.Websites
             }
         }
 
-        private void GetListing()
-        {
-            if (!CanRequestListing())
-            {
-                return;
-            }
-            var listingParser = new ListingParser(this).GetListing();
-            IsListing = listingParser.Item1;
-            var listing = listingParser.Item2;
-            if (listing != null)
-            {
-                new MediaParser(this).AddMedia(listing);
-                new LocationParser(this, listing).SetLocation();
-                new ES_Listings().Insert(listing);
-            }
-        }
-
-        private bool CanRequestListing()
+        public bool CanRequestListing()
         {
             return !IsMainPage();
         }

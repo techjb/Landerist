@@ -63,12 +63,7 @@ namespace landerist_library.Scrape
             ScrapePages(pages);
         }
 
-        public void ScrapeNonScrapped(Uri uri)
-        {
-            ScrapeNonScrapped(uri, false);
-        }
-
-        public void ScrapeNonScrapped(Uri uri, bool recursive)
+        public void ScrapeNonScrapped(Uri uri, bool recursive = false)
         {
             Website website = new(uri);
             ScrapeNonScrapped(website, recursive);
@@ -87,12 +82,7 @@ namespace landerist_library.Scrape
             }            
         }
 
-        public void ScrapeUnknowIsListing(Uri uri)
-        {
-            ScrapeUnknowIsListing(uri, false);
-        }
-
-        public void ScrapeUnknowIsListing(Uri uri, bool recursive)
+        public void ScrapeUnknowIsListing(Uri uri, bool recursive = false)
         {
             Website website = new(uri);
             ScrapeUnknowIsListing(website, recursive);
@@ -112,13 +102,34 @@ namespace landerist_library.Scrape
             }
         }
 
+        public void ScrapeIsNotListing(Uri uri, bool recursive = false)
+        {
+            Website website = new(uri);
+            ScrapeIsNotListing(website, recursive);
+        }
+
+        public void ScrapeIsNotListing(Website website, bool recursive)
+        {
+            var pages = website.GetIsNotListingPages();
+            if (pages.Count == 0)
+            {
+                return;
+            }
+            ScrapePages(pages);
+            if (recursive)
+            {
+                ScrapeIsNotListing(website, recursive);
+            }
+
+        }
+
         private void ScrapePages(List<Page> pages)
         {
             PendingPages.Clear();
             int TotalPages = pages.Count;
             Counter = 0;
             Parallel.ForEach(pages,
-                //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
+                new ParallelOptions() { MaxDegreeOfParallelism = 1 },
                 page =>
                 {
                     ScrapePage(page);
@@ -149,7 +160,7 @@ namespace landerist_library.Scrape
                 return;
             }
             AddToBlocker(page);
-            bool sucess = page.Scrape();
+            bool sucess = new PageScraper(page).Scrape();            
             AddSuccessError(sucess);
         }
 

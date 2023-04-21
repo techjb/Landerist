@@ -1,4 +1,5 @@
 ﻿using landerist_library.Websites;
+using System;
 
 namespace landerist_library.Index
 {
@@ -18,49 +19,55 @@ namespace landerist_library.Index
             Page = page;
         }
 
-        public List<Uri> GetUris()
+        public void InsertPageUrls()
         {
             if (Page.HtmlDocument == null)
             {
-                return Uris;
+                return;
             }
             try
             {
-                var links = Page.HtmlDocument.DocumentNode.Descendants("a")
+                var urls = Page.HtmlDocument.DocumentNode.Descendants("a")
                    .Where(a => !a.Attributes["rel"]?.Value.Contains("nofollow") ?? true)
                    .Select(a => a.Attributes["href"]?.Value)
                    .Where(href => !string.IsNullOrWhiteSpace(href))
                    .ToList();
 
-                if (links != null)
+                if (urls != null)
                 {
-                    GetUris(links);
+                    AddUrls(urls);
                 }
             }
             catch (Exception ecception)
             {
                 Logs.Log.WriteLogErrors(Page.Uri, ecception);
             }
-            return Uris;
+            Pages.Insert(Page.Website, Uris);
         }
 
-        private void GetUris(List<string?> links)
+        public void InsertUrl(string url)
         {
-            links = links.Distinct().ToList();
-            foreach (var link in links)
+            AddUri(url);
+            Pages.Insert(Page.Website, Uris);
+        }
+
+        private void AddUrls(List<string?> urls)
+        {
+            urls = urls.Distinct().ToList();
+            foreach (var url in urls)
             {
-                if (link != null)
+                if (url != null)
                 {
-                    AddUri(link);
+                    AddUri(url);
                 }
             }
         }
 
-        private void AddUri(string link)
+        private void AddUri(string url)
         {
             try
             {
-                var uri = GetUri(link);
+                var uri = GetUri(url);
                 if (uri != null && !Uris.Contains(uri))
                 {
                     Uris.Add(uri);

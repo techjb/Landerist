@@ -278,5 +278,10 @@ namespace landerist_library.Websites
         {
             return new Pages().GetUnknowIsListingPages(this);
         }
+
+        public List<Page> GetIsNotListingPages()
+        {
+            return new Pages().GetIsNotListingPages(this);
+        }
     }
 }

@@ -50,7 +50,7 @@ namespace landerist_console
             //var uriPage2 = new Uri("https://www.saroga.es/inmueble/piso-4-dormitorios-avenida-europa-pozuelo/");
             //var uriPage3 = new Uri("https://www.saroga.es/inmueble/piso-monte-pilar-majadahonda/");
             //var uriPage4 = new Uri("https://www.saroga.es/inmueble/apartamento-majadahonda/");
-            var uriPage5 = "https://mabelan.es/busqueda-avanzada";
+            var uriPage5 = "https://mabelan.es/busqueda-avanzada/";
 
             //var uri = new Uri("https://www.saroga.es/");
             var uri = new Uri("https://mabelan.es/");
@@ -80,7 +80,8 @@ namespace landerist_console
             //new Scraper().ScrapeMainPage(website);
             //new Scraper().ScrapeNonScrapped(uri);
             //new Scraper().ScrapeUnknowIsListing(uri);
-            new Scraper().ScrapePage(page);
+            new Scraper().ScrapeIsNotListing(uri);
+            //new Scraper().ScrapePage(page);
             //new Scraper().ScrapeAllPages();
 
             //new Csv().Export(true);
