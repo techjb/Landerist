@@ -1,6 +1,7 @@
 ﻿using HtmlAgilityPack;
 using landerist_library.Websites;
 using landerist_orels.ES;
+using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
@@ -78,9 +79,9 @@ namespace landerist_library.Parse
 
                 SetLocation(lat, lng);
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-
+                Logs.Log.WriteLogErrors(exception);
             }
         }
 

@@ -37,9 +37,9 @@ namespace landerist_library.Index
                     GetUris(links);
                 }
             }
-            catch (Exception ex)
+            catch (Exception ecception)
             {
-
+                Logs.Log.WriteLogErrors(Page.Uri, ecception);
             }
             return Uris;
         }
@@ -66,9 +66,9 @@ namespace landerist_library.Index
                     Uris.Add(uri);
                 }
             }
-            catch (Exception ex)
+            catch (Exception ecception)
             {
-
+                Logs.Log.WriteLogErrors(Page.Uri, ecception);
             }
         }
 

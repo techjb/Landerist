@@ -89,14 +89,27 @@ namespace landerist_library.Scrape
 
         public void ScrapeUnknowIsListing(Uri uri)
         {
-            Website website = new(uri);
-            ScrapeUnknowIsListing(website);
+            ScrapeUnknowIsListing(uri, false);
         }
 
-        public void ScrapeUnknowIsListing(Website website)
+        public void ScrapeUnknowIsListing(Uri uri, bool recursive)
+        {
+            Website website = new(uri);
+            ScrapeUnknowIsListing(website, recursive);
+        }
+
+        public void ScrapeUnknowIsListing(Website website, bool recursive)
         {
             var pages = website.GetUnknowIsListingPages();
+            if (pages.Count == 0)
+            {
+                return;
+            }
             ScrapePages(pages);
+            if (recursive)
+            {
+                ScrapeUnknowIsListing(website, recursive);
+            }
         }
 
         private void ScrapePages(List<Page> pages)
@@ -105,7 +118,7 @@ namespace landerist_library.Scrape
             int TotalPages = pages.Count;
             Counter = 0;
             Parallel.ForEach(pages,
-                new ParallelOptions() { MaxDegreeOfParallelism = 1 },
+                //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
                 page =>
                 {
                     ScrapePage(page);

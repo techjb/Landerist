@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Security.Cryptography;
 using System.Text;
 using HtmlAgilityPack;
@@ -182,8 +183,9 @@ namespace landerist_library.Websites
                 ResponseBody = await response.Content.ReadAsStringAsync();
                 return response.IsSuccessStatusCode;
             }
-            catch
+            catch(Exception exception) 
             {
+                Logs.Log.WriteLogErrors(Uri, exception);
                 return false;
             }
         }
@@ -210,8 +212,9 @@ namespace landerist_library.Websites
                 HtmlDocument = new();
                 HtmlDocument.LoadHtml(ResponseBody);
             }
-            catch
+            catch(Exception exception)
             {
+                Logs.Log.WriteLogErrors(Uri, exception);
                 HtmlDocument = null;
             }
         }
@@ -247,30 +250,13 @@ namespace landerist_library.Websites
             return Uri.Equals(Website.MainUri);
         }
 
-        public bool LanguageIs(string language)
+        public void SetResponseBodyText()
         {
             LoadHtmlDocument();
             if (HtmlDocument != null)
             {
-                var htmlNode = HtmlDocument.DocumentNode.SelectSingleNode("//html");
-                if (htmlNode != null)
-                {
-                    var langAttribute = htmlNode.Attributes["lang"];
-                    if (langAttribute != null)
-                    {
-                        string value = langAttribute.Value;
-                        if (value.Contains("-"))
-                        {
-                            value = value.Split('-')[0];
-                        }
-                        if (!value.Equals(language, StringComparison.OrdinalIgnoreCase))
-                        {
-                            return false;
-                        }
-                    }
-                }
+                ResponseBodyText = new HtmlToText(HtmlDocument).GetText();
             }
-            return true;
         }
     }
 }

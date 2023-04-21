@@ -19,7 +19,7 @@ namespace landerist_library.Parse
 
         public Tuple<bool?, Listing?> GetListing()
         {
-            SetResponseBodyText();
+            Page.SetResponseBodyText();
             if (RequestListingIsPermited())
             {
                 RequestListing();
@@ -32,16 +32,7 @@ namespace landerist_library.Parse
             return
                 !string.IsNullOrEmpty(Page.ResponseBodyText) &&
                 ChatGPT.IsLengthAllowed(Page.ResponseBodyText);
-        }
-
-        private void SetResponseBodyText()
-        {
-            Page.LoadHtmlDocument();
-            if (Page.HtmlDocument != null)
-            {
-                Page.ResponseBodyText = new HtmlToText(Page.HtmlDocument).GetText();
-            }
-        }
+        }        
 
         private void RequestListing()
         {
@@ -67,9 +58,9 @@ namespace landerist_library.Parse
                     IsListing = Listing != null;
                 }
             }
-            catch
+            catch(Exception exception) 
             {
-                
+                Logs.Log.WriteLogErrors(Page.Uri, exception);
             }   
         }
     }

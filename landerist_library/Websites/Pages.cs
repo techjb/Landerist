@@ -41,7 +41,8 @@ namespace landerist_library.Websites
             string query =
                 "SELECT * " +
                 "FROM " + TABLE_PAGES + " " +
-                "WHERE [Host] = @Host AND [Updated] IS NULL";
+                "WHERE [Host] = @Host AND " +
+                "[Updated] IS NULL";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"Host", website.Host }
@@ -55,7 +56,8 @@ namespace landerist_library.Websites
             string query =
                 "SELECT * " +
                 "FROM " + TABLE_PAGES + " " +
-                "WHERE [Host] = @Host AND [IsListing] IS NULL";
+                "WHERE [Host] = @Host AND " +
+                "[IsListing] IS NULL";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"Host", website.Host }
