@@ -9,7 +9,7 @@ namespace landerist_library.Export
             return Export(new string[] { inputFile }, zipFile);            
         }
 
-        public bool Export(string[] files, string zipFile)
+        public static bool Export(string[] files, string zipFile)
         {
             if (files.Length == 0)
             {

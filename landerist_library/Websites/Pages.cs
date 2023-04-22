@@ -12,7 +12,7 @@ namespace landerist_library.Websites
 
         }
 
-        public DataTable GetAll()
+        public static DataTable GetAll()
         {
             Console.WriteLine("Reading all pages");
             string query =
@@ -83,7 +83,7 @@ namespace landerist_library.Websites
         }
 
 
-        private List<Page> GetPages(Website website, DataTable dataTable)
+        private static List<Page> GetPages(Website website, DataTable dataTable)
         {
             List<Page> pages = new();
             foreach (DataRow dataRow in dataTable.Rows)

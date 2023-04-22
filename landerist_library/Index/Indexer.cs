@@ -1,5 +1,4 @@
 ﻿using landerist_library.Websites;
-using System;
 
 namespace landerist_library.Index
 {
@@ -12,7 +11,6 @@ namespace landerist_library.Index
         private static readonly string[] MultimediaExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".mp3", ".mp4", ".avi", ".mov", ".mkv", ".flv", ".ogg", ".webm" };
 
         private static readonly string[] WebPageExtensions = { ".htm", ".html", ".xhtml", ".asp", ".aspx", ".php", ".jsp", ".cshtml", ".vbhtml", "razor" };
-
 
         public Indexer(Page page)
         {
@@ -136,7 +134,7 @@ namespace landerist_library.Index
             return uri;
         }
 
-        private bool IsMultimediaPage(Uri uri)
+        private static bool IsMultimediaPage(Uri uri)
         {
             var path = uri.AbsolutePath.ToLower();
             var extension = Path.GetExtension(path);

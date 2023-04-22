@@ -86,9 +86,9 @@ namespace landerist_library.Scrape
             var listing = listingParser.Item2;
             if (listing != null)
             {
-                new MediaParser(Page).AddMedia(listing);
                 new LocationParser(Page, listing).SetLocation();
-                new ES_Listings().Insert(listing);
+                new MediaParser(Page).AddMedia(listing);                
+                new ES_Listings().InsertUpdate(listing);
             }
         }
 

@@ -124,7 +124,7 @@ namespace landerist_library.Websites
             SetHttpStatusCodes(websites);
         }
 
-        private void SetHttpStatusCodes(List<Website> websites)
+        private static void SetHttpStatusCodes(List<Website> websites)
         {
             int total = websites.Count;
             int counter = 0;
@@ -158,7 +158,7 @@ namespace landerist_library.Websites
             InsertUpdateUris(websites);
         }
 
-        private void InsertUpdateUris(List<Website> websites)
+        private static void InsertUpdateUris(List<Website> websites)
         {
             int total = websites.Count;
             int counter = 0;
@@ -217,7 +217,7 @@ namespace landerist_library.Websites
             SetRobotsTxt(websites);
         }
 
-        private void SetRobotsTxt(List<Website> websites)
+        private static void SetRobotsTxt(List<Website> websites)
         {
             int total = websites.Count;
             int counter = 0;
@@ -259,7 +259,7 @@ namespace landerist_library.Websites
             SetIpAdress(websites);
         }
 
-        private void SetIpAdress(List<Website> websites)
+        private static void SetIpAdress(List<Website> websites)
         {
             int total = websites.Count;
             int counter = 0;
@@ -297,7 +297,7 @@ namespace landerist_library.Websites
                 });
         }
 
-        public void CountCanAccesToMainUri()
+        public static void CountCanAccesToMainUri()
         {
             var websites = GetStatusCodeOk();
             int counterYes = 0;
@@ -317,7 +317,7 @@ namespace landerist_library.Websites
             }
         }
 
-        public void CountSiteMaps()
+        public static void CountSiteMaps()
         {
             var websites = GetStatusCodeOk();
             int counter = 0;
@@ -328,7 +328,7 @@ namespace landerist_library.Websites
             }
         }
 
-        public void InsertMainPages()
+        public static void InsertMainPages()
         {
             var websites = GetStatusCodeOk();
             int inserted = 0;
@@ -347,7 +347,7 @@ namespace landerist_library.Websites
             }
         }
 
-        public void RemoveBlockedDomains()
+        public static void RemoveBlockedDomains()
         {
             var websites = AllWebsites();
             int counter = 0;

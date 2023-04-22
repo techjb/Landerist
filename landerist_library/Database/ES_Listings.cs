@@ -6,11 +6,47 @@ namespace landerist_library.Database
     public class ES_Listings
     {
 
-        public static string TABLE_ES_LISTINGS = "[ES_LISTINGS]";
+        public const string TABLE_ES_LISTINGS = "[ES_LISTINGS]";
 
         public ES_Listings()
         {
 
+        }
+
+        public void InsertUpdate(Listing newListing)
+        {
+            Listing? oldListing = GetListing(newListing.guid);
+            if (oldListing != null)
+            {
+                if (ListingHasChanged(oldListing, newListing))
+                {
+                    Update(oldListing, newListing);
+                }
+            }
+            else
+            {
+                Insert(newListing);
+            }
+        }
+
+        private static bool ListingHasChanged(Listing oldListing, Listing newListing)
+        {
+            return ListingDataHasChanged(oldListing, newListing)
+                || ListingMediaHasChanged(oldListing, newListing)
+                ;
+        }
+
+        private static bool ListingDataHasChanged(Listing oldListing, Listing newListing)
+        {
+            var schema = new Schema();
+            schema.AddListing(oldListing);
+            schema.AddListing(newListing);
+            return schema.listings.Count.Equals(2);
+        }
+
+        private static bool ListingMediaHasChanged(Listing oldListing, Listing newListing)
+        {
+            return oldListing.media != newListing.media;
         }
 
         public void Insert(Listing listing)
@@ -24,10 +60,23 @@ namespace landerist_library.Database
             string query =
                 "INSERT INTO " + TABLE_ES_LISTINGS + " " +
                 "VALUES( " +
-                "@guid, @listingStatus, @listingDate, @unlistingDate, @operation, @propertyType, @propertySubtype, @priceAmount, @priceCurrency, @description, @dataSourceName, @dataSourceGuid, @dataSourceUpdate, @dataSourceUrl, @contactName, @contactPhone, @contactEmail, @contactUrl, @contactOther, @address, @latitude, @longitude, @locationIsAccurate, @cadastralReference, @propertySize, @landSize, @constructionYear, @constructionStatus, @floors, @floor, @bedrooms, @bathrooms, @parkings, @terrace, @garden, @garage, @motorbikeGarage, @pool, @lift, @disabledAccess, @storageRoom, @furnished, @nonFurnished, @heating, @airConditioning, @petsAllowed, @securitySystems " +
+                "@guid, @listingStatus, @listingDate, @unlistingDate, @operation, @propertyType, " +
+                "@propertySubtype, @priceAmount, @priceCurrency, @description, @dataSourceName, " +
+                "@dataSourceGuid, @dataSourceUpdate, @dataSourceUrl, @contactName, @contactPhone, " +
+                "@contactEmail, @contactUrl, @contactOther, @address, @latitude, @longitude, " +
+                "@locationIsAccurate, @cadastralReference, @propertySize, @landSize, @constructionYear, " +
+                "@constructionStatus, @floors, @floor, @bedrooms, @bathrooms, @parkings, @terrace, @garden, " +
+                "@garage, @motorbikeGarage, @pool, @lift, @disabledAccess, @storageRoom, @furnished, " +
+                "@nonFurnished, @heating, @airConditioning, @petsAllowed, @securitySystems " +
                 ")";
 
-            return new DataBase().Query(query, new Dictionary<string, object?> {
+            var queryParameters = GetQueryParameters(listing);
+            return new DataBase().Query(query, queryParameters);
+        }
+
+        private static Dictionary<string, object?> GetQueryParameters(Listing listing)
+        {
+            return new Dictionary<string, object?> {
                 {"guid", listing.guid },
                 {"listingStatus", listing.listingStatus.ToString() },
                 {"listingDate", listing.listingDate},
@@ -75,9 +124,73 @@ namespace landerist_library.Database
                 {"airConditioning", listing.features != null && listing.features.Contains(Feature.air_conditioning) ? true : DBNull.Value },
                 {"petsAllowed", listing.features != null && listing.features.Contains(Feature.pets_allowed) ? true : DBNull.Value },
                 {"securitySystems", listing.features != null && listing.features.Contains(Feature.security_systems) ? true : DBNull.Value },
-            });
+            };
         }
 
+        public void Update(Listing oldListing, Listing newListing)
+        {
+            UpdateData(newListing);
+            if(ListingMediaHasChanged(oldListing, newListing))
+            {
+                ES_Media.Update(newListing);
+            }
+        }
+
+        private bool UpdateData(Listing listing)
+        {
+            string query =
+                "UPDATE " + TABLE_ES_LISTINGS + " SET " +
+                "[listingStatus] = @listingStatus, " +
+                "[listingDate] = @listingDate, " +
+                "[unlistingDate] = @unlistingDate, " +
+                "[operation] = @operation, " +
+                "[propertyType] = @propertyType, " +
+                "[propertySubtype] = @propertySubtype, " +
+                "[priceAmount] = @priceAmount, " +
+                "[priceCurrency] = @priceCurrency, " +
+                "[description] = @description, " +
+                "[dataSourceName] = @dataSourceName, " +
+                "[dataSourceGuid] = @dataSourceGuid, " +
+                "[dataSourceUpdate] = @dataSourceUpdate, " +
+                "[dataSourceUrl] = @dataSourceUrl, " +
+                "[contactName] = @contactName, " +
+                "[contactPhone] = @contactPhone, " +
+                "[contactEmail] = @contactEmail, " +
+                "[contactUrl] = @contactUrl, " +
+                "[contactOther] = @contactOther, " +
+                "[address] = @address, " +
+                "[latitude] = @latitude, " +
+                "[longitude] = @longitude, " +
+                "[locationIsAccurate] = @locationIsAccurate, " +
+                "[cadastralReference] = @cadastralReference, " +
+                "[propertySize] = @propertySize, " +
+                "[landSize] = @landSize, " +
+                "[constructionYear] = @constructionYear, " +
+                "[constructionStatus] = @constructionStatus, " +
+                "[floors] = @floors, " +
+                "[floor] = @floor, " +
+                "[bedrooms] = @bedrooms, " +
+                "[bathrooms] = @bathrooms, " +
+                "[parkings] = @parkings, " +
+                "[terrace] = @terrace, " +
+                "[garden] = @garden, " +
+                "[garage] = @garage, " +
+                "[motorbikeGarage] = @motorbikeGarage, " +
+                "[pool] = @pool, " +
+                "[lift] = @lift, " +
+                "[disabledAccess] = @disabledAccess, " +
+                "[storageRoom] = @storageRoom, " +
+                "[furnished] = @furnished, " +
+                "[nonFurnished] = @nonFurnished, " +
+                "[heating] = @heating, " +
+                "[airConditioning] = @airConditioning, " +
+                "[petsAllowed] = @petsAllowed, " +
+                "[securitySystems] = @securitySystems " +
+                "WHERE [guid] = @guid";
+
+            var queryParameters = GetQueryParameters(listing);
+            return new DataBase().Query(query, queryParameters);
+        }
 
         public SortedSet<Listing> GetAll(bool loadMedia)
         {
@@ -99,6 +212,24 @@ namespace landerist_library.Database
                 listings.Add(listing);
             }
             return listings;
+        }
+
+        public Listing? GetListing(string guid)
+        {
+            string query =
+                "SELECT * " +
+                "FROM " + TABLE_ES_LISTINGS + " " +
+                "WHERE [Guid] = @Guid";
+
+            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+                {"Guid", guid }
+            });
+
+            if (dataTable.Rows.Count.Equals(1))
+            {
+                return GetListing(dataTable.Rows[0]);
+            }
+            return null;
         }
 
         public Listing GetListing(DataRow dataRow)
@@ -165,7 +296,7 @@ namespace landerist_library.Database
             return listing;
         }
 
-        private void AddFeature(Listing listing, DataRow dataRow, string rowName, Feature feature)
+        private static void AddFeature(Listing listing, DataRow dataRow, string rowName, Feature feature)
         {
             if (dataRow[rowName] is DBNull)
             {

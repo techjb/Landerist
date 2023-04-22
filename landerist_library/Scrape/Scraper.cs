@@ -29,12 +29,12 @@ namespace landerist_library.Scrape
         public void ScrapeAllPages()
         {
             var dictionary = Websites.Websites.GetDicionaryStatusCodeOk();
-            var dataTable = new Pages().GetAll();
+            var dataTable = Pages.GetAll();
             var pages = GetPages(dictionary, dataTable);            
             ScrapePages(pages);
         }
 
-        private List<Page> GetPages(Dictionary<string, Website> dictionary, DataTable dataTable)
+        private static List<Page> GetPages(Dictionary<string, Website> dictionary, DataTable dataTable)
         {
             List<Page> pages = new();
             foreach (DataRow dataRow in dataTable.Rows)

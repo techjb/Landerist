@@ -18,7 +18,7 @@ namespace landerist_library.Scrape
                 IsBlocked(HostBlocker, website.Host);
         }
 
-        private bool IsBlocked(Dictionary<string, DateTime> keyValuePairs, string? key)
+        private static bool IsBlocked(Dictionary<string, DateTime> keyValuePairs, string? key)
         {
             if (key != null && keyValuePairs.ContainsKey(key))
             {
@@ -51,12 +51,12 @@ namespace landerist_library.Scrape
             return DateTime.Now.AddSeconds(secconds);
         }
 
-        private int RandomSecconds()
+        private static int RandomSecconds()
         {
             return new Random().Next(MinSecconds, MaxSecconds); ;
         }
 
-        private void Add(Dictionary<string, DateTime> keyValuePairs, string? key, DateTime blockUntil)
+        private static void Add(Dictionary<string, DateTime> keyValuePairs, string? key, DateTime blockUntil)
         {
             if (key == null || key.Trim().Equals(string.Empty))
             {
@@ -79,7 +79,7 @@ namespace landerist_library.Scrape
             Clean(HostBlocker);
         }
 
-        private void Clean(Dictionary<string, DateTime> keyValuePairs)
+        private static void Clean(Dictionary<string, DateTime> keyValuePairs)
         {
             foreach (var key in keyValuePairs.Keys.ToList())
             {

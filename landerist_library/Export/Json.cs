@@ -12,7 +12,7 @@ namespace landerist_library.Export
 
         private const string ZIP_FILE_NAME = JSON_FILE_NAME + ".zip";
 
-        public bool Export(bool makeZip)
+        public static bool Export(bool makeZip)
         {
             var listings = new ES_Listings().GetAll(true);
             var schema = new Schema(listings);

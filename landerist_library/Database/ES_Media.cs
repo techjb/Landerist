@@ -5,7 +5,7 @@ namespace landerist_library.Database
 {
     public class ES_Media
     {
-        public static string TABLE_ES_MEDIA = "[ES_MEDIA]";
+        public const string TABLE_ES_MEDIA = "[ES_MEDIA]";
 
         public static void Insert(Listing listing)
         {
@@ -27,6 +27,25 @@ namespace landerist_library.Database
                     {"url", media.url?.ToString()},
                 });
             }
+        }
+
+        public static void Update(Listing listing)
+        {
+            Delete(listing);
+            Insert(listing);
+        }
+
+        private static bool Delete(Listing listing)
+        {
+            string query =
+                "DELETE " +
+                "FROM " + TABLE_ES_MEDIA + " " +
+                "WHERE [listingGuid] = @listingGuid";
+
+            return new DataBase().Query(query, new Dictionary<string, object?>()
+            {
+                { "listingGuid", listing.guid }
+            });
         }
 
         public static SortedSet<Media> GetMedia(Listing listing)

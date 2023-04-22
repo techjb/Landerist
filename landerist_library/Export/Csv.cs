@@ -32,7 +32,7 @@ namespace landerist_library.Export
             var csvMedia = GetFilePath(FILE_NAME_MEDIA);
             var zipFile = GetFilePath(ZIP_FILE);
             var files = new string[] { csvListings, csvMedia };            
-            return new Zip().Export(files, zipFile);
+            return Zip.Export(files, zipFile);
         }
 
         private bool ExportListings()
@@ -41,7 +41,7 @@ namespace landerist_library.Export
             return Export(ES_Listings.TABLE_ES_LISTINGS, filePath);
         }
 
-        private string GetFilePath(string fileName)
+        private static string GetFilePath(string fileName)
         {
             return Config.EXPORT_DIRECTORY + fileName;
         }
@@ -52,7 +52,7 @@ namespace landerist_library.Export
             return Export(ES_Media.TABLE_ES_MEDIA, filePath);
         }
 
-        private bool Export(string tableName, string fileName)
+        private static bool Export(string tableName, string fileName)
         {
             File.Delete(fileName);
             tableName = "[" + Config.DATABASE_NAME + "].[dbo]." + tableName;
