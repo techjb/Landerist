@@ -9,6 +9,8 @@ using Newtonsoft.Json;
 using landerist_library.Configuration;
 using System;
 using landerist_library.Logs;
+using landerist_library.Database;
+using landerist_orels.ES;
 
 namespace landerist_console
 {
@@ -16,10 +18,10 @@ namespace landerist_console
     {
 
         private static DateTime DateStart;
-        
+
         static void Main(string[] args)
         {
-            Console.Title = "Landerist Console";            
+            Console.Title = "Landerist Console";
             SetDateStart();
             Config.Init(false);
             Run();
@@ -80,12 +82,28 @@ namespace landerist_console
             //new Scraper().ScrapeMainPage(website);
             //new Scraper().ScrapeNonScrapped(uri);
             //new Scraper().ScrapeUnknowIsListing(uri);
-            new Scraper().ScrapeIsNotListing(uri);
+            //new Scraper().ScrapeIsNotListing(uri);
             //new Scraper().ScrapePage(page);
             //new Scraper().ScrapeAllPages();
 
             //new Csv().Export(true);
             //new Json().Export(true);
+
+            string guid = "2A82D55502097911496D547A0910B16620AA66244BC774CCA97873C80C6D43BB";
+            var listing1 = new ES_Listings().GetListing(guid)!;
+            var listing2 = new ES_Listings().GetListing(guid)!;
+            listing2.media.Clear();
+            var equals = listing1.Equals(listing2);
+            //var eauqlsPrice = (listing1.price == listing2.price || (listing1.price != null && listing2.price != null && listing1.price.Equals(listing2.price)));
+
+            //Price? price2 = listing2.price;
+            //if (price2 != null)
+            //{
+            //    Price price22 = ((Price)price2);
+            //    price22.amount = 33;
+            //}
+            
+            //var eauqlsPrice = (listing1.price.Equals(listing2.price));
         }
 
         private static void EndBeep()

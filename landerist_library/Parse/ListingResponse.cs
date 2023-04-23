@@ -71,7 +71,7 @@ namespace landerist_library.Parse
 
         [JsonProperty("tiene garaje")]
         public bool? TieneGaraje { get; set; } = null;
-        
+
         [JsonProperty("tiene parking para moto")]
         public bool? TieneParkingParaMoto { get; set; } = null;
 
@@ -404,10 +404,8 @@ namespace landerist_library.Parse
             {
                 return null;
             }
-            return new Price()
-            {
-                amount = (decimal)PrecioDelAnuncio
-            };
+
+            return new Price((decimal)PrecioDelAnuncio, Currency.EUR);
         }
 
         private string? GetDescription()

@@ -1,5 +1,6 @@
 ﻿using landerist_orels.ES;
 using System.Data;
+using System.Net.Http.Headers;
 
 namespace landerist_library.Database
 {
@@ -292,6 +293,8 @@ namespace landerist_library.Database
             AddFeature(listing, dataRow, "airConditioning", Feature.air_conditioning);
             AddFeature(listing, dataRow, "petsAllowed", Feature.pets_allowed);
             AddFeature(listing, dataRow, "securitySystems", Feature.security_systems);
+
+            //listing.media = 
 
             return listing;
         }

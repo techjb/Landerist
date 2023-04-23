@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace landerist_orels.ES
 {
@@ -195,7 +196,7 @@ namespace landerist_orels.ES
 
         public void SetMedia(SortedSet<Media> media)
         {
-            if(media == null || media.Count.Equals(0))
+            if (media == null || media.Count.Equals(0))
             {
                 return;
             }
@@ -219,5 +220,99 @@ namespace landerist_orels.ES
                 features.Add(feature);
             }
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || obj.GetType() != GetType())
+            {
+                return false;
+            }
+            return Equals((Listing)obj);
+        }
+        private bool Equals(Listing other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+
+            return
+                guid == other.guid &&
+                listingStatus == other.listingStatus &&
+                listingDate == other.listingDate &&
+                unlistingDate == other.unlistingDate &&
+                operation == other.operation &&
+                propertyType == other.propertyType &&
+                propertySubtype == other.propertySubtype &&
+                (media == other.media || (media != null && other.media != null && media.SetEquals(other.media))) &&
+                (price == other.price || (price != null && other.price != null && price.Equals(other.price))) &&
+                description == other.description &&
+                dataSourceName == other.dataSourceName &&
+                dataSourceGuid == other.dataSourceGuid &&
+                //dataSourceUpdate == other.dataSourceUpdate &&
+                dataSourceUrl == other.dataSourceUrl &&
+                contactName == other.contactName &&
+                contactPhone == other.contactPhone &&
+                contactEmail == other.contactEmail &&
+                contactUrl == other.contactUrl &&
+                contactOther == other.contactOther &&
+                address == other.address &&
+                latitude == other.latitude &&
+                longitude == other.longitude &&
+                locationIsAccurate == other.locationIsAccurate &&
+                cadastralReference == other.cadastralReference &&
+                propertySize == other.propertySize &&
+                landSize == other.landSize &&
+                constructionYear == other.constructionYear &&
+                constructionStatus == other.constructionStatus &&
+                floors == other.floors &&
+                floor == other.floor &&
+                bedrooms == other.bedrooms &&
+                bathrooms == other.bathrooms &&
+                parkings == other.parkings &&
+                (features == other.features || (features != null && other.features != null && features.SequenceEqual(other.features)));
+        }
+
+
+        public override int GetHashCode()
+        {
+            int hash = guid?.GetHashCode() ?? 0;
+            hash ^= listingStatus.GetHashCode();
+            hash ^= listingDate?.GetHashCode() ?? 0;
+            hash ^= unlistingDate?.GetHashCode() ?? 0;
+            hash ^= operation.GetHashCode();
+            hash ^= propertyType.GetHashCode();
+            hash ^= propertySubtype?.GetHashCode() ?? 0;
+            hash ^= media?.GetHashCode() ?? 0;
+            hash ^= price?.GetHashCode() ?? 0;
+            hash ^= description?.GetHashCode() ?? 0;
+            hash ^= dataSourceName?.GetHashCode() ?? 0;
+            hash ^= dataSourceGuid?.GetHashCode() ?? 0;
+            //hash ^= (dataSourceUpdate?.GetHashCode() ?? 0);
+            hash ^= dataSourceUrl?.GetHashCode() ?? 0;
+            hash ^= contactName?.GetHashCode() ?? 0;
+            hash ^= contactPhone?.GetHashCode() ?? 0;
+            hash ^= contactEmail?.GetHashCode() ?? 0;
+            hash ^= contactUrl?.GetHashCode() ?? 0;
+            hash ^= contactOther?.GetHashCode() ?? 0;
+            hash ^= address?.GetHashCode() ?? 0;
+            hash ^= latitude?.GetHashCode() ?? 0;
+            hash ^= longitude?.GetHashCode() ?? 0;
+            hash ^= locationIsAccurate?.GetHashCode() ?? 0;
+            hash ^= cadastralReference?.GetHashCode() ?? 0;
+            hash ^= propertySize?.GetHashCode() ?? 0;
+            hash ^= landSize?.GetHashCode() ?? 0;
+            hash ^= constructionYear?.GetHashCode() ?? 0;
+            hash ^= constructionStatus?.GetHashCode() ?? 0;
+            hash ^= floors?.GetHashCode() ?? 0;
+            hash ^= floor?.GetHashCode() ?? 0;
+            hash ^= bedrooms?.GetHashCode() ?? 0;
+            hash ^= bathrooms?.GetHashCode() ?? 0;
+            hash ^= parkings?.GetHashCode() ?? 0;
+            hash ^= features?.GetHashCode() ?? 0;
+
+            return hash;
+        }
+
     }
 }
