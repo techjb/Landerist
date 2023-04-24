@@ -52,7 +52,7 @@ namespace landerist_console
             //var uriPage2 = new Uri("https://www.saroga.es/inmueble/piso-4-dormitorios-avenida-europa-pozuelo/");
             //var uriPage3 = new Uri("https://www.saroga.es/inmueble/piso-monte-pilar-majadahonda/");
             //var uriPage4 = new Uri("https://www.saroga.es/inmueble/apartamento-majadahonda/");
-            var uriPage5 = "https://mabelan.es/busqueda-avanzada/";
+            var uriPage5 = "https://mabelan.es/proyectos/5384v/";
 
             //var uri = new Uri("https://www.saroga.es/");
             var uri = new Uri("https://mabelan.es/");
@@ -83,27 +83,16 @@ namespace landerist_console
             //new Scraper().ScrapeNonScrapped(uri);
             //new Scraper().ScrapeUnknowIsListing(uri);
             //new Scraper().ScrapeIsNotListing(uri);
-            //new Scraper().ScrapePage(page);
+            new Scraper().ScrapePage(page);
             //new Scraper().ScrapeAllPages();
 
-            //new Csv().Export(true);
-            //new Json().Export(true);
+            //Csv.Export(true);
+            //Json.Export(true);
 
-            string guid = "2A82D55502097911496D547A0910B16620AA66244BC774CCA97873C80C6D43BB";
-            var listing1 = new ES_Listings().GetListing(guid)!;
-            var listing2 = new ES_Listings().GetListing(guid)!;
-            listing2.media.Clear();
-            var equals = listing1.Equals(listing2);
-            //var eauqlsPrice = (listing1.price == listing2.price || (listing1.price != null && listing2.price != null && listing1.price.Equals(listing2.price)));
-
-            //Price? price2 = listing2.price;
-            //if (price2 != null)
-            //{
-            //    Price price22 = ((Price)price2);
-            //    price22.amount = 33;
-            //}
-            
-            //var eauqlsPrice = (listing1.price.Equals(listing2.price));
+            //string guid = "2A82D55502097911496D547A0910B16620AA66244BC774CCA97873C80C6D43BB";
+            //var listing1 = ES_Listings.GetListing(guid)!;
+            //var listing2 = ES_Listings.GetListing(guid)!;
+            //var equals = listing1.Equals(listing2);
         }
 
         private static void EndBeep()

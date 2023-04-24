@@ -88,7 +88,7 @@ namespace landerist_library.Scrape
             {
                 new LocationParser(Page, listing).SetLocation();
                 new MediaParser(Page).AddMedia(listing);                
-                new ES_Listings().InsertUpdate(listing);
+                ES_Listings.InsertUpdate(listing);
             }
         }
 

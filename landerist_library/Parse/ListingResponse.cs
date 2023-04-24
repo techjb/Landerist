@@ -499,9 +499,9 @@ namespace landerist_library.Parse
             return (int?)NúmeroDeParkings;
         }
 
-        private List<Feature> GetFeatures()
+        private HashSet<Feature> GetFeatures()
         {
-            var features = new List<Feature>();
+            var features = new HashSet<Feature>();
             AddFeature(features, TieneTerraza, Feature.terrace);
             AddFeature(features, TieneJardín, Feature.garden);
             AddFeature(features, TieneGaraje, Feature.garage);
@@ -518,16 +518,13 @@ namespace landerist_library.Parse
             return features;
         }
 
-        private static void AddFeature(List<Feature> features, bool? value, Feature feature)
+        private static void AddFeature(HashSet<Feature> features, bool? value, Feature feature)
         {
             if (value != null)
             {
                 if ((bool)value)
                 {
-                    if (!features.Contains(feature))
-                    {
-                        features.Add(feature);
-                    }
+                    features.Add(feature);
                 }
             }
         }

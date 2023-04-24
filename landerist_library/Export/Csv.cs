@@ -11,12 +11,8 @@ namespace landerist_library.Export
 
         private const string ZIP_FILE = "listings.csv.zip";
 
-        public Csv()
-        {
 
-        }
-
-        public bool Export(bool makeZip)
+        public static bool Export(bool makeZip)
         {
             var success = ExportListings() && ExportMedia();
             if (makeZip)
@@ -26,7 +22,7 @@ namespace landerist_library.Export
             return success;
         }
 
-        private bool MakeZip()
+        private static bool MakeZip()
         {
             var csvListings = GetFilePath(FILE_NAME_LISTINGS);
             var csvMedia = GetFilePath(FILE_NAME_MEDIA);
@@ -35,7 +31,7 @@ namespace landerist_library.Export
             return Zip.Export(files, zipFile);
         }
 
-        private bool ExportListings()
+        private static bool ExportListings()
         {
             string filePath = GetFilePath(FILE_NAME_LISTINGS);
             return Export(ES_Listings.TABLE_ES_LISTINGS, filePath);
@@ -46,7 +42,7 @@ namespace landerist_library.Export
             return Config.EXPORT_DIRECTORY + fileName;
         }
 
-        private bool ExportMedia()
+        private static bool ExportMedia()
         {
             string filePath = GetFilePath(FILE_NAME_MEDIA);
             return Export(ES_Media.TABLE_ES_MEDIA, filePath);

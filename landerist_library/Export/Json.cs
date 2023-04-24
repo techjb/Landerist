@@ -14,7 +14,7 @@ namespace landerist_library.Export
 
         public static bool Export(bool makeZip)
         {
-            var listings = new ES_Listings().GetAll(true);
+            var listings = ES_Listings.GetAll(true);
             var schema = new Schema(listings);
             var jsonSereializerSettings = new JsonSerializerSettings
             {

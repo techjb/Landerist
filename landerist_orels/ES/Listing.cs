@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace landerist_orels.ES
 {
@@ -175,7 +174,7 @@ namespace landerist_orels.ES
 
         [JsonProperty(Order = 34)]
 
-        public List<Feature> features;
+        public HashSet<Feature> features;
 
         private void InitMedia()
         {
@@ -206,16 +205,16 @@ namespace landerist_orels.ES
 
         public void AddFeature(Feature feature)
         {
-            AddFeature(true, feature);
+            AddFeature(feature, true);
         }
 
-        public void AddFeature(bool? value, Feature feature)
+        public void AddFeature(Feature feature, bool? value)
         {
             if (value != null && (bool)value)
             {
                 if (features == null)
                 {
-                    features = new List<Feature>();
+                    features = new HashSet<Feature>();
                 }
                 features.Add(feature);
             }
@@ -229,6 +228,7 @@ namespace landerist_orels.ES
             }
             return Equals((Listing)obj);
         }
+
         private bool Equals(Listing other)
         {
             if (other == null)
@@ -239,7 +239,7 @@ namespace landerist_orels.ES
             return
                 guid == other.guid &&
                 listingStatus == other.listingStatus &&
-                listingDate == other.listingDate &&
+                //listingDate == other.listingDate &&
                 unlistingDate == other.unlistingDate &&
                 operation == other.operation &&
                 propertyType == other.propertyType &&
@@ -270,15 +270,14 @@ namespace landerist_orels.ES
                 bedrooms == other.bedrooms &&
                 bathrooms == other.bathrooms &&
                 parkings == other.parkings &&
-                (features == other.features || (features != null && other.features != null && features.SequenceEqual(other.features)));
+                (features == other.features || (features != null && other.features != null && features.SetEquals(other.features)));
         }
-
 
         public override int GetHashCode()
         {
             int hash = guid?.GetHashCode() ?? 0;
             hash ^= listingStatus.GetHashCode();
-            hash ^= listingDate?.GetHashCode() ?? 0;
+            //hash ^= listingDate?.GetHashCode() ?? 0;
             hash ^= unlistingDate?.GetHashCode() ?? 0;
             hash ^= operation.GetHashCode();
             hash ^= propertyType.GetHashCode();
@@ -313,6 +312,5 @@ namespace landerist_orels.ES
 
             return hash;
         }
-
     }
 }

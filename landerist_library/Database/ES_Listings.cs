@@ -1,6 +1,5 @@
 ﻿using landerist_orels.ES;
 using System.Data;
-using System.Net.Http.Headers;
 
 namespace landerist_library.Database
 {
@@ -9,17 +8,12 @@ namespace landerist_library.Database
 
         public const string TABLE_ES_LISTINGS = "[ES_LISTINGS]";
 
-        public ES_Listings()
-        {
-
-        }
-
-        public void InsertUpdate(Listing newListing)
+        public static void InsertUpdate(Listing newListing)
         {
             Listing? oldListing = GetListing(newListing.guid);
             if (oldListing != null)
             {
-                if (ListingHasChanged(oldListing, newListing))
+                if (!oldListing.Equals(newListing))
                 {
                     Update(oldListing, newListing);
                 }
@@ -30,33 +24,13 @@ namespace landerist_library.Database
             }
         }
 
-        private static bool ListingHasChanged(Listing oldListing, Listing newListing)
-        {
-            return ListingDataHasChanged(oldListing, newListing)
-                || ListingMediaHasChanged(oldListing, newListing)
-                ;
-        }
-
-        private static bool ListingDataHasChanged(Listing oldListing, Listing newListing)
-        {
-            var schema = new Schema();
-            schema.AddListing(oldListing);
-            schema.AddListing(newListing);
-            return schema.listings.Count.Equals(2);
-        }
-
-        private static bool ListingMediaHasChanged(Listing oldListing, Listing newListing)
-        {
-            return oldListing.media != newListing.media;
-        }
-
-        public void Insert(Listing listing)
+        public static void Insert(Listing listing)
         {
             InsertData(listing);
             ES_Media.Insert(listing);
         }
 
-        private bool InsertData(Listing listing)
+        private static bool InsertData(Listing listing)
         {
             string query =
                 "INSERT INTO " + TABLE_ES_LISTINGS + " " +
@@ -128,16 +102,23 @@ namespace landerist_library.Database
             };
         }
 
-        public void Update(Listing oldListing, Listing newListing)
+        public static void Update(Listing oldListing, Listing newListing)
         {
             UpdateData(newListing);
-            if(ListingMediaHasChanged(oldListing, newListing))
+            if (!ListingMediaAreEquals(oldListing, newListing))
             {
                 ES_Media.Update(newListing);
             }
         }
 
-        private bool UpdateData(Listing listing)
+        private static bool ListingMediaAreEquals(Listing oldListing, Listing newListing)
+        {
+            return
+                oldListing.media == newListing.media ||
+                (oldListing.media != null && newListing.media != null && oldListing.media.SetEquals(newListing.media));
+        }
+
+        private static bool UpdateData(Listing listing)
         {
             string query =
                 "UPDATE " + TABLE_ES_LISTINGS + " SET " +
@@ -193,7 +174,7 @@ namespace landerist_library.Database
             return new DataBase().Query(query, queryParameters);
         }
 
-        public SortedSet<Listing> GetAll(bool loadMedia)
+        public static SortedSet<Listing> GetAll(bool loadMedia)
         {
             string query =
                 "SELECT * " +
@@ -204,18 +185,13 @@ namespace landerist_library.Database
             SortedSet<Listing> listings = new(new ListingComparer());
             foreach (DataRow dataRow in dataTable.Rows)
             {
-                var listing = GetListing(dataRow);
-                if (loadMedia)
-                {
-                    var media = ES_Media.GetMedia(listing);
-                    listing.SetMedia(media);
-                }
+                var listing = GetListing(dataRow, loadMedia);
                 listings.Add(listing);
             }
             return listings;
         }
 
-        public Listing? GetListing(string guid)
+        public static Listing? GetListing(string guid, bool loadMedia = true)
         {
             string query =
                 "SELECT * " +
@@ -228,12 +204,23 @@ namespace landerist_library.Database
 
             if (dataTable.Rows.Count.Equals(1))
             {
-                return GetListing(dataTable.Rows[0]);
+                return GetListing(dataTable.Rows[0], loadMedia);
             }
             return null;
         }
 
-        public Listing GetListing(DataRow dataRow)
+        public static Listing GetListing(DataRow dataRow, bool loadMedia)
+        {
+            var listing = GetListingData(dataRow);
+            if (loadMedia)
+            {
+                var media = ES_Media.GetMedia(listing);
+                listing.SetMedia(media);
+            }
+            return listing;
+        }
+
+        private static Listing GetListingData(DataRow dataRow)
         {
             Enum.TryParse((string)dataRow["listingStatus"], out ListingStatus listingStatus);
             Enum.TryParse((string)dataRow["operation"], out Operation operation);
@@ -294,8 +281,6 @@ namespace landerist_library.Database
             AddFeature(listing, dataRow, "petsAllowed", Feature.pets_allowed);
             AddFeature(listing, dataRow, "securitySystems", Feature.security_systems);
 
-            //listing.media = 
-
             return listing;
         }
 
@@ -307,7 +292,7 @@ namespace landerist_library.Database
             }
 
             var value = (bool?)dataRow[rowName];
-            listing.AddFeature(value, feature);
+            listing.AddFeature(feature, value);
         }
     }
 }
