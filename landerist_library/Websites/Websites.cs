@@ -10,7 +10,7 @@ namespace landerist_library.Websites
         public static List<Website> AllWebsites()
         {
             var dataTable = GetDataTableAll();
-            return ParseWebsites(dataTable);
+            return GetWebsites(dataTable);
         }
 
         public static Dictionary<string, Website> GetDicionaryStatusCodeOk()
@@ -27,19 +27,19 @@ namespace landerist_library.Websites
         public static List<Website> GetStatusCodeOk()
         {
             var dataTable = ToDataTableHttpStatusCodeOk();
-            return ParseWebsites(dataTable);
+            return GetWebsites(dataTable);
         }
 
         public static List<Website> GetStatusCodeNotOk()
         {
             var dataTable = ToDataTableHttpStatusCodeNotOk();
-            return ParseWebsites(dataTable);
+            return GetWebsites(dataTable);
         }
 
         public static List<Website> GetStatusCodeNull()
         {
             var dataTable = ToDataTableHttpStatusCodeNull();
-            return ParseWebsites(dataTable);
+            return GetWebsites(dataTable);
         }
 
         private static DataTable GetDataTableAll()
@@ -88,12 +88,13 @@ namespace landerist_library.Websites
 
             if (dataTable.Rows.Count.Equals(1))
             {
-                return new Website(dataTable.Rows[0]);
+                var dataRow = dataTable.Rows[0];
+                return new Website(dataRow);
             }
             return null;
         }
 
-        private static List<Website> ParseWebsites(DataTable dataTable)
+        private static List<Website> GetWebsites(DataTable dataTable)
         {
             var list = new List<Website>();
             foreach (DataRow dataRow in dataTable.Rows)
@@ -104,7 +105,7 @@ namespace landerist_library.Websites
             return list;
         }
 
-        public static HashSet<string> GetUris()
+        public static HashSet<string> GetUrls()
         {
             string query =
                 "SELECT Uri " +
@@ -112,13 +113,13 @@ namespace landerist_library.Websites
             return new DataBase().QueryHashSet(query);
         }
 
-        public void SetHttpStatusCodesToAll()
+        public static void SetHttpStatusCodesToAll()
         {
             var websites = AllWebsites();
             SetHttpStatusCodes(websites);
         }
 
-        public void SetHttpStatusCodesToNull()
+        public static void SetHttpStatusCodesToNull()
         {
             var websites = GetStatusCodeNull();
             SetHttpStatusCodes(websites);
@@ -143,7 +144,7 @@ namespace landerist_library.Websites
                         "Errors: " + erros + " " + website.MainUri.ToString());
                     try
                     {
-                        website.SetHttpStatusCode();
+                        website.UpdateHttpStatusCode();
                     }
                     catch
                     {
@@ -152,11 +153,11 @@ namespace landerist_library.Websites
                 });
         }
 
-        public void InsertUpdateUrisFromNotOk()
-        {
-            var websites = GetStatusCodeNotOk();
-            InsertUpdateUris(websites);
-        }
+        //public static void InsertUpdateUrisFromNotOk()
+        //{
+        //    var websites = GetStatusCodeNotOk();
+        //    InsertUpdateUris(websites);
+        //}
 
         private static void InsertUpdateUris(List<Website> websites)
         {
@@ -202,16 +203,16 @@ namespace landerist_library.Websites
                         errors++;
                     }
                 });
-            new UrisInserter().Insert(uris);
+            new WebsitesInserter().Insert(uris);
         }
 
-        public void SetRobotsTxtToAll()
+        public static void SetRobotsTxt()
         {
             var websites = AllWebsites();
             SetRobotsTxt(websites);
         }
 
-        public void SetRobotsTxtToHttpStatusCodeOk()
+        public static void SetRobotsTxtToHttpStatusCodeOk()
         {
             var websites = GetStatusCodeOk();
             SetRobotsTxt(websites);
@@ -229,7 +230,7 @@ namespace landerist_library.Websites
                 bool success = false;
                 try
                 {
-                    success = website.SetRobotsTxt();
+                    success = website.UpdateRobotsTxt();
                 }
                 catch
                 {
@@ -253,7 +254,7 @@ namespace landerist_library.Websites
             });
         }
 
-        public void SetIpAdressToAll()
+        public static void SetIpAdress()
         {
             var websites = AllWebsites();
             SetIpAdress(websites);
@@ -273,7 +274,7 @@ namespace landerist_library.Websites
                     bool success = false;
                     try
                     {
-                        success = website.SetIpAddress();
+                        success = website.UpdateIpAddress();
                     }
                     catch
                     {
@@ -345,21 +346,6 @@ namespace landerist_library.Websites
                 }
                 Console.WriteLine("Inserted: " + inserted + " Errors: " + errors + " From: " + websites.Count);
             }
-        }
-
-        public static void RemoveBlockedDomains()
-        {
-            var websites = AllWebsites();
-            int counter = 0;
-            foreach (var website in websites)
-            {
-                if (BlockedDomains.IsBlocked(website.MainUri))
-                {
-                    website.Remove();
-                    counter++;
-                }
-            }
-            Console.WriteLine("Blocked: " + counter);
         }
     }
 }

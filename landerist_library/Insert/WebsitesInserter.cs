@@ -3,13 +3,23 @@ using System.Data;
 
 namespace landerist_library.Insert
 {
-    public class UrisInserter
+    public class WebsitesInserter
     {
-        private readonly HashSet<string> InsertedUris;
+        private readonly HashSet<Uri> InsertedUris = new();
 
-        public UrisInserter()
+        public WebsitesInserter()
         {
-            InsertedUris = Websites.Websites.GetUris();
+            InitInsertedUris();
+        }
+
+        private void InitInsertedUris()
+        {
+            var urls = Websites.Websites.GetUrls();
+            foreach(var url in urls)
+            {
+                Uri uri = new(url);
+                InsertedUris.Add(uri);
+            }
         }
 
         public void FromCsv()
@@ -85,7 +95,7 @@ namespace landerist_library.Insert
             Console.WriteLine("Inserted: " + inserted + " Error: " + errors);
         }
 
-        public bool InsertWebsite(Uri uri)
+        private bool InsertWebsite(Uri uri)
         {
             try
             {
@@ -94,7 +104,7 @@ namespace landerist_library.Insert
                     return false;
                 }
 
-                if (InsertedUris.Contains(uri.ToString()))
+                if (InsertedUris.Contains(uri))
                 {
                     return false;
                 }
@@ -106,7 +116,7 @@ namespace landerist_library.Insert
                 };
                 if (website.Insert())
                 {
-                    InsertedUris.Add(uri.ToString());
+                    InsertedUris.Add(uri);
                     return true;
                 }
             }
@@ -121,9 +131,9 @@ namespace landerist_library.Insert
         {
             Website website = new(uri);
 
-            website.SetHttpStatusCode();
-            website.SetRobotsTxt();
-            website.SetIpAddress();
+            website.UpdateHttpStatusCode();
+            website.UpdateRobotsTxt();
+            website.UpdateIpAddress();
             website.InsertMainPage();
         }
     }

@@ -1,4 +1,6 @@
-﻿namespace landerist_library.Insert
+﻿using landerist_library.Websites;
+
+namespace landerist_library.Insert
 {
     internal class BlockedDomains
     {
@@ -58,10 +60,29 @@
 
         public static bool IsBlocked(Uri uri)
         {
-            string[] parts = uri.Host.Split('.');  
+            if (!uri.Host.Contains('.'))
+            {
+                return false;
+            }
+            string[] parts = uri.Host.Split('.');
             string domain = parts[^2] + "." + parts[^1];
 
             return Domains.Contains(domain, StringComparer.OrdinalIgnoreCase);
+        }
+
+        public static void RemoveWebsites()
+        {
+            var websites = Websites.Websites.AllWebsites();
+            int counter = 0;
+            foreach (var website in websites)
+            {
+                if (IsBlocked(website.MainUri))
+                {
+                    website.Remove();
+                    counter++;
+                }
+            }
+            Console.WriteLine("Removed: " + counter + " websites.");
         }
     }
 }

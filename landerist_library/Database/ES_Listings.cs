@@ -1,4 +1,6 @@
-﻿using landerist_orels.ES;
+﻿using landerist_library.Websites;
+using landerist_orels.ES;
+using System;
 using System.Data;
 
 namespace landerist_library.Database
@@ -191,6 +193,11 @@ namespace landerist_library.Database
             return listings;
         }
 
+        public static Listing? GetListing(Page page, bool loadMedia = true)
+        {
+            return GetListing(page.UriHash, loadMedia);
+        }
+
         public static Listing? GetListing(string guid, bool loadMedia = true)
         {
             string query =
@@ -293,6 +300,23 @@ namespace landerist_library.Database
 
             var value = (bool?)dataRow[rowName];
             listing.AddFeature(feature, value);
+        }
+
+        public static bool Remove(Listing listing)
+        {
+            return RemoveData(listing) && 
+                ES_Media.RemoveMedia(listing);
+        }
+
+        public static bool RemoveData(Listing listing)
+        {
+            string query =
+                "DELETE FROM " + TABLE_ES_LISTINGS + " " +
+                "WHERE [guid] = @guid";
+
+            return new DataBase().Query(query, new Dictionary<string, object?> {
+                {"guid", listing.guid }
+            });
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Net;
 
 namespace landerist_library.Websites
 {
-    public class Website : Websites
+    public class Website
     {
         public Uri MainUri { get; set; }
 
@@ -18,7 +18,7 @@ namespace landerist_library.Websites
 
         public short? HttpStatusCode { get; set; }
 
-        
+
         private Robots? Robots = null;
 
         public Website()
@@ -26,7 +26,7 @@ namespace landerist_library.Websites
             MainUri = new Uri("about:blank", UriKind.RelativeOrAbsolute);
         }
 
-        public Website(Uri mainUri):this()
+        public Website(Uri mainUri) : this()
         {
             MainUri = mainUri;
             Host = mainUri.Host;
@@ -37,23 +37,23 @@ namespace landerist_library.Websites
             }
         }
 
-        public Website(DataRow dataRow): this()
+        public Website(DataRow dataRow) : this()
         {
             Load(dataRow);
         }
 
         private DataRow? GetDataRow()
         {
-            string query = 
+            string query =
                 "SELECT * " +
-                "FROM " + TABLE_WEBSITES + " " +
+                "FROM " + Websites.TABLE_WEBSITES + " " +
                 "WHERE [MainUri] = @MainUri";
 
             var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"MainUri", MainUri.ToString() }                
+                {"MainUri", MainUri.ToString() }
             });
 
-            if(dataTable.Rows.Count > 0)
+            if (dataTable.Rows.Count > 0)
             {
                 return dataTable.Rows[0];
             }
@@ -65,33 +65,32 @@ namespace landerist_library.Websites
             string mainUriString = dataRow["MainUri"].ToString()!;
             MainUri = new(mainUriString);
             Host = dataRow["Host"].ToString()!;
-            RobotsTxt = dataRow["RobotsTxt"].ToString();
-            IpAddress = dataRow["IpAddress"].ToString();
+            RobotsTxt = dataRow["RobotsTxt"] is DBNull ? null : dataRow["RobotsTxt"].ToString();
+            IpAddress = dataRow["IpAddress"] is DBNull ? null : dataRow["IpAddress"].ToString();
             HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
         }
 
         public bool Insert()
         {
             string query =
-                "INSERT INTO " + TABLE_WEBSITES + " " +
-                "VALUES (@MainUri, @Host, NULL, NULL, NULL)";
+                "INSERT INTO " + Websites.TABLE_WEBSITES + " " +
+                "VALUES (@MainUri, @Host, @RobotsTxt, @IpAddress, @HttpStatusCode)";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"MainUri", MainUri.ToString() },
-                {"Host", Host }
+                {"Host", Host },
+                {"RobotsTxt", RobotsTxt },
+                {"IpAddress", IpAddress },
+                {"HttpStatusCode", HttpStatusCode },
             });
         }
 
-        public bool UpdateRobotsTxt(string robotsTxt)
+        public bool UpdateRobotsTxt(string? robotsTxt)
         {
             RobotsTxt = robotsTxt;
-            if (RobotsTxt == null)
-            {
-                return true;
-            }
 
             string query =
-                "UPDATE " + TABLE_WEBSITES + " " +
+                "UPDATE " + Websites.TABLE_WEBSITES + " " +
                 "SET RobotsTxt =  @RobotsTxt " +
                 "WHERE Host = @Host";
 
@@ -101,15 +100,12 @@ namespace landerist_library.Websites
             });
         }
 
-        public bool UpdateIpAddress(string ipAddress)
+        public bool UpdateIpAddress(string? ipAddress)
         {
             IpAddress = ipAddress;
-            if (IpAddress == null)
-            {
-                return true;
-            }
+
             string query =
-                "UPDATE " + TABLE_WEBSITES + " " +
+                "UPDATE " + Websites.TABLE_WEBSITES + " " +
                 "SET IpAddress =  @IpAddress " +
                 "WHERE Host = @Host";
 
@@ -124,7 +120,7 @@ namespace landerist_library.Websites
             MainUri = mainUri;
 
             string query =
-                "UPDATE " + TABLE_WEBSITES + " " +
+                "UPDATE " + Websites.TABLE_WEBSITES + " " +
                 "SET MainUri =  @MainUri " +
                 "WHERE Host = @Host";
 
@@ -137,12 +133,9 @@ namespace landerist_library.Websites
         public bool UpdateHttpStatusCode(short httpStatusCode)
         {
             HttpStatusCode = httpStatusCode;
-            if (HttpStatusCode == null)
-            {
-                return true;
-            }
+
             string query =
-                "UPDATE " + TABLE_WEBSITES + " " +
+                "UPDATE " + Websites.TABLE_WEBSITES + " " +
                 "SET HttpStatusCode =  @HttpStatusCode " +
                 "WHERE Host = @Host";
 
@@ -152,7 +145,7 @@ namespace landerist_library.Websites
             });
         }
 
-        public void SetHttpStatusCode()
+        public void UpdateHttpStatusCode()
         {
             HttpClientHandler handler = new()
             {
@@ -182,27 +175,27 @@ namespace landerist_library.Websites
             return response.Headers.Location;
         }
 
-        public bool SetRobotsTxt()
+        public bool UpdateRobotsTxt()
         {
             var httpClient = new HttpClient();
             var robotsTxtUrl = new Uri(MainUri, "/robots.txt");
             var response = httpClient.GetAsync(robotsTxtUrl).GetAwaiter().GetResult();
+            string? robotsTxt = null;
             if (response.IsSuccessStatusCode)
             {
-                string robotsTxt = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-                return UpdateRobotsTxt(robotsTxt);
+                robotsTxt = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
             }
-            return false;
+            return UpdateRobotsTxt(robotsTxt);
         }
 
-        public bool SetIpAddress()
+        public bool UpdateIpAddress()
         {
             IPAddress[] ipAddresses = Dns.GetHostAddresses(Host);
-            if (ipAddresses.Length.Equals(0))
+            string? ipAdress = null;
+            if (ipAddresses.Length > 0)
             {
-                return false;
+                ipAdress = ipAddresses[0].ToString();
             }
-            var ipAdress = ipAddresses[0].ToString();
             return UpdateIpAddress(ipAdress);
         }
 
@@ -246,10 +239,33 @@ namespace landerist_library.Websites
 
         public bool Remove()
         {
+            RemoveListings();
             Pages.Remove(this);
+            return RemoveWebsite();
+        }
 
+        public void RemoveListings()
+        {
+            int counter = 0;
+            var pages = GetPages();
+            foreach (var page in pages)
+            {
+                var listing = ES_Listings.GetListing(page, false);
+                if (listing != null)
+                {
+                    if (ES_Listings.Remove(listing))
+                    {
+                        counter++;
+                    }
+                }
+            }
+            Console.WriteLine("Removed " + counter + " listings");
+        }
+
+        private bool RemoveWebsite()
+        {
             string query =
-               "DELETE FROM " + TABLE_WEBSITES + " " +
+               "DELETE FROM " + Websites.TABLE_WEBSITES + " " +
                "WHERE [Host] = @Host";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {

@@ -11,6 +11,7 @@ using System;
 using landerist_library.Logs;
 using landerist_library.Database;
 using landerist_orels.ES;
+using System.Windows.Markup;
 
 namespace landerist_console
 {
@@ -52,28 +53,27 @@ namespace landerist_console
             //var uriPage2 = new Uri("https://www.saroga.es/inmueble/piso-4-dormitorios-avenida-europa-pozuelo/");
             //var uriPage3 = new Uri("https://www.saroga.es/inmueble/piso-monte-pilar-majadahonda/");
             //var uriPage4 = new Uri("https://www.saroga.es/inmueble/apartamento-majadahonda/");
-            var uriPage5 = "https://mabelan.es/proyectos/5384v/";
+            //var uriPage5 = "https://mabelan.es/proyectos/5384v/";
 
             //var uri = new Uri("https://www.saroga.es/");
-            var uri = new Uri("https://mabelan.es/");
-            //var uri = new Uri("https://www.saguar.immo/");
+            //var uri = new Uri("https://mabelan.es/");
+            var uri = new Uri("https://www.saguar.immo/");
             //var uri = new Uri("https://www.inmolocalgestion.com/");
             //var uri = new Uri("https://www.expimad.com/");
 
             var website = new Website(uri);
-            var page = new Page(website, uriPage5);
+            //var page = new Page(website, uriPage5);
 
-            //website.Remove(); return;
+            //website.Remove(); return;            
 
-            //new UrisInserter().Insert(uri);
-            //new UrisInserter().FromCsv();
-            //new Websites().RemoveBlockedDomains();
+            new WebsitesInserter().Insert(uri);
+           //new WebsitesInserter().FromCsv();            
 
             //new Websites().SetHttpStatusCodesToNull();
-            //new Websites().InsertUpdateUrisFromNotOk();
+            //Websites.InsertUpdateUrisFromNotOk();
             //new Websites().SetHttpStatusCodesToAll();            
             //new Websites().SetRobotsTxtToHttpStatusCodeOk();
-            //new Websites().SetIpAdressToAll();            
+            //new Websites().SetIpAdress();            
             //new Websites().CountCanAccesToMainUri();
             //new Websites().CountRobotsSiteMaps();
             //new Websites().CalculateHashes();
@@ -83,16 +83,11 @@ namespace landerist_console
             //new Scraper().ScrapeNonScrapped(uri);
             //new Scraper().ScrapeUnknowIsListing(uri);
             //new Scraper().ScrapeIsNotListing(uri);
-            new Scraper().ScrapePage(page);
+            //new Scraper().ScrapePage(page);
             //new Scraper().ScrapeAllPages();
 
             //Csv.Export(true);
             //Json.Export(true);
-
-            //string guid = "2A82D55502097911496D547A0910B16620AA66244BC774CCA97873C80C6D43BB";
-            //var listing1 = ES_Listings.GetListing(guid)!;
-            //var listing2 = ES_Listings.GetListing(guid)!;
-            //var equals = listing1.Equals(listing2);
         }
 
         private static void EndBeep()

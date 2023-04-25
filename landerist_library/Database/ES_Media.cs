@@ -78,5 +78,16 @@ namespace landerist_library.Database
                 url = new Uri((string)dataRow["url"])
             };
         }
+
+        public static bool RemoveMedia(Listing listing)
+        {
+            string query =
+                "DELETE FROM " + TABLE_ES_MEDIA + " " +
+                "WHERE [listingGuid] = @listingGuid";
+
+            return new DataBase().Query(query, new Dictionary<string, object?> {
+                {"listingGuid", listing.guid }
+            });
+        }
     }
 }
