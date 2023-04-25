@@ -7,15 +7,18 @@ namespace landerist_library.Insert
     {
         private readonly HashSet<Uri> InsertedUris = new();
 
-        public WebsitesInserter()
+        public WebsitesInserter(bool initInsertedUris)
         {
-            InitInsertedUris();
+            if (initInsertedUris)
+            {
+                InitInsertedUris();
+            }
         }
 
         private void InitInsertedUris()
         {
             var urls = Websites.Websites.GetUrls();
-            foreach(var url in urls)
+            foreach (var url in urls)
             {
                 Uri uri = new(url);
                 InsertedUris.Add(uri);
@@ -85,7 +88,6 @@ namespace landerist_library.Insert
                 if (InsertWebsite(uri))
                 {
                     inserted++;
-                    InitWebsite(uri);
                 }
                 else
                 {
@@ -108,17 +110,23 @@ namespace landerist_library.Insert
                 {
                     return false;
                 }
-                
-                Website website = new()
+
+                var website = Websites.Websites.GetWebsite(uri.Host);
+                if (website != null)
+                {
+                    return false;
+                }
+
+                website = new()
                 {
                     MainUri = uri,
                     Host = uri.Host,
                 };
-                if (website.Insert())
+                if (InsertWebsite(website))
                 {
                     InsertedUris.Add(uri);
                     return true;
-                }
+                }                
             }
             catch
             {
@@ -127,14 +135,13 @@ namespace landerist_library.Insert
             return false;
         }
 
-        private static void InitWebsite(Uri uri)
+        private static bool InsertWebsite(Website website)
         {
-            Website website = new(uri);
-
-            website.UpdateHttpStatusCode();
-            website.UpdateRobotsTxt();
-            website.UpdateIpAddress();
+            website.SetHttpStatusCode();
+            website.SetRobotsTxt();
+            website.SetIpAddress();
             website.InsertMainPage();
+            return website.Insert();
         }
     }
 }

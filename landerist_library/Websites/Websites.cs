@@ -1,5 +1,4 @@
 ﻿using landerist_library.Database;
-using landerist_library.Insert;
 using System.Data;
 
 namespace landerist_library.Websites
@@ -128,82 +127,35 @@ namespace landerist_library.Websites
         private static void SetHttpStatusCodes(List<Website> websites)
         {
             int total = websites.Count;
-            int counter = 0;
-            int erros = 0;
-            var sync = new object();
-            Parallel.ForEach(websites,
-                //new ParallelOptions() { MaxDegreeOfParallelism = 1}, 
-                website =>
-                {
-                    lock (sync)
-                    {
-                        counter++;
-                    }
-                    double progressPercentage = Math.Round((double)counter * 100 / total, 2);
-                    Console.WriteLine(counter + "/" + total + " (" + progressPercentage + "%) " +
-                        "Errors: " + erros + " " + website.MainUri.ToString());
-                    try
-                    {
-                        website.UpdateHttpStatusCode();
-                    }
-                    catch
-                    {
-                        erros++;
-                    }
-                });
-        }
-
-        //public static void InsertUpdateUrisFromNotOk()
-        //{
-        //    var websites = GetStatusCodeNotOk();
-        //    InsertUpdateUris(websites);
-        //}
-
-        private static void InsertUpdateUris(List<Website> websites)
-        {
-            int total = websites.Count;
-            int counter = 0;
+            int counter = 0;            
+            int successed = 0;
             int errors = 0;
             var sync = new object();
-            List<Uri> uris = new();
             Parallel.ForEach(websites,
                 //new ParallelOptions() { MaxDegreeOfParallelism = 1}, 
                 website =>
                 {
+                    bool success = website.SetHttpStatusCode();
+                    if (success)
+                    {
+                        website.Update();
+                    }
                     lock (sync)
                     {
                         counter++;
+                        if (success)
+                        {
+                            successed++;
+                        }
+                        else
+                        {
+                            errors++;
+                        }
                     }
                     double progressPercentage = Math.Round((double)counter * 100 / total, 2);
                     Console.WriteLine(counter + "/" + total + " (" + progressPercentage + "%) " +
-                        "Uris: " + uris.Count + " " + "Errors: " + errors + " " + website.MainUri.ToString());
-                    try
-                    {
-                        var uri = website.GetResponseLocation();
-                        if (uri == null)
-                        {
-                            return;
-                        }
-
-                        if (uri.Host.Equals(website.Host))
-                        {
-                            website.UpdateMainUri(uri);
-                            return;
-                        }
-                        if (!uris.Contains(uri))
-                        {
-                            lock (sync)
-                            {
-                                uris.Add(uri);
-                            }
-                        }
-                    }
-                    catch
-                    {
-                        errors++;
-                    }
+                        "Success: " + successed + " Errors: " + errors + " " + website.MainUri.ToString());
                 });
-            new WebsitesInserter().Insert(uris);
         }
 
         public static void SetRobotsTxt()
@@ -225,16 +177,14 @@ namespace landerist_library.Websites
             int successed = 0;
             int errors = 0;
             var sync = new object();
-            Parallel.ForEach(websites, website =>
+            Parallel.ForEach(websites,
+                //new ParallelOptions() { MaxDegreeOfParallelism = 1},
+                website =>
             {
-                bool success = false;
-                try
+                bool success = website.SetRobotsTxt();                
+                if(success)
                 {
-                    success = website.UpdateRobotsTxt();
-                }
-                catch
-                {
-                    errors++;
+                    website.Update();
                 }
                 lock (sync)
                 {
@@ -271,14 +221,10 @@ namespace landerist_library.Websites
                 //new ParallelOptions() { MaxDegreeOfParallelism = 1}, 
                 website =>
                 {
-                    bool success = false;
-                    try
+                    bool success = website.SetIpAddress();
+                    if (success)
                     {
-                        success = website.UpdateIpAddress();
-                    }
-                    catch
-                    {
-                        errors++;
+                        website.Update();
                     }
                     lock (sync)
                     {

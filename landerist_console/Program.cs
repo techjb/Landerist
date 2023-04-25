@@ -66,7 +66,7 @@ namespace landerist_console
 
             //website.Remove(); return;            
 
-            new WebsitesInserter().Insert(uri);
+            new WebsitesInserter(false).Insert(uri);
            //new WebsitesInserter().FromCsv();            
 
             //new Websites().SetHttpStatusCodesToNull();
