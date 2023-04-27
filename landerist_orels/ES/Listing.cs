@@ -52,25 +52,6 @@ namespace landerist_orels.ES
         refurbished
     }
 
-    public enum Feature
-    {
-        terrace,
-        garden,
-        garage,
-        motorbike_garage,
-        pool,
-        lift,
-        disabled_access,
-        storage_room,
-        furnished,
-        non_furnished,
-        heating,
-        air_conditioning,
-        pets_allowed,
-        security_systems
-    }
-
-
     public class Listing
     {
         [JsonProperty(Order = 1)]
@@ -173,8 +154,46 @@ namespace landerist_orels.ES
         public int? parkings { get; set; }
 
         [JsonProperty(Order = 34)]
+        public bool? terrace { get; set; }
 
-        public HashSet<Feature> features;
+        [JsonProperty(Order = 35)]
+        public bool? garden { get; set; }
+
+        [JsonProperty(Order = 36)]
+        public bool? garage { get; set; }
+
+        [JsonProperty(Order = 37)]
+        public bool? motorbikeGarage { get; set; }
+
+        [JsonProperty(Order = 38)]
+        public bool? pool { get; set; }
+
+        [JsonProperty(Order = 39)]
+        public bool? lift { get; set; }
+
+        [JsonProperty(Order = 40)]
+        public bool? disabledAccess { get; set; }
+
+        [JsonProperty(Order = 41)]
+        public bool? storageRoom { get; set; }
+
+        [JsonProperty(Order = 42)]
+        public bool? furnished { get; set; }
+
+        [JsonProperty(Order = 43)]
+        public bool? nonFurnished { get; set; }
+
+        [JsonProperty(Order = 44)]
+        public bool? heating { get; set; }
+
+        [JsonProperty(Order = 45)]
+        public bool? airConditioning { get; set; }
+
+        [JsonProperty(Order = 46)]
+        public bool? petsAllowed { get; set; }
+
+        [JsonProperty(Order = 47)]
+        public bool? securitySystems { get; set; }
 
         private void InitMedia()
         {
@@ -201,23 +220,6 @@ namespace landerist_orels.ES
             }
             InitMedia();
             this.media = media;
-        }
-
-        public void AddFeature(Feature feature)
-        {
-            AddFeature(feature, true);
-        }
-
-        public void AddFeature(Feature feature, bool? value)
-        {
-            if (value != null && (bool)value)
-            {
-                if (features == null)
-                {
-                    features = new HashSet<Feature>();
-                }
-                features.Add(feature);
-            }
         }
 
         public override bool Equals(object obj)
@@ -269,8 +271,22 @@ namespace landerist_orels.ES
                 floor == other.floor &&
                 bedrooms == other.bedrooms &&
                 bathrooms == other.bathrooms &&
-                parkings == other.parkings &&
-                (features == other.features || (features != null && other.features != null && features.SetEquals(other.features)));
+                parkings == other.parkings &&                
+                terrace == other.terrace &&
+                garden == other.garden &&
+                garage == other.garage &&
+                motorbikeGarage == other.motorbikeGarage &&
+                pool == other.pool &&
+                lift == other.lift &&
+                disabledAccess == other.disabledAccess &&
+                storageRoom == other.storageRoom &&
+                furnished == other.furnished &&
+                nonFurnished == other.nonFurnished &&
+                heating == other.heating &&
+                airConditioning == other.airConditioning &&
+                petsAllowed == other.petsAllowed &&
+                securitySystems == other.securitySystems
+                ;
         }
 
         public override int GetHashCode()
@@ -308,7 +324,20 @@ namespace landerist_orels.ES
             hash ^= bedrooms?.GetHashCode() ?? 0;
             hash ^= bathrooms?.GetHashCode() ?? 0;
             hash ^= parkings?.GetHashCode() ?? 0;
-            hash ^= features?.GetHashCode() ?? 0;
+            hash ^= terrace?.GetHashCode() ?? 0;
+            hash ^= garden?.GetHashCode() ?? 0;
+            hash ^= garage?.GetHashCode() ?? 0;
+            hash ^= motorbikeGarage?.GetHashCode() ?? 0;
+            hash ^= pool?.GetHashCode() ?? 0;
+            hash ^= lift?.GetHashCode() ?? 0;
+            hash ^= disabledAccess?.GetHashCode() ?? 0;
+            hash ^= storageRoom?.GetHashCode() ?? 0;
+            hash ^= furnished?.GetHashCode() ?? 0;
+            hash ^= nonFurnished?.GetHashCode() ?? 0;
+            hash ^= heating?.GetHashCode() ?? 0;
+            hash ^= airConditioning?.GetHashCode() ?? 0;
+            hash ^= petsAllowed?.GetHashCode() ?? 0;
+            hash ^= securitySystems?.GetHashCode() ?? 0;
 
             return hash;
         }

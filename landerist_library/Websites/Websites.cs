@@ -135,7 +135,7 @@ namespace landerist_library.Websites
                 //new ParallelOptions() { MaxDegreeOfParallelism = 1}, 
                 website =>
                 {
-                    bool success = website.SetHttpStatusCode();
+                    bool success = website.SetMainUriAndStatusCode();
                     if (success)
                     {
                         website.Update();
@@ -264,7 +264,7 @@ namespace landerist_library.Websites
             }
         }
 
-        public static void CountSiteMaps()
+        public static void CountRobotsSiteMaps()
         {
             var websites = GetStatusCodeOk();
             int counter = 0;

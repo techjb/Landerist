@@ -5,7 +5,7 @@ namespace landerist_library.Insert
 {
     public class WebsitesInserter
     {
-        private readonly HashSet<Uri> InsertedUris = new();
+        private readonly static HashSet<Uri> InsertedUris = new();
 
         public WebsitesInserter(bool initInsertedUris)
         {
@@ -15,7 +15,7 @@ namespace landerist_library.Insert
             }
         }
 
-        private void InitInsertedUris()
+        private static void InitInsertedUris()
         {
             var urls = Websites.Websites.GetUrls();
             foreach (var url in urls)
@@ -97,7 +97,7 @@ namespace landerist_library.Insert
             Console.WriteLine("Inserted: " + inserted + " Error: " + errors);
         }
 
-        private bool InsertWebsite(Uri uri)
+        private static bool InsertWebsite(Uri uri)
         {
             try
             {
@@ -122,11 +122,8 @@ namespace landerist_library.Insert
                     MainUri = uri,
                     Host = uri.Host,
                 };
-                if (InsertWebsite(website))
-                {
-                    InsertedUris.Add(uri);
-                    return true;
-                }                
+
+                return InsertWebsite(website);
             }
             catch
             {
@@ -137,11 +134,30 @@ namespace landerist_library.Insert
 
         private static bool InsertWebsite(Website website)
         {
-            website.SetHttpStatusCode();
-            website.SetRobotsTxt();
-            website.SetIpAddress();
+            if (!website.SetMainUriAndStatusCode())
+            {
+                return false;
+            }
+            if (InsertedUris.Contains(website.MainUri))
+            {
+                return false;
+            }
+            if (!website.SetRobotsTxt())
+            {
+                return false;
+            }
+            if (!website.SetIpAddress())
+            {
+                return false;
+            }
+            if (!website.Insert())
+            {
+                return false;
+            }
             website.InsertMainPage();
-            return website.Insert();
+            InsertedUris.Add(website.MainUri);
+            
+            return true;
         }
     }
 }

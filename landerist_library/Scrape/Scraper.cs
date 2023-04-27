@@ -120,7 +120,6 @@ namespace landerist_library.Scrape
             {
                 ScrapeIsNotListing(website, recursive);
             }
-
         }
 
         private void ScrapePages(List<Page> pages)
@@ -129,7 +128,7 @@ namespace landerist_library.Scrape
             int TotalPages = pages.Count;
             Counter = 0;
             Parallel.ForEach(pages,
-                new ParallelOptions() { MaxDegreeOfParallelism = 1 },
+                //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
                 page =>
                 {
                     ScrapePage(page);

@@ -1,6 +1,5 @@
 ﻿using landerist_library.Websites;
 using landerist_orels.ES;
-using System;
 using System.Data;
 
 namespace landerist_library.Database
@@ -87,20 +86,20 @@ namespace landerist_library.Database
                 {"bedrooms", listing.bedrooms },
                 {"bathrooms", listing.bathrooms },
                 {"parkings", listing.parkings },
-                {"terrace", listing.features!=null && listing.features.Contains(Feature.terrace) ?true: DBNull.Value },
-                {"garden", listing.features!=null && listing.features.Contains(Feature.garden) ?true: DBNull.Value },
-                {"garage", listing.features!=null && listing.features.Contains(Feature.garage)?true: DBNull.Value  },
-                {"motorbikeGarage", listing.features!=null && listing.features.Contains(Feature.motorbike_garage) ?true: DBNull.Value },
-                {"pool", listing.features!=null && listing.features.Contains(Feature.pool) ?true: DBNull.Value },
-                {"lift", listing.features!=null && listing.features.Contains(Feature.lift) ?true: DBNull.Value },
-                {"disabledAccess", listing.features!=null && listing.features.Contains(Feature.disabled_access) ?true: DBNull.Value },
-                {"storageRoom", listing.features != null && listing.features.Contains(Feature.storage_room) ? true : DBNull.Value },
-                {"furnished", listing.features != null && listing.features.Contains(Feature.furnished) ? true : DBNull.Value },
-                {"nonFurnished", listing.features != null && listing.features.Contains(Feature.non_furnished) ? true : DBNull.Value },
-                {"heating", listing.features != null && listing.features.Contains(Feature.heating) ? true : DBNull.Value },
-                {"airConditioning", listing.features != null && listing.features.Contains(Feature.air_conditioning) ? true : DBNull.Value },
-                {"petsAllowed", listing.features != null && listing.features.Contains(Feature.pets_allowed) ? true : DBNull.Value },
-                {"securitySystems", listing.features != null && listing.features.Contains(Feature.security_systems) ? true : DBNull.Value },
+                {"terrace", listing.terrace },
+                {"garden", listing.garden },
+                {"garage", listing.garage },
+                {"motorbikeGarage", listing.motorbikeGarage },
+                {"pool", listing.pool },
+                {"lift", listing.lift },
+                {"disabledAccess", listing.disabledAccess },
+                {"storageRoom", listing.storageRoom },
+                {"furnished", listing.furnished },
+                {"nonFurnished", listing.nonFurnished },
+                {"heating", listing.heating },
+                {"airConditioning", listing.airConditioning },
+                {"petsAllowed", listing.petsAllowed },
+                {"securitySystems", listing.securitySystems },
             };
         }
 
@@ -237,8 +236,8 @@ namespace landerist_library.Database
             {
                 guid = (string)dataRow["guid"],
                 listingStatus = listingStatus,
-                listingDate = dataRow["listingDate"] is DBNull ? null : (DateTime)dataRow["listingDate"],
-                unlistingDate = dataRow["unlistingDate"] is DBNull ? null : (DateTime)dataRow["unlistingDate"],
+                listingDate = GetDateTime(dataRow, "listingDate"),
+                unlistingDate = GetDateTime(dataRow, "unlistingDate"),
                 operation = operation,
                 propertyType = propertyType,
                 propertySubtype = dataRow["propertySubtype"] is DBNull ? null : (PropertySubtype)Enum.Parse(typeof(PropertySubtype), dataRow["propertySubtype"].ToString()!),
@@ -247,64 +246,82 @@ namespace landerist_library.Database
                     amount = Convert.ToDecimal(dataRow["priceAmount"]),
                     currency = (Currency)Enum.Parse(typeof(Currency), dataRow["priceCurrency"].ToString()!)
                 },
-                description = dataRow["description"] is DBNull ? null : (string)dataRow["description"],
-                dataSourceName = dataRow["dataSourceName"] is DBNull ? null : (string)dataRow["dataSourceName"],
-                dataSourceGuid = dataRow["dataSourceGuid"] is DBNull ? null : (string)dataRow["dataSourceGuid"],
-                dataSourceUpdate = dataRow["dataSourceUpdate"] is DBNull ? null : (DateTime)dataRow["dataSourceUpdate"],
-                dataSourceUrl = dataRow["dataSourceUrl"] is DBNull ? null : new Uri((string)dataRow["dataSourceUrl"]),
-                contactName = dataRow["contactName"] is DBNull ? null : (string)dataRow["contactName"],
-                contactPhone = dataRow["contactPhone"] is DBNull ? null : (string)dataRow["contactPhone"],
-                contactEmail = dataRow["contactEmail"] is DBNull ? null : (string)dataRow["contactEmail"],
-                contactUrl = dataRow["contactEmail"] is DBNull ? null : new Uri((string)dataRow["contactEmail"]),
-                contactOther = dataRow["contactOther"] is DBNull ? null : (string)dataRow["contactOther"],
-                address = dataRow["address"] is DBNull ? null : (string)dataRow["address"],
-                latitude = dataRow["latitude"] is DBNull ? null : (double)dataRow["latitude"],
-                longitude = dataRow["longitude"] is DBNull ? null : (double)dataRow["longitude"],
-                locationIsAccurate = dataRow["locationIsAccurate"] is DBNull ? null : (bool)dataRow["locationIsAccurate"],
-                cadastralReference = dataRow["cadastralReference"] is DBNull ? null : (string)dataRow["cadastralReference"],
-                propertySize = dataRow["propertySize"] is DBNull ? null : (double)dataRow["propertySize"],
-                landSize = dataRow["landSize"] is DBNull ? null : (double)dataRow["landSize"],
-                constructionYear = dataRow["constructionYear"] is DBNull ? null : (short)dataRow["constructionYear"],
+                description = GetString(dataRow, "description"),
+                dataSourceName = GetString(dataRow, "dataSourceName"),
+                dataSourceGuid = GetString(dataRow, "dataSourceGuid"),
+                dataSourceUpdate = GetDateTime(dataRow, "dataSourceUpdate"),
+                dataSourceUrl = GetUri(dataRow, "dataSourceUrl"),
+                contactName = GetString(dataRow, "contactName"),
+                contactPhone = GetString(dataRow, "contactPhone"),
+                contactEmail = GetString(dataRow, "contactEmail"),
+                contactUrl = GetUri(dataRow, "contactUrl"),
+                contactOther = GetString(dataRow, "contactOther"),
+                address = GetString(dataRow, "address"),
+                latitude = GetDouble(dataRow, "latitude"),
+                longitude = GetDouble(dataRow, "longitude"),
+                locationIsAccurate = GetBoolean(dataRow, "locationIsAccurate"),
+                cadastralReference = GetString(dataRow, "cadastralReference"),
+                propertySize = GetDouble(dataRow, "propertySize"),
+                landSize = GetDouble(dataRow, "landSize"),
+                constructionYear = GetShort(dataRow, "constructionYear"),
                 constructionStatus = dataRow["constructionStatus"] is DBNull ? null : (ConstructionStatus)Enum.Parse(typeof(ConstructionStatus), dataRow["constructionStatus"].ToString()!),
-                floors = dataRow["floors"] is DBNull ? null : (short)dataRow["floors"],
-                floor = dataRow["floor"] is DBNull ? null : (string)dataRow["floor"],
-                bedrooms = dataRow["bedrooms"] is DBNull ? null : (short)dataRow["bedrooms"],
-                bathrooms = dataRow["bathrooms"] is DBNull ? null : (short)dataRow["bathrooms"],
-                parkings = dataRow["parkings"] is DBNull ? null : (short)dataRow["parkings"],
+                floors = GetShort(dataRow, "floors"),
+                floor = GetString(dataRow, "floor"),
+                bedrooms = GetShort(dataRow, "bedrooms"),
+                bathrooms = GetShort(dataRow, "bathrooms"),
+                parkings = GetShort(dataRow, "parkings"),
+                terrace = GetBoolean(dataRow, "terrace"),
+                garden = GetBoolean(dataRow, "garden"),
+                garage = GetBoolean(dataRow, "garage"),
+                motorbikeGarage = GetBoolean(dataRow, "motorbikeGarage"),
+                pool = GetBoolean(dataRow, "pool"),
+                lift = GetBoolean(dataRow, "lift"),
+                disabledAccess = GetBoolean(dataRow, "disabledAccess"),
+                storageRoom = GetBoolean(dataRow, "storageRoom"),
+                furnished = GetBoolean(dataRow, "furnished"),
+                nonFurnished = GetBoolean(dataRow, "nonFurnished"),
+                heating = GetBoolean(dataRow, "heating"),
+                airConditioning = GetBoolean(dataRow, "airConditioning"),
+                petsAllowed = GetBoolean(dataRow, "petsAllowed"),
+                securitySystems = GetBoolean(dataRow, "securitySystems"),
             };
-
-            AddFeature(listing, dataRow, "terrace", Feature.terrace);
-            AddFeature(listing, dataRow, "garden", Feature.garden);
-            AddFeature(listing, dataRow, "garage", Feature.garage);
-            AddFeature(listing, dataRow, "motorbikeGarage", Feature.motorbike_garage);
-            AddFeature(listing, dataRow, "pool", Feature.pool);
-            AddFeature(listing, dataRow, "lift", Feature.lift);
-            AddFeature(listing, dataRow, "disabledAccess", Feature.disabled_access);
-            AddFeature(listing, dataRow, "storageRoom", Feature.storage_room);
-            AddFeature(listing, dataRow, "furnished", Feature.furnished);
-            AddFeature(listing, dataRow, "nonFurnished", Feature.non_furnished);
-            AddFeature(listing, dataRow, "heating", Feature.heating);
-            AddFeature(listing, dataRow, "airConditioning", Feature.air_conditioning);
-            AddFeature(listing, dataRow, "petsAllowed", Feature.pets_allowed);
-            AddFeature(listing, dataRow, "securitySystems", Feature.security_systems);
 
             return listing;
         }
 
-        private static void AddFeature(Listing listing, DataRow dataRow, string rowName, Feature feature)
+        private static bool? GetBoolean(DataRow dataRow, string columnName)
         {
-            if (dataRow[rowName] is DBNull)
-            {
-                return;
-            }
+            return dataRow[columnName] is DBNull ? null : (bool)dataRow[columnName];
+        }
 
-            var value = (bool?)dataRow[rowName];
-            listing.AddFeature(feature, value);
+        private static string? GetString(DataRow dataRow, string columnName)
+        {
+            return dataRow[columnName] is DBNull ? null : (string)dataRow[columnName];
+        }
+
+        private static short? GetShort(DataRow dataRow, string columnName)
+        {
+            return dataRow[columnName] is DBNull ? null : (short)dataRow[columnName];
+        }
+
+        private static double? GetDouble(DataRow dataRow, string columnName)
+        {
+            return dataRow[columnName] is DBNull ? null : (double)dataRow[columnName];
+        }
+
+        private static DateTime? GetDateTime(DataRow dataRow, string columnName)
+        {
+            return dataRow[columnName] is DBNull ? null : (DateTime)dataRow[columnName];
+        }
+
+        private static Uri? GetUri(DataRow dataRow, string columnName)
+        {
+            return dataRow[columnName] is DBNull ? null : new Uri((string)dataRow[columnName]);
         }
 
         public static bool Remove(Listing listing)
         {
-            return RemoveData(listing) && 
+            return RemoveData(listing) &&
                 ES_Media.RemoveMedia(listing);
         }
 

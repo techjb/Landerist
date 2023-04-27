@@ -189,7 +189,20 @@ namespace landerist_library.Parse
                 bedrooms = GetBedrooms(),
                 bathrooms = GetBathrooms(),
                 parkings = GetParkings(),
-                features = GetFeatures()
+                terrace = TieneTerraza,
+                garden = TieneJardín,
+                garage = TieneGaraje,
+                motorbikeGarage = TieneParkingParaMoto,
+                pool = TienePiscina,
+                lift = TieneAscensor,
+                disabledAccess = TieneAccesoParaDiscapacitados,
+                storageRoom = TieneTrastero,
+                furnished = EstáAmueblado,
+                nonFurnished = NoEstáAmueblado,
+                heating = TienCalefácción,
+                airConditioning = TienAireAcondicionado,
+                petsAllowed = PermiteMascotas,
+                securitySystems = TieneSistemasDeSeguridad,
             };
             return listing;
         }
@@ -497,36 +510,6 @@ namespace landerist_library.Parse
         private int? GetParkings()
         {
             return (int?)NúmeroDeParkings;
-        }
-
-        private HashSet<Feature> GetFeatures()
-        {
-            var features = new HashSet<Feature>();
-            AddFeature(features, TieneTerraza, Feature.terrace);
-            AddFeature(features, TieneJardín, Feature.garden);
-            AddFeature(features, TieneGaraje, Feature.garage);
-            AddFeature(features, TieneParkingParaMoto, Feature.motorbike_garage);
-            AddFeature(features, TienePiscina, Feature.pool);
-            AddFeature(features, TieneAscensor, Feature.lift);
-            AddFeature(features, TieneAccesoParaDiscapacitados, Feature.disabled_access);
-            AddFeature(features, TieneTrastero, Feature.storage_room);
-            AddFeature(features, EstáAmueblado, Feature.furnished);
-            AddFeature(features, NoEstáAmueblado, Feature.non_furnished);
-            AddFeature(features, TienCalefácción, Feature.heating);
-            AddFeature(features, PermiteMascotas, Feature.pets_allowed);
-            AddFeature(features, TieneSistemasDeSeguridad, Feature.security_systems);
-            return features;
-        }
-
-        private static void AddFeature(HashSet<Feature> features, bool? value, Feature feature)
-        {
-            if (value != null)
-            {
-                if ((bool)value)
-                {
-                    features.Add(feature);
-                }
-            }
         }
     }
 }

@@ -29,12 +29,17 @@ namespace landerist_library.Websites
         public Website(Uri mainUri) : this()
         {
             MainUri = mainUri;
-            Host = mainUri.Host;
+            SetHost();
             var dataRow = GetDataRow();
             if (dataRow != null)
             {
                 Load(dataRow);
             }
+        }
+
+        private void SetHost()
+        {
+            Host = MainUri.Host;
         }
 
         public Website(DataRow dataRow) : this()
@@ -47,10 +52,10 @@ namespace landerist_library.Websites
             string query =
                 "SELECT * " +
                 "FROM " + Websites.TABLE_WEBSITES + " " +
-                "WHERE [MainUri] = @MainUri";
+                "WHERE [Host] = @Host";
 
             var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"MainUri", MainUri.ToString() }
+                {"MainUri", MainUri.Host }
             });
 
             if (dataTable.Rows.Count > 0)
@@ -105,49 +110,38 @@ namespace landerist_library.Websites
             };
         }
 
-        public bool SetHttpStatusCode()
+        public bool SetMainUriAndStatusCode(int iteration = 0)
         {
             HttpClientHandler handler = new()
             {
                 AllowAutoRedirect = false
             };
+
             using var client = new HttpClient(handler);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);            
             try
             {
-                client.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
                 HttpRequestMessage request = new(HttpMethod.Head, MainUri);
-
                 var response = client.SendAsync(request).GetAwaiter().GetResult();
-                var statusCode = response.StatusCode;
-                HttpStatusCode = ((short)statusCode);
+                HttpStatusCode = (short)response.StatusCode;
+                if (response != null && response.Headers != null && response.Headers.Location != null)
+                {
+                    var uriLocation = response.Headers.Location;
+                    if (!uriLocation.Equals(MainUri))
+                    {
+                        MainUri = uriLocation;
+                        SetHost();
+                        iteration++;
+                        if (iteration < 10)
+                        {
+                            SetMainUriAndStatusCode(iteration++);
+                        }
+                    }
+                }
                 return true;
             }
             catch { }
-            return false;            
-        }
-
-        public bool SetMainUri()
-        {
-            HttpClientHandler handler = new()
-            {
-                AllowAutoRedirect = false
-            };
-
-            using var client = new HttpClient(handler);
-            client.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
-            try
-            {
-                HttpRequestMessage request = new(HttpMethod.Head, MainUri);
-
-                var response = client.SendAsync(request).GetAwaiter().GetResult();
-                if (response != null && response.Headers!=null && response.Headers.Location!=null)
-                {
-                    MainUri = response.Headers.Location;
-                    return true;
-                }                
-            }
-            catch { }
-            return false;            
+            return false;
         }
 
         public bool SetRobotsTxt()
@@ -155,6 +149,7 @@ namespace landerist_library.Websites
             try
             {
                 var httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
                 var robotsTxtUrl = new Uri(MainUri, "/robots.txt");
                 var response = httpClient.GetAsync(robotsTxtUrl).GetAwaiter().GetResult();
                 RobotsTxt = null;

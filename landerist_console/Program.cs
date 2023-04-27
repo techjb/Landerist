@@ -52,35 +52,34 @@ namespace landerist_console
             //var uriPage1 = new Uri("https://www.saroga.es/inmueble/chalet-independiente-satelites-majadahonda/");
             //var uriPage2 = new Uri("https://www.saroga.es/inmueble/piso-4-dormitorios-avenida-europa-pozuelo/");
             //var uriPage3 = new Uri("https://www.saroga.es/inmueble/piso-monte-pilar-majadahonda/");
-            //var uriPage4 = new Uri("https://www.saroga.es/inmueble/apartamento-majadahonda/");
-            //var uriPage5 = "https://mabelan.es/proyectos/5384v/";
+            //var uriPage4 = new Uri("https://www.saroga.es/inmueble/apartamento-majadahonda/");          
 
+            //var uri = new Uri("https://www.goolzoom.com/");
             //var uri = new Uri("https://www.saroga.es/");
             //var uri = new Uri("https://mabelan.es/");
             var uri = new Uri("https://www.saguar.immo/");
             //var uri = new Uri("https://www.inmolocalgestion.com/");
             //var uri = new Uri("https://www.expimad.com/");
 
-            var website = new Website(uri);
+            //var website = new Website(uri);
             //var page = new Page(website, uriPage5);
 
             //website.Remove(); return;            
 
-            new WebsitesInserter(false).Insert(uri);
-           //new WebsitesInserter().FromCsv();            
+            //new WebsitesInserter(false).Insert(uri);
+            //new WebsitesInserter().FromCsv();            
 
-            //new Websites().SetHttpStatusCodesToNull();
+            //Websites.SetHttpStatusCodesToNull();
             //Websites.InsertUpdateUrisFromNotOk();
-            //new Websites().SetHttpStatusCodesToAll();            
-            //new Websites().SetRobotsTxtToHttpStatusCodeOk();
-            //new Websites().SetIpAdress();            
-            //new Websites().CountCanAccesToMainUri();
-            //new Websites().CountRobotsSiteMaps();
-            //new Websites().CalculateHashes();
-            //new Websites().InsertMainPages();
+            //Websites.SetHttpStatusCodesToAll();            
+            //Websites.SetRobotsTxtToHttpStatusCodeOk();
+            //Websites.SetIpAdress();            
+            //Websites.CountCanAccesToMainUri();
+            //Websites.CountRobotsSiteMaps();            
+            //Websites.InsertMainPages();
 
             //new Scraper().ScrapeMainPage(website);
-            //new Scraper().ScrapeNonScrapped(uri);
+            //new Scraper().ScrapeNonScrapped(uri, true);
             //new Scraper().ScrapeUnknowIsListing(uri);
             //new Scraper().ScrapeIsNotListing(uri);
             //new Scraper().ScrapePage(page);
