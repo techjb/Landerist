@@ -52,6 +52,19 @@ namespace landerist_library.Insert
             Insert(uris);
         }
 
+        public void RemoveAndInsert(Uri uri)
+        {
+            Website website = new(uri);
+            RemoveAndInsert(website);
+        }
+
+        public void RemoveAndInsert(Website website)
+        {
+            website.Remove();
+            Insert(website.MainUri);
+        }
+
+
         public void Insert(string url)
         {
             if (Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))

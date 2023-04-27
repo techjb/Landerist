@@ -53,19 +53,21 @@ namespace landerist_console
             //var uriPage2 = new Uri("https://www.saroga.es/inmueble/piso-4-dormitorios-avenida-europa-pozuelo/");
             //var uriPage3 = new Uri("https://www.saroga.es/inmueble/piso-monte-pilar-majadahonda/");
             //var uriPage4 = new Uri("https://www.saroga.es/inmueble/apartamento-majadahonda/");          
+            var uriPage5 = new Uri("https://www.inmolocalgestion.com/ficha-inmueble.php?id=53");
 
             //var uri = new Uri("https://www.goolzoom.com/");
             //var uri = new Uri("https://www.saroga.es/");
             //var uri = new Uri("https://mabelan.es/");
-            var uri = new Uri("https://www.saguar.immo/");
-            //var uri = new Uri("https://www.inmolocalgestion.com/");
+            //var uri = new Uri("https://www.saguar.immo/");
+            var uri = new Uri("https://www.inmolocalgestion.com/");
             //var uri = new Uri("https://www.expimad.com/");
 
-            //var website = new Website(uri);
-            //var page = new Page(website, uriPage5);
+            var website = new Website(uri);
+            var page = new Page(website, uriPage5);
 
-            //website.Remove(); return;            
+            //website.Remove(); return;
 
+            //new WebsitesInserter(false).RemoveAndInsert(uri); return;
             //new WebsitesInserter(false).Insert(uri);
             //new WebsitesInserter().FromCsv();            
 
@@ -80,9 +82,9 @@ namespace landerist_console
 
             //new Scraper().ScrapeMainPage(website);
             //new Scraper().ScrapeNonScrapped(uri, true);
-            //new Scraper().ScrapeUnknowIsListing(uri);
+            //new Scraper().ScrapeUnknowIsListing(uri, true);
             //new Scraper().ScrapeIsNotListing(uri);
-            //new Scraper().ScrapePage(page);
+            new Scraper().ScrapePage(page);
             //new Scraper().ScrapeAllPages();
 
             //Csv.Export(true);
@@ -91,8 +93,10 @@ namespace landerist_console
 
         private static void EndBeep()
         {
-            while (true)
+            int counter = 0;
+            while (counter < 3)
             {
+                counter++;
                 Console.Beep(400, 1000);
                 Thread.Sleep(300);
             }

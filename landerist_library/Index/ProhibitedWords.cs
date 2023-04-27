@@ -40,7 +40,9 @@
             "experiencia",
             "donacion",
             "quiero",
-            "rgpd",            
+            "rgpd",
+            "mapaweb",
+            "resize"
         };
 
         public static bool Contains(Uri uri)

@@ -64,7 +64,7 @@ namespace landerist_library.Parse
             }
 
             string extension = Path.GetExtension(attributeValue).ToLower();
-            if (extension != ".jpg" && extension != ".jpeg")
+            if (!extension.StartsWith(".jpg") && !extension.StartsWith(".jpeg"))
             {
                 return null;
             }

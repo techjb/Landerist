@@ -1,4 +1,5 @@
 ﻿using landerist_library.Websites;
+using Newtonsoft.Json.Linq;
 
 namespace landerist_library.Index
 {
@@ -91,18 +92,21 @@ namespace landerist_library.Index
             {
                 return null;
             }
-            //UriBuilder uriBuilder = new(uri) // para construirlo con parámetros ?param1=values..
-            //{
-            //    Fragment = ""
-            //};
-            UriBuilder uriBuilder = new()
+            // to build without fragments #fragment1..
+            UriBuilder uriBuilder = new(uri) // 
             {
-                Fragment = "",
-                Scheme = uri.Scheme,
-                Host = uri.Host,
-                Port = uri.Port,
-                Path = uri.AbsolutePath
+                Fragment = ""
             };
+
+            // build without parameters
+            //UriBuilder uriBuilder = new()
+            //{
+            //    Fragment = "",
+            //    Scheme = uri.Scheme,
+            //    Host = uri.Host,
+            //    Port = uri.Port,
+            //    Path = uri.AbsolutePath
+            //};
             uri = uriBuilder.Uri;
             if (ProhibitedWords.Contains(uri))
             {

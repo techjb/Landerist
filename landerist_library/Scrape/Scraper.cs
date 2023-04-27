@@ -7,11 +7,11 @@ namespace landerist_library.Scrape
     {
         private readonly TempBlocker TempBlocker = new();
 
-        private readonly object SyncBlocker = new();
+        private readonly object SyncTempBlocker = new();
 
-        private readonly List<Page> PendingPages = new();
+        private readonly HashSet<Page> PendingPages = new();
 
-        private int Counter = 0;
+        private readonly object SyncPendingPages = new();
 
         private int Sucess = 0;
 
@@ -30,7 +30,7 @@ namespace landerist_library.Scrape
         {
             var dictionary = Websites.Websites.GetDicionaryStatusCodeOk();
             var dataTable = Pages.GetAll();
-            var pages = GetPages(dictionary, dataTable);            
+            var pages = GetPages(dictionary, dataTable);
             ScrapePages(pages);
         }
 
@@ -71,7 +71,7 @@ namespace landerist_library.Scrape
         public void ScrapeNonScrapped(Website website, bool recursive)
         {
             var pages = website.GetNonScrapedPages();
-            if(pages.Count == 0)
+            if (pages.Count == 0)
             {
                 return;
             }
@@ -79,9 +79,10 @@ namespace landerist_library.Scrape
             if (recursive)
             {
                 ScrapeNonScrapped(website, recursive);
-            }            
+            }
         }
 
+        // Can be infinite loops
         public void ScrapeUnknowIsListing(Uri uri, bool recursive = false)
         {
             Website website = new(uri);
@@ -126,15 +127,20 @@ namespace landerist_library.Scrape
         {
             PendingPages.Clear();
             int TotalPages = pages.Count;
-            Counter = 0;
+            int Counter = 0;
             Parallel.ForEach(pages,
                 //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
                 page =>
                 {
-                    ScrapePage(page);
+                    lock (SyncCounter)
+                    {
+                        Counter++;
+                    }
                     Console.WriteLine(
                         "Scrapped: " + Counter + "/" + TotalPages + " Pending: " + PendingPages.Count + " " +
                         "Success: " + Sucess + " Errors: " + Errors);
+
+                    ScrapePage(page);
                 });
 
             if (PendingPages.Count > 0)
@@ -147,33 +153,25 @@ namespace landerist_library.Scrape
 
         public void ScrapePage(Page page)
         {
-            IncreaseCounter();
             if (!page.CanScrape())
             {
                 return;
-            }
-
+            }            
             if (TempBlocker.IsBlocked(page.Website))
             {
-                PendingPages.Add(page);
+                lock (SyncTempBlocker)
+                {
+                    PendingPages.Add(page);
+                }                
                 return;
             }
             AddToBlocker(page);
-            bool sucess = new PageScraper(page).Scrape();            
+            bool sucess = new PageScraper(page).Scrape();
             AddSuccessError(sucess);
         }
-
-        private void IncreaseCounter()
-        {
-            lock (SyncCounter)
-            {
-                Counter++;
-            }
-        }
-
         private void AddToBlocker(Page page)
         {
-            lock (SyncBlocker)
+            lock (SyncTempBlocker)
             {
                 TempBlocker.Add(page.Website);
             }
