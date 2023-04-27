@@ -1,4 +1,5 @@
 ﻿using landerist_library.Websites;
+using System.Collections.Generic;
 using System.Data;
 
 namespace landerist_library.Scrape
@@ -34,9 +35,9 @@ namespace landerist_library.Scrape
             ScrapePages(pages);
         }
 
-        private static List<Page> GetPages(Dictionary<string, Website> dictionary, DataTable dataTable)
+        private static HashSet<Page> GetPages(Dictionary<string, Website> dictionary, DataTable dataTable)
         {
-            List<Page> pages = new();
+            HashSet<Page> pages = new();
             foreach (DataRow dataRow in dataTable.Rows)
             {
                 var host = (string)dataRow["host"];
@@ -125,6 +126,12 @@ namespace landerist_library.Scrape
 
         private void ScrapePages(List<Page> pages)
         {
+            HashSet<Page> hashSet = new(pages, new PageComparer());
+            ScrapePages(hashSet);
+        }
+
+        private void ScrapePages(HashSet<Page> pages)
+        {
             PendingPages.Clear();
             int TotalPages = pages.Count;
             int Counter = 0;
@@ -159,7 +166,7 @@ namespace landerist_library.Scrape
             }            
             if (TempBlocker.IsBlocked(page.Website))
             {
-                lock (SyncTempBlocker)
+                lock (SyncPendingPages)
                 {
                     PendingPages.Add(page);
                 }                

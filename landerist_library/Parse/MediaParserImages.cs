@@ -57,16 +57,17 @@ namespace landerist_library.Parse
             {
                 return null;
             }
-            string title = imgNode.GetAttributeValue("alt", null);
-            if (string.IsNullOrEmpty(title))
-            {
-                title = imgNode.GetAttributeValue("title", null);
-            }
-
+            
             string extension = Path.GetExtension(attributeValue).ToLower();
             if (!extension.StartsWith(".jpg") && !extension.StartsWith(".jpeg"))
             {
                 return null;
+            }
+
+            string title = imgNode.GetAttributeValue("alt", null);
+            if (string.IsNullOrEmpty(title))
+            {
+                title = imgNode.GetAttributeValue("title", null);
             }
 
             return new Media()

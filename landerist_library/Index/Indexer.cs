@@ -92,7 +92,7 @@ namespace landerist_library.Index
             {
                 return null;
             }
-            // to build without fragments #fragment1..
+            // build without fragments #fragment1..
             UriBuilder uriBuilder = new(uri) // 
             {
                 Fragment = ""

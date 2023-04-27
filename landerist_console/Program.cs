@@ -52,7 +52,7 @@ namespace landerist_console
             //var uriPage1 = new Uri("https://www.saroga.es/inmueble/chalet-independiente-satelites-majadahonda/");
             //var uriPage2 = new Uri("https://www.saroga.es/inmueble/piso-4-dormitorios-avenida-europa-pozuelo/");
             //var uriPage3 = new Uri("https://www.saroga.es/inmueble/piso-monte-pilar-majadahonda/");
-            //var uriPage4 = new Uri("https://www.saroga.es/inmueble/apartamento-majadahonda/");          
+            var uriPage4 = new Uri("https://www.saroga.es/inmueble/apartamento-majadahonda/");          
             var uriPage5 = new Uri("https://www.inmolocalgestion.com/ficha-inmueble.php?id=53");
 
             //var uri = new Uri("https://www.goolzoom.com/");
@@ -63,7 +63,9 @@ namespace landerist_console
             //var uri = new Uri("https://www.expimad.com/");
 
             var website = new Website(uri);
-            var page = new Page(website, uriPage5);
+            var page = new Page(website, uriPage4);
+
+
 
             //website.Remove(); return;
 
@@ -81,10 +83,10 @@ namespace landerist_console
             //Websites.InsertMainPages();
 
             //new Scraper().ScrapeMainPage(website);
-            //new Scraper().ScrapeNonScrapped(uri, true);
+            new Scraper().ScrapeNonScrapped(uri, true);
             //new Scraper().ScrapeUnknowIsListing(uri, true);
             //new Scraper().ScrapeIsNotListing(uri);
-            new Scraper().ScrapePage(page);
+            //new Scraper().ScrapePage(page);
             //new Scraper().ScrapeAllPages();
 
             //Csv.Export(true);
