@@ -168,6 +168,8 @@ namespace landerist_library.Insert
                 return false;
             }
             website.InsertMainPage();
+            website.InsertPagesFromSiteMap();
+
             InsertedUris.Add(website.MainUri);
             
             return true;

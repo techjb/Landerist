@@ -9,6 +9,7 @@
             "privacid",
             "aviso",
             "legal",
+
             "filosof",
             "nosotros",
             "conozca",
@@ -32,6 +33,8 @@
             "blog",
             "vendetu",
             "condiciones",
+            "terminos",
+            "términos",
             "historia",
             "franquicia",
             "empleo",

@@ -72,7 +72,7 @@ namespace landerist_library.Scrape
             {
                 return;
             }
-            new Indexer(Page).InsertPageUrls();
+            new Indexer(Page).InsertHtmlDocumentPages();
         }
 
         private void GetListing()

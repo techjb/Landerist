@@ -1,5 +1,4 @@
 ﻿using landerist_library.Websites;
-using System.Collections.Generic;
 using System.Data;
 
 namespace landerist_library.Scrape
@@ -136,7 +135,7 @@ namespace landerist_library.Scrape
             int TotalPages = pages.Count;
             int Counter = 0;
             Parallel.ForEach(pages,
-                //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
+                new ParallelOptions() { MaxDegreeOfParallelism = 1 },
                 page =>
                 {
                     lock (SyncCounter)

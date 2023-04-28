@@ -1,6 +1,7 @@
 ﻿using Com.Bekijkhet.RobotsTxt;
 using landerist_library.Configuration;
 using landerist_library.Database;
+using landerist_library.Index;
 using System.Data;
 using System.Net;
 
@@ -118,7 +119,7 @@ namespace landerist_library.Websites
             };
 
             using var client = new HttpClient(handler);
-            client.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);            
+            client.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
             try
             {
                 HttpRequestMessage request = new(HttpMethod.Head, MainUri);
@@ -171,7 +172,7 @@ namespace landerist_library.Websites
                 IpAddress = null;
                 if (ipAddresses.Length > 0)
                 {
-                    IpAddress = ipAddresses[0].ToString();                     
+                    IpAddress = ipAddresses[0].ToString();
                 }
                 return true;
             }
@@ -258,6 +259,27 @@ namespace landerist_library.Websites
         {
             var page = new Page(this);
             return page.Insert();
+        }
+
+        public void InsertPagesFromSiteMap()
+        {
+            var siteMaps = GetSiteMaps();
+            if (siteMaps == null)
+            {
+                return;
+            }
+            var page = new Page(this);
+            new Indexer(page).InsertSitemaps(siteMaps);
+        }
+
+        public List<Sitemap>? GetSiteMaps()
+        {
+            if (RobotsTxt != null)
+            {
+                Robots ??= Robots.Load(RobotsTxt);
+                return Robots.Sitemaps;
+            }
+            return null;
         }
 
         public List<Page> GetPages()

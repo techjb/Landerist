@@ -1,5 +1,6 @@
-﻿using landerist_library.Websites;
-using Newtonsoft.Json.Linq;
+﻿using Com.Bekijkhet.RobotsTxt;
+using landerist_library.Websites;
+using Louw.SitemapParser;
 
 namespace landerist_library.Index
 {
@@ -18,7 +19,7 @@ namespace landerist_library.Index
             Page = page;
         }
 
-        public void InsertPageUrls()
+        public void InsertHtmlDocumentPages()
         {
             if (Page.HtmlDocument == null)
             {
@@ -42,6 +43,38 @@ namespace landerist_library.Index
                 Logs.Log.WriteLogErrors(Page.Uri, ecception);
             }
             Pages.Insert(Page.Website, Uris);
+        }
+
+        public void InsertSitemaps(List<Com.Bekijkhet.RobotsTxt.Sitemap> sitemaps)
+        {
+            foreach (var sitemap in sitemaps)
+            {
+                var lowSitemap = new Louw.SitemapParser.Sitemap(sitemap.Url);
+                InsertSitemaps(lowSitemap);
+            }
+        }
+
+        public void InsertSitemaps(Louw.SitemapParser.Sitemap siteMap)
+        {
+            siteMap = Task.Run(async () => await siteMap.LoadAsync()).Result;
+            if (!siteMap.IsLoaded)
+            {
+                return;
+            }
+            if (siteMap.SitemapType == SitemapType.Index)
+            {
+                foreach(var indexSiteMap in siteMap.Sitemaps)
+                {
+                    InsertSitemaps(indexSiteMap);
+                }
+            }
+            else if (siteMap.SitemapType == SitemapType.Items)
+            {
+                foreach(var item in siteMap.Items)
+                {
+
+                }
+            }
         }
 
         public void InsertUrl(string url)
