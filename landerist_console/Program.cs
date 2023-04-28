@@ -12,6 +12,8 @@ using landerist_library.Logs;
 using landerist_library.Database;
 using landerist_orels.ES;
 using System.Windows.Markup;
+using static System.Net.Mime.MediaTypeNames;
+using System.Text.RegularExpressions;
 
 namespace landerist_console
 {
@@ -49,11 +51,11 @@ namespace landerist_console
 
         private static void Run()
         {
-            //var uriPage1 = new Uri("https://www.saroga.es/inmueble/chalet-independiente-satelites-majadahonda/");
-            //var uriPage2 = new Uri("https://www.saroga.es/inmueble/piso-4-dormitorios-avenida-europa-pozuelo/");
-            //var uriPage3 = new Uri("https://www.saroga.es/inmueble/piso-monte-pilar-majadahonda/");
-            var uriPage4 = new Uri("https://www.saroga.es/inmueble/apartamento-majadahonda/");          
-            var uriPage5 = new Uri("https://www.inmolocalgestion.com/ficha-inmueble.php?id=53");
+            //var uriPage = new Uri("https://www.saroga.es/inmueble/chalet-independiente-satelites-majadahonda/");
+            //var uriPage = new Uri("https://www.saroga.es/inmueble/piso-4-dormitorios-avenida-europa-pozuelo/");
+            //var uriPage = new Uri("https://www.saroga.es/inmueble/piso-monte-pilar-majadahonda/");
+            //var uriPage = new Uri("https://www.saroga.es/inmueble/apartamento-majadahonda/");          
+            var uriPage = new Uri("https://www.inmolocalgestion.com/ficha-inmueble.php?id=53");
 
             //var uri = new Uri("https://www.goolzoom.com/");
             //var uri = new Uri("https://www.saroga.es/");
@@ -63,7 +65,7 @@ namespace landerist_console
             //var uri = new Uri("https://www.expimad.com/");
 
             var website = new Website(uri);
-            var page = new Page(website, uriPage4);
+            var page = new Page(website, uriPage);
 
 
 
@@ -83,14 +85,38 @@ namespace landerist_console
             //Websites.InsertMainPages();
 
             //new Scraper().ScrapeMainPage(website);
-            new Scraper().ScrapeNonScrapped(uri, true);
+            //new Scraper().ScrapeNonScrapped(uri, true);
             //new Scraper().ScrapeUnknowIsListing(uri, true);
             //new Scraper().ScrapeIsNotListing(uri);
-            //new Scraper().ScrapePage(page);
+            new Scraper().ScrapePage(page);
             //new Scraper().ScrapeAllPages();
 
             //Csv.Export(true);
             //Json.Export(true);
+
+            //string regexPattern = @"latitude\s*=\s*(-?\d+(\.\d+)?)\s*,\s*longitude\s*=\s*(-?\d+(\.\d+)?)";
+            //string text = "latitude=40.504108,longitude=-3.888549 cca de perro latitude = 28.504108 , longitude = -10.888549";
+
+            //string regexPattern = @"lat\s*:\s*(-?\d+\.\d+)\s*,\s*lng\s*:\s*(-?\d+\.\d+)";
+            //string text = "lat:40.504108,lng:-3.888549 cca de perro lat: 28.504108 , lng: -10.888549";
+
+            //string regexPattern = @"LatLng\s*\(\s*(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)\s*\)";
+            //string text = " lola LatLng( 40.504108 , -3.888549 ) LatLng (28.504108 , -10.888549) misers";
+
+            //string text = "acasca";
+            //var matches = new Regex(regexPattern).Matches(text);
+            //foreach (Match match in matches)
+            //{
+            //    string latitude;
+            //    string longitude;
+            //    switch (match.Groups.Count)
+            //    {
+            //        case 3: latitude = match.Groups[1].Value; longitude = match.Groups[2].Value; break;
+            //        case 5: latitude = match.Groups[1].Value; longitude = match.Groups[3].Value; break;
+            //        default: continue;
+            //    }
+
+            //}          
         }
 
         private static void EndBeep()

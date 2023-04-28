@@ -44,6 +44,8 @@ namespace landerist_library.Parse
             AddNumberProperty(list, nameof(PrecioDelAnuncio));
             AddStringProperty(list, nameof(DescripciónDelAnuncio));
             AddStringProperty(list, nameof(ReferenciaDelAnuncio));
+            AddStringProperty(list, nameof(TeléfonoDeContacto));
+            AddStringProperty(list, nameof(EmailDeContacto));
             AddStringProperty(list, nameof(DirecciónDelInmueble));
             AddStringProperty(list, nameof(RererenciaCatastral));
             AddNumberProperty(list, nameof(TamañoDelInmueble));
@@ -84,7 +86,6 @@ namespace landerist_library.Parse
             JObject jObject = JObject.Parse(json);
             return jObject.ToString(Formatting.Indented);
         }
-
 
         private static void AddStringProperty(List<string> list, string name)
         {

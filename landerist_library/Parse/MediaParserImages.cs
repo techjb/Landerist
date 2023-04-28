@@ -41,7 +41,7 @@ namespace landerist_library.Parse
                 var media = ParseImage(node, attributeValue);
                 if (media != null)
                 {
-                    MediaParser.Medias.Add(media);
+                    MediaParser.Media.Add(media);
                 }
             }
         }

@@ -47,7 +47,7 @@ namespace landerist_library.Parse
                             mediaType = MediaType.video,
                             url = uri
                         };
-                        MediaParser.Medias.Add(media);
+                        MediaParser.Media.Add(media);
                     }
                 }
             }

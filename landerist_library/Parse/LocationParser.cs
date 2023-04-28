@@ -28,13 +28,16 @@ namespace landerist_library.Parse
             {
                 return;
             }
+            if (LocationFound)
+            {
+                return;
+            }
             GetLocationIframeGoogleMaps(Page.HtmlDocument);
             if (LocationFound)
             {
                 return;
             }
             GetLocationRegex(Page.HtmlDocument);
-
         }
 
         private void GetLocationIframeGoogleMaps(HtmlDocument htmlDocument)
@@ -88,30 +91,41 @@ namespace landerist_library.Parse
         {
             List<string> listRegex = new()
             {
-                @"latitude=(-?\d+(\.\d+)?),\s*longitude=(-?\d+(\.\d+)?)",
-                @"lat:\s*(-?\d+\.\d+)\s*,\s*lng:\s*(-?\d+\.\d+)",
-
+                @"(latitude|lat|latitud)\s*(=|:)\s*(-?\d+(\.\d+)?)\s*(,|;)\s*(longitude|lng|longitud)\s*(=|:)\s*(-?\d+(\.\d+)?)",
+                @"LatLng\s*\(\s*(-?\d+\.\d+)\s*(,|\s*)\s*(-?\d+\.\d+)\s*\)"
             };
-            foreach(var regex in listRegex)
+            foreach (var regex in listRegex)
             {
                 if (LocationFound)
                 {
                     break;
                 }
-                GetLocationRegex(htmlDocument, regex);
+                GetLocationRegex(htmlDocument.DocumentNode.InnerHtml, regex);
             }
         }
 
-        private void GetLocationRegex(HtmlDocument htmlDocument, string regexPattern)
+        public void GetLocationRegex(string text, string regexPattern)
         {
-            var regex = new Regex(regexPattern);
-            var match = regex.Match(htmlDocument.DocumentNode.InnerHtml);
-
-            if (match.Success)
+            var matches = new Regex(regexPattern).Matches(text);
+            foreach (Match match in matches.Cast<Match>())
             {
-                string latitude = match.Groups[1].Value;
-                string longitude = match.Groups[2].Value;
-                SetLocation(latitude, longitude);
+                if (LocationFound)
+                {
+                    return;
+                }
+
+                string? latitude;
+                string? longitude;
+                switch (match.Groups.Count)
+                {
+                    case 3: latitude = match.Groups[1].Value; longitude = match.Groups[2].Value; break;
+                    case 5: latitude = match.Groups[1].Value; longitude = match.Groups[3].Value; break;
+                    default: continue;
+                }
+                if (latitude != null && longitude != null)
+                {
+                    SetLocation(latitude, longitude);
+                }
             }
         }
 

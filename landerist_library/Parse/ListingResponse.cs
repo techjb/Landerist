@@ -30,6 +30,12 @@ namespace landerist_library.Parse
         [JsonProperty("referencia del anuncio")]
         public string? ReferenciaDelAnuncio { get; set; } = null;
 
+        [JsonProperty("teléfono de contacto")]
+        public string? TeléfonoDeContacto { get; set; } = null;
+
+        [JsonProperty("email de contacto")]
+        public string? EmailDeContacto { get; set; } = null;
+
         [JsonProperty("dirección del inmueble")]
         public string? DirecciónDelInmueble { get; set; } = null;
 
@@ -173,19 +179,21 @@ namespace landerist_library.Parse
                 propertyType = GetPropertyType(),
                 propertySubtype = GetPropertySubtype(),
                 price = GetPropertyPrice(),
-                description = GetDescription(),
+                description = DescripciónDelAnuncio,
                 dataSourceName = GetDataSourceName(page),
-                dataSourceGuid = GetDataSourceGuid(),
+                dataSourceGuid = ReferenciaDelAnuncio,
                 dataSourceUpdate = GetDataSourceUpdate(),
                 dataSourceUrl = GetDataSourceUrl(page),
-                address = GetAddress(),
-                cadastralReference = GetCadastralReference(),
-                propertySize = GetPropertySize(),
-                landSize = GetLandSize(),
+                contactPhone = TeléfonoDeContacto,
+                contactEmail = EmailDeContacto,
+                address = DirecciónDelInmueble,
+                cadastralReference = RererenciaCatastral,
+                propertySize = TamañoDelInmueble,
+                landSize = TamañoDeLaParcela,
                 constructionYear = GetConstrunctionYear(),
                 constructionStatus = GetConstructionStatus(),
                 floors = GetFloors(),
-                floor = GetFloor(),
+                floor = PlantaDelInmueble,
                 bedrooms = GetBedrooms(),
                 bathrooms = GetBathrooms(),
                 parkings = GetParkings(),
@@ -421,19 +429,9 @@ namespace landerist_library.Parse
             return new Price((decimal)PrecioDelAnuncio, Currency.EUR);
         }
 
-        private string? GetDescription()
-        {
-            return DescripciónDelAnuncio;
-        }
-
         private static string GetDataSourceName(Page page)
         {
             return page.Website.Host;
-        }
-
-        private string? GetDataSourceGuid()
-        {
-            return ReferenciaDelAnuncio;
         }
 
         private static DateTime GetDataSourceUpdate()
@@ -445,26 +443,7 @@ namespace landerist_library.Parse
         {
             return page.Uri;
         }
-
-        private string? GetAddress()
-        {
-            return DirecciónDelInmueble;
-        }
-
-        private string? GetCadastralReference()
-        {
-            return RererenciaCatastral;
-        }
-
-        private double? GetPropertySize()
-        {
-            return TamañoDelInmueble;
-        }
-
-        private double? GetLandSize()
-        {
-            return TamañoDeLaParcela;
-        }
+        
 
         private int? GetConstrunctionYear()
         {
@@ -490,11 +469,6 @@ namespace landerist_library.Parse
         private int? GetFloors()
         {
             return (int?)PlantasDelEdificio;
-        }
-
-        private string? GetFloor()
-        {
-            return PlantaDelInmueble;
         }
 
         private int? GetBedrooms()

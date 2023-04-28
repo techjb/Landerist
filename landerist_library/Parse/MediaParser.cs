@@ -7,7 +7,7 @@ namespace landerist_library.Parse
     {
         public readonly Page Page;
 
-        public readonly SortedSet<Media> Medias = new(new MediaComparer());
+        public readonly SortedSet<Media> Media = new(new MediaComparer());
 
         public MediaParser(Page page)
         {
@@ -23,7 +23,7 @@ namespace landerist_library.Parse
             }
             new MediaParserImages(this).GetImages();
             new MediaParserVideos(this).GetVideos();            
-            listing.SetMedia(Medias);
+            listing.SetMedia(Media);
         }
 
         private void InitHtmlDocument()
