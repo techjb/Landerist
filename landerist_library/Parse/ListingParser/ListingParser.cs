@@ -2,7 +2,7 @@
 using landerist_orels.ES;
 using Newtonsoft.Json;
 
-namespace landerist_library.Parse
+namespace landerist_library.Parse.ListingParser
 {
     public class ListingParser
     {
@@ -32,7 +32,7 @@ namespace landerist_library.Parse
             return
                 !string.IsNullOrEmpty(Page.ResponseBodyText) &&
                 ChatGPT.IsLengthAllowed(Page.ResponseBodyText);
-        }        
+        }
 
         private void RequestListing()
         {
@@ -58,10 +58,10 @@ namespace landerist_library.Parse
                     IsListing = Listing != null;
                 }
             }
-            catch(Exception exception) 
+            catch (Exception exception)
             {
                 //Logs.Log.WriteLogErrors(Page.Uri, exception);
-            }   
+            }
         }
     }
 }

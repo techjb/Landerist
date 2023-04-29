@@ -105,13 +105,10 @@ namespace landerist_library.Websites
             });
         }
 
-        public static void Insert(Website website, List<Uri> uris)
+        public static void Insert(Website website, Uri uri)
         {
-            foreach (var uri in uris)
-            {
-                var page = new Page(website, uri);
-                page.Insert();
-            }
+            var page = new Page(website, uri);
+            page.Insert();
         }
     }
 }

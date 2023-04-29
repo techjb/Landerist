@@ -1,7 +1,9 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Index;
-using landerist_library.Parse;
+using landerist_library.Parse.ListingParser;
+using landerist_library.Parse.LocationParser;
+using landerist_library.Parse.MediaParser;
 using landerist_library.Websites;
 
 namespace landerist_library.Scrape
@@ -72,7 +74,7 @@ namespace landerist_library.Scrape
             {
                 return;
             }
-            new Indexer(Page).InsertHtmlDocumentPages();
+            new HtmlIndexer(Page).InsertHyperlinks();
         }
 
         private void GetListing()

@@ -4,7 +4,7 @@ using landerist_orels.ES;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace landerist_library.Parse
+namespace landerist_library.Parse.LocationParser
 {
     public class LocationParser
     {

@@ -2,7 +2,7 @@
 using landerist_orels.ES;
 using Newtonsoft.Json;
 
-namespace landerist_library.Parse
+namespace landerist_library.Parse.ListingParser
 {
     public class ListingResponse
     {
@@ -443,7 +443,7 @@ namespace landerist_library.Parse
         {
             return page.Uri;
         }
-        
+
 
         private int? GetConstrunctionYear()
         {

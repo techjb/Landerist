@@ -25,6 +25,10 @@
             "yi", "yo", "za", "zu"
         };
 
+        public static bool ContainsNotAllowedES(Uri uri)
+        {
+            return ContainsNotAllowed(uri, "es");
+        }
         public static bool ContainsNotAllowed(Uri uri, string allowedLanguage)
         {
             string absolutePath = uri.AbsolutePath;
@@ -36,17 +40,34 @@
                 {
                     continue;
                 }
-                string language = path;
-                if (path.Contains('-'))
+                if (ContainsNotAllowed(path, allowedLanguage))
                 {
-                    language = path.Split('-')[0];
-                }
+                    return true;
+                }              
+            }
+            return false;
+        }
 
-                if (string.Equals(language, allowedLanguage, StringComparison.OrdinalIgnoreCase))
+        protected static bool ContainsNotAllowed(string path, string allowedLanguage)
+        {
+            string[] pathItems = new string[] { path };
+            if (path.Contains('-'))
+            {
+                pathItems = path.Split('-');
+            }
+
+            if (pathItems.Length > 3)
+            {
+                return false;
+            }
+
+            foreach (var pathItem in pathItems)
+            {
+                if (string.Equals(pathItem, allowedLanguage, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
-                if (Iso6391Codes.Contains(language))
+                if (Iso6391Codes.Contains(pathItem))
                 {
                     return true;
                 }

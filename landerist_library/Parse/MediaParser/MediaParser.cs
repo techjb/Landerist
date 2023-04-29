@@ -1,7 +1,7 @@
 ﻿using landerist_library.Websites;
 using landerist_orels.ES;
 
-namespace landerist_library.Parse
+namespace landerist_library.Parse.MediaParser
 {
     public class MediaParser
     {
@@ -22,7 +22,7 @@ namespace landerist_library.Parse
                 return;
             }
             new MediaParserImages(this).GetImages();
-            new MediaParserVideos(this).GetVideos();            
+            new MediaParserVideos(this).GetVideos();
             listing.SetMedia(Media);
         }
 

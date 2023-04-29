@@ -2,7 +2,7 @@
 using landerist_orels.ES;
 using System.Text.RegularExpressions;
 
-namespace landerist_library.Parse
+namespace landerist_library.Parse.MediaParser
 {
     public class MediaParserVideos
     {

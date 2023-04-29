@@ -1,129 +1,53 @@
-﻿using Com.Bekijkhet.RobotsTxt;
-using landerist_library.Websites;
-using Louw.SitemapParser;
+﻿using landerist_library.Websites;
 
 namespace landerist_library.Index
 {
     public class Indexer
     {
-        private readonly Page Page;
+        protected readonly Page Page;
 
-        private readonly List<Uri> Uris = new();
+        private readonly HashSet<Uri> Inserted = new();
 
         private static readonly string[] MultimediaExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".mp3", ".mp4", ".avi", ".mov", ".mkv", ".flv", ".ogg", ".webm" };
 
         private static readonly string[] WebPageExtensions = { ".htm", ".html", ".xhtml", ".asp", ".aspx", ".php", ".jsp", ".cshtml", ".vbhtml", "razor" };
+
+
+        public Indexer(Website website) : this(new Page(website))
+        {
+
+        }
 
         public Indexer(Page page)
         {
             Page = page;
         }
 
-        public void InsertHtmlDocumentPages()
-        {
-            if (Page.HtmlDocument == null)
-            {
-                return;
-            }
-            try
-            {
-                var urls = Page.HtmlDocument.DocumentNode.Descendants("a")
-                   .Where(a => !a.Attributes["rel"]?.Value.Contains("nofollow") ?? true)
-                   .Select(a => a.Attributes["href"]?.Value)
-                   .Where(href => !string.IsNullOrWhiteSpace(href))
-                   .ToList();
-
-                if (urls != null)
-                {
-                    AddUrls(urls);
-                }
-            }
-            catch (Exception ecception)
-            {
-                Logs.Log.WriteLogErrors(Page.Uri, ecception);
-            }
-            Pages.Insert(Page.Website, Uris);
-        }
-
-        public void InsertSitemaps(List<Com.Bekijkhet.RobotsTxt.Sitemap> sitemaps)
-        {
-            foreach (var sitemap in sitemaps)
-            {
-                var lowSitemap = new Louw.SitemapParser.Sitemap(sitemap.Url);
-                InsertSitemaps(lowSitemap);
-            }
-        }
-
-        public void InsertSitemaps(Louw.SitemapParser.Sitemap siteMap)
-        {
-            siteMap = Task.Run(async () => await siteMap.LoadAsync()).Result;
-            if (!siteMap.IsLoaded)
-            {
-                return;
-            }
-            if (siteMap.SitemapType == SitemapType.Index)
-            {
-                foreach(var indexSiteMap in siteMap.Sitemaps)
-                {
-                    InsertSitemaps(indexSiteMap);
-                }
-            }
-            else if (siteMap.SitemapType == SitemapType.Items)
-            {
-                foreach(var item in siteMap.Items)
-                {
-
-                }
-            }
-        }
-
-        public void InsertUrl(string url)
-        {
-            AddUri(url);
-            Pages.Insert(Page.Website, Uris);
-        }
-
-        private void AddUrls(List<string?> urls)
+        public void InsertUrls(List<string?> urls)
         {
             urls = urls.Distinct().ToList();
             foreach (var url in urls)
             {
                 if (url != null)
                 {
-                    AddUri(url);
+                    InsertUrl(url);
                 }
             }
         }
 
-        private void AddUri(string url)
-        {
-            try
-            {
-                var uri = GetUri(url);
-                if (uri != null && !Uris.Contains(uri))
-                {
-                    Uris.Add(uri);
-                }
-            }
-            catch (Exception ecception)
-            {
-                Logs.Log.WriteLogErrors(Page.Uri, ecception);
-            }
-        }
-
-        private Uri? GetUri(string? link)
+        public void InsertUrl(string? link)
         {
             if (link == null)
             {
-                return null;
+                return;
             }
             if (!Uri.TryCreate(Page.Uri, link, out Uri? uri))
             {
-                return null;
+                return;
             }
             if (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)
             {
-                return null;
+                return;
             }
             // build without fragments #fragment1..
             UriBuilder uriBuilder = new(uri) // 
@@ -140,35 +64,48 @@ namespace landerist_library.Index
             //    Port = uri.Port,
             //    Path = uri.AbsolutePath
             //};
-            uri = uriBuilder.Uri;
+            //
+            InsertUri(uriBuilder.Uri);
+        }
+
+        protected void InsertUri(Uri uri)
+        {
+            if (Inserted.Contains(uri))
+            {
+                return;
+            }
             if (ProhibitedWords.Contains(uri))
             {
-                return null;
-            }
+                return;
+            }           
             if (!IsWebPage(uri))
             {
-                return null;
+                return;
             }
-            if (Languages.ContainsNotAllowed(uri, "es"))
+            if (Languages.ContainsNotAllowedES(uri))
             {
-                return null;
+                return;
             }
             if (!uri.Host.Equals(Page.Host) || uri.Equals(Page.Uri))
             {
-                return null;
+                return;
             }
-            if (Page.Website != null)
+            if (Page.Website == null)
             {
-                if (!Page.Website.IsUriAllowed(uri))
-                {
-                    return null;
-                }
-                if (Page.Website.MainUri.Equals(uri))
-                {
-                    return null;
-                }
+                return;
             }
-            return uri;
+
+            if (!Page.Website.IsUriAllowed(uri))
+            {
+                return;
+            }
+            if (Page.Website.MainUri.Equals(uri))
+            {
+                return;
+            }
+
+            Pages.Insert(Page.Website, uri);
+            Inserted.Add(uri);
         }
 
         private static bool IsMultimediaPage(Uri uri)

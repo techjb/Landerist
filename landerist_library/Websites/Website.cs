@@ -267,9 +267,8 @@ namespace landerist_library.Websites
             if (siteMaps == null)
             {
                 return;
-            }
-            var page = new Page(this);
-            new Indexer(page).InsertSitemaps(siteMaps);
+            }            
+            new SitemapIndexer(this).InsertSitemaps(siteMaps);
         }
 
         public List<Sitemap>? GetSiteMaps()

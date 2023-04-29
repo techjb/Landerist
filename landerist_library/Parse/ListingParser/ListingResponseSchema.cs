@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System.Reflection;
 
-namespace landerist_library.Parse
+namespace landerist_library.Parse.ListingParser
 {
     public class ListingResponseSchema : ListingResponse
     {
@@ -12,7 +12,7 @@ namespace landerist_library.Parse
 
             AddStringProperty(list, nameof(FechaDePublicación));
             AddEnumProperty(list, nameof(TipoDeOperacion), new string[] {
-                OPERACION_VENTA, 
+                OPERACION_VENTA,
                 OPERACION_ALQUILER
             });
             AddEnumProperty(list, nameof(TipoDeInmueble), new string[] {

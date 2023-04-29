@@ -1,7 +1,7 @@
 ﻿using HtmlAgilityPack;
 using landerist_orels.ES;
 
-namespace landerist_library.Parse
+namespace landerist_library.Parse.MediaParser
 {
     public class MediaParserImages
     {
@@ -57,7 +57,7 @@ namespace landerist_library.Parse
             {
                 return null;
             }
-            
+
             string extension = Path.GetExtension(attributeValue).ToLower();
             if (!extension.StartsWith(".jpg") && !extension.StartsWith(".jpeg"))
             {

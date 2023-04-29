@@ -1,6 +1,6 @@
 ﻿using HtmlAgilityPack;
 
-namespace landerist_library.Parse
+namespace landerist_library.Parse.ListingParser
 {
     public class HtmlToText
     {
@@ -56,7 +56,7 @@ namespace landerist_library.Parse
                    ;
 
             var visibleText = visibleNodes.Select(n => n.InnerHtml.Trim());
-            
+
             HtmlText = string.Join(Environment.NewLine, visibleText);
         }
     }

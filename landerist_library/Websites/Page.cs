@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using HtmlAgilityPack;
 using landerist_library.Database;
-using landerist_library.Parse;
+using landerist_library.Parse.ListingParser;
 
 namespace landerist_library.Websites
 {
