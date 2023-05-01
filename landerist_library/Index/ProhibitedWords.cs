@@ -55,7 +55,7 @@
                .Replace("/", string.Empty)
                .ToLower()
                ;
-            foreach(string word in ES)
+            foreach (string word in ES)
             {
                 if (absolutePath.StartsWith(word))
                 {

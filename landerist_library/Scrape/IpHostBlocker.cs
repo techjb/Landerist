@@ -2,7 +2,7 @@
 
 namespace landerist_library.Scrape
 {
-    public class TempBlocker
+    public class IpHostBlocker
     {
         private readonly Dictionary<string, DateTime> IpBlocker = new();
 
@@ -37,13 +37,13 @@ namespace landerist_library.Scrape
             Add(HostBlocker, website.Host, hostBlockUntil);
         }
 
-        private DateTime CalculateBlockUntil()
+        private static DateTime CalculateBlockUntil()
         {
             int secconds = RandomSecconds();
             return DateTime.Now.AddSeconds(secconds);
         }
 
-        private DateTime CalculateBlockUntil(Website website)
+        private static DateTime CalculateBlockUntil(Website website)
         {
             int randomSecconds = RandomSecconds();
             long crawDelay = website.CrawlDelay();

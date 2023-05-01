@@ -63,8 +63,36 @@ namespace landerist_library.Scrape
 
         private void DownloadSucess()
         {
+            if (!HtmInLanguage())
+            {
+                new LinkAlternateIndexer(Page).Insert();
+                return;
+            }
             InsertPages();
             GetListing();
+        }
+
+        private bool HtmInLanguage()
+        {
+            Page.LoadHtmlDocument();
+            if (Page.HtmlDocument != null)
+            {
+                var htmlNode = Page.HtmlDocument.DocumentNode.SelectSingleNode("/html");
+                if (htmlNode != null)
+                {
+                    var langAttr = htmlNode.Attributes["lang"];
+                    if (langAttr != null)
+                    {
+                        var language = langAttr.Value.ToLower();
+                        if (language.Contains('-'))
+                        {
+                            language = language.Split('-')[0];
+                        }
+                        return language.Equals(Page.Website.Language);
+                    }
+                }
+            }
+            return true;
         }
 
         private void InsertPages()
@@ -74,7 +102,7 @@ namespace landerist_library.Scrape
             {
                 return;
             }
-            new HtmlIndexer(Page).InsertHyperlinks();
+            new HyperlinksIndexer(Page).Insert();
         }
 
         private void GetListing()
@@ -89,7 +117,7 @@ namespace landerist_library.Scrape
             if (listing != null)
             {
                 new LocationParser(Page, listing).SetLocation();
-                new MediaParser(Page).AddMedia(listing);                
+                new MediaParser(Page).AddMedia(listing);
                 ES_Listings.InsertUpdate(listing);
             }
         }
@@ -101,7 +129,7 @@ namespace landerist_library.Scrape
                 return;
             }
             int code = (int)Page.HttpStatusCode;
-            if(code >= 300 && code < 400)
+            if (code >= 300 && code < 400)
             {
                 DownloadErrorRedirect();
             };
@@ -119,8 +147,8 @@ namespace landerist_library.Scrape
                 if (redirectUrl != null)
                 {
                     new Indexer(Page).InsertUrl(redirectUrl);
-                }                
-            }            
+                }
+            }
         }
     }
 }

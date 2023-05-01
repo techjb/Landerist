@@ -1,19 +1,7 @@
-﻿using landerist_library.Insert;
+﻿using landerist_library.Configuration;
+using landerist_library.Insert;
 using landerist_library.Scrape;
 using landerist_library.Websites;
-using landerist_library.Export;
-using System.Reflection.Metadata;
-using System.Text;
-using landerist_library.Parse;
-using Newtonsoft.Json;
-using landerist_library.Configuration;
-using System;
-using landerist_library.Logs;
-using landerist_library.Database;
-using landerist_orels.ES;
-using System.Windows.Markup;
-using static System.Net.Mime.MediaTypeNames;
-using System.Text.RegularExpressions;
 
 namespace landerist_console
 {
@@ -55,7 +43,7 @@ namespace landerist_console
             //var uriPage = new Uri("https://www.saroga.es/inmueble/piso-4-dormitorios-avenida-europa-pozuelo/");
             //var uriPage = new Uri("https://www.saroga.es/inmueble/piso-monte-pilar-majadahonda/");
             //var uriPage = new Uri("https://www.saroga.es/inmueble/apartamento-majadahonda/");          
-            var uriPage = new Uri("https://www.inmolocalgestion.com/ficha-inmueble.php?id=53");
+            //var uriPage = new Uri("https://www.inmolocalgestion.com/ficha-inmueble.php?id=53");
 
             //var uri = new Uri("https://www.goolzoom.com/");
             //var uri = new Uri("https://www.saroga.es/");
@@ -63,12 +51,13 @@ namespace landerist_console
             //var uri = new Uri("https://www.saguar.immo/");
             //var uri = new Uri("https://www.inmolocalgestion.com/");
             var uri = new Uri("https://www.expimad.com/");
+            //var uri = new Uri("https://www.prorealty.es/");
 
             var website = new Website(uri);
-            var page = new Page(website, uriPage);
+            //var page = new Page(website, uriPage);
 
             //website.Remove(); return;
-            new WebsitesInserter(false).RemoveAndInsert(uri); return;
+            //new WebsitesInserter(false).RemoveAndInsert(uri); return;
             //new WebsitesInserter(false).Insert(uri);
             //new WebsitesInserter().FromCsv();            
 
@@ -82,7 +71,7 @@ namespace landerist_console
             //Websites.InsertMainPages();
 
             //new Scraper().ScrapeMainPage(website);
-            //new Scraper().ScrapeNonScrapped(uri);
+            new Scraper().ScrapeNonScrapped(uri);
             //new Scraper().ScrapeUnknowIsListing(uri, true);
             //new Scraper().ScrapeIsNotListing(uri);
             //new Scraper().ScrapePage(page);
@@ -119,7 +108,7 @@ namespace landerist_console
         private static void EndBeep()
         {
             int counter = 0;
-            while (counter < 3)
+            while (counter < 1)
             {
                 counter++;
                 Console.Beep(400, 1000);

@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json.Converters;
-using Newtonsoft.Json;
-using landerist_orels.ES;
+﻿using landerist_library.Configuration;
 using landerist_library.Database;
-using landerist_library.Configuration;
+using landerist_orels.ES;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace landerist_library.Export
 {
@@ -31,7 +31,7 @@ namespace landerist_library.Export
             {
                 string zipFile = Config.EXPORT_DIRECTORY + ZIP_FILE_NAME;
                 File.Delete(zipFile);
-                return new Zip().Export(jsonFile, zipFile);
+                Zip.Export(jsonFile, zipFile);
             }
             return true;
         }

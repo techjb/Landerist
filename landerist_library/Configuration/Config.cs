@@ -13,7 +13,7 @@
 
         public const string DATABASE_USER = PrivateConfig.DATABASE_USER;
 
-        public const string DATABASE_PW = PrivateConfig.DATABASE_PW;        
+        public const string DATABASE_PW = PrivateConfig.DATABASE_PW;
 
         private static readonly string CONNECTION_USER =
             "User ID=" + DATABASE_USER + ";" +

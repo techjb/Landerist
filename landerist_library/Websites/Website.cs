@@ -22,6 +22,9 @@ namespace landerist_library.Websites
 
         private Robots? Robots = null;
 
+        
+        public string Language = "es";
+
         public Website()
         {
             MainUri = new Uri("about:blank", UriKind.RelativeOrAbsolute);
@@ -263,12 +266,23 @@ namespace landerist_library.Websites
 
         public void InsertPagesFromSiteMap()
         {
-            var siteMaps = GetSiteMaps();
-            if (siteMaps == null)
+            var sitemaps = GetSiteMaps();
+            if (sitemaps == null || sitemaps.Count.Equals(0))
             {
+                var uri = GetDefaultSiteMap();
+                if (uri != null)
+                {
+                    new SitemapIndexer(this).InsertSitemap(uri);
+                }
                 return;
-            }            
-            new SitemapIndexer(this).InsertSitemaps(siteMaps);
+            }
+            new SitemapIndexer(this).InsertSitemaps(sitemaps);
+        }
+
+        private Uri? GetDefaultSiteMap()
+        {
+            Uri.TryCreate(MainUri, "sitemap.xml", out Uri? uri);
+            return uri;
         }
 
         public List<Sitemap>? GetSiteMaps()
@@ -283,22 +297,22 @@ namespace landerist_library.Websites
 
         public List<Page> GetPages()
         {
-            return new Pages().GetPages(this);
+            return Pages.GetPages(this);
         }
 
         public List<Page> GetNonScrapedPages()
         {
-            return new Pages().GetNonScrapedPages(this);
+            return Pages.GetNonScrapedPages(this);
         }
 
         public List<Page> GetUnknowIsListingPages()
         {
-            return new Pages().GetUnknowIsListingPages(this);
+            return Pages.GetUnknowIsListingPages(this);
         }
 
         public List<Page> GetIsNotListingPages()
         {
-            return new Pages().GetIsNotListingPages(this);
+            return Pages.GetIsNotListingPages(this);
         }
     }
 }

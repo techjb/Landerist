@@ -2,7 +2,7 @@
 {
     internal class BlockedDomains
     {
-        private static readonly HashSet<string> Domains = new ()
+        private static readonly HashSet<string> Domains = new()
         {
             "idealista.com",
             "fotocasa.es",

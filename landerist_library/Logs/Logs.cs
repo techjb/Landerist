@@ -1,6 +1,6 @@
-﻿using System.Data;
-using landerist_library.Configuration;
+﻿using landerist_library.Configuration;
 using landerist_library.Database;
+using System.Data;
 
 namespace landerist_library.Logs
 {
@@ -17,7 +17,7 @@ namespace landerist_library.Logs
             {
                 return;
             }
-            if (Environment.UserInteractive && 
+            if (Environment.UserInteractive &&
                 !Config.IsConfigurationProduction())
             {
                 Console.WriteLine(logKey.ToString() + ": " + text);

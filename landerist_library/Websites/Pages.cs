@@ -19,10 +19,10 @@ namespace landerist_library.Websites
                 "SELECT * " +
                 "FROM " + TABLE_PAGES + " ";
 
-            return new DataBase().QueryTable(query);            
+            return new DataBase().QueryTable(query);
         }
 
-        public List<Page> GetPages(Website website)
+        public static List<Page> GetPages(Website website)
         {
             string query =
                 "SELECT * " +
@@ -36,7 +36,7 @@ namespace landerist_library.Websites
             return GetPages(website, dataTable);
         }
 
-        public List<Page> GetNonScrapedPages(Website website)
+        public static List<Page> GetNonScrapedPages(Website website)
         {
             string query =
                 "SELECT * " +
@@ -51,7 +51,7 @@ namespace landerist_library.Websites
             return GetPages(website, dataTable);
         }
 
-        public List<Page> GetUnknowIsListingPages(Website website)
+        public static List<Page> GetUnknowIsListingPages(Website website)
         {
             string query =
                 "SELECT * " +
@@ -67,7 +67,7 @@ namespace landerist_library.Websites
         }
 
 
-        public List<Page> GetIsNotListingPages(Website website)
+        public static List<Page> GetIsNotListingPages(Website website)
         {
             string query =
                 "SELECT * " +

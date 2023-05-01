@@ -1,5 +1,4 @@
 ﻿using landerist_library.Websites;
-using System.Data;
 
 namespace landerist_library.Insert
 {
@@ -25,33 +24,6 @@ namespace landerist_library.Insert
             }
         }
 
-        public void FromCsv()
-        {
-            string file = @"E:\Landerist\Csv\Base_de_datos\Excel\Pedido_completo.csv";
-            Console.WriteLine("Reading " + file);
-            DataTable dataTable = CsvReader.ReadFile(file, ';');
-
-            List<Uri> uris = new();
-            foreach (DataRow row in dataTable.Rows)
-            {
-                string url = row["SITIO WEB"].ToString() ?? string.Empty;
-                if (url.Equals(string.Empty))
-                {
-                    continue;
-                }
-                try
-                {
-                    Uri uri = new(url);
-                    if (!uris.Contains(uri))
-                    {
-                        uris.Add(uri);
-                    }
-                }
-                catch { }
-            }
-            Insert(uris);
-        }
-
         public void RemoveAndInsert(Uri uri)
         {
             Website website = new(uri);
@@ -64,7 +36,6 @@ namespace landerist_library.Insert
             Insert(website.MainUri);
         }
 
-
         public void Insert(string url)
         {
             if (Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
@@ -73,7 +44,7 @@ namespace landerist_library.Insert
             }
         }
 
-        public void Insert(Uri uri)
+        public static void Insert(Uri uri)
         {
             var list = new List<Uri>()
             {
@@ -82,13 +53,13 @@ namespace landerist_library.Insert
             Insert(list);
         }
 
-        public void Insert(List<Uri> uris)
+        public static void Insert(List<Uri> uris)
         {
             HashSet<Uri> hashSet = new(uris);
             Insert(hashSet);
         }
 
-        private void Insert(HashSet<Uri> uris)
+        private static void Insert(HashSet<Uri> uris)
         {
             int inserted = 0;
             int errors = 0;
@@ -171,7 +142,7 @@ namespace landerist_library.Insert
             website.InsertPagesFromSiteMap();
 
             InsertedUris.Add(website.MainUri);
-            
+
             return true;
         }
     }

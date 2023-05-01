@@ -11,39 +11,59 @@ namespace landerist_library.Index
         {
             foreach (var sitemap in sitemaps)
             {
-                var lowSitemap = new Sitemap(sitemap.Url);
-                InsertSitemap(lowSitemap);
+                InsertSitemap(sitemap.Url);                
             }
         }
 
-        public void InsertSitemap(Sitemap siteMap)
+        public void InsertSitemap(Uri uri)
         {
-            if (!siteMap.IsLoaded)
-            {
-                siteMap = Task.Run(async () => await siteMap.LoadAsync()).Result;                
-            }
-            if (!siteMap.IsLoaded)
+            var sitemap = new Sitemap(uri);
+            InsertSitemap(sitemap);
+        }
+
+        private void InsertSitemap(Sitemap sitemap)
+        {
+            if (!IsValidSitemap(sitemap))
             {
                 return;
             }
-            if (siteMap.SitemapType == SitemapType.Index)
+            if (!sitemap.IsLoaded)
             {
-                foreach (var indexSiteMap in siteMap.Sitemaps)
-                {
-                    if (Languages.ContainsNotAllowedES(indexSiteMap.SitemapLocation))
-                    {
-                        continue;
-                    }
-                    InsertSitemap(indexSiteMap);
-                }                
+                sitemap = DownloadSitemap(sitemap);
             }
-            else if (siteMap.SitemapType == SitemapType.Items)
+            if (!sitemap.IsLoaded)
             {
-                foreach (var item in siteMap.Items)
+                return;
+            }
+            if (sitemap.SitemapType == SitemapType.Index)
+            {
+                foreach (var indexSiteMap in sitemap.Sitemaps)
+                {
+                    InsertSitemap(indexSiteMap);
+                }
+            }
+            else if (sitemap.SitemapType == SitemapType.Items)
+            {
+                foreach (var item in sitemap.Items)
                 {
                     InsertUri(item.Location);
                 }
             }
+        }
+
+        private static Sitemap DownloadSitemap(Sitemap siteMap)
+        {
+            try
+            {
+                siteMap = Task.Run(async () => await siteMap.LoadAsync()).Result;
+            }
+            catch { }
+            return siteMap;
+        }
+
+        private static bool IsValidSitemap(Sitemap sitemap)
+        {
+            return !Languages.ContainsNotAllowed(sitemap.SitemapLocation, Page.Website.Language);
         }
     }
 }

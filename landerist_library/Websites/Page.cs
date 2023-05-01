@@ -1,9 +1,9 @@
-﻿using System.Data;
-using System.Security.Cryptography;
-using System.Text;
-using HtmlAgilityPack;
+﻿using HtmlAgilityPack;
 using landerist_library.Database;
 using landerist_library.Parse.ListingParser;
+using System.Data;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace landerist_library.Websites
 {
@@ -37,8 +37,8 @@ namespace landerist_library.Websites
         {
 
         }
-        
-        public Page(Website website, string url): this(website, new Uri(url))
+
+        public Page(Website website, string url) : this(website, new Uri(url))
         {
 
         }
@@ -148,7 +148,7 @@ namespace landerist_library.Websites
             return true;
         }
 
-        
+
         public void LoadHtmlDocument(bool forceReload = false)
         {
             if (HtmlDocument != null && !forceReload)
@@ -160,7 +160,7 @@ namespace landerist_library.Websites
                 HtmlDocument = new();
                 HtmlDocument.LoadHtml(ResponseBody);
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 Logs.Log.WriteLogErrors(Uri, exception);
                 HtmlDocument = null;

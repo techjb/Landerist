@@ -271,7 +271,7 @@ namespace landerist_orels.ES
                 floor == other.floor &&
                 bedrooms == other.bedrooms &&
                 bathrooms == other.bathrooms &&
-                parkings == other.parkings &&                
+                parkings == other.parkings &&
                 terrace == other.terrace &&
                 garden == other.garden &&
                 garage == other.garage &&

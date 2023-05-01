@@ -1,8 +1,8 @@
-﻿using OpenAI_API;
+﻿using AI.Dev.OpenAI.GPT;
+using landerist_library.Configuration;
+using OpenAI_API;
 using OpenAI_API.Chat;
 using OpenAI_API.Models;
-using AI.Dev.OpenAI.GPT;
-using landerist_library.Configuration;
 
 namespace landerist_library.Parse.ListingParser
 {

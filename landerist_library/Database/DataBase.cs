@@ -1,7 +1,7 @@
-﻿using System.Data;
+﻿using landerist_library.Configuration;
+using System.Data;
 using System.Data.SqlClient;
 using System.Text;
-using landerist_library.Configuration;
 
 namespace landerist_library.Database
 {

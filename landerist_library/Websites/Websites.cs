@@ -127,7 +127,7 @@ namespace landerist_library.Websites
         private static void SetHttpStatusCodes(List<Website> websites)
         {
             int total = websites.Count;
-            int counter = 0;            
+            int counter = 0;
             int successed = 0;
             int errors = 0;
             var sync = new object();
@@ -181,8 +181,8 @@ namespace landerist_library.Websites
                 //new ParallelOptions() { MaxDegreeOfParallelism = 1},
                 website =>
             {
-                bool success = website.SetRobotsTxt();                
-                if(success)
+                bool success = website.SetRobotsTxt();
+                if (success)
                 {
                     website.Update();
                 }

@@ -4,9 +4,9 @@ namespace landerist_library.Export
 {
     public class Zip
     {
-        public bool Export(string inputFile, string zipFile)
+        public static bool Export(string inputFile, string zipFile)
         {
-            return Export(new string[] { inputFile }, zipFile);            
+            return Export(new string[] { inputFile }, zipFile);
         }
 
         public static bool Export(string[] files, string zipFile)
@@ -15,16 +15,16 @@ namespace landerist_library.Export
             {
                 return false;
             }
-           
+
             File.Delete(zipFile);
             try
             {
                 using FileStream zipFileStream = new(zipFile, FileMode.Create);
                 using ZipArchive zipArchive = new(zipFileStream, ZipArchiveMode.Create);
 
-                foreach(string file in files)
+                foreach (string file in files)
                 {
-                    if(!File.Exists(file))
+                    if (!File.Exists(file))
                     {
                         return false;
                     }

@@ -2,11 +2,11 @@
 
 namespace landerist_library.Index
 {
-    public class HtmlIndexer: Indexer
+    public class HyperlinksIndexer : Indexer
     {
-        public HtmlIndexer(Page page): base(page) { }
+        public HyperlinksIndexer(Page page) : base(page) { }
 
-        public void InsertHyperlinks()
+        public void Insert()
         {
             if (Page.HtmlDocument == null)
             {

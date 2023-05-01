@@ -4,7 +4,7 @@ namespace landerist_library.Index
 {
     public class Indexer
     {
-        protected readonly Page Page;
+        protected static Page Page;
 
         private readonly HashSet<Uri> Inserted = new();
 
@@ -15,7 +15,7 @@ namespace landerist_library.Index
 
         public Indexer(Website website) : this(new Page(website))
         {
-
+            
         }
 
         public Indexer(Page page)
@@ -77,12 +77,12 @@ namespace landerist_library.Index
             if (ProhibitedWords.Contains(uri))
             {
                 return;
-            }           
+            }
             if (!IsWebPage(uri))
             {
                 return;
             }
-            if (Languages.ContainsNotAllowedES(uri))
+            if (Languages.ContainsNotAllowed(uri, Page.Website.Language))
             {
                 return;
             }

@@ -27,7 +27,7 @@ namespace landerist_library.Export
             var csvListings = GetFilePath(FILE_NAME_LISTINGS);
             var csvMedia = GetFilePath(FILE_NAME_MEDIA);
             var zipFile = GetFilePath(ZIP_FILE);
-            var files = new string[] { csvListings, csvMedia };            
+            var files = new string[] { csvListings, csvMedia };
             return Zip.Export(files, zipFile);
         }
 
