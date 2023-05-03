@@ -319,13 +319,13 @@ namespace landerist_library.Database
             return dataRow[columnName] is DBNull ? null : new Uri((string)dataRow[columnName]);
         }
 
-        public static bool Remove(Listing listing)
+        public static bool Delete(Listing listing)
         {
-            return RemoveData(listing) &&
-                ES_Media.RemoveMedia(listing);
+            return DeleteData(listing) &&
+                ES_Media.Delete(listing);
         }
 
-        public static bool RemoveData(Listing listing)
+        public static bool DeleteData(Listing listing)
         {
             string query =
                 "DELETE FROM " + TABLE_ES_LISTINGS + " " +

@@ -221,14 +221,14 @@ namespace landerist_library.Websites
             return 0;
         }
 
-        public bool Remove()
+        public bool Delete()
         {
-            RemoveListings();
-            Pages.Remove(this);
-            return RemoveWebsite();
+            DeleteListings();
+            Pages.Delete(this);
+            return DeleteWebsite();
         }
 
-        public void RemoveListings()
+        public void DeleteListings()
         {
             int counter = 0;
             var pages = GetPages();
@@ -237,16 +237,16 @@ namespace landerist_library.Websites
                 var listing = ES_Listings.GetListing(page, false);
                 if (listing != null)
                 {
-                    if (ES_Listings.Remove(listing))
+                    if (ES_Listings.Delete(listing))
                     {
                         counter++;
                     }
                 }
             }
-            Console.WriteLine("Removed " + counter + " listings");
+            Console.WriteLine("Deleted " + counter + " listings");
         }
 
-        private bool RemoveWebsite()
+        private bool DeleteWebsite()
         {
             string query =
                "DELETE FROM " + Websites.TABLE_WEBSITES + " " +

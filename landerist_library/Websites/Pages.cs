@@ -94,7 +94,7 @@ namespace landerist_library.Websites
             return pages;
         }
 
-        public static bool Remove(Website website)
+        public static bool Delete(Website website)
         {
             string query =
                "DELETE FROM " + TABLE_PAGES + " " +

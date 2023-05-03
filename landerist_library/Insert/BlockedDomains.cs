@@ -74,7 +74,7 @@
             return Domains.Contains(domain, StringComparer.OrdinalIgnoreCase);
         }
 
-        public static void RemoveBlockedWebsites()
+        public static void DeleteBlockedWebsites()
         {
             var websites = Websites.Websites.AllWebsites();
             int counter = 0;
@@ -82,11 +82,11 @@
             {
                 if (IsBlocked(website.MainUri))
                 {
-                    website.Remove();
+                    website.Delete();
                     counter++;
                 }
             }
-            Console.WriteLine("Removed: " + counter + " websites.");
+            Console.WriteLine("Deleted: " + counter + " websites.");
         }
     }
 }

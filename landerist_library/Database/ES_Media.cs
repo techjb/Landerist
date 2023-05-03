@@ -35,7 +35,7 @@ namespace landerist_library.Database
             Insert(listing);
         }
 
-        private static bool Delete(Listing listing)
+        public static bool Delete(Listing listing)
         {
             string query =
                 "DELETE " +
@@ -77,17 +77,6 @@ namespace landerist_library.Database
                 title = dataRow["title"] is DBNull ? null : (string)dataRow["title"],
                 url = new Uri((string)dataRow["url"])
             };
-        }
-
-        public static bool RemoveMedia(Listing listing)
-        {
-            string query =
-                "DELETE FROM " + TABLE_ES_MEDIA + " " +
-                "WHERE [listingGuid] = @listingGuid";
-
-            return new DataBase().Query(query, new Dictionary<string, object?> {
-                {"listingGuid", listing.guid }
-            });
         }
     }
 }

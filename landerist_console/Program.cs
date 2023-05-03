@@ -56,8 +56,8 @@ namespace landerist_console
             var website = new Website(uri);
             //var page = new Page(website, uriPage);
 
-            //website.Remove(); return;
-            //new WebsitesInserter(false).RemoveAndInsert(uri); return;
+            //website.Delete(); return;
+            //new WebsitesInserter(false).DeleteAndInsert(uri); return;
             //new WebsitesInserter(false).Insert(uri);
             //new WebsitesInserter().FromCsv();            
 
@@ -71,7 +71,7 @@ namespace landerist_console
             //Websites.InsertMainPages();
 
             //new Scraper().ScrapeMainPage(website);
-            new Scraper().ScrapeNonScrapped(uri);
+            //new Scraper().ScrapeNonScrapped(uri);
             //new Scraper().ScrapeUnknowIsListing(uri, true);
             //new Scraper().ScrapeIsNotListing(uri);
             //new Scraper().ScrapePage(page);

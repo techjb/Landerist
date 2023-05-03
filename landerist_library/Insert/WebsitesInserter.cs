@@ -24,19 +24,19 @@ namespace landerist_library.Insert
             }
         }
 
-        public void RemoveAndInsert(Uri uri)
+        public void DeleteAndInsert(Uri uri)
         {
             Website website = new(uri);
-            RemoveAndInsert(website);
+            DeleteAndInsert(website);
         }
 
-        public void RemoveAndInsert(Website website)
+        public static void DeleteAndInsert(Website website)
         {
-            website.Remove();
+            website.Delete();
             Insert(website.MainUri);
         }
 
-        public void Insert(string url)
+        public static void Insert(string url)
         {
             if (Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
             {
