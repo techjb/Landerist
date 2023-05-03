@@ -30,13 +30,13 @@ namespace landerist_library.Insert
             DeleteAndInsert(website);
         }
 
-        public static void DeleteAndInsert(Website website)
+        public void DeleteAndInsert(Website website)
         {
             website.Delete();
             Insert(website.MainUri);
         }
 
-        public static void Insert(string url)
+        public void Insert(string url)
         {
             if (Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
             {
@@ -44,7 +44,7 @@ namespace landerist_library.Insert
             }
         }
 
-        public static void Insert(Uri uri)
+        public void Insert(Uri uri)
         {
             var list = new List<Uri>()
             {

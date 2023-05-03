@@ -6,7 +6,7 @@ namespace landerist_library.Websites
     public class Websites
     {
         public const string TABLE_WEBSITES = "[WEBSITES]";
-        public static List<Website> AllWebsites()
+        public static HashSet<Website> GetAll()
         {
             var dataTable = GetDataTableAll();
             return GetWebsites(dataTable);
@@ -23,19 +23,19 @@ namespace landerist_library.Websites
             return dictionary;
         }
 
-        public static List<Website> GetStatusCodeOk()
+        public static HashSet<Website> GetStatusCodeOk()
         {
             var dataTable = ToDataTableHttpStatusCodeOk();
             return GetWebsites(dataTable);
         }
 
-        public static List<Website> GetStatusCodeNotOk()
+        public static HashSet<Website> GetStatusCodeNotOk()
         {
             var dataTable = ToDataTableHttpStatusCodeNotOk();
             return GetWebsites(dataTable);
         }
 
-        public static List<Website> GetStatusCodeNull()
+        public static HashSet<Website> GetStatusCodeNull()
         {
             var dataTable = ToDataTableHttpStatusCodeNull();
             return GetWebsites(dataTable);
@@ -93,15 +93,15 @@ namespace landerist_library.Websites
             return null;
         }
 
-        private static List<Website> GetWebsites(DataTable dataTable)
+        private static HashSet<Website> GetWebsites(DataTable dataTable)
         {
-            var list = new List<Website>();
+            var hashSet = new HashSet<Website>();
             foreach (DataRow dataRow in dataTable.Rows)
             {
                 Website website = new(dataRow);
-                list.Add(website);
+                hashSet.Add(website);
             }
-            return list;
+            return hashSet;
         }
 
         public static HashSet<string> GetUrls()
@@ -114,7 +114,7 @@ namespace landerist_library.Websites
 
         public static void SetHttpStatusCodesToAll()
         {
-            var websites = AllWebsites();
+            var websites = GetAll();
             SetHttpStatusCodes(websites);
         }
 
@@ -124,7 +124,7 @@ namespace landerist_library.Websites
             SetHttpStatusCodes(websites);
         }
 
-        private static void SetHttpStatusCodes(List<Website> websites)
+        private static void SetHttpStatusCodes(HashSet<Website> websites)
         {
             int total = websites.Count;
             int counter = 0;
@@ -160,7 +160,7 @@ namespace landerist_library.Websites
 
         public static void SetRobotsTxt()
         {
-            var websites = AllWebsites();
+            var websites = GetAll();
             SetRobotsTxt(websites);
         }
 
@@ -170,7 +170,7 @@ namespace landerist_library.Websites
             SetRobotsTxt(websites);
         }
 
-        private static void SetRobotsTxt(List<Website> websites)
+        private static void SetRobotsTxt(HashSet<Website> websites)
         {
             int total = websites.Count;
             int counter = 0;
@@ -206,11 +206,11 @@ namespace landerist_library.Websites
 
         public static void SetIpAdress()
         {
-            var websites = AllWebsites();
+            var websites = GetAll();
             SetIpAdress(websites);
         }
 
-        private static void SetIpAdress(List<Website> websites)
+        private static void SetIpAdress(HashSet<Website> websites)
         {
             int total = websites.Count;
             int counter = 0;
@@ -292,6 +292,20 @@ namespace landerist_library.Websites
                 }
                 Console.WriteLine("Inserted: " + inserted + " Errors: " + errors + " From: " + websites.Count);
             }
+        }
+
+        public static void DeleteAll()
+        {
+            var websites = GetAll();
+            int counter = 0;
+            foreach (var website in websites)
+            {
+                if (website.Delete())
+                {
+                    counter++;
+                }
+            }
+            Console.WriteLine("Deleted " + counter + " websites");
         }
     }
 }

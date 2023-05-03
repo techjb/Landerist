@@ -44,20 +44,31 @@
             "quiero",
             "rgpd",
             "mapaweb",
-            "resize"
+            "resize",
+            "descarga"
         };
 
         public static bool Contains(Uri uri)
         {
-            string absolutePath = uri.AbsolutePath
+            var absolutePaths = uri.AbsolutePath.Split('/');
+            if (absolutePaths.Length <= 1)
+            {
+                return true;
+            }
+
+            string lastPath = absolutePaths[^1];
+            lastPath = lastPath
                .Replace("-", string.Empty)
                .Replace("_", string.Empty)
-               .Replace("/", string.Empty)
                .ToLower()
                ;
+            if (string.IsNullOrEmpty(lastPath))
+            {
+                return true;
+            }
             foreach (string word in ES)
             {
-                if (absolutePath.StartsWith(word))
+                if (lastPath.StartsWith(word))
                 {
                     return true;
                 }

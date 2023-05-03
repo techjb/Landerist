@@ -76,7 +76,7 @@
 
         public static void DeleteBlockedWebsites()
         {
-            var websites = Websites.Websites.AllWebsites();
+            var websites = Websites.Websites.GetAll();
             int counter = 0;
             foreach (var website in websites)
             {

@@ -237,7 +237,8 @@ namespace landerist_library.Websites
                 var listing = ES_Listings.GetListing(page, false);
                 if (listing != null)
                 {
-                    if (ES_Listings.Delete(listing))
+                    if (ES_Listings.Delete(listing) && 
+                        ES_Media.Delete(listing))
                     {
                         counter++;
                     }

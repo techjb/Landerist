@@ -50,15 +50,17 @@ namespace landerist_console
             //var uri = new Uri("https://mabelan.es/");
             //var uri = new Uri("https://www.saguar.immo/");
             //var uri = new Uri("https://www.inmolocalgestion.com/");
-            var uri = new Uri("https://www.expimad.com/");
-            //var uri = new Uri("https://www.prorealty.es/");
+            //var uri = new Uri("https://www.expimad.com/");
+            var uri = new Uri("https://www.prorealty.es/");
 
-            var website = new Website(uri);
+            //var website = new Website(uri);
             //var page = new Page(website, uriPage);
 
             //website.Delete(); return;
+            //Websites.DeleteAll(); return;
+
             //new WebsitesInserter(false).DeleteAndInsert(uri); return;
-            //new WebsitesInserter(false).Insert(uri);
+            //new WebsitesInserter(false).Insert(uri); return;
             //new WebsitesInserter().FromCsv();            
 
             //Websites.SetHttpStatusCodesToNull();
@@ -71,7 +73,7 @@ namespace landerist_console
             //Websites.InsertMainPages();
 
             //new Scraper().ScrapeMainPage(website);
-            //new Scraper().ScrapeNonScrapped(uri);
+            new Scraper().ScrapeNonScrapped(uri);
             //new Scraper().ScrapeUnknowIsListing(uri, true);
             //new Scraper().ScrapeIsNotListing(uri);
             //new Scraper().ScrapePage(page);

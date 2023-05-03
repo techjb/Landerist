@@ -84,11 +84,10 @@ namespace landerist_library.Scrape
                     if (langAttr != null)
                     {
                         var language = langAttr.Value.ToLower();
-                        if (language.Contains('-'))
+                        if (!string.IsNullOrEmpty(language))
                         {
-                            language = language.Split('-')[0];
-                        }
-                        return language.Equals(Page.Website.Language);
+                            return language.StartsWith(Page.Website.Language);
+                        }                        
                     }
                 }
             }

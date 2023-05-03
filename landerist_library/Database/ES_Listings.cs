@@ -321,12 +321,6 @@ namespace landerist_library.Database
 
         public static bool Delete(Listing listing)
         {
-            return DeleteData(listing) &&
-                ES_Media.Delete(listing);
-        }
-
-        public static bool DeleteData(Listing listing)
-        {
             string query =
                 "DELETE FROM " + TABLE_ES_LISTINGS + " " +
                 "WHERE [guid] = @guid";
