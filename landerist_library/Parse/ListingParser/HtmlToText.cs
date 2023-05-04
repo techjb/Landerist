@@ -4,83 +4,66 @@ namespace landerist_library.Parse.ListingParser
 {
     public class HtmlToText
     {
-        private readonly HtmlDocument HtmlDocument;
 
-        private string HtmlText = string.Empty;
-
-        public HtmlToText(HtmlDocument htmlDocument)
-        {
-            HtmlDocument = htmlDocument;
-        }
-
-        public string GetText()
+        public static string GetText(HtmlDocument htmlDocument)
         {
             try
             {
-                RemoveNodes();
-                GetVisibleText();
+                htmlDocument = RemoveNodes(htmlDocument);
+                var visibletText = GetVisibleText(htmlDocument);
+                return CleanText(visibletText);
             }
             catch { }
-            return HtmlText.Trim();
+            return string.Empty;
         }
 
 
-        private void RemoveNodes()
+        private static HtmlDocument RemoveNodes(HtmlDocument htmlDocument)
         {
-            if (HtmlDocument == null)
-            {
-                return;
-            }
             var xPath =
                 "//script | //nav | //footer | //style | //head | " +
                 "//a | //code | //canvas | //input | //meta | //option | " +
                 "//select | //progress | //svg | //textarea | //del";
 
-            var nodesToRemove = HtmlDocument.DocumentNode.SelectNodes(xPath).ToList();
+            var nodesToRemove = htmlDocument.DocumentNode.SelectNodes(xPath).ToList();
             foreach (var node in nodesToRemove)
             {
                 node.Remove();
             }
+            return htmlDocument;
         }
 
-        private void GetVisibleText()
+        private static IEnumerable<string>? GetVisibleText(HtmlDocument htmlDocument)
         {
-            if (HtmlDocument == null)
-            {
-                return;
-            }
-            var visibleNodes = HtmlDocument.DocumentNode.DescendantsAndSelf().Where(
+            var visibleNodes = htmlDocument.DocumentNode.DescendantsAndSelf().Where(
                    n => n.NodeType == HtmlNodeType.Text)
-                   .Where(n => !string.IsNullOrWhiteSpace(n.InnerHtml))
-                   .Where(n => !n.InnerHtml.Trim().ToLower().Equals("&nbsp;"))
-                   ;
+                   .Where(n => !string.IsNullOrWhiteSpace(n.InnerHtml));
 
-            var visibleText = visibleNodes.Select(n => n.InnerHtml.Trim());
-            var cleanned = RemoveNbsp(visibleText);
-            HtmlText = string.Join(Environment.NewLine, cleanned);
+            return visibleNodes.Select(n => n.InnerHtml.Trim());
         }
 
-        private static List<string> RemoveNbsp(IEnumerable<string>? lines)
+        private static string CleanText(IEnumerable<string>? lines)
         {
-            List<string> cleaned = new();
+            List<string> cleanedLines = new();
             if (lines == null)
             {
-                return cleaned;
+                return string.Empty;
             }
             foreach (var line in lines)
             {
-                string cleanedLine = line.Replace("&nbsp;", string.Empty).Trim();
-                if (string.IsNullOrEmpty(cleanedLine))
+                string decodedLine = HtmlEntity.DeEntitize(line).Trim();
+                if (string.IsNullOrEmpty(decodedLine))
                 {
                     continue;
                 }
-                if (IsSymbol(cleanedLine))
+                if (IsSymbol(decodedLine))
                 {
                     continue;
                 }
-                cleaned.Add(cleanedLine);
+                cleanedLines.Add(decodedLine);
             }
-            return cleaned;
+            string text = string.Join(Environment.NewLine, cleanedLines);
+            return text;
         }
 
         private static bool IsSymbol(string input)

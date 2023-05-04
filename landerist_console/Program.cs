@@ -13,8 +13,8 @@ namespace landerist_console
         static void Main(string[] args)
         {
             Console.Title = "Landerist Console";
-            SetDateStart();
             Config.Init(false);
+            SetDateStart();
             Run();
             SetFinish();
             EndBeep();
@@ -33,7 +33,7 @@ namespace landerist_console
             DateTime dateFinished = DateTime.Now;
             string textFinished =
                 "FINISHED at " + dateFinished.ToShortDateString() + " " + dateFinished.ToString(@"hh\:mm\:ss") +
-                "\nDuration: " + (dateFinished - DateStart).ToString(@"hh\:mm\:ss") + ". ";
+                "\nDuration: " + (dateFinished - DateStart).ToString(@"dd\:hh\:mm\:ss\.fff") + ". ";
             Console.WriteLine("\n" + textFinished);
         }
 
@@ -44,7 +44,11 @@ namespace landerist_console
             //var uriPage = new Uri("https://www.saroga.es/inmueble/piso-monte-pilar-majadahonda/");
             //var uriPage = new Uri("https://www.saroga.es/inmueble/apartamento-majadahonda/");          
             //var uriPage = new Uri("https://www.inmolocalgestion.com/ficha-inmueble.php?id=53");
-            var uriPage = new Uri("https://www.prorealty.es/es/las_rozas_de_madrid/molino_de_la_hoz/chalets_independientes/ref-4465");
+            //var uriPage = new Uri("https://www.expimad.com/inmueble/piso-2-habitaciones-sin-comision-de-agenciasesena-urbanizacion-el-quinon-ideal-inversoresactualmente-alquilado-/20231214");
+            //var uriPage = new Uri("https://www.prorealty.es/es/las_rozas_de_madrid/molino_de_la_hoz/chalets_independientes/ref-4465");
+            var uriPage = new Uri("https://www.goolzoom.com");
+            Selenium.CrhomeScrapePage(uriPage);
+            //Selenium.FirefoxScrape(uriPage);
 
             //var uri = new Uri("https://www.goolzoom.com/");
             //var uri = new Uri("https://www.saroga.es/");
@@ -52,10 +56,10 @@ namespace landerist_console
             //var uri = new Uri("https://www.saguar.immo/");
             //var uri = new Uri("https://www.inmolocalgestion.com/");
             //var uri = new Uri("https://www.expimad.com/");
-            var uri = new Uri("https://www.prorealty.es/");
+            //var uri = new Uri("https://www.prorealty.es/");
 
-            var website = new Website(uri);
-            var page = new Page(website, uriPage);
+            //var website = new Website(uri);
+            //var page = new Page(website, uriPage);
 
             //website.Delete(); return;
             //Websites.DeleteAll(); return;
@@ -77,7 +81,7 @@ namespace landerist_console
             //new Scraper().ScrapeNonScrapped(uri);
             //new Scraper().ScrapeUnknowIsListing(uri, true);
             //new Scraper().ScrapeIsNotListing(uri);
-            new Scraper().ScrapePage(page);
+            //new Scraper().CrhomeScrapePage(page);
             //new Scraper().ScrapeAllPages();
 
             //Csv.Export(true);

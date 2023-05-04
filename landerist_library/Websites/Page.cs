@@ -186,7 +186,7 @@ namespace landerist_library.Websites
             LoadHtmlDocument();
             if (HtmlDocument != null)
             {
-                ResponseBodyText = new HtmlToText(HtmlDocument).GetText();
+                ResponseBodyText = HtmlToText.GetText(HtmlDocument);
             }
         }
     }
