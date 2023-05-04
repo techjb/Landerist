@@ -1,8 +1,8 @@
 ﻿namespace landerist_library.Index
 {
-    internal class ProhibitedWords
+    internal class UriValidator
     {
-        private static readonly HashSet<string> ES = new(StringComparer.OrdinalIgnoreCase)
+        private static readonly HashSet<string> ProhibitedWords_ES = new(StringComparer.OrdinalIgnoreCase)
         {
             "contact",
             "politic",
@@ -45,35 +45,32 @@
             "rgpd",
             "mapaweb",
             "resize",
-            "descarga"
+            "descarga",
+            "cookie"
         };
 
-        public static bool Contains(Uri uri)
+        public static bool IsValid(Uri uri)
         {
-            var absolutePaths = uri.AbsolutePath.Split('/');
-            if (absolutePaths.Length <= 1)
+            var directories = uri.AbsolutePath.ToLower().Split('/');
+            foreach (var directory in directories)
             {
-                return true;
-            }
-
-            string lastPath = absolutePaths[^1];
-            lastPath = lastPath
-               .Replace("-", string.Empty)
-               .Replace("_", string.Empty)
-               .ToLower()
-               ;
-            if (string.IsNullOrEmpty(lastPath))
-            {
-                return true;
-            }
-            foreach (string word in ES)
-            {
-                if (lastPath.StartsWith(word))
+                if (string.IsNullOrEmpty(directory))
                 {
-                    return true;
+                    continue;
+                }
+                string directoryCleaned = directory
+                    .Replace("-", string.Empty)
+                    .Replace("_", string.Empty);
+
+                foreach (string word in ProhibitedWords_ES)
+                {
+                    if (directoryCleaned.StartsWith(word))
+                    {
+                        return false;
+                    }
                 }
             }
-            return false;
+            return true;
         }
     }
 }

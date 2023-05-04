@@ -74,7 +74,7 @@ namespace landerist_library.Index
             {
                 return;
             }
-            if (ProhibitedWords.Contains(uri))
+            if (!UriValidator.IsValid(uri))
             {
                 return;
             }
@@ -82,7 +82,7 @@ namespace landerist_library.Index
             {
                 return;
             }
-            if (Languages.ContainsNotAllowed(uri, Page.Website.Language))
+            if (LanguageValidator.ContainsNotAllowed(uri, Page.Website.Language))
             {
                 return;
             }

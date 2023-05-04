@@ -63,7 +63,7 @@ namespace landerist_library.Index
 
         private static bool IsValidSitemap(Sitemap sitemap)
         {
-            return !Languages.ContainsNotAllowed(sitemap.SitemapLocation, Page.Website.Language);
+            return !LanguageValidator.ContainsNotAllowed(sitemap.SitemapLocation, Page.Website.Language);
         }
     }
 }

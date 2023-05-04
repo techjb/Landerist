@@ -33,7 +33,7 @@ namespace landerist_library.Parse.ListingParser
             }
             var xPath =
                 "//script | //nav | //footer | //style | //head | " +
-                "//form | //a | //code | //canvas | //input | //meta | //option | " +
+                "//a | //code | //canvas | //input | //meta | //option | " +
                 "//select | //progress | //svg | //textarea | //del";
 
             var nodesToRemove = HtmlDocument.DocumentNode.SelectNodes(xPath).ToList();
@@ -56,8 +56,43 @@ namespace landerist_library.Parse.ListingParser
                    ;
 
             var visibleText = visibleNodes.Select(n => n.InnerHtml.Trim());
+            var cleanned = RemoveNbsp(visibleText);
+            HtmlText = string.Join(Environment.NewLine, cleanned);
+        }
 
-            HtmlText = string.Join(Environment.NewLine, visibleText);
+        private static List<string> RemoveNbsp(IEnumerable<string>? lines)
+        {
+            List<string> cleaned = new();
+            if (lines == null)
+            {
+                return cleaned;
+            }
+            foreach (var line in lines)
+            {
+                string cleanedLine = line.Replace("&nbsp;", string.Empty).Trim();
+                if (string.IsNullOrEmpty(cleanedLine))
+                {
+                    continue;
+                }
+                if (IsSymbol(cleanedLine))
+                {
+                    continue;
+                }
+                cleaned.Add(cleanedLine);
+            }
+            return cleaned;
+        }
+
+        private static bool IsSymbol(string input)
+        {
+            foreach (char c in input)
+            {
+                if (!char.IsPunctuation(c) && !char.IsSymbol(c))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

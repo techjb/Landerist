@@ -1,6 +1,6 @@
 ﻿namespace landerist_library.Index
 {
-    internal class Languages
+    internal class LanguageValidator
     {
         private static readonly HashSet<string> Iso6391Codes = new(StringComparer.OrdinalIgnoreCase)
         {
