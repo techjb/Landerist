@@ -29,8 +29,8 @@ namespace landerist_library.Parse.LocationParser
             {
                 return;
             }
-            AddLocationIframeGoogleMaps(Page.HtmlDocument);
-            AddLocationsRegex(Page.HtmlDocument);
+            LocationIframeGoogleMaps(Page.HtmlDocument);
+            LocationInHtmlLatLng(Page.HtmlDocument);
             SetLocationToListing();
         }
 
@@ -48,11 +48,11 @@ namespace landerist_library.Parse.LocationParser
             }
             else
             {
-                
+                // todo: decide later
             }
         }
 
-        private void AddLocationIframeGoogleMaps(HtmlDocument htmlDocument)
+        private void LocationIframeGoogleMaps(HtmlDocument htmlDocument)
         {
             var iframes = htmlDocument.DocumentNode.Descendants("iframe");
             if (iframes == null)
@@ -95,7 +95,7 @@ namespace landerist_library.Parse.LocationParser
             }
         }
 
-        private void AddLocationsRegex(HtmlDocument htmlDocument)
+        private void LocationInHtmlLatLng(HtmlDocument htmlDocument)
         {
             List<string> listRegex = new()
             {

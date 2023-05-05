@@ -4,6 +4,7 @@ using landerist_library.Insert;
 using landerist_library.Parse.LocationParser;
 using landerist_library.Scrape;
 using landerist_library.Websites;
+using landerist_orels.ES;
 
 namespace landerist_console
 {
@@ -65,7 +66,7 @@ namespace landerist_console
             var website = new Website(uri);
             var page = new Page(website, uriPage);
 
-            
+
 
             //website.Delete(); return;
             //Websites.DeleteAll(); return;
@@ -115,8 +116,9 @@ namespace landerist_console
             //        case 5: latitude = match.Groups[1].Value; longitude = match.Groups[3].Value; break;
             //        default: continue;
             //    }
+            //}
+            //          
 
-            //}          
         }
 
         private static void EndBeep()

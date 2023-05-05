@@ -21,8 +21,8 @@ namespace landerist_library.Parse.MediaParser
             {
                 return;
             }
-            new MediaParserImages(this).GetImages();
-            new MediaParserVideos(this).GetVideos();
+            new ImageParser(this).GetImages();
+            new VideoParser(this).GetVideos();
             listing.SetMedia(Media);
         }
 
@@ -35,7 +35,7 @@ namespace landerist_library.Parse.MediaParser
             }
             var xPath =
                 "//nav | //footer | //style | //head | " +
-                "//form | //code | //canvas | //input | //meta | //option | " +
+                "//code | //canvas | //input | //meta | //option | " +
                 "//select | //progress | //svg | //textarea | //del";
 
             var nodesToRemove = Page.HtmlDocument.DocumentNode.SelectNodes(xPath).ToList();
@@ -43,6 +43,40 @@ namespace landerist_library.Parse.MediaParser
             {
                 node.Remove();
             }
+        }
+
+        public void AddVideo(string url)
+        {
+            if (!Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out Uri? uri))
+            {
+                return ;
+            }            
+            if (uri == null)
+            {
+                return;
+            }
+            var media = new Media()
+            {
+                mediaType = MediaType.video,
+                url = uri
+            };
+            Media.Add(media);
+        }
+
+        public void AddImage(string url, string title)
+        {
+            if (!Uri.TryCreate(Page.Uri, url, out Uri? uri))
+            {
+                return;
+            }
+
+            var media = new Media()
+            {
+                mediaType = MediaType.image,
+                url = uri,
+                title = title,
+            };
+            Media.Add(media);
         }
     }
 }

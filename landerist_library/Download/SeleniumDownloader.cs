@@ -6,29 +6,24 @@ namespace landerist_library.Download
 {
     public class SeleniumDownloader
     {
-
+        
         public static void GetChrome(Uri uri)
         {
             ChromeDriverService driverService = ChromeDriverService.CreateDefaultService();
-            driverService.HideCommandPromptWindow = true; // Para ocultar la ventana de comandos
-
+            driverService.HideCommandPromptWindow = true;
 
             ChromeOptions options = new();
-            options.AddArgument("disable-infobars");
-            options.AddArgument("--disable-css-rendering");
             //options.AddArgument("headless"); // Ejecutar en modo sin cabeza (sin UI)
+
             options.AddUserProfilePreference("profile.default_content_setting_values.images", 2); // 2: bloquear imágenes
-            options.AddUserProfilePreference("profile.default_content_setting_values.stylesheets", 2); // 2: bloquear hojas de estilo
+            options.AddUserProfilePreference("profile.default_content_setting_values.stylesheets", 2); // No funciona, no es posible
             options.AddUserProfilePreference("profile.default_content_setting_values.cookies", 2);
             options.AddUserProfilePreference("profile.default_content_setting_values.plugins", 2);
             options.AddUserProfilePreference("profile.default_content_setting_values.popups", 2);
             options.AddUserProfilePreference("profile.default_content_setting_values.fonts", 2);
-            options.AddUserProfilePreference("profile.default_content_setting_values.css", 2);
+            options.AddUserProfilePreference("profile.default_content_setting_values.css", 2);// No funciona, no es posible
             options.AddUserProfilePreference("profile.default_content_setting_values.geolocation", 2);
             options.AddUserProfilePreference("profile.default_content_setting_values.media_stream", 2);
-
-
-
 
             // Establecer la política de seguridad de contenido para bloquear otros recursos
             //string contentSecurityPolicy = "default-src 'self' 'unsafe-inline' 'unsafe-eval'; object-src 'none'";

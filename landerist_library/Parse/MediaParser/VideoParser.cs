@@ -4,11 +4,11 @@ using System.Text.RegularExpressions;
 
 namespace landerist_library.Parse.MediaParser
 {
-    public class MediaParserVideos
+    public class VideoParser
     {
         private readonly MediaParser MediaParser;
 
-        public MediaParserVideos(MediaParser mediaParser)
+        public VideoParser(MediaParser mediaParser)
         {
             MediaParser = mediaParser;
         }
@@ -33,23 +33,20 @@ namespace landerist_library.Parse.MediaParser
             foreach (HtmlNode linkNode in linkNodes)
             {
                 string attributeValue = linkNode.GetAttributeValue(attributeName, string.Empty);
+                if (attributeValue == null)
+                {
+                    continue;
+                }
                 Match match = regex.Match(attributeValue);
                 if (!match.Success)
                 {
                     continue;
                 }
-                if (Uri.TryCreate(attributeValue, UriKind.Absolute, out Uri? uri))
+                if (attributeValue.StartsWith("//"))
                 {
-                    if (uri != null)
-                    {
-                        var media = new Media()
-                        {
-                            mediaType = MediaType.video,
-                            url = uri
-                        };
-                        MediaParser.Media.Add(media);
-                    }
+                    attributeValue = "https:" + attributeValue;
                 }
+                MediaParser.AddVideo(attributeValue);
             }
         }
     }

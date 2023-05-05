@@ -3,11 +3,11 @@ using landerist_orels.ES;
 
 namespace landerist_library.Parse.MediaParser
 {
-    public class MediaParserImages
+    public class ImageParser
     {
         private readonly MediaParser MediaParser;
 
-        public MediaParserImages(MediaParser mediaParser)
+        public ImageParser(MediaParser mediaParser)
         {
             MediaParser = mediaParser;
         }
@@ -38,30 +38,22 @@ namespace landerist_library.Parse.MediaParser
             }
             foreach (var node in nodeCollection)
             {
-                var media = ParseImage(node, attributeValue);
-                if (media != null)
-                {
-                    MediaParser.Media.Add(media);
-                }
+                ParseImage(node, attributeValue);                
             }
         }
 
-        private Media? ParseImage(HtmlNode imgNode, string name)
+        private void ParseImage(HtmlNode imgNode, string name)
         {
             string attributeValue = imgNode.GetAttributeValue(name, null);
             if (string.IsNullOrEmpty(attributeValue))
             {
-                return null;
-            }
-            if (!Uri.TryCreate(MediaParser.Page.Uri, attributeValue, out Uri? uri))
-            {
-                return null;
-            }
+                return;
+            }            
 
             string extension = Path.GetExtension(attributeValue).ToLower();
             if (!extension.StartsWith(".jpg") && !extension.StartsWith(".jpeg"))
             {
-                return null;
+                return;
             }
 
             string title = imgNode.GetAttributeValue("alt", null);
@@ -70,12 +62,7 @@ namespace landerist_library.Parse.MediaParser
                 title = imgNode.GetAttributeValue("title", null);
             }
 
-            return new Media()
-            {
-                mediaType = MediaType.image,
-                url = uri,
-                title = title,
-            };
+            MediaParser.AddImage(attributeValue, title);
         }
     }
 }

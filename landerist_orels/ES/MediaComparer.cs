@@ -6,7 +6,8 @@ namespace landerist_orels.ES
     {
         public int Compare(Media x, Media y)
         {
-            return x.url.ToString().CompareTo(y.url.ToString());
+            string yCompared = y.url.ToString().ToLower().Trim();
+            return x.url.ToString().ToLower().Trim().CompareTo(yCompared);
         }
     }
 }
