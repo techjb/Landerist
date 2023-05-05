@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System;
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using HtmlAgilityPack;
 using OpenQA.Selenium.Firefox;
 
-namespace landerist_library.Scrape
+namespace landerist_library.Download
 {
     public class SeleniumDownloader
     {
@@ -34,7 +27,7 @@ namespace landerist_library.Scrape
             options.AddUserProfilePreference("profile.default_content_setting_values.geolocation", 2);
             options.AddUserProfilePreference("profile.default_content_setting_values.media_stream", 2);
 
-            
+
 
 
             // Establecer la política de seguridad de contenido para bloquear otros recursos
@@ -43,7 +36,7 @@ namespace landerist_library.Scrape
 
             // Inicializa el driver de Chrome (asegúrate de que ChromeDriver esté instalado y en tu PATH)
             IWebDriver driver = new ChromeDriver(driverService, options);
-            
+
 
             // Navega a una página web
             driver.Navigate().GoToUrl(uri);

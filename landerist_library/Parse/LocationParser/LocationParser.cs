@@ -12,7 +12,8 @@ namespace landerist_library.Parse.LocationParser
 
         private readonly Listing Listing;
 
-        private bool LocationFound = false;
+        private readonly HashSet<Tuple<double, double>> Locations = new();
+
 
         public LocationParser(Page page, Listing listing)
         {
@@ -28,19 +29,30 @@ namespace landerist_library.Parse.LocationParser
             {
                 return;
             }
-            if (LocationFound)
-            {
-                return;
-            }
-            GetLocationIframeGoogleMaps(Page.HtmlDocument);
-            if (LocationFound)
-            {
-                return;
-            }
-            GetLocationRegex(Page.HtmlDocument);
+            AddLocationIframeGoogleMaps(Page.HtmlDocument);
+            AddLocationsRegex(Page.HtmlDocument);
+            SetLocationToListing();
         }
 
-        private void GetLocationIframeGoogleMaps(HtmlDocument htmlDocument)
+        private void SetLocationToListing()
+        {
+            if (Locations.Count == 0)
+            {
+                return;
+            }
+            if (Locations.Count.Equals(1))
+            {
+                var tuple = Locations.Single();
+                Listing.latitude = tuple.Item1;
+                Listing.longitude = tuple.Item2;
+            }
+            else
+            {
+                
+            }
+        }
+
+        private void AddLocationIframeGoogleMaps(HtmlDocument htmlDocument)
         {
             var iframes = htmlDocument.DocumentNode.Descendants("iframe");
             if (iframes == null)
@@ -55,10 +67,6 @@ namespace landerist_library.Parse.LocationParser
                     continue;
                 }
                 GetLocationIframeGoogleMaps(src);
-                if (LocationFound)
-                {
-                    return;
-                }
             }
         }
 
@@ -79,7 +87,7 @@ namespace landerist_library.Parse.LocationParser
                 var lat = src[(src.IndexOf("!3d") + 3)..];
                 lat = lat[..lat.IndexOf("!")];
 
-                SetLocation(lat, lng);
+                AddLocation(lat, lng);
             }
             catch (Exception exception)
             {
@@ -87,61 +95,70 @@ namespace landerist_library.Parse.LocationParser
             }
         }
 
-        private void GetLocationRegex(HtmlDocument htmlDocument)
+        private void AddLocationsRegex(HtmlDocument htmlDocument)
         {
             List<string> listRegex = new()
             {
-                @"(latitude|lat|latitud)\s*(=|:)\s*(-?\d+(\.\d+)?)\s*(,|;)\s*(longitude|lng|longitud)\s*(=|:)\s*(-?\d+(\.\d+)?)",
+                @"(latitude|lat|latitud)\s*(=|:)\s*(-?\d+(\.\d+)?).*(longitude|lng|longitud)\s*(=|:)\s*(-?\d+(\.\d+)?)",
                 @"LatLng\s*\(\s*(-?\d+\.\d+)\s*(,|\s*)\s*(-?\d+\.\d+)\s*\)"
             };
+
+            string text = htmlDocument.DocumentNode.InnerHtml
+                .Replace("\n", string.Empty)
+                .Replace("\r", string.Empty);
+
             foreach (var regex in listRegex)
             {
-                if (LocationFound)
-                {
-                    break;
-                }
-                GetLocationRegex(htmlDocument.DocumentNode.InnerHtml, regex);
+                GetLocationRegex(text, regex);
             }
         }
 
         public void GetLocationRegex(string text, string regexPattern)
         {
-            var matches = new Regex(regexPattern).Matches(text);
+            var regex = new Regex(regexPattern, RegexOptions.IgnoreCase);
+            var matches = regex.Matches(text);
             foreach (Match match in matches.Cast<Match>())
             {
-                if (LocationFound)
+                double? latitude = null;
+                double? longitude = null;
+                
+                foreach (Group group in match.Groups.Cast<Group>()) 
                 {
-                    return;
-                }
-
-                string? latitude;
-                string? longitude;
-                switch (match.Groups.Count)
-                {
-                    case 3: latitude = match.Groups[1].Value; longitude = match.Groups[2].Value; break;
-                    case 5: latitude = match.Groups[1].Value; longitude = match.Groups[3].Value; break;
-                    default: continue;
-                }
-                if (latitude != null && longitude != null)
-                {
-                    SetLocation(latitude, longitude);
+                    var value = group.Value;
+                    if (value.StartsWith("."))
+                    {
+                        continue;
+                    }
+                    if(!double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double latOrLng))
+                    {
+                        continue;
+                    }
+                    if (latitude == null)
+                    {
+                        latitude = latOrLng;
+                    }
+                    else
+                    {
+                        longitude = latOrLng;
+                        AddLocation((double)latitude, (double)longitude);
+                        break;
+                    }
                 }
             }
         }
 
-        private void SetLocation(string latitude, string longitude)
+        private void AddLocation(string latitude, string longitude)
         {
             if (double.TryParse(longitude, NumberStyles.Float, CultureInfo.InvariantCulture, out double lng) &&
                 double.TryParse(latitude, NumberStyles.Float, CultureInfo.InvariantCulture, out double lat))
             {
-                SetLocation(lat, lng);
+                AddLocation(lat, lng);
             }
         }
-        private void SetLocation(double latitude, double longitude)
+        private void AddLocation(double latitude, double longitude)
         {
-            Listing.longitude = longitude;
-            Listing.latitude = latitude;
-            LocationFound = true;
+            var tuple = Tuple.Create(latitude, longitude);
+            Locations.Add(tuple);
         }
     }
 }

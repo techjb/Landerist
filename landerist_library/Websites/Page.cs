@@ -1,6 +1,7 @@
 ﻿using HtmlAgilityPack;
 using landerist_library.Database;
 using landerist_library.Parse.ListingParser;
+using landerist_orels.ES;
 using System.Data;
 using System.Security.Cryptography;
 using System.Text;
@@ -188,6 +189,11 @@ namespace landerist_library.Websites
             {
                 ResponseBodyText = HtmlToText.GetText(HtmlDocument);
             }
+        }
+
+        public Listing? GetLising()
+        {
+            return ES_Listings.GetListing(this, false);
         }
     }
 }

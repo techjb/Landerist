@@ -1,5 +1,5 @@
-﻿using landerist_library.Configuration;
-using landerist_library.Database;
+﻿using landerist_library.Database;
+using landerist_library.Download;
 using landerist_library.Index;
 using landerist_library.Parse.ListingParser;
 using landerist_library.Parse.LocationParser;
@@ -12,16 +12,17 @@ namespace landerist_library.Scrape
     {
         private readonly Page Page;
 
-        private HttpResponseMessage? HttpResponseMessage;
+        private readonly HttpClientDownloader HttpClientDownloader;
+
         public PageScraper(Page page)
         {
             Page = page;
+            HttpClientDownloader = new HttpClientDownloader();
         }
 
         public bool Scrape()
         {
-            var task = Task.Run(async () => await Download());
-            if (task.Result)
+            if (HttpClientDownloader.Get(Page))
             {
                 DownloadSucess();
             }
@@ -30,35 +31,6 @@ namespace landerist_library.Scrape
                 DownloadError();
             }
             return Page.Update();
-        }
-
-        private async Task<bool> Download()
-        {
-            Page.HttpStatusCode = null;
-            Page.ResponseBody = null;
-            Page.ResponseBodyText = null;
-
-            HttpClientHandler handler = new()
-            {
-                AllowAutoRedirect = false
-            };
-            using var client = new HttpClient(handler);
-            client.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
-
-            HttpRequestMessage request = new(HttpMethod.Get, Page.Uri);
-            bool sucess = false;
-            try
-            {
-                HttpResponseMessage = await client.SendAsync(request);
-                sucess = HttpResponseMessage.IsSuccessStatusCode;
-                Page.HttpStatusCode = (short)HttpResponseMessage.StatusCode;
-                Page.ResponseBody = await HttpResponseMessage.Content.ReadAsStringAsync();
-            }
-            catch (Exception exception)
-            {
-                Logs.Log.WriteLogErrors(Page.Uri, exception);
-            }
-            return sucess;
         }
 
         private void DownloadSucess()
@@ -136,17 +108,10 @@ namespace landerist_library.Scrape
 
         private void DownloadErrorRedirect()
         {
-            if (HttpResponseMessage == null)
+            var redirectUrl = HttpClientDownloader.GetRedirectUrl();
+            if (redirectUrl != null)
             {
-                return;
-            }
-            if (HttpResponseMessage.Headers.TryGetValues("Location", out var locations))
-            {
-                var redirectUrl = locations.FirstOrDefault();
-                if (redirectUrl != null)
-                {
-                    new Indexer(Page).InsertUrl(redirectUrl);
-                }
+                new Indexer(Page).InsertUrl(redirectUrl);
             }
         }
     }
