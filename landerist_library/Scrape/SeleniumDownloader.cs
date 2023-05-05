@@ -11,10 +11,10 @@ using OpenQA.Selenium.Firefox;
 
 namespace landerist_library.Scrape
 {
-    public class Selenium
+    public class SeleniumDownloader
     {
 
-        public static void CrhomeScrapePage(Uri uri)
+        public static void GetChrome(Uri uri)
         {
             ChromeDriverService driverService = ChromeDriverService.CreateDefaultService();
             driverService.HideCommandPromptWindow = true; // Para ocultar la ventana de comandos
@@ -61,7 +61,7 @@ namespace landerist_library.Scrape
 
         }
 
-        public static void FirefoxScrape(Uri uri)
+        public static void GetFirefox(Uri uri)
         {
             // Configura el FirefoxDriver
             FirefoxDriverService driverService = FirefoxDriverService.CreateDefaultService();

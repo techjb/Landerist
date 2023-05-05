@@ -12,6 +12,7 @@
     <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
     <PackageReference Include="Louw.SitemapParser" Version="0.0.2" />
     <PackageReference Include="OpenAI" Version="1.7.2" />
+    <PackageReference Include="PuppeteerSharp" Version="9.1.0" />
     <PackageReference Include="Selenium.Firefox.WebDriver" Version="0.27.0" />
     <PackageReference Include="Selenium.WebDriver" Version="4.9.0" />
     <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="113.0.5672.6300" />
