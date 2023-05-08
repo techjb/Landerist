@@ -1,11 +1,9 @@
 # Landerist
 
-Open project for the decentralization of real estate listings.
-
-The methodology to carry out the decentralization is as follows:
+Open project for the decentralization of real estate listings using the following methodology:
 
 1. Locate websites of real estate agencies by country that may contain property listings.
-2. Download the real estate listing data and standardize it.
+2. Download the data from the real estate listings and standardize it using artificial intelligence.
 3. Distribute the dataset for free in [ORELS](https://github.com/techjb/Open-Real-Estate-Listings-Schema) format.
 4. Keep the dataset updated daily.
 
