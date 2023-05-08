@@ -6,7 +6,7 @@ namespace landerist_library.Download
 {
     public class SeleniumDownloader
     {
-        
+
         public static void GetChrome(Uri uri)
         {
             ChromeDriverService driverService = ChromeDriverService.CreateDefaultService();

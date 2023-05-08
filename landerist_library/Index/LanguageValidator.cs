@@ -86,7 +86,7 @@ namespace landerist_library.Index
                 return false;
             }
 
-            if (!country.Equals(string.Empty) && 
+            if (!country.Equals(string.Empty) &&
                 !string.Equals(country, website.CountryCode.ToString(), StringComparison.OrdinalIgnoreCase))
             {
                 return false;

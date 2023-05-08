@@ -37,7 +37,7 @@ namespace landerist_library.Parse.MediaParser
             }
             foreach (var node in nodeCollection)
             {
-                ParseImage(node, attributeValue);                
+                ParseImage(node, attributeValue);
             }
         }
 
@@ -47,7 +47,7 @@ namespace landerist_library.Parse.MediaParser
             if (string.IsNullOrEmpty(attributeValue))
             {
                 return;
-            }            
+            }
 
             string extension = Path.GetExtension(attributeValue).ToLower();
             if (!extension.StartsWith(".jpg") && !extension.StartsWith(".jpeg"))

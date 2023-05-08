@@ -44,11 +44,11 @@ namespace landerist_library.Index
                 {
                     var href = htmlNode.GetAttributeValue("href", string.Empty);
                     InsertUrl(href);
-                }                
+                }
             }
             catch { }
         }
 
-        
+
     }
 }

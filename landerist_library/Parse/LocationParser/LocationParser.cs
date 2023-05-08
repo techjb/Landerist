@@ -121,15 +121,15 @@ namespace landerist_library.Parse.LocationParser
             {
                 double? latitude = null;
                 double? longitude = null;
-                
-                foreach (Group group in match.Groups.Cast<Group>()) 
+
+                foreach (Group group in match.Groups.Cast<Group>())
                 {
                     var value = group.Value;
                     if (value.StartsWith("."))
                     {
                         continue;
                     }
-                    if(!double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double latOrLng))
+                    if (!double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double latOrLng))
                     {
                         continue;
                     }

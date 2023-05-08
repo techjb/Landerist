@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace landerist_library.Insert
 {
-    public class CsvInserter: WebsitesInserter
+    public class CsvInserter : WebsitesInserter
     {
         public CsvInserter(bool initInsertedUris) : base(initInsertedUris)
         {

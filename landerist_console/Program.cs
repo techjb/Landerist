@@ -53,7 +53,7 @@ namespace landerist_console
             //SeleniumDownloader.GetChrome(uriPage);
             //PuppeteerDownloader.Get(uriPage);
             //new HttpClientDownloader().Get(uriPage);
-            
+
 
             //var uri = new Uri("https://www.goolzoom.com/");
             //var uri = new Uri("https://www.saroga.es/");
@@ -117,7 +117,7 @@ namespace landerist_console
             //}
             //
             // 
-            
+
 
         }
 

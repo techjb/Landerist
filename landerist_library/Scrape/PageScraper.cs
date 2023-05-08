@@ -82,7 +82,7 @@ namespace landerist_library.Scrape
             var listingParser = new ListingParser(Page).GetListing();
             Page.IsListing = listingParser.Item1;
             var listing = listingParser.Item2;
-            if(listing == null)
+            if (listing == null)
             {
                 return;
             }
@@ -93,8 +93,8 @@ namespace landerist_library.Scrape
                 new MediaParser(Page).AddMedia(listing);
                 ES_Listings.InsertUpdate(listing);
                 Page.ResponseBodyText = null;
-            }            
-            else 
+            }
+            else
             {
                 ES_Listings.Insert(listing);
             }

@@ -15,7 +15,7 @@ namespace landerist_library.Index
 
         public Indexer(Website website) : this(new Page(website))
         {
-            
+
         }
 
         public Indexer(Page page)
@@ -41,7 +41,7 @@ namespace landerist_library.Index
             {
                 return;
             }
-            
+
             if (!Uri.TryCreate(Page.Uri, link, out Uri? uri))
             {
                 return;

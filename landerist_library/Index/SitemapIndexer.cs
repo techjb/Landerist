@@ -11,7 +11,7 @@ namespace landerist_library.Index
         {
             foreach (var sitemap in sitemaps)
             {
-                InsertSitemap(sitemap.Url);                
+                InsertSitemap(sitemap.Url);
             }
         }
 

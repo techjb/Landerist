@@ -49,8 +49,8 @@ namespace landerist_library.Parse.MediaParser
         {
             if (!Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out Uri? uri))
             {
-                return ;
-            }            
+                return;
+            }
             if (uri == null)
             {
                 return;
