@@ -44,7 +44,7 @@ namespace landerist_library.Insert
             }
         }
 
-        public void Insert(Uri uri)
+        public static void Insert(Uri uri)
         {
             var list = new List<Uri>()
             {

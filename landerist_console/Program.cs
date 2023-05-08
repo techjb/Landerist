@@ -66,13 +66,11 @@ namespace landerist_console
             var website = new Website(uri);
             var page = new Page(website, uriPage);
 
-
-
             //website.Delete(); return;
             //Websites.DeleteAll(); return;
 
             //new WebsitesInserter(false).DeleteAndInsert(uri); return;
-            //new WebsitesInserter(false).Insert(uri); return;
+            //new WebsitesInserter(false).InsertLinksAlternate(uri); return;
             //new WebsitesInserter().FromCsv();            
 
             //Websites.SetHttpStatusCodesToNull();
@@ -88,7 +86,7 @@ namespace landerist_console
             //new Scraper().ScrapeNonScrapped(uri);
             //new Scraper().ScrapeUnknowIsListing(uri, true);
             //new Scraper().ScrapeIsNotListing(uri);
-            new Scraper().ScrapePage(page);
+            //new Scraper().ScrapePage(page);
             //new Scraper().GetChrome(page);
             //new Scraper().ScrapeAllPages();
 
@@ -117,7 +115,9 @@ namespace landerist_console
             //        default: continue;
             //    }
             //}
-            //          
+            //
+            // 
+            
 
         }
 

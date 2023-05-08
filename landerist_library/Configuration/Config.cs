@@ -4,6 +4,8 @@
     {
         private static bool ConfigurationProduction = true;
 
+        public static readonly bool ListingDataTrainingMode = true;
+
         private static readonly string VERSION_PRODUCCION = "1.00";
 
         private static readonly string VERSION_LOCAL = new Random().Next(1000, 9999).ToString();
@@ -44,7 +46,7 @@
 
         private static readonly string EXPORT_DIRECTORY_PRODUCTION = PrivateConfig.EXPORT_DIRECTORY_PRODUCTION;
 
-        public static string USER_AGENT = "Mozilla/5.0 (compatible; AcmeInc/1.0)";
+        public static readonly string USER_AGENT = "Mozilla/5.0 (compatible; AcmeInc/1.0)";
 
 
         public static bool IsConfigurationProduction()

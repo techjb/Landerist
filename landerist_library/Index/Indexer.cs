@@ -37,10 +37,11 @@ namespace landerist_library.Index
 
         public void InsertUrl(string? link)
         {
-            if (link == null)
+            if (string.IsNullOrEmpty(link))
             {
                 return;
             }
+            
             if (!Uri.TryCreate(Page.Uri, link, out Uri? uri))
             {
                 return;
@@ -82,7 +83,7 @@ namespace landerist_library.Index
             {
                 return;
             }
-            if (LanguageValidator.ContainsNotAllowed(uri, Page.Website.Language))
+            if (LanguageValidator.ContainsNotAllowed(uri, Page.Website.LanguageCode))
             {
                 return;
             }

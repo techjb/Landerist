@@ -7,6 +7,19 @@ using System.Net;
 
 namespace landerist_library.Websites
 {
+
+    // https://www.w3schools.com/tags/ref_country_codes.asp
+    public enum CountryCode
+    {
+        ES
+    }
+
+    // https://www.w3schools.com/tags/ref_language_codes.asp
+    public enum LanguageCode
+    {
+        es
+    }
+
     public class Website
     {
         public Uri MainUri { get; set; }
@@ -22,8 +35,11 @@ namespace landerist_library.Websites
 
         private Robots? Robots = null;
 
-        
-        public string Language = "es";
+
+        public LanguageCode LanguageCode = LanguageCode.es;
+
+
+        public CountryCode CountryCode = CountryCode.ES;
 
         public Website()
         {
@@ -74,6 +90,8 @@ namespace landerist_library.Websites
             string mainUriString = dataRow["MainUri"].ToString()!;
             MainUri = new(mainUriString);
             Host = dataRow["Host"].ToString()!;
+            LanguageCode = (LanguageCode)Enum.Parse(typeof(LanguageCode), dataRow["LanguageCode"].ToString()!);
+            CountryCode = (CountryCode)Enum.Parse(typeof(CountryCode), dataRow["CountryCode"].ToString()!);
             RobotsTxt = dataRow["RobotsTxt"] is DBNull ? null : dataRow["RobotsTxt"].ToString();
             IpAddress = dataRow["IpAddress"] is DBNull ? null : dataRow["IpAddress"].ToString();
             HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
@@ -83,7 +101,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "INSERT INTO " + Websites.TABLE_WEBSITES + " " +
-                "VALUES (@MainUri, @Host, @RobotsTxt, @IpAddress, @HttpStatusCode)";
+                "VALUES (@MainUri, @Host, @LanguageCode, @CountryCode, @RobotsTxt, @IpAddress, @HttpStatusCode)";
 
             var parameters = GetQueryParameters();
             return new DataBase().Query(query, parameters);
@@ -94,6 +112,8 @@ namespace landerist_library.Websites
             string query =
                 "UPDATE " + Websites.TABLE_WEBSITES + " SET " +
                 "[MainUri] = @MainUri, " +
+                "[LanguageCode] = @LanguageCode, " +
+                "[CountryCode] = @CountryCode, " +
                 "[RobotsTxt] = @RobotsTxt, " +
                 "[IpAddress] = @IpAddress, " +
                 "[HttpStatusCode] = @HttpStatusCode " +
@@ -108,6 +128,8 @@ namespace landerist_library.Websites
             return new Dictionary<string, object?> {
                 {"MainUri", MainUri.ToString() },
                 {"Host", Host },
+                {"LanguageCode", LanguageCode.ToString() },
+                {"CountryCode", CountryCode.ToString() },
                 {"RobotsTxt", RobotsTxt },
                 {"IpAddress", IpAddress },
                 {"HttpStatusCode", HttpStatusCode },
@@ -237,7 +259,7 @@ namespace landerist_library.Websites
                 var listing = ES_Listings.GetListing(page, false);
                 if (listing != null)
                 {
-                    if (ES_Listings.Delete(listing) && 
+                    if (ES_Listings.Delete(listing) &&
                         ES_Media.Delete(listing))
                     {
                         counter++;

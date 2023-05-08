@@ -7,7 +7,7 @@ namespace landerist_library.Index
     {
         public LinkAlternateIndexer(Page page) : base(page) { }
 
-        public void Insert()
+        public void InsertLinksAlternate()
         {
             if (Page.HtmlDocument == null)
             {
@@ -40,16 +40,15 @@ namespace landerist_library.Index
             try
             {
                 var hreflang = htmlNode.GetAttributeValue("hreflang", string.Empty);
-                if (hreflang.StartsWith(Page.Website.Language))
+                if (LanguageValidator.IsValidLanguageAndCountry(Page.Website, hreflang))
                 {
-                    var hrefAttr = htmlNode.GetAttributeValue("href", string.Empty);
-                    if (!string.IsNullOrEmpty(hrefAttr))
-                    {
-                        InsertUrl(hrefAttr);
-                    }
-                }
+                    var href = htmlNode.GetAttributeValue("href", string.Empty);
+                    InsertUrl(href);
+                }                
             }
             catch { }
         }
+
+        
     }
 }

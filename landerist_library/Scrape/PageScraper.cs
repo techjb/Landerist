@@ -1,4 +1,5 @@
-﻿using landerist_library.Database;
+﻿using landerist_library.Configuration;
+using landerist_library.Database;
 using landerist_library.Download;
 using landerist_library.Index;
 using landerist_library.Parse.ListingParser;
@@ -35,16 +36,16 @@ namespace landerist_library.Scrape
 
         private void DownloadSucess()
         {
-            if (!HtmInLanguage())
+            if (!HtmInWebsiteLanguage())
             {
-                new LinkAlternateIndexer(Page).Insert();
+                new LinkAlternateIndexer(Page).InsertLinksAlternate();
                 return;
             }
             InsertPages();
             GetListing();
         }
 
-        private bool HtmInLanguage()
+        private bool HtmInWebsiteLanguage()
         {
             Page.LoadHtmlDocument();
             if (Page.HtmlDocument != null)
@@ -52,14 +53,10 @@ namespace landerist_library.Scrape
                 var htmlNode = Page.HtmlDocument.DocumentNode.SelectSingleNode("/html");
                 if (htmlNode != null)
                 {
-                    var langAttr = htmlNode.Attributes["lang"];
-                    if (langAttr != null)
+                    var lang = htmlNode.Attributes["lang"];
+                    if (lang != null)
                     {
-                        var language = langAttr.Value.ToLower();
-                        if (!string.IsNullOrEmpty(language))
-                        {
-                            return language.StartsWith(Page.Website.Language);
-                        }                        
+                        return LanguageValidator.IsValidLanguageAndCountry(Page.Website, lang.Value);
                     }
                 }
             }
@@ -85,11 +82,21 @@ namespace landerist_library.Scrape
             var listingParser = new ListingParser(Page).GetListing();
             Page.IsListing = listingParser.Item1;
             var listing = listingParser.Item2;
-            if (listing != null)
+            if(listing == null)
+            {
+                return;
+            }
+
+            if (!Config.ListingDataTrainingMode)
             {
                 new LocationParser(Page, listing).SetLocation();
                 new MediaParser(Page).AddMedia(listing);
                 ES_Listings.InsertUpdate(listing);
+                Page.ResponseBodyText = null;
+            }            
+            else 
+            {
+                ES_Listings.Insert(listing);
             }
         }
 

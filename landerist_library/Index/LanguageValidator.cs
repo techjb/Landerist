@@ -1,4 +1,6 @@
-﻿namespace landerist_library.Index
+﻿using landerist_library.Websites;
+
+namespace landerist_library.Index
 {
     internal class LanguageValidator
     {
@@ -25,23 +27,20 @@
             "yi", "yo", "za", "zu"
         };
 
-        public static bool ContainsNotAllowed(Uri uri, string allowedLanguage)
+        public static bool ContainsNotAllowed(Uri uri, LanguageCode allowedLanguage)
         {
             string absolutePath = uri.AbsolutePath;
             string[] pathComponents = absolutePath.Split('/');
-            
-            for (var i = 1; i < 2; i++)
+
+            if (pathComponents.Length.Equals(0))
             {
-                var path = pathComponents[i];
-                if (ContainsNotAllowed(path, allowedLanguage))
-                {
-                    return true;
-                }
+                return false;
             }
-            return false;
+            var path = pathComponents[1];
+            return ContainsNotAllowed(path, allowedLanguage);
         }
 
-        protected static bool ContainsNotAllowed(string path, string allowedLanguage)
+        protected static bool ContainsNotAllowed(string path, LanguageCode allowedLanguage)
         {
             string[] pathItems = new string[] { path };
             if (path.Contains('-'))
@@ -55,7 +54,7 @@
 
             foreach (var pathItem in pathItems)
             {
-                if (string.Equals(pathItem, allowedLanguage, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(pathItem, allowedLanguage.ToString(), StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
@@ -65,6 +64,34 @@
                 }
             }
             return false;
+        }
+
+        public static bool IsValidLanguageAndCountry(Website website, string hreflang)
+        {
+            if (string.IsNullOrEmpty(hreflang))
+            {
+                return false;
+            }
+
+            var language = hreflang;
+            var country = string.Empty;
+            if (hreflang.Contains('-'))
+            {
+                var hrefLangParts = hreflang.Split('-');
+                language = hrefLangParts[0];
+                country = hrefLangParts[1];
+            }
+            if (!string.Equals(language, website.LanguageCode.ToString(), StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            if (!country.Equals(string.Empty) && 
+                !string.Equals(country, website.CountryCode.ToString(), StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            return true;
         }
     }
 }
