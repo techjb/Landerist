@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "landerist_orels": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:60126;http://localhost:60127"
+    }
+  }
+}

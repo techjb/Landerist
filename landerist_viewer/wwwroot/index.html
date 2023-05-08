@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ORELS Validator and viewer</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.classless.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/ajv/dist/ajv.bundle.js"></script>
+</head>
+<body>
+    <header>
+        <hgroup>
+            <h1>ORELS Validator and viewer</h1>
+            <h2>
+                View real state listings in
+                <a href="https://github.com/techjb/Open-Real-Estate-Listings-Schema">ORELS</a>
+                format.
+            </h2>
+        </hgroup>
+    </header>
+    <main>        
+        <section>
+            <form>
+                <label for="json-file" class="button">Select/dragg Json in ORELS format</label>
+                <input type="file" id="json-file" accept=".json" />
+            </form>
+            <div id="validation-result"></div>
+            <pre id="json-preview"></pre>
+        </section>
+    </main>
+    <footer>
+        <script type="text/javascript">
+            var schema;
+            PreloadSchema();
+
+            function PreloadSchema() {
+                var getJSON = function (url, callback) {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET', url, true);
+                    xhr.responseType = 'json';
+                    xhr.onload = function () {
+                        var status = xhr.status;
+                        if (status === 200) {
+                            callback(null, xhr.response);
+                        } else {
+                            callback(status, xhr.response);
+                        }
+                    };
+                    xhr.send();
+                };
+
+                getJSON('https://raw.githubusercontent.com/techjb/Open-Real-Estate-Listings-Schema/master/ES/1.0.json',
+                    function (err, data) {
+                        if (err !== null) {
+                            alert('Something went wrong: ' + err);
+                        } else {
+                            schema = data;
+                        }
+                    });
+            }
+
+            
+            document.getElementById("json-file").addEventListener("change", (e) => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const json = JSON.parse(event.target.result);
+                        const ajv = new Ajv.default();
+                        const isValid = ajv.validate(schema, json);
+
+                        if (isValid) {
+                            document.getElementById("validation-result").textContent = "JSON is valid.";
+                            document.getElementById("json-preview").textContent = JSON.stringify(jsonData, null, 2);
+                        } else {
+                            result.textContent = "JSON inválido:\n" + ajv.errorsText();
+                            result.style.color = "red";
+
+                            document.getElementById("validation-result").textContent = "JSON is not valid. Reason: " + validationResult.reason;
+                            document.getElementById("json-preview").textContent = "";
+                        }
+
+                    } catch (error) {
+                        document.getElementById("validation-result").textContent = "Error reading file: " + error.message;
+                        document.getElementById("json-preview").textContent = "";
+                    }
+                };
+                reader.readAsText(file);
+            });
+        </script>
+    </footer>
+</body>
+</html>
