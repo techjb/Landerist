@@ -1,6 +1,6 @@
 # Landerist
 
-Landerist is an open project for the decentralization of real estate listings.
+Open project for the decentralization of real estate listings.
 
 The methodology to carry out the decentralization is as follows:
 
