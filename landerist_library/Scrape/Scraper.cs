@@ -1,4 +1,5 @@
 ﻿using landerist_library.Websites;
+using System.Collections.Generic;
 using System.Data;
 
 namespace landerist_library.Scrape
@@ -31,7 +32,7 @@ namespace landerist_library.Scrape
             var dictionary = Websites.Websites.GetDicionaryStatusCodeOk();
             var dataTable = Pages.GetAll();
             var pages = GetPages(dictionary, dataTable);
-            ScrapePages(pages);
+            Scrape(pages);
         }
 
         private static HashSet<Page> GetPages(Dictionary<string, Website> dictionary, DataTable dataTable)
@@ -54,13 +55,13 @@ namespace landerist_library.Scrape
         public void ScrapeMainPage(Website website)
         {
             var page = new Page(website);
-            ScrapePage(page);
+            Scrape(page);
         }
 
         public void ScrapePages(Website website)
         {
             var pages = website.GetPages();
-            ScrapePages(pages);
+            Scrape(pages);
         }
 
         public void ScrapeNonScrapped(Uri uri, bool recursive = false)
@@ -75,7 +76,7 @@ namespace landerist_library.Scrape
             {
                 return;
             }
-            ScrapePages(pages);
+            Scrape(pages);
             if (recursive)
             {
                 ScrapeNonScrapped(website, recursive);
@@ -96,7 +97,7 @@ namespace landerist_library.Scrape
             {
                 return;
             }
-            ScrapePages(pages);
+            Scrape(pages);
             if (recursive)
             {
                 ScrapeUnknowIsListing(website, recursive);
@@ -116,21 +117,22 @@ namespace landerist_library.Scrape
             {
                 return;
             }
-            ScrapePages(pages);
+            Scrape(pages);
             if (recursive)
             {
                 ScrapeIsNotListing(website, recursive);
             }
         }
 
-        private void ScrapePages(List<Page> pages)
+        private void Scrape(List<Page> pages)
         {
             HashSet<Page> hashSet = new(pages, new PageComparer());
-            ScrapePages(hashSet);
+            Scrape(hashSet);
         }
 
-        private void ScrapePages(HashSet<Page> pages)
+        private void Scrape(HashSet<Page> pages)
         {
+            pages.RemoveWhere(p => !p.CanScrape());
             PendingPages.Clear();
             int TotalPages = pages.Count;
             int Counter = 0;
@@ -146,18 +148,18 @@ namespace landerist_library.Scrape
                         "Scrapped: " + Counter + "/" + TotalPages + " Pending: " + PendingPages.Count + " " +
                         "Success: " + Sucess + " Errors: " + Errors);
 
-                    ScrapePage(page);
+                    Scrape(page);
                 });
 
             if (PendingPages.Count > 0)
             {
                 Thread.Sleep(2000);
-                List<Page> newList = new(PendingPages);
-                ScrapePages(newList);
+                HashSet<Page> newList = new(PendingPages);
+                Scrape(newList);
             }
         }
 
-        public void ScrapePage(Page page)
+        public void Scrape(Page page)
         {
             if (!page.CanScrape())
             {

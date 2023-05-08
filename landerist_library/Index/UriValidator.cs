@@ -1,4 +1,6 @@
-﻿namespace landerist_library.Index
+﻿using landerist_library.Configuration;
+
+namespace landerist_library.Index
 {
     internal class UriValidator
     {
@@ -51,6 +53,11 @@
 
         public static bool IsValid(Uri uri)
         {
+            if(!Config.ListingDataTrainingMode)
+            {
+                return true;
+            }
+
             var directories = uri.AbsolutePath.ToLower().Split('/');
             foreach (var directory in directories)
             {
