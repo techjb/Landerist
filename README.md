@@ -6,7 +6,7 @@ The methodology to carry out the decentralization is as follows:
 
 1. Locate websites of real estate agencies by country that may contain property listings.
 2. Download the real estate listing data and standardize it.
-3. Distribute the dataset for free in ORELS format.
+3. Distribute the dataset for free in [ORELS](https://github.com/techjb/Open-Real-Estate-Listings-Schema) format.
 4. Keep the dataset updated daily.
 
 ## Installation
