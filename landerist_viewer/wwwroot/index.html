@@ -6,14 +6,28 @@
     <title>ORELS Viewer</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.classless.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/ajv/dist/ajv.bundle.js"></script>
+    <style type="text/css">
+        div#dropZone {
+            background: gray;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 999;
+            opacity: 0.6;
+            visibility: hidden;
+        }
+      
+    </style>
 </head>
 <body>
+    <div id="dropZone"></div>
     <header>
         <hgroup>
             <h1>ORELS Viewer</h1>
             <h2>
-                View real state listings in
-                <a href="https://github.com/techjb/Open-Real-Estate-Listings-Schema">ORELS</a>
+                View property listings in <a href="https://github.com/techjb/Open-Real-Estate-Listings-Schema">ORELS</a>
                 format.
             </h2>
         </hgroup>
@@ -26,106 +40,195 @@
                     <option value="" selected>ES/1.0</option>
                 </select>
                 <label for="json-file">
-                    Select/dragg Json in ORELS format
+                    Select or dragg JSON file
                     <input type="file" id="json-file" accept=".json" />
                 </label>
             </form>
-            <div id="validation-result"></div>
-            <pre id="json-preview"></pre>
+            <div id="validation-error"></div>
+        </section>
+        <section id="json-preview">
         </section>
     </main>
     <footer>
-        <script type="text/javascript">
-            var schema;
-            var validationResult = document.getElementById("validation-result");
-            var jsonPreview = document.getElementById("json-preview");
-            var jsonFile = document.getElementById("json-file");
+        <small>
+            This website is part of the <a title="Landerits" href="https://github.com/techjb/Landerist">Landerist</a> project. <a href="https://twitter.com/techjb">Follow me</a> on Twitter.
+        </small>
+    </footer>
 
-            PreloadSchema();
+    <script type="text/javascript">
+        var schema;
+        var jsonFile = document.getElementById("json-file");
+        var validationError = document.getElementById("validation-error");
+        var jsonPreview = document.getElementById("json-preview");
+        var dropZone = document.getElementById('dropZone');
 
-            function PreloadSchema() {
-                var getJSON = function (url, callback) {
-                    var xhr = new XMLHttpRequest();
-                    xhr.open('GET', url, true);
-                    xhr.responseType = 'json';
-                    xhr.onload = function () {
-                        var status = xhr.status;
-                        if (status === 200) {
-                            callback(null, xhr.response);
-                        } else {
-                            callback(status, xhr.response);
-                        }
-                    };
-                    xhr.send();
-                };
+        PreloadSchema();
 
-                let url = 'https://raw.githubusercontent.com/techjb/Open-Real-Estate-Listings-Schema/master/ES/1.0.json';
-
-                getJSON(url, function (err, data) {
-                    if (err !== null) {
-                        alert('Something went wrong: ' + err);
+        function PreloadSchema() {
+            var getJSON = function (url, callback) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', url, true);
+                xhr.responseType = 'json';
+                xhr.onload = function () {
+                    var status = xhr.status;
+                    if (status === 200) {
+                        callback(null, xhr.response);
                     } else {
-                        schema = data;
+                        callback(status, xhr.response);
                     }
-                });
-            }
-
-            function Reset() {
-                validationResult.textContent = "";
-                jsonPreview.textContent = "";
-            }
-
-            jsonFile.addEventListener("change", (e) => {
-                Reset();
-                const file = e.target.files[0];
-                ViewFile(file);
-            });
-
-
-            function ViewFile(file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    OnLoadFile(event);
                 };
-                reader.readAsText(file);
+                xhr.send();
             };
 
-            function OnLoadFile(event) {
-                try {
-                    const json = JSON.parse(event.target.result);
-                    const ajv = new Ajv();                    
-                    const isValid = ajv.validate(schema, json);
+            let url = 'https://raw.githubusercontent.com/techjb/Open-Real-Estate-Listings-Schema/master/ES/1.0.json';
 
-                    if (isValid) {
-                        validationResult.textContent = "JSON is valid.";
-                        ShowJson(json);
-                    } else {
-                        console.log(ajv.errors)
-                        validationResult.textContent = "JSON is not valid. Reason: " + ajv.errors;
-                    }
+            getJSON(url, function (err, data) {
+                if (err !== null) {
+                    alert('Something went wrong: ' + err);
+                } else {
+                    schema = data;
+                }
+            });
+        }
 
-                } catch (error) {                    
-                    validationResult.textContent = "Error reading file: " + error.message;
+        function Reset() {
+            validationError.innerHTML = "";
+            jsonPreview.innerHTML = "";
+        }
+
+        jsonFile.addEventListener("change", (e) => {
+            Reset();
+            const file = e.target.files[0];
+            ReadFile(file);
+        });
+
+        function showDropZone() {
+            dropZone.style.visibility = "visible";
+        }
+        function hideDropZone() {
+            dropZone.style.visibility = "hidden";
+        }
+
+        function allowDrag(e) {
+            if (true) {  // Test that the item being dragged is a valid one
+                e.dataTransfer.dropEffect = 'copy';
+                e.preventDefault();
+            }
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            hideDropZone();
+
+            let files = e.dataTransfer.files
+            if (files.length > 0) {
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(files[0]);
+                jsonFile.files = dataTransfer.files;
+                var event = new Event('change');
+                jsonFile.dispatchEvent(event);
+            }
+        }
+
+        window.addEventListener('dragenter', function (e) {
+            showDropZone();
+        });
+
+        dropZone.addEventListener('dragenter', allowDrag);
+        dropZone.addEventListener('dragover', allowDrag);
+
+        dropZone.addEventListener('dragleave', function (e) {
+            hideDropZone();
+        });
+
+        dropZone.addEventListener('drop', handleDrop);
+
+
+        function ReadFile(file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                OnLoadFile(event);
+            };
+            reader.readAsText(file);
+        };
+
+        function OnLoadFile(event) {
+            try {
+                const json = JSON.parse(event.target.result);
+                const ajv = new Ajv();
+                const isValid = ajv.validate(schema, json);
+                if (isValid) {
+                    ShowJson(json);
+                } else {
+                    SetError("JSON is not valid. Reason: " + ajv.errors);
                 }
             }
+            catch (error) {
+                SetError("Error reading file: " + error.message);
+            }
+        }
 
-            function ShowJson(json) {
-                for (var i = 0; i < json.listings.length; i++) {
-                    var listing = json.listings[i];
-                    ShowListing(listing);
+        function SetError(text) {
+            validationError.innerHTML = "<strong>" + text + "</strong>";
+        }
+
+        function ShowJson(json) {
+            for (var i = 0; i < json.listings.length; i++) {
+                var listing = json.listings[i];
+                ShowListing(listing);
+            }
+        }
+
+        function ShowListing(listing) {
+            try {
+                var article = document.createElement("article");
+                CreateHeader(listing, article);
+                CreateFooter(listing, article);
+
+                
+                jsonPreview.append(article);
+            }
+            catch {
+
+            }
+        }
+
+        function CreateHeader(listing, article) {
+
+        }
+
+        function CreateFooter(listing, article) {
+            let dataSourceName = false;
+            let dataSourceUrl = false;
+            let dataSourceUpdate = false;
+
+            if (listing.hasOwnProperty('dataSourceName')) {
+                dataSourceName = listing.dataSourceName;
+            }
+            if (listing.hasOwnProperty('dataSourceUrl')) {
+                dataSourceUrl = listing.dataSourceUrl;
+            }
+            if (listing.hasOwnProperty('dataSourceUpdate')) {
+                dataSourceUpdate = listing.dataSourceUpdate;
+            }
+            if (dataSourceName && dataSourceUrl) {
+
+            }
+            var innerHTML = '';
+            if (dataSourceName) {
+                innerHTML = '<div title="dataSourceName">' + dataSourceName + '</div>';
+                if (dataSourceUrl) {
+                    innerHTML = '<div title="dataSourceName & dataSourceUrl"><a href="' + dataSourceUrl + '">' + dataSourceName + '</a></div>';
                 }
             }
-
-            function ShowListing(listing) {
-                console.log(listing);
-                try {
-
-                }
-                catch {
-
-                }
+            if (dataSourceUpdate) {
+                innerHTML += '<div><small title="dataSourceUpdate">' + dataSourceUpdate + '</small></div>';
             }
-        </script>
-    </footer>
+
+            var footer = document.createElement("footer");
+            footer.innerHTML = innerHTML;
+            article.appendChild(footer);
+        }
+    </script>
 </body>
 </html>

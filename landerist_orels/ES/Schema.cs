@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 
@@ -28,6 +29,18 @@ namespace landerist_orels.ES
         public void AddListing(Listing listing)
         {
             listings.Add(listing);
+        }
+
+        public string Serialize()
+        {
+            var jsonSereializerSettings = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+            };
+            jsonSereializerSettings.Converters.Add(new StringEnumConverter());
+            jsonSereializerSettings.DateFormatString = "yyyy-MM-ddTHH:mm:ssZ";
+
+            return JsonConvert.SerializeObject(this, Formatting.Indented, jsonSereializerSettings);
         }
     }
 }

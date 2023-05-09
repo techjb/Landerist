@@ -16,14 +16,7 @@ namespace landerist_library.Export
         {
             var listings = ES_Listings.GetAll(true);
             var schema = new Schema(listings);
-            var jsonSereializerSettings = new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore,
-            };
-            jsonSereializerSettings.Converters.Add(new StringEnumConverter());
-            jsonSereializerSettings.DateFormatString = "yyyy-MM-ddTHH:mm:ssZ";            
-
-            string json = JsonConvert.SerializeObject(schema, Formatting.Indented, jsonSereializerSettings);
+            string json = schema.Serialize();
             string jsonFile = Config.EXPORT_DIRECTORY + JSON_FILE_NAME;
             File.Delete(jsonFile);
             File.WriteAllText(jsonFile, json);
