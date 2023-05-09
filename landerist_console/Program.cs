@@ -1,5 +1,6 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Download;
+using landerist_library.Export;
 using landerist_library.Insert;
 using landerist_library.Parse.LocationParser;
 using landerist_library.Scrape;
@@ -92,33 +93,7 @@ namespace landerist_console
             //new Scraper().ScrapeAllPages();
 
             //Csv.Export(true);
-            //Json.Export(true);
-
-            //string regexPattern = @"latitude\s*=\s*(-?\d+(\.\d+)?)\s*,\s*longitude\s*=\s*(-?\d+(\.\d+)?)";
-            //string text = "latitude=40.504108,longitude=-3.888549 cca de perro latitude = 28.504108 , longitude = -10.888549";
-
-            //string regexPattern = @"lat\s*:\s*(-?\d+\.\d+)\s*,\s*lng\s*:\s*(-?\d+\.\d+)";
-            //string text = "lat:40.504108,lng:-3.888549 cca de perro lat: 28.504108 , lng: -10.888549";
-
-            //string regexPattern = @"LatLng\s*\(\s*(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)\s*\)";
-            //string text = " lola LatLng( 40.504108 , -3.888549 ) LatLng (28.504108 , -10.888549) misers";
-
-            //string text = "acasca";
-            //var matches = new Regex(regexPattern).Matches(text);
-            //foreach (Match match in matches)
-            //{
-            //    string latitude;
-            //    string longitude;
-            //    switch (match.Groups.Count)
-            //    {
-            //        case 3: latitude = match.Groups[1].Value; longitude = match.Groups[2].Value; break;
-            //        case 5: latitude = match.Groups[1].Value; longitude = match.Groups[3].Value; break;
-            //        default: continue;
-            //    }
-            //}
-            //
-            // 
-
+            Json.Export(true);
 
         }
 

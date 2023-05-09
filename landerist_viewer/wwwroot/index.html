@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ORELS Validator and viewer</title>
+    <title>ORELS Viewer</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.classless.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/ajv/dist/ajv.bundle.js"></script>
 </head>
 <body>
     <header>
         <hgroup>
-            <h1>ORELS Validator and viewer</h1>
+            <h1>ORELS Viewer</h1>
             <h2>
                 View real state listings in
                 <a href="https://github.com/techjb/Open-Real-Estate-Listings-Schema">ORELS</a>
@@ -18,11 +18,17 @@
             </h2>
         </hgroup>
     </header>
-    <main>        
+    <main>
         <section>
             <form>
-                <label for="json-file" class="button">Select/dragg Json in ORELS format</label>
-                <input type="file" id="json-file" accept=".json" />
+                <label for="select">Schema</label>
+                <select id="select" name="select" required>
+                    <option value="" selected>ES/1.0</option>
+                </select>
+                <label for="json-file">
+                    Select/dragg Json in ORELS format
+                    <input type="file" id="json-file" accept=".json" />
+                </label>
             </form>
             <div id="validation-result"></div>
             <pre id="json-preview"></pre>
@@ -31,6 +37,10 @@
     <footer>
         <script type="text/javascript">
             var schema;
+            var validationResult = document.getElementById("validation-result");
+            var jsonPreview = document.getElementById("json-preview");
+            var jsonFile = document.getElementById("json-file");
+
             PreloadSchema();
 
             function PreloadSchema() {
@@ -49,44 +59,72 @@
                     xhr.send();
                 };
 
-                getJSON('https://raw.githubusercontent.com/techjb/Open-Real-Estate-Listings-Schema/master/ES/1.0.json',
-                    function (err, data) {
-                        if (err !== null) {
-                            alert('Something went wrong: ' + err);
-                        } else {
-                            schema = data;
-                        }
-                    });
+                let url = 'https://raw.githubusercontent.com/techjb/Open-Real-Estate-Listings-Schema/master/ES/1.0.json';
+
+                getJSON(url, function (err, data) {
+                    if (err !== null) {
+                        alert('Something went wrong: ' + err);
+                    } else {
+                        schema = data;
+                    }
+                });
             }
 
-            
-            document.getElementById("json-file").addEventListener("change", (e) => {
+            function Reset() {
+                validationResult.textContent = "";
+                jsonPreview.textContent = "";
+            }
+
+            jsonFile.addEventListener("change", (e) => {
+                Reset();
                 const file = e.target.files[0];
+                ViewFile(file);
+            });
+
+
+            function ViewFile(file) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    try {
-                        const json = JSON.parse(event.target.result);
-                        const ajv = new Ajv.default();
-                        const isValid = ajv.validate(schema, json);
-
-                        if (isValid) {
-                            document.getElementById("validation-result").textContent = "JSON is valid.";
-                            document.getElementById("json-preview").textContent = JSON.stringify(jsonData, null, 2);
-                        } else {
-                            result.textContent = "JSON inválido:\n" + ajv.errorsText();
-                            result.style.color = "red";
-
-                            document.getElementById("validation-result").textContent = "JSON is not valid. Reason: " + validationResult.reason;
-                            document.getElementById("json-preview").textContent = "";
-                        }
-
-                    } catch (error) {
-                        document.getElementById("validation-result").textContent = "Error reading file: " + error.message;
-                        document.getElementById("json-preview").textContent = "";
-                    }
+                    OnLoadFile(event);
                 };
                 reader.readAsText(file);
-            });
+            };
+
+            function OnLoadFile(event) {
+                try {
+                    const json = JSON.parse(event.target.result);
+                    const ajv = new Ajv();                    
+                    const isValid = ajv.validate(schema, json);
+
+                    if (isValid) {
+                        validationResult.textContent = "JSON is valid.";
+                        ShowJson(json);
+                    } else {
+                        console.log(ajv.errors)
+                        validationResult.textContent = "JSON is not valid. Reason: " + ajv.errors;
+                    }
+
+                } catch (error) {                    
+                    validationResult.textContent = "Error reading file: " + error.message;
+                }
+            }
+
+            function ShowJson(json) {
+                for (var i = 0; i < json.listings.length; i++) {
+                    var listing = json.listings[i];
+                    ShowListing(listing);
+                }
+            }
+
+            function ShowListing(listing) {
+                console.log(listing);
+                try {
+
+                }
+                catch {
+
+                }
+            }
         </script>
     </footer>
 </body>

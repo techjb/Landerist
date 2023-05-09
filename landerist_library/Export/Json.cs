@@ -21,6 +21,7 @@ namespace landerist_library.Export
                 NullValueHandling = NullValueHandling.Ignore,
             };
             jsonSereializerSettings.Converters.Add(new StringEnumConverter());
+            jsonSereializerSettings.DateFormatString = "yyyy-MM-ddTHH:mm:ssZ";            
 
             string json = JsonConvert.SerializeObject(schema, Formatting.Indented, jsonSereializerSettings);
             string jsonFile = Config.EXPORT_DIRECTORY + JSON_FILE_NAME;
