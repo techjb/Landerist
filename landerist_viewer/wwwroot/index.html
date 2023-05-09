@@ -18,7 +18,6 @@
             opacity: 0.6;
             visibility: hidden;
         }
-      
     </style>
 </head>
 <body>
@@ -51,7 +50,7 @@
     </main>
     <footer>
         <small>
-            This website is part of the <a title="Landerits" href="https://github.com/techjb/Landerist">Landerist</a> project. <a href="https://twitter.com/techjb">Follow me</a> on Twitter.
+            This website is part of the <a title="Landerits" href="https://github.com/techjb/Landerist">Landerist</a> project. Follow me on <a href="https://twitter.com/techjb">Twitter</a>.
         </small>
     </footer>
 
@@ -185,7 +184,7 @@
                 CreateHeader(listing, article);
                 CreateFooter(listing, article);
 
-                
+
                 jsonPreview.append(article);
             }
             catch {
@@ -216,10 +215,11 @@
             }
             var innerHTML = '';
             if (dataSourceName) {
-                innerHTML = '<div title="dataSourceName">' + dataSourceName + '</div>';
-                if (dataSourceUrl) {
-                    innerHTML = '<div title="dataSourceName & dataSourceUrl"><a href="' + dataSourceUrl + '">' + dataSourceName + '</a></div>';
-                }
+                innerHTML += '<div title="dataSourceName">' + dataSourceName + '</div>';
+            }
+            if (dataSourceUrl) {
+                innerHTML += '<div title="dataSourceUrl"><a href="' + dataSourceUrl + '">' +
+                    dataSourceUrl + '</a></div>';
             }
             if (dataSourceUpdate) {
                 innerHTML += '<div><small title="dataSourceUpdate">' + dataSourceUpdate + '</small></div>';
