@@ -198,8 +198,10 @@
                 AddProperty(listing, article, "propertyType");
                 AddProperty(listing, article, "propertySubtype");
                 if (Object.hasOwn(listing, "price")) {
-                    AddProperty(listing.price, article, "amount");
-                    AddProperty(listing.price, article, "currency");
+                    //AddProperty(listing.price, article, "amount");
+                    //AddProperty(listing.price, article, "currency");
+                    AddProperty(listing, article, "price.amount");
+                    AddProperty(listing, article, "price.currency");
                 }
 
                 AddMedias(listing, article);
@@ -258,7 +260,16 @@
 
 
         function AddProperty(object, parent, property, wrapper) {
-            if (!Object.hasOwn(object, property)) {
+            var value = object[property];
+
+            if (property.includes(".")) {
+                var propertyObject = property.replace(".", "?.");
+                value = eval("object?." + propertyObject);
+                if (!value || value === "undefined") {
+                    return;
+                }
+            }
+            else if (!Object.hasOwn(object, property)) {
                 return;
             }
             var div = document.createElement("div");
@@ -268,14 +279,14 @@
 
             if (wrapper) {
                 var wrapperElement = document.createElement(wrapper);
-                wrapperElement.innerHTML = object[property];
+                wrapperElement.innerHTML = value;
                 if (wrapper == "a") {
-                    wrapperElement.setAttribute('href', object[property]);
+                    wrapperElement.setAttribute('href', value);
                 }
                 div.appendChild(wrapperElement);
             }
             else {
-                div.innerHTML += object[property];
+                div.innerHTML += value;
             }
             parent.appendChild(div);
         }
@@ -322,7 +333,7 @@
         }
 
         function AddMediaImage(div, media) {
-            var img = document.createElement("img");            
+            var img = document.createElement("img");
             img.setAttribute("data-flickity-lazyload", media.url);
             img.setAttribute("class", "carousel-image");
             var title = media.url;
