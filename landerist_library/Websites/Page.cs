@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Parse.ListingParser;
 using landerist_orels.ES;
@@ -121,6 +122,10 @@ namespace landerist_library.Websites
 
         public bool Update()
         {
+            if (!Config.TrainingMode)
+            {
+                ResponseBodyText = null;
+            }
             Updated = DateTime.Now;
 
             string query =

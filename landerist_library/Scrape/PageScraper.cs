@@ -31,6 +31,7 @@ namespace landerist_library.Scrape
             {
                 DownloadError();
             }
+            
             return Page.Update();
         }
 
@@ -87,12 +88,11 @@ namespace landerist_library.Scrape
                 return;
             }
 
-            if (!Config.ListingDataTrainingMode)
+            if (!Config.TrainingMode)
             {
                 new LocationParser(Page, listing).SetLocation();
                 new MediaParser(Page).AddMedia(listing);
-                ES_Listings.InsertUpdate(listing);
-                Page.ResponseBodyText = null;
+                ES_Listings.InsertUpdate(listing);                
             }
             else
             {

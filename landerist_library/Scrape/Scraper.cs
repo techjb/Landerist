@@ -134,7 +134,7 @@ namespace landerist_library.Scrape
         {
             pages.RemoveWhere(p => !p.CanScrape());
             PendingPages.Clear();
-            int TotalPages = pages.Count;
+            int totalPages = pages.Count;
             int Counter = 0;
             Parallel.ForEach(pages,
                 new ParallelOptions() { MaxDegreeOfParallelism = 1 },
@@ -144,8 +144,17 @@ namespace landerist_library.Scrape
                     {
                         Counter++;
                     }
+                    if (!page.CanScrape())
+                    {
+                        return;
+                    }
+                    if (IpHostBlocker.IsBlocked(page.Website))
+                    {
+                        AddToPendingPages(page);
+                        return;
+                    }
                     Console.WriteLine(
-                        "Scrapped: " + Counter + "/" + TotalPages + " Pending: " + PendingPages.Count + " " +
+                        "Scrapped: " + Counter + "/" + totalPages + " Pending: " + PendingPages.Count + " " +
                         "Success: " + Sucess + " Errors: " + Errors);
 
                     Scrape(page);
@@ -160,23 +169,20 @@ namespace landerist_library.Scrape
         }
 
         public void Scrape(Page page)
-        {
-            if (!page.CanScrape())
-            {
-                return;
-            }
-            if (IpHostBlocker.IsBlocked(page.Website))
-            {
-                lock (SyncPendingPages)
-                {
-                    PendingPages.Add(page);
-                }
-                return;
-            }
+        {            
             AddToBlocker(page);
             bool sucess = new PageScraper(page).Scrape();
             AddSuccessError(sucess);
         }
+
+        private void AddToPendingPages(Page page)
+        {
+            lock (SyncPendingPages)
+            {
+                PendingPages.Add(page);
+            }
+        }
+
         private void AddToBlocker(Page page)
         {
             lock (SyncTempBlocker)

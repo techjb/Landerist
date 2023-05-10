@@ -50,20 +50,23 @@ namespace landerist_console
             //var uriPage = new Uri("https://www.inmolocalgestion.com/ficha-inmueble.php?id=53");
             //var uriPage = new Uri("https://www.expimad.com/inmueble/piso-2-habitaciones-sin-comision-de-agenciasesena-urbanizacion-el-quinon-ideal-inversoresactualmente-alquilado-/20231214");
             //var uriPage = new Uri("https://www.prorealty.es/es/las_rozas_de_madrid/molino_de_la_hoz/chalets_independientes/ref-4465");
-            //var uriPage = new Uri("https://www.goolzoom.com");            
+
+
             //SeleniumDownloader.GetChrome(uriPage);
             //PuppeteerDownloader.Get(uriPage);
             //new HttpClientDownloader().Get(uriPage);
 
-
             //var uri = new Uri("https://www.goolzoom.com/");
-            var uri = new Uri("https://www.saroga.es/");
+            //var uri = new Uri("https://www.saroga.es/");
             //var uri = new Uri("https://mabelan.es/");
             //var uri = new Uri("https://www.saguar.immo/");
             //var uri = new Uri("https://www.inmolocalgestion.com/");
             //var uri = new Uri("https://www.expimad.com/");
             //var uri = new Uri("https://www.prorealty.es/");
+
             //var uri = new Uri("http://real-viv.com/");
+            var uri = new Uri("http://casavida.es/");
+
 
             var website = new Website(uri);
             //var page = new Page(website, uriPage);
@@ -86,7 +89,7 @@ namespace landerist_console
             //Websites.InsertMainPages();
 
             //new Scraper().ScrapeMainPage(website);
-            //new Scraper().ScrapeNonScrapped(uri);
+            new Scraper().ScrapeNonScrapped(uri);
             //new Scraper().ScrapeUnknowIsListing(uri, true);
             //new Scraper().ScrapeIsNotListing(uri);
             //new Scraper().Scrape(page);

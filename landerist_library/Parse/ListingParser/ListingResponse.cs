@@ -170,6 +170,7 @@ namespace landerist_library.Parse.ListingParser
             {
                 return null;
             }
+
             var listing = new Listing
             {
                 guid = page.UriHash,

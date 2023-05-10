@@ -31,7 +31,7 @@ namespace landerist_library.Index
             {
                 sitemap = DownloadSitemap(sitemap);
             }
-            if (!sitemap.IsLoaded)
+            if (sitemap == null || !sitemap.IsLoaded)
             {
                 return;
             }
@@ -55,6 +55,7 @@ namespace landerist_library.Index
         {
             try
             {
+                // can return null.
                 siteMap = Task.Run(async () => await siteMap.LoadAsync()).Result;
             }
             catch { }

@@ -58,7 +58,7 @@ namespace landerist_library.Parse.ListingParser
                     IsListing = Listing != null;
                 }
             }
-            catch (Exception exception)
+            catch 
             {
                 //Logs.Log.WriteLogErrors(Page.Uri, exception);
             }

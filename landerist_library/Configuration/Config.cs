@@ -4,7 +4,7 @@
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly bool ListingDataTrainingMode = false;
+        public static readonly bool TrainingMode = false;
 
         private static readonly string VERSION_PRODUCCION = "1.00";
 

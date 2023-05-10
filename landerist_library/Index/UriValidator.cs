@@ -48,12 +48,16 @@ namespace landerist_library.Index
             "mapaweb",
             "resize",
             "descarga",
-            "cookie"
+            "cookie",
+            "agente",
+            "queja",
+            "estadistica",
+            "hipoteca"
         };
 
         public static bool IsValid(Uri uri)
         {
-            if(!Config.ListingDataTrainingMode)
+            if(Config.TrainingMode)
             {
                 return true;
             }
