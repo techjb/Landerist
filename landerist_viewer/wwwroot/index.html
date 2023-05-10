@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ORELS Viewer</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.classless.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/ajv/dist/ajv.bundle.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/flickity@2/dist/flickity.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/ajv/dist/ajv.bundle.min.js"></script>
+    <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
+
     <style type="text/css">
         div#dropZone {
             background: gray;
@@ -172,18 +176,76 @@
         }
 
         function ShowJson(json) {
-            for (var i = 0; i < json.listings.length; i++) {
+            for (var i = 1; i < json.listings.length; i++) {
                 var listing = json.listings[i];
                 ShowListing(listing);
+
             }
+            InitCarousells();
         }
 
         function ShowListing(listing) {
             try {
                 var article = document.createElement("article");
-                CreateHeader(listing, article);
-                CreateFooter(listing, article);
 
+                AddProperty(listing, article, "guid");
+                AddProperty(listing, article, "listingStatus");
+                AddProperty(listing, article, "listingDate");
+                AddProperty(listing, article, "unlistingDate");
+                AddProperty(listing, article, "operation");
+                AddProperty(listing, article, "propertyType");
+                AddProperty(listing, article, "propertySubtype");
+                if (Object.hasOwn(listing, "price")) {
+                    AddProperty(listing.price, article, "amount");
+                    AddProperty(listing.price, article, "currency");
+                }
+
+                AddMedias(listing, article);
+
+                AddProperty(listing, article, "description");
+                AddProperty(listing, article, "dataSourceName");
+                AddProperty(listing, article, "dataSourceGuid");
+                AddProperty(listing, article, "dataSourceUpdate");
+                AddProperty(listing, article, "dataSourceUrl", "a");
+                AddProperty(listing, article, "contactName");
+                AddProperty(listing, article, "contactPhone");
+                AddProperty(listing, article, "contactEmail");
+                AddProperty(listing, article, "contactUrl", "a");
+                AddProperty(listing, article, "contactOther");
+                AddProperty(listing, article, "address");
+                AddProperty(listing, article, "latitude");
+                AddProperty(listing, article, "longitude");
+                AddProperty(listing, article, "locationIsAccurate");
+                AddProperty(listing, article, "cadastralReference");
+                AddProperty(listing, article, "propertySize");
+                AddProperty(listing, article, "landSize");
+                AddProperty(listing, article, "constructionYear");
+                AddProperty(listing, article, "constructionStatus");
+                AddProperty(listing, article, "floors");
+                AddProperty(listing, article, "floor");
+                AddProperty(listing, article, "bedrooms");
+                AddProperty(listing, article, "bathrooms");
+                AddProperty(listing, article, "parkings");
+
+                var ul = document.createElement("ul");
+                AddFeature(listing, ul, "terrace");
+                AddFeature(listing, ul, "garden");
+                AddFeature(listing, ul, "garage");
+                AddFeature(listing, ul, "motorbikeGarage");
+                AddFeature(listing, ul, "pool");
+                AddFeature(listing, ul, "lift");
+                AddFeature(listing, ul, "disabledAccess");
+                AddFeature(listing, ul, "storageRoom");
+                AddFeature(listing, ul, "furnished");
+                AddFeature(listing, ul, "nonFurnished");
+                AddFeature(listing, ul, "heating");
+                AddFeature(listing, ul, "airConditioning");
+                AddFeature(listing, ul, "petsAllowed");
+                AddFeature(listing, ul, "securitySystems");
+
+                if (ul.childNodes.length != 0) {
+                    article.appendChild(ul);
+                }
 
                 jsonPreview.append(article);
             }
@@ -192,43 +254,125 @@
             }
         }
 
-        function CreateHeader(listing, article) {
 
+        function AddProperty(object, parent, property, wrapper) {
+            if (!Object.hasOwn(object, property)) {
+                return;
+            }
+            var div = document.createElement("div");
+            var strong = document.createElement("strong");
+            strong.innerText = property + ": ";
+            div.appendChild(strong);
+
+            if (wrapper) {
+                var wrapperElement = document.createElement(wrapper);
+                wrapperElement.innerHTML = object[property];
+                if (wrapper == "a") {
+                    wrapperElement.setAttribute('href', object[property]);
+                }
+                div.appendChild(wrapperElement);
+            }
+            else {
+                div.innerHTML += object[property];
+            }
+            parent.appendChild(div);
         }
 
-        function CreateFooter(listing, article) {
-            let dataSourceName = false;
-            let dataSourceUrl = false;
-            let dataSourceUpdate = false;
-
-            if (listing.hasOwnProperty('dataSourceName')) {
-                dataSourceName = listing.dataSourceName;
+        function AddFeature(object, parent, property) {
+            if (!Object.hasOwn(object, property)) {
+                return;
             }
-            if (listing.hasOwnProperty('dataSourceUrl')) {
-                dataSourceUrl = listing.dataSourceUrl;
-            }
-            if (listing.hasOwnProperty('dataSourceUpdate')) {
-                dataSourceUpdate = listing.dataSourceUpdate;
-            }
-            if (dataSourceName && dataSourceUrl) {
-
-            }
-            var innerHTML = '';
-            if (dataSourceName) {
-                innerHTML += '<div title="dataSourceName">' + dataSourceName + '</div>';
-            }
-            if (dataSourceUrl) {
-                innerHTML += '<div title="dataSourceUrl"><a href="' + dataSourceUrl + '">' +
-                    dataSourceUrl + '</a></div>';
-            }
-            if (dataSourceUpdate) {
-                innerHTML += '<div><small title="dataSourceUpdate">' + dataSourceUpdate + '</small></div>';
+            var value = object[property];
+            if (!value) {
+                return;
             }
 
-            var footer = document.createElement("footer");
-            footer.innerHTML = innerHTML;
-            article.appendChild(footer);
+            var li = document.createElement("li");
+            li.innerText = property;
+            parent.appendChild(li);
         }
+
+        function AddMedias(listing, article) {
+            if (!Object.hasOwn(listing, "media")) {
+                return;
+            }
+            var div = document.createElement("div");
+            div.setAttribute("class", "carousel");
+            for (var i = 0; i < listing.media.length; i++) {
+                var media = listing.media[i];
+                AddMedia(div, media);
+            }
+            if (div.childNodes.length != 0) {
+                article.appendChild(div);
+            }
+        }
+
+        function AddMedia(object, media) {
+            var mediaType = 'other';
+            if (Object.hasOwn(media, "mediaType")) {
+                mediaType = media.mediaType;
+            }
+            switch (mediaType) {
+                case 'image': AddMediaImage(object, media); break;
+                case 'video': AddMediaVideo(object, media); break;
+                default: AddMediaOther(div, media); break;
+            }
+        }
+
+        function AddMediaImage(div, media) {
+            var img = document.createElement("img");            
+            img.setAttribute("data-flickity-lazyload", media.url);
+            img.setAttribute("class", "carousel-image");
+            var title = media.url;
+            if (Object.hasOwn(media, "title")) {
+                title = media.title;
+            }
+            img.setAttribute("title", title);
+            img.setAttribute("alt", title);
+            div.appendChild(img);
+        }
+
+        function AddMediaVideo(div, media) {
+            var iframe = document.createElement("iframe");
+            iframe.setAttribute("src", media.url);
+            iframe.setAttribute("frameborder", "0");
+            iframe.setAttribute("class", "carousel-cell");
+            if (Object.hasOwn(media, "title")) {
+                iframe.setAttribute("title", media.title);
+            }
+            div.appendChild(iframe);
+        }
+
+        function AddMediaOther(div, media) {
+            var a = document.createElement("a");
+            a.setAttribute("href", media.url);
+            a.setAttribute("alt", media.url);
+            a.setAttribute("target", "_blank");
+            a.innerText = media.url;
+            if (Object.hasOwn(media, "title")) {
+                a.innerText = media.title;
+            }
+            var carousellCell = document.createElement("div");
+            carousellCell.setAttribute("class", "carousel-cell");
+            carousellCell.appendChild(a);
+            div.appendChild(carousellCell);
+        }
+
+        function InitCarousells() {
+            var carousels = document.getElementsByClassName('carousel');
+            for (var i = 0; i < carousels.length; i++) {
+                new Flickity(carousels[i], {
+                    cellAlign: 'left',
+                    contain: true,
+                    freeScroll: true,
+                    pageDots: false,
+                    lazyLoad: 1,
+                    adaptiveHeight: false,
+                    imagesLoaded: true
+                });
+            }
+        }
+
     </script>
 </body>
 </html>
