@@ -30,7 +30,7 @@ namespace landerist_library.Insert
             DeleteAndInsert(website);
         }
 
-        public void DeleteAndInsert(Website website)
+        public static void DeleteAndInsert(Website website)
         {
             website.Delete();
             Insert(website.MainUri);
