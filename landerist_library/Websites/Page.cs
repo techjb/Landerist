@@ -38,12 +38,7 @@ namespace landerist_library.Websites
         public Page(Website website) : this(website, website.MainUri)
         {
 
-        }
-
-        public Page(Website website, string url) : this(website, new Uri(url))
-        {
-
-        }
+        }   
 
         public Page(Website website, Uri uri)
         {
@@ -65,6 +60,12 @@ namespace landerist_library.Websites
         {
             Website = website;
             Load(dataRow);
+        }
+
+        public Page(DataRow dataRow)
+        {
+            Load(dataRow);
+            Website = Websites.GetWebsite(this);
         }
 
         private void Load(DataRow dataRow)

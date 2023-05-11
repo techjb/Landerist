@@ -54,6 +54,8 @@ namespace landerist_orels.ES
 
     public class Listing
     {
+        public const int MAX_MEDIA_ITEMS = 200;
+
         [JsonProperty(Order = 1)]
         public string guid { get; set; }
 
@@ -209,6 +211,10 @@ namespace landerist_orels.ES
                 return;
             }
             InitMedia();
+            if (this.media.Count >= MAX_MEDIA_ITEMS)
+            {
+                return;
+            }
             this.media.Add(media);
         }
 
@@ -219,7 +225,32 @@ namespace landerist_orels.ES
                 return;
             }
             InitMedia();
+            FitMedia(media);
             this.media = media;
+        }
+
+        private void FitMedia(SortedSet<Media> media)
+        {
+            if (media.Count < MAX_MEDIA_ITEMS)
+            {
+                return;
+            }
+            List<Media> toRemove = new List<Media>();
+            int ccounter = 0;
+            foreach (Media element in media)
+            {
+                if (ccounter < MAX_MEDIA_ITEMS)
+                {
+                    ccounter++;
+                    continue;
+                }
+                toRemove.Add(element);
+            }
+
+            foreach (Media element in toRemove)
+            {
+                media.Remove(element);
+            }
         }
 
         public override bool Equals(object obj)

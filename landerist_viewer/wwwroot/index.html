@@ -165,16 +165,27 @@
                 if (isValid) {
                     AddJson(json);
                 } else {
-                    SetError("JSON is not valid. Reason: " + ajv.errors);
+                    ShowErrors(ajv);
                 }
             }
             catch (error) {
-                SetError("Error reading file: " + error.message);
+                SetError("<strong>Error reading file: " + error.message + "</strong>");
             }
         }
 
+        function ShowErrors(ajv) {
+            let urErrors = '<ul>';
+            for (var i = 0; i < ajv.errors.length; i++) {
+                var error = ajv.errors[i];
+                console.log(error);
+                urErrors += "<li>" + error.message + "</li>";
+            }
+            urErrors += "</ul>";
+            SetError("<strong>JSON is not valid:</strong> " + urErrors);
+        }
+
         function SetError(text) {
-            validationError.innerHTML = "<strong>" + text + "</strong>";
+            validationError.innerHTML = text;
         }
 
         function AddJson(json) {
@@ -196,7 +207,7 @@
                 AddProperty(listing, article, "operation");
                 AddProperty(listing, article, "propertyType");
                 AddProperty(listing, article, "propertySubtype");
-                if (Object.hasOwn(listing, "price")) {                    
+                if (Object.hasOwn(listing, "price")) {
                     AddProperty(listing, article, "price.amount");
                     AddProperty(listing, article, "price.currency");
                 }
@@ -375,8 +386,8 @@
                 lazyLoad: 1,
                 adaptiveHeight: false,
                 imagesLoaded: true
-            };                
-            for (var i = 0; i < carousels.length; i++) {                
+            };
+            for (var i = 0; i < carousels.length; i++) {
                 new Flickity(carousels[i], options);
             }
         }

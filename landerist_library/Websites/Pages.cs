@@ -5,7 +5,7 @@ namespace landerist_library.Websites
 {
     public class Pages
     {
-        public const string TABLE_PAGES = "[PAGES]";
+        protected const string TABLE_PAGES = "[PAGES]";
 
         public Pages()
         {
@@ -51,6 +51,17 @@ namespace landerist_library.Websites
             return GetPages(website, dataTable);
         }
 
+        public static List<Page> GetNonScraped()
+        {
+            string query =
+                "SELECT * " +
+                "FROM " + TABLE_PAGES + " " +
+                "WHERE [Updated] IS NULL";
+
+            DataTable dataTable = new DataBase().QueryTable(query);
+            return GetPages(dataTable);
+        }
+
         public static List<Page> GetUnknowIsListingPages(Website website)
         {
             string query =
@@ -82,6 +93,16 @@ namespace landerist_library.Websites
             return GetPages(website, dataTable);
         }
 
+        private static List<Page> GetPages(DataTable dataTable)
+        {
+            List<Page> pages = new();
+            foreach (DataRow dataRow in dataTable.Rows)
+            {
+                Page page = new(dataRow);
+                pages.Add(page);
+            }
+            return pages;
+        }
 
         private static List<Page> GetPages(Website website, DataTable dataTable)
         {

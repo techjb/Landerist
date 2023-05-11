@@ -74,7 +74,12 @@ namespace landerist_library.Websites
             return new DataBase().QueryTable(query);
         }
 
-        public static Website? GetWebsite(string host)
+        public static Website GetWebsite(Page page)
+        {
+            return GetWebsite(page.Host);
+        }
+
+        public static Website GetWebsite(string host)
         {
             string query =
                 "SELECT TOP 1 * " +
@@ -85,13 +90,9 @@ namespace landerist_library.Websites
                 {"Host", host }
             });
 
-            if (dataTable.Rows.Count.Equals(1))
-            {
-                var dataRow = dataTable.Rows[0];
-                return new Website(dataRow);
-            }
-            return null;
-        }
+            var dataRow = dataTable.Rows[0];
+            return new Website(dataRow);
+        }        
 
         private static HashSet<Website> GetWebsites(DataTable dataTable)
         {

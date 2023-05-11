@@ -75,7 +75,7 @@ namespace landerist_library.Websites
                 "WHERE [Host] = @Host";
 
             var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"MainUri", MainUri.Host }
+                {"Host", Host }
             });
 
             if (dataTable.Rows.Count > 0)

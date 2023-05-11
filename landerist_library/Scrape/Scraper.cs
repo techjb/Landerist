@@ -1,5 +1,4 @@
 ﻿using landerist_library.Websites;
-using System.Collections.Generic;
 using System.Data;
 
 namespace landerist_library.Scrape
@@ -27,30 +26,30 @@ namespace landerist_library.Scrape
 
         }
 
-        public void ScrapeAllPages()
-        {
-            var dictionary = Websites.Websites.GetDicionaryStatusCodeOk();
-            var dataTable = Pages.GetAll();
-            var pages = GetPages(dictionary, dataTable);
-            Scrape(pages);
-        }
+        //public void ScrapeAllPages()
+        //{
+        //    var dictionary = Websites.Websites.GetDicionaryStatusCodeOk();
+        //    var dataTable = Pages.GetAll();
+        //    var pages = GetPages(dictionary, dataTable);
+        //    Scrape(pages);
+        //}
 
-        private static HashSet<Page> GetPages(Dictionary<string, Website> dictionary, DataTable dataTable)
-        {
-            HashSet<Page> pages = new();
-            foreach (DataRow dataRow in dataTable.Rows)
-            {
-                var host = (string)dataRow["host"];
-                if (!dictionary.ContainsKey(host))
-                {
-                    continue;
-                }
-                var website = dictionary[host];
-                Page page = new(website, dataRow);
-                pages.Add(page);
-            }
-            return pages;
-        }
+        //private static HashSet<Page> GetPages(Dictionary<string, Website> dictionary, DataTable dataTable)
+        //{
+        //    HashSet<Page> pages = new();
+        //    foreach (DataRow dataRow in dataTable.Rows)
+        //    {
+        //        var host = (string)dataRow["host"];
+        //        if (!dictionary.ContainsKey(host))
+        //        {
+        //            continue;
+        //        }
+        //        var website = dictionary[host];
+        //        Page page = new(website, dataRow);
+        //        pages.Add(page);
+        //    }
+        //    return pages;
+        //}
 
         public void ScrapeMainPage(Website website)
         {
@@ -62,6 +61,20 @@ namespace landerist_library.Scrape
         {
             var pages = website.GetPages();
             Scrape(pages);
+        }
+
+        public void ScrapeNonScrapped(bool recursive = false)
+        {
+            List<Page> pages = Pages.GetNonScraped();
+            if (pages.Count.Equals(0))
+            {
+                return;
+            }
+            Scrape(pages);
+            if (recursive)
+            {
+                ScrapeNonScrapped(recursive);
+            }
         }
 
         public void ScrapeNonScrapped(Uri uri, bool recursive = false)
@@ -137,7 +150,7 @@ namespace landerist_library.Scrape
             int totalPages = pages.Count;
             int Counter = 0;
             Parallel.ForEach(pages,
-                new ParallelOptions() { MaxDegreeOfParallelism = 1 },
+                //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
                 page =>
                 {
                     lock (SyncCounter)

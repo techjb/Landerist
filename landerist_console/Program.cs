@@ -66,6 +66,7 @@ namespace landerist_console
 
             //var uri = new Uri("http://real-viv.com/");
             var uri = new Uri("http://casavida.es/");
+            //var uri = new Uri("https://www.inmobiliariamarbella.es/");
 
 
             var website = new Website(uri);
@@ -74,7 +75,7 @@ namespace landerist_console
             //website.Delete(); return;
             //Websites.DeleteAll(); return;
 
-            //WebsitesInserter.Insert(uri);
+            //WebsitesInserter.Insert(uri);return;
             //new WebsitesInserter(false).DeleteAndInsert(uri); return;
             //new WebsitesInserter(false).InsertLinksAlternate(uri); return;
             //new WebsitesInserter().FromCsv();            
@@ -89,7 +90,7 @@ namespace landerist_console
             //Websites.InsertMainPages();
 
             //new Scraper().ScrapeMainPage(website);
-            new Scraper().ScrapeNonScrapped(uri);
+            //new Scraper().ScrapeNonScrapped();
             //new Scraper().ScrapeUnknowIsListing(uri, true);
             //new Scraper().ScrapeIsNotListing(uri);
             //new Scraper().Scrape(page);
@@ -97,7 +98,7 @@ namespace landerist_console
             //new Scraper().ScrapeAllPages();
 
             //Csv.Export(true);
-            //Json.Export(true);
+            Json.Export(true);
 
         }
 
