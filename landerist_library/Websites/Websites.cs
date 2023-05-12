@@ -6,6 +6,7 @@ namespace landerist_library.Websites
     public class Websites
     {
         public const string TABLE_WEBSITES = "[WEBSITES]";
+
         public static HashSet<Website> GetAll()
         {
             var dataTable = GetDataTableAll();
@@ -309,6 +310,12 @@ namespace landerist_library.Websites
                 }
                 Console.WriteLine("Inserted: " + inserted + " Errors: " + errors + " From: " + websites.Count);
             }
+        }
+
+        public static void Delete(Uri uri)
+        {
+            var webSite = new Website(uri);
+            webSite.Delete();
         }
 
         public static void DeleteAll()

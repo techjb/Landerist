@@ -1,45 +1,24 @@
 ﻿using landerist_library.Websites;
-using System.Data;
-using System.Net.Http.Headers;
 
 namespace landerist_library.Scrape
 {
     public class Scraper
     {
-        private readonly IpHostBlocker IpHostBlocker = new();
+        private static readonly IpHostBlocker IpHostBlocker = new();
 
-        private readonly object SyncTempBlocker = new();
+        private static readonly object SyncTempBlocker = new();
 
-        private readonly HashSet<Page> PendingPages = new();
+        private static readonly HashSet<Page> PendingPages = new();
 
-        private readonly object SyncPendingPages = new();
+        private static readonly object SyncPendingPages = new();
 
-        private int Sucess = 0;
+        private static int ListingsCounter = 0;
 
-        private int Errors = 0;
+        private static readonly object SyncCounter = new();
 
-        private readonly object SyncCounter = new();
+        private static readonly object SyncListingsCounter = new();
 
-        private readonly object SyncSuccessErrros = new();
-
-        public Scraper()
-        {
-
-        }
-
-        public void ScrapeMainPage(Website website)
-        {
-            var page = new Page(website);
-            Scrape(page);
-        }
-
-        public void ScrapePages(Website website)
-        {
-            var pages = website.GetPages();
-            Scrape(pages);
-        }
-
-        public void ScrapeNonScrapped(bool recursive = false)
+        public static void ScrapeNonScrapped(bool recursive = false)
         {
             List<Page> pages = Pages.GetNonScraped();
             if (pages.Count.Equals(0))
@@ -53,13 +32,13 @@ namespace landerist_library.Scrape
             }
         }
 
-        public void ScrapeNonScrapped(Uri uri, bool recursive = false)
+        public static void ScrapeNonScrapped(Uri uri, bool recursive = false)
         {
             Website website = new(uri);
             ScrapeNonScrapped(website, recursive);
         }
 
-        public void ScrapeNonScrapped(Website website, bool recursive)
+        public static void ScrapeNonScrapped(Website website, bool recursive)
         {
             var pages = website.GetNonScrapedPages();
             if (pages.Count == 0)
@@ -73,14 +52,28 @@ namespace landerist_library.Scrape
             }
         }
 
+        public static void ScrapeUnknowHttpStatusCode(bool recursive = false)
+        {
+            List<Page> pages = Pages.GetUnknowHttpStatusCode();
+            if (pages.Count.Equals(0))
+            {
+                return;
+            }
+            Scrape(pages);
+            if (recursive)
+            {
+                ScrapeUnknowHttpStatusCode(recursive);
+            }
+        }
+
         // Can be infinite loops
-        public void ScrapeUnknowIsListing(Uri uri, bool recursive = false)
+        public static void ScrapeUnknowIsListing(Uri uri, bool recursive = false)
         {
             Website website = new(uri);
             ScrapeUnknowIsListing(website, recursive);
         }
 
-        public void ScrapeUnknowIsListing(Website website, bool recursive)
+        public static void ScrapeUnknowIsListing(Website website, bool recursive)
         {
             var pages = website.GetUnknowIsListingPages();
             if (pages.Count == 0)
@@ -94,13 +87,13 @@ namespace landerist_library.Scrape
             }
         }
 
-        public void ScrapeIsNotListing(Uri uri, bool recursive = false)
+        public static void ScrapeIsNotListing(Uri uri, bool recursive = false)
         {
             Website website = new(uri);
             ScrapeIsNotListing(website, recursive);
         }
 
-        public void ScrapeIsNotListing(Website website, bool recursive)
+        public static void ScrapeIsNotListing(Website website, bool recursive)
         {
             var pages = website.GetIsNotListingPages();
             if (pages.Count == 0)
@@ -113,15 +106,25 @@ namespace landerist_library.Scrape
                 ScrapeIsNotListing(website, recursive);
             }
         }
-        
+        public static void ScrapeMainPage(Website website)
+        {
+            var page = new Page(website);
+            Scrape(page);
+        }
 
-        private void Scrape(List<Page> pages)
+        public static void Scrape(Website website)
+        {
+            var pages = website.GetPages();
+            Scrape(pages);
+        }
+
+        private static void Scrape(List<Page> pages)
         {
             HashSet<Page> hashSet = new(pages, new PageComparer());
             Scrape(hashSet);
         }
 
-        private void Scrape(HashSet<Page> pages)
+        private static void Scrape(HashSet<Page> pages)
         {
             pages.RemoveWhere(p => !p.CanScrape());
             PendingPages.Clear();
@@ -135,10 +138,10 @@ namespace landerist_library.Scrape
                     lock (SyncCounter)
                     {
                         Counter++;
-                    }                    
+                    }
                     Console.WriteLine(
                         "Scrapped: " + Counter + "/" + totalPages + " Pending: " + PendingPages.Count + " " +
-                        "Success: " + Sucess + " Errors: " + Errors);
+                        "Listings: " + ListingsCounter);
 
                     if (IpHostBlocker.IsBlocked(page.Website))
                     {
@@ -151,7 +154,7 @@ namespace landerist_library.Scrape
             ScrapePendingPages(dateStart);
         }
 
-        private void ScrapePendingPages(DateTime dateStart)
+        private static void ScrapePendingPages(DateTime dateStart)
         {
             if (PendingPages.Count.Equals(0))
             {
@@ -165,20 +168,20 @@ namespace landerist_library.Scrape
             Scrape(newList);
         }
 
-        public void Scrape(Uri uri)
+        public static void Scrape(Uri uri)
         {
             var page = new Page(uri);
             Scrape(page);
         }
 
-        public void Scrape(Page page)
+        public static void Scrape(Page page)
         {
             AddToBlocker(page);
-            bool sucess = new PageScraper(page).Scrape();
-            AddSuccessError(sucess);
+            new PageScraper(page).Scrape();
+            AddIsListingCounter(page);
         }
 
-        private void AddToPendingPages(Page page)
+        private static void AddToPendingPages(Page page)
         {
             lock (SyncPendingPages)
             {
@@ -186,7 +189,7 @@ namespace landerist_library.Scrape
             }
         }
 
-        private void AddToBlocker(Page page)
+        private static void AddToBlocker(Page page)
         {
             lock (SyncTempBlocker)
             {
@@ -194,17 +197,16 @@ namespace landerist_library.Scrape
             }
         }
 
-        private void AddSuccessError(bool success)
+        private static void AddIsListingCounter(Page page)
         {
-            lock (SyncSuccessErrros)
+            if (page.IsListing != null)
             {
-                if (success)
+                if ((bool)page.IsListing)
                 {
-                    Sucess++;
-                }
-                else
-                {
-                    Errors++;
+                    lock (SyncListingsCounter)
+                    {
+                        ListingsCounter++;
+                    }
                 }
             }
         }

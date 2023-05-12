@@ -62,6 +62,17 @@ namespace landerist_library.Websites
             return GetPages(dataTable);
         }
 
+        public static List<Page> GetUnknowHttpStatusCode()
+        {
+            string query =
+                "SELECT * " +
+                "FROM " + TABLE_PAGES + " " +
+                "WHERE [HttpStatusCode] IS NULL";
+
+            DataTable dataTable = new DataBase().QueryTable(query);
+            return GetPages(dataTable);
+        }
+
         public static List<Page> GetUnknowIsListingPages(Website website)
         {
             string query =

@@ -13,8 +13,18 @@ namespace landerist_library.Parse.MediaParser
 
         public void GetImages()
         {
+            GetImagesOpenGraph();
             GetImagesSrc();
             //GetImagesA(); // Add some invalid images
+        }
+
+        private void GetImagesOpenGraph()
+        {
+            var imageNodes = MediaParser.Page.HtmlDocument!.DocumentNode.SelectNodes("//meta[@property='og:image']");
+            ParseImages(imageNodes, "content");
+
+            imageNodes = MediaParser.Page.HtmlDocument!.DocumentNode.SelectNodes("//meta[@property='og:image:secure_url']");
+            ParseImages(imageNodes, "content");
         }
 
         private void GetImagesSrc()

@@ -34,8 +34,12 @@ namespace landerist_library.Parse.MediaParser
                 return;
             }
             var xPath =
-                "//nav | //footer | //style | //head | " +
-                "//code | //canvas | //input | //meta | //option | " +
+                //"//nav | //footer | //style | //head | " +
+                //"//code | //canvas | //input | //meta | //option | " +
+                //"//select | //progress | //svg | //textarea | //del";
+
+                "//nav | //footer | //style | " +
+                "//code | //canvas | //input | //option | " +
                 "//select | //progress | //svg | //textarea | //del";
 
             var nodesToRemove = Page.HtmlDocument.DocumentNode.SelectNodes(xPath).ToList();
