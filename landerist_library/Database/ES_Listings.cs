@@ -220,7 +220,7 @@ namespace landerist_library.Database
             var listing = GetListingData(dataRow);
             if (loadMedia)
             {
-                var media = ES_Media.GetMedia(listing);
+                var media = ES_Media.GetMedia(listing);                
                 listing.SetMedia(media);
             }
             return listing;

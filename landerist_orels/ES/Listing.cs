@@ -231,7 +231,7 @@ namespace landerist_orels.ES
 
         private void FitMedia(SortedSet<Media> media)
         {
-            if (media.Count < MAX_MEDIA_ITEMS)
+            if (media.Count <= MAX_MEDIA_ITEMS)
             {
                 return;
             }

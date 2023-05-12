@@ -1,5 +1,6 @@
 ﻿using landerist_library.Websites;
 using System.Data;
+using System.Net.Http.Headers;
 
 namespace landerist_library.Scrape
 {
@@ -25,31 +26,6 @@ namespace landerist_library.Scrape
         {
 
         }
-
-        //public void ScrapeAllPages()
-        //{
-        //    var dictionary = Websites.Websites.GetDicionaryStatusCodeOk();
-        //    var dataTable = Pages.GetAll();
-        //    var pages = GetPages(dictionary, dataTable);
-        //    Scrape(pages);
-        //}
-
-        //private static HashSet<Page> GetPages(Dictionary<string, Website> dictionary, DataTable dataTable)
-        //{
-        //    HashSet<Page> pages = new();
-        //    foreach (DataRow dataRow in dataTable.Rows)
-        //    {
-        //        var host = (string)dataRow["host"];
-        //        if (!dictionary.ContainsKey(host))
-        //        {
-        //            continue;
-        //        }
-        //        var website = dictionary[host];
-        //        Page page = new(website, dataRow);
-        //        pages.Add(page);
-        //    }
-        //    return pages;
-        //}
 
         public void ScrapeMainPage(Website website)
         {
@@ -149,6 +125,7 @@ namespace landerist_library.Scrape
             PendingPages.Clear();
             int totalPages = pages.Count;
             int Counter = 0;
+            DateTime dateStart = DateTime.Now;
             Parallel.ForEach(pages,
                 //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
                 page =>
@@ -173,16 +150,25 @@ namespace landerist_library.Scrape
                     Scrape(page);
                 });
 
-            if (PendingPages.Count > 0)
+            ScrapePendingPages(dateStart);
+        }
+
+        private void ScrapePendingPages(DateTime dateStart)
+        {
+            if (PendingPages.Count.Equals(0))
+            {
+                return;
+            }
+            if (dateStart.AddSeconds(2) > DateTime.Now)
             {
                 Thread.Sleep(2000);
-                HashSet<Page> newList = new(PendingPages);
-                Scrape(newList);
             }
+            HashSet<Page> newList = new(PendingPages);
+            Scrape(newList);
         }
 
         public void Scrape(Page page)
-        {            
+        {
             AddToBlocker(page);
             bool sucess = new PageScraper(page).Scrape();
             AddSuccessError(sucess);
