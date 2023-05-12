@@ -44,7 +44,7 @@ namespace landerist_console
 
         private static void Run()
         {
-            var uriPage = new Uri("https://casavida.es/thank-you/");
+            //var uriPage = new Uri("https://casavida.es/thank-you/");
 
             //SeleniumDownloader.GetChrome(uriPage);
             //PuppeteerDownloader.Get(uriPage);
@@ -89,12 +89,12 @@ namespace landerist_console
             //new Scraper().ScrapeUnknowIsListing(uri, true);
             //new Scraper().ScrapeIsNotListing(uri);
             //new Scraper().Scrape(page);
-            new Scraper().Scrape(uriPage);
+            //new Scraper().Scrape(uriPage);
             //new Scraper().GetChrome(page);
             //new Scraper().ScrapeAllPages();
 
             //Csv.Export(true);
-            //Json.Export(true);
+            Json.Export(true);
 
         }
 

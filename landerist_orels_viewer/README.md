@@ -11,7 +11,7 @@ to discuss what you would like to change.
 Please make sure to update tests as appropriate.
 
 ## Demo
-Try this [demo online](https://techjb.github.io/Landerist/landerist_viewer/wwwroot/index.html).
+Try this [demo online](https://techjb.github.io/Landerist/landerist_orels_viewer/wwwroot/index.html).
 
 ## License
 

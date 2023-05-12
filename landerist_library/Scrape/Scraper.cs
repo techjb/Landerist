@@ -58,6 +58,7 @@ namespace landerist_library.Scrape
             Website website = new(uri);
             ScrapeNonScrapped(website, recursive);
         }
+
         public void ScrapeNonScrapped(Website website, bool recursive)
         {
             var pages = website.GetNonScrapedPages();
@@ -112,6 +113,7 @@ namespace landerist_library.Scrape
                 ScrapeIsNotListing(website, recursive);
             }
         }
+        
 
         private void Scrape(List<Page> pages)
         {
