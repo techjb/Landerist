@@ -9,6 +9,7 @@ namespace landerist_library.Index
             "contact",
             "politic",
             "privacid",
+            "privacy",
             "aviso",
             "legal",
             "filosof",

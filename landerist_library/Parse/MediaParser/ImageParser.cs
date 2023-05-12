@@ -14,7 +14,7 @@ namespace landerist_library.Parse.MediaParser
         public void GetImages()
         {
             GetImagesSrc();
-            GetImagesA();
+            //GetImagesA(); // Add some invalid images
         }
 
         private void GetImagesSrc()

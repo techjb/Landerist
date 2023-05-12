@@ -5,10 +5,6 @@ namespace landerist_library.Download
 {
     public class HttpClientDownloader
     {
-        private short? HttpStatusCode;
-
-        private string? ResponseBody;
-
         private HttpResponseMessage? HttpResponseMessage;
 
         public bool Get(Page page)
@@ -17,25 +13,11 @@ namespace landerist_library.Download
             page.ResponseBody = null;
             page.ResponseBodyText = null;
 
-            if (Get(page.Uri))
-            {
-                page.HttpStatusCode = HttpStatusCode;
-                page.ResponseBody = ResponseBody;
-                return true;
-            }
-            return false;
-        }
-
-        public bool Get(Uri uri)
-        {
-            HttpStatusCode = null;
-            ResponseBody = null;
-
-            var task = Task.Run(async () => await GetAsync(uri));
+            var task = Task.Run(async () => await GetAsync(page));
             return task.Result;
         }
 
-        private async Task<bool> GetAsync(Uri uri)
+        private async Task<bool> GetAsync(Page page)
         {
             HttpClientHandler handler = new()
             {
@@ -44,19 +26,19 @@ namespace landerist_library.Download
             using var client = new HttpClient(handler);
             client.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
 
-            HttpRequestMessage request = new(HttpMethod.Get, uri);
+            HttpRequestMessage request = new(HttpMethod.Get, page.Uri);
             bool sucess = false;
             HttpResponseMessage = null;
             try
             {
                 HttpResponseMessage = await client.SendAsync(request);
                 sucess = HttpResponseMessage.IsSuccessStatusCode;
-                HttpStatusCode = (short)HttpResponseMessage.StatusCode;
-                ResponseBody = await HttpResponseMessage.Content.ReadAsStringAsync();
+                page.HttpStatusCode = (short)HttpResponseMessage.StatusCode;
+                page.ResponseBody = await HttpResponseMessage.Content.ReadAsStringAsync();
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors(uri, exception);
+                Logs.Log.WriteLogErrors(page.Uri, exception);
             }
             return sucess;
         }

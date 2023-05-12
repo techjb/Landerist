@@ -92,7 +92,23 @@ namespace landerist_library.Websites
 
             var dataRow = dataTable.Rows[0];
             return new Website(dataRow);
-        }        
+        }
+
+        public static bool ExistsWebsite(string host)
+        {
+            string query =
+                "IF EXISTS (" +
+                "   SELECT 1 " +
+                "   FROM " + TABLE_WEBSITES + " " +
+                "   WHERE Host = @Host) " +
+                "SELECT 'true' " +
+                "ELSE " +
+                "SELECT 'false' ";
+
+            return new DataBase().QueryBool(query, new Dictionary<string, object?> {
+                {"Host", host }
+            });
+        }
 
         private static HashSet<Website> GetWebsites(DataTable dataTable)
         {

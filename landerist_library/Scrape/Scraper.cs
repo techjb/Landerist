@@ -133,20 +133,16 @@ namespace landerist_library.Scrape
                     lock (SyncCounter)
                     {
                         Counter++;
-                    }
-                    if (!page.CanScrape())
-                    {
-                        return;
-                    }
+                    }                    
+                    Console.WriteLine(
+                        "Scrapped: " + Counter + "/" + totalPages + " Pending: " + PendingPages.Count + " " +
+                        "Success: " + Sucess + " Errors: " + Errors);
+
                     if (IpHostBlocker.IsBlocked(page.Website))
                     {
                         AddToPendingPages(page);
                         return;
                     }
-                    Console.WriteLine(
-                        "Scrapped: " + Counter + "/" + totalPages + " Pending: " + PendingPages.Count + " " +
-                        "Success: " + Sucess + " Errors: " + Errors);
-
                     Scrape(page);
                 });
 
@@ -165,6 +161,12 @@ namespace landerist_library.Scrape
             }
             HashSet<Page> newList = new(PendingPages);
             Scrape(newList);
+        }
+
+        public void Scrape(Uri uri)
+        {
+            var page = new Page(uri);
+            Scrape(page);
         }
 
         public void Scrape(Page page)

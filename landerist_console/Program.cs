@@ -6,6 +6,7 @@ using landerist_library.Parse.LocationParser;
 using landerist_library.Scrape;
 using landerist_library.Websites;
 using landerist_orels.ES;
+using PuppeteerSharp;
 
 namespace landerist_console
 {
@@ -43,14 +44,7 @@ namespace landerist_console
 
         private static void Run()
         {
-            //var uriPage = new Uri("https://www.saroga.es/inmueble/chalet-independiente-satelites-majadahonda/");
-            //var uriPage = new Uri("https://www.saroga.es/inmueble/piso-4-dormitorios-avenida-europa-pozuelo/");
-            //var uriPage = new Uri("https://www.saroga.es/inmueble/piso-monte-pilar-majadahonda/");
-            //var uriPage = new Uri("https://www.saroga.es/inmueble/apartamento-majadahonda/");          
-            //var uriPage = new Uri("https://www.inmolocalgestion.com/ficha-inmueble.php?id=53");
-            //var uriPage = new Uri("https://www.expimad.com/inmueble/piso-2-habitaciones-sin-comision-de-agenciasesena-urbanizacion-el-quinon-ideal-inversoresactualmente-alquilado-/20231214");
-            //var uriPage = new Uri("https://www.prorealty.es/es/las_rozas_de_madrid/molino_de_la_hoz/chalets_independientes/ref-4465");
-
+            var uriPage = new Uri("https://casavida.es/thank-you/");
 
             //SeleniumDownloader.GetChrome(uriPage);
             //PuppeteerDownloader.Get(uriPage);
@@ -65,12 +59,13 @@ namespace landerist_console
             //var uri = new Uri("https://www.prorealty.es/");
 
             //var uri = new Uri("http://real-viv.com/");
-            var uri = new Uri("http://casavida.es/");
+            //var uri = new Uri("http://casavida.es/");
             //var uri = new Uri("https://www.inmobiliariamarbella.es/");
 
 
-            var website = new Website(uri);
+            //var website = new Website(uri);
             //var page = new Page(website, uriPage);
+            //var page = new Page(uriPage);
 
             //website.Delete(); return;
             //Websites.DeleteAll(); return;
@@ -94,11 +89,12 @@ namespace landerist_console
             //new Scraper().ScrapeUnknowIsListing(uri, true);
             //new Scraper().ScrapeIsNotListing(uri);
             //new Scraper().Scrape(page);
+            new Scraper().Scrape(uriPage);
             //new Scraper().GetChrome(page);
             //new Scraper().ScrapeAllPages();
 
             //Csv.Export(true);
-            Json.Export(true);
+            //Json.Export(true);
 
         }
 

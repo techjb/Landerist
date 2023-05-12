@@ -95,18 +95,16 @@ namespace landerist_library.Insert
                     return false;
                 }
 
-                var website = Websites.Websites.GetWebsite(uri.Host);
-                if (website != null)
+                if (Websites.Websites.ExistsWebsite(uri.Host))
                 {
                     return false;
                 }
 
-                website = new()
+                Website website = new()
                 {
                     MainUri = uri,
                     Host = uri.Host,
                 };
-
                 return InsertWebsite(website);
             }
             catch
