@@ -11,35 +11,35 @@ namespace landerist_library.Parse.MediaParser
             MediaParser = mediaParser;
         }
 
-        public void GetImages()
+        public void AddImages()
         {
-            GetImagesOpenGraph();
-            GetImagesSrc();
+            AddImagesOpenGraph();
+            AddImagesImgSrc();
             //GetImagesA(); // Add some invalid images
         }
 
-        private void GetImagesOpenGraph()
+        private void AddImagesOpenGraph()
         {
             var imageNodes = MediaParser.Page.HtmlDocument!.DocumentNode.SelectNodes("//meta[@property='og:image']");
-            ParseImages(imageNodes, "content");
+            AddImages(imageNodes, "content");
 
             imageNodes = MediaParser.Page.HtmlDocument!.DocumentNode.SelectNodes("//meta[@property='og:image:secure_url']");
-            ParseImages(imageNodes, "content");
+            AddImages(imageNodes, "content");
         }
 
-        private void GetImagesSrc()
+        private void AddImagesImgSrc()
         {
             var imageNodes = MediaParser.Page.HtmlDocument!.DocumentNode.SelectNodes("//img");
-            ParseImages(imageNodes, "src");
+            AddImages(imageNodes, "src");
         }
 
         private void GetImagesA()
         {
             var imageNodes = MediaParser.Page.HtmlDocument!.DocumentNode.SelectNodes("//a");
-            ParseImages(imageNodes, "href");
+            AddImages(imageNodes, "href");
         }
 
-        private void ParseImages(HtmlNodeCollection? nodeCollection, string attributeValue)
+        private void AddImages(HtmlNodeCollection? nodeCollection, string attributeValue)
         {
             if (nodeCollection == null)
             {
@@ -47,11 +47,11 @@ namespace landerist_library.Parse.MediaParser
             }
             foreach (var node in nodeCollection)
             {
-                ParseImage(node, attributeValue);
+                AddImage(node, attributeValue);
             }
         }
 
-        private void ParseImage(HtmlNode imgNode, string name)
+        private void AddImage(HtmlNode imgNode, string name)
         {
             string attributeValue = imgNode.GetAttributeValue(name, null);
             if (string.IsNullOrEmpty(attributeValue))

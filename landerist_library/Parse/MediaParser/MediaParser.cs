@@ -21,7 +21,7 @@ namespace landerist_library.Parse.MediaParser
             {
                 return;
             }
-            new ImageParser(this).GetImages();
+            new ImageParser(this).AddImages();
             new VideoParser(this).GetVideos();
             listing.SetMedia(Media);
         }
