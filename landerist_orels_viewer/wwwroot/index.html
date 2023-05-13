@@ -344,12 +344,7 @@
             var img = document.createElement("img");
             img.setAttribute("data-flickity-lazyload", media.url);
             img.setAttribute("class", "carousel-image");
-            var title = media.url;
-            if (Object.hasOwn(media, "title")) {
-                title = media.title;
-            }
-            img.setAttribute("title", title);
-            img.setAttribute("alt", title);
+            SetTitle(img, media);
             div.appendChild(img);
         }
 
@@ -358,25 +353,42 @@
             iframe.setAttribute("src", media.url);
             iframe.setAttribute("frameborder", "0");
             iframe.setAttribute("class", "carousel-cell");
-            if (Object.hasOwn(media, "title")) {
-                iframe.setAttribute("title", media.title);
-            }
+            SetTitle(iframe, media);
             div.appendChild(iframe);
         }
 
         function AddMediaOther(div, media) {
             var a = document.createElement("a");
             a.setAttribute("href", media.url);
-            a.setAttribute("alt", media.url);
             a.setAttribute("target", "_blank");
             a.innerText = media.url;
             if (Object.hasOwn(media, "title")) {
                 a.innerText = media.title;
             }
+            SetTitle(a, media);
             var carousellCell = document.createElement("div");
             carousellCell.setAttribute("class", "carousel-cell");
             carousellCell.appendChild(a);
             div.appendChild(carousellCell);
+        }
+
+        function SetTitle(element, media) {
+            var titles = [];
+            if (Object.hasOwn(media, "title")) {
+                titles.push("title: " + media.title);
+            }
+            if (Object.hasOwn(media, "mediaType")) {
+                titles.push("mediaType: " + media.mediaType);
+            }
+            if (Object.hasOwn(media, "url")) {
+                titles.push("url: " + media.url);
+            }
+            var title = titles.join("\n");
+            if (title == '') {
+                return;
+            }
+            element.setAttribute("title", title);
+            element.setAttribute("alt", title);
         }
 
         function InitCarousels() {

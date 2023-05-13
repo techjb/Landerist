@@ -83,7 +83,7 @@ namespace landerist_console
             //Websites.InsertMainPages();
 
             //Scraper.ScrapeMainPage(website);
-            Scraper.ScrapeNonScrapped();
+            //Scraper.ScrapeNonScrapped();
             //Scraper.ScrapeUnknowHttpStatusCode();
             //Scraper.ScrapeUnknowIsListing(uri, true);
             //Scraper.ScrapeIsNotListing(uri);
@@ -93,7 +93,7 @@ namespace landerist_console
             //Scraper.ScrapeAllPages();
 
             //Csv.Export(true);
-            //Json.Export(true);
+            Json.Export(true);
 
         }
 
