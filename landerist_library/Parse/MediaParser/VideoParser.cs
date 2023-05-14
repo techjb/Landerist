@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using landerist_orels.ES;
 using System.Text.RegularExpressions;
 
 namespace landerist_library.Parse.MediaParser
@@ -45,8 +46,26 @@ namespace landerist_library.Parse.MediaParser
                 {
                     attributeValue = "https:" + attributeValue;
                 }
-                MediaParser.AddVideo(attributeValue);
+                AddVideo(attributeValue);
             }
+        }
+
+        public void AddVideo(string url)
+        {
+            if (!Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out Uri? uri))
+            {
+                return;
+            }
+            if (uri == null)
+            {
+                return;
+            }
+            var media = new Media()
+            {
+                mediaType = MediaType.video,
+                url = uri
+            };
+            MediaParser.Media.Add(media);
         }
     }
 }
