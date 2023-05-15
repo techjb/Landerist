@@ -90,7 +90,7 @@ namespace landerist_library.Scrape
 
             if (!Config.TrainingMode)
             {
-                new LocationParser(Page, listing).SetLocation();
+                new LatLngParser(Page, listing).SetLatLng();
                 new MediaParser(Page).AddMedia(listing);
                 ES_Listings.InsertUpdate(listing);                
             }

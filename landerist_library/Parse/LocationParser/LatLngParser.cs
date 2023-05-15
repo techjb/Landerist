@@ -6,43 +6,43 @@ using System.Text.RegularExpressions;
 
 namespace landerist_library.Parse.LocationParser
 {
-    public class LocationParser
+    public class LatLngParser
     {
         private readonly Page Page;
 
         private readonly Listing Listing;
 
-        private readonly HashSet<Tuple<double, double>> Locations = new();
+        private readonly HashSet<Tuple<double, double>> LatLngs = new();
 
 
-        public LocationParser(Page page, Listing listing)
+        public LatLngParser(Page page, Listing listing)
         {
 
             Page = page;
             Listing = listing;
         }
 
-        public void SetLocation()
+        public void SetLatLng()
         {
             Page.LoadHtmlDocument(true);
             if (Page.HtmlDocument == null)
             {
                 return;
             }
-            LocationIframeGoogleMaps(Page.HtmlDocument);
-            LocationInHtmlLatLng(Page.HtmlDocument);
-            SetLocationToListing();
+            LatLngIframeGoogleMaps(Page.HtmlDocument);
+            LatLngInHtmlLatLng(Page.HtmlDocument);
+            SetLatLngToListing();
         }
 
-        private void SetLocationToListing()
+        private void SetLatLngToListing()
         {
-            if (Locations.Count == 0)
+            if (LatLngs.Count == 0)
             {
                 return;
             }
-            if (Locations.Count.Equals(1))
+            if (LatLngs.Count.Equals(1))
             {
-                var tuple = Locations.Single();
+                var tuple = LatLngs.Single();
                 Listing.latitude = tuple.Item1;
                 Listing.longitude = tuple.Item2;
             }
@@ -52,7 +52,7 @@ namespace landerist_library.Parse.LocationParser
             }
         }
 
-        private void LocationIframeGoogleMaps(HtmlDocument htmlDocument)
+        private void LatLngIframeGoogleMaps(HtmlDocument htmlDocument)
         {
             var iframes = htmlDocument.DocumentNode.Descendants("iframe");
             if (iframes == null)
@@ -66,11 +66,11 @@ namespace landerist_library.Parse.LocationParser
                 {
                     continue;
                 }
-                GetLocationIframeGoogleMaps(src);
+                LatLngIframeGoogleMaps(src);
             }
         }
 
-        private void GetLocationIframeGoogleMaps(string src)
+        private void LatLngIframeGoogleMaps(string src)
         {
             if (!src.Contains("https://www.google.com/maps/embed?pb=") &&
                 !src.Contains("!2d") &&
@@ -87,7 +87,7 @@ namespace landerist_library.Parse.LocationParser
                 var lat = src[(src.IndexOf("!3d") + 3)..];
                 lat = lat[..lat.IndexOf("!")];
 
-                AddLocation(lat, lng);
+                AddLatLng(lat, lng);
             }
             catch (Exception exception)
             {
@@ -95,7 +95,7 @@ namespace landerist_library.Parse.LocationParser
             }
         }
 
-        private void LocationInHtmlLatLng(HtmlDocument htmlDocument)
+        private void LatLngInHtmlLatLng(HtmlDocument htmlDocument)
         {
             List<string> listRegex = new()
             {
@@ -109,11 +109,11 @@ namespace landerist_library.Parse.LocationParser
 
             foreach (var regex in listRegex)
             {
-                GetLocationRegex(text, regex);
+                LatLngRegex(text, regex);
             }
         }
 
-        public void GetLocationRegex(string text, string regexPattern)
+        public void LatLngRegex(string text, string regexPattern)
         {
             var regex = new Regex(regexPattern, RegexOptions.IgnoreCase);
             var matches = regex.Matches(text);
@@ -140,25 +140,25 @@ namespace landerist_library.Parse.LocationParser
                     else
                     {
                         longitude = latOrLng;
-                        AddLocation((double)latitude, (double)longitude);
+                        AddLatLng((double)latitude, (double)longitude);
                         break;
                     }
                 }
             }
         }
 
-        private void AddLocation(string latitude, string longitude)
+        private void AddLatLng(string latitude, string longitude)
         {
             if (double.TryParse(longitude, NumberStyles.Float, CultureInfo.InvariantCulture, out double lng) &&
                 double.TryParse(latitude, NumberStyles.Float, CultureInfo.InvariantCulture, out double lat))
             {
-                AddLocation(lat, lng);
+                AddLatLng(lat, lng);
             }
         }
-        private void AddLocation(double latitude, double longitude)
+        private void AddLatLng(double latitude, double longitude)
         {
             var tuple = Tuple.Create(latitude, longitude);
-            Locations.Add(tuple);
+            LatLngs.Add(tuple);
         }
     }
 }
