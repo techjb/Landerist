@@ -2,9 +2,9 @@
 using landerist_library.Database;
 using landerist_library.Download;
 using landerist_library.Index;
-using landerist_library.Parse.ListingParser;
-using landerist_library.Parse.LocationParser;
-using landerist_library.Parse.MediaParser;
+using landerist_library.Parse.Listing;
+using landerist_library.Parse.Location;
+using landerist_library.Parse.Media;
 using landerist_library.Websites;
 
 namespace landerist_library.Scrape

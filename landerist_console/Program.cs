@@ -2,7 +2,7 @@
 using landerist_library.Download;
 using landerist_library.Export;
 using landerist_library.Insert;
-using landerist_library.Parse.LocationParser;
+using landerist_library.Parse.Location;
 using landerist_library.Scrape;
 using landerist_library.Websites;
 using landerist_orels.ES;
@@ -44,7 +44,7 @@ namespace landerist_console
 
         private static void Run()
         {
-            var uriPage = new Uri("https://casavida.es/propiedades/residencial-mediterraneo-mijas-costa-malaga/");
+            var uriPage = new Uri("https://www.inmobiliariamarbella.es/inmuebles/local-en-marbella-p4_l24/");
 
             //SeleniumDownloader.GetChrome(uriPage);
             //PuppeteerDownloader.Get(uriPage);
@@ -88,7 +88,7 @@ namespace landerist_console
             //Scraper.ScrapeUnknowIsListing(uri, true);
             //Scraper.ScrapeIsNotListing(uri);
             //Scraper.Scrape(website);
-            //Scraper.Scrape(uriPage);
+            Scraper.Scrape(uriPage);
             //Scraper.GetChrome(page);
             //Scraper.ScrapeAllPages();
 

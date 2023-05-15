@@ -1,13 +1,13 @@
 ﻿using landerist_library.Websites;
 using landerist_orels.ES;
 
-namespace landerist_library.Parse.MediaParser
+namespace landerist_library.Parse.Media
 {
     public class MediaParser
     {
         public readonly Page Page;
 
-        public readonly SortedSet<Media> Media = new(new MediaComparer());
+        public readonly SortedSet<landerist_orels.ES.Media> Media = new(new MediaComparer());
 
         public MediaParser(Page page)
         {
@@ -15,7 +15,7 @@ namespace landerist_library.Parse.MediaParser
             InitHtmlDocument();
         }
 
-        public void AddMedia(Listing listing)
+        public void AddMedia(landerist_orels.ES.Listing listing)
         {
             if (Page.HtmlDocument == null)
             {

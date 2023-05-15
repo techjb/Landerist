@@ -1,21 +1,20 @@
 ﻿using HtmlAgilityPack;
 using landerist_library.Websites;
-using landerist_orels.ES;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace landerist_library.Parse.LocationParser
+namespace landerist_library.Parse.Location
 {
     public class LatLngParser
     {
         private readonly Page Page;
 
-        private readonly Listing Listing;
+        private readonly landerist_orels.ES.Listing Listing;
 
         private readonly HashSet<Tuple<double, double>> LatLngs = new();
 
 
-        public LatLngParser(Page page, Listing listing)
+        public LatLngParser(Page page, landerist_orels.ES.Listing listing)
         {
 
             Page = page;

@@ -4,7 +4,7 @@ using OpenAI_API;
 using OpenAI_API.Chat;
 using OpenAI_API.Models;
 
-namespace landerist_library.Parse.ListingParser
+namespace landerist_library.Parse.Listing
 {
     public class ChatGPT
     {

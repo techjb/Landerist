@@ -1,11 +1,18 @@
 ﻿using HtmlAgilityPack;
+using landerist_library.Database;
 using landerist_orels.ES;
+using SkiaSharp;
+using System.Text.RegularExpressions;
 
-namespace landerist_library.Parse.MediaParser
+
+namespace landerist_library.Parse.Media
 {
     public class ImageParser
     {
         private readonly MediaParser MediaParser;
+
+        private const int MIN_IMAGE_SIZE = 256 * 256;
+
 
         private static readonly HashSet<string> ProhibitedWords = new(StringComparer.OrdinalIgnoreCase)
         {
@@ -83,12 +90,12 @@ namespace landerist_library.Parse.MediaParser
                 return;
             }
 
-            if (!IsValid(uri))
+            if (!IsValidImage(uri))
             {
                 return;
             }
 
-            var media = new Media()
+            var media = new landerist_orels.ES.Media()
             {
                 mediaType = MediaType.image,
                 url = uri,
@@ -98,28 +105,107 @@ namespace landerist_library.Parse.MediaParser
             MediaParser.Media.Add(media);
         }
 
-        private static bool IsValid(Uri uri)
+        private static bool IsValidImage(Uri uri)
         {
             string? filename = Path.GetFileNameWithoutExtension(uri.LocalPath);
             if (string.IsNullOrEmpty(filename))
             {
                 return true;
             }
+            if (FileNameContainsProhibitedWord(filename))
+            {
+                return false;
+            }
+            if (FileNameContainsSmallSize(filename))
+            {
+                return false;
+            }
+            if (DownloadedImageIsInvalid(uri))
+            {
+                return false;
+            }
+            return true;
+        }
 
-            filename = filename.Replace("_", "-");
-            var splitted = filename.Split('-');
+        private static bool FileNameContainsProhibitedWord(string fileName)
+        {
+            string filenameParsed = fileName.Replace("_", "-");
+            var splitted = filenameParsed.Split('-');
             foreach (var word in splitted)
             {
                 foreach (string prohibitedWord in ProhibitedWords)
                 {
                     if (word.Equals(prohibitedWord, StringComparison.OrdinalIgnoreCase))
                     {
-                        return false;
+                        return true;
                     }
                 }
             }
-            
-            return true;
+            return false;
+        }
+
+        private static bool FileNameContainsSmallSize(string fileName)
+        {
+            Regex regex = new(@"(\d+)x(\d+)");
+            Match match = regex.Match(fileName);
+
+            if (!match.Success)
+            {
+                return false;
+            }
+            if (!match.Groups.Count.Equals(3))
+            {
+                return false;
+            }
+
+            string widthString = match.Groups[1].Value;
+            string heightString = match.Groups[2].Value;
+
+            if (!int.TryParse(widthString, out int width) ||
+                !int.TryParse(heightString, out int height)
+                )
+            {
+                return false;
+            }
+
+            return ImageIsTooSmall(width, height);
+        }
+
+        private static bool ImageIsTooSmall(int width, int height)
+        {
+            int size = width * height;
+            return size < MIN_IMAGE_SIZE;
+        }
+
+        private static bool DownloadedImageIsInvalid(Uri uri)
+        {
+            if (DiscardedImages.Contains(uri))
+            {
+                return true;
+            }
+
+            bool isInValid = true;
+            try
+            {
+                using var client = new HttpClient();
+                var response = client.GetAsync(uri).Result;
+                response.EnsureSuccessStatusCode();
+                var responseContent = response.Content;
+                Stream stream = responseContent.ReadAsStreamAsync().Result;
+                using var sKManagedStream = new SKManagedStream(stream);
+                SKBitmap bitmap = SKBitmap.Decode(sKManagedStream);
+                SKImage image = SKImage.FromBitmap(bitmap);
+                isInValid = ImageIsTooSmall(image.Width, image.Height);
+            }
+            catch
+            {
+
+            }
+            if (isInValid)
+            {
+                DiscardedImages.Insert(uri);
+            }
+            return isInValid;
         }
     }
 }

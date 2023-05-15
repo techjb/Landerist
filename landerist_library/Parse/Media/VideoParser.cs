@@ -2,7 +2,7 @@
 using landerist_orels.ES;
 using System.Text.RegularExpressions;
 
-namespace landerist_library.Parse.MediaParser
+namespace landerist_library.Parse.Media
 {
     public class VideoParser
     {
@@ -60,7 +60,7 @@ namespace landerist_library.Parse.MediaParser
             {
                 return;
             }
-            var media = new Media()
+            var media = new landerist_orels.ES.Media()
             {
                 mediaType = MediaType.video,
                 url = uri

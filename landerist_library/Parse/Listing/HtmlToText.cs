@@ -1,6 +1,6 @@
 ﻿using HtmlAgilityPack;
 
-namespace landerist_library.Parse.ListingParser
+namespace landerist_library.Parse.Listing
 {
     public class HtmlToText
     {

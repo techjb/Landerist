@@ -1,8 +1,7 @@
 ﻿using landerist_library.Websites;
-using landerist_orels.ES;
 using Newtonsoft.Json;
 
-namespace landerist_library.Parse.ListingParser
+namespace landerist_library.Parse.Listing
 {
     public class ListingParser
     {
@@ -10,21 +9,21 @@ namespace landerist_library.Parse.ListingParser
 
         private bool? IsListing = null;
 
-        private Listing? Listing = null;
+        private landerist_orels.ES.Listing? Listing = null;
 
         public ListingParser(Page page)
         {
             Page = page;
         }
 
-        public Tuple<bool?, Listing?> GetListing()
+        public Tuple<bool?, landerist_orels.ES.Listing?> GetListing()
         {
             Page.SetResponseBodyText();
             if (RequestListingIsPermited())
             {
                 RequestListing();
             }
-            return Tuple.Create(IsListing, Listing);
+            return Tuple.Create<bool?, landerist_orels.ES.Listing>(IsListing, Listing);
         }
 
         public bool RequestListingIsPermited()

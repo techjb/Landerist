@@ -2,7 +2,7 @@
 using landerist_orels.ES;
 using Newtonsoft.Json;
 
-namespace landerist_library.Parse.ListingParser
+namespace landerist_library.Parse.Listing
 {
     public class ListingResponse
     {
@@ -164,14 +164,14 @@ namespace landerist_library.Parse.ListingParser
 
         protected const string ESTADO_DE_LA_CONSTRUCCIÓN_EN_RUINAS = "en_ruinas";
 
-        public Listing? ToListing(Page page)
+        public landerist_orels.ES.Listing? ToListing(Page page)
         {
             if (!IsValidResponse())
             {
                 return null;
             }
 
-            var listing = new Listing
+            var listing = new landerist_orels.ES.Listing
             {
                 guid = page.UriHash,
                 listingStatus = GetListingStatus(),

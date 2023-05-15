@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System.Reflection;
 
-namespace landerist_library.Parse.ListingParser
+namespace landerist_library.Parse.Listing
 {
     public class ListingResponseSchema : ListingResponse
     {

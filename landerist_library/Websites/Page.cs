@@ -1,7 +1,7 @@
 ﻿using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Database;
-using landerist_library.Parse.ListingParser;
+using landerist_library.Parse.Listing;
 using landerist_orels.ES;
 using System.Data;
 using System.Security.Cryptography;
