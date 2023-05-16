@@ -1,18 +1,29 @@
 ﻿using HtmlAgilityPack;
+using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_orels.ES;
-using SkiaSharp;
+using OpenCvSharp;
 using System.Text.RegularExpressions;
-
 
 namespace landerist_library.Parse.Media
 {
+    /// <summary>
+    /// In Linux need to add another package. See:
+    /// https://stackoverflow.com/questions/44105973/opencvsharp-unable-to-load-dll-opencvsharpextern
+    /// </summary>
     public class ImageParser
     {
         private readonly MediaParser MediaParser;
 
         private const int MIN_IMAGE_SIZE = 256 * 256;
 
+        private static readonly SortedSet<landerist_orels.ES.Media> MediaImages = new(new MediaComparer());
+
+        private static readonly List<landerist_orels.ES.Media> MediaToRemove = new();
+
+        private static readonly Dictionary<Uri, Mat> DictionaryMats = new();
+
+        private static readonly Dictionary<Uri, Mat> NotDuplicatedMats = new();
 
         private static readonly HashSet<string> ProhibitedWords = new(StringComparer.OrdinalIgnoreCase)
         {
@@ -29,7 +40,12 @@ namespace landerist_library.Parse.Media
         {
             AddImagesOpenGraph();
             AddImagesImgSrc();
-            //GetImagesA(); // Add some invalid images
+            //GetImagesA(); // Add some invalid currentMat
+            RemoveInvalidImages();
+            foreach (var image in MediaImages)
+            {
+                MediaParser.Media.Add(image);
+            }
         }
 
         private void AddImagesOpenGraph()
@@ -102,7 +118,7 @@ namespace landerist_library.Parse.Media
                 title = title,
             };
 
-            MediaParser.Media.Add(media);
+            MediaImages.Add(media);
         }
 
         private static bool IsValidImage(Uri uri)
@@ -120,10 +136,7 @@ namespace landerist_library.Parse.Media
             {
                 return false;
             }
-            if (DownloadedImageIsInvalid(uri))
-            {
-                return false;
-            }
+
             return true;
         }
 
@@ -168,44 +181,137 @@ namespace landerist_library.Parse.Media
                 return false;
             }
 
-            return ImageIsTooSmall(width, height);
+            return ImageIsSmall(width, height);
         }
 
-        private static bool ImageIsTooSmall(int width, int height)
+        private static bool ImageIsSmall(int width, int height)
         {
             int size = width * height;
             return size < MIN_IMAGE_SIZE;
         }
 
-        private static bool DownloadedImageIsInvalid(Uri uri)
+        private static void RemoveInvalidImages()
         {
-            if (DiscardedImages.Contains(uri))
+            RemoveDiscardedImages();
+            RemoveSmallImages();
+            RemoveDuplicatedImages();
+        }
+        private static void RemoveMediaToRemove(bool addToDiscarded)
+        {
+            foreach (var image in MediaToRemove)
             {
-                return true;
+                MediaImages.Remove(image);
+                if (addToDiscarded)
+                {
+                    DiscardedImages.Insert(image.url);
+                }
             }
+            MediaToRemove.Clear();
+        }
 
-            bool isInValid = true;
+        private static void RemoveDiscardedImages()
+        {
+            foreach (var image in MediaImages)
+            {
+                if (DiscardedImages.Contains(image.url))
+                {
+                    MediaToRemove.Add(image);
+                }
+            }
+            RemoveMediaToRemove(false);
+        }
+
+
+        private static void RemoveSmallImages()
+        {
+            foreach (var image in MediaImages)
+            {
+                if (ImageIsSmall(image.url))
+                {
+                    MediaToRemove.Add(image);
+                }
+            }
+            RemoveMediaToRemove(true);
+        }
+
+        public static bool ImageIsSmall(Uri uri)
+        {
+            bool imageIsSmall = true;
             try
             {
-                using var client = new HttpClient();
-                var response = client.GetAsync(uri).Result;
-                response.EnsureSuccessStatusCode();
-                var responseContent = response.Content;
-                Stream stream = responseContent.ReadAsStreamAsync().Result;
-                using var sKManagedStream = new SKManagedStream(stream);
-                SKBitmap bitmap = SKBitmap.Decode(sKManagedStream);
-                SKImage image = SKImage.FromBitmap(bitmap);
-                isInValid = ImageIsTooSmall(image.Width, image.Height);
+                var stream = GetStream(uri);
+                using MemoryStream memoryStream = new();
+                stream.CopyTo(memoryStream);
+                Mat mat = Cv2.ImDecode(memoryStream.ToArray(), ImreadModes.Color);
+                imageIsSmall = ImageIsSmall(mat.Width, mat.Height);
+                if (!imageIsSmall)
+                {
+                    DictionaryMats.Add(uri, mat);
+                }
             }
             catch
             {
 
             }
-            if (isInValid)
+            return imageIsSmall;
+        }
+
+        private static Stream GetStream(Uri uri)
+        {
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
+            var response = client.GetAsync(uri).Result;
+            response.EnsureSuccessStatusCode();
+            var responseContent = response.Content;
+            return responseContent.ReadAsStreamAsync().Result;
+        }
+
+        private static void RemoveDuplicatedImages()
+        {
+            foreach (var image in MediaImages)
             {
-                DiscardedImages.Insert(uri);
+                CheckIsDuplicated(image);
             }
-            return isInValid;
+            foreach (var image in MediaImages)
+            {
+                if (!NotDuplicatedMats.ContainsKey(image.url))
+                {
+                    MediaToRemove.Add(image);
+                }
+            }
+            RemoveMediaToRemove(true);
+        }
+
+        private static void CheckIsDuplicated(landerist_orels.ES.Media image)
+        {
+            if (!DictionaryMats.TryGetValue(image.url, out Mat? currentMat))
+            {
+                return;
+            }
+
+            var existingImage = NotDuplicatedMats.FirstOrDefault(kvp => AreSimilar(kvp.Value, currentMat));
+            if (existingImage.Equals(default(KeyValuePair<Uri, Mat>)))
+            {
+                NotDuplicatedMats[image.url] = currentMat;
+                return;
+            }
+            if (existingImage.Value.Width * existingImage.Value.Height < currentMat.Width * currentMat.Height)
+            {
+                NotDuplicatedMats.Remove(existingImage.Key);
+                NotDuplicatedMats[image.url] = currentMat;
+            }
+        }
+
+        private static bool AreSimilar(Mat mat1, Mat mat2)
+        {
+            Mat hist1 = new();
+            Mat hist2 = new();
+
+            Cv2.CalcHist(new Mat[] { mat1 }, new int[] { 0 }, null, hist1, 1, new int[] { 256 }, new Rangef[] { new Rangef(0, 256) });
+            Cv2.CalcHist(new Mat[] { mat2 }, new int[] { 0 }, null, hist2, 1, new int[] { 256 }, new Rangef[] { new Rangef(0, 256) });
+
+            double correl = Cv2.CompareHist(hist1, hist2, HistCompMethods.Correl);
+            return correl > 0.95;
         }
     }
 }

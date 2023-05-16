@@ -11,7 +11,7 @@
                 "   SELECT 1 " +
                 "   FROM " + DISCARDED_IMAGES + " " +
                 "   WHERE Uri = @Uri) " +
-                "BEGIN SELECT 'true' " +
+                "SELECT 'true' " +
                 "ELSE " +
                 "SELECT 'false' ";
 
@@ -29,7 +29,7 @@
 
             string query = 
                 "INSERT INTO " + DISCARDED_IMAGES + " " +
-                "(GETDATE(), @Uri)";
+                "VALUES (GETDATE(), @Uri)";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"Uri", uri.ToString() }

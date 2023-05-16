@@ -3,10 +3,10 @@ using landerist_library.Download;
 using landerist_library.Export;
 using landerist_library.Insert;
 using landerist_library.Parse.Location;
+using landerist_library.Parse.Media;
 using landerist_library.Scrape;
 using landerist_library.Websites;
 using landerist_orels.ES;
-using PuppeteerSharp;
 
 namespace landerist_console
 {
@@ -59,9 +59,9 @@ namespace landerist_console
             //var uri = new Uri("https://www.prorealty.es/");
             //var uri = new Uri("http://real-viv.com/");
             //var uri = new Uri("http://casavida.es/");
-            var uri = new Uri("https://www.inmobiliariamarbella.es/");
+            //var uri = new Uri("https://www.inmobiliariamarbella.es/");
 
-            ////var website = new Website(uri);
+            //var website = new Website(uri);
             //var page = new Page(website, uriPage);
             //var page = new Page(uriPage);
 
@@ -95,6 +95,7 @@ namespace landerist_console
             //Csv.Export(true);
             Json.Export(true);
 
+            
         }
 
         private static void EndBeep()
