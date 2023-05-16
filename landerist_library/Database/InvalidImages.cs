@@ -1,15 +1,15 @@
 ﻿namespace landerist_library.Database
 {
-    public class DiscardedImages
+    public class InvalidImages
     {
-        private const string DISCARDED_IMAGES = "[DISCARDED_IMAGES]";
+        private const string INVALID_IMAGES = "[INVALID_IMAGES]";
 
         public static bool Contains(Uri uri)
         {
             string query =
                 "IF EXISTS (" +
                 "   SELECT 1 " +
-                "   FROM " + DISCARDED_IMAGES + " " +
+                "   FROM " + INVALID_IMAGES + " " +
                 "   WHERE Uri = @Uri) " +
                 "SELECT 'true' " +
                 "ELSE " +
@@ -27,8 +27,8 @@
                 return false;
             }
 
-            string query = 
-                "INSERT INTO " + DISCARDED_IMAGES + " " +
+            string query =
+                "INSERT INTO " + INVALID_IMAGES + " " +
                 "VALUES (GETDATE(), @Uri)";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {

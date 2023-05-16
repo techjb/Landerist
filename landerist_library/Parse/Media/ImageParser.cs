@@ -21,6 +21,8 @@ namespace landerist_library.Parse.Media
 
         private static readonly List<landerist_orels.ES.Media> MediaToRemove = new();
 
+        private static readonly SortedSet<landerist_orels.ES.Media> UnknowIsValidImages = new(new MediaComparer());
+
         private static readonly Dictionary<Uri, Mat> DictionaryMats = new();
 
         private static readonly Dictionary<Uri, Mat> NotDuplicatedMats = new();
@@ -41,7 +43,7 @@ namespace landerist_library.Parse.Media
             AddImagesOpenGraph();
             AddImagesImgSrc();
             //GetImagesA(); // Add some invalid currentMat
-            RemoveInvalidImages();
+            RemoveImages();
             foreach (var image in MediaImages)
             {
                 MediaParser.Media.Add(image);
@@ -190,48 +192,61 @@ namespace landerist_library.Parse.Media
             return size < MIN_IMAGE_SIZE;
         }
 
-        private static void RemoveInvalidImages()
+        private static void RemoveImages()
         {
-            RemoveDiscardedImages();
+            RemoveInvalidImages();
+            LoadUnknowIsValid();
             RemoveSmallImages();
             RemoveDuplicatedImages();
+            InsertValidImages();
         }
-        private static void RemoveMediaToRemove(bool addToDiscarded)
+        private static void ProcessMediaToRemove(bool addToDiscarded)
         {
             foreach (var image in MediaToRemove)
             {
                 MediaImages.Remove(image);
+                UnknowIsValidImages.Remove(image);
                 if (addToDiscarded)
                 {
-                    DiscardedImages.Insert(image.url);
+                    InvalidImages.Insert(image.url);
                 }
             }
             MediaToRemove.Clear();
         }
 
-        private static void RemoveDiscardedImages()
+        private static void RemoveInvalidImages()
         {
             foreach (var image in MediaImages)
             {
-                if (DiscardedImages.Contains(image.url))
+                if (InvalidImages.Contains(image.url))
                 {
                     MediaToRemove.Add(image);
                 }
             }
-            RemoveMediaToRemove(false);
+            ProcessMediaToRemove(false);
         }
 
+        private static void LoadUnknowIsValid()
+        {
+            foreach (var image in MediaImages)
+            {
+                if (!ValidImages.Contains(image.url))
+                {
+                    UnknowIsValidImages.Add(image);
+                }
+            }
+        }
 
         private static void RemoveSmallImages()
         {
-            foreach (var image in MediaImages)
+            foreach (var image in UnknowIsValidImages)
             {
                 if (ImageIsSmall(image.url))
                 {
                     MediaToRemove.Add(image);
-                }
+                }                
             }
-            RemoveMediaToRemove(true);
+            ProcessMediaToRemove(true);
         }
 
         public static bool ImageIsSmall(Uri uri)
@@ -268,18 +283,18 @@ namespace landerist_library.Parse.Media
 
         private static void RemoveDuplicatedImages()
         {
-            foreach (var image in MediaImages)
+            foreach (var image in UnknowIsValidImages)
             {
                 CheckIsDuplicated(image);
             }
-            foreach (var image in MediaImages)
+            foreach (var image in UnknowIsValidImages)
             {
                 if (!NotDuplicatedMats.ContainsKey(image.url))
                 {
                     MediaToRemove.Add(image);
-                }
+                }                
             }
-            RemoveMediaToRemove(true);
+            ProcessMediaToRemove(true);
         }
 
         private static void CheckIsDuplicated(landerist_orels.ES.Media image)
@@ -312,6 +327,14 @@ namespace landerist_library.Parse.Media
 
             double correl = Cv2.CompareHist(hist1, hist2, HistCompMethods.Correl);
             return correl > 0.95;
+        }
+
+        private static void InsertValidImages()
+        {
+            foreach(var image in UnknowIsValidImages)
+            {
+                ValidImages.Insert(image.url);
+            }
         }
     }
 }
