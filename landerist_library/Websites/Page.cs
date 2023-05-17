@@ -129,7 +129,7 @@ namespace landerist_library.Websites
 
         public bool Update()
         {
-            if (!Config.TrainingMode)
+            if (!Config.TRAINING_MODE)
             {
                 ResponseBodyText = null;
             }

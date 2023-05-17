@@ -80,23 +80,32 @@ namespace landerist_library.Scrape
             {
                 return;
             }
-            var listingParser = new ListingParser(Page).GetListing();
-            Page.IsListing = listingParser.Item1;
-            var listing = listingParser.Item2;
+            landerist_orels.ES.Listing? listing;
+            if (Config.SKIP_PARSE_LISTINGS)
+            {
+                listing = ES_Listings.GetListing(Page, false);
+                Page.IsListing = listing != null;
+            }
+            else
+            {
+                var listingParser = new ListingParser(Page).GetListing();
+                Page.IsListing = listingParser.Item1;
+                listing = listingParser.Item2;
+            }            
             if (listing == null)
             {
                 return;
             }
 
-            if (!Config.TrainingMode)
+            if (Config.TRAINING_MODE)
+            {
+                ES_Listings.Insert(listing);
+            }
+            else
             {
                 new LatLngParser(Page, listing).SetLatLng();
                 new MediaParser(Page).AddMedia(listing);
                 ES_Listings.InsertUpdate(listing);                
-            }
-            else
-            {
-                ES_Listings.Insert(listing);
             }
         }
 

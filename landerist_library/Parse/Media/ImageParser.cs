@@ -97,11 +97,7 @@ namespace landerist_library.Parse.Media
                 return;
             }
 
-            string title = imgNode.GetAttributeValue("alt", null);
-            if (string.IsNullOrEmpty(title))
-            {
-                title = imgNode.GetAttributeValue("title", null);
-            }
+            string title = MediaParser.GetTitle(imgNode);
 
             if (!Uri.TryCreate(MediaParser.Page.Uri, attributeValue, out Uri? uri))
             {
@@ -121,7 +117,7 @@ namespace landerist_library.Parse.Media
             };
 
             MediaImages.Add(media);
-        }
+        }        
 
         private static bool IsValidImage(Uri uri)
         {
@@ -208,7 +204,7 @@ namespace landerist_library.Parse.Media
                 UnknowIsValidImages.Remove(image);
                 if (addToDiscarded)
                 {
-                    InvalidImages.Insert(image.url);
+                    ValidImages.InsertInvalid(image.url);
                 }
             }
             MediaToRemove.Clear();
@@ -218,7 +214,7 @@ namespace landerist_library.Parse.Media
         {
             foreach (var image in MediaImages)
             {
-                if (InvalidImages.Contains(image.url))
+                if (ValidImages.IsInvalid(image.url))
                 {
                     MediaToRemove.Add(image);
                 }
@@ -230,7 +226,7 @@ namespace landerist_library.Parse.Media
         {
             foreach (var image in MediaImages)
             {
-                if (!ValidImages.Contains(image.url))
+                if (!ValidImages.IsValid(image.url))
                 {
                     UnknowIsValidImages.Add(image);
                 }
@@ -244,7 +240,7 @@ namespace landerist_library.Parse.Media
                 if (ImageIsSmall(image.url))
                 {
                     MediaToRemove.Add(image);
-                }                
+                }
             }
             ProcessMediaToRemove(true);
         }
@@ -283,21 +279,30 @@ namespace landerist_library.Parse.Media
 
         private static void RemoveDuplicatedImages()
         {
-            foreach (var image in UnknowIsValidImages)
-            {
-                CheckIsDuplicated(image);
-            }
+            GetDuplicates();
             foreach (var image in UnknowIsValidImages)
             {
                 if (!NotDuplicatedMats.ContainsKey(image.url))
                 {
                     MediaToRemove.Add(image);
-                }                
+                }
             }
             ProcessMediaToRemove(true);
         }
 
-        private static void CheckIsDuplicated(landerist_orels.ES.Media image)
+        private static void GetDuplicates()
+        {
+            foreach (var kvp in DictionaryMats)
+            {
+                DictionaryMats[kvp.Key] = CalculateHystogram(kvp.Value);
+            }
+            foreach (var image in UnknowIsValidImages)
+            {
+                GetDuplicates(image);
+            }
+        }
+
+        private static void GetDuplicates(landerist_orels.ES.Media image)
         {
             if (!DictionaryMats.TryGetValue(image.url, out Mat? currentMat))
             {
@@ -317,23 +322,25 @@ namespace landerist_library.Parse.Media
             }
         }
 
+        private static Mat CalculateHystogram(Mat mat)
+        {
+            Mat hist = new();
+            Cv2.CalcHist(new Mat[] { mat }, new int[] { 0 }, null, hist, 1, 
+                new int[] { 256 }, new Rangef[] { new Rangef(0, 256) });
+            return hist;
+        }
+
         private static bool AreSimilar(Mat mat1, Mat mat2)
         {
-            Mat hist1 = new();
-            Mat hist2 = new();
-
-            Cv2.CalcHist(new Mat[] { mat1 }, new int[] { 0 }, null, hist1, 1, new int[] { 256 }, new Rangef[] { new Rangef(0, 256) });
-            Cv2.CalcHist(new Mat[] { mat2 }, new int[] { 0 }, null, hist2, 1, new int[] { 256 }, new Rangef[] { new Rangef(0, 256) });
-
-            double correl = Cv2.CompareHist(hist1, hist2, HistCompMethods.Correl);
+            double correl = Cv2.CompareHist(mat1, mat2, HistCompMethods.Correl);            
             return correl > 0.95;
         }
 
         private static void InsertValidImages()
         {
-            foreach(var image in UnknowIsValidImages)
+            foreach (var image in UnknowIsValidImages)
             {
-                ValidImages.Insert(image.url);
+                ValidImages.InsertValid(image.url);
             }
         }
     }

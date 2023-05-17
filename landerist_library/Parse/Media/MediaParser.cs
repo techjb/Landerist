@@ -1,4 +1,5 @@
-﻿using landerist_library.Websites;
+﻿using HtmlAgilityPack;
+using landerist_library.Websites;
 using landerist_orels.ES;
 
 namespace landerist_library.Parse.Media
@@ -23,6 +24,7 @@ namespace landerist_library.Parse.Media
             }
             new ImageParser(this).AddImages();
             new VideoParser(this).GetVideos();
+            new OtherParser(this).GetOthers();
             listing.SetMedia(Media);
         }
 
@@ -43,6 +45,17 @@ namespace landerist_library.Parse.Media
             {
                 node.Remove();
             }
+        }
+
+        public static string GetTitle(HtmlNode imgNode)
+        {
+            string title = imgNode.GetAttributeValue("alt", null);
+            if (string.IsNullOrEmpty(title))
+            {
+                title = imgNode.GetAttributeValue("title", null);
+            }
+
+            return title;
         }
     }
 }

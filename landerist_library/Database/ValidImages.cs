@@ -1,39 +1,72 @@
-﻿namespace landerist_library.Database
+﻿using System.Security.Cryptography;
+using System.Text;
+
+namespace landerist_library.Database
 {
     public class ValidImages
     {
         private const string VALID_IMAGES = "[VALID_IMAGES]";
 
-        public static bool Contains(Uri uri)
+        private const string INVALID_IMAGES = "[INVALID_IMAGES]";
+
+        public static bool IsValid(Uri uri)
         {
+            return IsValidInvalid(uri, true);
+        }
+
+        public static bool IsInvalid(Uri uri)
+        {
+            return IsValidInvalid(uri, false);
+        }
+
+        private static bool IsValidInvalid(Uri uri, bool isValid)
+        {
+            string tableName = isValid ? VALID_IMAGES : INVALID_IMAGES;
+            string uriHash = CalculateHash(uri);
             string query =
                 "IF EXISTS (" +
                 "   SELECT 1 " +
-                "   FROM " + VALID_IMAGES + " " +
-                "   WHERE Uri = @Uri) " +
+                "   FROM " + tableName + " " +
+                "   WHERE UriHash = @UriHash) " +
                 "SELECT 'true' " +
                 "ELSE " +
                 "SELECT 'false' ";
 
             return new DataBase().QueryBool(query, new Dictionary<string, object?> {
-                {"Uri", uri.ToString() }
+                {"UriHash", uriHash }
             });
         }
 
-        public static bool Insert(Uri uri)
+        public static bool InsertValid(Uri uri)
         {
-            if (uri.ToString().Length > 400)
-            {
-                return false;
-            }
+            return Insert(uri, true);
+        }
 
+
+        public static bool InsertInvalid(Uri uri)
+        {
+            return Insert(uri, false);
+        }
+
+        private static bool Insert(Uri uri, bool isValid)
+        {
+            string tableName = isValid ? VALID_IMAGES : INVALID_IMAGES;
+            string uriHash = CalculateHash(uri);
             string query =
-                "INSERT INTO " + VALID_IMAGES + " " +
-                "VALUES (GETDATE(), @Uri)";
+                "INSERT INTO " + tableName + " " +
+                "VALUES (GETDATE(), @UriHash)";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
-                {"Uri", uri.ToString() }
+                {"UriHash", uriHash }
             });
+        }
+
+        private static string CalculateHash(Uri uri)
+        {
+            string text = uri.ToString();
+            byte[] bytes = Encoding.UTF8.GetBytes(text);
+            byte[] hash = SHA256.Create().ComputeHash(bytes);
+            return BitConverter.ToString(hash).Replace("-", "");
         }
     }
 }
