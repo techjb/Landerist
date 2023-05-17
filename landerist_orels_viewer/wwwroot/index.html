@@ -203,13 +203,13 @@
         }
 
         function AddJson(json) {
-            for (var i = 1; i < json.listings.length; i++) {
+            for (var i = 0; i < json.listings.length; i++) {
                 var listing = json.listings[i];
                 AddListing(listing);
             }
         }
 
-        function AddListing(listing) {
+        function AddListing(listing) {            
             try {
                 var article = document.createElement("article");
                 AddMedias(listing, article);
