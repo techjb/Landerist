@@ -7,7 +7,7 @@
 
     <title>ORELS Viewer</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.classless.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/ajv/dist/ajv.bundle.min.js"></script>    
+    <script src="https://cdn.jsdelivr.net/npm/ajv/dist/ajv.bundle.min.js"></script>
 
     <style type="text/css">
         div#dropZone {
@@ -22,20 +22,20 @@
             visibility: hidden;
         }
 
-        figure{
+        figure {
             max-height: 600px;
         }
 
-        figure > div {
-            vertical-align: top;
-            display: inline;
-        }
-
-            figure > div > img {
-                height: 200px;
-                max-height: 200px;
-                padding: 4pt;
+            figure > div {
+                vertical-align: top;
+                display: inline;
             }
+
+                figure > div > a > img {
+                    height: 200px;
+                    max-height: 200px;
+                    padding: 4pt;
+                }
     </style>
 </head>
 <body>
@@ -209,7 +209,7 @@
             }
         }
 
-        function AddListing(listing) {            
+        function AddListing(listing) {
             try {
                 var article = document.createElement("article");
                 AddMedias(listing, article);
@@ -357,15 +357,19 @@
         function AddMediaImage(div, media) {
             var img = document.createElement("img");
             img.setAttribute("loading", "lazy");
-            img.setAttribute("src", media.url);            
+            img.setAttribute("src", media.url);
             SetTitle(img, media);
-            div.appendChild(img);
+            var a = document.createElement("a");
+            a.setAttribute("href", media.url);
+            a.setAttribute("target", "_blank");
+            a.appendChild(img);
+            div.appendChild(a);
         }
 
         function AddMediaVideo(div, media) {
             var iframe = document.createElement("iframe");
             iframe.setAttribute("src", media.url);
-            iframe.setAttribute("frameborder", "0");            
+            iframe.setAttribute("frameborder", "0");
             SetTitle(iframe, media);
             div.appendChild(iframe);
         }
@@ -379,7 +383,7 @@
                 a.innerText = media.title;
             }
             SetTitle(a, media);
-            var carousellCell = document.createElement("div");            
+            var carousellCell = document.createElement("div");
             carousellCell.appendChild(a);
             div.appendChild(carousellCell);
         }
