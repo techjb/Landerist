@@ -15,7 +15,7 @@ namespace landerist_library.Parse.Media
         public void GetOthers()
         {
             HtmlNodeCollection htmlNodeCollection = MediaParser.Page.HtmlDocument!.DocumentNode.SelectNodes("//a[@href]");
-            GetOthers(htmlNodeCollection, "pdf");
+            GetOthers(htmlNodeCollection, ".pdf");
         }
 
         private void GetOthers(HtmlNodeCollection htmlNodeCollection, string fileExtension)
@@ -37,7 +37,7 @@ namespace landerist_library.Parse.Media
             {
                 return;
             }
-
+            
             string extension = Path.GetExtension(attributeValue).ToLower();
             if (!extension.Equals(fileExtension))
             {

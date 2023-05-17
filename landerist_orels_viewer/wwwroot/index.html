@@ -173,7 +173,7 @@
             try {
                 const json = JSON.parse(event.target.result);
                 const ajv = new Ajv();
-                const isValid = ajv.validate(schema, json);
+                const isValid = ajv.validate(schema, json);                
                 if (isValid) {
                     AddJson(json);
                 } else {
@@ -332,26 +332,42 @@
             if (listing.media.length == 0) {
                 return;
             }
+            AddMediaAudioVideo(listing, article);
+            AddMediasOther(listing, article);
+        }
+        function AddMediaAudioVideo(listing, article) {
             var figure = document.createElement("figure");
             for (var i = 0; i < listing.media.length; i++) {
-                var divContainer = document.createElement("div");
-                figure.appendChild(divContainer);
                 var media = listing.media[i];
-                AddMedia(divContainer, media);
+                if (!Object.hasOwn(media, "mediaType")) {
+                    continue;
+                }                     
+                var divContainer = document.createElement("div");
+                figure.appendChild(divContainer);                
+                switch (media.mediaType) {
+                    case 'image': AddMediaImage(divContainer, media); break;
+                    case 'video': AddMediaVideo(divContainer, media); break;
+                    default: break;
+                }
             }
-            article.appendChild(figure);
+
+            if (figure.childNodes.length != 0) {                
+                article.appendChild(figure);
+            }            
         }
 
-        function AddMedia(object, media) {
-            var mediaType = 'other';
-            if (Object.hasOwn(media, "mediaType")) {
-                mediaType = media.mediaType;
-            }
-            switch (mediaType) {
-                case 'image': AddMediaImage(object, media); break;
-                case 'video': AddMediaVideo(object, media); break;
-                default: AddMediaOther(div, media); break;
-            }
+        function AddMediasOther(listing, article) {               
+            for (var i = 0; i < listing.media.length; i++) {
+                var media = listing.media[i];
+                if (Object.hasOwn(media, "mediaType")) {
+                    if (media.mediaType != 'other') {
+                        continue;
+                    }
+                }
+                var div = document.createElement("div");
+                AddMediaOther(div, media);
+                article.appendChild(div);                
+            }                
         }
 
         function AddMediaImage(div, media) {
@@ -374,18 +390,16 @@
             div.appendChild(iframe);
         }
 
-        function AddMediaOther(div, media) {
+        function AddMediaOther(div, media) {            
             var a = document.createElement("a");
             a.setAttribute("href", media.url);
             a.setAttribute("target", "_blank");
-            a.innerText = media.url;
+            a.innerText = media.url;            
             if (Object.hasOwn(media, "title")) {
                 a.innerText = media.title;
             }
             SetTitle(a, media);
-            var carousellCell = document.createElement("div");
-            carousellCell.appendChild(a);
-            div.appendChild(carousellCell);
+            div.appendChild(a);
         }
 
         function SetTitle(element, media) {
