@@ -8,8 +8,8 @@ namespace landerist_library.Parse.Media.Image
         public Duplicates(ImageParser imageParser)
         {
             ImageParser = imageParser;
-
         }
+
         public void FindDuplicates()
         {
             foreach (var kvp in ImageParser.DictionaryMats)

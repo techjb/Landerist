@@ -1,4 +1,7 @@
 ﻿using HtmlAgilityPack;
+using landerist_library.Parse.Media.Image;
+using landerist_library.Parse.Media.Other;
+using landerist_library.Parse.Media.Video;
 using landerist_library.Websites;
 using landerist_orels.ES;
 

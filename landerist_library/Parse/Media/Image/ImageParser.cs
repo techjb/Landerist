@@ -1,5 +1,4 @@
 ﻿using HtmlAgilityPack;
-using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_orels.ES;
 using OpenCvSharp;
@@ -42,7 +41,7 @@ namespace landerist_library.Parse.Media.Image
         {
             AddImagesOpenGraph();
             AddImagesImgSrc();
-            //GetImagesA(); // Add some invalid currentMat
+            //GetImagesA(); // Add some invalid results
             RemoveImages();
             foreach (var image in MediaImages)
             {
@@ -192,6 +191,7 @@ namespace landerist_library.Parse.Media.Image
         {
             RemoveInvalidImages();
             LoadUnknowIsValid();
+            DownloadImages();
             RemoveSmallImages();
             RemoveDuplicatedImages();
             InsertValidImages();
@@ -233,11 +233,11 @@ namespace landerist_library.Parse.Media.Image
             }
         }
 
-        private void RemoveSmallImages()
+        private void DownloadImages()
         {
             foreach (var image in UnknowIsValidImages)
             {
-                if (ImageIsSmall(image.url))
+                if (!ImageDownloader.Download(this, image.url))
                 {
                     MediaToRemove.Add(image);
                 }
@@ -245,36 +245,20 @@ namespace landerist_library.Parse.Media.Image
             ProcessMediaToRemove(true);
         }
 
-        public bool ImageIsSmall(Uri uri)
+        private void RemoveSmallImages()
         {
-            bool imageIsSmall = true;
-            try
+            foreach (var image in UnknowIsValidImages)
             {
-                var stream = GetStream(uri);
-                using MemoryStream memoryStream = new();
-                stream.CopyTo(memoryStream);
-                Mat mat = Cv2.ImDecode(memoryStream.ToArray(), ImreadModes.Color);
-                imageIsSmall = ImageIsSmall(mat.Width, mat.Height);
-                if (!imageIsSmall)
+                if (!DictionaryMats.TryGetValue(image.url, out Mat? mat))
                 {
-                    DictionaryMats.Add(uri, mat);
+                    continue;
+                }
+                if (ImageIsSmall(mat.Width, mat.Height))
+                {
+                    MediaToRemove.Add(image);
                 }
             }
-            catch
-            {
-
-            }
-            return imageIsSmall;
-        }
-
-        private static Stream GetStream(Uri uri)
-        {
-            using var client = new HttpClient();
-            client.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
-            var response = client.GetAsync(uri).Result;
-            response.EnsureSuccessStatusCode();
-            var responseContent = response.Content;
-            return responseContent.ReadAsStreamAsync().Result;
+            ProcessMediaToRemove(true);
         }
 
         private void RemoveDuplicatedImages()
@@ -288,7 +272,7 @@ namespace landerist_library.Parse.Media.Image
                 }
             }
             ProcessMediaToRemove(true);
-        }        
+        }
 
         private void InsertValidImages()
         {
