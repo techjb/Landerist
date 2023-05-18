@@ -63,7 +63,9 @@
             </form>
             <div id="validation-error"></div>
         </section>
-        <section id="json-preview">
+        <section id="section-summary">
+        </section>
+        <section id="section-listings">
         </section>
     </main>
     <footer>
@@ -73,21 +75,22 @@
     </footer>
 
     <script type="text/javascript">
-        var schema;
-        var jsonFile = document.getElementById("json-file");
-        var validationError = document.getElementById("validation-error");
-        var jsonPreview = document.getElementById("json-preview");
-        var dropZone = document.getElementById('dropZone');
+        let schema;
+        let jsonFile = document.getElementById("json-file");
+        let validationError = document.getElementById("validation-error");
+        let sectionListings = document.getElementById("section-listings");
+        let sectionSummary = document.getElementById("section-summary");
+        let dropZone = document.getElementById('dropZone');
 
         PreloadSchema();
 
         function PreloadSchema() {
-            var getJSON = function (url, callback) {
-                var xhr = new XMLHttpRequest();
+            let getJSON = function (url, callback) {
+                let xhr = new XMLHttpRequest();
                 xhr.open('GET', url, true);
                 xhr.responseType = 'json';
                 xhr.onload = function () {
-                    var status = xhr.status;
+                    let status = xhr.status;
                     if (status === 200) {
                         callback(null, xhr.response);
                     } else {
@@ -110,7 +113,8 @@
 
         function Reset() {
             validationError.innerHTML = "";
-            jsonPreview.innerHTML = "";
+            sectionSummary.innerHTML = "";
+            sectionListings.innerHTML = "";
         }
 
         jsonFile.addEventListener("change", (e) => {
@@ -142,7 +146,7 @@
                 const dataTransfer = new DataTransfer();
                 dataTransfer.items.add(files[0]);
                 jsonFile.files = dataTransfer.files;
-                var event = new Event('change');
+                let event = new Event('change');
                 jsonFile.dispatchEvent(event);
             }
         }
@@ -160,7 +164,6 @@
 
         dropZone.addEventListener('drop', handleDrop);
 
-
         function ReadFile(file) {
             const reader = new FileReader();
             reader.onload = (event) => {
@@ -173,7 +176,7 @@
             try {
                 const json = JSON.parse(event.target.result);
                 const ajv = new Ajv();
-                const isValid = ajv.validate(schema, json);                
+                const isValid = ajv.validate(schema, json);
                 if (isValid) {
                     AddJson(json);
                 } else {
@@ -181,7 +184,8 @@
                 }
             }
             catch (error) {
-                SetError("<strong>Error reading file: " + error.message + "</strong>");
+                let text = "<strong>Error reading file: " + error.message + "</strong>";
+                SetError(text);
             }
         }
 
@@ -189,8 +193,8 @@
             let text = "JSON is not valid:";
             console.log(text);
             let urErrors = '<ul>';
-            for (var i = 0; i < ajv.errors.length; i++) {
-                var error = ajv.errors[i];
+            for (let i = 0; i < ajv.errors.length; i++) {
+                let error = ajv.errors[i];
                 console.log(error);
                 urErrors += "<li>" + error.message + "</li>";
             }
@@ -203,15 +207,34 @@
         }
 
         function AddJson(json) {
-            for (var i = 0; i < json.listings.length; i++) {
-                var listing = json.listings[i];
+            AddSummary(json);
+            AddListings(json);
+        }
+
+        function AddListings(json) {
+            AddHeader(sectionListings, "Listings");
+            for (let i = 0; i < json.listings.length; i++) {
+                let listing = json.listings[i];
                 AddListing(listing);
             }
         }
 
+        function AddSummary(json) {
+            AddHeader(sectionSummary, "Summary");
+            AddProperty(json, sectionSummary, "created");            
+            AddProperty(json, sectionSummary, "schemaUrl", "a");
+            AddKeyValueDiv(sectionSummary, "listings", json.listings.length);
+        }
+
+        function AddHeader(div, text) {
+            let h2 = document.createElement("h2");
+            h2.innerText = text;
+            div.appendChild(h2);
+        }
+
         function AddListing(listing) {
             try {
-                var article = document.createElement("article");
+                let article = document.createElement("article");
                 AddMedias(listing, article);
                 AddProperty(listing, article, "guid");
                 AddProperty(listing, article, "listingStatus");
@@ -249,7 +272,7 @@
                 AddProperty(listing, article, "bathrooms");
                 AddProperty(listing, article, "parkings");
 
-                var ul = document.createElement("ul");
+                let ul = document.createElement("ul");
                 AddFeature(listing, ul, "terrace");
                 AddFeature(listing, ul, "garden");
                 AddFeature(listing, ul, "garage");
@@ -269,7 +292,7 @@
                     article.appendChild(ul);
                 }
 
-                jsonPreview.append(article);
+                sectionListings.append(article);
             }
             catch {
 
@@ -278,11 +301,10 @@
 
 
         function AddProperty(object, parent, property, wrapper) {
-            var value = object[property];
-
+            let value = object[property];
             // for price.amount price.currency
             if (property.includes(".")) {
-                var propertyObject = property.replace(".", "?.");
+                let propertyObject = property.replace(".", "?.");
                 value = eval("object?." + propertyObject);
                 if (!value || value === "undefined") {
                     return;
@@ -291,13 +313,17 @@
             else if (!Object.hasOwn(object, property)) {
                 return;
             }
-            var div = document.createElement("div");
-            var strong = document.createElement("strong");
-            strong.innerText = property + ": ";
+            AddKeyValueDiv(parent, property, value, wrapper);
+        }
+
+        function AddKeyValueDiv(parent, key, value, wrapper) {
+            let div = document.createElement("div");
+            let strong = document.createElement("strong");
+            strong.innerText = key + ": ";
             div.appendChild(strong);
 
             if (wrapper) {
-                var wrapperElement = document.createElement(wrapper);
+                let wrapperElement = document.createElement(wrapper);
                 wrapperElement.innerHTML = value;
                 if (wrapper == "a") {
                     wrapperElement.setAttribute('href', value);
@@ -315,12 +341,12 @@
             if (!Object.hasOwn(object, property)) {
                 return;
             }
-            var value = object[property];
+            let value = object[property];
             if (!value) {
                 return;
             }
 
-            var li = document.createElement("li");
+            let li = document.createElement("li");
             li.innerText = property;
             parent.appendChild(li);
         }
@@ -336,14 +362,14 @@
             AddMediasOther(listing, article);
         }
         function AddMediaAudioVideo(listing, article) {
-            var figure = document.createElement("figure");
-            for (var i = 0; i < listing.media.length; i++) {
-                var media = listing.media[i];
+            let figure = document.createElement("figure");
+            for (let i = 0; i < listing.media.length; i++) {
+                let media = listing.media[i];
                 if (!Object.hasOwn(media, "mediaType")) {
                     continue;
-                }                     
-                var divContainer = document.createElement("div");
-                figure.appendChild(divContainer);                
+                }
+                let divContainer = document.createElement("div");
+                figure.appendChild(divContainer);
                 switch (media.mediaType) {
                     case 'image': AddMediaImage(divContainer, media); break;
                     case 'video': AddMediaVideo(divContainer, media); break;
@@ -351,31 +377,31 @@
                 }
             }
 
-            if (figure.childNodes.length != 0) {                
+            if (figure.childNodes.length != 0) {
                 article.appendChild(figure);
-            }            
+            }
         }
 
-        function AddMediasOther(listing, article) {               
-            for (var i = 0; i < listing.media.length; i++) {
-                var media = listing.media[i];
+        function AddMediasOther(listing, article) {
+            for (let i = 0; i < listing.media.length; i++) {
+                let media = listing.media[i];
                 if (Object.hasOwn(media, "mediaType")) {
                     if (media.mediaType != 'other') {
                         continue;
                     }
                 }
-                var div = document.createElement("div");
+                let div = document.createElement("div");
                 AddMediaOther(div, media);
-                article.appendChild(div);                
-            }                
+                article.appendChild(div);
+            }
         }
 
         function AddMediaImage(div, media) {
-            var img = document.createElement("img");
+            let img = document.createElement("img");
             img.setAttribute("loading", "lazy");
             img.setAttribute("src", media.url);
             SetTitle(img, media);
-            var a = document.createElement("a");
+            let a = document.createElement("a");
             a.setAttribute("href", media.url);
             a.setAttribute("target", "_blank");
             a.appendChild(img);
@@ -383,18 +409,18 @@
         }
 
         function AddMediaVideo(div, media) {
-            var iframe = document.createElement("iframe");
+            let iframe = document.createElement("iframe");
             iframe.setAttribute("src", media.url);
             iframe.setAttribute("frameborder", "0");
             SetTitle(iframe, media);
             div.appendChild(iframe);
         }
 
-        function AddMediaOther(div, media) {            
-            var a = document.createElement("a");
+        function AddMediaOther(div, media) {
+            let a = document.createElement("a");
             a.setAttribute("href", media.url);
             a.setAttribute("target", "_blank");
-            a.innerText = media.url;            
+            a.innerText = media.url;
             if (Object.hasOwn(media, "title")) {
                 a.innerText = media.title;
             }
@@ -403,7 +429,7 @@
         }
 
         function SetTitle(element, media) {
-            var titles = [];
+            let titles = [];
             if (Object.hasOwn(media, "title")) {
                 titles.push("title: " + media.title);
             }
@@ -413,7 +439,7 @@
             if (Object.hasOwn(media, "url")) {
                 titles.push("url: " + media.url);
             }
-            var title = titles.join("\n");
+            let title = titles.join("\n");
             if (title == '') {
                 return;
             }

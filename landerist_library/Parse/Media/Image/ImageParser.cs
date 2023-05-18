@@ -5,7 +5,7 @@ using landerist_orels.ES;
 using OpenCvSharp;
 using System.Text.RegularExpressions;
 
-namespace landerist_library.Parse.Media
+namespace landerist_library.Parse.Media.Image
 {
     /// <summary>
     /// In Linux need to add another package. See:
@@ -17,15 +17,15 @@ namespace landerist_library.Parse.Media
 
         private const int MIN_IMAGE_SIZE = 256 * 256;
 
-        private static readonly SortedSet<landerist_orels.ES.Media> MediaImages = new(new MediaComparer());
+        private readonly SortedSet<landerist_orels.ES.Media> MediaImages = new(new MediaComparer());
 
-        private static readonly List<landerist_orels.ES.Media> MediaToRemove = new();
+        private readonly List<landerist_orels.ES.Media> MediaToRemove = new();
 
-        private static readonly SortedSet<landerist_orels.ES.Media> UnknowIsValidImages = new(new MediaComparer());
+        public readonly SortedSet<landerist_orels.ES.Media> UnknowIsValidImages = new(new MediaComparer());
 
-        private static readonly Dictionary<Uri, Mat> DictionaryMats = new();
+        public readonly Dictionary<Uri, Mat> DictionaryMats = new();
 
-        private static readonly Dictionary<Uri, Mat> NotDuplicatedMats = new();
+        public readonly Dictionary<Uri, Mat> NotDuplicatedMats = new();
 
         private static readonly HashSet<string> ProhibitedWords = new(StringComparer.OrdinalIgnoreCase)
         {
@@ -97,8 +97,6 @@ namespace landerist_library.Parse.Media
                 return;
             }
 
-            string title = MediaParser.GetTitle(imgNode);
-
             if (!Uri.TryCreate(MediaParser.Page.Uri, attributeValue, out Uri? uri))
             {
                 return;
@@ -109,6 +107,8 @@ namespace landerist_library.Parse.Media
                 return;
             }
 
+            string title = MediaParser.GetTitle(imgNode);
+
             var media = new landerist_orels.ES.Media()
             {
                 mediaType = MediaType.image,
@@ -117,7 +117,7 @@ namespace landerist_library.Parse.Media
             };
 
             MediaImages.Add(media);
-        }        
+        }
 
         private static bool IsValidImage(Uri uri)
         {
@@ -188,7 +188,7 @@ namespace landerist_library.Parse.Media
             return size < MIN_IMAGE_SIZE;
         }
 
-        private static void RemoveImages()
+        private void RemoveImages()
         {
             RemoveInvalidImages();
             LoadUnknowIsValid();
@@ -196,7 +196,7 @@ namespace landerist_library.Parse.Media
             RemoveDuplicatedImages();
             InsertValidImages();
         }
-        private static void ProcessMediaToRemove(bool addToDiscarded)
+        private void ProcessMediaToRemove(bool addToDiscarded)
         {
             foreach (var image in MediaToRemove)
             {
@@ -210,7 +210,7 @@ namespace landerist_library.Parse.Media
             MediaToRemove.Clear();
         }
 
-        private static void RemoveInvalidImages()
+        private void RemoveInvalidImages()
         {
             foreach (var image in MediaImages)
             {
@@ -222,7 +222,7 @@ namespace landerist_library.Parse.Media
             ProcessMediaToRemove(false);
         }
 
-        private static void LoadUnknowIsValid()
+        private void LoadUnknowIsValid()
         {
             foreach (var image in MediaImages)
             {
@@ -233,7 +233,7 @@ namespace landerist_library.Parse.Media
             }
         }
 
-        private static void RemoveSmallImages()
+        private void RemoveSmallImages()
         {
             foreach (var image in UnknowIsValidImages)
             {
@@ -245,7 +245,7 @@ namespace landerist_library.Parse.Media
             ProcessMediaToRemove(true);
         }
 
-        public static bool ImageIsSmall(Uri uri)
+        public bool ImageIsSmall(Uri uri)
         {
             bool imageIsSmall = true;
             try
@@ -277,9 +277,9 @@ namespace landerist_library.Parse.Media
             return responseContent.ReadAsStreamAsync().Result;
         }
 
-        private static void RemoveDuplicatedImages()
+        private void RemoveDuplicatedImages()
         {
-            GetDuplicates();
+            new Duplicates(this).FindDuplicates();
             foreach (var image in UnknowIsValidImages)
             {
                 if (!NotDuplicatedMats.ContainsKey(image.url))
@@ -288,55 +288,9 @@ namespace landerist_library.Parse.Media
                 }
             }
             ProcessMediaToRemove(true);
-        }
+        }        
 
-        private static void GetDuplicates()
-        {
-            foreach (var kvp in DictionaryMats)
-            {
-                DictionaryMats[kvp.Key] = CalculateHystogram(kvp.Value);
-            }
-            foreach (var image in UnknowIsValidImages)
-            {
-                GetDuplicates(image);
-            }
-        }
-
-        private static void GetDuplicates(landerist_orels.ES.Media image)
-        {
-            if (!DictionaryMats.TryGetValue(image.url, out Mat? currentMat))
-            {
-                return;
-            }
-
-            var existingImage = NotDuplicatedMats.FirstOrDefault(kvp => AreSimilar(kvp.Value, currentMat));
-            if (existingImage.Equals(default(KeyValuePair<Uri, Mat>)))
-            {
-                NotDuplicatedMats[image.url] = currentMat;
-                return;
-            }
-            if (existingImage.Value.Width * existingImage.Value.Height < currentMat.Width * currentMat.Height)
-            {
-                NotDuplicatedMats.Remove(existingImage.Key);
-                NotDuplicatedMats[image.url] = currentMat;
-            }
-        }
-
-        private static Mat CalculateHystogram(Mat mat)
-        {
-            Mat hist = new();
-            Cv2.CalcHist(new Mat[] { mat }, new int[] { 0 }, null, hist, 1, 
-                new int[] { 256 }, new Rangef[] { new Rangef(0, 256) });
-            return hist;
-        }
-
-        private static bool AreSimilar(Mat mat1, Mat mat2)
-        {
-            double correl = Cv2.CompareHist(mat1, mat2, HistCompMethods.Correl);            
-            return correl > 0.95;
-        }
-
-        private static void InsertValidImages()
+        private void InsertValidImages()
         {
             foreach (var image in UnknowIsValidImages)
             {

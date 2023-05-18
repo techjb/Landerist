@@ -1,7 +1,7 @@
 ﻿using HtmlAgilityPack;
 using landerist_orels.ES;
 
-namespace landerist_library.Parse.Media
+namespace landerist_library.Parse.Media.Other
 {
     public class OtherParser
     {
@@ -37,20 +37,20 @@ namespace landerist_library.Parse.Media
             {
                 return;
             }
-            
+
             string extension = Path.GetExtension(attributeValue).ToLower();
             if (!extension.Equals(fileExtension))
             {
                 return;
             }
 
-            string title = MediaParser.GetTitle(htmlNode);
-
             if (!Uri.TryCreate(MediaParser.Page.Uri, attributeValue, out Uri? uri))
             {
                 return;
             }
-           
+
+            string title = MediaParser.GetTitle(htmlNode);
+
             var media = new landerist_orels.ES.Media()
             {
                 mediaType = MediaType.other,
@@ -60,7 +60,5 @@ namespace landerist_library.Parse.Media
 
             MediaParser.Media.Add(media);
         }
-
-        
     }
 }
