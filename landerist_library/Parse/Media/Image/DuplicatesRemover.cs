@@ -2,15 +2,29 @@
 
 namespace landerist_library.Parse.Media.Image
 {
-    public class Duplicates
+    public class DuplicatesRemover
     {
         private readonly ImageParser ImageParser;
-        public Duplicates(ImageParser imageParser)
+
+        public DuplicatesRemover(ImageParser imageParser)
         {
             ImageParser = imageParser;
         }
 
-        public void FindDuplicates()
+        public void RemoveDuplicatedImages()
+        {
+            FindDuplicates();
+            foreach (var image in ImageParser.UnknowIsValidImages)
+            {
+                if (!ImageParser.NotDuplicatedMats.ContainsKey(image.url))
+                {
+                    ImageParser.MediaToRemove.Add(image);
+                }
+            }
+            ImageParser.ProcessMediaToRemove(true);
+        }
+
+        private void FindDuplicates()
         {
             foreach (var kvp in ImageParser.DictionaryMats)
             {

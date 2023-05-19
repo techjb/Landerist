@@ -18,7 +18,7 @@ namespace landerist_library.Parse.Media.Image
 
         private readonly SortedSet<landerist_orels.ES.Media> MediaImages = new(new MediaComparer());
 
-        private readonly List<landerist_orels.ES.Media> MediaToRemove = new();
+        public readonly List<landerist_orels.ES.Media> MediaToRemove = new();
 
         public readonly SortedSet<landerist_orels.ES.Media> UnknowIsValidImages = new(new MediaComparer());
 
@@ -190,13 +190,13 @@ namespace landerist_library.Parse.Media.Image
         private void RemoveImages()
         {
             RemoveInvalidImages();
-            LoadUnknowIsValid();
-            DownloadImages();
+            LoadUnknowIsValid();            
+            new ImageDownloader(this).DownloadImages();            
             RemoveSmallImages();
-            RemoveDuplicatedImages();
+            new DuplicatesRemover(this).RemoveDuplicatedImages();
             InsertValidImages();
         }
-        private void ProcessMediaToRemove(bool addToDiscarded)
+        public void ProcessMediaToRemove(bool addToDiscarded)
         {
             foreach (var image in MediaToRemove)
             {
@@ -231,19 +231,7 @@ namespace landerist_library.Parse.Media.Image
                     UnknowIsValidImages.Add(image);
                 }
             }
-        }
-
-        private void DownloadImages()
-        {
-            foreach (var image in UnknowIsValidImages)
-            {
-                if (!ImageDownloader.Download(this, image.url))
-                {
-                    MediaToRemove.Add(image);
-                }
-            }
-            ProcessMediaToRemove(true);
-        }
+        }       
 
         private void RemoveSmallImages()
         {
@@ -260,20 +248,7 @@ namespace landerist_library.Parse.Media.Image
             }
             ProcessMediaToRemove(true);
         }
-
-        private void RemoveDuplicatedImages()
-        {
-            new Duplicates(this).FindDuplicates();
-            foreach (var image in UnknowIsValidImages)
-            {
-                if (!NotDuplicatedMats.ContainsKey(image.url))
-                {
-                    MediaToRemove.Add(image);
-                }
-            }
-            ProcessMediaToRemove(true);
-        }
-
+      
         private void InsertValidImages()
         {
             foreach (var image in UnknowIsValidImages)

@@ -5,7 +5,47 @@ namespace landerist_library.Parse.Media.Image
 {
     public class ImageDownloader
     {
-        public static bool Download(ImageParser ImageParser, Uri uri)
+        private readonly ImageParser ImageParser;
+        private readonly object Sync1 = new();
+        private readonly object Sync2 = new();
+
+        public ImageDownloader(ImageParser imageParser)
+        {
+            ImageParser = imageParser;
+        }
+
+        public void DownloadImages()
+        {
+            if (ImageParser.UnknowIsValidImages.Count > 2)
+            {
+                Parallel.ForEach(ImageParser.UnknowIsValidImages, image =>
+                {
+                    DownloadImage(image);
+                });
+            }
+            else
+            {
+                foreach (var image in ImageParser.UnknowIsValidImages)
+                {
+                    DownloadImage(image);
+                }
+            }
+
+            ImageParser.ProcessMediaToRemove(true);
+        }
+
+        private void DownloadImage(landerist_orels.ES.Media image)
+        {
+            if (!Download(image.url))
+            {
+                lock (Sync1)
+                {
+                    ImageParser.MediaToRemove.Add(image);
+                }
+            }
+        }
+
+        private bool Download(Uri uri)
         {
             try
             {
@@ -13,7 +53,10 @@ namespace landerist_library.Parse.Media.Image
                 using MemoryStream memoryStream = new();
                 stream.CopyTo(memoryStream);
                 Mat mat = Cv2.ImDecode(memoryStream.ToArray(), ImreadModes.Color);
-                ImageParser.DictionaryMats.Add(uri, mat);
+                lock (Sync2)
+                {
+                    ImageParser.DictionaryMats.Add(uri, mat);
+                }
                 return true;
             }
             catch

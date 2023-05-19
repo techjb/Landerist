@@ -6,6 +6,7 @@ namespace landerist_orels.ES
     {
         EUR
     }
+
     public class Price
     {
         [JsonProperty(Order = 1)]
@@ -24,6 +25,7 @@ namespace landerist_orels.ES
             this.amount = amount;
             this.currency = currency;
         }
+
         public override bool Equals(object obj)
         {
             if (obj == null || obj.GetType() != GetType())
