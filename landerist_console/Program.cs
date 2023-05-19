@@ -1,5 +1,6 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Export;
+using landerist_library.Parse.Location;
 using landerist_library.Scrape;
 
 namespace landerist_console
@@ -53,7 +54,7 @@ namespace landerist_console
             //var uri = new Uri("https://www.prorealty.es/");
             //var uri = new Uri("http://real-viv.com/");
             //var uri = new Uri("http://casavida.es/");
-            var uri = new Uri("https://www.inmobiliariamarbella.es/");
+            //var uri = new Uri("https://www.inmobiliariamarbella.es/");
 
             //var website = new Website(uri);
             //var page = new Page(website, uriPage);
@@ -82,12 +83,14 @@ namespace landerist_console
             //Scraper.ScrapeUnknowIsListing(uri, true);
             //Scraper.ScrapeIsNotListing(uri);
             //Scraper.Scrape(website);
-            Scraper.Scrape(uriPage);
+            //Scraper.Scrape(uriPage);
             //Scraper.GetChrome(page);
             //Scraper.ScrapeAllPages();
 
             //Csv.Export(true);
-            Json.Export(true);
+            //Json.Export(true);
+
+            Countries.InsertAll();
 
 
         }

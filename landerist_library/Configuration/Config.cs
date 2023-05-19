@@ -44,9 +44,13 @@
 
         public static string? EXPORT_DIRECTORY { get; set; }
 
-        private static readonly string EXPORT_DIRECTORY_LOCAL = PrivateConfig.EXPORT_DIRECTORY_LOCAL;
+        public static readonly string INSERT_DIRECTORY = PrivateConfig.INSERT_DIRECTORY;
 
-        private static readonly string EXPORT_DIRECTORY_PRODUCTION = PrivateConfig.EXPORT_DIRECTORY_PRODUCTION;
+        private static readonly string EXPORT_DIRECTORY_LOCAL = PrivateConfig.EXPORT_LOCAL_DIRECTORY;
+
+        private static readonly string EXPORT_DIRECTORY_PRODUCTION = PrivateConfig.EXPORT_PRODUCTION_DIRECTORY;
+
+        public static readonly string DELIMITATIONS_DIRECTORY = PrivateConfig.DELIMITATIONS_DIRECTORY;
 
         public static readonly string USER_AGENT = "Mozilla/5.0 (compatible; AcmeInc/1.0)";
 

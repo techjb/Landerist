@@ -13,7 +13,7 @@ namespace landerist_library.Insert
 
         public static void InserWebsites()
         {
-            string file = @"E:\Landerist\Csv\Base_de_datos\Excel\Pedido_completo.csv";
+            string file = Configuration.Config.INSERT_DIRECTORY + @"Base_de_datos\Excel\Pedido_completo.csv";
             Console.WriteLine("Reading " + file);
             DataTable dataTable = ReadFile(file, ';');
 
