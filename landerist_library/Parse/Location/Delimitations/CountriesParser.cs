@@ -114,6 +114,8 @@ namespace landerist_library.Parse.Location.Delimitations
             switch (countryCode)
             {
                 case CountryCode.ES: return iso_3 == "ESP";
+                default:
+                    break;
             }
             return false;
         }

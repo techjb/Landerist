@@ -394,6 +394,21 @@ namespace landerist_library.Parse.Listing
                     {
                         return IsValidSubtypeLand(propertySubtypeNonNull);
                     }
+
+                case PropertyType.room:
+                    break;
+                case PropertyType.premise:
+                    break;
+                case PropertyType.industrial:
+                    break;
+                case PropertyType.garage:
+                    break;
+                case PropertyType.storage:
+                    break;
+                case PropertyType.office:
+                    break;
+                case PropertyType.building:
+                    break;
                 default: break;
             }
             return false;
