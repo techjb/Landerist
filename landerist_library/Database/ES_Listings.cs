@@ -39,7 +39,7 @@ namespace landerist_library.Database
                 "@guid, @listingStatus, @listingDate, @unlistingDate, @operation, @propertyType, " +
                 "@propertySubtype, @priceAmount, @priceCurrency, @description, @dataSourceName, " +
                 "@dataSourceGuid, @dataSourceUpdate, @dataSourceUrl, @contactName, @contactPhone, " +
-                "@contactEmail, @contactUrl, @contactOther, @address, @latitude, @longitude, " +
+                "@contactEmail, @contactUrl, @contactOther, @address, @lauId, @latitude, @longitude, " +
                 "@locationIsAccurate, @cadastralReference, @propertySize, @landSize, @constructionYear, " +
                 "@constructionStatus, @floors, @floor, @bedrooms, @bathrooms, @parkings, @terrace, @garden, " +
                 "@garage, @motorbikeGarage, @pool, @lift, @disabledAccess, @storageRoom, @furnished, " +
@@ -73,6 +73,7 @@ namespace landerist_library.Database
                 {"contactUrl", listing.contactUrl?.ToString() },
                 {"contactOther", listing.contactOther },
                 {"address", listing.address },
+                {"lauId", listing.lauId},
                 {"latitude", listing.latitude},
                 {"longitude", listing.longitude},
                 {"locationIsAccurate", listing.locationIsAccurate},
@@ -142,6 +143,7 @@ namespace landerist_library.Database
                 "[contactUrl] = @contactUrl, " +
                 "[contactOther] = @contactOther, " +
                 "[address] = @address, " +
+                "[lauId] = @lauId, " +
                 "[latitude] = @latitude, " +
                 "[longitude] = @longitude, " +
                 "[locationIsAccurate] = @locationIsAccurate, " +
@@ -257,6 +259,7 @@ namespace landerist_library.Database
                 contactUrl = GetUri(dataRow, "contactUrl"),
                 contactOther = GetString(dataRow, "contactOther"),
                 address = GetString(dataRow, "address"),
+                lauId = GetString(dataRow, "lauId"),
                 latitude = GetDouble(dataRow, "latitude"),
                 longitude = GetDouble(dataRow, "longitude"),
                 locationIsAccurate = GetBoolean(dataRow, "locationIsAccurate"),

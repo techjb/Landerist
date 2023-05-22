@@ -104,6 +104,7 @@ namespace landerist_library.Scrape
             else
             {
                 new LatLngParser(Page, listing).SetLatLng();
+                new LauIdParser(Page,listing).SetLauId();
                 new MediaParser(Page).AddMedia(listing);
                 ES_Listings.InsertUpdate(listing);
             }

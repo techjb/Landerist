@@ -34,8 +34,8 @@ namespace landerist_library.Parse.Location.Delimitations
                 string natCode = feature.Attributes["NATCODE"].ToString()!.Trim();
                 string nameUnit = feature.Attributes["NAMEUNIT"].ToString()!.Trim();
 
-                if (inspireId.Equals(string.Empty) || 
-                    nameUnit.Equals(string.Empty) || 
+                if (inspireId.Equals(string.Empty) ||
+                    nameUnit.Equals(string.Empty) ||
                     natCode.Equals(string.Empty))
                 {
                     return;
@@ -55,22 +55,36 @@ namespace landerist_library.Parse.Location.Delimitations
             Console.WriteLine("Success: " + success + " Errors: " + errors);
         }
 
-        public static Tuple<int, string>? GetNatCodeAndNatUnit(double latitude, double longitude)
+        public static string? GetNatCode(landerist_orels.ES.Listing listing)
+        {
+            if (listing.latitude == null || listing.longitude == null)
+            {
+                return null;
+            }
+            return GetNatCode((double)listing.latitude, (double)listing.longitude);
+        }
+
+        public static string? GetNatCode(double latitude, double longitude)
+        {
+            var tuple = GetNatCodeAndNatUnit(latitude, longitude);
+            if (tuple == null)
+            {
+                return null;
+            }
+            return tuple.Item1;
+        }
+
+        public static Tuple<string, string>? GetNatCodeAndNatUnit(double latitude, double longitude)
         {
             DataRow? dataRow = Database.CNIG.Get(latitude, longitude);
             if (dataRow == null)
             {
                 return null;
             }
-            string natCodeString = dataRow["natcode"].ToString()!;
+            string natCode = dataRow["natcode"].ToString()!;
             string nameUnit = dataRow["nameunit"].ToString()!;
 
-            natCodeString = natCodeString[6..]; // always natCodeString is 11 length
-            if(!int.TryParse(natCodeString, out int natCode))
-            {
-                return null;
-            }
-
+            natCode = natCode[6..]; // always natCode is 11 length
             return Tuple.Create(natCode, nameUnit);
         }
     }

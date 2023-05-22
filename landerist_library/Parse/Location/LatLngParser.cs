@@ -14,10 +14,8 @@ namespace landerist_library.Parse.Location
 
         private readonly HashSet<Tuple<double, double>> LatLngs = new();
 
-
         public LatLngParser(Page page, landerist_orels.ES.Listing listing)
         {
-
             Page = page;
             Listing = listing;
         }

@@ -52,6 +52,25 @@ namespace landerist_library.Parse.Location.Delimitations
             Console.WriteLine("Success: " + success + " Errors: " + errors);
         }
 
+        public static string? GetId(landerist_orels.ES.Listing listing)
+        {
+            if (listing.latitude == null || listing.longitude == null)
+            {
+                return null;
+            }
+            return GetId((double)listing.latitude, (double)listing.longitude);
+        }
+
+        public static string? GetId(double latitude, double longitude)
+        {
+            var idAndName = GetIdAndName(latitude, longitude);
+            if(idAndName == null)
+            {
+                return null;
+            }
+            return idAndName.Item1;
+        }
+
         public static Tuple<string, string>? GetIdAndName(double latitude, double longitude)
         {
             DataRow? dataRow = Database.LAU.Get(latitude, longitude);

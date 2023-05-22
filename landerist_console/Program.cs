@@ -114,7 +114,6 @@ namespace landerist_console
             //    var lau = CNIGParser.GetNatCodeAndNatUnit(40.5046553703, -3.8940765057);
             //    Console.WriteLine(lau.Item1 + " " + lau.Item2);
             //}
-
         }
 
         private static void EndBeep()
