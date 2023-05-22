@@ -190,8 +190,8 @@ namespace landerist_library.Parse.Media.Image
         private void RemoveImages()
         {
             RemoveInvalidImages();
-            LoadUnknowIsValid();            
-            new ImageDownloader(this).DownloadImages();            
+            LoadUnknowIsValid();
+            new ImageDownloader(this).DownloadImages();
             RemoveSmallImages();
             new DuplicatesRemover(this).RemoveDuplicatedImages();
             InsertValidImages();
@@ -231,7 +231,7 @@ namespace landerist_library.Parse.Media.Image
                     UnknowIsValidImages.Add(image);
                 }
             }
-        }       
+        }
 
         private void RemoveSmallImages()
         {
@@ -248,7 +248,7 @@ namespace landerist_library.Parse.Media.Image
             }
             ProcessMediaToRemove(true);
         }
-      
+
         private void InsertValidImages()
         {
             foreach (var image in UnknowIsValidImages)

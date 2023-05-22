@@ -58,7 +58,7 @@ namespace landerist_library.Index
 
         public static bool IsValid(Uri uri)
         {
-            if(Config.TRAINING_MODE)
+            if (Config.TRAINING_MODE)
             {
                 return true;
             }

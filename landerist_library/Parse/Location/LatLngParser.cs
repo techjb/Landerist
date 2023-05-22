@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using landerist_library.Parse.Location.Delimitations;
 using landerist_library.Websites;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -156,6 +157,10 @@ namespace landerist_library.Parse.Location
         }
         private void AddLatLng(double latitude, double longitude)
         {
+            if (!CountriesParser.ContainsCountry(Page.Website.CountryCode, latitude, longitude))
+            {
+                return;
+            }
             var tuple = Tuple.Create(latitude, longitude);
             LatLngs.Add(tuple);
         }

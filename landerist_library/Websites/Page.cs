@@ -35,16 +35,16 @@ namespace landerist_library.Websites
 
         public HtmlDocument? HtmlDocument = null;
 
-        
-        public Page(Uri uri): this(Websites.GetWebsite(uri.Host), uri)
+
+        public Page(Uri uri) : this(Websites.GetWebsite(uri.Host), uri)
         {
-            
+
         }
 
         public Page(Website website) : this(website, website.MainUri)
         {
 
-        }   
+        }
 
         public Page(Website website, Uri uri)
         {

@@ -31,7 +31,7 @@ namespace landerist_library.Scrape
             {
                 DownloadError();
             }
-            
+
             return Page.Update();
         }
 
@@ -91,7 +91,7 @@ namespace landerist_library.Scrape
                 var listingParser = new ListingParser(Page).GetListing();
                 Page.IsListing = listingParser.Item1;
                 listing = listingParser.Item2;
-            }            
+            }
             if (listing == null)
             {
                 return;
@@ -105,7 +105,7 @@ namespace landerist_library.Scrape
             {
                 new LatLngParser(Page, listing).SetLatLng();
                 new MediaParser(Page).AddMedia(listing);
-                ES_Listings.InsertUpdate(listing);                
+                ES_Listings.InsertUpdate(listing);
             }
         }
 
