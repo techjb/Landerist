@@ -204,7 +204,7 @@ namespace landerist_library.Parse.Media.Image
                 UnknowIsValidImages.Remove(image);
                 if (addToDiscarded)
                 {
-                    ValidImages.InsertInvalid(image.url);
+                    ValidInvalidImages.InsertInvalid(image.url);
                 }
             }
             MediaToRemove.Clear();
@@ -214,7 +214,7 @@ namespace landerist_library.Parse.Media.Image
         {
             foreach (var image in MediaImages)
             {
-                if (ValidImages.IsInvalid(image.url))
+                if (ValidInvalidImages.IsInvalid(image.url))
                 {
                     MediaToRemove.Add(image);
                 }
@@ -226,7 +226,7 @@ namespace landerist_library.Parse.Media.Image
         {
             foreach (var image in MediaImages)
             {
-                if (!ValidImages.IsValid(image.url))
+                if (!ValidInvalidImages.IsValid(image.url))
                 {
                     UnknowIsValidImages.Add(image);
                 }
@@ -253,7 +253,7 @@ namespace landerist_library.Parse.Media.Image
         {
             foreach (var image in UnknowIsValidImages)
             {
-                ValidImages.InsertValid(image.url);
+                ValidInvalidImages.InsertValid(image.url);
             }
         }
     }

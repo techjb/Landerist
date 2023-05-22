@@ -1,9 +1,8 @@
 ﻿using System.Data;
-using System.Globalization;
 
 namespace landerist_library.Database
 {
-    internal class LAU
+    internal class LAU : DBDelimitations
     {
         private const string TABLE_LAU = "[LAU]";
 
@@ -28,41 +27,17 @@ namespace landerist_library.Database
 
         public static bool MakeValidAll()
         {
-            string query =
-                "UPDATE " + TABLE_LAU + " " +
-                "SET [the_geom] = [the_geom].MakeValid()";
-
-            return new DataBase().Query(query);
+            return MakeValidTheGeom(TABLE_LAU);
         }
 
         public static bool ReorientIfNeccesary()
         {
-            string query =
-                "UPDATE " + TABLE_LAU + " " +
-                "SET [the_geom] = [the_geom].ReorientObject().MakeValid() " +
-                "WHERE [the_geom].EnvelopeAngle() > 90";
-
-            return new DataBase().Query(query);
+            return ReorientTheGeomIfNeccesary(TABLE_LAU);
         }
 
         public static DataRow? Get(double latitude, double longitude)
         {
-            string point =
-                "POINT(" + longitude.ToString(CultureInfo.InvariantCulture) + " " +
-                latitude.ToString(CultureInfo.InvariantCulture) + ")";
-
-            string query =
-                "SELECT TOP 1 lau_id, lau_name " +
-                "FROM " + TABLE_LAU + " " +
-                "WITH(INDEX([SpatialIndex-the_geom])) " +
-                "WHERE [the_geom].STIntersects(geography::STGeomFromText('" + point + "', 4326)) = 1";
-
-            DataTable dataTable = new DataBase().QueryTable(query);
-            if (dataTable.Rows.Count > 0)
-            {
-                return dataTable.Rows[0];
-            }
-            return null;
+            return GetdDataRow(TABLE_LAU, "lau_id, lau_name", latitude, longitude);            
         }
     }
 }

@@ -5,13 +5,13 @@ using System.Data;
 
 namespace landerist_library.Parse.Location.Delimitations
 {
-    public class LAUParser
+    public class CNIGParser
     {
         public static void Insert()
         {
-            Database.LAU.DeleteAll();
+            Database.CNIG.DeleteAll();
 
-            string file = Configuration.Config.DELIMITATIONS_DIRECTORY + @"LAU\LAU_RG_01M_2021_4326.geojson";
+            string file = Configuration.Config.DELIMITATIONS_DIRECTORY + @"CNIG\CNIG.geojson";
             Console.WriteLine("Reading " + file);
 
             var geoJsonSerializer = GeoJsonSerializer.Create();
@@ -29,15 +29,18 @@ namespace landerist_library.Parse.Location.Delimitations
             {
                 byte[] wkb = wKBWriter.Write(feature.Geometry);
                 string the_geom = WKBWriter.ToHex(wkb);
-                string gisco_id = feature.Attributes["GISCO_ID"].ToString()!.Trim();
-                string lau_id = feature.Attributes["LAU_ID"].ToString()!.Trim();
-                string lau_name = feature.Attributes["LAU_NAME"].ToString()!.Trim();
 
-                if (lau_name.Equals(string.Empty) || lau_id.Equals(string.Empty))
+                string inspireId = feature.Attributes["INSPIREID"].ToString()!.Trim();
+                string natCode = feature.Attributes["NATCODE"].ToString()!.Trim();
+                string nameUnit = feature.Attributes["NAMEUNIT"].ToString()!.Trim();
+
+                if (inspireId.Equals(string.Empty) || 
+                    nameUnit.Equals(string.Empty) || 
+                    natCode.Equals(string.Empty))
                 {
                     return;
                 }
-                if (Database.LAU.Insert(the_geom, gisco_id, lau_id, lau_name))
+                if (Database.CNIG.Insert(the_geom, inspireId, natCode, nameUnit))
                 {
                     success++;
                 }
@@ -46,23 +49,29 @@ namespace landerist_library.Parse.Location.Delimitations
                     errors++;
                 }
             });
-            
-            Database.LAU.MakeValidAll();
-            Database.LAU.ReorientIfNeccesary();
+
+            Database.CNIG.MakeValidAll();
+            Database.CNIG.ReorientIfNeccesary();
             Console.WriteLine("Success: " + success + " Errors: " + errors);
         }
 
-        public static Tuple<string, string>? GetIdAndName(double latitude, double longitude)
+        public static Tuple<int, string>? GetNatCodeAndNatUnit(double latitude, double longitude)
         {
-            DataRow? dataRow = Database.LAU.Get(latitude, longitude);
+            DataRow? dataRow = Database.CNIG.Get(latitude, longitude);
             if (dataRow == null)
             {
                 return null;
             }
-            string lau_id = dataRow["lau_id"].ToString()!;
-            string lau_name = dataRow["lau_name"].ToString()!;
+            string natCodeString = dataRow["natcode"].ToString()!;
+            string nameUnit = dataRow["nameunit"].ToString()!;
 
-            return Tuple.Create(lau_id, lau_name);
+            natCodeString = natCodeString[6..]; // always natCodeString is 11 length
+            if(!int.TryParse(natCodeString, out int natCode))
+            {
+                return null;
+            }
+
+            return Tuple.Create(natCode, nameUnit);
         }
     }
 }

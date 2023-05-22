@@ -108,6 +108,13 @@ namespace landerist_console
             //    Console.WriteLine(lau.Item1 + " " + lau.Item2);
             //}
 
+            //CNIGParser.Insert();
+            //for (int i = 0; i < 100; i++)
+            //{
+            //    var lau = CNIGParser.GetNatCodeAndNatUnit(40.5046553703, -3.8940765057);
+            //    Console.WriteLine(lau.Item1 + " " + lau.Item2);
+            //}
+
         }
 
         private static void EndBeep()

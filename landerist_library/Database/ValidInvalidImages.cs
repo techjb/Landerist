@@ -3,7 +3,7 @@ using System.Text;
 
 namespace landerist_library.Database
 {
-    public class ValidImages
+    public class ValidInvalidImages
     {
         private const string VALID_IMAGES = "[VALID_IMAGES]";
 
@@ -41,7 +41,6 @@ namespace landerist_library.Database
         {
             return Insert(uri, true);
         }
-
 
         public static bool InsertInvalid(Uri uri)
         {
