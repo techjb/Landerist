@@ -33,14 +33,25 @@ namespace landerist_orels.ES
 
         public string Serialize()
         {
-            var jsonSereializerSettings = new JsonSerializerSettings
+            var jsonSerializerSettings = GetJsonSerializerSettings();
+            return JsonConvert.SerializeObject(this, Formatting.Indented, jsonSerializerSettings);
+        }
+
+        public Schema Deserialize(string json)
+        {
+            var jsonSerializerSettings = GetJsonSerializerSettings();
+            return JsonConvert.DeserializeObject<Schema>(json, jsonSerializerSettings);
+        }
+
+        private JsonSerializerSettings GetJsonSerializerSettings()
+        {
+            var jsonSerializerSettings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore,
+                DateFormatString = "yyyy-MM-ddTHH:mm:ssZ",                
             };
-            jsonSereializerSettings.Converters.Add(new StringEnumConverter());
-            jsonSereializerSettings.DateFormatString = "yyyy-MM-ddTHH:mm:ssZ";
-
-            return JsonConvert.SerializeObject(this, Formatting.Indented, jsonSereializerSettings);
+            jsonSerializerSettings.Converters.Add(new StringEnumConverter());            
+            return jsonSerializerSettings;
         }
     }
 }

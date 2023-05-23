@@ -78,7 +78,7 @@ namespace landerist_orels.ES
         public PropertySubtype? propertySubtype { get; set; }
 
         [JsonProperty(Order = 8)]
-        public SortedSet<Media> media { get; set; }
+        public SortedSet<Media> media { get; set; } = new SortedSet<Media>(new MediaComparer());
 
         [JsonProperty(Order = 9)]
         public Price price { get; set; } = null;
@@ -200,20 +200,12 @@ namespace landerist_orels.ES
         [JsonProperty(Order = 48)]
         public bool? securitySystems { get; set; }
 
-        private void InitMedia()
-        {
-            if (media == null)
-            {
-                media = new SortedSet<Media>(new MediaComparer());
-            }
-        }
         public void AddMedia(Media media)
         {
             if (media == null)
             {
                 return;
             }
-            InitMedia();
             if (this.media.Count >= MAX_MEDIA_ITEMS)
             {
                 return;
@@ -226,8 +218,7 @@ namespace landerist_orels.ES
             if (media == null || media.Count.Equals(0))
             {
                 return;
-            }
-            InitMedia();
+            }            
             FitMedia(media);
             this.media = media;
         }
