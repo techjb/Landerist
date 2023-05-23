@@ -1,7 +1,9 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Export;
+using landerist_library.Parse.Location;
 using landerist_library.Parse.Location.Delimitations;
 using landerist_library.Scrape;
+using landerist_orels.ES;
 
 namespace landerist_console
 {
@@ -90,30 +92,8 @@ namespace landerist_console
             //Csv.Export(true);
             //Json.Export(true);
 
-            //CountriesParser.Insert();            
-            //for (int i = 0; i < 100; i++)
-            //{
-            //    var contains = CountriesParser.ContainsCountry(landerist_library.Websites.CountryCode.ES, 40.5046553703, -3.8940765057);
-            //    Console.WriteLine(contains);
-            //}
-
-            //LAUParser.Insert();
-            //for (int i = 0; i < 100; i++)
-            //{
-            //    var lau = LAUParser.GetIdAndName(40.5046553703, -3.8940765057);
-            //    if (lau == null)
-            //    {
-            //        continue;
-            //    }
-            //    Console.WriteLine(lau.Item1 + " " + lau.Item2);
-            //}
-
-            //CNIGParser.Insert();
-            //for (int i = 0; i < 100; i++)
-            //{
-            //    var lau = CNIGParser.GetNatCodeAndNatUnit(40.5046553703, -3.8940765057);
-            //    Console.WriteLine(lau.Item1 + " " + lau.Item2);
-            //}
+            var tuple = GoogleMapsGeocoding.Geocode("Alondra 8, las rozas de madrid", landerist_library.Websites.CountryCode.ES);
+            Console.WriteLine(tuple);
         }
 
         private static void EndBeep()

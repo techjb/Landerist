@@ -29,6 +29,7 @@ namespace landerist_library.Parse.Location
             }
             LatLngIframeGoogleMaps(Page.HtmlDocument);
             LatLngInHtmlLatLng(Page.HtmlDocument);
+            AddressToLatLng();
             SetLatLngToListing();
         }
 
@@ -161,6 +162,27 @@ namespace landerist_library.Parse.Location
             }
             var tuple = Tuple.Create(latitude, longitude);
             LatLngs.Add(tuple);
+        }
+
+        private void AddressToLatLng()
+        {
+            if (Listing.address == null)
+            {
+                return;
+            }
+
+            if (LatLngs.Count > 0)
+            {
+                return;
+            }
+
+            var tuple = GoogleMapsGeocoding.Geocode(Listing.address, Page.Website.CountryCode);
+            if (tuple == null)
+            {
+                return;
+            }
+
+            AddLatLng(tuple.Item1, tuple.Item2);
         }
     }
 }
