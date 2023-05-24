@@ -1,6 +1,5 @@
 ﻿using HtmlAgilityPack;
 using landerist_library.Parse.Location.Delimitations;
-using landerist_library.Parse.Location.GoogleMaps;
 using landerist_library.Websites;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -13,7 +12,7 @@ namespace landerist_library.Parse.Location
 
         private readonly landerist_orels.ES.Listing Listing;
 
-        private readonly HashSet<Tuple<double, double>> LatLngs = new();
+        private readonly HashSet<Tuple<double, double, bool>> LatLngs = new();
 
         public LatLngParser(Page page, landerist_orels.ES.Listing listing)
         {
@@ -23,6 +22,13 @@ namespace landerist_library.Parse.Location
 
         public void SetLatLng()
         {
+            CatastralReferenceToLatLng();
+            if (LatLngs.Count > 0)
+            {
+                SetLatLngToListing();
+                return;
+            }
+
             Page.LoadHtmlDocument(true);
             if (Page.HtmlDocument == null)
             {
@@ -36,7 +42,7 @@ namespace landerist_library.Parse.Location
 
         private void SetLatLngToListing()
         {
-            if (LatLngs.Count == 0)
+            if (LatLngs.Count.Equals(0))
             {
                 return;
             }
@@ -45,6 +51,7 @@ namespace landerist_library.Parse.Location
                 var tuple = LatLngs.Single();
                 Listing.latitude = tuple.Item1;
                 Listing.longitude = tuple.Item2;
+                Listing.locationIsAccurate = tuple.Item3;
             }
             else
             {
@@ -87,7 +94,7 @@ namespace landerist_library.Parse.Location
                 var lat = src[(src.IndexOf("!3d") + 3)..];
                 lat = lat[..lat.IndexOf("!")];
 
-                AddLatLng(lat, lng);
+                AddLatLng(lat, lng, false);
             }
             catch (Exception exception)
             {
@@ -140,34 +147,34 @@ namespace landerist_library.Parse.Location
                     else
                     {
                         longitude = latOrLng;
-                        AddLatLng((double)latitude, (double)longitude);
+                        AddLatLng((double)latitude, (double)longitude, false);
                         break;
                     }
                 }
             }
         }
 
-        private void AddLatLng(string latitude, string longitude)
+        private void AddLatLng(string latitude, string longitude, bool locationIsAccurate)
         {
             if (double.TryParse(longitude, NumberStyles.Float, CultureInfo.InvariantCulture, out double lng) &&
                 double.TryParse(latitude, NumberStyles.Float, CultureInfo.InvariantCulture, out double lat))
             {
-                AddLatLng(lat, lng);
+                AddLatLng(lat, lng, locationIsAccurate);
             }
         }
-        private void AddLatLng(double latitude, double longitude)
+        private void AddLatLng(double latitude, double longitude, bool locationIsAccurate)
         {
             if (!CountriesParser.ContainsCountry(Page.Website.CountryCode, latitude, longitude))
             {
                 return;
             }
-            var tuple = Tuple.Create(latitude, longitude);
+            var tuple = Tuple.Create(latitude, longitude, locationIsAccurate);
             LatLngs.Add(tuple);
         }
 
         private void AddressToLatLng()
         {
-            if (Listing.address == null)
+            if (string.IsNullOrEmpty(Listing.address))
             {
                 return;
             }
@@ -183,7 +190,21 @@ namespace landerist_library.Parse.Location
                 return;
             }
 
-            AddLatLng(tuple.Item1, tuple.Item2);
+            AddLatLng(tuple.Item1, tuple.Item2, false);
+        }
+
+        public void CatastralReferenceToLatLng()
+        {
+            if (string.IsNullOrEmpty(Listing.cadastralReference))
+            {
+                return;
+            }
+            var tuple = Goolzoom.CadastralRefToLatLng.Parse(Listing.cadastralReference);
+            if (tuple == null)
+            {
+                return;
+            }
+            AddLatLng(tuple.Item1, tuple.Item2, true);
         }
     }
 }

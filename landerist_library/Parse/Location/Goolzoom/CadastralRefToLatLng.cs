@@ -1,60 +1,41 @@
-﻿using landerist_library.Parse.Location.GoogleMaps;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace landerist_library.Parse.Location.Goolzoom
 {
 
-    //public class GoolzoomFeature
-    //{
-
-    //}
-
-    //public class GoolzoomResponse
-    //{
-    //    public GoolzoomFeature[]? features { get; set; }
-    //}
+    public class GoolzoomCenter
+    {
+        public double lat;
+        public double lng;
+    }
 
     public class CadastralRefToLatLng
     {
-        public static Tuple<string, string>? Parse(string cadastralReference)
+        public static Tuple<double, double>? Parse(string cadastralReference)
         {
             string requestUrl =
-                "https://api.goolzoom.com/v1/cadastre/cadastralreference/" + cadastralReference + "/geo";
+                "https://api.goolzoom.com/v1/cadastre/cadastralparcel/" + cadastralReference + "/center";
 
+            HttpClient client = new();
+            client.DefaultRequestHeaders.Add("x-api-key", Configuration.Config.GOOLZOOM_API);
             try
             {
-                HttpClient client = new();
-                client.DefaultRequestHeaders.Add("x-api-key", "application/json");
                 var response = client.GetAsync(requestUrl).Result;
                 response.EnsureSuccessStatusCode();
                 var content = response.Content.ReadAsStringAsync().Result;
                 if (content != null)
                 {
-                    //GoolzoomResponse? geocodeData = JsonConvert.DeserializeObject<GoolzoomResponse>(content);
-                    //if (geocodeData != null && geocodeData.results != null)
-                    //{
-                    //    if (geocodeData.results.Count() > 0)
-                    //    {
-                    //        var result = geocodeData.results[0];
-                    //        if (result.geometry != null &&
-                    //            result.geometry.location != null &&
-                    //            result.geometry.location.lat != null &&
-                    //            result.geometry.location.lng != null
-                    //            )
-                    //        {
-                    //            string lat = result.geometry.location.lat;
-                    //            string lng = result.geometry.location.lng;
-                    //            return Tuple.Create(lat, lng);
-                    //        }
-                    //    }
-                    //}
+                    var goolzoomCenter = JsonConvert.DeserializeObject<GoolzoomCenter>(content);
+                    if (goolzoomCenter != null)
+                    {
+                        return Tuple.Create(goolzoomCenter.lat, goolzoomCenter.lng);
+                    }
                 }
             }
-            catch (Exception e)
+            catch
             {
-                Console.WriteLine(e.Message);
-            }
 
+            }
             return null;
         }
 

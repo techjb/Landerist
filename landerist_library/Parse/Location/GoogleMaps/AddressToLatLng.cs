@@ -11,8 +11,8 @@ namespace landerist_library.Parse.Location.GoogleMaps
 
     public class Location
     {
-        public string? lat { get; set; }
-        public string? lng { get; set; }
+        public double? lat { get; set; }
+        public double? lng { get; set; }
     }
 
     public class Result
@@ -27,14 +27,14 @@ namespace landerist_library.Parse.Location.GoogleMaps
 
     public class AddressToLatLng
     {
-        public static Tuple<string, string>? Parse(string address, CountryCode countryCode)
+        public static Tuple<double, double>? Parse(string address, CountryCode countryCode)
         {
             string uriAdress = Uri.EscapeDataString(address);
             string requestUrl =
                 "https://maps.googleapis.com/maps/api/geocode/json?" +
                 "address=" + uriAdress +
                 "&region=" + GetRegion(countryCode) +
-                "&key=" + Config.GOOGLE_MAPS_API;
+                "&key=" + Config.GOOGLEMAPS_API;
 
             try
             {
@@ -56,8 +56,8 @@ namespace landerist_library.Parse.Location.GoogleMaps
                                 result.geometry.location.lng != null
                                 )
                             {
-                                string lat = result.geometry.location.lat;
-                                string lng = result.geometry.location.lng;
+                                double lat = (double)result.geometry.location.lat;
+                                double lng = (double)result.geometry.location.lng;
                                 return Tuple.Create(lat, lng);
                             }
                         }
