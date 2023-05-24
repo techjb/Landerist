@@ -218,6 +218,10 @@ namespace landerist_library.Parse.Listing
 
         private bool IsValidResponse()
         {
+            if (!Configuration.Config.LISTING_PARSER_VALIDATE_RESPONSE)
+            {
+                return true;
+            }
             return
                 IsValidTipoDeOperacion() &&
                 IsValidTipoDeInmueble();

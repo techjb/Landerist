@@ -23,7 +23,7 @@ namespace landerist_library.Parse.Listing
             {
                 RequestListing();
             }
-            return Tuple.Create<bool?, landerist_orels.ES.Listing>(IsListing, Listing);
+            return Tuple.Create(IsListing, Listing);
         }
 
         public bool RequestListingIsPermited()

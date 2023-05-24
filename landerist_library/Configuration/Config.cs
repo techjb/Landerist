@@ -6,7 +6,9 @@
 
         public static readonly bool TRAINING_MODE = false;
 
-        public static readonly bool SKIP_PARSE_LISTINGS = true;
+        public static readonly bool SKIP_PARSE_LISTINGS = false;
+
+        public static readonly bool LISTING_PARSER_VALIDATE_RESPONSE = false;
 
         private static readonly string VERSION_PRODUCCION = "1.00";
 
@@ -57,7 +59,6 @@
         public static readonly string GOOGLEMAPS_API = PrivateConfig.GOOGLEMAPS_API;
 
         public static readonly string GOOLZOOM_API = PrivateConfig.GOOLZOOM_API;
-
 
         public static bool IsConfigurationProduction()
         {

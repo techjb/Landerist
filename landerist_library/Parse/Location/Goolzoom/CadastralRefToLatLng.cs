@@ -14,7 +14,8 @@ namespace landerist_library.Parse.Location.Goolzoom
         public static Tuple<double, double>? Parse(string cadastralReference)
         {
             string requestUrl =
-                "https://api.goolzoom.com/v1/cadastre/cadastralparcel/" + cadastralReference + "/center";
+                "https://api.goolzoom.com/v1/cadastre/cadastralreference/" +
+                cadastralReference + "/center";
 
             HttpClient client = new();
             client.DefaultRequestHeaders.Add("x-api-key", Configuration.Config.GOOLZOOM_API);
@@ -38,6 +39,5 @@ namespace landerist_library.Parse.Location.Goolzoom
             }
             return null;
         }
-
     }
 }

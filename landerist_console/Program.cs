@@ -1,8 +1,10 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Export;
+using landerist_library.Insert;
 using landerist_library.Parse.Location;
 using landerist_library.Parse.Location.Delimitations;
 using landerist_library.Scrape;
+using landerist_library.Websites;
 using landerist_orels.ES;
 
 namespace landerist_console
@@ -41,7 +43,7 @@ namespace landerist_console
 
         private static void Run()
         {
-            var uriPage = new Uri("https://www.inmobiliariamarbella.es/inmuebles/local-en-marbella-p4_l24/");
+            var uriPage = new Uri("https://www.landvalue.es/informacion-del-suelo/14366");
 
             //SeleniumDownloader.GetChrome(uriPage);
             //PuppeteerDownloader.Get(uriPage);
@@ -57,15 +59,16 @@ namespace landerist_console
             //var uri = new Uri("http://real-viv.com/");
             //var uri = new Uri("http://casavida.es/");
             //var uri = new Uri("https://www.inmobiliariamarbella.es/");
+            //var uri = new Uri("https://www.landvalue.es/");
 
             //var website = new Website(uri);
             //var page = new Page(website, uriPage);
-            //var page = new Page(uriPage);
+            var page = new Page(uriPage);
 
             //Websites.Delete(uri); return;
             //Websites.DeleteAll(); return;
 
-            //WebsitesInserter.InsertValid(uri);return;
+            //WebsitesInserter.Insert(uri);return;
             //new WebsitesInserter(false).DeleteAndInsert(uri); return;
             //new WebsitesInserter(false).InsertLinksAlternate(uri); return;
             //new WebsitesInserter().FromCsv();            
@@ -92,11 +95,14 @@ namespace landerist_console
             //Csv.Export(true);
             //Json.Export(true);
 
-            //var tuple = landerist_library.Parse.Location.GoogleMaps.AddressToLatLng.Parse("Alondra 8, las rozas de madrid", landerist_library.Websites.CountryCode.ES);
-            //Console.WriteLine(tuple);
+            //var tuple1 = landerist_library.Parse.Location.GoogleMaps.AddressToLatLng.Parse("Alondra 8, las rozas de madrid", landerist_library.Websites.CountryCode.ES);
+            //Console.WriteLine(tuple1);
 
-            //var tuple = landerist_library.Parse.Location.Goolzoom.CadastralRefToLatLng.Parse("4242103VK2844S0002SS");
-            //Console.WriteLine(tuple);
+            //var tuple1 = landerist_library.Parse.Location.Goolzoom.CadastralRefToLatLng.Parse("9441515XM7094A0001FT");
+            //Console.WriteLine(tuple1);
+
+            //var tuple2 = landerist_library.Parse.Location.Goolzoom.CadastralRefToLatLng.Parse("9441515XM7094A");
+            //Console.WriteLine(tuple2);
         }
 
         private static void EndBeep()
