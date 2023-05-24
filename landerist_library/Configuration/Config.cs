@@ -54,7 +54,9 @@
 
         public static readonly string USER_AGENT = "Mozilla/5.0 (compatible; AcmeInc/1.0)";
 
-        public static readonly string GOOGLE_MAPS_GEOCODING_API = PrivateConfig.GOOGLE_MAPS_GEOCODING_API;
+        public static readonly string GOOGLE_MAPS_API = PrivateConfig.GOOGLE_MAPS_API;
+
+        public static readonly string GOOLZOOM_API = PrivateConfig.GOOLZOOM_API;
 
 
         public static bool IsConfigurationProduction()

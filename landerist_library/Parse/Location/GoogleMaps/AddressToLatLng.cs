@@ -2,7 +2,7 @@
 using landerist_library.Websites;
 using Newtonsoft.Json;
 
-namespace landerist_library.Parse.Location
+namespace landerist_library.Parse.Location.GoogleMaps
 {
     public class Geometry
     {
@@ -24,16 +24,17 @@ namespace landerist_library.Parse.Location
     {
         public Result[]? results { get; set; }
     }
-    public class GoogleMapsGeocoding
+
+    public class AddressToLatLng
     {
-        public static Tuple<string, string>? Geocode(string address, CountryCode countryCode)
+        public static Tuple<string, string>? Parse(string address, CountryCode countryCode)
         {
             string uriAdress = Uri.EscapeDataString(address);
             string requestUrl =
                 "https://maps.googleapis.com/maps/api/geocode/json?" +
                 "address=" + uriAdress +
                 "&region=" + GetRegion(countryCode) +
-                "&key=" + Config.GOOGLE_MAPS_GEOCODING_API;
+                "&key=" + Config.GOOGLE_MAPS_API;
 
             try
             {
@@ -49,9 +50,9 @@ namespace landerist_library.Parse.Location
                         if (geocodeData.results.Count() > 0)
                         {
                             var result = geocodeData.results[0];
-                            if (result.geometry != null && 
-                                result.geometry.location != null && 
-                                result.geometry.location.lat != null && 
+                            if (result.geometry != null &&
+                                result.geometry.location != null &&
+                                result.geometry.location.lat != null &&
                                 result.geometry.location.lng != null
                                 )
                             {
@@ -73,7 +74,7 @@ namespace landerist_library.Parse.Location
 
         private static string GetRegion(CountryCode countryCode)
         {
-            switch(countryCode)
+            switch (countryCode)
             {
                 case CountryCode.ES: return "es";
                 default: return string.Empty;

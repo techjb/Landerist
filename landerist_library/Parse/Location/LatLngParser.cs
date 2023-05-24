@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using landerist_library.Parse.Location.Delimitations;
+using landerist_library.Parse.Location.GoogleMaps;
 using landerist_library.Websites;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -176,7 +177,7 @@ namespace landerist_library.Parse.Location
                 return;
             }
 
-            var tuple = GoogleMapsGeocoding.Geocode(Listing.address, Page.Website.CountryCode);
+            var tuple = GoogleMaps.AddressToLatLng.Parse(Listing.address, Page.Website.CountryCode);
             if (tuple == null)
             {
                 return;

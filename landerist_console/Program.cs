@@ -92,7 +92,10 @@ namespace landerist_console
             //Csv.Export(true);
             //Json.Export(true);
 
-            var tuple = GoogleMapsGeocoding.Geocode("Alondra 8, las rozas de madrid", landerist_library.Websites.CountryCode.ES);
+            //var tuple = landerist_library.Parse.Location.GoogleMaps.AddressToLatLng.Parse("Alondra 8, las rozas de madrid", landerist_library.Websites.CountryCode.ES);
+            //Console.WriteLine(tuple);
+
+            var tuple = landerist_library.Parse.Location.Goolzoom.CadastralRefToLatLng.Parse("4242103VK2844S");
             Console.WriteLine(tuple);
         }
 
