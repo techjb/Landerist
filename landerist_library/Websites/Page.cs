@@ -238,7 +238,7 @@ namespace landerist_library.Websites
                         var contents = contentAttribute.Split(',');
                         foreach(var item in contents)
                         {
-                            if (item.Equals(content))
+                            if (item.Equals(content) || item.Equals("none"))
                             {
                                 return true;
                             }
