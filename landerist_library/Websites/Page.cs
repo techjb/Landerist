@@ -208,5 +208,46 @@ namespace landerist_library.Websites
         {
             return ES_Listings.GetListing(this, false);
         }
+
+        public bool CanIndex()
+        {
+            return !ContainsMetaRobots("noindex");
+        }
+
+        public bool CanIndexImages()
+        {
+            return !ContainsMetaRobots("noimageindex");
+        }
+
+        public bool CanFollowLinks()
+        {
+            return !ContainsMetaRobots("noindex");
+        }
+
+        private bool ContainsMetaRobots(string content)
+        {
+            LoadHtmlDocument();
+            if (HtmlDocument != null)
+            {
+                var node = HtmlDocument.DocumentNode.SelectSingleNode("//meta[@name='robots']");
+                if (node != null)
+                {
+                    var contentAttribute = node.GetAttributeValue("content", "");
+                    if (!string.IsNullOrEmpty(contentAttribute))
+                    {
+                        var contents = contentAttribute.Split(',');
+                        foreach(var item in contents)
+                        {
+                            if (item.Equals(content))
+                            {
+                                return true;
+                            }
+                        }
+                        
+                    }
+                }
+            }
+            return false;
+        }
     }
 }

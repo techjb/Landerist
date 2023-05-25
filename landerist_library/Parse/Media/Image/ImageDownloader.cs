@@ -1,5 +1,6 @@
 ﻿using landerist_library.Configuration;
 using OpenCvSharp;
+using System;
 
 namespace landerist_library.Parse.Media.Image
 {
@@ -36,6 +37,12 @@ namespace landerist_library.Parse.Media.Image
 
         private void DownloadImage(landerist_orels.ES.Media image)
         {
+
+            if (!ImageParser.MediaParser.Page.Website.IsUriAllowed(image.url))
+            {
+                return;
+            }
+
             if (!Download(image.url))
             {
                 lock (Sync1)

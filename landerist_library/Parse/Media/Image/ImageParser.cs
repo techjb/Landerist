@@ -12,7 +12,7 @@ namespace landerist_library.Parse.Media.Image
     /// </summary>
     public class ImageParser
     {
-        private readonly MediaParser MediaParser;
+        public readonly MediaParser MediaParser;
 
         private const int MIN_IMAGE_SIZE = 256 * 256;
 

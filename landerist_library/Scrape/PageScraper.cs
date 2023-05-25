@@ -42,8 +42,14 @@ namespace landerist_library.Scrape
                 new LinkAlternateIndexer(Page).InsertLinksAlternate();
                 return;
             }
-            InsertPages();
-            GetListing();
+            if (Page.CanFollowLinks())
+            {
+                IndexPages();
+            }
+            if (Page.CanIndex())
+            {
+                GetListing();
+            }
         }
 
         private bool HtmInWebsiteLanguage()
@@ -64,7 +70,7 @@ namespace landerist_library.Scrape
             return true;
         }
 
-        private void InsertPages()
+        private void IndexPages()
         {
             Page.LoadHtmlDocument();
             if (Page.HtmlDocument == null || Page.Website == null)
@@ -104,7 +110,7 @@ namespace landerist_library.Scrape
             else
             {
                 new LatLngParser(Page, listing).SetLatLng();
-                new LauIdParser(Page,listing).SetLauId();
+                new LauIdParser(Page, listing).SetLauId();
                 new MediaParser(Page).AddMedia(listing);
                 ES_Listings.InsertUpdate(listing);
             }
