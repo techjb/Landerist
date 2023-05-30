@@ -56,7 +56,18 @@ namespace landerist_library.Index
             try
             {
                 // can return null.
-                siteMap = Task.Run(async () => await siteMap.LoadAsync()).Result;
+                var task = Task.Run(() => siteMap.LoadAsync());
+                if (task != null)
+                {
+                    try
+                    {
+                        siteMap = task.Result;
+                    }
+                    catch (AggregateException ae)
+                    {
+                        
+                    }
+                }
             }
             catch { }
             return siteMap;

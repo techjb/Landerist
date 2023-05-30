@@ -149,7 +149,7 @@ namespace landerist_library.Database
                 SqlCommand.ExecuteNonQuery();
                 result = true;
             }
-            catch (Exception exception)
+            catch
             {
 
             }

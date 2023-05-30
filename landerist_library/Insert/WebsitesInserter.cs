@@ -1,4 +1,5 @@
 ﻿using landerist_library.Websites;
+using System;
 
 namespace landerist_library.Insert
 {
@@ -66,7 +67,9 @@ namespace landerist_library.Insert
             int total = uris.Count;
             object sync = new();
 
-            Parallel.ForEach(uris, uri =>
+            Parallel.ForEach(uris, 
+                //new ParallelOptions() { MaxDegreeOfParallelism = 1 }, 
+                uri =>
             {
                 bool success = InsertWebsite(uri);
                 lock (sync)
@@ -81,8 +84,7 @@ namespace landerist_library.Insert
                     }
                 }
                 Console.WriteLine("Total: " + total + " Inserted: " + inserted + " Errors: " + errors);
-
-            });            
+            });
         }
 
         private static bool InsertWebsite(Uri uri)
@@ -111,9 +113,9 @@ namespace landerist_library.Insert
                 };
                 return InsertWebsite(website);
             }
-            catch
+            catch (Exception exception)
             {
-
+                Logs.Log.WriteLogErrors(exception);
             }
             return false;
         }
@@ -123,8 +125,12 @@ namespace landerist_library.Insert
             if (!website.SetMainUriAndStatusCode())
             {
                 return false;
-            }
+            }            
             if (InsertedUris.Contains(website.MainUri))
+            {
+                return false;
+            }
+            if (Websites.Websites.ExistsWebsite(website.Host))
             {
                 return false;
             }
@@ -140,8 +146,17 @@ namespace landerist_library.Insert
             {
                 return false;
             }
+
             website.InsertMainPage();
-            website.InsertPagesFromSiteMap();
+            try
+            {
+                website.InsertPagesFromSiteMap();
+            }
+            catch (Exception exception)
+            {
+                Logs.Log.WriteLogErrors(exception);
+            }
+
 
             InsertedUris.Add(website.MainUri);
 

@@ -153,7 +153,11 @@ namespace landerist_library.Websites
                 if (response != null && response.Headers != null && response.Headers.Location != null)
                 {
                     var uriLocation = response.Headers.Location;
-                    if (!uriLocation.Equals(MainUri))
+                    if (uriLocation.ToString().StartsWith("/"))
+                    {
+                        Uri.TryCreate(MainUri, uriLocation, out uriLocation);
+                    }
+                    if (uriLocation !=null && !uriLocation.Equals(MainUri))
                     {
                         MainUri = uriLocation;
                         SetHost();
@@ -185,7 +189,10 @@ namespace landerist_library.Websites
                 }
                 return true;
             }
-            catch { }
+            catch (Exception exception) 
+            {
+                Logs.Log.WriteLogErrors(exception);
+            }
             return false;
         }
 
