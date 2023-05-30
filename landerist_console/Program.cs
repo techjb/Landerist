@@ -43,7 +43,7 @@ namespace landerist_console
 
         private static void Run()
         {
-            var uriPage = new Uri("https://www.landvalue.es/informacion-del-suelo/14366");
+            //var uriPage = new Uri("https://www.landvalue.es/informacion-del-suelo/14366");
 
             //SeleniumDownloader.GetChrome(uriPage);
             //PuppeteerDownloader.Get(uriPage);
@@ -63,7 +63,7 @@ namespace landerist_console
 
             //var website = new Website(uri);
             //var page = new Page(website, uriPage);
-            var page = new Page(uriPage);
+            //var page = new Page(uriPage);
 
             //Websites.Delete(uri); return;
             //Websites.DeleteAll(); return;
@@ -71,7 +71,8 @@ namespace landerist_console
             //WebsitesInserter.Insert(uri);return;
             //new WebsitesInserter(false).DeleteAndInsert(uri); return;
             //new WebsitesInserter(false).InsertLinksAlternate(uri); return;
-            //new WebsitesInserter().FromCsv();            
+            //new CsvInserter(true).InsertBancodedatos_es(); 
+            new CsvInserter(true).InsertBaseDeedatosempresas_es();
 
             //Websites.SetHttpStatusCodesToNull();
             //Websites.InsertUpdateUrisFromNotOk();

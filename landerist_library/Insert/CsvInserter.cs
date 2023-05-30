@@ -11,37 +11,29 @@ namespace landerist_library.Insert
         {
         }
 
-        public static void InserWebsites()
-        {
-            string file = Configuration.Config.INSERT_DIRECTORY + @"Base_de_datos\Excel\Pedido_completo.csv";
-            Console.WriteLine("Reading " + file);
-            DataTable dataTable = ReadFile(file, ';');
 
-            List<Uri> uris = new();
-            foreach (DataRow row in dataTable.Rows)
-            {
-                string url = row["SITIO WEB"].ToString() ?? string.Empty;
-                if (url.Equals(string.Empty))
-                {
-                    continue;
-                }
-                try
-                {
-                    Uri uri = new(url);
-                    if (!uris.Contains(uri))
-                    {
-                        uris.Add(uri);
-                    }
-                }
-                catch { }
-            }
+        public void InsertBancodedatos_es()
+        {
+            string file = Configuration.Config.INSERT_DIRECTORY + @"bancodedatos.es\Excel\Pedido_completo.csv";
+            DataTable dataTable = ReadFile(file, ';');
+            var uris = ToList(dataTable, "SITIO WEB");            
             Insert(uris);
         }
 
-        public static DataTable ReadFile(string fileName, char separator)
+        public void InsertBaseDeedatosempresas_es()
         {
-            DataTable dataTable = new();
+            string file = Configuration.Config.INSERT_DIRECTORY + @"basededatosempresas.net\Inmobiliarias.csv";
+            DataTable dataTable = ReadFile(file, ';');
+            var uris = ToList(dataTable, "Website");
+            Insert(uris);
+        }
 
+       
+        private static DataTable ReadFile(string fileName, char separator)
+        {
+            Console.WriteLine("Reading " + fileName);
+
+            DataTable dataTable = new();
             StreamReader streanReader = new(fileName, Encoding.UTF8);
             var line = streanReader.ReadLine();
             if (line == null)
@@ -82,5 +74,33 @@ namespace landerist_library.Insert
             }
             return dataTable;
         }
+
+        private List<Uri> ToList(DataTable dataTable, string columnName)
+        {
+            List<Uri> uris = new();
+            foreach (DataRow row in dataTable.Rows)
+            {
+                string url = row[columnName].ToString() ?? string.Empty;
+                if (url.Equals(string.Empty))
+                {
+                    continue;
+                }
+                if (!url.StartsWith("http"))
+                {
+                    url = "http://" + url;
+                }
+                try
+                {
+                    Uri uri = new(url);
+                    if (!uris.Contains(uri))
+                    {
+                        uris.Add(uri);
+                    }
+                }
+                catch { }
+            }
+            return uris;
+        }
+
     }
 }

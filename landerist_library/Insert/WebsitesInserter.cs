@@ -64,21 +64,25 @@ namespace landerist_library.Insert
             int inserted = 0;
             int errors = 0;
             int total = uris.Count;
+            object sync = new();
 
-            Console.WriteLine("Inserting " + total + " websites ..");
-
-            foreach (Uri uri in uris)
+            Parallel.ForEach(uris, uri =>
             {
-                if (InsertWebsite(uri))
+                bool success = InsertWebsite(uri);
+                lock (sync)
                 {
-                    inserted++;
+                    if (success)
+                    {
+                        inserted++;
+                    }
+                    else
+                    {
+                        errors++;
+                    }
                 }
-                else
-                {
-                    errors++;
-                }
-            }
-            Console.WriteLine("Inserted: " + inserted + " Error: " + errors);
+                Console.WriteLine("Total: " + total + " Inserted: " + inserted + " Errors: " + errors);
+
+            });            
         }
 
         private static bool InsertWebsite(Uri uri)
