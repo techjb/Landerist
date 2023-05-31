@@ -314,8 +314,13 @@ namespace landerist_library.Websites
 
         public static void Delete(Uri uri)
         {
-            var webSite = new Website(uri);
-            webSite.Delete();
+            var website = new Website(uri);
+            Delete(website);
+        }
+
+        public static void Delete(Website website)
+        {
+            website.Delete();
         }
 
         public static void DeleteAll()
