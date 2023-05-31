@@ -20,7 +20,7 @@ namespace landerist_library.Insert
             Insert(uris);
         }
 
-        public void InsertBaseDeedatosempresas_es()
+        public void InsertBasededatosempresas_net()
         {
             string file = Configuration.Config.INSERT_DIRECTORY + @"basededatosempresas.net\Inmobiliarias.csv";
             DataTable dataTable = ReadFile(file);

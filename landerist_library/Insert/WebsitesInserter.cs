@@ -1,11 +1,19 @@
 ﻿using landerist_library.Websites;
-using System;
 
 namespace landerist_library.Insert
 {
     public class WebsitesInserter
     {
         private readonly static HashSet<Uri> InsertedUris = new();
+
+        private static int Inserted = 0;
+        private static int ErrorsMainUri = 0;
+        private static int ErrorsRobotsTxt = 0;
+        private static int ErrorsIpAddress = 0;
+        private static int ErrorsInsert = 0;
+        private static int ErrorsException = 0;
+        private static int Skipped = 0;
+        private static readonly object sync = new();
 
         public WebsitesInserter(bool initInsertedUris)
         {
@@ -62,48 +70,38 @@ namespace landerist_library.Insert
 
         private static void Insert(HashSet<Uri> uris)
         {
-            int inserted = 0;
-            int errors = 0;
             int total = uris.Count;
-            object sync = new();
-
-            Parallel.ForEach(uris, 
-                //new ParallelOptions() { MaxDegreeOfParallelism = 1 }, 
+            Parallel.ForEach(uris,
+                //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
                 uri =>
             {
-                bool success = InsertWebsite(uri);
-                lock (sync)
-                {
-                    if (success)
-                    {
-                        inserted++;
-                    }
-                    else
-                    {
-                        errors++;
-                    }
-                }
-                Console.WriteLine("Total: " + total + " Inserted: " + inserted + " Errors: " + errors);
+
+                //if (!uri.ToString().Contains("iregua.com"))
+                //{
+                //    return;
+                //}
+
+                InsertWebsite(uri);
+                Console.WriteLine(
+                    "Total: " + total + " " +
+                    "Skipped: " + Skipped + " " +
+                    "Inserted: " + Inserted + " " +                    
+                    "ErrorsMainUri: " + ErrorsMainUri + " " +
+                    "ErrorsRobotsTxt: " + ErrorsRobotsTxt + " " +
+                    "ErrorsIpAddress: " + ErrorsIpAddress + " " +
+                    "ErrorsInsert: " + ErrorsInsert + " " +
+                    "ErrorsException: " + ErrorsException + " ");
             });
         }
 
-        private static bool InsertWebsite(Uri uri)
+        private static void InsertWebsite(Uri uri)
         {
             try
             {
-                if (BlockedDomains.IsBlocked(uri))
+                if (!CanInsert(uri))
                 {
-                    return false;
-                }
-
-                if (InsertedUris.Contains(uri))
-                {
-                    return false;
-                }
-
-                if (Websites.Websites.ExistsWebsite(uri.Host))
-                {
-                    return false;
+                    IncreaseSkipped();
+                    return;
                 }
 
                 Website website = new()
@@ -111,56 +109,132 @@ namespace landerist_library.Insert
                     MainUri = uri,
                     Host = uri.Host,
                 };
-                return InsertWebsite(website);
+                InsertWebsite(website);
             }
             catch (Exception exception)
             {
+                IncreaseErrorsException();
                 Logs.Log.WriteLogErrors(exception);
             }
-            return false;
         }
 
-        private static bool InsertWebsite(Website website)
+        private static bool CanInsert(Uri uri)
+        {
+            if (BlockedDomains.IsBlocked(uri))
+            {
+                return false;
+            }
+
+            if (InsertedUris.Contains(uri))
+            {
+                return false;
+            }
+
+            if (Websites.Websites.ExistsWebsite(uri.Host))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private static void InsertWebsite(Website website)
         {
             if (!website.SetMainUriAndStatusCode())
             {
-                return false;
+                IncreaseErrorsMainUri();
+                return;
+            }
+            if (!CanInsert(website.MainUri))
+            {
+                IncreaseSkipped();
+                return;
             }            
-            if (InsertedUris.Contains(website.MainUri))
-            {
-                return false;
-            }
-            if (Websites.Websites.ExistsWebsite(website.Host))
-            {
-                return false;
-            }
             if (!website.SetRobotsTxt())
             {
-                return false;
+                IncreaseErrorsRobotsTxt();
+                return;
             }
             if (!website.SetIpAddress())
             {
-                return false;
+                IncreaseErrorsIpAddress();
+                return;
             }
             if (!website.Insert())
             {
-                return false;
+                IncreaseErrorsInsert();
+                return;
             }
 
-            website.InsertMainPage();
+            IncreaseInserted();
+            InsertedUris.Add(website.MainUri);
+
             try
             {
+                website.InsertMainPage();
                 website.InsertPagesFromSiteMap();
             }
             catch (Exception exception)
             {
+                IncreaseErrorsException();
                 Logs.Log.WriteLogErrors(exception);
             }
+        }
 
 
-            InsertedUris.Add(website.MainUri);
+        private static void IncreaseErrorsMainUri()
+        {
+            lock (sync)
+            {
+                ErrorsMainUri++;
+            }
+        }
 
-            return true;
+        private static void IncreaseErrorsRobotsTxt()
+        {
+            lock (sync)
+            {
+                ErrorsRobotsTxt++;
+            }
+        }
+
+        private static void IncreaseErrorsIpAddress()
+        {
+            lock (sync)
+            {
+                ErrorsIpAddress++;
+            }
+        }
+
+        private static void IncreaseErrorsException()
+        {
+            lock (sync)
+            {
+                ErrorsException++;
+            }
+        }
+
+        private static void IncreaseErrorsInsert()
+        {
+            lock (sync)
+            {
+                ErrorsInsert++;
+            }
+        }
+
+        private static void IncreaseSkipped()
+        {
+            lock (sync)
+            {
+                Skipped++;
+            }
+        }
+
+        private static void IncreaseInserted()
+        {
+            lock (sync)
+            {
+                Inserted++;
+            }
         }
     }
 }

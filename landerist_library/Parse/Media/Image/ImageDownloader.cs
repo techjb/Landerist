@@ -1,6 +1,5 @@
 ﻿using landerist_library.Configuration;
 using OpenCvSharp;
-using System;
 
 namespace landerist_library.Parse.Media.Image
 {

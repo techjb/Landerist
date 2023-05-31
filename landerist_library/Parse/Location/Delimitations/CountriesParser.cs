@@ -19,7 +19,7 @@ namespace landerist_library.Parse.Location.Delimitations
         //    using var reader = new StreamReader(file);
         //    bool isFirstLine = true;
         //    int success = 0;
-        //    int errors = 0;
+        //    int ErrorsMainUri = 0;
         //    while (!reader.EndOfStream)
         //    {
         //        var line = reader.ReadLine();
@@ -56,10 +56,10 @@ namespace landerist_library.Parse.Location.Delimitations
         //        }
         //        else
         //        {
-        //            errors++;
+        //            ErrorsMainUri++;
         //        }                
         //    }
-        //    Console.WriteLine("Success: " + success + " Errors: " + errors);
+        //    Console.WriteLine("Success: " + success + " ErrorsMainUri: " + ErrorsMainUri);
         //}
 
         /// <summary>

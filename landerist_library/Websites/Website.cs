@@ -4,6 +4,7 @@ using landerist_library.Database;
 using landerist_library.Index;
 using System.Data;
 using System.Net;
+using System.Text;
 
 namespace landerist_library.Websites
 {
@@ -48,8 +49,7 @@ namespace landerist_library.Websites
 
         public Website(Uri mainUri) : this()
         {
-            MainUri = mainUri;
-            SetHost();
+            SetMainUri(mainUri);
             var dataRow = GetDataRow();
             if (dataRow != null)
             {
@@ -57,8 +57,9 @@ namespace landerist_library.Websites
             }
         }
 
-        private void SetHost()
+        private void SetMainUri(Uri mainUri)
         {
+            MainUri = mainUri;
             Host = MainUri.Host;
         }
 
@@ -157,14 +158,13 @@ namespace landerist_library.Websites
                     {
                         Uri.TryCreate(MainUri, uriLocation, out uriLocation);
                     }
-                    if (uriLocation !=null && !uriLocation.Equals(MainUri))
+                    if (uriLocation != null && !uriLocation.Equals(MainUri))
                     {
-                        MainUri = uriLocation;
-                        SetHost();
+                        SetMainUri(uriLocation);
                         iteration++;
                         if (iteration < 10)
                         {
-                            SetMainUriAndStatusCode(iteration++);
+                            return SetMainUriAndStatusCode(iteration++);
                         }
                     }
                 }
@@ -185,11 +185,12 @@ namespace landerist_library.Websites
                 RobotsTxt = null;
                 if (response.IsSuccessStatusCode)
                 {
-                    RobotsTxt = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    using var streamReader = new StreamReader(response.Content.ReadAsStreamAsync().GetAwaiter().GetResult(), Encoding.Default);
+                    RobotsTxt = streamReader.ReadToEnd();
                 }
                 return true;
             }
-            catch (Exception exception) 
+            catch (Exception exception)
             {
                 Logs.Log.WriteLogErrors(exception);
             }

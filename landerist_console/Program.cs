@@ -72,7 +72,7 @@ namespace landerist_console
             //new WebsitesInserter(false).DeleteAndInsert(uri); return;
             //new WebsitesInserter(false).InsertLinksAlternate(uri); return;
             //new CsvInserter(true).InsertBancodedatos_es(); 
-            new CsvInserter(true).InsertBaseDeedatosempresas_es();
+            new CsvInserter(true).InsertBasededatosempresas_net();
 
             //Websites.SetHttpStatusCodesToNull();
             //Websites.InsertUpdateUrisFromNotOk();
