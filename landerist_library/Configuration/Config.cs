@@ -1,12 +1,10 @@
-﻿using OpenQA.Selenium.DevTools.V110.Audits;
-
-namespace landerist_library.Configuration
+﻿namespace landerist_library.Configuration
 {
     public class Config
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly bool TRAINING_MODE = false;
+        public static readonly bool TRAINING_MODE = true;
 
         public static readonly bool SKIP_PARSE_LISTINGS = false;
 
@@ -62,11 +60,8 @@ namespace landerist_library.Configuration
 
         public static readonly string GOOLZOOM_API = PrivateConfig.GOOLZOOM_API;
 
-
-        // Environment.UserInteractive &&
-        // !Config.IsConfigurationProduction()
+        // Environment.UserInteractive && !Config.IsConfigurationProduction()
         public static readonly bool LOGS_ENABLED = true;
-
 
         public static bool IsConfigurationProduction()
         {

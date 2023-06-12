@@ -11,15 +11,15 @@ namespace landerist_library.Logs
         public const string LogKeyError = "error";
         public const string LogKeyInfo = "info";
 
-        private static void WriteLog(string logKey, string text)
+        private static void WriteLog(string logKey, string source, string text)
         {
             if (text.Equals(string.Empty))
             {
                 return;
-            }            
+            }
             if (Config.LOGS_ENABLED)
             {
-                WriteLogDB(logKey, text);
+                WriteLogDB(logKey, source, text);
             }
             else
             {
@@ -27,14 +27,15 @@ namespace landerist_library.Logs
             }
         }
 
-        private static void WriteLogDB(string logKey, string text)
+        private static void WriteLogDB(string logKey, string source, string text)
         {
             string query =
                 "INSERT INTO " + TABLE_LOGS + " " +
-                "VALUES(GETDATE(), @LogKey, @Text)";
+                "VALUES(GETDATE(), @LogKey, @Source, @Text)";
 
             new DataBase().Query(query, new Dictionary<string, object?> {
                     { "LogKey", logKey },
+                    { "Source", source },
                     { "Text", text.Trim() }
                 });
         }
@@ -83,9 +84,9 @@ namespace landerist_library.Logs
 
         #region Write Logs
 
-        public static void WriteLogErrors(string text)
+        public static void WriteLogErrors(string source, string text)
         {
-            WriteLog(LogKeyError, text);
+            WriteLog(LogKeyError, source, text);
         }
 
         public static void WriteLogErrors(Exception exception)
@@ -93,24 +94,20 @@ namespace landerist_library.Logs
             WriteLogErrors(string.Empty, exception);
         }
 
-        public static void WriteLogErrors(string text, Exception exception)
+        public static void WriteLogErrors(string source, Exception exception)
         {
             string textError = GetText(exception);
-            if (!text.Equals(string.Empty))
-            {
-                textError = text + Environment.NewLine + textError;
-            }
-            WriteLogErrors(textError);
+            WriteLogErrors(source, textError);
         }
 
         public static void WriteLogErrors(Uri uri, Exception exception)
         {
-            WriteLogErrors("Uri: " + uri.ToString(), exception);
+            WriteLogErrors(uri.ToString(), exception);
         }
 
-        public static void WriteLogInfo(string text)
+        public static void WriteLogInfo(string source, string text)
         {
-            WriteLog(LogKeyInfo, text);
+            WriteLog(LogKeyInfo, source, text);
         }
 
         public static void WriteLogInfo(Exception exception)
@@ -118,9 +115,10 @@ namespace landerist_library.Logs
             WriteLogInfo(string.Empty, exception);
         }
 
-        public static void WriteLogInfo(string text, Exception exception)
+        public static void WriteLogInfo(string source, Exception exception)
         {
-            WriteLogInfo((text.Equals(string.Empty) ? string.Empty : text + " ") + GetText(exception));
+            string textError = GetText(exception);
+            WriteLogInfo(source, textError);
         }
 
         #endregion Write Logs

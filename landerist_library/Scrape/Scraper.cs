@@ -140,10 +140,11 @@ namespace landerist_library.Scrape
                         Counter++;
                     }
                     Console.WriteLine(
-                        "Scrapped: " + Counter + "/" + totalPages + " Pending: " + PendingPages.Count + " " +
+                        "Scraped: " + Counter + "/" + totalPages + " " +
+                        "Pending: " + PendingPages.Count + " " +
                         "Listings: " + ListingsCounter);
 
-                    if (IpHostBlocker.IsBlocked(page.Website))
+                    if (IsBlocked(page))
                     {
                         AddToPendingPages(page);
                         return;
@@ -177,7 +178,7 @@ namespace landerist_library.Scrape
         public static void Scrape(Page page)
         {
             AddToBlocker(page);
-            new PageScraper(page).Scrape();
+            new PageScraper(page).Scrape();            
             AddIsListingCounter(page);
         }
 
@@ -187,6 +188,11 @@ namespace landerist_library.Scrape
             {
                 PendingPages.Add(page);
             }
+        }
+
+        private static bool IsBlocked(Page page)
+        {
+            return IpHostBlocker.IsBlocked(page.Website);
         }
 
         private static void AddToBlocker(Page page)

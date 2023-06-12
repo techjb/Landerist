@@ -78,12 +78,6 @@ namespace landerist_library.Insert
                 //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
                 uri =>
             {
-
-                //if (!uri.ToString().Contains("iregua.com"))
-                //{
-                //    return;
-                //}
-
                 InsertWebsite(uri);
                 Console.WriteLine(
                     "Total: " + total + " " +
