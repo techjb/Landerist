@@ -1,4 +1,6 @@
-﻿namespace landerist_library.Configuration
+﻿using OpenQA.Selenium.DevTools.V110.Audits;
+
+namespace landerist_library.Configuration
 {
     public class Config
     {
@@ -59,6 +61,12 @@
         public static readonly string GOOGLEMAPS_API = PrivateConfig.GOOGLEMAPS_API;
 
         public static readonly string GOOLZOOM_API = PrivateConfig.GOOLZOOM_API;
+
+
+        // Environment.UserInteractive &&
+        // !Config.IsConfigurationProduction()
+        public static readonly bool LOGS_ENABLED = true;
+
 
         public static bool IsConfigurationProduction()
         {

@@ -332,5 +332,13 @@ namespace landerist_library.Database
                 {"guid", listing.guid }
             });
         }
+
+        public static bool Delete()
+        {
+            string query =
+                "DELETE FROM " + TABLE_ES_LISTINGS;
+
+            return new DataBase().Query(query);
+        }
     }
 }

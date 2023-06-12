@@ -17,6 +17,10 @@ namespace landerist_library.Index
 
         public void InsertSitemap(Uri uri)
         {
+            if(uri == null)
+            {
+                return;
+            }
             var sitemap = new Sitemap(uri);
             InsertSitemap(sitemap);
         }
@@ -26,7 +30,7 @@ namespace landerist_library.Index
             if (!IsValidSitemap(sitemap))
             {
                 return;
-            }
+            }            
             if (!sitemap.IsLoaded)
             {
                 sitemap = DownloadSitemap(sitemap);
@@ -75,6 +79,11 @@ namespace landerist_library.Index
 
         private static bool IsValidSitemap(Sitemap sitemap)
         {
+            if (sitemap == null)
+            {
+                return false;
+            }
+            
             return !LanguageValidator.ContainsNotAllowed(sitemap.SitemapLocation, Page.Website.LanguageCode);
         }
     }

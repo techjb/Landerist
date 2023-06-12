@@ -137,6 +137,14 @@ namespace landerist_library.Websites
             });
         }
 
+        public static bool Delete()
+        {
+            string query =
+               "DELETE FROM " + TABLE_PAGES;
+
+            return new DataBase().Query(query);
+        }
+
         public static void Insert(Website website, Uri uri)
         {
             var page = new Page(website, uri);

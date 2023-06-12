@@ -170,17 +170,20 @@ namespace landerist_library.Websites
                 }
                 return true;
             }
-            catch { }
+            catch (Exception exception)
+            {
+                Logs.Log.WriteLogErrors(MainUri, exception);
+            }
             return false;
         }
 
         public bool SetRobotsTxt()
         {
+            var robotsTxtUrl = new Uri(MainUri, "/robots.txt");
             try
             {
                 var httpClient = new HttpClient();
                 httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
-                var robotsTxtUrl = new Uri(MainUri, "/robots.txt");
                 var response = httpClient.GetAsync(robotsTxtUrl).GetAwaiter().GetResult();
                 RobotsTxt = null;
                 if (response.IsSuccessStatusCode)
@@ -192,7 +195,7 @@ namespace landerist_library.Websites
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors(exception);
+                Logs.Log.WriteLogErrors(robotsTxtUrl, exception);
             }
             return false;
         }
@@ -209,7 +212,10 @@ namespace landerist_library.Websites
                 }
                 return true;
             }
-            catch { }
+            catch (Exception exception)
+            {
+                Logs.Log.WriteLogErrors(Host, exception);
+            }
             return false;
         }
 
@@ -284,7 +290,6 @@ namespace landerist_library.Websites
                "WHERE [Host] = @Host";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
-                {"MainUri", MainUri.ToString() },
                 {"Host", Host }
             });
         }
@@ -298,16 +303,18 @@ namespace landerist_library.Websites
         public void InsertPagesFromSiteMap()
         {
             var sitemaps = GetSiteMaps();
-            if (sitemaps == null || sitemaps.Count.Equals(0))
+            if (sitemaps != null && sitemaps.Count > 0)
+            {
+                new SitemapIndexer(this).InsertSitemaps(sitemaps);
+            }
+            else
             {
                 var uri = GetDefaultSiteMap();
                 if (uri != null)
                 {
                     new SitemapIndexer(this).InsertSitemap(uri);
                 }
-                return;
             }
-            new SitemapIndexer(this).InsertSitemaps(sitemaps);
         }
 
         private Uri? GetDefaultSiteMap()

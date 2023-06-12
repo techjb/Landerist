@@ -38,14 +38,21 @@ namespace landerist_library.Database
         public static bool Delete(Listing listing)
         {
             string query =
-                "DELETE " +
-                "FROM " + TABLE_ES_MEDIA + " " +
+                "DELETE FROM " + TABLE_ES_MEDIA + " " +
                 "WHERE [listingGuid] = @listingGuid";
 
             return new DataBase().Query(query, new Dictionary<string, object?>()
             {
                 { "listingGuid", listing.guid }
             });
+        }
+
+        public static bool Delete()
+        {
+            string query =
+                "DELETE FROM " + TABLE_ES_MEDIA;
+
+            return new DataBase().Query(query);
         }
 
         public static SortedSet<Media> GetMedia(Listing listing)

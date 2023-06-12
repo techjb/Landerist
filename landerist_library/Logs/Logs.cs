@@ -16,18 +16,15 @@ namespace landerist_library.Logs
             if (text.Equals(string.Empty))
             {
                 return;
+            }            
+            if (Config.LOGS_ENABLED)
+            {
+                WriteLogDB(logKey, text);
             }
-            if (Environment.UserInteractive &&
-                !Config.IsConfigurationProduction())
+            else
             {
                 Console.WriteLine(logKey.ToString() + ": " + text);
             }
-
-            WriteLogDB(logKey, text);
-            //else
-            //{
-            //    WriteLogDB(logKey, text);
-            //}
         }
 
         private static void WriteLogDB(string logKey, string text)
@@ -75,19 +72,13 @@ namespace landerist_library.Logs
         }
 
 
-        private static string GetText(Exception exception, string additionalInformation = "")
+        private static string GetText(Exception exception)
         {
-            if (additionalInformation != "")
-            {
-                additionalInformation = "<br />" +
-                    "Aditional information: " + additionalInformation.Trim();
-            }
             return
-                "Message: " + exception.Message + "<br />" +
-                "Source: " + exception.Source + "<br />" +
-                "StackTrace: " + exception.StackTrace + "<br />" +
-                "StackTrace: " + exception.TargetSite +
-                additionalInformation;
+                "Message: " + exception.Message + Environment.NewLine +
+                "Source: " + exception.Source + Environment.NewLine +
+                "StackTrace: " + exception.StackTrace + Environment.NewLine +
+                "TargetSite: " + exception.TargetSite;
         }
 
         #region Write Logs
@@ -104,7 +95,12 @@ namespace landerist_library.Logs
 
         public static void WriteLogErrors(string text, Exception exception)
         {
-            WriteLogErrors((text.Equals(string.Empty) ? string.Empty : text + " ") + GetText(exception));
+            string textError = GetText(exception);
+            if (!text.Equals(string.Empty))
+            {
+                textError = text + Environment.NewLine + textError;
+            }
+            WriteLogErrors(textError);
         }
 
         public static void WriteLogErrors(Uri uri, Exception exception)

@@ -1,4 +1,6 @@
 ﻿using landerist_library.Websites;
+using landerist_library.Logs;
+
 
 namespace landerist_library.Insert
 {
@@ -13,7 +15,8 @@ namespace landerist_library.Insert
         private static int ErrorsInsert = 0;
         private static int ErrorsException = 0;
         private static int Skipped = 0;
-        private static readonly object sync = new();
+        private static readonly object syncErrors = new();
+        private static readonly object syncHashSet = new();
 
         public WebsitesInserter(bool initInsertedUris)
         {
@@ -33,7 +36,7 @@ namespace landerist_library.Insert
             }
         }
 
-        public void DeleteAndInsert(Uri uri)
+        public static void DeleteAndInsert(Uri uri)
         {
             Website website = new(uri);
             DeleteAndInsert(website);
@@ -45,7 +48,7 @@ namespace landerist_library.Insert
             Insert(website.MainUri);
         }
 
-        public void Insert(string url)
+        public static void Insert(string url)
         {
             if (Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
             {
@@ -114,7 +117,7 @@ namespace landerist_library.Insert
             catch (Exception exception)
             {
                 IncreaseErrorsException();
-                Logs.Log.WriteLogErrors(exception);
+                Log.WriteLogErrors(uri, exception);
             }
         }
 
@@ -166,7 +169,10 @@ namespace landerist_library.Insert
             }
 
             IncreaseInserted();
-            InsertedUris.Add(website.MainUri);
+            lock(syncHashSet)
+            {
+                InsertedUris.Add(website.MainUri);
+            }            
 
             try
             {
@@ -176,14 +182,14 @@ namespace landerist_library.Insert
             catch (Exception exception)
             {
                 IncreaseErrorsException();
-                Logs.Log.WriteLogErrors(exception);
+                Log.WriteLogErrors(website.Host, exception);
             }
         }
 
 
         private static void IncreaseErrorsMainUri()
         {
-            lock (sync)
+            lock (syncErrors)
             {
                 ErrorsMainUri++;
             }
@@ -191,7 +197,7 @@ namespace landerist_library.Insert
 
         private static void IncreaseErrorsRobotsTxt()
         {
-            lock (sync)
+            lock (syncErrors)
             {
                 ErrorsRobotsTxt++;
             }
@@ -199,7 +205,7 @@ namespace landerist_library.Insert
 
         private static void IncreaseErrorsIpAddress()
         {
-            lock (sync)
+            lock (syncErrors)
             {
                 ErrorsIpAddress++;
             }
@@ -207,7 +213,7 @@ namespace landerist_library.Insert
 
         private static void IncreaseErrorsException()
         {
-            lock (sync)
+            lock (syncErrors)
             {
                 ErrorsException++;
             }
@@ -215,7 +221,7 @@ namespace landerist_library.Insert
 
         private static void IncreaseErrorsInsert()
         {
-            lock (sync)
+            lock (syncErrors)
             {
                 ErrorsInsert++;
             }
@@ -223,7 +229,7 @@ namespace landerist_library.Insert
 
         private static void IncreaseSkipped()
         {
-            lock (sync)
+            lock (syncErrors)
             {
                 Skipped++;
             }
@@ -231,7 +237,7 @@ namespace landerist_library.Insert
 
         private static void IncreaseInserted()
         {
-            lock (sync)
+            lock (syncErrors)
             {
                 Inserted++;
             }

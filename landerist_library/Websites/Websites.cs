@@ -323,18 +323,20 @@ namespace landerist_library.Websites
             website.Delete();
         }
 
+        private static bool Delete()
+        {
+            string query =
+             "DELETE FROM " + TABLE_WEBSITES;
+
+            return new DataBase().Query(query);
+        }
+
         public static void DeleteAll()
         {
-            var websites = GetAll();
-            int counter = 0;
-            foreach (var website in websites)
-            {
-                if (website.Delete())
-                {
-                    counter++;
-                }
-            }
-            Console.WriteLine("Deleted " + counter + " websites");
-        }
+            Delete();
+            Pages.Delete();
+            ES_Listings.Delete();
+            ES_Media.Delete();
+        }       
     }
 }
