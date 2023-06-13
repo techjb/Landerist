@@ -1,4 +1,5 @@
 ﻿using landerist_library.Websites;
+using System.Collections.Concurrent;
 
 namespace landerist_library.Scrape
 {
@@ -124,14 +125,44 @@ namespace landerist_library.Scrape
             Scrape(hashSet);
         }
 
+        //private static void Scrape(HashSet<Page> pages)
+        //{
+        //    pages.RemoveWhere(p => !p.CanScrape());
+        //    PendingPages.Clear();
+        //    int totalPages = pages.Count;
+        //    int Counter = 0;
+        //    DateTime dateStart = DateTime.Now;
+        //    Parallel.ForEach(pages,
+        //        //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
+        //        page =>
+        //        {
+        //            lock (SyncCounter)
+        //            {
+        //                Counter++;
+        //            }
+        //            Console.WriteLine(
+        //                "Scraped: " + Counter + "/" + totalPages + " " +
+        //                "Pending: " + PendingPages.Count + " " +
+        //                "Listings: " + ListingsCounter);
+
+        //            if (IsBlocked(page))
+        //            {
+        //                AddToPendingPages(page);
+        //                return;
+        //            }
+        //            Scrape(page);
+        //        });
+
+        //    ScrapePendingPages(dateStart);
+        //}
+
+
         private static void Scrape(HashSet<Page> pages)
         {
-            pages.RemoveWhere(p => !p.CanScrape());
-            PendingPages.Clear();
-            int totalPages = pages.Count;
+            var blockingCollection = GetBlockingCollection(pages);
             int Counter = 0;
             DateTime dateStart = DateTime.Now;
-            Parallel.ForEach(pages,
+            Parallel.ForEach(blockingCollection.GetConsumingEnumerable(),
                 //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
                 page =>
                 {
@@ -140,34 +171,43 @@ namespace landerist_library.Scrape
                         Counter++;
                     }
                     Console.WriteLine(
-                        "Scraped: " + Counter + "/" + totalPages + " " +
-                        "Pending: " + PendingPages.Count + " " +
+                        "Scraped: " + Counter + "/" + blockingCollection.Count + " " +
                         "Listings: " + ListingsCounter);
 
                     if (IsBlocked(page))
                     {
-                        AddToPendingPages(page);
+                        blockingCollection.Add(page);
                         return;
                     }
                     Scrape(page);
                 });
-
-            ScrapePendingPages(dateStart);
         }
 
-        private static void ScrapePendingPages(DateTime dateStart)
+        private static BlockingCollection<Page> GetBlockingCollection(HashSet<Page> pages)
         {
-            if (PendingPages.Count.Equals(0))
+            pages.RemoveWhere(p => !p.CanScrape());
+            BlockingCollection<Page> blockingCollection = new();
+            foreach (var page in pages)
             {
-                return;
+                blockingCollection.Add(page);
             }
-            if (dateStart.AddSeconds(2) > DateTime.Now)
-            {
-                Thread.Sleep(2000);
-            }
-            HashSet<Page> newList = new(PendingPages);
-            Scrape(newList);
+            return blockingCollection;
         }
+
+
+        //private static void ScrapePendingPages(DateTime dateStart)
+        //{
+        //    if (PendingPages.Count.Equals(0))
+        //    {
+        //        return;
+        //    }
+        //    if (dateStart.AddSeconds(2) > DateTime.Now)
+        //    {
+        //        Thread.Sleep(2000);
+        //    }
+        //    HashSet<Page> newList = new(PendingPages);
+        //    Scrape(newList);
+        //}
 
         public static void Scrape(Uri uri)
         {
@@ -178,7 +218,14 @@ namespace landerist_library.Scrape
         public static void Scrape(Page page)
         {
             AddToBlocker(page);
-            new PageScraper(page).Scrape();            
+            try
+            {
+                new PageScraper(page).Scrape();
+            }
+            catch (Exception exception)
+            {
+                Logs.Log.WriteLogErrors(page.Uri, exception);
+            }            
             AddIsListingCounter(page);
         }
 

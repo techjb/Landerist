@@ -14,8 +14,12 @@ namespace landerist_library.Scrape
 
         public bool IsBlocked(Website website)
         {
-            return IsBlocked(IpBlocker, website.IpAddress) ||
-                IsBlocked(HostBlocker, website.Host);
+            bool isIpBlocked = IsBlocked(IpBlocker, website.IpAddress);
+            bool isHostBlocked = IsBlocked(HostBlocker, website.Host);
+
+            bool isBlocked = isIpBlocked || isHostBlocked;
+            
+            return isBlocked;
         }
 
         private static bool IsBlocked(Dictionary<string, DateTime> keyValuePairs, string? key)
@@ -53,7 +57,7 @@ namespace landerist_library.Scrape
 
         private static int RandomSecconds()
         {
-            return new Random().Next(MinSecconds, MaxSecconds); ;
+            return new Random().Next(MinSecconds, MaxSecconds);
         }
 
         private static void Add(Dictionary<string, DateTime> keyValuePairs, string? key, DateTime blockUntil)
