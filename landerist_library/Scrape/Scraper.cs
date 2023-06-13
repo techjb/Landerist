@@ -9,9 +9,9 @@ namespace landerist_library.Scrape
 
         private static readonly object SyncTempBlocker = new();
 
-        private static readonly HashSet<Page> PendingPages = new();
+        //private static readonly HashSet<Page> PendingPages = new();
 
-        private static readonly object SyncPendingPages = new();
+        //private static readonly object SyncPendingPages = new();
 
         private static int ListingsCounter = 0;
 
@@ -229,13 +229,13 @@ namespace landerist_library.Scrape
             AddIsListingCounter(page);
         }
 
-        private static void AddToPendingPages(Page page)
-        {
-            lock (SyncPendingPages)
-            {
-                PendingPages.Add(page);
-            }
-        }
+        //private static void AddToPendingPages(Page page)
+        //{
+        //    lock (SyncPendingPages)
+        //    {
+        //        PendingPages.Add(page);
+        //    }
+        //}
 
         private static bool IsBlocked(Page page)
         {
