@@ -22,7 +22,7 @@ namespace landerist_library.Parse.Listing
             if (RequestListingIsPermited())
             {
                 RequestListing();
-            }
+            }            
             return Tuple.Create(IsListing, Listing);
         }
 
@@ -38,7 +38,7 @@ namespace landerist_library.Parse.Listing
             if (!string.IsNullOrEmpty(Page.ResponseBodyText))
             {
                 var result = new ChatGPT().GetResponse(Page.ResponseBodyText);
-                if (result != null)
+                if (!string.IsNullOrEmpty(result))
                 {
                     ParseListing(result);
                 }
@@ -47,23 +47,19 @@ namespace landerist_library.Parse.Listing
 
         private void ParseListing(string json)
         {
-            IsListing = false;
             try
             {
                 ListingResponse? listingResponse = JsonConvert.DeserializeObject<ListingResponse>(json);
                 if (listingResponse != null)
                 {
-                    Listing = listingResponse.ToListing(Page);
-                    if (Listing != null)
-                    {
-                        IsListing = Configuration.Config.TRAINING_MODE || Listing.IsValid();
-                    }
+                    Listing = listingResponse.ToListing(Page);                    
                 }
             }
             catch //(Exception exception)
             {
                 //Logs.Log.WriteLogErrors(Page.Uri, exception);
             }
+            IsListing = Listing != null;
         }
     }
 }
