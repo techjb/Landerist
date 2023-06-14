@@ -57,8 +57,8 @@ namespace landerist_library.Database
                 {"listingStatus", listing.listingStatus.ToString() },
                 {"listingDate", listing.listingDate},
                 {"unlistingDate", listing.unlistingDate},
-                {"operation", listing.operation.ToString() },
-                {"propertyType", listing.propertyType.ToString() },
+                {"operation", listing.operation?.ToString() },
+                {"propertyType", listing.propertyType?.ToString() },
                 {"propertySubType", listing.propertySubtype?.ToString()},
                 {"priceAmount", listing.price?.amount },
                 {"priceCurrency", listing.price?.currency.ToString()},
@@ -230,18 +230,14 @@ namespace landerist_library.Database
 
         private static Listing GetListingData(DataRow dataRow)
         {
-            Enum.TryParse((string)dataRow["listingStatus"], out ListingStatus listingStatus);
-            Enum.TryParse((string)dataRow["operation"], out Operation operation);
-            Enum.TryParse((string)dataRow["propertyType"], out PropertyType propertyType);
-
             Listing listing = new()
             {
                 guid = (string)dataRow["guid"],
-                listingStatus = listingStatus,
+                listingStatus = (ListingStatus)Enum.Parse(typeof(ListingStatus), dataRow["listingStatus"].ToString()!),
                 listingDate = GetDateTime(dataRow, "listingDate"),
                 unlistingDate = GetDateTime(dataRow, "unlistingDate"),
-                operation = operation,
-                propertyType = propertyType,
+                operation = dataRow["operation"] is DBNull ? null : (Operation)Enum.Parse(typeof(Operation), dataRow["operation"].ToString()!),
+                propertyType = dataRow["propertyType"] is DBNull ? null : (PropertyType)Enum.Parse(typeof(PropertyType), dataRow["propertyType"].ToString()!),
                 propertySubtype = dataRow["propertySubtype"] is DBNull ? null : (PropertySubtype)Enum.Parse(typeof(PropertySubtype), dataRow["propertySubtype"].ToString()!),
                 price = dataRow["priceAmount"] is DBNull ? null : new Price()
                 {

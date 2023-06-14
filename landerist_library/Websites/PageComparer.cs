@@ -6,6 +6,10 @@ namespace landerist_library.Websites
     {
         public bool Equals(Page? x, Page? y)
         {
+            if (x == null || y == null)
+            {
+                return false;
+            }
             return x.Uri.Equals(y.Uri);
         }
 

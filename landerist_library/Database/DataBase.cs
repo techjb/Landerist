@@ -9,8 +9,8 @@ namespace landerist_library.Database
     {
         #region Private Variables
 
-        private SqlConnection SqlConnection;
-        private SqlCommand SqlCommand;
+        private SqlConnection SqlConnection = new();
+        private SqlCommand SqlCommand = new();
         private readonly SqlDataAdapter SqlDataAdapter;
         private readonly StringBuilder StringBuilder = new();
         private int StackCounter = 0;

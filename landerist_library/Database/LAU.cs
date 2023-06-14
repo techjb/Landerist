@@ -37,7 +37,7 @@ namespace landerist_library.Database
 
         public static DataRow? Get(double latitude, double longitude)
         {
-            return GetdDataRow(TABLE_LAU, "lau_id, lau_name", latitude, longitude);            
+            return GetdDataRow(TABLE_LAU, "lau_id, lau_name", latitude, longitude);
         }
     }
 }

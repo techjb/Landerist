@@ -18,7 +18,7 @@ namespace landerist_library.Scrape
             bool isHostBlocked = IsBlocked(HostBlocker, website.Host);
 
             bool isBlocked = isIpBlocked || isHostBlocked;
-            
+
             return isBlocked;
         }
 

@@ -8,8 +8,6 @@
 
         public static readonly bool SKIP_PARSE_LISTINGS = false;
 
-        public static readonly bool LISTING_PARSER_VALIDATE_RESPONSE = false;
-
         private static readonly string VERSION_PRODUCCION = "1.00";
 
         private static readonly string VERSION_LOCAL = new Random().Next(1000, 9999).ToString();

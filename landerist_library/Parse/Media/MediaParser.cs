@@ -25,10 +25,10 @@ namespace landerist_library.Parse.Media
             {
                 return;
             }
-            if(Page.CanIndexImages())
+            if (Page.CanIndexImages())
             {
                 new ImageParser(this).AddImages();
-            }            
+            }
             new VideoParser(this).GetVideos();
             new OtherParser(this).GetOthers();
             listing.SetMedia(Media);

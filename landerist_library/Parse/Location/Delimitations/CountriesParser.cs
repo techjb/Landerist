@@ -1,7 +1,7 @@
-﻿using NetTopologySuite.IO;
-using Newtonsoft.Json;
+﻿using landerist_library.Websites;
 using NetTopologySuite.Features;
-using landerist_library.Websites;
+using NetTopologySuite.IO;
+using Newtonsoft.Json;
 
 namespace landerist_library.Parse.Location.Delimitations
 {
@@ -103,8 +103,8 @@ namespace landerist_library.Parse.Location.Delimitations
             }
             Database.Countries.MakeValidAll();
             // run twice because there is a problen in ios_a3 = "NOR"
-            Database.Countries.ReorientIfNeccesary(); 
-            Database.Countries.ReorientIfNeccesary();            
+            Database.Countries.ReorientIfNeccesary();
+            Database.Countries.ReorientIfNeccesary();
             Console.WriteLine("Success: " + success + " Errors: " + errors);
         }
 

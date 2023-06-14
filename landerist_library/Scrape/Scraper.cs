@@ -121,9 +121,10 @@ namespace landerist_library.Scrape
             Scrape(hashSet);
         }
 
-     
+
         private static void Scrape(HashSet<Page> pages)
         {
+            pages.RemoveWhere(p => !p.CanScrape());
             var blockingCollection = GetBlockingCollection(pages);
             int Counter = 0;
             DateTime dateStart = DateTime.Now;
@@ -150,7 +151,6 @@ namespace landerist_library.Scrape
 
         private static BlockingCollection<Page> GetBlockingCollection(HashSet<Page> pages)
         {
-            pages.RemoveWhere(p => !p.CanScrape());
             BlockingCollection<Page> blockingCollection = new();
             foreach (var page in pages)
             {
@@ -175,7 +175,7 @@ namespace landerist_library.Scrape
             catch (Exception exception)
             {
                 Logs.Log.WriteLogErrors(page.Uri, exception);
-            }            
+            }
             AddIsListingCounter(page);
         }
 

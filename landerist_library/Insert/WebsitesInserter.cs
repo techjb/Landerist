@@ -1,5 +1,5 @@
-﻿using landerist_library.Websites;
-using landerist_library.Logs;
+﻿using landerist_library.Logs;
+using landerist_library.Websites;
 
 
 namespace landerist_library.Insert
@@ -82,7 +82,7 @@ namespace landerist_library.Insert
                 Console.WriteLine(
                     "Total: " + total + " " +
                     "Skipped: " + Skipped + " " +
-                    "Inserted: " + Inserted + " " +                    
+                    "Inserted: " + Inserted + " " +
                     "ErrorsMainUri: " + ErrorsMainUri + " " +
                     "ErrorsRobotsTxt: " + ErrorsRobotsTxt + " " +
                     "ErrorsIpAddress: " + ErrorsIpAddress + " " +
@@ -145,7 +145,7 @@ namespace landerist_library.Insert
             {
                 IncreaseSkipped();
                 return;
-            }            
+            }
             if (!website.SetRobotsTxt())
             {
                 IncreaseErrorsRobotsTxt();
@@ -163,10 +163,10 @@ namespace landerist_library.Insert
             }
 
             IncreaseInserted();
-            lock(syncHashSet)
+            lock (syncHashSet)
             {
                 InsertedUris.Add(website.MainUri);
-            }            
+            }
 
             try
             {

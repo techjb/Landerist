@@ -36,7 +36,7 @@ namespace landerist_library.Database
 
         public static DataRow? Get(double latitude, double longitude)
         {
-            return GetdDataRow(TABLE_CNIG, "natcode, nameunit", latitude, longitude);            
+            return GetdDataRow(TABLE_CNIG, "natcode, nameunit", latitude, longitude);
         }
     }
 }

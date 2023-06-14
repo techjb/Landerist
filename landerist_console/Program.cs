@@ -21,7 +21,7 @@ namespace landerist_console
             SetDateStart();
             Run();
             SetFinish();
-            EndBeep();
+            Console.Beep();
         }
 
         private static void SetDateStart()
@@ -105,17 +105,6 @@ namespace landerist_console
 
             //var tuple2 = landerist_library.Parse.Location.Goolzoom.CadastralRefToLatLng.Parse("9441515XM7094A");
             //Console.WriteLine(tuple2);
-        }
-
-        private static void EndBeep()
-        {
-            int counter = 0;
-            while (counter < 1)
-            {
-                counter++;
-                Console.Beep(400, 1000);
-                Thread.Sleep(300);
-            }
         }
     }
 }

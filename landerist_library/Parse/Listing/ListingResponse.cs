@@ -166,11 +166,6 @@ namespace landerist_library.Parse.Listing
 
         public landerist_orels.ES.Listing? ToListing(Page page)
         {
-            if (!IsValidResponse())
-            {
-                return null;
-            }
-
             var listing = new landerist_orels.ES.Listing
             {
                 guid = page.UriHash,
@@ -216,47 +211,6 @@ namespace landerist_library.Parse.Listing
             return listing;
         }
 
-        private bool IsValidResponse()
-        {
-            if (!Configuration.Config.LISTING_PARSER_VALIDATE_RESPONSE)
-            {
-                return true;
-            }
-            return
-                IsValidTipoDeOperacion() &&
-                IsValidTipoDeInmueble();
-        }
-
-        private bool IsValidTipoDeOperacion()
-        {
-            if (TipoDeOperacion != null)
-            {
-                return
-                    TipoDeOperacion.Equals(OPERACION_VENTA) ||
-                    TipoDeOperacion.Equals(OPERACION_ALQUILER);
-            }
-            return false;
-        }
-
-        private bool IsValidTipoDeInmueble()
-        {
-            if (TipoDeInmueble != null)
-            {
-                return
-                    TipoDeInmueble.Equals(TIPO_DE_INMUEBLE_VIVIENDA) ||
-                    TipoDeInmueble.Equals(TIPO_DE_INMUEBLE_DORMITORIO) ||
-                    TipoDeInmueble.Equals(TIPO_DE_INMUEBLE_LOCAL_COMERCIAL) ||
-                    TipoDeInmueble.Equals(TIPO_DE_INMUEBLE_NAVE_INDUSTRIAL) ||
-                    TipoDeInmueble.Equals(TIPO_DE_INMUEBLE_GARAJE) ||
-                    TipoDeInmueble.Equals(TIPO_DE_INMUEBLE_TRASTERO) ||
-                    TipoDeInmueble.Equals(TIPO_DE_INMUEBLE_OFICINA) ||
-                    TipoDeInmueble.Equals(TIPO_DE_INMUEBLE_PARCELA) ||
-                    TipoDeInmueble.Equals(TIPO_DE_INMUEBLE_EDIFICIO);
-            }
-            return false;
-        }
-
-
         private static ListingStatus GetListingStatus()
         {
             return ListingStatus.published;
@@ -274,19 +228,17 @@ namespace landerist_library.Parse.Listing
             return DateTime.Now;
         }
 
-        private Operation GetOperation()
+        private Operation? GetOperation()
         {
             switch (TipoDeOperacion)
             {
                 case OPERACION_VENTA: return Operation.sell;
                 case OPERACION_ALQUILER: return Operation.rent;
-                default:
-                    break;
+                default: return null;
             }
-            return Operation.sell;
         }
 
-        private PropertyType GetPropertyType()
+        private PropertyType? GetPropertyType()
         {
             switch (TipoDeInmueble)
             {
@@ -299,11 +251,8 @@ namespace landerist_library.Parse.Listing
                 case TIPO_DE_INMUEBLE_OFICINA: return PropertyType.office;
                 case TIPO_DE_INMUEBLE_PARCELA: return PropertyType.land;
                 case TIPO_DE_INMUEBLE_EDIFICIO: return PropertyType.building;
-                default:
-                    break;
+                default: return null;
             }
-
-            return PropertyType.home;
         }
 
         private PropertySubtype? GetPropertySubtype()

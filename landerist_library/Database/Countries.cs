@@ -1,6 +1,6 @@
 ﻿namespace landerist_library.Database
 {
-    public class Countries: DBDelimitations
+    public class Countries : DBDelimitations
     {
         private const string TABLE_COUNTRIES = "[COUNTRIES]";
 
@@ -32,7 +32,7 @@
 
         public static string Get(double latitude, double longitude)
         {
-            return GetString(TABLE_COUNTRIES, "iso_a3", latitude, longitude);            
+            return GetString(TABLE_COUNTRIES, "iso_a3", latitude, longitude);
         }
     }
 }

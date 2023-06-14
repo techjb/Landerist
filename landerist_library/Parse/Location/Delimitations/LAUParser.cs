@@ -46,7 +46,7 @@ namespace landerist_library.Parse.Location.Delimitations
                     errors++;
                 }
             });
-            
+
             Database.LAU.MakeValidAll();
             Database.LAU.ReorientIfNeccesary();
             Console.WriteLine("Success: " + success + " Errors: " + errors);
@@ -64,7 +64,7 @@ namespace landerist_library.Parse.Location.Delimitations
         public static string? GetId(double latitude, double longitude)
         {
             var idAndName = GetIdAndName(latitude, longitude);
-            if(idAndName == null)
+            if (idAndName == null)
             {
                 return null;
             }

@@ -69,10 +69,10 @@ namespace landerist_orels.ES
         public DateTime? unlistingDate { get; set; }
 
         [JsonProperty(Order = 5)]
-        public Operation operation { get; set; }
+        public Operation? operation { get; set; }
 
         [JsonProperty(Order = 6)]
-        public PropertyType propertyType { get; set; }
+        public PropertyType? propertyType { get; set; }
 
         [JsonProperty(Order = 7)]
         public PropertySubtype? propertySubtype { get; set; }
@@ -218,7 +218,7 @@ namespace landerist_orels.ES
             if (media == null || media.Count.Equals(0))
             {
                 return;
-            }            
+            }
             FitMedia(media);
             this.media = media;
         }
@@ -367,6 +367,13 @@ namespace landerist_orels.ES
             hash ^= securitySystems?.GetHashCode() ?? 0;
 
             return hash;
+        }
+
+        public bool IsValid()
+        {
+            return 
+                operation != null && 
+                propertyType != null;
         }
     }
 }

@@ -16,7 +16,7 @@ namespace landerist_library.Insert
         {
             string file = Configuration.Config.INSERT_DIRECTORY + @"bancodedatos.es\Excel\Pedido_completo.csv";
             DataTable dataTable = ReadFile(file);
-            var uris = ToList(dataTable, "SITIO WEB");            
+            var uris = ToList(dataTable, "SITIO WEB");
             Insert(uris);
         }
 
@@ -28,7 +28,7 @@ namespace landerist_library.Insert
             Insert(uris);
         }
 
-       
+
         // File must be semicolom separated
         private static DataTable ReadFile(string fileName)
         {

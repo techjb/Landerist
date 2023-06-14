@@ -4,7 +4,7 @@ namespace landerist_library.Index
 {
     public class Indexer
     {
-        protected static Page Page;
+        protected static Page Page = new();
 
         private readonly HashSet<Uri> Inserted = new();
 

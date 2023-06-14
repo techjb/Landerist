@@ -11,11 +11,11 @@ namespace landerist_library.Websites
 {
     public class Page : Pages
     {
-        public string Host { get; set; }
+        public string Host { get; set; } = string.Empty;
 
-        public Uri Uri { get; set; }
+        public Uri Uri { get; set; } = new Uri("about:blank");
 
-        public string UriHash { get; set; }
+        public string UriHash { get; set; } = string.Empty;
 
         public DateTime Inserted { get; set; }
 
@@ -30,11 +30,16 @@ namespace landerist_library.Websites
         public bool? IsListing { get; set; }
 
 
-        public Website Website;
+        public Website Website = new();
 
 
         public HtmlDocument? HtmlDocument = null;
 
+
+        public Page()
+        {
+
+        }
 
         public Page(Uri uri) : this(Websites.GetWebsite(uri.Host), uri)
         {
@@ -236,14 +241,14 @@ namespace landerist_library.Websites
                     if (!string.IsNullOrEmpty(contentAttribute))
                     {
                         var contents = contentAttribute.Split(',');
-                        foreach(var item in contents)
+                        foreach (var item in contents)
                         {
                             if (item.Equals(content) || item.Equals("none"))
                             {
                                 return true;
                             }
                         }
-                        
+
                     }
                 }
             }

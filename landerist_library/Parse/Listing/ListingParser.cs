@@ -54,10 +54,13 @@ namespace landerist_library.Parse.Listing
                 if (listingResponse != null)
                 {
                     Listing = listingResponse.ToListing(Page);
-                    IsListing = Listing != null;
+                    if (Listing != null)
+                    {
+                        IsListing = Configuration.Config.TRAINING_MODE || Listing.IsValid();
+                    }
                 }
             }
-            catch (Exception exception) 
+            catch //(Exception exception)
             {
                 //Logs.Log.WriteLogErrors(Page.Uri, exception);
             }
