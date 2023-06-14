@@ -9,10 +9,6 @@ namespace landerist_library.Scrape
 
         private static readonly object SyncTempBlocker = new();
 
-        //private static readonly HashSet<Page> PendingPages = new();
-
-        //private static readonly object SyncPendingPages = new();
-
         private static int ListingsCounter = 0;
 
         private static readonly object SyncCounter = new();
@@ -125,38 +121,7 @@ namespace landerist_library.Scrape
             Scrape(hashSet);
         }
 
-        //private static void Scrape(HashSet<Page> pages)
-        //{
-        //    pages.RemoveWhere(p => !p.CanScrape());
-        //    PendingPages.Clear();
-        //    int totalPages = pages.Count;
-        //    int Counter = 0;
-        //    DateTime dateStart = DateTime.Now;
-        //    Parallel.ForEach(pages,
-        //        //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
-        //        page =>
-        //        {
-        //            lock (SyncCounter)
-        //            {
-        //                Counter++;
-        //            }
-        //            Console.WriteLine(
-        //                "Scraped: " + Counter + "/" + totalPages + " " +
-        //                "Pending: " + PendingPages.Count + " " +
-        //                "Listings: " + ListingsCounter);
-
-        //            if (IsBlocked(page))
-        //            {
-        //                AddToPendingPages(page);
-        //                return;
-        //            }
-        //            Scrape(page);
-        //        });
-
-        //    ScrapePendingPages(dateStart);
-        //}
-
-
+     
         private static void Scrape(HashSet<Page> pages)
         {
             var blockingCollection = GetBlockingCollection(pages);
@@ -194,21 +159,6 @@ namespace landerist_library.Scrape
             return blockingCollection;
         }
 
-
-        //private static void ScrapePendingPages(DateTime dateStart)
-        //{
-        //    if (PendingPages.Count.Equals(0))
-        //    {
-        //        return;
-        //    }
-        //    if (dateStart.AddSeconds(2) > DateTime.Now)
-        //    {
-        //        Thread.Sleep(2000);
-        //    }
-        //    HashSet<Page> newList = new(PendingPages);
-        //    Scrape(newList);
-        //}
-
         public static void Scrape(Uri uri)
         {
             var page = new Page(uri);
@@ -228,14 +178,6 @@ namespace landerist_library.Scrape
             }            
             AddIsListingCounter(page);
         }
-
-        //private static void AddToPendingPages(Page page)
-        //{
-        //    lock (SyncPendingPages)
-        //    {
-        //        PendingPages.Add(page);
-        //    }
-        //}
 
         private static bool IsBlocked(Page page)
         {

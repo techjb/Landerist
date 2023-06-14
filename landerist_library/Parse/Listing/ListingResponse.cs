@@ -446,7 +446,12 @@ namespace landerist_library.Parse.Listing
                 return null;
             }
 
-            return new Price((decimal)PrecioDelAnuncio, Currency.EUR);
+            var price = (decimal)PrecioDelAnuncio;
+            if (price <= 0)
+            {
+                return null;
+            }
+            return new Price(price, Currency.EUR);
         }
 
         private static string GetDataSourceName(Page page)
@@ -463,7 +468,6 @@ namespace landerist_library.Parse.Listing
         {
             return page.Uri;
         }
-
 
         private int? GetConstrunctionYear()
         {
