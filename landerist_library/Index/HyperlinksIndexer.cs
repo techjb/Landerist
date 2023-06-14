@@ -23,7 +23,6 @@ namespace landerist_library.Index
                    .Where(href => !string.IsNullOrWhiteSpace(href))
                    .ToList();
 
-
                 if (urls != null)
                 {
                     InsertUrls(urls);
@@ -37,12 +36,19 @@ namespace landerist_library.Index
 
         static bool IsHoneypotTrap(HtmlNode link)
         {
-            var style = link.GetAttributeValue("style", string.Empty);
-            if (!string.IsNullOrEmpty(style))
+            try
             {
-                var regex = new Regex(@"display\s*:\s*none|visibility\s*:\s*hidden", RegexOptions.IgnoreCase);
-                return regex.IsMatch(style);
+                var style = link.GetAttributeValue("style", string.Empty);
+                if (!string.IsNullOrEmpty(style))
+                {
+                    var regex = new Regex(@"display\s*:\s*none|visibility\s*:\s*hidden", RegexOptions.IgnoreCase);
+                    return regex.IsMatch(style);
+                }
             }
+            catch 
+            { 
+            }
+
             return false;
         }
     }

@@ -33,11 +33,15 @@ namespace landerist_library.Logs
                 "INSERT INTO " + TABLE_LOGS + " " +
                 "VALUES(GETDATE(), @LogKey, @Source, @Text)";
 
-            new DataBase().Query(query, new Dictionary<string, object?> {
+            bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
                     { "LogKey", logKey },
                     { "Source", source },
                     { "Text", text.Trim() }
                 });
+            if (!sucess)
+            {
+
+            }
         }
 
         public static DataTable ReadLog(string logKey, int top = 200)

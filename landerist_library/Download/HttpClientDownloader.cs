@@ -36,9 +36,9 @@ namespace landerist_library.Download
                 page.HttpStatusCode = (short)HttpResponseMessage.StatusCode;
                 page.ResponseBody = await HttpResponseMessage.Content.ReadAsStringAsync();
             }
-            catch (Exception exception)
+            catch// (Exception exception)
             {
-                Logs.Log.WriteLogErrors(page.Uri, exception);
+                //Logs.Log.WriteLogErrors(page.Uri, exception);
             }
             return sucess;
         }
