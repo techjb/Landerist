@@ -15,9 +15,9 @@ namespace landerist_library.Scrape
 
         private static readonly object SyncListingsCounter = new();
 
-        public static void ScrapeNonScrapped(bool recursive = false)
+        public static void ScrapeNonScrapped(bool recursive = false, int? rows = null)
         {
-            List<Page> pages = Pages.GetNonScraped();
+            List<Page> pages = Pages.GetNonScraped(rows);
             if (pages.Count.Equals(0))
             {
                 return;
@@ -126,19 +126,24 @@ namespace landerist_library.Scrape
         {
             pages.RemoveWhere(p => !p.CanScrape());
             var blockingCollection = GetBlockingCollection(pages);
-            int Counter = 0;
-            DateTime dateStart = DateTime.Now;
-            Parallel.ForEach(blockingCollection.GetConsumingEnumerable(),
-                //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
-                page =>
+            int Counter = 0;            
+            Parallel.ForEach(
+                //blockingCollection.GetConsumingEnumerable(),
+                Partitioner.Create(blockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering),
+                //new ParallelOptions() { MaxDegreeOfParallelism = 1},
+                //new ParallelOptions() { MaxDegreeOfParallelism = Environment.ProcessorCount },
+                (page, state) =>
                 {
                     lock (SyncCounter)
                     {
                         Counter++;
                     }
                     Console.WriteLine(
-                        "Scraped: " + Counter + "/" + blockingCollection.Count + " " +
-                        "Listings: " + ListingsCounter);
+                        "Scraped: " + Counter + " " +
+                        "BlockingCollection: " + blockingCollection.Count + " " +                       
+                        "Listings: " + ListingsCounter + " " + 
+                        "Page: " + page.Host);
+
 
                     if (IsBlocked(page))
                     {
@@ -146,6 +151,10 @@ namespace landerist_library.Scrape
                         return;
                     }
                     Scrape(page);
+                    //if (blockingCollection.Count.Equals(0))
+                    //{
+
+                    //}
                 });
         }
 

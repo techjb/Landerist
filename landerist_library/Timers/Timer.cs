@@ -18,25 +18,21 @@ namespace landerist_library.Timers
             {
                 return;
             }
-            int milliseconds = (DateTime.Now - dateStart).Milliseconds;
+            double milliseconds = (DateTime.Now - dateStart).TotalMilliseconds;
             SaveTimer(timerKey, source, milliseconds);
         }
 
-        private static void SaveTimer(string timerKey, string source, int milliseconds)
+        private static bool SaveTimer(string timerKey, string source, double milliseconds)
         {
             string query =
                 "INSERT INTO " + TABLE_TIMERS + " " +
                 "VALUES(GETDATE(), @TimerKey, @Source, @Milliseconds)";
 
-            bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
+            return new DataBase().Query(query, new Dictionary<string, object?> {
                     { "TimerKey", timerKey },
                     { "Source", source },
                     { "Milliseconds", milliseconds }
-                });
-            if (!sucess)
-            {
-
-            }
+                });           
         }
 
         public static void DeleteLog(string timerKey)

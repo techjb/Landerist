@@ -302,6 +302,10 @@ namespace landerist_library.Websites
 
         public void InsertPagesFromSiteMap()
         {
+            if (!Config.INDEXER_ENABLED)
+            {
+                return;
+            }
             var sitemaps = GetSiteMaps();
             if (sitemaps != null && sitemaps.Count > 0)
             {

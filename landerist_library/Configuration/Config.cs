@@ -4,11 +4,19 @@
     {
         private static bool ConfigurationProduction = true;
 
+        private static readonly string VERSION_PRODUCTION = "1.00";
+
         public static readonly bool TRAINING_MODE = true;
 
         public static readonly bool SKIP_PARSE_LISTINGS = false;
 
-        private static readonly string VERSION_PRODUCCION = "1.00";
+        public static readonly bool INDEXER_ENABLED = false;
+
+        // Environment.UserInteractive && !Config.IsConfigurationProduction()
+        public static readonly bool LOGS_ENABLED = false;
+
+        public static readonly bool TIMERS_ENABLED = false;
+
 
         private static readonly string VERSION_LOCAL = new Random().Next(1000, 9999).ToString();
         public static string? VERSION { get; set; }
@@ -57,12 +65,7 @@
         public static readonly string GOOGLEMAPS_API = PrivateConfig.GOOGLEMAPS_API;
 
         public static readonly string GOOLZOOM_API = PrivateConfig.GOOLZOOM_API;
-
-        // Environment.UserInteractive && !Config.IsConfigurationProduction()
-        public static readonly bool LOGS_ENABLED = true;
-
-        public static readonly bool TIMERS_ENABLED = true;
-
+        
         public static bool IsConfigurationProduction()
         {
             return ConfigurationProduction;
@@ -73,7 +76,7 @@
             ConfigurationProduction = configurationProduction;
 
             VERSION = ConfigurationProduction ?
-                VERSION_PRODUCCION :
+                VERSION_PRODUCTION :
                 VERSION_LOCAL;
 
             DATASOURCE = ConfigurationProduction ?

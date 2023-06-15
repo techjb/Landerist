@@ -51,12 +51,20 @@ namespace landerist_library.Websites
             return GetPages(website, dataTable);
         }
 
-        public static List<Page> GetNonScraped()
+        public static List<Page> GetNonScraped(int? rows = null)
         {
+            string topRows = string.Empty;
+            string orderBy = string.Empty;
+            if (rows != null)
+            {
+                topRows = "TOP " + rows + " ";
+                orderBy = "ORDER BY NEWID()";
+            }
             string query =
-                "SELECT * " +
+                "SELECT "+ topRows + "* " +
                 "FROM " + TABLE_PAGES + " " +
-                "WHERE [Updated] IS NULL";
+                "WHERE [Updated] IS NULL " + 
+                orderBy;
 
             DataTable dataTable = new DataBase().QueryTable(query);
             return GetPages(dataTable);

@@ -25,6 +25,7 @@ namespace landerist_library.Parse.Listing
                 Temperature = 0,
                 //MaxTokens = 50,
             };
+            
             Conversation = openAIAPI.Chat.CreateConversation(chatRequest);
             var systemMessage = GetSystemMessage();
             Conversation.AppendSystemMessage(systemMessage);

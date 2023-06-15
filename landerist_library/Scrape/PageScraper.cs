@@ -39,14 +39,17 @@ namespace landerist_library.Scrape
         {
             if (!HtmInWebsiteLanguage())
             {
-                new LinkAlternateIndexer(Page).InsertLinksAlternate();
+                if (Config.INDEXER_ENABLED)
+                {
+                    new LinkAlternateIndexer(Page).InsertLinksAlternate();
+                }                
                 return;
             }
             if (Page.CanFollowLinks())
             {
                 IndexPages();
             }
-            if (Page.CanIndex())
+            if (Page.CanIndexContent())
             {
                 GetListing();
             }
@@ -72,6 +75,10 @@ namespace landerist_library.Scrape
 
         private void IndexPages()
         {
+            if (!Config.INDEXER_ENABLED)
+            {
+                return;
+            }
             Page.LoadHtmlDocument();
             if (Page.HtmlDocument == null || Page.Website == null)
             {
@@ -132,7 +139,7 @@ namespace landerist_library.Scrape
         private void DownloadErrorRedirect()
         {
             var redirectUrl = HttpClientDownloader.GetRedirectUrl();
-            if (redirectUrl != null)
+            if (redirectUrl != null && Config.INDEXER_ENABLED)
             {
                 new Indexer(Page).InsertUrl(redirectUrl);
             }
