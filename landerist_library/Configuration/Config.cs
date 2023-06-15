@@ -61,6 +61,8 @@
         // Environment.UserInteractive && !Config.IsConfigurationProduction()
         public static readonly bool LOGS_ENABLED = true;
 
+        public static readonly bool TIMERS_ENABLED = true;
+
         public static bool IsConfigurationProduction()
         {
             return ConfigurationProduction;

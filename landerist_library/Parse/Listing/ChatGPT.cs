@@ -35,7 +35,9 @@ namespace landerist_library.Parse.Listing
             Conversation.AppendUserInput(userInput);
             try
             {
+                DateTime dateStart = DateTime.Now;
                 string response = Task.Run(async () => await Conversation.GetResponseFromChatbotAsync()).Result;
+                Timers.Timer.ChatGPT(string.Empty, dateStart);
                 return response;
             }
             catch

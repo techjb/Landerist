@@ -29,9 +29,12 @@ namespace landerist_library.Download
             HttpRequestMessage request = new(HttpMethod.Get, page.Uri);
             bool sucess = false;
             HttpResponseMessage = null;
+            
             try
             {
+                DateTime dateStart = DateTime.Now;
                 HttpResponseMessage = await client.SendAsync(request);
+                Timers.Timer.DownloadPage(page.Uri.ToString(), dateStart);
                 sucess = HttpResponseMessage.IsSuccessStatusCode;
                 page.HttpStatusCode = (short)HttpResponseMessage.StatusCode;
                 page.ResponseBody = await HttpResponseMessage.Content.ReadAsStringAsync();
@@ -41,6 +44,8 @@ namespace landerist_library.Download
                 //Logs.Log.WriteLogErrors(page.Uri, exception);
             }
             return sucess;
+
+            
         }
 
         public string? GetRedirectUrl()
