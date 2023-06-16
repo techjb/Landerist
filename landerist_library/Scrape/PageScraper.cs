@@ -138,8 +138,12 @@ namespace landerist_library.Scrape
 
         private void DownloadErrorRedirect()
         {
+            if (!Config.INDEXER_ENABLED)
+            {
+                return;
+            }
             var redirectUrl = HttpClientDownloader.GetRedirectUrl();
-            if (redirectUrl != null && Config.INDEXER_ENABLED)
+            if (redirectUrl != null)
             {
                 new Indexer(Page).InsertUrl(redirectUrl);
             }

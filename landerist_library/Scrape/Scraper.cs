@@ -127,12 +127,11 @@ namespace landerist_library.Scrape
             Scrape(hashSet);
         }
 
-
         private static void Scrape(HashSet<Page> pages)
         {
             pages.RemoveWhere(p => !p.CanScrape());
             InitBlockingCollection(pages);
-            TotalCounter = pages.Count;            
+            TotalCounter = pages.Count;
             Scraped = 0;
             Remaining = TotalCounter;
             ThreadCounter = 0;
@@ -151,11 +150,11 @@ namespace landerist_library.Scrape
         {
             if (IsBlocked(page) && !BlockingCollection.IsCompleted)
             {
-                BlockingCollection.Add(page);                
+                BlockingCollection.Add(page);
             }
             else
             {
-                Scrape(page);                
+                Scrape(page);
                 Interlocked.Increment(ref Scraped);
                 Interlocked.Decrement(ref Remaining);
             }

@@ -48,8 +48,6 @@ namespace landerist_library.Download
                 Logs.Log.WriteLogErrors(page.Uri, exception);
             }
             return sucess;
-
-
         }
 
         public string? GetRedirectUrl()
