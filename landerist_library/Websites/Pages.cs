@@ -117,11 +117,15 @@ namespace landerist_library.Websites
         {
             Console.WriteLine("Parsing to pages ..");
             List<Page> pages = new();
-            foreach (DataRow dataRow in dataTable.Rows)
+            var sync = new object();
+            Parallel.ForEach(dataTable.AsEnumerable(), dataRow =>
             {
                 Page page = new(dataRow);
-                pages.Add(page);
-            }
+                lock (sync)
+                {
+                    pages.Add(page);
+                }                
+            });
             return pages;
         }
 
