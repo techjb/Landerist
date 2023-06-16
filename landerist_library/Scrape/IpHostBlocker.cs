@@ -8,18 +8,19 @@ namespace landerist_library.Scrape
 
         private readonly Dictionary<string, DateTime> HostBlocker = new();
 
-        private const int MinSecconds = 10;
+        private const int MinSecconds = 5;
 
-        private const int MaxSecconds = 20;
+        private const int MaxSecconds = 10;
 
         public bool IsBlocked(Website website)
         {
             bool isIpBlocked = IsBlocked(IpBlocker, website.IpAddress);
+            if (isIpBlocked)
+            {
+                return true;
+            }
             bool isHostBlocked = IsBlocked(HostBlocker, website.Host);
-
-            bool isBlocked = isIpBlocked || isHostBlocked;
-
-            return isBlocked;
+            return isHostBlocked;
         }
 
         private static bool IsBlocked(Dictionary<string, DateTime> keyValuePairs, string? key)
@@ -93,6 +94,11 @@ namespace landerist_library.Scrape
                     keyValuePairs.Remove(key);
                 }
             }
+        }
+
+        public Tuple<int,int> Count()
+        {
+            return Tuple.Create(IpBlocker.Count, HostBlocker.Count);  
         }
     }
 }

@@ -132,14 +132,13 @@ namespace landerist_library.Scrape
         {
             pages.RemoveWhere(p => !p.CanScrape());
             InitBlockingCollection(pages);
-            TotalCounter = BlockingCollection.Count;            
+            TotalCounter = pages.Count;            
             Scraped = 0;
             Remaining = TotalCounter;
             ThreadCounter = 0;
             Parallel.ForEach(
                 Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering),
-                //new ParallelOptions() { MaxDegreeOfParallelism = 1},
-                //new ParallelOptions() { MaxDegreeOfParallelism = Environment.ProcessorCount },
+                //new ParallelOptions() { MaxDegreeOfParallelism = 1},                
                 (page, state) =>
                 {
                     StartThread();
@@ -152,7 +151,7 @@ namespace landerist_library.Scrape
         {
             if (IsBlocked(page) && !BlockingCollection.IsCompleted)
             {
-                BlockingCollection.Append(page);
+                BlockingCollection.Add(page);                
             }
             else
             {
@@ -166,7 +165,6 @@ namespace landerist_library.Scrape
                 "Threads: " + ThreadCounter + " " +
                 "BlockingCollection: " + BlockingCollection.Count + " " +
                 "Listings: " + ListingsCounter + " ");
-                //"Page host: " + page.Host);
         }
 
         private static void StartThread()

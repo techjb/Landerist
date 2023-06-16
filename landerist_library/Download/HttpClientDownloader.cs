@@ -21,10 +21,14 @@ namespace landerist_library.Download
         {
             HttpClientHandler handler = new()
             {
-                AllowAutoRedirect = false
+                AllowAutoRedirect = false,
+                // trust certificate allways
+                //ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; }
             };
+
             using var client = new HttpClient(handler);
             client.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
+            client.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
 
             HttpRequestMessage request = new(HttpMethod.Get, page.Uri);
             bool sucess = false;
@@ -39,9 +43,9 @@ namespace landerist_library.Download
                 page.HttpStatusCode = (short)HttpResponseMessage.StatusCode;
                 page.ResponseBody = await HttpResponseMessage.Content.ReadAsStringAsync();
             }
-            catch// (Exception exception)
+            catch (Exception exception)
             {
-                //Logs.Log.WriteLogErrors(page.Uri, exception);
+                Logs.Log.WriteLogErrors(page.Uri, exception);
             }
             return sucess;
 

@@ -17,7 +17,6 @@
 
         public static readonly bool TIMERS_ENABLED = false;
 
-
         private static readonly string VERSION_LOCAL = new Random().Next(1000, 9999).ToString();
         public static string? VERSION { get; set; }
 
@@ -61,6 +60,8 @@
         public static readonly string DELIMITATIONS_DIRECTORY = PrivateConfig.DELIMITATIONS_DIRECTORY;
 
         public static readonly string USER_AGENT = "Mozilla/5.0 (compatible; AcmeInc/1.0)";
+
+        public static readonly int HTTPCLIENT_SECONDS_TIMEOUT = 10;
 
         public static readonly string GOOGLEMAPS_API = PrivateConfig.GOOGLEMAPS_API;
 
