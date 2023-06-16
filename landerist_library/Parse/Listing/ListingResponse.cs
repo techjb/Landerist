@@ -263,10 +263,10 @@ namespace landerist_library.Parse.Listing
             {
                 if (DateTime.TryParse(FechaDePublicación, out DateTime listingDate))
                 {
-                    if(listingDate < DateTime.Now)
+                    if (listingDate < DateTime.Now)
                     {
                         return listingDate;
-                    }                    
+                    }
                 }
             }
             return DateTime.Now;

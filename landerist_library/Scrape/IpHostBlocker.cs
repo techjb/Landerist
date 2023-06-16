@@ -96,9 +96,9 @@ namespace landerist_library.Scrape
             }
         }
 
-        public Tuple<int,int> Count()
+        public Tuple<int, int> Count()
         {
-            return Tuple.Create(IpBlocker.Count, HostBlocker.Count);  
+            return Tuple.Create(IpBlocker.Count, HostBlocker.Count);
         }
     }
 }

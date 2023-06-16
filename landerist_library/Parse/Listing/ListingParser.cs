@@ -22,7 +22,7 @@ namespace landerist_library.Parse.Listing
             if (RequestListingIsPermited())
             {
                 RequestListing();
-            }            
+            }
             return Tuple.Create(IsListing, Listing);
         }
 
@@ -52,7 +52,7 @@ namespace landerist_library.Parse.Listing
                 ListingResponse? listingResponse = JsonConvert.DeserializeObject<ListingResponse>(json);
                 if (listingResponse != null)
                 {
-                    Listing = listingResponse.ToListing(Page);                    
+                    Listing = listingResponse.ToListing(Page);
                 }
             }
             catch //(Exception exception)

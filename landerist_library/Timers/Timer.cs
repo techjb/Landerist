@@ -1,7 +1,5 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Database;
-using OpenCvSharp;
-using System.Data;
 
 namespace landerist_library.Timers
 {
@@ -32,7 +30,7 @@ namespace landerist_library.Timers
                     { "TimerKey", timerKey },
                     { "Source", source },
                     { "Milliseconds", milliseconds }
-                });           
+                });
         }
 
         public static void DeleteLog(string timerKey)
@@ -58,7 +56,7 @@ namespace landerist_library.Timers
         {
             SaveTimer(TimerKeyDownloadPage, source, dateStart);
         }
-       
+
 
         #endregion Write Logs
     }

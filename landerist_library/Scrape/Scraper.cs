@@ -155,7 +155,7 @@ namespace landerist_library.Scrape
             }
             else
             {
-                Scrape(page);
+                Scrape(page);                
                 Interlocked.Increment(ref Scraped);
                 Interlocked.Decrement(ref Remaining);
             }

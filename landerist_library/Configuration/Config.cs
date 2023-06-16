@@ -13,9 +13,9 @@
         public static readonly bool INDEXER_ENABLED = false;
 
         // Environment.UserInteractive && !Config.IsConfigurationProduction()
-        public static readonly bool LOGS_ENABLED = false;
+        public static readonly bool LOGS_ENABLED = true;
 
-        public static readonly bool TIMERS_ENABLED = false;
+        public static readonly bool TIMERS_ENABLED = true;
 
         private static readonly string VERSION_LOCAL = new Random().Next(1000, 9999).ToString();
         public static string? VERSION { get; set; }
@@ -66,7 +66,7 @@
         public static readonly string GOOGLEMAPS_API = PrivateConfig.GOOGLEMAPS_API;
 
         public static readonly string GOOLZOOM_API = PrivateConfig.GOOLZOOM_API;
-        
+
         public static bool IsConfigurationProduction()
         {
             return ConfigurationProduction;

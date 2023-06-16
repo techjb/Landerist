@@ -48,9 +48,9 @@ namespace landerist_orels.ES
             var jsonSerializerSettings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore,
-                DateFormatString = "yyyy-MM-ddTHH:mm:ssZ",                
+                DateFormatString = "yyyy-MM-ddTHH:mm:ssZ",
             };
-            jsonSerializerSettings.Converters.Add(new StringEnumConverter());            
+            jsonSerializerSettings.Converters.Add(new StringEnumConverter());
             return jsonSerializerSettings;
         }
     }

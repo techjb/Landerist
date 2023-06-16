@@ -33,7 +33,7 @@ namespace landerist_library.Download
             HttpRequestMessage request = new(HttpMethod.Get, page.Uri);
             bool sucess = false;
             HttpResponseMessage = null;
-            
+
             try
             {
                 DateTime dateStart = DateTime.Now;
@@ -49,7 +49,7 @@ namespace landerist_library.Download
             }
             return sucess;
 
-            
+
         }
 
         public string? GetRedirectUrl()

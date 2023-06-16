@@ -45,8 +45,8 @@ namespace landerist_library.Index
                     return regex.IsMatch(style);
                 }
             }
-            catch 
-            { 
+            catch
+            {
             }
 
             return false;

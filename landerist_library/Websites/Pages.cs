@@ -61,9 +61,9 @@ namespace landerist_library.Websites
                 orderBy = "ORDER BY NEWID()";
             }
             string query =
-                "SELECT "+ topRows + "* " +
+                "SELECT " + topRows + "* " +
                 "FROM " + TABLE_PAGES + " " +
-                "WHERE [Updated] IS NULL " + 
+                "WHERE [Updated] IS NULL " +
                 orderBy;
 
             Console.WriteLine("Reading non scraped ..");
@@ -124,7 +124,7 @@ namespace landerist_library.Websites
                 lock (sync)
                 {
                     pages.Add(page);
-                }                
+                }
             });
             return pages;
         }

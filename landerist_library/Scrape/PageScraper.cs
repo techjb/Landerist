@@ -42,7 +42,7 @@ namespace landerist_library.Scrape
                 if (Config.INDEXER_ENABLED)
                 {
                     new LinkAlternateIndexer(Page).InsertLinksAlternate();
-                }                
+                }
                 return;
             }
             if (Page.CanFollowLinks())
