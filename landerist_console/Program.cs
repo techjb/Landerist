@@ -18,13 +18,12 @@ namespace landerist_console
         {
             Console.Title = "Landerist Console";
             Config.Init(false);
-            SetDateStart();
+            Start();
             Run();
-            SetFinish();
-            Console.Beep();
+            End();            
         }
 
-        private static void SetDateStart()
+        private static void Start()
         {
             DateStart = DateTime.Now;
             string textStarted =
@@ -32,13 +31,15 @@ namespace landerist_console
             Console.WriteLine(textStarted);
         }
 
-        private static void SetFinish()
+        private static void End()
         {
             DateTime dateFinished = DateTime.Now;
             string textFinished =
                 "FINISHED at " + dateFinished.ToShortDateString() + " " + dateFinished.ToString(@"hh\:mm\:ss") +
                 "\nDuration: " + (dateFinished - DateStart).ToString(@"dd\:hh\:mm\:ss\.fff") + ". ";
             Console.WriteLine("\n" + textFinished);
+
+            Console.Beep(500, 500);
         }
 
         private static void Run()
@@ -85,7 +86,7 @@ namespace landerist_console
             //Websites.InsertMainPages();
 
             //Scraper.ScrapeMainPage(website);
-            Scraper.ScrapeNonScrapped(false, 100);
+            Scraper.ScrapeNonScrapped(false, 100000);
             //Scraper.ScrapeUnknowHttpStatusCode();
             //Scraper.ScrapeUnknowIsListing(uri, true);
             //Scraper.ScrapeIsNotListing(uri);

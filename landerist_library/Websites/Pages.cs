@@ -66,6 +66,7 @@ namespace landerist_library.Websites
                 "WHERE [Updated] IS NULL " + 
                 orderBy;
 
+            Console.WriteLine("Reading non scraped ..");
             DataTable dataTable = new DataBase().QueryTable(query);
             return GetPages(dataTable);
         }
@@ -114,6 +115,7 @@ namespace landerist_library.Websites
 
         private static List<Page> GetPages(DataTable dataTable)
         {
+            Console.WriteLine("Parsing to pages ..");
             List<Page> pages = new();
             foreach (DataRow dataRow in dataTable.Rows)
             {

@@ -7,13 +7,19 @@ namespace landerist_library.Scrape
     {
         private static readonly IpHostBlocker IpHostBlocker = new();
 
-        private static readonly object SyncTempBlocker = new();
+        private static readonly object SyncIpHostBlocker = new();
 
         private static int ListingsCounter = 0;
 
-        private static readonly object SyncCounter = new();
+        private static int TotalCounter = 0;
 
-        private static readonly object SyncListingsCounter = new();
+        private static int Scraped = 0;
+
+        private static int Remaining = 0;
+
+        private static int ThreadCounter = 0;
+
+        private static BlockingCollection<Page> BlockingCollection = new();
 
         public static void ScrapeNonScrapped(bool recursive = false, int? rows = null)
         {
@@ -125,47 +131,67 @@ namespace landerist_library.Scrape
         private static void Scrape(HashSet<Page> pages)
         {
             pages.RemoveWhere(p => !p.CanScrape());
-            var blockingCollection = GetBlockingCollection(pages);
-            int Counter = 0;            
+            InitBlockingCollection(pages);
+            TotalCounter = BlockingCollection.Count;            
+            Scraped = 0;
+            Remaining = TotalCounter;
+            ThreadCounter = 0;
             Parallel.ForEach(
-                //blockingCollection.GetConsumingEnumerable(),
-                Partitioner.Create(blockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering),
+                Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering),
                 //new ParallelOptions() { MaxDegreeOfParallelism = 1},
                 //new ParallelOptions() { MaxDegreeOfParallelism = Environment.ProcessorCount },
                 (page, state) =>
                 {
-                    lock (SyncCounter)
-                    {
-                        Counter++;
-                    }
-                    Console.WriteLine(
-                        "Scraped: " + Counter + " " +
-                        "BlockingCollection: " + blockingCollection.Count + " " +                       
-                        "Listings: " + ListingsCounter + " " + 
-                        "Page: " + page.Host);
-
-
-                    if (IsBlocked(page))
-                    {
-                        blockingCollection.Add(page);
-                        return;
-                    }
-                    Scrape(page);
-                    //if (blockingCollection.Count.Equals(0))
-                    //{
-
-                    //}
+                    StartThread();
+                    ProcessThread(page);
+                    EndThread();
                 });
         }
 
-        private static BlockingCollection<Page> GetBlockingCollection(HashSet<Page> pages)
+        private static void ProcessThread(Page page)
         {
-            BlockingCollection<Page> blockingCollection = new();
+            if (IsBlocked(page) && !BlockingCollection.IsCompleted)
+            {
+                BlockingCollection.Append(page);
+            }
+            else
+            {
+                Scrape(page);
+                Interlocked.Increment(ref Scraped);
+                Interlocked.Decrement(ref Remaining);
+            }
+
+            Console.WriteLine(
+                "Remaining: " + TotalCounter + " - " + Scraped + " = " + Remaining + " " +
+                "Threads: " + ThreadCounter + " " +
+                "BlockingCollection: " + BlockingCollection.Count + " " +
+                "Listings: " + ListingsCounter + " ");
+                //"Page host: " + page.Host);
+        }
+
+        private static void StartThread()
+        {
+            Interlocked.Increment(ref ThreadCounter);
+        }
+
+        private static void EndThread()
+        {
+            Interlocked.Decrement(ref ThreadCounter);
+
+            if (ThreadCounter == 0 && BlockingCollection.Count == 0)
+            {
+                BlockingCollection.CompleteAdding();
+                Console.WriteLine("Finished");
+            }
+        }
+
+        private static void InitBlockingCollection(HashSet<Page> pages)
+        {
+            BlockingCollection = new();
             foreach (var page in pages)
             {
-                blockingCollection.Add(page);
+                BlockingCollection.Add(page);
             }
-            return blockingCollection;
         }
 
         public static void Scrape(Uri uri)
@@ -195,7 +221,7 @@ namespace landerist_library.Scrape
 
         private static void AddToBlocker(Page page)
         {
-            lock (SyncTempBlocker)
+            lock (SyncIpHostBlocker)
             {
                 IpHostBlocker.Add(page.Website);
             }
@@ -207,10 +233,7 @@ namespace landerist_library.Scrape
             {
                 if ((bool)page.IsListing)
                 {
-                    lock (SyncListingsCounter)
-                    {
-                        ListingsCounter++;
-                    }
+                    Interlocked.Increment(ref ListingsCounter);
                 }
             }
         }
