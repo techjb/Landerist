@@ -8,9 +8,9 @@ namespace landerist_library.Scrape
 
         private readonly Dictionary<string, DateTime> HostBlocker = new();
 
-        private const int MinSecconds = 5;
+        private const int MinSecconds = 4;
 
-        private const int MaxSecconds = 10;
+        private const int MaxSecconds = 7;
 
         public bool IsBlocked(Website website)
         {
@@ -51,8 +51,8 @@ namespace landerist_library.Scrape
         private static DateTime CalculateBlockUntil(Website website)
         {
             int randomSecconds = RandomSecconds();
-            long crawDelay = website.CrawlDelay();
-            int secconds = Math.Max(randomSecconds, (int)crawDelay);
+            int crawDelay = website.CrawlDelay();
+            int secconds = Math.Max(randomSecconds, crawDelay);
             return DateTime.Now.AddSeconds(secconds);
         }
 

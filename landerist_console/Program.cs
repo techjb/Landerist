@@ -1,5 +1,6 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Scrape;
+using landerist_library.Websites;
 
 namespace landerist_console
 {
@@ -54,7 +55,7 @@ namespace landerist_console
             //var uri = new Uri("http://real-viv.com/");
             //var uri = new Uri("http://casavida.es/");
             //var uri = new Uri("https://www.inmobiliariamarbella.es/");
-            //var uri = new Uri("https://www.landvalue.es/");
+            //var uri = new Uri("https://www.inmoarregi.com/");
 
             //var website = new Website(uri);
             //var page = new Page(website, uriPage);
@@ -80,7 +81,7 @@ namespace landerist_console
             //Websites.InsertMainPages();
 
             //Scraper.ScrapeMainPage(website);
-            Scraper.ScrapeNonScrapped(false, 300000);
+            //Scraper.ScrapeNonScrapped(false, 1000);
             //Scraper.ScrapeUnknowHttpStatusCode();
             //Scraper.ScrapeUnknowIsListing(uri, true);
             //Scraper.ScrapeIsNotListing(uri);
@@ -100,6 +101,7 @@ namespace landerist_console
 
             //var tuple2 = landerist_library.Parse.Location.Goolzoom.CadastralRefToLatLng.Parse("9441515XM7094A");
             //Console.WriteLine(tuple2);
+
         }
     }
 }

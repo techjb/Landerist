@@ -247,12 +247,12 @@ namespace landerist_library.Websites
             return 0;
         }
 
-        public long CrawlDelay()
+        public int CrawlDelay()
         {
             if (RobotsTxt != null)
             {
                 Robots ??= Robots.Load(RobotsTxt);
-                return Robots.CrawlDelay(Config.USER_AGENT);
+                return (int) Robots.CrawlDelay(Config.USER_AGENT) / 1000;
             }
             return 0;
         }

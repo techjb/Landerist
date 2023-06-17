@@ -164,6 +164,10 @@ namespace landerist_library.Websites
             {
                 return false;
             }
+            if (Website.CrawlDelay() > 60 * 30)
+            {
+                return false;
+            }
             return true;
         }
 
