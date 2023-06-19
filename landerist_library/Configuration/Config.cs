@@ -63,6 +63,8 @@
 
         public static readonly int HTTPCLIENT_SECONDS_TIMEOUT = 10;
 
+        public static readonly int MAX_CRAW_DELAY_SECONDS = 60;
+
         public static readonly string GOOGLEMAPS_API = PrivateConfig.GOOGLEMAPS_API;
 
         public static readonly string GOOLZOOM_API = PrivateConfig.GOOLZOOM_API;

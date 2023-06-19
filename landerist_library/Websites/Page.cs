@@ -164,7 +164,7 @@ namespace landerist_library.Websites
             {
                 return false;
             }
-            if (Website.CrawlDelay() > 60 * 30)
+            if (Website.CrawlDelay() > Config.MAX_CRAW_DELAY_SECONDS) 
             {
                 return false;
             }

@@ -21,7 +21,7 @@ namespace landerist_library.Scrape
 
         private static BlockingCollection<Page> BlockingCollection = new();
 
-        public static void ScrapeNonScrapped(bool recursive = false, int? rows = null)
+        public static void ScrapeNonScrapped(int? rows = null, bool recursive = false)
         {
             List<Page> pages = Pages.GetNonScraped(rows);
             if (pages.Count.Equals(0))
@@ -31,7 +31,7 @@ namespace landerist_library.Scrape
             Scrape(pages);
             if (recursive)
             {
-                ScrapeNonScrapped(recursive);
+                ScrapeNonScrapped(rows, recursive);
             }
         }
 
@@ -145,6 +145,10 @@ namespace landerist_library.Scrape
                     EndThread();
                 });
         }
+        private static void StartThread()
+        {
+            Interlocked.Increment(ref ThreadCounter);
+        }
 
         private static void ProcessThread(Page page)
         {
@@ -165,12 +169,7 @@ namespace landerist_library.Scrape
                 "BlockingCollection: " + BlockingCollection.Count + " " +
                 "Listings: " + ListingsCounter + " ");
         }
-
-        private static void StartThread()
-        {
-            Interlocked.Increment(ref ThreadCounter);
-        }
-
+       
         private static void EndThread()
         {
             Interlocked.Decrement(ref ThreadCounter);

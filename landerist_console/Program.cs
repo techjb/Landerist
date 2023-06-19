@@ -81,7 +81,7 @@ namespace landerist_console
             //Websites.InsertMainPages();
 
             //Scraper.ScrapeMainPage(website);
-            //Scraper.ScrapeNonScrapped(false, 1000);
+            //Scraper.ScrapeNonScrapped(10000, false);
             //Scraper.ScrapeUnknowHttpStatusCode();
             //Scraper.ScrapeUnknowIsListing(uri, true);
             //Scraper.ScrapeIsNotListing(uri);
