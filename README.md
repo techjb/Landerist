@@ -10,6 +10,7 @@ Open project for the decentralization of real estate listings using the followin
 ## Installation
 
 Download the project and open it in Visual Studio. In the file /landerist_library/Configuration/Config.cs, set the value of the PrivateConfig variables.
+Open Database.sql file, update local paths, and run in Sql Server to initalize the Database.
 
 ## Contributing
 
