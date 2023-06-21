@@ -8,28 +8,34 @@ namespace landerist_library.Parse.Listing.MLModel
 {
     public class TrainingData
     {
+        private static readonly bool RemoveBreakLines = true;
         public static void Create()
         {
             CreateIsListing();
             CreateListings();
         }
 
-        private static void CreateIsListing()
+        public static void CreateIsListing()
         {
-            Console.WriteLine("Creating IsListing ..");
+            Console.WriteLine("Reading IsListing ..");
             DataTable dataTable = Pages.GetTrainingIsListing();
             string file = Config.MLMODEL_DIRECTORY + "IsListing.csv";
-            File.Delete(file);
-            DataTableToCsv.Convert(dataTable, file);
+            CreateFile(dataTable, file);            
         }
 
-        private static void CreateListings()
+        public static void CreateListings()
         {
-            Console.WriteLine("Creating Listings ..");
+            Console.WriteLine("Reading Listings ..");
             DataTable dataTable = ES_Listings.GetTrainingListings();
             string file = Config.MLMODEL_DIRECTORY + "Listings.csv";
+            CreateFile(dataTable, file);
+        }
+
+        private static void CreateFile(DataTable dataTable, string file)
+        {
+            Console.WriteLine("Creating " + file + " ..");
             File.Delete(file);
-            DataTableToCsv.Convert(dataTable, file);
+            DataTableToCsv.Convert(dataTable, file, RemoveBreakLines);
         }
     }
 }

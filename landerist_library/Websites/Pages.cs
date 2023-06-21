@@ -170,7 +170,7 @@ namespace landerist_library.Websites
             string query =
                 "SELECT [ResponseBodyText], [IsListing] " +
                 "FROM " + TABLE_PAGES + " " +
-                "WHERE [IsListing] IS NOT NULL";
+                "WHERE [IsListing] IS NOT NULL AND [ResponseBodyText] IS NOT NULL";
 
             return new DataBase().QueryTable(query);
         }

@@ -101,6 +101,8 @@ namespace landerist_console
             //Console.WriteLine(tuple2);
 
             //landerist_library.Parse.Listing.MLModel.TrainingData.Create();
+            //landerist_library.Parse.Listing.MLModel.TrainingData.CreateIsListing();
+            //landerist_library.Parse.Listing.MLModel.TrainingData.CreateListings();
         }
     }
 }
