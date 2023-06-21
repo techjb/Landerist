@@ -2,9 +2,9 @@
 using Newtonsoft.Json.Linq;
 using System.Reflection;
 
-namespace landerist_library.Parse.Listing
+namespace landerist_library.Parse.Listing.ChatGPT
 {
-    public class ListingResponseSchema : ListingResponse
+    public class ChatGPTResponseSchema : ChatGPTResponse
     {
         public static string GetSchema()
         {
@@ -121,7 +121,7 @@ namespace landerist_library.Parse.Listing
 
         private static string GetJsonName(string name)
         {
-            PropertyInfo propertyInfo = typeof(ListingResponse).GetProperty(name)!;
+            PropertyInfo propertyInfo = typeof(ChatGPTResponse).GetProperty(name)!;
             JsonPropertyAttribute? jsonPropertyAttribute = propertyInfo.GetCustomAttribute<JsonPropertyAttribute>();
             if (jsonPropertyAttribute != null && jsonPropertyAttribute.PropertyName != null)
             {

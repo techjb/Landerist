@@ -1,4 +1,5 @@
-﻿using landerist_library.Websites;
+﻿using landerist_library.Parse.Listing.ChatGPT;
+using landerist_library.Websites;
 using Newtonsoft.Json;
 
 namespace landerist_library.Parse.Listing
@@ -30,14 +31,14 @@ namespace landerist_library.Parse.Listing
         {
             return
                 !string.IsNullOrEmpty(Page.ResponseBodyText) &&
-                ChatGPT.IsLengthAllowed(Page.ResponseBodyText);
+                ChatGPTRequest.IsLengthAllowed(Page.ResponseBodyText);
         }
 
         private void RequestListing()
         {
             if (!string.IsNullOrEmpty(Page.ResponseBodyText))
             {
-                var result = new ChatGPT().GetResponse(Page.ResponseBodyText);
+                var result = new ChatGPTRequest().GetResponse(Page.ResponseBodyText);
                 if (!string.IsNullOrEmpty(result))
                 {
                     ParseListing(result);
@@ -49,7 +50,7 @@ namespace landerist_library.Parse.Listing
         {
             try
             {
-                ListingResponse? listingResponse = JsonConvert.DeserializeObject<ListingResponse>(json);
+                ChatGPTResponse? listingResponse = JsonConvert.DeserializeObject<ChatGPTResponse>(json);
                 if (listingResponse != null)
                 {
                     Listing = listingResponse.ToListing(Page);

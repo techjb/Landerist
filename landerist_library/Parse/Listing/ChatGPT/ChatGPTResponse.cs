@@ -2,9 +2,9 @@
 using landerist_orels.ES;
 using Newtonsoft.Json;
 
-namespace landerist_library.Parse.Listing
+namespace landerist_library.Parse.Listing.ChatGPT
 {
-    public class ListingResponse
+    public class ChatGPTResponse
     {
         [JsonProperty("fecha de publicación")]
         public string? FechaDePublicación { get; set; } = null;
@@ -23,9 +23,6 @@ namespace landerist_library.Parse.Listing
 
         [JsonProperty("descripción del anuncio")]
         public string? DescripciónDelAnuncio { get; set; } = null;
-
-        [JsonProperty("nombre de la fuente del dato")]
-        public string? NombreDeLaFuenteDelDato { get; set; } = null;
 
         [JsonProperty("referencia del anuncio")]
         public string? ReferenciaDelAnuncio { get; set; } = null;

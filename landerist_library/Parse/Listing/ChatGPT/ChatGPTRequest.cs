@@ -4,9 +4,9 @@ using OpenAI_API;
 using OpenAI_API.Chat;
 using OpenAI_API.Models;
 
-namespace landerist_library.Parse.Listing
+namespace landerist_library.Parse.Listing.ChatGPT
 {
-    public class ChatGPT
+    public class ChatGPTRequest
     {
 
         // GPT-3.5-Turbo: 4096
@@ -16,7 +16,7 @@ namespace landerist_library.Parse.Listing
 
         private readonly Conversation Conversation;
 
-        public ChatGPT()
+        public ChatGPTRequest()
         {
             OpenAIAPI openAIAPI = new(Config.OPENAI_API_KEY);
             var chatRequest = new ChatRequest()
@@ -51,7 +51,7 @@ namespace landerist_library.Parse.Listing
         {
             return
                 "Proporciona una representación JSON que siga estrictamente este esquema:\n\n" +
-                ListingResponseSchema.GetSchema() + "\n\n" +
+                ChatGPTResponseSchema.GetSchema() + "\n\n" +
                 "Escribe null en los campos que falten.";
         }
 

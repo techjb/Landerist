@@ -102,6 +102,8 @@ namespace landerist_console
             //var tuple2 = landerist_library.Parse.Location.Goolzoom.CadastralRefToLatLng.Parse("9441515XM7094A");
             //Console.WriteLine(tuple2);
 
+            landerist_library.Parse.Listing.MLModel.TrainingData.Create();
+
         }
     }
 }

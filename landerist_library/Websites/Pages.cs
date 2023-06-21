@@ -5,7 +5,7 @@ namespace landerist_library.Websites
 {
     public class Pages
     {
-        protected const string TABLE_PAGES = "[PAGES]";
+        public const string TABLE_PAGES = "[PAGES]";
 
         public Pages()
         {
