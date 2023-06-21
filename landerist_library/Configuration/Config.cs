@@ -12,7 +12,6 @@
 
         public static readonly bool INDEXER_ENABLED = false;
 
-        // Environment.UserInteractive && !Config.IsConfigurationProduction()
         public static readonly bool LOGS_ENABLED = true;
 
         public static readonly bool TIMERS_ENABLED = true;
@@ -56,6 +55,8 @@
         private static readonly string EXPORT_DIRECTORY_LOCAL = PrivateConfig.EXPORT_LOCAL_DIRECTORY;
 
         private static readonly string EXPORT_DIRECTORY_PRODUCTION = PrivateConfig.EXPORT_PRODUCTION_DIRECTORY;
+
+        public static readonly string MLMODEL_DIRECTORY = PrivateConfig.MLMODEL_DIRECTORY;
 
         public static readonly string DELIMITATIONS_DIRECTORY = PrivateConfig.DELIMITATIONS_DIRECTORY;
 

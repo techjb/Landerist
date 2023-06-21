@@ -1,7 +1,7 @@
 ﻿using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Database;
-using landerist_library.Parse.Listing;
+using landerist_library.Tools;
 using landerist_orels.ES;
 using System.Data;
 using System.Security.Cryptography;
@@ -164,7 +164,7 @@ namespace landerist_library.Websites
             {
                 return false;
             }
-            if (Website.CrawlDelay() > Config.MAX_CRAW_DELAY_SECONDS) 
+            if (Website.CrawlDelay() > Config.MAX_CRAW_DELAY_SECONDS)
             {
                 return false;
             }

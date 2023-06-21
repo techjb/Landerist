@@ -164,5 +164,15 @@ namespace landerist_library.Websites
             var page = new Page(website, uri);
             page.Insert();
         }
+
+        public static DataTable GetTrainingIsListing()
+        {
+            string query =
+                "SELECT [ResponseBodyText], [IsListing] " +
+                "FROM " + TABLE_PAGES + " " +
+                "WHERE [IsListing] IS NOT NULL";
+
+            return new DataBase().QueryTable(query);
+        }
     }
 }

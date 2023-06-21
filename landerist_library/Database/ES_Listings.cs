@@ -333,21 +333,48 @@ namespace landerist_library.Database
         {
             string query =
                 "DELETE FROM " + TABLE_ES_LISTINGS;
-            
+
             return new DataBase().Query(query);
         }
 
-        public static DataTable GetTrainingData()
+        public static DataTable GetTrainingListings()
         {
             string query =
                 "SELECT " +
-                "[operation], [propertyType], [propertySubtype], [priceAmount], [description], " +
-                "[dataSourceGuid], [contactPhone], [contactEmail], [address], " +
-                "[cadastralReference], [propertySize], [landSize], [constructionYear], [constructionStatus], " +
-                "[floors], [floor], [bedrooms], [bathrooms], [parkings], " +
-                "[terrace], [garden], [garage], [motorbikeGarage], [pool], [lift], [disabledAccess], " +
-                "[storageRoom], [furnished], [nonFurnished], [heating], [airConditioning], [petsAllowed], [securitySystems], " +
-                Pages.TABLE_PAGES + ".[ResponseBodyText] " +
+                Pages.TABLE_PAGES + ".[ResponseBodyText], " +
+                "[operation], " +
+                "[propertyType], " +
+                "[propertySubtype], " +
+                "[priceAmount], " +
+                "[description], " +
+                "[dataSourceGuid], " +
+                "[contactPhone], " +
+                "[contactEmail], " +
+                "[address], " +
+                "[cadastralReference], " +
+                "[propertySize], " +
+                "[landSize], " +
+                "[constructionYear], " +
+                "[constructionStatus], " +
+                "[floors], " +
+                "[floor], " +
+                "[bedrooms], " +
+                "[bathrooms], " +
+                "[parkings], " +
+                "[terrace], " +
+                "[garden], " +
+                "[garage], " +
+                "[motorbikeGarage], " +
+                "[pool], " +
+                "[lift], " +
+                "[disabledAccess], " +
+                "[storageRoom], " +
+                "[furnished], " +
+                "[nonFurnished], " +
+                "[heating], " +
+                "[airConditioning], " +
+                "[petsAllowed], " +
+                "[securitySystems] " +
                 "FROM " + TABLE_ES_LISTINGS + " " +
                 "INNER JOIN PAGES ON " + TABLE_ES_LISTINGS + ".[guid] = " + Pages.TABLE_PAGES + ".[UriHash] ";
 

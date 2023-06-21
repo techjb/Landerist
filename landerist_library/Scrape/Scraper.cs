@@ -169,7 +169,7 @@ namespace landerist_library.Scrape
                 "BlockingCollection: " + BlockingCollection.Count + " " +
                 "Listings: " + ListingsCounter + " ");
         }
-       
+
         private static void EndThread()
         {
             Interlocked.Decrement(ref ThreadCounter);

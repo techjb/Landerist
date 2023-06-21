@@ -252,7 +252,7 @@ namespace landerist_library.Websites
             if (RobotsTxt != null)
             {
                 Robots ??= Robots.Load(RobotsTxt);
-                return (int) Robots.CrawlDelay(Config.USER_AGENT) / 1000;
+                return (int)Robots.CrawlDelay(Config.USER_AGENT) / 1000;
             }
             return 0;
         }

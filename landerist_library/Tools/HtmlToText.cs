@@ -1,10 +1,9 @@
 ﻿using HtmlAgilityPack;
 
-namespace landerist_library.Parse.Listing
+namespace landerist_library.Tools
 {
     public class HtmlToText
     {
-
         public static string GetText(HtmlDocument htmlDocument)
         {
             try
