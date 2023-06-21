@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using System.Text.RegularExpressions;
 
 namespace landerist_library.Tools
 {
@@ -61,7 +62,8 @@ namespace landerist_library.Tools
                 }
                 cleanedLines.Add(decodedLine);
             }
-            string text = string.Join(Environment.NewLine, cleanedLines);
+            string text = string.Join(" ", cleanedLines);
+            text = Regex.Replace(text, @"\r\n?|\n", " ");
             return text;
         }
 

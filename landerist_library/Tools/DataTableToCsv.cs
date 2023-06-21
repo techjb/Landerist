@@ -8,7 +8,7 @@ namespace landerist_library.Tools
 {
     public class DataTableToCsv
     {
-        public static void Convert(DataTable dataTable, string filePath, bool removeBreaklines)
+        public static void Convert(DataTable dataTable, string filePath)
         {
             using StreamWriter writer = new(filePath);
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -26,7 +26,7 @@ namespace landerist_library.Tools
 
             using CsvWriter csvWriter = new(writer, config);
             AddHeader(dataTable, csvWriter);
-            AddRows(dataTable, csvWriter, removeBreaklines);
+            AddRows(dataTable, csvWriter);
         }
 
         private static void AddHeader(DataTable dataTable, CsvWriter csvWriter)
@@ -35,11 +35,10 @@ namespace landerist_library.Tools
             {
                 csvWriter.WriteField(column.ColumnName);
             }
-
             csvWriter.NextRecord();
         }
 
-        private static void AddRows(DataTable dataTable, CsvWriter csvWriter, bool removeBrealines)
+        private static void AddRows(DataTable dataTable, CsvWriter csvWriter)
         {
             foreach (DataRow row in dataTable.Rows)
             {
@@ -49,14 +48,7 @@ namespace landerist_library.Tools
                     if (field is DBNull)
                     {
                         field = "null";
-                    }
-                    if (removeBrealines)
-                    {
-                        if (field.GetType() == typeof(string))
-                        {
-                            field = Regex.Replace(((string)field), @"\r\n?|\n", " ");
-                        }
-                    }
+                    }                   
                     csvWriter.WriteField(field);
                 }
                 csvWriter.NextRecord();

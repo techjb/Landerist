@@ -1,6 +1,11 @@
-﻿using landerist_library.Websites;
+﻿using landerist_library.Tools;
+using landerist_library.Websites;
 using landerist_orels.ES;
 using Newtonsoft.Json;
+using OpenCvSharp;
+using OpenQA.Selenium.Internal;
+using System.Drawing;
+using System.Text.RegularExpressions;
 
 namespace landerist_library.Parse.Listing.ChatGPT
 {
@@ -177,21 +182,21 @@ namespace landerist_library.Parse.Listing.ChatGPT
                 propertyType = GetPropertyType(),
                 propertySubtype = GetPropertySubtype(),
                 price = GetPropertyPrice(),
-                description = DescripciónDelAnuncio,
+                description = GetDescription(),
                 dataSourceName = GetDataSourceName(page),
-                dataSourceGuid = ReferenciaDelAnuncio,
+                dataSourceGuid = GetDataSourceGuid(),
                 dataSourceUpdate = GetDataSourceUpdate(),
                 dataSourceUrl = GetDataSourceUrl(page),
-                contactPhone = TeléfonoDeContacto,
-                contactEmail = EmailDeContacto,
-                address = DirecciónDelInmueble,
-                cadastralReference = RererenciaCatastral,
+                contactPhone = GetPhone(),
+                contactEmail = GetEmail(),
+                address = GetAddress(),
+                cadastralReference = GetCadastralReference(),
                 propertySize = TamañoDelInmueble,
                 landSize = TamañoDeLaParcela,
                 constructionYear = GetConstrunctionYear(),
                 constructionStatus = GetConstructionStatus(),
                 floors = GetFloors(),
-                floor = PlantaDelInmueble,
+                floor = GetFloor(),
                 bedrooms = GetBedrooms(),
                 bathrooms = GetBathrooms(),
                 parkings = GetParkings(),
@@ -444,9 +449,27 @@ namespace landerist_library.Parse.Listing.ChatGPT
             return new Price(price, Currency.EUR);
         }
 
+        private string? GetDescription()
+        {
+            if (DescripciónDelAnuncio == null)
+            {
+                return null;
+            }
+            return BreakLines.ToSpace(DescripciónDelAnuncio);
+        }
+
         private static string GetDataSourceName(Page page)
         {
             return page.Website.Host;
+        }
+
+        private string? GetDataSourceGuid()
+        {
+            if (ReferenciaDelAnuncio == null)
+            {
+                return null;
+            }
+            return BreakLines.ToSpace(ReferenciaDelAnuncio);
         }
 
         private static DateTime GetDataSourceUpdate()
@@ -457,6 +480,42 @@ namespace landerist_library.Parse.Listing.ChatGPT
         private static Uri GetDataSourceUrl(Page page)
         {
             return page.Uri;
+        }
+
+        private string? GetPhone()
+        {
+            if (TeléfonoDeContacto == null)
+            {
+                return null;
+            }
+            return BreakLines.ToSpace(TeléfonoDeContacto);
+        }
+
+        private string? GetEmail()
+        {
+            if (EmailDeContacto == null)
+            {
+                return null;
+            }
+            return BreakLines.ToSpace(EmailDeContacto);
+        }
+
+        private string? GetAddress()
+        {
+            if (DirecciónDelInmueble == null)
+            {
+                return null;
+            }
+            return BreakLines.ToSpace(DirecciónDelInmueble);
+        }
+
+        private string? GetCadastralReference()
+        {
+            if (RererenciaCatastral == null)
+            {
+                return null;
+            }
+            return BreakLines.ToSpace(RererenciaCatastral);
         }
 
         private int? GetConstrunctionYear()
@@ -483,6 +542,15 @@ namespace landerist_library.Parse.Listing.ChatGPT
         private int? GetFloors()
         {
             return (int?)PlantasDelEdificio;
+        }
+
+        private string? GetFloor()
+        {
+            if (PlantaDelInmueble == null)
+            {
+                return null;
+            }
+            return BreakLines.ToSpace(PlantaDelInmueble);
         }
 
         private int? GetBedrooms()

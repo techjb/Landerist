@@ -8,7 +8,6 @@ namespace landerist_library.Parse.Listing.MLModel
 {
     public class TrainingData
     {
-        private static readonly bool RemoveBreakLines = true;
         public static void Create()
         {
             CreateIsListing();
@@ -35,7 +34,7 @@ namespace landerist_library.Parse.Listing.MLModel
         {
             Console.WriteLine("Creating " + file + " ..");
             File.Delete(file);
-            DataTableToCsv.Convert(dataTable, file, RemoveBreakLines);
+            DataTableToCsv.Convert(dataTable, file);
         }
     }
 }
