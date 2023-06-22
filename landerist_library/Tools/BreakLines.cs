@@ -8,5 +8,10 @@ namespace landerist_library.Tools
         {
             return Regex.Replace(text, @"\r\n?|\n", " ");
         }
+
+        public static string Remove(string text)
+        {
+            return Regex.Replace(text, @"\r\n?|\n", string.Empty);
+        }
     }
 }

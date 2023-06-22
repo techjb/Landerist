@@ -1,4 +1,5 @@
-﻿using landerist_library.Websites;
+﻿using landerist_library.Tools;
+using landerist_library.Websites;
 using landerist_orels.ES;
 using System.Data;
 
@@ -379,6 +380,56 @@ namespace landerist_library.Database
                 "INNER JOIN PAGES ON " + TABLE_ES_LISTINGS + ".[guid] = " + Pages.TABLE_PAGES + ".[UriHash] ";
 
             return new DataBase().QueryTable(query);
+        }
+
+        public static void UpdateCadastralReference()
+        {
+            string query =
+                "SELECT [guid], [cadastralReference] " +
+                "FROM " + TABLE_ES_LISTINGS + " " +
+                "WHERE [cadastralReference] IS NOT NULL";
+
+            DataTable table = new DataBase().QueryTable(query);
+            int total = table.Rows.Count;
+            int valids = 0;
+            int invalids = 0;
+            int errors = 0;
+            foreach (DataRow row in table.Rows)
+            {
+                string guid = (string)row["guid"];
+                string value = (string)row["cadastralReference"];
+                //value = BreakLines.ToSpace(value);
+                if(Validate.CadastralReference(value))
+                {
+                    valids++;                    
+                }
+                else
+                {
+                    invalids++;
+                    if (!Update(guid, value))
+                    {
+                        errors++;
+                    }
+                    Console.WriteLine(value);
+
+                }
+                Console.WriteLine("Total: " + total + " Valids: " + valids +
+                    " Invalids: " + invalids + " Errors: " + errors);
+            }
+        }
+
+        private static bool Update(string guid, string contactEmail)
+        {
+            string query =
+                "UPDATE " + TABLE_ES_LISTINGS + " " +
+                "SET [cadastralReference] = NULL " +
+                "WHERE [guid] = @guid";
+
+            return new DataBase().Query(query, new Dictionary<string, object?>()
+            {
+                //{ "value", value },
+                { "guid", guid },
+            });
         }
     }
 }

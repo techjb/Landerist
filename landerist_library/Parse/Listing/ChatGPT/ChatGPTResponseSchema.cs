@@ -47,7 +47,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             AddStringProperty(list, nameof(TeléfonoDeContacto));
             AddStringProperty(list, nameof(EmailDeContacto));
             AddStringProperty(list, nameof(DirecciónDelInmueble));
-            AddStringProperty(list, nameof(RererenciaCatastral));
+            AddStringProperty(list, nameof(ReferenciaCatastral));
             AddNumberProperty(list, nameof(TamañoDelInmueble));
             AddNumberProperty(list, nameof(TamañoDeLaParcela));
             AddNumberProperty(list, nameof(AñoDeConstrucción));

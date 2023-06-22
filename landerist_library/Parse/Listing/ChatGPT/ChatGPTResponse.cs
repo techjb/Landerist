@@ -42,7 +42,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
         public string? DirecciónDelInmueble { get; set; } = null;
 
         [JsonProperty("referencia catastral")]
-        public string? RererenciaCatastral { get; set; } = null;
+        public string? ReferenciaCatastral { get; set; } = null;
 
         [JsonProperty("metros cuadrados del inmueble")]
         public double? TamañoDelInmueble { get; set; } = null;
@@ -488,7 +488,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             {
                 return null;
             }
-            return BreakLines.ToSpace(TeléfonoDeContacto);
+            return BreakLines.Remove(TeléfonoDeContacto);
         }
 
         private string? GetEmail()
@@ -497,7 +497,12 @@ namespace landerist_library.Parse.Listing.ChatGPT
             {
                 return null;
             }
-            return BreakLines.ToSpace(EmailDeContacto);
+            EmailDeContacto = BreakLines.Remove(EmailDeContacto);
+            if (!Validate.Email(EmailDeContacto))
+            {
+                return null;
+            }
+            return EmailDeContacto;
         }
 
         private string? GetAddress()
@@ -511,11 +516,16 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
         private string? GetCadastralReference()
         {
-            if (RererenciaCatastral == null)
+            if (ReferenciaCatastral == null)
             {
                 return null;
             }
-            return BreakLines.ToSpace(RererenciaCatastral);
+            ReferenciaCatastral = BreakLines.Remove(ReferenciaCatastral);
+            if (!Validate.CadastralReference(ReferenciaCatastral))
+            {
+                return null;
+            }
+            return ReferenciaCatastral;
         }
 
         private int? GetConstrunctionYear()

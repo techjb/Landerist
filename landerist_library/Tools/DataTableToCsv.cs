@@ -48,7 +48,11 @@ namespace landerist_library.Tools
                     if (field is DBNull)
                     {
                         field = "null";
-                    }                   
+                    }
+                    if (field.GetType() == typeof(string))
+                    {
+                        field = BreakLines.ToSpace((string)field);
+                    }
                     csvWriter.WriteField(field);
                 }
                 csvWriter.NextRecord();

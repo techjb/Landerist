@@ -176,48 +176,5 @@ namespace landerist_library.Websites
 
             return new DataBase().QueryTable(query);
         }
-        
-        public static void CleanText()
-        {
-            string query =
-               "SELECT [UriHash], [ResponseBodyText] " +
-               "FROM " + TABLE_PAGES + " " +
-               "WHERE [IsListing] IS NOT NULL";
-
-            DataTable dataTable = new DataBase().QueryTable(query);
-            int total = dataTable.Rows.Count;
-            int sucessed = 0;
-            int errors = 0;
-            foreach(DataRow row in dataTable.Rows)
-            {
-                string uriHash = (string)row["UriHash"];
-                string responseBodyText = (string)row["ResponseBodyText"];
-                responseBodyText = BreakLines.ToSpace(responseBodyText);
-                bool sucess = CleanText(uriHash, responseBodyText);
-                if( sucess )
-                {
-                    sucessed++;
-                }
-                else
-                {
-                    errors++;
-                }
-                Console.WriteLine("Total: " + total + " Suceess: " + sucessed + " Errors: " + errors);
-            }
-        }
-
-        public static bool CleanText(string uriHash, string responseBodyText)
-        {
-            string query =
-                "UPDATE " + TABLE_PAGES + " " +
-                "SET [ResponseBodyText] = @ResponseBodyText " +
-                "WHERE [UriHash] = @UriHash";
-
-            return new DataBase().Query(query, new Dictionary<string, object?>()
-            {
-                {"UriHash", uriHash },
-                {"ResponseBodyText", responseBodyText }
-            });            
-        }
     }
 }

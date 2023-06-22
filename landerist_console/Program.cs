@@ -1,5 +1,7 @@
-﻿using landerist_library.Configuration;
+﻿using CsvHelper;
+using landerist_library.Configuration;
 using landerist_library.Websites;
+using OpenQA.Selenium.DevTools.V110.Database;
 
 namespace landerist_console
 {
@@ -105,7 +107,7 @@ namespace landerist_console
             //landerist_library.Parse.Listing.MLModel.TrainingData.CreateIsListing();
             //landerist_library.Parse.Listing.MLModel.TrainingData.CreateListings();
 
-            Pages.CleanText();
+            landerist_library.Database.ES_Listings.UpdateCadastralReference();
         }
     }
 }
