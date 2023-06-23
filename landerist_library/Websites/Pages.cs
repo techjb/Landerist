@@ -174,5 +174,14 @@ namespace landerist_library.Websites
 
             return new DataBase().QueryTable(query);
         }
+
+        public static List<string> GetIsNotListingUris()
+        {
+            string query = 
+                "SELECT [Uri] " +
+                "FROM " + TABLE_PAGES + " " +
+                "WHERE IsListing = 0";
+            return new DataBase().QueryListString(query);
+        }
     }
 }

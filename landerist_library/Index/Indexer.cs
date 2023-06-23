@@ -75,7 +75,7 @@ namespace landerist_library.Index
             {
                 return;
             }
-            if (!UriValidator.IsValid(uri))
+            if (ProhibitedUrls.IsProhibited(uri, Page.Website.LanguageCode))
             {
                 return;
             }
