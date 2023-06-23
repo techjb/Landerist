@@ -106,8 +106,6 @@ namespace landerist_console
             //landerist_library.Parse.Listing.MLModel.TrainingData.Create();
             //landerist_library.Parse.Listing.MLModel.TrainingData.CreateIsListing();
             //landerist_library.Parse.Listing.MLModel.TrainingData.CreateListings();
-
-            landerist_library.Database.ES_Listings.UpdateCadastralReference();
         }
     }
 }

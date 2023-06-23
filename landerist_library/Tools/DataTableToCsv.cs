@@ -2,7 +2,6 @@
 using CsvHelper.Configuration;
 using System.Data;
 using System.Globalization;
-using System.Text.RegularExpressions;
 
 namespace landerist_library.Tools
 {
@@ -51,7 +50,7 @@ namespace landerist_library.Tools
                     }
                     if (field.GetType() == typeof(string))
                     {
-                        field = BreakLines.ToSpace((string)field);
+                        field = Strings.BreaklinesToSpace((string)field);
                     }
                     csvWriter.WriteField(field);
                 }

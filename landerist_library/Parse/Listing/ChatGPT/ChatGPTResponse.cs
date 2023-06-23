@@ -2,10 +2,6 @@
 using landerist_library.Websites;
 using landerist_orels.ES;
 using Newtonsoft.Json;
-using OpenCvSharp;
-using OpenQA.Selenium.Internal;
-using System.Drawing;
-using System.Text.RegularExpressions;
 
 namespace landerist_library.Parse.Listing.ChatGPT
 {
@@ -451,11 +447,11 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
         private string? GetDescription()
         {
-            if (DescripciónDelAnuncio == null)
+            if (string.IsNullOrEmpty(DescripciónDelAnuncio))
             {
                 return null;
             }
-            return BreakLines.ToSpace(DescripciónDelAnuncio);
+            return Strings.BreaklinesToSpace(DescripciónDelAnuncio);
         }
 
         private static string GetDataSourceName(Page page)
@@ -465,11 +461,11 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
         private string? GetDataSourceGuid()
         {
-            if (ReferenciaDelAnuncio == null)
+            if (string.IsNullOrEmpty(ReferenciaDelAnuncio))
             {
                 return null;
             }
-            return BreakLines.ToSpace(ReferenciaDelAnuncio);
+            return Strings.BreaklinesToSpace(ReferenciaDelAnuncio);
         }
 
         private static DateTime GetDataSourceUpdate()
@@ -484,20 +480,26 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
         private string? GetPhone()
         {
-            if (TeléfonoDeContacto == null)
+            if (string.IsNullOrEmpty(TeléfonoDeContacto))
             {
                 return null;
             }
-            return BreakLines.Remove(TeléfonoDeContacto);
+            TeléfonoDeContacto = Strings.BreaklinesToSpace(TeléfonoDeContacto);
+            if (!Validate.Phone(TeléfonoDeContacto))
+            {
+                return null;
+            }
+            return TeléfonoDeContacto;
         }
 
         private string? GetEmail()
         {
-            if (EmailDeContacto == null)
+            if (string.IsNullOrEmpty(EmailDeContacto))
             {
                 return null;
             }
-            EmailDeContacto = BreakLines.Remove(EmailDeContacto);
+            EmailDeContacto = Strings.BreaklinesToSpace(EmailDeContacto);
+            EmailDeContacto = Strings.RemoveSpaces(EmailDeContacto);
             if (!Validate.Email(EmailDeContacto))
             {
                 return null;
@@ -507,20 +509,20 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
         private string? GetAddress()
         {
-            if (DirecciónDelInmueble == null)
+            if (string.IsNullOrEmpty(DirecciónDelInmueble))
             {
                 return null;
             }
-            return BreakLines.ToSpace(DirecciónDelInmueble);
+            return Strings.BreaklinesToSpace(DirecciónDelInmueble);
         }
 
         private string? GetCadastralReference()
         {
-            if (ReferenciaCatastral == null)
+            if (string.IsNullOrEmpty(ReferenciaCatastral))
             {
                 return null;
             }
-            ReferenciaCatastral = BreakLines.Remove(ReferenciaCatastral);
+            ReferenciaCatastral = Strings.BreaklinesToSpace(ReferenciaCatastral);
             if (!Validate.CadastralReference(ReferenciaCatastral))
             {
                 return null;
@@ -535,7 +537,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
         private ConstructionStatus? GetConstructionStatus()
         {
-            if (EstadoDeLaConstrucción == null)
+            if (string.IsNullOrEmpty(EstadoDeLaConstrucción))
             {
                 return null;
             }
@@ -556,11 +558,11 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
         private string? GetFloor()
         {
-            if (PlantaDelInmueble == null)
+            if (string.IsNullOrEmpty(PlantaDelInmueble))
             {
                 return null;
             }
-            return BreakLines.ToSpace(PlantaDelInmueble);
+            return Strings.BreaklinesToSpace(PlantaDelInmueble);
         }
 
         private int? GetBedrooms()

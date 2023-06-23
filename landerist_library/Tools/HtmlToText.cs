@@ -63,7 +63,7 @@ namespace landerist_library.Tools
                 cleanedLines.Add(decodedLine);
             }
             string text = string.Join(" ", cleanedLines);
-            text = Regex.Replace(text, @"\r\n?|\n", " ");
+            text = Strings.BreaklinesToSpace(text);
             return text;
         }
 
