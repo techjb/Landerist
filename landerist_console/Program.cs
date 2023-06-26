@@ -7,7 +7,6 @@ namespace landerist_console
 {
     internal class Program
     {
-
         private static DateTime DateStart;
 
         static void Main(string[] args)
@@ -107,7 +106,9 @@ namespace landerist_console
             //landerist_library.Parse.Listing.MLModel.TrainingData.CreateIsListing();
             //landerist_library.Parse.Listing.MLModel.TrainingData.CreateListings();
 
-            landerist_library.Index.ProhibitedUrls.FindNewProhibitedStartsWith();
+            //landerist_library.Index.ProhibitedUrls.FindNewProhibitedStartsWith();
+
+            landerist_library.Parse.Listing.MLModel.Tests.Run();
         }
     }
 }
