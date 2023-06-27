@@ -105,10 +105,11 @@ namespace landerist_console
             //landerist_library.Parse.Listing.MLModel.TrainingData.Create();
             //landerist_library.Parse.Listing.MLModel.TrainingData.CreateIsListing();
             //landerist_library.Parse.Listing.MLModel.TrainingData.CreateListings();
+            landerist_library.Parse.Listing.MLModel.TrainingTests.Run();
 
             //landerist_library.Index.ProhibitedUrls.FindNewProhibitedStartsWith();
 
-            landerist_library.Parse.Listing.MLModel.Tests.Run();
+
         }
     }
 }

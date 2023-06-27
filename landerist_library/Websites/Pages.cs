@@ -165,10 +165,15 @@ namespace landerist_library.Websites
             page.Insert();
         }
 
-        public static DataTable GetTrainingIsListing()
+        public static DataTable GetTrainingIsListing(int? top = null)
         {
+            string queryTop = string.Empty;
+            if (top != null)
+            {
+                queryTop = " TOP " + top;
+            }
             string query =
-                "SELECT [ResponseBodyText], [IsListing] " +
+                "SELECT " + queryTop + " [ResponseBodyText], [IsListing] " +
                 "FROM " + TABLE_PAGES + " " +
                 "WHERE [IsListing] IS NOT NULL";
 
@@ -177,7 +182,7 @@ namespace landerist_library.Websites
 
         public static List<string> GetIsNotListingUris()
         {
-            string query = 
+            string query =
                 "SELECT [Uri] " +
                 "FROM " + TABLE_PAGES + " " +
                 "WHERE IsListing = 0";
