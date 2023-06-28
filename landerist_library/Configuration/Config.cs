@@ -58,6 +58,8 @@
 
         public static readonly string MLMODEL_DIRECTORY = PrivateConfig.MLMODEL_DIRECTORY;
 
+        public static readonly string MLMODEL_TRAINING_DATA_DIRECTORY = MLMODEL_DIRECTORY + @"TrainingData\";
+
         public static readonly string DELIMITATIONS_DIRECTORY = PrivateConfig.DELIMITATIONS_DIRECTORY;
 
         public static readonly string USER_AGENT = "Mozilla/5.0 (compatible; AcmeInc/1.0)";

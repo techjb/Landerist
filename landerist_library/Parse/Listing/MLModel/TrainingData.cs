@@ -8,6 +8,22 @@ namespace landerist_library.Parse.Listing.MLModel
 {
     public class TrainingData
     {
+
+        public static void TestData()
+        {
+            DataTable dataTable = Pages.GetTrainingIsListing();
+            int charCounter = 0;
+            foreach(DataRow row in dataTable.Rows)
+            {
+                string responseBodyText = (string)row["ResponseBodyText"];
+                bool isListing = (bool)row["IsListing"];
+
+                charCounter += responseBodyText.Length + isListing.ToString().Length;
+            }
+            Console.WriteLine("Total chars: " + charCounter);
+        }
+
+
         public static void Create()
         {
             CreateIsListing();
@@ -17,16 +33,16 @@ namespace landerist_library.Parse.Listing.MLModel
         public static void CreateIsListing()
         {
             Console.WriteLine("Reading IsListing ..");
-            DataTable dataTable = Pages.GetTrainingIsListing();
-            string file = Config.MLMODEL_DIRECTORY + "IsListing.csv";
-            CreateFile(dataTable, file);            
+            DataTable dataTable = Pages.GetTrainingIsListing();           
+            string file = Config.MLMODEL_TRAINING_DATA_DIRECTORY + "IsListing.csv";
+            CreateFile(dataTable, file);
         }
 
         public static void CreateListings()
         {
             Console.WriteLine("Reading Listings ..");
             DataTable dataTable = ES_Listings.GetTrainingListings();
-            string file = Config.MLMODEL_DIRECTORY + "Listings.csv";
+            string file = Config.MLMODEL_TRAINING_DATA_DIRECTORY + "Listings.csv";
             CreateFile(dataTable, file);
         }
 
@@ -34,7 +50,7 @@ namespace landerist_library.Parse.Listing.MLModel
         {
             Console.WriteLine("Creating " + file + " ..");
             File.Delete(file);
-            DataTableToCsv.Convert(dataTable, file);
+            DataTableToCsv.Convert(dataTable, file, false);
         }
     }
 }

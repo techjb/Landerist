@@ -7,7 +7,7 @@ namespace landerist_library.Tools
 {
     public class DataTableToCsv
     {
-        public static void Convert(DataTable dataTable, string filePath)
+        public static void Convert(DataTable dataTable, string filePath, bool addHeaders)
         {
             using StreamWriter writer = new(filePath);
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -24,7 +24,10 @@ namespace landerist_library.Tools
             };
 
             using CsvWriter csvWriter = new(writer, config);
-            AddHeader(dataTable, csvWriter);
+            if (addHeaders)
+            {
+                AddHeader(dataTable, csvWriter);
+            }            
             AddRows(dataTable, csvWriter);
         }
 

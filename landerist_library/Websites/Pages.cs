@@ -173,7 +173,7 @@ namespace landerist_library.Websites
                 queryTop = " TOP " + top;
             }
             string query =
-                "SELECT " + queryTop + " [ResponseBodyText], [IsListing] " +
+                "SELECT " + queryTop + " [IsListing], [ResponseBodyText] " +
                 "FROM " + TABLE_PAGES + " " +
                 "WHERE [IsListing] IS NOT NULL";
 
