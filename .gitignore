@@ -362,3 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /landerist_library/Configuration/PrivateConfig.cs
+/landerist_library/Configuration/GoogleApplicationCredentials.json
