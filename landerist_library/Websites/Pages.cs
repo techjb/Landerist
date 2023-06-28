@@ -165,7 +165,7 @@ namespace landerist_library.Websites
             page.Insert();
         }
 
-        public static DataTable GetTrainingIsListing(int? top = null)
+        public static DataTable GetTrainingIsListingNotNull(int? top = null)
         {
             string queryTop = string.Empty;
             if (top != null)
@@ -178,6 +178,24 @@ namespace landerist_library.Websites
                 "WHERE [IsListing] IS NOT NULL";
 
             return new DataBase().QueryTable(query);
+        }
+
+        public static DataTable GetTrainingIsListing(int top, bool isListing, bool random)
+        {
+            string query =
+                "SELECT  TOP " + top + " [IsListing], [ResponseBodyText] " +
+                "FROM " + TABLE_PAGES + " " +
+                "WHERE [IsListing] = @IsListing";
+
+            if (random)
+            {
+                query += " ORDER BY NEWID()";
+            }
+
+            return new DataBase().QueryTable(query, new Dictionary<string, object?>()
+            {
+                {"IsListing", isListing }
+            });
         }
 
         public static List<string> GetIsNotListingUris()

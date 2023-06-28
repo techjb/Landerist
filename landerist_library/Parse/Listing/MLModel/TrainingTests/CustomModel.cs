@@ -3,9 +3,9 @@ using Newtonsoft.Json;
 using System.Data;
 using System.Text;
 
-namespace landerist_library.Parse.Listing.MLModel
+namespace landerist_library.Parse.Listing.MLModel.TrainingTests
 {
-    public class TrainingTests
+    public class CustomModel
     {
 
         //public static void Run()
@@ -46,7 +46,7 @@ namespace landerist_library.Parse.Listing.MLModel
         public static void Run()
         {
             Thread.Sleep(3000);
-            DataTable dataTable = Pages.GetTrainingIsListing(100);
+            DataTable dataTable = Pages.GetTrainingIsListingNotNull(100);
             int total = dataTable.Rows.Count;
             int sucess = 0;
             int noSucess = 0;

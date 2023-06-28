@@ -38,7 +38,7 @@ namespace landerist_library.Download
             {
                 DateTime dateStart = DateTime.Now;
                 HttpResponseMessage = await client.SendAsync(request);
-                Timers.Timer.DownloadPage(page.Uri.ToString(), dateStart);
+                Timers.Timer.SaveTimerDownloadPage(page.Uri.ToString(), dateStart);
                 sucess = HttpResponseMessage.IsSuccessStatusCode;
                 page.HttpStatusCode = (short)HttpResponseMessage.StatusCode;
                 page.ResponseBody = await HttpResponseMessage.Content.ReadAsStringAsync();

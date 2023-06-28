@@ -11,9 +11,9 @@ namespace landerist_library.Parse.Listing.MLModel
 
         public static void TestData()
         {
-            DataTable dataTable = Pages.GetTrainingIsListing();
+            DataTable dataTable = Pages.GetTrainingIsListingNotNull();
             int charCounter = 0;
-            foreach(DataRow row in dataTable.Rows)
+            foreach (DataRow row in dataTable.Rows)
             {
                 string responseBodyText = (string)row["ResponseBodyText"];
                 bool isListing = (bool)row["IsListing"];
@@ -30,10 +30,23 @@ namespace landerist_library.Parse.Listing.MLModel
             CreateListings();
         }
 
+        public static void CreateIsListing(int rows)
+        {
+            Console.WriteLine("Reading IsListing ..");
+            DataTable dataTableIsListing = Pages.GetTrainingIsListing(rows, true, false);
+            DataTable dataTableIsNotListing = Pages.GetTrainingIsListing(rows, false, false);
+
+            DataTable dataTableAll = dataTableIsListing.Copy();
+            dataTableAll.Merge(dataTableIsNotListing);
+
+            string file = Config.MLMODEL_TRAINING_DATA_DIRECTORY + "IsListing" + rows + ".csv";
+            CreateFile(dataTableAll, file);
+        }
+
         public static void CreateIsListing()
         {
             Console.WriteLine("Reading IsListing ..");
-            DataTable dataTable = Pages.GetTrainingIsListing();           
+            DataTable dataTable = Pages.GetTrainingIsListingNotNull();
             string file = Config.MLMODEL_TRAINING_DATA_DIRECTORY + "IsListing.csv";
             CreateFile(dataTable, file);
         }

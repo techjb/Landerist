@@ -10,7 +10,12 @@ namespace landerist_library.Timers
         public const string TimerKeyChatGPT = "chatgpt";
         public const string TimerKeyDownloadPage = "downloadpage";
 
-        private static void SaveTimer(string timerKey, string source, DateTime dateStart)
+        public static void SaveTimer(string timerKey, DateTime dateStart)
+        {
+            SaveTimer(timerKey, string.Empty, dateStart);
+        }
+
+        public static void SaveTimer(string timerKey, string source, DateTime dateStart)
         {
             if (!Config.TIMERS_ENABLED)
             {
@@ -47,12 +52,12 @@ namespace landerist_library.Timers
 
         #region Save timer
 
-        public static void ChatGPT(string source, DateTime dateStart)
+        public static void SaveTimerChatGPT(string source, DateTime dateStart)
         {
             SaveTimer(TimerKeyChatGPT, source, dateStart);
         }
 
-        public static void DownloadPage(string source, DateTime dateStart)
+        public static void SaveTimerDownloadPage(string source, DateTime dateStart)
         {
             SaveTimer(TimerKeyDownloadPage, source, dateStart);
         }
