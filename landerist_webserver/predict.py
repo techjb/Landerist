@@ -7,7 +7,7 @@ import numpy as np
 # typically __name__ when using a single module.
 app = Flask(__name__)
 
-with open('E:\Landerist\MLModel\Models\IsListing.pkl', 'rb') as f:
+with open('E:\Landerist\MLModel\Danyalktk\IsListing.pkl', 'rb') as f:
     model = pickle.load(f)
 
 # Flask route decorators map / and /hello to the hello function.

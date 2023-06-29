@@ -27,7 +27,7 @@ namespace landerist_library.Tools
             if (addHeaders)
             {
                 AddHeader(dataTable, csvWriter);
-            }            
+            }
             AddRows(dataTable, csvWriter);
         }
 

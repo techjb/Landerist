@@ -68,7 +68,9 @@
 
         public static readonly int MAX_CRAW_DELAY_SECONDS = 60;
 
-        public static readonly string GOOGLEMAPS_API = PrivateConfig.GOOGLEMAPS_API;
+        public static readonly string GOOGLEMAPS_API = PrivateConfig.GOOGLE_MAPS_API;
+
+        public static readonly string GOOGLE_NATURAL_LANGUAGE_API_KEY = PrivateConfig.GOOGLE_NATURAL_LANGUAGE_API_KEY;
 
         public static readonly string GOOLZOOM_API = PrivateConfig.GOOLZOOM_API;
 

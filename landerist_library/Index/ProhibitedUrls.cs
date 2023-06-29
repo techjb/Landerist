@@ -1,6 +1,5 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Websites;
-using System.Linq;
 
 namespace landerist_library.Index
 {
@@ -105,7 +104,7 @@ namespace landerist_library.Index
                 if (isProhibited)
                 {
                     return true;
-                }                
+                }
             }
             return false;
         }
@@ -138,9 +137,9 @@ namespace landerist_library.Index
                 {
                     continue;
                 }
-                
+
                 var directories = GetDirectories(uri);
-                foreach(var directory in directories)
+                foreach (var directory in directories)
                 {
                     if (dictionary.ContainsKey(directory))
                     {
@@ -192,7 +191,7 @@ namespace landerist_library.Index
                 {
                     dirs.Add(directory);
                 }
-                
+
             }
             return dirs;
         }

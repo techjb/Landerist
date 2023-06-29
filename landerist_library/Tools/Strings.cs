@@ -4,7 +4,7 @@ namespace landerist_library.Tools
 {
     public class Strings
     {
-        public static string BreaklinesToSpace(string text) 
+        public static string BreaklinesToSpace(string text)
         {
             return Regex.Replace(text, @"\r\n?|\n", " ");
         }
