@@ -29,6 +29,8 @@ namespace landerist_library.Websites
 
         public bool? IsListing { get; set; }
 
+        public bool? IsListingGoogleCNL { get; set; }
+
 
         public Website Website = new();
 
@@ -90,6 +92,7 @@ namespace landerist_library.Websites
             HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
             ResponseBodyText = dataRow["ResponseBodyText"] is DBNull ? null : dataRow["ResponseBodyText"].ToString();
             IsListing = dataRow["IsListing"] is DBNull ? null : (bool)dataRow["IsListing"];
+            IsListingGoogleCNL = dataRow["IsListingGoogleCNL"] is DBNull ? null : (bool)dataRow["IsListingGoogleCNL"];
         }
 
         public DataRow? GetDataRow()
@@ -147,6 +150,7 @@ namespace landerist_library.Websites
                 "[HttpStatusCode] = @HttpStatusCode, " +
                 "[ResponseBodyText] = @ResponseBodyText, " +
                 "[IsListing] = @IsListing " +
+                "[IsListingGoogleCNL] = @IsListingGoogleCNL " +
                 "WHERE [UriHash] = @UriHash";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
@@ -155,6 +159,7 @@ namespace landerist_library.Websites
                 {"HttpStatusCode", HttpStatusCode},
                 {"ResponseBodyText", ResponseBodyText},
                 {"IsListing", IsListing },
+                {"IsListingGoogleCNL", IsListingGoogleCNL },
             });
         }
 

@@ -110,11 +110,9 @@ namespace landerist_console
 
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.Danyalktk().Run();
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.AWSComprehend().Run();
-            //new landerist_library.Parse.Listing.MLModel.TrainingTests.GCNaturalLanguage().Run();
-
+            //new landerist_library.Parse.Listing.MLModel.TrainingTests.GoogleCNL().Run();
 
             //landerist_library.Index.ProhibitedUrls.FindNewProhibitedStartsWith();
-
         }
     }
 }

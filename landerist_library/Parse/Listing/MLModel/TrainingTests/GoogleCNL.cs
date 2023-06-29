@@ -6,11 +6,11 @@ using landerist_library.Configuration;
 
 namespace landerist_library.Parse.Listing.MLModel.TrainingTests
 {
-    public class GCNaturalLanguage : TrainingTests
+    public class GoogleCNL : TrainingTests
     {
         readonly LanguageServiceClient languageServiceClient;
 
-        public GCNaturalLanguage()
+        public GoogleCNL()
         {
             LanguageServiceSettings settings = new()
             {
@@ -29,6 +29,7 @@ namespace landerist_library.Parse.Listing.MLModel.TrainingTests
             StartTestsIsListing();
         }
 
+        // List of categories: https://cloud.google.com/natural-language/docs/categories?hl=es-419
         public override bool? PredictIsListing(string responseBodyText)
         {
             var document = new Document
@@ -55,7 +56,7 @@ namespace landerist_library.Parse.Listing.MLModel.TrainingTests
                 foreach (var category in response.Categories)
                 {
                     if (category.Name.Contains("/Real Estate Listings")
-                        && category.Confidence > 0.6)
+                        && category.Confidence >= 0.6)
                     {
                         return true;
                     }
