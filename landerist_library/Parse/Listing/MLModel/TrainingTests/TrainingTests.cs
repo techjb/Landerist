@@ -15,7 +15,7 @@ namespace landerist_library.Parse.Listing.MLModel.TrainingTests
 
         public void StartTestsIsListing()
         {
-            const int rows = 100;
+            const int rows = 200;
 
             DataTable dataTableIsListing = Pages.GetTrainingIsListing(rows, true, true);
             DataTable dataTableIsNotListing = Pages.GetTrainingIsListing(0, false, true);

@@ -36,7 +36,7 @@ namespace landerist_library.Parse.Listing.MLModel.TrainingTests
             {
                 Content = responseBodyText,
                 Type = Document.Types.Type.PlainText,
-                Language = "es",
+                //Language = "es",
             };
 
             ClassificationModelOptions classificationModelOptions = new()
@@ -55,12 +55,18 @@ namespace landerist_library.Parse.Listing.MLModel.TrainingTests
                 var response = languageServiceClient.ClassifyText(classifyTextRequest);
                 foreach (var category in response.Categories)
                 {
-                    if (category.Name.Contains("/Real Estate Listings")
-                        && category.Confidence >= 0.6)
+                    string name = category.Name;
+                    float confidence = category.Confidence;
+
+                    if (category.Name.Contains("/Real Estate Listings"))
                     {
-                        return true;
+                        if(category.Confidence >= 8)
+                        {
+                            return true;
+                        }                        
                     }
                 }
+                
                 return false;
             }
             catch (Exception exception)
