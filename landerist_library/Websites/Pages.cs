@@ -146,12 +146,17 @@ namespace landerist_library.Websites
                "DELETE FROM " + TABLE_PAGES + " " +
                "WHERE [Host] = @Host";
 
-            return new DataBase().Query(query, new Dictionary<string, object?> {
+            bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
                 {"Host", website.Host }
             });
+            if (sucess)
+            {
+                website.SetNumPagesToZero();
+            }
+            return sucess;
         }
 
-        public static bool Delete()
+        public static bool DeleteAll()
         {
             string query =
                "DELETE FROM " + TABLE_PAGES;

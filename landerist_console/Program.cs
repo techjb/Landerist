@@ -1,5 +1,8 @@
 ﻿using CsvHelper;
+using HtmlAgilityPack;
 using landerist_library.Configuration;
+using landerist_library.Insert;
+using landerist_library.Tools;
 using landerist_library.Websites;
 using OpenQA.Selenium.DevTools.V114.Database;
 
@@ -57,6 +60,8 @@ namespace landerist_console
             //var uri = new Uri("https://www.inmobiliariamarbella.es/");
             //var uri = new Uri("https://www.inmoarregi.com/");
 
+            //var uri = new Uri("https://residenciaestates.com/");
+
             //var website = new Website(uri);
             //var page = new Page(website, uriPage);
             //var page = new Page(uriPage);
@@ -65,7 +70,7 @@ namespace landerist_console
             //Websites.Delete(uri); return;
             //Websites.DeleteAll(); return;
 
-            //WebsitesInserter.Insert(uri);return;
+            //WebsitesInserter.DeleteAndInsert(uri);return;
             //new WebsitesInserter(false).DeleteAndInsert(uri); return;
             //new WebsitesInserter(false).InsertLinksAlternate(uri); return;
             //new CsvInserter(true).InsertBancodedatos_es(); 
@@ -113,6 +118,26 @@ namespace landerist_console
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.GoogleCNL().Run();
 
             //landerist_library.Index.ProhibitedUrls.FindNewProhibitedStartsWith();
+
+            //string html =
+            //    "<!DOCTYPE html>" +
+            //    "<html>" +
+            //    "<body>" +
+            //    "   <nav>uni naavv</nav>" +
+            //    "   <p1>primero javascript sfa</p1>" +
+            //    "   <p2> segundo" +
+            //    "       <p3>tercero <p4>cuarto </p4> quinto browser</p3>" +
+            //    "   </p2>" +
+            //    "   <p>sexto</p>" +
+            //    "</body>" +
+            //    "</html>";
+            //HtmlDocument htmlDocument = new();
+            //htmlDocument.LoadHtml(html);
+
+            //var text = HtmlToText.GetText(htmlDocument);
+            //Console.WriteLine(text);    
+
+
         }
     }
 }

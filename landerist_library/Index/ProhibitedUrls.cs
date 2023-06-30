@@ -84,10 +84,6 @@ namespace landerist_library.Index
 
         public static bool IsProhibited(Uri uri, LanguageCode languageCode)
         {
-            if (Config.TRAINING_MODE)
-            {
-                return false;
-            }
             var prohibitedStartsWith = GetProhibitedStartsWith(languageCode);
             var directories = uri.AbsolutePath.ToLower().Split('/');
             foreach (var directory in directories)

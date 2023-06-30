@@ -451,7 +451,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             {
                 return null;
             }
-            return Strings.BreaklinesToSpace(DescripciónDelAnuncio);
+            return Strings.Clean(DescripciónDelAnuncio);
         }
 
         private static string GetDataSourceName(Page page)
@@ -465,7 +465,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             {
                 return null;
             }
-            return Strings.BreaklinesToSpace(ReferenciaDelAnuncio);
+            return Strings.Clean(ReferenciaDelAnuncio);
         }
 
         private static DateTime GetDataSourceUpdate()
@@ -484,7 +484,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             {
                 return null;
             }
-            TeléfonoDeContacto = Strings.BreaklinesToSpace(TeléfonoDeContacto);
+            TeléfonoDeContacto = Strings.Clean(TeléfonoDeContacto);
             if (!Validate.Phone(TeléfonoDeContacto))
             {
                 return null;
@@ -498,7 +498,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             {
                 return null;
             }
-            EmailDeContacto = Strings.BreaklinesToSpace(EmailDeContacto);
+            EmailDeContacto = Strings.Clean(EmailDeContacto);
             EmailDeContacto = Strings.RemoveSpaces(EmailDeContacto);
             if (!Validate.Email(EmailDeContacto))
             {
@@ -513,7 +513,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             {
                 return null;
             }
-            return Strings.BreaklinesToSpace(DirecciónDelInmueble);
+            return Strings.Clean(DirecciónDelInmueble);
         }
 
         private string? GetCadastralReference()
@@ -522,7 +522,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             {
                 return null;
             }
-            ReferenciaCatastral = Strings.BreaklinesToSpace(ReferenciaCatastral);
+            ReferenciaCatastral = Strings.Clean(ReferenciaCatastral);
             if (!Validate.CadastralReference(ReferenciaCatastral))
             {
                 return null;
@@ -562,7 +562,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             {
                 return null;
             }
-            return Strings.BreaklinesToSpace(PlantaDelInmueble);
+            return Strings.Clean(PlantaDelInmueble);
         }
 
         private int? GetBedrooms()

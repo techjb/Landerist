@@ -8,9 +8,11 @@
 
         public static readonly bool TRAINING_MODE = true;
 
-        public static readonly bool SKIP_PARSE_LISTINGS = false;
+        public static readonly bool LISTINGS_PARSER_ENABLED = false;
 
-        public static readonly bool INDEXER_ENABLED = false;
+        public static readonly bool INDEXER_ENABLED = true;
+
+        public static readonly int MAX_PAGES_PER_WEBSITE = 100;
 
         public static readonly bool LOGS_ENABLED = true;
 

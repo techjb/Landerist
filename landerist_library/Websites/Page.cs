@@ -29,8 +29,6 @@ namespace landerist_library.Websites
 
         public bool? IsListing { get; set; }
 
-        public bool? IsListingGoogleCNL { get; set; }
-
 
         public Website Website = new();
 
@@ -91,8 +89,7 @@ namespace landerist_library.Websites
             Updated = dataRow["Updated"] is DBNull ? null : (DateTime)dataRow["Updated"];
             HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
             ResponseBodyText = dataRow["ResponseBodyText"] is DBNull ? null : dataRow["ResponseBodyText"].ToString();
-            IsListing = dataRow["IsListing"] is DBNull ? null : (bool)dataRow["IsListing"];
-            IsListingGoogleCNL = dataRow["IsListingGoogleCNL"] is DBNull ? null : (bool)dataRow["IsListingGoogleCNL"];
+            IsListing = dataRow["IsListing"] is DBNull ? null : (bool)dataRow["IsListing"];            
         }
 
         public DataRow? GetDataRow()
@@ -127,12 +124,17 @@ namespace landerist_library.Websites
                 "INSERT INTO " + TABLE_PAGES + " " +
                 "VALUES(@Host, @Uri, @UriHash, @Inserted, NULL, NULL, NULL, NULL)";
 
-            return new DataBase().Query(query, new Dictionary<string, object?> {
+            bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
                 {"Host", Host },
                 {"Uri", Uri.ToString() },
                 {"UriHash", UriHash },
                 {"Inserted", Inserted }
             });
+            if (sucess)
+            {
+                Website.IncreaseNumPages();
+            }
+            return sucess;
         }
 
         public bool Update()
@@ -149,8 +151,7 @@ namespace landerist_library.Websites
                 "[Updated] = @Updated, " +
                 "[HttpStatusCode] = @HttpStatusCode, " +
                 "[ResponseBodyText] = @ResponseBodyText, " +
-                "[IsListing] = @IsListing " +
-                "[IsListingGoogleCNL] = @IsListingGoogleCNL " +
+                "[IsListing] = @IsListing " +                
                 "WHERE [UriHash] = @UriHash";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
@@ -159,8 +160,23 @@ namespace landerist_library.Websites
                 {"HttpStatusCode", HttpStatusCode},
                 {"ResponseBodyText", ResponseBodyText},
                 {"IsListing", IsListing },
-                {"IsListingGoogleCNL", IsListingGoogleCNL },
             });
+        }
+
+        public bool Delete()
+        {
+            string query =
+                "DELETE FROM " + TABLE_PAGES + " " +
+                "WHERE [UriHash] = @UriHash";
+
+            bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
+                {"UriHash", UriHash }
+            });
+            if (sucess)
+            {
+                Website.DecreaseNumPages();
+            }
+            return sucess;
         }
 
         public bool CanScrape()

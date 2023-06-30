@@ -14,8 +14,7 @@ namespace landerist_library.Insert
         private static int ErrorsIpAddress = 0;
         private static int ErrorsInsert = 0;
         private static int ErrorsException = 0;
-        private static int Skipped = 0;
-        private static readonly object syncErrors = new();
+        private static int Skipped = 0;        
         private static readonly object syncHashSet = new();
 
         public WebsitesInserter(bool initInsertedUris)
@@ -97,7 +96,7 @@ namespace landerist_library.Insert
             {
                 if (!CanInsert(uri))
                 {
-                    IncreaseSkipped();
+                    Interlocked.Increment(ref Skipped);
                     return;
                 }
 
@@ -110,7 +109,7 @@ namespace landerist_library.Insert
             }
             catch (Exception exception)
             {
-                IncreaseErrorsException();
+                Interlocked.Increment(ref ErrorsException);
                 Log.WriteLogErrors(uri, exception);
             }
         }
@@ -127,7 +126,7 @@ namespace landerist_library.Insert
                 return false;
             }
 
-            if (Websites.Websites.ExistsWebsite(uri.Host))
+            if (Websites.Websites.Exists(uri.Host))
             {
                 return false;
             }
@@ -138,31 +137,31 @@ namespace landerist_library.Insert
         {
             if (!website.SetMainUriAndStatusCode())
             {
-                IncreaseErrorsMainUri();
+                Interlocked.Increment(ref ErrorsMainUri);
                 return;
             }
             if (!CanInsert(website.MainUri))
             {
-                IncreaseSkipped();
+                Interlocked.Increment(ref Skipped);
                 return;
             }
             if (!website.SetRobotsTxt())
             {
-                IncreaseErrorsRobotsTxt();
+                Interlocked.Increment(ref ErrorsRobotsTxt);
                 return;
             }
             if (!website.SetIpAddress())
             {
-                IncreaseErrorsIpAddress();
+                Interlocked.Increment(ref ErrorsIpAddress);
                 return;
             }
             if (!website.Insert())
             {
-                IncreaseErrorsInsert();
+                Interlocked.Increment(ref ErrorsInsert);
                 return;
             }
 
-            IncreaseInserted();
+            Interlocked.Increment(ref Inserted);
             lock (syncHashSet)
             {
                 InsertedUris.Add(website.MainUri);
@@ -175,65 +174,8 @@ namespace landerist_library.Insert
             }
             catch (Exception exception)
             {
-                IncreaseErrorsException();
+                Interlocked.Increment(ref ErrorsException);
                 Log.WriteLogErrors(website.Host, exception);
-            }
-        }
-
-
-        private static void IncreaseErrorsMainUri()
-        {
-            lock (syncErrors)
-            {
-                ErrorsMainUri++;
-            }
-        }
-
-        private static void IncreaseErrorsRobotsTxt()
-        {
-            lock (syncErrors)
-            {
-                ErrorsRobotsTxt++;
-            }
-        }
-
-        private static void IncreaseErrorsIpAddress()
-        {
-            lock (syncErrors)
-            {
-                ErrorsIpAddress++;
-            }
-        }
-
-        private static void IncreaseErrorsException()
-        {
-            lock (syncErrors)
-            {
-                ErrorsException++;
-            }
-        }
-
-        private static void IncreaseErrorsInsert()
-        {
-            lock (syncErrors)
-            {
-                ErrorsInsert++;
-            }
-        }
-
-        private static void IncreaseSkipped()
-        {
-            lock (syncErrors)
-            {
-                Skipped++;
-            }
-        }
-
-        private static void IncreaseInserted()
-        {
-            lock (syncErrors)
-            {
-                Inserted++;
             }
         }
     }

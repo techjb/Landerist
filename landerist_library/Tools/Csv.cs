@@ -5,9 +5,24 @@ using System.Globalization;
 
 namespace landerist_library.Tools
 {
-    public class DataTableToCsv
+    public class Csv
     {
-        public static void Convert(DataTable dataTable, string filePath, bool addHeaders)
+        public static DataTable ToDataTable(string file)
+        {
+            using var streamReader = new StreamReader(file);
+            var config = new CsvConfiguration(CultureInfo.CurrentCulture)
+            {
+                BadDataFound = null
+            };
+            using var csvReader = new CsvReader(streamReader, config);            
+            using var csvDataReader = new CsvDataReader(csvReader);
+
+            var dataTable = new DataTable();            
+            dataTable.Load(csvDataReader);
+            return dataTable;
+        }
+
+        public static void Write(DataTable dataTable, string filePath, bool addHeaders)
         {
             using StreamWriter writer = new(filePath);
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -53,7 +68,7 @@ namespace landerist_library.Tools
                     }
                     if (field.GetType() == typeof(string))
                     {
-                        field = Strings.BreaklinesToSpace((string)field);
+                        field = Strings.Clean((string)field);
                     }
                     csvWriter.WriteField(field);
                 }

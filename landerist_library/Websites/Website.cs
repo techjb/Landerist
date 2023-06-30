@@ -33,6 +33,8 @@ namespace landerist_library.Websites
 
         public short? HttpStatusCode { get; set; }
 
+        public int NumPages { get; set; } = 0;
+
 
         private Robots? Robots = null;
 
@@ -96,13 +98,15 @@ namespace landerist_library.Websites
             RobotsTxt = dataRow["RobotsTxt"] is DBNull ? null : dataRow["RobotsTxt"].ToString();
             IpAddress = dataRow["IpAddress"] is DBNull ? null : dataRow["IpAddress"].ToString();
             HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
+            NumPages = (int)dataRow["NumPages"];
         }
 
         public bool Insert()
         {
             string query =
                 "INSERT INTO " + Websites.TABLE_WEBSITES + " " +
-                "VALUES (@MainUri, @Host, @LanguageCode, @CountryCode, @RobotsTxt, @IpAddress, @HttpStatusCode)";
+                "VALUES (@MainUri, @Host, @LanguageCode, @CountryCode, @RobotsTxt, " +
+                "@IpAddress, @HttpStatusCode, @NumPages)";
 
             var parameters = GetQueryParameters();
             return new DataBase().Query(query, parameters);
@@ -117,7 +121,8 @@ namespace landerist_library.Websites
                 "[CountryCode] = @CountryCode, " +
                 "[RobotsTxt] = @RobotsTxt, " +
                 "[IpAddress] = @IpAddress, " +
-                "[HttpStatusCode] = @HttpStatusCode " +
+                "[HttpStatusCode] = @HttpStatusCode, " +
+                "[NumPages] = @NumPages " +
                 "WHERE [Host] = @Host";
 
             var parameters = GetQueryParameters();
@@ -134,6 +139,7 @@ namespace landerist_library.Websites
                 {"RobotsTxt", RobotsTxt },
                 {"IpAddress", IpAddress },
                 {"HttpStatusCode", HttpStatusCode },
+                {"NumPages", NumPages },
             };
         }
 
@@ -355,6 +361,41 @@ namespace landerist_library.Websites
         public List<Page> GetIsNotListingPages()
         {
             return Pages.GetIsNotListingPages(this);
+        }
+
+        public bool SetNumPagesToZero()
+        {
+            NumPages = 0;
+            return UpdateNumPages();
+        }
+
+        public bool IncreaseNumPages()
+        {
+            NumPages++;
+            return UpdateNumPages();
+        }
+
+        public bool DecreaseNumPages()
+        {
+            NumPages--;
+            if (NumPages < 0)
+            {
+                NumPages = 0;
+            }
+            return UpdateNumPages();
+        }
+
+        public bool UpdateNumPages()
+        {
+            string query =
+                "UPDATE " + Websites.TABLE_WEBSITES + " " +
+                "SET [NumPages] = @NumPages " +
+                "WHERE [Host] = @Host";
+
+            return new DataBase().Query(query, new Dictionary<string, object?> {
+                {"Host", Host },
+                {"NumPages", NumPages }
+            });
         }
     }
 }

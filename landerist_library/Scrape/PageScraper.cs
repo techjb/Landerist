@@ -94,16 +94,16 @@ namespace landerist_library.Scrape
                 return;
             }
             landerist_orels.ES.Listing? listing;
-            if (Config.SKIP_PARSE_LISTINGS)
-            {
-                listing = ES_Listings.GetListing(Page, false);
-                Page.IsListing = listing != null;
-            }
-            else
+            if (Config.LISTINGS_PARSER_ENABLED)
             {
                 var listingParser = new ListingParser(Page).GetListing();
                 Page.IsListing = listingParser.Item1;
                 listing = listingParser.Item2;
+            }
+            else
+            {
+                listing = ES_Listings.GetListing(Page, false);
+                Page.IsListing = listing != null;                
             }
             if (listing == null)
             {

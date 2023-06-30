@@ -12,7 +12,6 @@ namespace landerist_library.Index
 
         private static readonly string[] WebPageExtensions = { ".htm", ".html", ".xhtml", ".asp", ".aspx", ".php", ".jsp", ".cshtml", ".vbhtml", "razor" };
 
-
         public Indexer(Website website) : this(new Page(website))
         {
 
@@ -28,6 +27,10 @@ namespace landerist_library.Index
             urls = urls.Distinct().ToList();
             foreach (var url in urls)
             {
+                if (!CanInsertNewUrls())
+                {
+                    break;
+                }
                 if (url != null)
                 {
                     InsertUrl(url);
@@ -41,7 +44,6 @@ namespace landerist_library.Index
             {
                 return;
             }
-
             if (!Uri.TryCreate(Page.Uri, link, out Uri? uri))
             {
                 return;
@@ -69,8 +71,18 @@ namespace landerist_library.Index
             InsertUri(uriBuilder.Uri);
         }
 
+        private bool CanInsertNewUrls()
+        {
+            return Page.Website.NumPages < Configuration.Config.MAX_PAGES_PER_WEBSITE;
+        }
+
         protected void InsertUri(Uri uri)
         {
+            if (!CanInsertNewUrls())
+            {
+                return;
+            }
+            
             if (Inserted.Contains(uri))
             {
                 return;

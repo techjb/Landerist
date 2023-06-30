@@ -29,20 +29,47 @@ namespace landerist_library.Parse.Listing
 
         public bool RequestListingIsPermited()
         {
+            if (string.IsNullOrEmpty(Page.ResponseBodyText))
+            {
+                return false;
+            }
+            if (ResponseBodyTextIsError())
+            {
+                return false;
+            }
+            if (Configuration.Config.LISTINGS_PARSER_ENABLED && 
+                !ChatGPTRequest.IsLengthAllowed(Page.ResponseBodyText))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private bool ResponseBodyTextIsError()
+        {
+            if (Page.ResponseBodyText == null)
+            {
+                return false;
+            }
             return
-                !string.IsNullOrEmpty(Page.ResponseBodyText) &&
-                ChatGPTRequest.IsLengthAllowed(Page.ResponseBodyText);
+                Page.ResponseBodyText.StartsWith("Error", StringComparison.OrdinalIgnoreCase) ||
+                Page.ResponseBodyText.StartsWith("404", StringComparison.OrdinalIgnoreCase) ||
+                Page.ResponseBodyText.Contains("Página no encontrada", StringComparison.OrdinalIgnoreCase) ||
+                Page.ResponseBodyText.Contains("Page Not found", StringComparison.OrdinalIgnoreCase)
+                ;
         }
 
         private void RequestListing()
         {
-            if (!string.IsNullOrEmpty(Page.ResponseBodyText))
+            if (string.IsNullOrEmpty(Page.ResponseBodyText))
             {
-                var result = new ChatGPTRequest().GetResponse(Page.ResponseBodyText);
-                if (!string.IsNullOrEmpty(result))
-                {
-                    ParseListing(result);
-                }
+                return;
+            }
+
+            var result = new ChatGPTRequest().GetResponse(Page.ResponseBodyText);
+            if (!string.IsNullOrEmpty(result))
+            {
+                ParseListing(result);
             }
         }
 

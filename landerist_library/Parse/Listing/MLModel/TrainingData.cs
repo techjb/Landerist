@@ -63,7 +63,7 @@ namespace landerist_library.Parse.Listing.MLModel
         {
             Console.WriteLine("Creating " + file + " ..");
             File.Delete(file);
-            DataTableToCsv.Convert(dataTable, file, false);
+            Csv.Write(dataTable, file, false);
         }
     }
 }

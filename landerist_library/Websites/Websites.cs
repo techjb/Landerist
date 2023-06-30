@@ -95,7 +95,7 @@ namespace landerist_library.Websites
             return new Website(dataRow);
         }
 
-        public static bool ExistsWebsite(string host)
+        public static bool Exists(string host)
         {
             string query =
                 "IF EXISTS (" +
@@ -334,7 +334,7 @@ namespace landerist_library.Websites
         public static void DeleteAll()
         {
             Delete();
-            Pages.Delete();
+            Pages.DeleteAll();
             ES_Listings.Delete();
             ES_Media.Delete();
         }

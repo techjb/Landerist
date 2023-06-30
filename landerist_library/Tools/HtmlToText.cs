@@ -1,42 +1,76 @@
 ﻿using HtmlAgilityPack;
+using System.Text;
 
 namespace landerist_library.Tools
 {
     public class HtmlToText
     {
+
+        private static readonly List<string> ListTextToRemoveNode = new()
+        {
+            "cookie",  "javascript", "navegador", "browser"
+        };
+
+        private const string TagsToRemove =
+                "//script | //nav | //footer | //style | //head | " +
+                "//a | //code | //canvas | //input | //meta | //option | " +
+                "//select | //progress | //svg | //textarea | //del";
+
         public static string GetText(HtmlDocument htmlDocument)
         {
             try
             {
-                htmlDocument = RemoveNodes(htmlDocument);
-                var visibletText = GetVisibleText(htmlDocument);
-                return CleanText(visibletText);
+                RemoveNodesWithTags(htmlDocument);
+                RemoveNodesWithTexts(htmlDocument);
+                var visibleText = GetVisibleText(htmlDocument);
+                return CleanText(visibleText);
             }
             catch { }
             return string.Empty;
         }
 
 
-        private static HtmlDocument RemoveNodes(HtmlDocument htmlDocument)
+        private static void RemoveNodesWithTags(HtmlDocument htmlDocument)
         {
-            var xPath =
-                "//script | //nav | //footer | //style | //head | " +
-                "//a | //code | //canvas | //input | //meta | //option | " +
-                "//select | //progress | //svg | //textarea | //del";
+            var nodesToRemove = htmlDocument.DocumentNode.SelectNodes(TagsToRemove);
+            if (nodesToRemove != null)
+            {
+                RemoveNodes(nodesToRemove.ToList());                
+            }
+        }
 
-            var nodesToRemove = htmlDocument.DocumentNode.SelectNodes(xPath).ToList();
+        private static void RemoveNodesWithTexts(HtmlDocument htmlDocument)
+        {
+            var queryBuilder = new StringBuilder("//*[text()[");
+            foreach (var word in ListTextToRemoveNode)
+            {
+                queryBuilder.Append($"contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '{word.ToLower()}') or ");
+            }
+            queryBuilder.Length -= 4;
+            queryBuilder.Append("]]");
+
+            var nodesToRemove = htmlDocument.DocumentNode.SelectNodes(queryBuilder.ToString());
+
+            if (nodesToRemove != null)
+            {
+                RemoveNodes(nodesToRemove.ToList());
+            }            
+        }
+        
+        private static void RemoveNodes(List<HtmlNode> nodesToRemove)
+        {
             foreach (var node in nodesToRemove)
             {
                 node.Remove();
             }
-            return htmlDocument;
         }
 
         private static IEnumerable<string>? GetVisibleText(HtmlDocument htmlDocument)
         {
-            var visibleNodes = htmlDocument.DocumentNode.DescendantsAndSelf().Where(
-                   n => n.NodeType == HtmlNodeType.Text)
-                   .Where(n => !string.IsNullOrWhiteSpace(n.InnerHtml));
+            var visibleNodes = htmlDocument.DocumentNode.DescendantsAndSelf()
+                .Where(n => n.NodeType == HtmlNodeType.Text)
+                   .Where(n => !string.IsNullOrWhiteSpace(n.InnerHtml))
+                   ;
 
             return visibleNodes.Select(n => n.InnerHtml.Trim());
         }
@@ -62,7 +96,7 @@ namespace landerist_library.Tools
                 cleanedLines.Add(decodedLine);
             }
             string text = string.Join(" ", cleanedLines);
-            text = Strings.BreaklinesToSpace(text);
+            text = Strings.Clean(text);
             return text;
         }
 
