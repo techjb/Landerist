@@ -2,6 +2,7 @@
 using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Insert;
+using landerist_library.Scrape;
 using landerist_library.Tools;
 using landerist_library.Websites;
 using OpenQA.Selenium.DevTools.V114.Database;
@@ -86,7 +87,7 @@ namespace landerist_console
             //Websites.InsertMainPages();
 
             //Scraper.ScrapeMainPage(website);
-            //Scraper.ScrapeNonScrapped(10000, false);
+            Scraper.ScrapeNonScrapped(1000, false);
             //Scraper.ScrapeUnknowHttpStatusCode();
             //Scraper.ScrapeUnknowIsListing(uri, true);
             //Scraper.ScrapeIsNotListing(uri);
@@ -118,25 +119,6 @@ namespace landerist_console
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.GoogleCNL().Run();
 
             //landerist_library.Index.ProhibitedUrls.FindNewProhibitedStartsWith();
-
-            //string html =
-            //    "<!DOCTYPE html>" +
-            //    "<html>" +
-            //    "<body>" +
-            //    "   <nav>uni naavv</nav>" +
-            //    "   <p1>primero javascript sfa</p1>" +
-            //    "   <p2> segundo" +
-            //    "       <p3>tercero <p4>cuarto </p4> quinto browser</p3>" +
-            //    "   </p2>" +
-            //    "   <p>sexto</p>" +
-            //    "</body>" +
-            //    "</html>";
-            //HtmlDocument htmlDocument = new();
-            //htmlDocument.LoadHtml(html);
-
-            //var text = HtmlToText.GetText(htmlDocument);
-            //Console.WriteLine(text);    
-
 
         }
     }

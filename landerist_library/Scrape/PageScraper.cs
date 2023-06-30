@@ -94,7 +94,7 @@ namespace landerist_library.Scrape
                 return;
             }
             landerist_orels.ES.Listing? listing;
-            if (Config.LISTINGS_PARSER_ENABLED)
+            if (Config.CHATGPT_ENABLED)
             {
                 var listingParser = new ListingParser(Page).GetListing();
                 Page.IsListing = listingParser.Item1;

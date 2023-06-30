@@ -1,6 +1,5 @@
 ﻿using landerist_library.Parse.Listing.ChatGPT;
 using landerist_library.Websites;
-using Newtonsoft.Json;
 
 namespace landerist_library.Parse.Listing
 {
@@ -22,7 +21,8 @@ namespace landerist_library.Parse.Listing
             Page.SetResponseBodyText();
             if (RequestListingIsPermited())
             {
-                RequestListing();
+                //RequestListing();
+                RequestIsListing();
             }
             return Tuple.Create(IsListing, Listing);
         }
@@ -37,8 +37,10 @@ namespace landerist_library.Parse.Listing
             {
                 return false;
             }
-            if (Configuration.Config.LISTINGS_PARSER_ENABLED && 
-                !ChatGPTRequest.IsLengthAllowed(Page.ResponseBodyText))
+            if (Configuration.Config.CHATGPT_ENABLED &&
+                //!ChatGPTRequest.IsLengthAllowed(ChatGPTGetListing.SystemMessage, Page.ResponseBodyText)
+                !ChatGPTIsListing.IsTextAllowed(Page.ResponseBodyText)
+                )
             {
                 return false;
             }
@@ -61,33 +63,16 @@ namespace landerist_library.Parse.Listing
 
         private void RequestListing()
         {
-            if (string.IsNullOrEmpty(Page.ResponseBodyText))
-            {
-                return;
-            }
-
-            var result = new ChatGPTRequest().GetResponse(Page.ResponseBodyText);
-            if (!string.IsNullOrEmpty(result))
-            {
-                ParseListing(result);
-            }
+            Listing = new ChatGPTGetListing().GetListing(Page);
+            IsListing = Listing != null;
         }
 
-        private void ParseListing(string json)
+        private void RequestIsListing()
         {
-            try
+            if (!string.IsNullOrEmpty(Page.ResponseBodyText))
             {
-                ChatGPTResponse? listingResponse = JsonConvert.DeserializeObject<ChatGPTResponse>(json);
-                if (listingResponse != null)
-                {
-                    Listing = listingResponse.ToListing(Page);
-                }
+                IsListing = new ChatGPTIsListing().IsListing(Page.ResponseBodyText);
             }
-            catch //(Exception exception)
-            {
-                //Logs.Log.WriteLogErrors(Page.Uri, exception);
-            }
-            IsListing = Listing != null;
         }
     }
 }

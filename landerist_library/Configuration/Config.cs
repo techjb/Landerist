@@ -8,7 +8,7 @@
 
         public static readonly bool TRAINING_MODE = true;
 
-        public static readonly bool LISTINGS_PARSER_ENABLED = false;
+        public static readonly bool CHATGPT_ENABLED = true;
 
         public static readonly bool INDEXER_ENABLED = true;
 

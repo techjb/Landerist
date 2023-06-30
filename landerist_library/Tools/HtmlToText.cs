@@ -14,7 +14,7 @@ namespace landerist_library.Tools
         private const string TagsToRemove =
                 "//script | //nav | //footer | //style | //head | " +
                 "//a | //code | //canvas | //input | //meta | //option | " +
-                "//select | //progress | //svg | //textarea | //del";
+                "//select | //progress | //svg | //textarea | //del | //aside";
 
         public static string GetText(HtmlDocument htmlDocument)
         {
