@@ -18,6 +18,7 @@ namespace landerist_library.Parse.Listing
 
         public Tuple<bool?, landerist_orels.ES.Listing?> GetListing()
         {
+
             Page.SetResponseBodyText();
             if (RequestListingIsPermited())
             {
@@ -37,8 +38,7 @@ namespace landerist_library.Parse.Listing
             {
                 return false;
             }
-            if (Configuration.Config.CHATGPT_ENABLED &&
-                //!ChatGPTRequest.IsLengthAllowed(ChatGPTGetListing.SystemMessage, Page.ResponseBodyText)
+            if (//!ChatGPTRequest.IsLengthAllowed(ChatGPTGetListing.SystemMessage, Page.ResponseBodyText)
                 !ChatGPTIsListing.IsTextAllowed(Page.ResponseBodyText)
                 )
             {

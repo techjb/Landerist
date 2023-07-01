@@ -6,9 +6,11 @@
 
         private static readonly string VERSION_PRODUCTION = "1.00";
 
-        public static readonly bool TRAINING_MODE = true;
+        public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
-        public static readonly bool CHATGPT_ENABLED = true;
+        public static readonly bool STORE_RESPONSE_BODY_TEXT_IN_DATABASE = false;
+
+        public static readonly bool LISTING_PARSER_ENABLED = false;
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -17,6 +19,12 @@
         public static readonly bool LOGS_ENABLED = true;
 
         public static readonly bool TIMERS_ENABLED = true;
+
+        public static readonly string USER_AGENT = "Mozilla/5.0 (compatible; AcmeInc/1.0)";
+
+        public static readonly int HTTPCLIENT_SECONDS_TIMEOUT = 10;
+
+        public static readonly int MAX_CRAW_DELAY_SECONDS = 60;
 
         private static readonly string VERSION_LOCAL = new Random().Next(1000, 9999).ToString();
         public static string? VERSION { get; set; }
@@ -63,12 +71,6 @@
         public static readonly string MLMODEL_TRAINING_DATA_DIRECTORY = MLMODEL_DIRECTORY + @"TrainingData\";
 
         public static readonly string DELIMITATIONS_DIRECTORY = PrivateConfig.DELIMITATIONS_DIRECTORY;
-
-        public static readonly string USER_AGENT = "Mozilla/5.0 (compatible; AcmeInc/1.0)";
-
-        public static readonly int HTTPCLIENT_SECONDS_TIMEOUT = 10;
-
-        public static readonly int MAX_CRAW_DELAY_SECONDS = 60;
 
         public static readonly string GOOGLEMAPS_API = PrivateConfig.GOOGLE_MAPS_API;
 

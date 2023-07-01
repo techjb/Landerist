@@ -1,11 +1,15 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Websites;
+using System;
+using System.Net.Http;
+using System.Text;
 
 namespace landerist_library.Download
 {
     public class HttpClientDownloader
     {
         private HttpResponseMessage? HttpResponseMessage;
+
 
         public bool Get(Page page)
         {
@@ -42,7 +46,26 @@ namespace landerist_library.Download
                 sucess = HttpResponseMessage.IsSuccessStatusCode;
                 page.HttpStatusCode = (short)HttpResponseMessage.StatusCode;
                 page.ResponseBody = await HttpResponseMessage.Content.ReadAsStringAsync();
+
             }
+            //catch (InvalidOperationException)
+            //{
+            //    try
+            //    {
+            //        if (HttpResponseMessage != null)
+            //        {
+            //            var charset = HttpResponseMessage.Content.Headers.ContentType.CharSet;
+            //            var encoding = Encoding.GetEncoding(charset);
+            //            //using var streamReader = new StreamReader(await HttpResponseMessage.Content.ReadAsStreamAsync(), Encoding.GetEncoding("iso-8859-1"));
+            //            using var streamReader = new StreamReader(await HttpResponseMessage.Content.ReadAsStreamAsync(), encoding);
+            //            page.ResponseBody = streamReader.ReadToEnd();
+            //        }
+            //    }
+            //    catch (Exception exception)
+            //    {
+            //        Logs.Log.WriteLogErrors(page.Uri, exception);
+            //    }
+            //}
             catch (Exception exception)
             {
                 Logs.Log.WriteLogErrors(page.Uri, exception);

@@ -211,5 +211,13 @@ namespace landerist_library.Websites
                 "WHERE IsListing = 0";
             return new DataBase().QueryListString(query);
         }
+
+        public static List<string> GetAllUris()
+        {
+            string query =
+                "SELECT [Uri] " +
+                "FROM " + TABLE_PAGES;
+            return new DataBase().QueryListString(query);
+        }
     }
 }

@@ -22,20 +22,14 @@ namespace landerist_library.Tools
             return dataTable;
         }
 
-        public static void Write(DataTable dataTable, string filePath, bool addHeaders)
+        public static void Write(DataTable dataTable, string fileName, bool addHeaders)
         {
-            using StreamWriter writer = new(filePath);
+            using StreamWriter writer = new(fileName);
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 NewLine = Environment.NewLine,
                 TrimOptions = TrimOptions.Trim,
-                ShouldQuote = (field) => true,
-                //ShouldQuote = (field) => field.Field != null,                
-                //ShouldQuote = (field) =>
-                //{
-                //    Console.WriteLine(field.Field);
-                //    return field.Field != null;
-                //}
+                ShouldQuote = (field) => true,              
             };
 
             using CsvWriter csvWriter = new(writer, config);
@@ -44,6 +38,24 @@ namespace landerist_library.Tools
                 AddHeader(dataTable, csvWriter);
             }
             AddRows(dataTable, csvWriter);
+        }
+
+        public static void Write(HashSet<string> data, string filename)
+        {
+            try
+            {
+                using var writer = new StreamWriter(filename);
+                using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+                foreach (var item in data)
+                {
+                    csv.WriteField(item);
+                    csv.NextRecord();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error writting the file: " + ex.Message);
+            }
         }
 
         private static void AddHeader(DataTable dataTable, CsvWriter csvWriter)

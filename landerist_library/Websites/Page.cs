@@ -139,7 +139,7 @@ namespace landerist_library.Websites
 
         public bool Update()
         {
-            if (!Config.TRAINING_MODE)
+            if (!Config.STORE_RESPONSE_BODY_TEXT_IN_DATABASE)
             {
                 ResponseBodyText = null;
             }

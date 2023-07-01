@@ -94,7 +94,7 @@ namespace landerist_library.Scrape
                 return;
             }
             landerist_orels.ES.Listing? listing;
-            if (Config.CHATGPT_ENABLED)
+            if (Config.LISTING_PARSER_ENABLED)
             {
                 var listingParser = new ListingParser(Page).GetListing();
                 Page.IsListing = listingParser.Item1;
@@ -110,16 +110,16 @@ namespace landerist_library.Scrape
                 return;
             }
 
-            if (Config.TRAINING_MODE)
-            {
-                ES_Listings.Insert(listing);
-            }
-            else
+            if (Config.SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING)
             {
                 new LatLngParser(Page, listing).SetLatLng();
                 new LauIdParser(Page, listing).SetLauId();
                 new MediaParser(Page).AddMedia(listing);
                 ES_Listings.InsertUpdate(listing);
+            }
+            else
+            {
+                ES_Listings.Insert(listing);
             }
         }
 
