@@ -18,12 +18,10 @@ namespace landerist_library.Parse.Listing
 
         public Tuple<bool?, landerist_orels.ES.Listing?> GetListing()
         {
-
-            Page.SetResponseBodyText();
             if (RequestListingIsPermited())
             {
-                //RequestListing();
-                RequestIsListing();
+                RequestListing();
+                //RequestIsListing();
             }
             return Tuple.Create(IsListing, Listing);
         }

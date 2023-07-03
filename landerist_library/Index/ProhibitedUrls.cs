@@ -78,6 +78,9 @@ namespace landerist_library.Index
             "certificado",
             "colegio",
             "avislegal",
+            "textolegal",
+            "sobrenosotros",
+            "wplogin"
 
         };
 

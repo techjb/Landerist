@@ -11,7 +11,7 @@ namespace landerist_library.Parse.Listing.MLModel
 
         public static void TestData()
         {
-            DataTable dataTable = Pages.GetTrainingIsListingNotNull();
+            DataTable dataTable = Pages.GetIsListingResponseBodyText();
             int charCounter = 0;
             foreach (DataRow row in dataTable.Rows)
             {
@@ -33,8 +33,8 @@ namespace landerist_library.Parse.Listing.MLModel
         public static void CreateIsListing(int rows)
         {
             Console.WriteLine("Reading IsListing ..");
-            DataTable dataTableIsListing = Pages.GetTrainingIsListing(rows, true, false);
-            DataTable dataTableIsNotListing = Pages.GetTrainingIsListing(rows, false, false);
+            DataTable dataTableIsListing = Pages.GetIsListingResponseBodyText(rows, true, false);
+            DataTable dataTableIsNotListing = Pages.GetIsListingResponseBodyText(rows, false, false);
 
             DataTable dataTableAll = dataTableIsListing.Copy();
             dataTableAll.Merge(dataTableIsNotListing);
@@ -46,7 +46,7 @@ namespace landerist_library.Parse.Listing.MLModel
         public static void CreateIsListing()
         {
             Console.WriteLine("Reading IsListing ..");
-            DataTable dataTable = Pages.GetTrainingIsListingNotNull();
+            DataTable dataTable = Pages.GetIsListingResponseBodyText();
             string file = Config.MLMODEL_TRAINING_DATA_DIRECTORY + "IsListing.csv";
             CreateFile(dataTable, file);
         }
@@ -56,6 +56,14 @@ namespace landerist_library.Parse.Listing.MLModel
             Console.WriteLine("Reading Listings ..");
             DataTable dataTable = ES_Listings.GetTrainingListings();
             string file = Config.MLMODEL_TRAINING_DATA_DIRECTORY + "Listings.csv";
+            CreateFile(dataTable, file);
+        }
+
+        public static void CreateUriResponseBodyText()
+        {
+            Console.WriteLine("Reading IsListing ..");
+            DataTable dataTable = Pages.GetUriResponseBodyText();
+            string file = Config.MLMODEL_TRAINING_DATA_DIRECTORY + "UriResponseBodyText.csv";
             CreateFile(dataTable, file);
         }
 

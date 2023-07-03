@@ -44,7 +44,7 @@ namespace landerist_console
 
         private static void Run()
         {
-            //var uriPage = new Uri("https://www.goolzoom.com/es/valores/");
+            var uriPage = new Uri("http://jaycasa.com/ad/101408546");
 
             //SeleniumDownloader.GetChrome(uriPage);
             //PuppeteerDownloader.Get(uriPage);
@@ -61,7 +61,6 @@ namespace landerist_console
             //var uri = new Uri("http://casavida.es/");
             //var uri = new Uri("https://www.inmobiliariamarbella.es/");
             //var uri = new Uri("https://www.inmoarregi.com/");
-
             //var uri = new Uri("https://www.fincasvistamar.com/");
 
             //var website = new Website(uri);
@@ -76,7 +75,7 @@ namespace landerist_console
             //new WebsitesInserter(false).DeleteAndInsert(uri); return;
             //new WebsitesInserter(false).InsertLinksAlternate(uri); return;
             //new CsvInserter(true).InsertBancodedatos_es(); 
-            //new CsvInserter(true).InsertBasededatosempresas_net();
+            //new CsvInserter(true).InsertBasededatosempresas_net(); // 4985 urls
 
             //Websites.SetHttpStatusCodesToNull();
             //Websites.InsertUpdateUrisFromNotOk();
@@ -89,14 +88,13 @@ namespace landerist_console
 
             //Scraper.ScrapeMainPage(website);
 
-            //Scraper.ScrapeNonScrapped(100000, false);
+            //Scraper.ScrapeNonScrapped(200, false);
 
             //Scraper.ScrapeUnknowHttpStatusCode();
             //Scraper.ScrapeUnknowIsListing(uri, true);
             //Scraper.ScrapeIsNotListing(uri);
             //Scraper.Scrape(website);
-            //Scraper.Scrape(uriPage);
-            //Scraper.GetChrome(page);
+            Scraper.Scrape(uriPage);
             //Scraper.ScrapeAllPages();
 
             //Csv.Export(true);
@@ -111,19 +109,22 @@ namespace landerist_console
             //var tuple2 = landerist_library.Parse.Location.Goolzoom.CadastralRefToLatLng.Parse("9441515XM7094A");
             //Console.WriteLine(tuple2);
 
+            //landerist_library.Index.ProhibitedUrls.FindNewProhibitedStartsWith();
+
             //landerist_library.Parse.Listing.MLModel.TrainingData.TestData();
-            //landerist_library.Parse.Listing.MLModel.TrainingData.Create();
             //landerist_library.Parse.Listing.MLModel.TrainingData.CreateIsListing();
             //landerist_library.Parse.Listing.MLModel.TrainingData.CreateListings();
             //landerist_library.Parse.Listing.MLModel.TrainingData.CreateIsListing(1000);
+            //landerist_library.Parse.Listing.MLModel.TrainingData.CreateUriResponseBodyText();
+            //landerist_library.Parse.Listing.MLModel.IsListingUrl.IsListingUrl.CreateCsv();
 
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.Danyalktk().Run();
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.AWSComprehend().Run();
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.GoogleCNL().Run();
 
-            //landerist_library.Index.ProhibitedUrls.FindNewProhibitedStartsWith();
 
-            //landerist_library.Parse.Listing.MLModel.IsListingUrl.IsListingUrl.CreateCsv();
+
+
 
         }
     }

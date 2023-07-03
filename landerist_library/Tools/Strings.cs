@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using Grpc.Net.Client.Balancer;
+using System.Text.RegularExpressions;
 
 namespace landerist_library.Tools
 {
@@ -7,17 +8,16 @@ namespace landerist_library.Tools
         public static string Clean(string text)
         {
             text = BreaklinesToSpace(text);
-            return TabsToSpaces(text);
+            text = TabsToSpaces(text);
+            text = RemoveMultipleDots(text);
+            text = RemoveMultipleComas(text);
+            text = RemoveMultipleSpaces(text);
+            return text;
         }
 
         private static string BreaklinesToSpace(string text)
         {
             return Regex.Replace(text, @"\r\n?|\n", " ");
-        }
-
-        public static string RemoveBreaklines(string text)
-        {
-            return Regex.Replace(text, @"\r\n?|\n", string.Empty);
         }
 
         public static string RemoveSpaces(string text)
@@ -30,6 +30,21 @@ namespace landerist_library.Tools
             text = text.Replace("\t", " ");
             const string reduceMultiSpace = @"[ ]{2,}";
             return Regex.Replace(text, reduceMultiSpace, " ");
+        }
+
+        public static string RemoveMultipleDots(string text)
+        {
+            return Regex.Replace(text, @"(\s*\.)+", ".");
+        }
+
+        public static string RemoveMultipleComas(string text)
+        {
+            return Regex.Replace(text, @"(\s*,)+", ",");
+        }
+
+        public static string RemoveMultipleSpaces(string text)
+        {
+            return Regex.Replace(text, @"\s+", " ");
         }
     }
 }

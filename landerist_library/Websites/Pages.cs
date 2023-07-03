@@ -170,7 +170,7 @@ namespace landerist_library.Websites
             page.Insert();
         }
 
-        public static DataTable GetTrainingIsListingNotNull(int? top = null)
+        public static DataTable GetIsListingResponseBodyText(int? top = null)
         {
             string queryTop = string.Empty;
             if (top != null)
@@ -185,7 +185,22 @@ namespace landerist_library.Websites
             return new DataBase().QueryTable(query);
         }
 
-        public static DataTable GetTrainingIsListing(int top, bool isListing, bool random)
+        public static DataTable GetUriResponseBodyText(int? top = null)
+        {
+            string queryTop = string.Empty;
+            if (top != null)
+            {
+                queryTop = " TOP " + top;
+            }
+            string query =
+                "SELECT " + queryTop + " [Uri], [ResponseBodyText] " +
+                "FROM " + TABLE_PAGES + " " +
+                "WHERE [ResponseBodyText] IS NOT NULL";
+
+            return new DataBase().QueryTable(query);
+        }
+
+        public static DataTable GetIsListingResponseBodyText(int top, bool isListing, bool random)
         {
             string query =
                 "SELECT  TOP " + top + " [IsListing], [ResponseBodyText] " +

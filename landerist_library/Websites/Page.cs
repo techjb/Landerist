@@ -273,7 +273,6 @@ namespace landerist_library.Websites
                                 return true;
                             }
                         }
-
                     }
                 }
             }

@@ -93,7 +93,10 @@ namespace landerist_library.Scrape
             {
                 return;
             }
-            landerist_orels.ES.Listing? listing;
+
+            Page.SetResponseBodyText();
+
+            landerist_orels.ES.Listing? listing;            
             if (Config.LISTING_PARSER_ENABLED)
             {
                 var listingParser = new ListingParser(Page).GetListing();

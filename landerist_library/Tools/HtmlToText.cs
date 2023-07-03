@@ -6,62 +6,91 @@ namespace landerist_library.Tools
     public class HtmlToText
     {
 
-        private static readonly List<string> ListTextToRemoveNode = new()
+        private static readonly List<string> ListTextToRemoveNodeContains = new()
         {
-            "cookie",  "javascript", "navegador", "browser"
+            "cookie",  
+            "javascript", 
+            "navegador", 
+            "browser", 
+            "privacidad",
+            "redes sociales",
+            "formulario",
+            "contacta",
+            "contáctanos",
+            "política",
+            "rectificación",
+            "chrome",
+            "firefox",
+            "safari",
+            "explorer",           
+            "robot",
+            "error"
         };
 
+        private static readonly List<string> ListTextToRemoveNodeEquals = new()
+        {
+            "aceptar",
+            "enviar",
+            "contactar"
+        };
+
+
+        private static readonly string selectContainsText = InitSelectContainsText();
+
+        private static readonly string selectEqualsText = InitSelectEqualsText();
+
+
         private const string TagsToRemove =
-                "//script | //nav | //footer | //style | //head | " +
-                "//a | //code | //canvas | //input | //meta | //option | " +
-                "//select | //progress | //svg | //textarea | //del | //aside";
+            "//script | //nav | //footer | //style | //head | " +
+            "//a | //code | //canvas | //input | //meta | //option | " +
+            "//select | //progress | //svg | //textarea | //del | //aside " +
+            "//button | // form" /*//form//form "*/; 
 
-        public static string GetText(HtmlDocument htmlDocument)
-        {
-            try
-            {
-                RemoveNodesWithTags(htmlDocument);
-                RemoveNodesWithTexts(htmlDocument);
-                var visibleText = GetVisibleText(htmlDocument);
-                return CleanText(visibleText);
-            }
-            catch { }
-            return string.Empty;
-        }
+        
 
-
-        private static void RemoveNodesWithTags(HtmlDocument htmlDocument)
-        {
-            var nodesToRemove = htmlDocument.DocumentNode.SelectNodes(TagsToRemove);
-            if (nodesToRemove != null)
-            {
-                RemoveNodes(nodesToRemove.ToList());                
-            }
-        }
-
-        private static void RemoveNodesWithTexts(HtmlDocument htmlDocument)
+        private static string InitSelectContainsText()
         {
             var queryBuilder = new StringBuilder("//*[text()[");
-            foreach (var word in ListTextToRemoveNode)
+            foreach (var word in ListTextToRemoveNodeContains)
             {
                 queryBuilder.Append($"contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '{word.ToLower()}') or ");
             }
             queryBuilder.Length -= 4;
             queryBuilder.Append("]]");
 
-            var nodesToRemove = htmlDocument.DocumentNode.SelectNodes(queryBuilder.ToString());
-
-            if (nodesToRemove != null)
-            {
-                RemoveNodes(nodesToRemove.ToList());
-            }            
+            return queryBuilder.ToString();
         }
-        
-        private static void RemoveNodes(List<HtmlNode> nodesToRemove)
+
+        private static string InitSelectEqualsText()
         {
-            foreach (var node in nodesToRemove)
+            return "//*[" + string.Join(" or ", ListTextToRemoveNodeEquals.Select(t => $"translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='{t.Trim()}'")) + "]";
+        }
+
+        public static string GetText(HtmlDocument htmlDocument)
+        {
+            string text = string.Empty;
+            try
             {
-                node.Remove();
+                RemoveNodes(htmlDocument, TagsToRemove);
+                RemoveNodes(htmlDocument, selectContainsText);
+                RemoveNodes(htmlDocument, selectEqualsText);
+                var visibleText = GetVisibleText(htmlDocument);
+                text = CleanText(visibleText);
+            }
+            catch { }
+            return text;
+        }
+
+        private static void RemoveNodes(HtmlDocument htmlDocument, string select)
+        {
+            var htmlNodeCollection = htmlDocument.DocumentNode.SelectNodes(select);
+            if (htmlNodeCollection != null)
+            {
+                List<HtmlNode> nodesToRemove = htmlNodeCollection.ToList();
+                foreach (var node in nodesToRemove)
+                {
+                    node.Remove();
+                }
             }
         }
 

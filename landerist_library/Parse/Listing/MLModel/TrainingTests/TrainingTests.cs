@@ -17,8 +17,8 @@ namespace landerist_library.Parse.Listing.MLModel.TrainingTests
         {
             const int rows = 200;
 
-            DataTable dataTableIsListing = Pages.GetTrainingIsListing(rows, true, true);
-            DataTable dataTableIsNotListing = Pages.GetTrainingIsListing(0, false, true);
+            DataTable dataTableIsListing = Pages.GetIsListingResponseBodyText(rows, true, true);
+            DataTable dataTableIsNotListing = Pages.GetIsListingResponseBodyText(0, false, true);
 
             DataTable dataTableAll = dataTableIsListing.Copy();
             dataTableAll.Merge(dataTableIsNotListing);

@@ -10,11 +10,11 @@ namespace landerist_library.Tools
         public static DataTable ToDataTable(string file)
         {
             using var streamReader = new StreamReader(file);
-            var config = new CsvConfiguration(CultureInfo.CurrentCulture)
+            var csvConfiguration = new CsvConfiguration(CultureInfo.CurrentCulture)
             {
                 BadDataFound = null
             };
-            using var csvReader = new CsvReader(streamReader, config);            
+            using var csvReader = new CsvReader(streamReader, csvConfiguration);            
             using var csvDataReader = new CsvDataReader(csvReader);
 
             var dataTable = new DataTable();            
@@ -24,15 +24,15 @@ namespace landerist_library.Tools
 
         public static void Write(DataTable dataTable, string fileName, bool addHeaders)
         {
-            using StreamWriter writer = new(fileName);
-            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            using StreamWriter streamWriter = new(fileName);
+            var csvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 NewLine = Environment.NewLine,
                 TrimOptions = TrimOptions.Trim,
                 ShouldQuote = (field) => true,              
             };
 
-            using CsvWriter csvWriter = new(writer, config);
+            using CsvWriter csvWriter = new(streamWriter, csvConfiguration);
             if (addHeaders)
             {
                 AddHeader(dataTable, csvWriter);
@@ -44,12 +44,12 @@ namespace landerist_library.Tools
         {
             try
             {
-                using var writer = new StreamWriter(filename);
-                using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+                using var streamWriter = new StreamWriter(filename);
+                using var csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture);
                 foreach (var item in data)
                 {
-                    csv.WriteField(item);
-                    csv.NextRecord();
+                    csvWriter.WriteField(item);
+                    csvWriter.NextRecord();
                 }
             }
             catch (Exception ex)
