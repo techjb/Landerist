@@ -21,32 +21,63 @@ namespace landerist_library.Tools
             "rectificación",
             "chrome",
             "firefox",
-            "safari",
+            "safari",            
             "explorer",           
             "robot",
-            "error"
+            "error",
+            "analytics",
+            "ajustes",
+            "activar",
+            "imprimir",            
+            "recomendar",
+            "similares",
+            "enviado",
+            "hipoteca",
+            "buscador",
+            "aviso legal",
+            "avisos legales",
+            "sesión"
         };
 
         private static readonly List<string> ListTextToRemoveNodeEquals = new()
         {
             "aceptar",
             "enviar",
-            "contactar"
+            "contactar",
+            "contáctanos",            
         };
-
+       
+        private static readonly List<string> TagsToRemove = new()
+        {
+            "//script",
+            "//nav",
+            "//footer",
+            "//style",
+            "//head",
+            "//a",
+            "//code",
+            "//canvas",
+            "//meta",
+            "//option",
+            "//select",
+            "//progress",
+            "//svg",
+            "//textarea",
+            "//del",
+            "//aside",
+            "//button",
+            "//form[not(.//input[@id='__VIEWSTATE' or @id='__VIEWSTATEGENERATOR' or @id='__EVENTVALIDATION'])]",
+            "//input",
+            "//*[contains(@style, 'text-decoration: line-through')]",
+            "//*[contains(@style, 'text-decoration:line-through')]"
+        };
 
         private static readonly string selectContainsText = InitSelectContainsText();
 
         private static readonly string selectEqualsText = InitSelectEqualsText();
 
+        private static readonly string selectTagsToRemove = InitSelectTagsToRemove();
 
-        private const string TagsToRemove =
-            "//script | //nav | //footer | //style | //head | " +
-            "//a | //code | //canvas | //input | //meta | //option | " +
-            "//select | //progress | //svg | //textarea | //del | //aside " +
-            "//button | // form" /*//form//form "*/; 
-
-        
 
         private static string InitSelectContainsText()
         {
@@ -66,12 +97,18 @@ namespace landerist_library.Tools
             return "//*[" + string.Join(" or ", ListTextToRemoveNodeEquals.Select(t => $"translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='{t.Trim()}'")) + "]";
         }
 
+        private static string InitSelectTagsToRemove()
+        {
+            return string.Join(" | ", TagsToRemove.ToList());
+        }
+
         public static string GetText(HtmlDocument htmlDocument)
         {
             string text = string.Empty;
             try
             {
-                RemoveNodes(htmlDocument, TagsToRemove);
+
+                RemoveNodes(htmlDocument, selectTagsToRemove);                
                 RemoveNodes(htmlDocument, selectContainsText);
                 RemoveNodes(htmlDocument, selectEqualsText);
                 var visibleText = GetVisibleText(htmlDocument);

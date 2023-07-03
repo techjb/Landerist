@@ -44,7 +44,7 @@ namespace landerist_console
 
         private static void Run()
         {
-            var uriPage = new Uri("http://jaycasa.com/ad/101408546");
+            var uriPage = new Uri("http://www.finquessaconca.com/es/ficha/392/");
 
             //SeleniumDownloader.GetChrome(uriPage);
             //PuppeteerDownloader.Get(uriPage);

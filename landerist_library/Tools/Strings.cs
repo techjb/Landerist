@@ -1,5 +1,4 @@
-﻿using Grpc.Net.Client.Balancer;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace landerist_library.Tools
 {
@@ -7,6 +6,7 @@ namespace landerist_library.Tools
     {
         public static string Clean(string text)
         {
+            text = SymbolsToSpaces(text);
             text = BreaklinesToSpace(text);
             text = TabsToSpaces(text);
             text = RemoveMultipleDots(text);
@@ -45,6 +45,16 @@ namespace landerist_library.Tools
         public static string RemoveMultipleSpaces(string text)
         {
             return Regex.Replace(text, @"\s+", " ");
+        }
+
+        public static string SymbolsToSpaces(string text)
+        {
+            return text
+                .Replace("*", " ")
+                .Replace("…", " ")
+                .Replace("©", " ")                
+
+                ;
         }
     }
 }
