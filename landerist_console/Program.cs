@@ -44,7 +44,7 @@ namespace landerist_console
 
         private static void Run()
         {
-            var uriPage = new Uri("http://www.finquessaconca.com/es/ficha/392/");
+            var uriPage = new Uri("http://www.urdulizen.com/propiedad/barrika-chalet-individual/");
 
             //SeleniumDownloader.GetChrome(uriPage);
             //PuppeteerDownloader.Get(uriPage);

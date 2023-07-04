@@ -52,7 +52,7 @@ namespace landerist_library.Tools
             return text
                 .Replace("*", " ")
                 .Replace("…", " ")
-                .Replace("©", " ")                
+                .Replace("©", " ")
 
                 ;
         }

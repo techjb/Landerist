@@ -14,29 +14,36 @@ namespace landerist_library.Tools
             "browser", 
             "privacidad",
             "redes sociales",
-            "formulario",
-            "contacta",
-            "contáctanos",
+            "formulario",           
             "política",
             "rectificación",
             "chrome",
             "firefox",
             "safari",            
             "explorer",           
-            "robot",
-            "error",
+            " robot",
+            " error",
             "analytics",
-            "ajustes",
-            "activar",
-            "imprimir",            
+            " ajustes",
+            " activar",
+            " imprimir",            
             "recomendar",
-            "similares",
-            "enviado",
+            " similares",
+            " enviado",
             "hipoteca",
             "buscador",
             "aviso legal",
             "avisos legales",
-            "sesión"
+            "sesión",
+            " spam",
+            //"escríbenos",
+            //"contacta",
+            //"contáctanos",
+        };
+
+        private static readonly List<string> ListIdToRemoveNodeContains = new()
+        {
+            "similar",            
         };
 
         private static readonly List<string> ListTextToRemoveNodeEquals = new()
@@ -45,6 +52,10 @@ namespace landerist_library.Tools
             "enviar",
             "contactar",
             "contáctanos",            
+            "compartir",
+            "compartir esto",
+            "deja tu respuesta",
+            "contactar",                        
         };
        
         private static readonly List<string> TagsToRemove = new()
@@ -74,6 +85,8 @@ namespace landerist_library.Tools
 
         private static readonly string selectContainsText = InitSelectContainsText();
 
+        private static readonly string selectContainsId = InitSelectContainsId();
+
         private static readonly string selectEqualsText = InitSelectEqualsText();
 
         private static readonly string selectTagsToRemove = InitSelectTagsToRemove();
@@ -92,6 +105,12 @@ namespace landerist_library.Tools
             return queryBuilder.ToString();
         }
 
+        private static string InitSelectContainsId()
+        {
+            return "//*[" + string.Join(" or ", ListIdToRemoveNodeContains.Select(id => $"contains(translate(@id, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '{id.ToLower()}')")) + "]";
+
+        }
+
         private static string InitSelectEqualsText()
         {
             return "//*[" + string.Join(" or ", ListTextToRemoveNodeEquals.Select(t => $"translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='{t.Trim()}'")) + "]";
@@ -108,8 +127,9 @@ namespace landerist_library.Tools
             try
             {
 
-                RemoveNodes(htmlDocument, selectTagsToRemove);                
+                RemoveNodes(htmlDocument, selectTagsToRemove);
                 RemoveNodes(htmlDocument, selectContainsText);
+                RemoveNodes(htmlDocument, selectContainsId);
                 RemoveNodes(htmlDocument, selectEqualsText);
                 var visibleText = GetVisibleText(htmlDocument);
                 text = CleanText(visibleText);
