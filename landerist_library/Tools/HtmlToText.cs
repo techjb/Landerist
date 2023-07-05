@@ -1,63 +1,66 @@
 ﻿using HtmlAgilityPack;
+using RTools_NTS.Util;
 using System.Text;
+using static Google.Cloud.Language.V1.PartOfSpeech.Types;
 
 namespace landerist_library.Tools
 {
     public class HtmlToText
     {
 
-        private static readonly List<string> ListTextToRemoveNodeContains = new()
+        private static readonly List<string> TextContains = new()
         {
-            "cookie",  
-            "javascript", 
-            "navegador", 
-            "browser", 
-            "privacidad",
-            "redes sociales",
-            "formulario",           
-            "política",
-            "rectificación",
-            "chrome",
-            "firefox",
-            "safari",            
-            "explorer",           
+            " cookie",
+            " javascript",
+            " navegador",
+            " browser",
+            " política de privacidad",
+            " redes sociales",
+            " formulario",
+            " política",
+            " rectificación",
+            " chrome",
+            " firefox",
+            " safari",
+            " explorer",
             " robot",
             " error",
-            "analytics",
+            " analytics",
             " ajustes",
             " activar",
-            " imprimir",            
-            "recomendar",
+            " imprimir",
+            " recomendar",
             " similares",
             " enviado",
-            "hipoteca",
-            "buscador",
+            " hipoteca",
+            " buscador",
             "aviso legal",
             "avisos legales",
-            "sesión",
+            " sesión",
             " spam",
             //"escríbenos",
             //"contacta",
             //"contáctanos",
         };
 
-        private static readonly List<string> ListIdToRemoveNodeContains = new()
+        private static readonly List<string> ClassAndIdContains = new()
         {
-            "similar",            
+            "similar",
+            "result"
         };
 
-        private static readonly List<string> ListTextToRemoveNodeEquals = new()
+        private static readonly List<string> TextEquals = new()
         {
             "aceptar",
             "enviar",
             "contactar",
-            "contáctanos",            
+            "contáctanos",
             "compartir",
             "compartir esto",
             "deja tu respuesta",
-            "contactar",                        
+            "contactar",
         };
-       
+
         private static readonly List<string> TagsToRemove = new()
         {
             "//script",
@@ -83,40 +86,44 @@ namespace landerist_library.Tools
             "//*[contains(@style, 'text-decoration:line-through')]"
         };
 
-        private static readonly string selectContainsText = InitSelectContainsText();
+        private static readonly string XpathTextContains = InitXpathTextContains();
 
-        private static readonly string selectContainsId = InitSelectContainsId();
+        private static readonly string XpathIdContains = InitXpathIdContains();
 
-        private static readonly string selectEqualsText = InitSelectEqualsText();
+        private static readonly string XpathClassContains = InitXpathClassContains();
 
-        private static readonly string selectTagsToRemove = InitSelectTagsToRemove();
+        private static readonly string XpathTextEquals = InitXpathTextEquals();
 
+        private static readonly string XpathTagsToRemove = InitXpathTagsToRemove();
 
-        private static string InitSelectContainsText()
+        private static string InitXpathTextContains()
         {
-            var queryBuilder = new StringBuilder("//*[text()[");
-            foreach (var word in ListTextToRemoveNodeContains)
-            {
-                queryBuilder.Append($"contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '{word.ToLower()}') or ");
-            }
-            queryBuilder.Length -= 4;
-            queryBuilder.Append("]]");
-
-            return queryBuilder.ToString();
+            string xpath = ToXpathContains(TextContains, ".");
+            return xpath.Replace("//*", "//*[text()") + "]";
         }
 
-        private static string InitSelectContainsId()
+        private static string InitXpathIdContains()
         {
-            return "//*[" + string.Join(" or ", ListIdToRemoveNodeContains.Select(id => $"contains(translate(@id, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '{id.ToLower()}')")) + "]";
-
+            return ToXpathContains(ClassAndIdContains, "@id");
         }
 
-        private static string InitSelectEqualsText()
+        private static string InitXpathClassContains()
         {
-            return "//*[" + string.Join(" or ", ListTextToRemoveNodeEquals.Select(t => $"translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='{t.Trim()}'")) + "]";
+            return ToXpathContains(ClassAndIdContains, "@class");
         }
 
-        private static string InitSelectTagsToRemove()
+        private static string InitXpathTextEquals()
+        {
+            return "//*[" + string.Join(" or ", TextEquals.Select(word => $"translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='{word.Trim()}'")) + "]";
+        }
+
+        private static string ToXpathContains(List<string> list, string selector)
+        {
+            var enumerable = list.Select(word => $"contains(translate({selector}, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '{word.ToLower()}')");
+            return "//*[" + string.Join(" or ", enumerable) + "]";
+        }
+
+        private static string InitXpathTagsToRemove()
         {
             return string.Join(" | ", TagsToRemove.ToList());
         }
@@ -127,10 +134,12 @@ namespace landerist_library.Tools
             try
             {
 
-                RemoveNodes(htmlDocument, selectTagsToRemove);
-                RemoveNodes(htmlDocument, selectContainsText);
-                RemoveNodes(htmlDocument, selectContainsId);
-                RemoveNodes(htmlDocument, selectEqualsText);
+                RemoveNodes(htmlDocument, XpathTagsToRemove);
+                RemoveNodes(htmlDocument, XpathIdContains);
+                RemoveNodes(htmlDocument, XpathClassContains);
+                RemoveNodes(htmlDocument, XpathTextContains);
+                RemoveNodes(htmlDocument, XpathTextEquals);
+
                 var visibleText = GetVisibleText(htmlDocument);
                 text = CleanText(visibleText);
             }
