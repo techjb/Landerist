@@ -31,8 +31,12 @@
             return null;
         }
 
-        public static bool IsTextAllowed(string text)
+        public static bool IsTextAllowed(string? text)
         {
+            if(text == null)
+            {
+                return false;
+            }
             string userMessage = GetUserMessage(text);
             return IsLengthAllowed(SystemMessage, userMessage);
         }

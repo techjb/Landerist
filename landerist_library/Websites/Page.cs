@@ -211,11 +211,6 @@ namespace landerist_library.Websites
             }
         }
 
-        public bool CanRequestListing()
-        {
-            return !IsMainPage();
-        }
-
         public bool IsMainPage()
         {
             if (Website == null)

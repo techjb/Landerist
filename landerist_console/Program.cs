@@ -2,6 +2,7 @@
 using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Insert;
+using landerist_library.Parse.Listing;
 using landerist_library.Scrape;
 using landerist_library.Tools;
 using landerist_library.Websites;
@@ -44,7 +45,7 @@ namespace landerist_console
 
         private static void Run()
         {
-            var uriPage = new Uri("http://www.urdulizen.com/propiedad/barrika-chalet-individual/");
+            var uriPage = new Uri("https://tupropertyinspain.com/propiedades/");
 
             //SeleniumDownloader.GetChrome(uriPage);
             //PuppeteerDownloader.Get(uriPage);
@@ -122,6 +123,8 @@ namespace landerist_console
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.AWSComprehend().Run();
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.GoogleCNL().Run();
 
+
+          
 
 
 

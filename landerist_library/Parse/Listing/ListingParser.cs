@@ -28,11 +28,7 @@ namespace landerist_library.Parse.Listing
 
         public bool RequestListingIsPermited()
         {
-            if (string.IsNullOrEmpty(Page.ResponseBodyText))
-            {
-                return false;
-            }
-            if (ResponseBodyTextIsError())
+            if (!IsListingParser.IsListing(Page))
             {
                 return false;
             }
@@ -45,19 +41,7 @@ namespace landerist_library.Parse.Listing
             return true;
         }
 
-        private bool ResponseBodyTextIsError()
-        {
-            if (Page.ResponseBodyText == null)
-            {
-                return false;
-            }
-            return
-                Page.ResponseBodyText.StartsWith("Error", StringComparison.OrdinalIgnoreCase) ||
-                Page.ResponseBodyText.StartsWith("404", StringComparison.OrdinalIgnoreCase) ||
-                Page.ResponseBodyText.Contains("Página no encontrada", StringComparison.OrdinalIgnoreCase) ||
-                Page.ResponseBodyText.Contains("Page Not found", StringComparison.OrdinalIgnoreCase)
-                ;
-        }
+    
 
         private void RequestListing()
         {

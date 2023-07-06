@@ -6,12 +6,13 @@ namespace landerist_library.Tools
     {
         public static string Clean(string text)
         {
-            text = SymbolsToSpaces(text);
+            text = Replace(text);
             text = BreaklinesToSpace(text);
             text = TabsToSpaces(text);
+            text = RemoveUrls(text);
             text = RemoveMultipleDots(text);
             text = RemoveMultipleComas(text);
-            text = RemoveMultipleSpaces(text);
+            text = RemoveMultipleSpaces(text);            
             return text;
         }
 
@@ -47,13 +48,18 @@ namespace landerist_library.Tools
             return Regex.Replace(text, @"\s+", " ");
         }
 
-        public static string SymbolsToSpaces(string text)
+        public static string RemoveUrls(string text)
+        {
+            return Regex.Replace(text, @"http[^\s]+|www\.[^\s]+", string.Empty);
+        }
+
+        public static string Replace(string text)
         {
             return text
                 .Replace("*", " ")
                 .Replace("…", " ")
                 .Replace("©", " ")
-
+                .Replace(" :", ":")
                 ;
         }
     }

@@ -89,7 +89,7 @@ namespace landerist_library.Scrape
 
         private void GetListing()
         {
-            if (!Page.CanRequestListing())
+            if (!IsListingParser.IsListing(Page))
             {
                 return;
             }
