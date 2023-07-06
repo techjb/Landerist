@@ -8,7 +8,7 @@ namespace landerist_library.Parse.Listing.MLModel.IsListingUrl
         public static void CreateCsv() 
         {
             Console.WriteLine("Reading Rris");
-            var urls = Pages.GetAllUris();
+            var urls = Pages.GetUris();
             HashSet<string> list = new(StringComparer.OrdinalIgnoreCase);
             foreach (var url in urls)
             {

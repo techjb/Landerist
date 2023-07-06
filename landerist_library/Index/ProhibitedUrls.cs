@@ -118,7 +118,7 @@ namespace landerist_library.Index
 
         public static void FindNewProhibitedStartsWith()
         {
-            var urls = Pages.GetIsNotListingUris();
+            var urls = Pages.GetUris(false);
             var dictionary = ToDictionary(urls);
             foreach (var entry in dictionary)
             {
@@ -147,20 +147,7 @@ namespace landerist_library.Index
                     {
                         dictionary[directory] = 1;
                     }
-                }
-                //string directory = GetDirectory(uri);
-                //if (directory.Equals(string.Empty))
-                //{
-                //    continue;
-                //}
-                //if (dictionary.ContainsKey(directory))
-                //{
-                //    dictionary[directory] = dictionary[directory] + 1;
-                //}
-                //else
-                //{
-                //    dictionary[directory] = 1;
-                //}
+                }              
             }
             var sortedDict = from entry in dictionary orderby entry.Value descending select entry;
             dictionary = sortedDict.ToDictionary(x => x.Key, x => x.Value);

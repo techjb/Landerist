@@ -95,7 +95,7 @@ namespace landerist_console
             //Scraper.ScrapeUnknowIsListing(uri, true);
             //Scraper.ScrapeIsNotListing(uri);
             //Scraper.Scrape(website);
-            Scraper.Scrape(uriPage);
+            //Scraper.Scrape(uriPage);
             //Scraper.ScrapeAllPages();
 
             //Csv.Export(true);
@@ -111,6 +111,7 @@ namespace landerist_console
             //Console.WriteLine(tuple2);
 
             //landerist_library.Index.ProhibitedUrls.FindNewProhibitedStartsWith();
+            landerist_library.Parse.Listing.IsListingParser.FindProhibitedEndsSegments();
 
             //landerist_library.Parse.Listing.MLModel.TrainingData.TestData();
             //landerist_library.Parse.Listing.MLModel.TrainingData.CreateIsListing();
@@ -124,7 +125,8 @@ namespace landerist_console
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.GoogleCNL().Run();
 
 
-          
+
+
 
 
 

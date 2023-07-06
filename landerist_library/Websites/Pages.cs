@@ -1,4 +1,5 @@
-﻿using landerist_library.Database;
+﻿using Amazon.Runtime.Internal.Transform;
+using landerist_library.Database;
 using System.Data;
 
 namespace landerist_library.Websites
@@ -218,16 +219,19 @@ namespace landerist_library.Websites
             });
         }
 
-        public static List<string> GetIsNotListingUris()
+        public static List<string> GetUris(bool isListing)
         {
             string query =
                 "SELECT [Uri] " +
                 "FROM " + TABLE_PAGES + " " +
-                "WHERE IsListing = 0";
-            return new DataBase().QueryListString(query);
+                "WHERE IsListing = @IsListing";
+            return new DataBase().QueryListString(query, new Dictionary<string, object?>() 
+            {
+                { "IsListing", isListing }
+            });
         }
 
-        public static List<string> GetAllUris()
+        public static List<string> GetUris()
         {
             string query =
                 "SELECT [Uri] " +
