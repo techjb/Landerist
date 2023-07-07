@@ -5,9 +5,9 @@ namespace landerist_library.Scrape
 {
     public class Scraper
     {
-        private static readonly IpHostBlocker IpHostBlocker = new();
+        private static readonly PageBlocker PageBlocker = new();
 
-        private static readonly object SyncIpHostBlocker = new();
+        private static readonly object SyncPageBlocker = new();
 
         private static int ListingsCounter = 0;
 
@@ -198,7 +198,7 @@ namespace landerist_library.Scrape
 
         public static void Scrape(Page page)
         {
-            AddToBlocker(page);
+            AddToPageBlocker(page);
             try
             {
                 new PageScraper(page).Scrape();
@@ -207,23 +207,23 @@ namespace landerist_library.Scrape
             {
                 Logs.Log.WriteLogErrors(page.Uri, exception);
             }
-            AddIsListingCounter(page);
+            IncrementListingsCounter(page);
         }
 
         private static bool IsBlocked(Page page)
         {
-            return IpHostBlocker.IsBlocked(page.Website);
+            return PageBlocker.IsBlocked(page.Website);
         }
 
-        private static void AddToBlocker(Page page)
+        private static void AddToPageBlocker(Page page)
         {
-            lock (SyncIpHostBlocker)
+            lock (SyncPageBlocker)
             {
-                IpHostBlocker.Add(page.Website);
+                PageBlocker.Add(page.Website);
             }
         }
 
-        private static void AddIsListingCounter(Page page)
+        private static void IncrementListingsCounter(Page page)
         {
             if (page.IsListing != null)
             {

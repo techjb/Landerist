@@ -1,7 +1,4 @@
 ﻿using HtmlAgilityPack;
-using RTools_NTS.Util;
-using System.Text;
-using static Google.Cloud.Language.V1.PartOfSpeech.Types;
 
 namespace landerist_library.Tools
 {
@@ -170,7 +167,6 @@ namespace landerist_library.Tools
             string text = string.Empty;
             try
             {
-
                 RemoveNodes(htmlDocument, XpathTagsToRemove);
                 RemoveNodes(htmlDocument, XpathIdContains);
                 RemoveNodes(htmlDocument, XpathClassContains);

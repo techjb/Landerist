@@ -3,7 +3,6 @@ using landerist_library.Configuration;
 using OpenAI_API;
 using OpenAI_API.Chat;
 using OpenAI_API.Models;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace landerist_library.Parse.Listing.ChatGPT
 {
@@ -15,7 +14,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
         // gpt-3.5-turbo-16k: 16384
         // GPT-4-8K: 8192
         // GPT-4-32K: 32768
-        public static readonly int MAX_TOKENS = 4096;
+        public static readonly int MAX_TOKENS = 8192;
 
         private readonly Conversation Conversation;
 
@@ -24,7 +23,8 @@ namespace landerist_library.Parse.Listing.ChatGPT
             OpenAIAPI openAIAPI = new(Config.OPENAI_API_KEY);
             var chatRequest = new ChatRequest()
             {
-                Model = Model.ChatGPTTurbo,
+                //Model = Model.ChatGPTTurbo,
+                Model = Model.GPT4,
                 Temperature = 0,                
             };
 

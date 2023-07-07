@@ -1,5 +1,4 @@
-﻿using Amazon.Runtime.Internal.Transform;
-using landerist_library.Database;
+﻿using landerist_library.Database;
 using System.Data;
 
 namespace landerist_library.Websites

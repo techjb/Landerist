@@ -2,7 +2,7 @@
 
 namespace landerist_library.Scrape
 {
-    public class IpHostBlocker
+    public class PageBlocker
     {
         private readonly Dictionary<string, DateTime> IpBlocker = new();
 

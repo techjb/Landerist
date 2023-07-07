@@ -35,6 +35,9 @@ namespace landerist_library.Websites
 
         public int NumPages { get; set; } = 0;
 
+        //todo: add NumListings
+        //public int NumListings { get; set; } = 0;
+
 
         private Robots? Robots = null;
 

@@ -1,13 +1,11 @@
 ﻿using landerist_library.Index;
 using landerist_library.Websites;
-using System.Collections.Concurrent;
-using System.IO;
 
 namespace landerist_library.Parse.Listing
 {
     public class IsListingParser
     {
-        private static readonly HashSet<string> ProhibitedEndsSegments = new(StringComparer.OrdinalIgnoreCase)
+        private static readonly HashSet<string> ProhibitedLatestSegments = new(StringComparer.OrdinalIgnoreCase)
         {
             "promociones",
             "propiedades",
@@ -56,19 +54,60 @@ namespace landerist_library.Parse.Listing
             "captacion",
             "piso",
             "casa",
-            "alquiler.php",
-            "venta.php",
             "inicio",
             "apartamento",
+            "alquiler.php",
+            "alquiler_vacacional.php",
+            "venta.php",
+            "novedades.php",
             "promociones.php",
-            "venta-garajes",            
+            "agencia-inmobiliaria.php",
+            "setup-config.php",
+            "search-form-top.php",
+            "buscador.php",
+            "destacados.php",
+            "alquilar-tu-vivienda.php",
+            "search-form-top-obra-nueva.php",
+            "popup.php",
+            "ventas.php",
+            "comprar.php",
+            "propiedades.php",
+            "ventas.php",
+            "index.php",
+            "vender.php",
+            "alertas.php",
+            "destacados.php",
+            "arquitectura.php",
+            "vender_alquiler.php",
+            "ipc.php",
+            "inmuebles.php",
+            "legislacion.php",
+            "venta-casas",
+            "venta-garajes",
             "vacacional",
             "alquiler-pisos",
             "venta-pisos",
             "venta-locales",
             "alquiler-locales",
-            //"alquiler.html",
-            //"venta.html"
+            "locales-o-naves",
+            "venta-oficinas",
+            "alquiler.html",
+            "venta.html",
+            "inicio.html",
+            "index.html",
+            "mis-propiedades.html",
+            "inmuebles.html",
+            "inmuebles.html",
+            "404.html",
+            "alertas.html",
+            "locales-comerciales.html",
+            "mapa.html",
+            "vender.html",
+            "buscador.html",
+            "en-venta-1.html",
+            "en-alquiler-2.html",
+            "inmobiliaria.html",
+            "propiedades.html",
             "venta-edificios_singulares",
             "terrenos",
             "parcelas",
@@ -76,7 +115,6 @@ namespace landerist_library.Parse.Listing
             "alquiler-oficinas",
             "pisos-apartamentos",
             "busqueda-avanzada",
-            "search-form-top.php",
             "alquiler-naves",
             "email-protection",
             "venta-naves",
@@ -84,23 +122,30 @@ namespace landerist_library.Parse.Listing
             "registro",
             "mapa-footer",
             "eres-propietario",
+            "otros-tipos",
             "es",
             "en",
             "fr",
             "de",
             "ca",
             "ru",
+            "zh",
+            "es-es",
             "1",
             "2",
             "3",
             "4",
+            "&",
             "i-t-e-inspeccion-tecnica-de-edificios",
-
-
-
-
-
+            "preguntas-frecuentes",
+            "comercializados",
+            "alquile-o-venda-su-propiedad",
+            "obra-nueva-en-",
+            "terms_of_use",
+            "garaje-trastero-en-",
+            "properties",
         };
+
         public static bool IsListing(Page page)
         {
             if (page == null)
@@ -111,7 +156,7 @@ namespace landerist_library.Parse.Listing
             {
                 return false;
             }
-            if (IsProhibitedEndSegment(page.Uri))
+            if (LastSegmentIsProhibited(page.Uri))
             {
                 return false;
             }
@@ -125,14 +170,14 @@ namespace landerist_library.Parse.Listing
             return true;
         }
 
-        public static bool IsProhibitedEndSegment(Uri uri)
+        public static bool LastSegmentIsProhibited(Uri uri)
         {
             if (!string.IsNullOrEmpty(uri.Query))
             {
                 return false;
             }
             var lastSegment = GetLastSegment(uri);
-            return ProhibitedEndsSegments.Any(item => lastSegment.Equals(item, StringComparison.OrdinalIgnoreCase));
+            return ProhibitedLatestSegments.Any(item => lastSegment.Equals(item, StringComparison.OrdinalIgnoreCase));
         }
 
         private static string GetLastSegment(Uri uri)
@@ -205,7 +250,12 @@ namespace landerist_library.Parse.Listing
                   }
 
                   var lastSegment = GetLastSegment(uri);
-                  if (ProhibitedEndsSegments.Contains(lastSegment))
+                  if (ProhibitedLatestSegments.Contains(lastSegment))
+                  {
+                      return;
+                  }
+
+                  if (!lastSegment.EndsWith(".html"))
                   {
                       return;
                   }

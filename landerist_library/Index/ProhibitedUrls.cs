@@ -80,8 +80,24 @@ namespace landerist_library.Index
             "avislegal",
             "textolegal",
             "sobrenosotros",
-            "wplogin"
-
+            "wplogin",
+            "mapadesitio",
+            "alerta",
+            "quehacemos",
+            "searchform",
+            "hipoteca",
+            "encontrar",
+            "boletín",
+            "comovender",
+            "venderconchm",
+            "inmobiliariachm",
+            "camaraseuropa",
+            "legislacion",
+            "enlacesinteres",
+            "asesoria",
+            "situacion",
+            "flipover",
+            "hosteleria"
         };
 
         public static bool IsProhibited(Uri uri, LanguageCode languageCode)

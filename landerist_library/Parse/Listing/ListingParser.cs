@@ -41,8 +41,6 @@ namespace landerist_library.Parse.Listing
             return true;
         }
 
-    
-
         private void RequestListing()
         {
             Listing = new ChatGPTGetListing().GetListing(Page);

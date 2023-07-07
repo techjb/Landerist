@@ -45,7 +45,7 @@ namespace landerist_console
 
         private static void Run()
         {
-            var uriPage = new Uri("https://tupropertyinspain.com/propiedades/");
+            var uriPage = new Uri("https://www.viviz.es/ads/venta/inmueble/balearsilles-palmademallorca/ref-90908");
 
             //SeleniumDownloader.GetChrome(uriPage);
             //PuppeteerDownloader.Get(uriPage);
@@ -89,7 +89,7 @@ namespace landerist_console
 
             //Scraper.ScrapeMainPage(website);
 
-            //Scraper.ScrapeNonScrapped(200, false);
+            Scraper.ScrapeNonScrapped(500, false);
 
             //Scraper.ScrapeUnknowHttpStatusCode();
             //Scraper.ScrapeUnknowIsListing(uri, true);
@@ -111,7 +111,7 @@ namespace landerist_console
             //Console.WriteLine(tuple2);
 
             //landerist_library.Index.ProhibitedUrls.FindNewProhibitedStartsWith();
-            landerist_library.Parse.Listing.IsListingParser.FindProhibitedEndsSegments();
+            //landerist_library.Parse.Listing.IsListingParser.FindProhibitedEndsSegments();
 
             //landerist_library.Parse.Listing.MLModel.TrainingData.TestData();
             //landerist_library.Parse.Listing.MLModel.TrainingData.CreateIsListing();
@@ -123,14 +123,6 @@ namespace landerist_console
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.Danyalktk().Run();
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.AWSComprehend().Run();
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.GoogleCNL().Run();
-
-
-
-
-
-
-
-
         }
     }
 }
