@@ -28,10 +28,10 @@ namespace landerist_library.Parse.Listing
 
         public bool RequestListingIsPermited()
         {
-            if (!IsListingParser.IsListing(Page))
-            {
-                return false;
-            }
+            //if (!IsListingParser.IsListing(Page))
+            //{
+            //    return false;
+            //}
             if (//!ChatGPTRequest.IsLengthAllowed(ChatGPTGetListing.SystemMessage, Page.ResponseBodyText)
                 !ChatGPTIsListing.IsTextAllowed(Page.ResponseBodyText)
                 )

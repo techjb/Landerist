@@ -1,10 +1,7 @@
 ﻿using landerist_library.Configuration;
-using landerist_library.Database;
 using landerist_library.Download;
 using landerist_library.Index;
 using landerist_library.Parse.Listing;
-using landerist_library.Parse.Location;
-using landerist_library.Parse.Media;
 using landerist_library.Websites;
 
 namespace landerist_library.Scrape
@@ -37,8 +34,9 @@ namespace landerist_library.Scrape
 
         private void DownloadSucess()
         {
-            if (!HtmInWebsiteLanguage())
+            if (!IsCorrectLanguage())
             {
+                Page.SetPageType(PageType.IncorrectLanguage);
                 if (Config.INDEXER_ENABLED)
                 {
                     new LinkAlternateIndexer(Page).InsertLinksAlternate();
@@ -51,11 +49,11 @@ namespace landerist_library.Scrape
             }
             if (Page.CanIndexContent())
             {
-                GetListing();
+                SetPageType();
             }
         }
 
-        private bool HtmInWebsiteLanguage()
+        private bool IsCorrectLanguage()
         {
             Page.LoadHtmlDocument();
             if (Page.HtmlDocument != null)
@@ -87,49 +85,66 @@ namespace landerist_library.Scrape
             new HyperlinksIndexer(Page).Insert();
         }
 
-        private void GetListing()
+        private void SetPageType()
         {
-            if (!IsListingParser.IsListing(Page))
-            {
-                return;
-            }
-
-            landerist_orels.ES.Listing? listing;            
-            if (Config.LISTING_PARSER_ENABLED)
-            {
-                var listingParser = new ListingParser(Page).GetListing();
-                Page.IsListing = listingParser.Item1;
-                listing = listingParser.Item2;
-            }
-            else
-            {
-                listing = ES_Listings.GetListing(Page, false);
-                Page.IsListing = listing != null;                
-            }
-            if (listing == null)
-            {
-                return;
-            }
-
-            if (Config.SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING)
-            {
-                new LatLngParser(Page, listing).SetLatLng();
-                new LauIdParser(Page, listing).SetLauId();
-                new MediaParser(Page).AddMedia(listing);
-                ES_Listings.InsertUpdate(listing);
-            }
-            else
-            {
-                ES_Listings.Insert(listing);
-            }
+            var pageType = PageTypeParser.GetPageType(Page);
+            Page.SetPageType(pageType);
         }
+
+        //private void GetListing()
+        //{
+        //    if (!IsListingParser.IsListing(Page))
+        //    {
+        //        return;
+        //    }
+
+        //    landerist_orels.ES.Listing? listing;            
+        //    if (Config.LISTING_PARSER_ENABLED)
+        //    {
+        //        var listingParser = new ListingParser(Page).GetListing();
+        //        if (listingParser.Item1==null)
+        //        {
+
+        //        }
+        //        else
+        //        {
+
+        //        }
+        //        Page.IsListing = listingParser.Item1;
+        //        listing = listingParser.Item2;
+        //    }
+        //    else
+        //    {
+        //        listing = ES_Listings.GetListing(Page, false);
+        //        Page.IsListing = listing != null;                
+        //    }
+        //    if (listing == null)
+        //    {
+        //        return;
+        //    }
+
+        //    if (Config.SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING)
+        //    {
+        //        new LatLngParser(Page, listing).SetLatLng();
+        //        new LauIdParser(Page, listing).SetLauId();
+        //        new MediaParser(Page).AddMedia(listing);
+        //        ES_Listings.InsertUpdate(Page.Website, listing);
+        //    }
+        //    else
+        //    {
+        //        ES_Listings.Insert(Page.Website, listing);
+        //    }
+        //}
 
         private void DownloadError()
         {
+            Page.SetPageType(PageType.DownloadError);
+
             if (Page.HttpStatusCode == null)
             {
                 return;
             }
+
             int code = (int)Page.HttpStatusCode;
             if (code >= 300 && code < 400)
             {

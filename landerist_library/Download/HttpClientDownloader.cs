@@ -27,9 +27,9 @@ namespace landerist_library.Download
                 //ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; }
             };
 
-            using var client = new HttpClient(handler);
-            client.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
-            client.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
+            using var httpClient = new HttpClient(handler);
+            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
+            httpClient.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
 
             HttpRequestMessage request = new(HttpMethod.Get, page.Uri);
             bool sucess = false;
@@ -38,7 +38,7 @@ namespace landerist_library.Download
             try
             {
                 DateTime dateStart = DateTime.Now;
-                HttpResponseMessage = await client.SendAsync(request);
+                HttpResponseMessage = await httpClient.SendAsync(request);
                 Timers.Timer.SaveTimerDownloadPage(page.Uri.ToString(), dateStart);
                 sucess = HttpResponseMessage.IsSuccessStatusCode;
                 page.HttpStatusCode = (short)HttpResponseMessage.StatusCode;

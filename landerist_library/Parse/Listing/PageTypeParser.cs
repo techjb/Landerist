@@ -3,7 +3,7 @@ using landerist_library.Websites;
 
 namespace landerist_library.Parse.Listing
 {
-    public class IsListingParser
+    public class PageTypeParser
     {
         private static readonly HashSet<string> ProhibitedLatestSegments = new(StringComparer.OrdinalIgnoreCase)
         {
@@ -146,31 +146,33 @@ namespace landerist_library.Parse.Listing
             "properties",
         };
 
-        public static bool IsListing(Page page)
+        public static PageType? GetPageType(Page page)
         {
             if (page == null)
             {
-                return false;
+                return null;
             }
             if (page.IsMainPage())
             {
-                return false;
+                return PageType.MainPage;
             }
-            if (LastSegmentIsProhibited(page.Uri))
+            if (LastSegmentIsForbidden(page.Uri))
             {
-                return false;
+                return PageType.ForbiddenLastSegment;
             }
 
             page.SetResponseBodyText();
-            if (ResponseBodyTextIsError(page.ResponseBodyText))
+
+            if (ResponseBodyIsError(page.ResponseBodyText))
             {
                 page.ResponseBodyText = null;
-                return false;
+                return PageType.ResponseBodyError;
             }
-            return true;
+
+            return PageType.MayContainListing;
         }
 
-        public static bool LastSegmentIsProhibited(Uri uri)
+        public static bool LastSegmentIsForbidden(Uri uri)
         {
             if (!string.IsNullOrEmpty(uri.Query))
             {
@@ -196,7 +198,7 @@ namespace landerist_library.Parse.Listing
             return segment;
         }
 
-        private static bool ResponseBodyTextIsError(string? responseBodyText)
+        private static bool ResponseBodyIsError(string? responseBodyText)
         {
             if (responseBodyText == null)
             {
@@ -204,7 +206,7 @@ namespace landerist_library.Parse.Listing
             }
             return
                 responseBodyText.StartsWith("Error", StringComparison.OrdinalIgnoreCase) ||
-                responseBodyText.StartsWith("404", StringComparison.OrdinalIgnoreCase) ||
+                responseBodyText.StartsWith("404", StringComparison.OrdinalIgnoreCase) ||                                
                 responseBodyText.Contains("Página no encontrada", StringComparison.OrdinalIgnoreCase) ||
                 responseBodyText.Contains("Page Not found", StringComparison.OrdinalIgnoreCase)
                 ;

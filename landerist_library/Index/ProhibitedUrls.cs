@@ -4,7 +4,7 @@ namespace landerist_library.Index
 {
     public class ProhibitedUrls
     {
-        private static readonly HashSet<string> ProhibitedStartsWith_ES = new(StringComparer.OrdinalIgnoreCase)
+        private static readonly HashSet<string> ProhibitedContains_ES = new(StringComparer.OrdinalIgnoreCase)
         {
             "contact",
             "politic",
@@ -97,40 +97,47 @@ namespace landerist_library.Index
             "asesoria",
             "situacion",
             "flipover",
-            "hosteleria"
+            "hosteleria",
+            "hipoteca",
+            "noticias",
+            "quiénessomos",
+            "financiación",
+            "financiacion",
+
         };
 
         public static bool IsProhibited(Uri uri, LanguageCode languageCode)
         {
-            var prohibitedStartsWith = GetProhibitedStartsWith(languageCode);
-            var directories = uri.AbsolutePath.ToLower().Split('/');
+            var prohibitedContains = GetProhibitedContains(languageCode);
+            var absolutePath = uri.AbsolutePath.ToLower()
+                    .Replace("-", string.Empty)
+                    .Replace("_", string.Empty);
+
+            var directories = absolutePath.Split('/');
             foreach (var directory in directories)
             {
                 if (string.IsNullOrEmpty(directory))
                 {
                     continue;
-                }
-                string directoryCleaned = directory
-                    .Replace("-", string.Empty)
-                    .Replace("_", string.Empty);
+                }              
 
-                bool isProhibited = prohibitedStartsWith.Any(item => directoryCleaned.StartsWith(item));
-                if (isProhibited)
+                if (prohibitedContains.Any(item => directory.Contains(item)))
                 {
                     return true;
                 }
+                
             }
             return false;
         }
 
-        private static HashSet<string> GetProhibitedStartsWith(LanguageCode languageCode)
+        private static HashSet<string> GetProhibitedContains(LanguageCode languageCode)
         {
             switch (languageCode)
             {
-                case LanguageCode.es: return ProhibitedStartsWith_ES;
+                case LanguageCode.es: return ProhibitedContains_ES;
                 default: return new HashSet<string>();
             }
-        }
+        }       
 
         public static void FindNewProhibitedStartsWith()
         {
@@ -173,21 +180,22 @@ namespace landerist_library.Index
 
         private static List<string> GetDirectories(Uri uri)
         {
-            var directories = uri.AbsolutePath.ToLower().Split('/');
-            List<string> dirs = new();
-            var prohibitedStartsWith = GetProhibitedStartsWith(LanguageCode.es);
-            foreach (var directory in directories)
-            {
-                string directoryCleaned = directory
+            var prohibitedContains = GetProhibitedContains(LanguageCode.es);
+            var absolutePath = uri.AbsolutePath.ToLower()
                     .Replace("-", string.Empty)
                     .Replace("_", string.Empty);
 
-                if (directoryCleaned.Equals(string.Empty))
+            var directories = absolutePath.Split('/');
+
+            List<string> dirs = new();            
+            foreach (var directory in directories)
+            {
+                if (string.IsNullOrEmpty(directory))
                 {
                     continue;
                 }
 
-                bool isProhibited = prohibitedStartsWith.Any(item => directoryCleaned.StartsWith(item));
+                bool isProhibited = prohibitedContains.Any(item => directory.Contains(item));
                 if (!isProhibited)
                 {
                     dirs.Add(directory);

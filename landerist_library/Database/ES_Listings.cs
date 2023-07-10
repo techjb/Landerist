@@ -9,7 +9,7 @@ namespace landerist_library.Database
 
         public const string TABLE_ES_LISTINGS = "[ES_LISTINGS]";
 
-        public static void InsertUpdate(Listing newListing)
+        public static void InsertUpdate(Website website, Listing newListing)
         {
             Listing? oldListing = GetListing(newListing.guid);
             if (oldListing != null)
@@ -21,14 +21,17 @@ namespace landerist_library.Database
             }
             else
             {
-                Insert(newListing);
+                Insert(website, newListing);
             }
         }
 
-        public static void Insert(Listing listing)
+        public static void Insert(Website website, Listing listing)
         {
-            InsertData(listing);
-            ES_Media.Insert(listing);
+            if (InsertData(listing))
+            {
+                website.IncreaseNumListings();
+                ES_Media.Insert(listing);                
+            }            
         }
 
         private static bool InsertData(Listing listing)
@@ -104,7 +107,7 @@ namespace landerist_library.Database
             };
         }
 
-        public static void Update(Listing oldListing, Listing newListing)
+        private static void Update(Listing oldListing, Listing newListing)
         {
             UpdateData(newListing);
             if (!ListingMediaAreEquals(oldListing, newListing))
@@ -199,7 +202,7 @@ namespace landerist_library.Database
             return GetListing(page.UriHash, loadMedia);
         }
 
-        public static Listing? GetListing(string guid, bool loadMedia = true)
+        private static Listing? GetListing(string guid, bool loadMedia = true)
         {
             string query =
                 "SELECT * " +
@@ -217,7 +220,7 @@ namespace landerist_library.Database
             return null;
         }
 
-        public static Listing GetListing(DataRow dataRow, bool loadMedia)
+        private static Listing GetListing(DataRow dataRow, bool loadMedia)
         {
             var listing = GetListingData(dataRow);
             if (loadMedia)
@@ -318,7 +321,17 @@ namespace landerist_library.Database
             return dataRow[columnName] is DBNull ? null : new Uri((string)dataRow[columnName]);
         }
 
-        public static bool Delete(Listing listing)
+        public static bool Delete(Website website, Listing listing)
+        {
+            bool sucess = Delete(listing);
+            if (sucess)
+            {
+                website.DecreaseNumListings();
+            }
+            return sucess;
+        }
+
+        private static bool Delete(Listing listing)
         {
             string query =
                 "DELETE FROM " + TABLE_ES_LISTINGS + " " +
@@ -380,55 +393,5 @@ namespace landerist_library.Database
 
             return new DataBase().QueryTable(query);
         }
-
-        //public static void UpdateAddress()
-        //{
-        //    string query =
-        //        "SELECT [guid], [address] " +
-        //        "FROM " + TABLE_ES_LISTINGS + " " +
-        //        "WHERE [address] IS NOT NULL";
-
-        //    DataTable table = new DataBase().QueryTable(query);
-        //    int total = table.Rows.Count;
-        //    int valids = 0;
-        //    int invalids = 0;
-        //    int errors = 0;
-        //    foreach (DataRow row in table.Rows)
-        //    {
-        //        string guid = (string)row["guid"];
-        //        string value = (string)row["address"];
-        //        value = Strings.BreaklinesToSpace(value);
-        //        //if(Validate.Phone(value))
-        //        //{
-        //            valids++;                   
-        //        //}
-        //        //else
-        //        //{
-        //        //    invalids++;
-        //            if (!Update(guid, value))
-        //            {
-        //                errors++;
-        //            }
-
-
-        //       // }
-        //        Console.WriteLine("Total: " + total + " Valids: " + valids +
-        //            " Invalids: " + invalids + " Errors: " + errors);
-        //    }
-        //}
-
-        //private static bool Update(string guid, string address)
-        //{
-        //    string query =
-        //        "UPDATE " + TABLE_ES_LISTINGS + " " +
-        //        "SET [address] = @address " +
-        //        "WHERE [guid] = @guid";
-
-        //    return new DataBase().Query(query, new Dictionary<string, object?>()
-        //    {
-        //        { "address", address },
-        //        { "guid", guid },
-        //    });
-        //}
     }
 }

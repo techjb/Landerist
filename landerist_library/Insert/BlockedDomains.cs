@@ -53,7 +53,9 @@
             "anunciofinca.com",
             "todopisos.es",
             "housage.es",
-            "viveku.es"
+            "viveku.es",
+            "blogspot.com",
+
         };
 
         public static bool IsBlocked(Uri uri)

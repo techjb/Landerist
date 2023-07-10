@@ -9,7 +9,11 @@ namespace landerist_library.Scrape
 
         private static readonly object SyncPageBlocker = new();
 
-        private static int ListingsCounter = 0;
+        private static int DownloadErrorCounter = 0;
+
+        private static int MayContainListingsCounter = 0;
+
+        private static int OtherPageType = 0;
 
         private static int TotalCounter = 0;
 
@@ -163,11 +167,23 @@ namespace landerist_library.Scrape
                 Interlocked.Decrement(ref Remaining);
             }
 
+            WriteConsole();
+        }
+
+        private static void WriteConsole()
+        {
+            var downloadErrorPercentage = Math.Round((float)DownloadErrorCounter * TotalCounter / 100, 2);
+            var downloadMayContainListingPercentage = Math.Round((float)MayContainListingsCounter * TotalCounter / 100, 2);
+            var OtherPageTypePercentage = Math.Round((float)OtherPageType * TotalCounter / 100, 2);
+
             Console.WriteLine(
-                "Remaining: " + TotalCounter + " - " + Scraped + " = " + Remaining + " " +
-                "Threads: " + ThreadCounter + " " +
-                "BlockingCollection: " + BlockingCollection.Count + " " +
-                "Listings: " + ListingsCounter + " ");
+               "Remaining: " + TotalCounter + " - " + Scraped + " = " + Remaining + " " +
+               "Threads: " + ThreadCounter + " " +
+               "BlockingCollection: " + BlockingCollection.Count + " " +
+               "DownloadError: " + DownloadErrorCounter + " ("+ downloadErrorPercentage + "%) " +
+               "MayContainListing: " + MayContainListingsCounter + " ("+ downloadMayContainListingPercentage + "%) " +
+               "OtherPageType: " + OtherPageType + " (" + OtherPageTypePercentage + "%) "
+               );
         }
 
         private static void EndThread()
@@ -225,13 +241,24 @@ namespace landerist_library.Scrape
 
         private static void IncrementListingsCounter(Page page)
         {
-            if (page.IsListing != null)
+            switch (page.PageType)
             {
-                if ((bool)page.IsListing)
-                {
-                    Interlocked.Increment(ref ListingsCounter);
-                }
+                case PageType.Listing:
+                    {
+                        Interlocked.Increment(ref MayContainListingsCounter);
+                    }
+                    break;
+                case PageType.DownloadError:
+                    {
+                        Interlocked.Increment(ref DownloadErrorCounter);
+                    }
+                    break;
+                default:
+                    {
+                        Interlocked.Increment(ref OtherPageType);
+                    }break;
             }
+
         }
     }
 }

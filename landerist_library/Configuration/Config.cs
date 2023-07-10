@@ -16,13 +16,15 @@
 
         public static readonly int MAX_PAGES_PER_WEBSITE = 20;
 
+        //public static readonly int MAX_LISTINGS_PER_WEBSITE = 100;
+
         public static readonly bool LOGS_ENABLED = false;
 
         public static readonly bool TIMERS_ENABLED = false;
 
         public static readonly string USER_AGENT = "Mozilla/5.0 (compatible; AcmeInc/1.0)";
 
-        public static readonly int HTTPCLIENT_SECONDS_TIMEOUT = 7;
+        public static readonly int HTTPCLIENT_SECONDS_TIMEOUT = 10;
 
         public static readonly int MAX_CRAW_DELAY_SECONDS = 60;
 

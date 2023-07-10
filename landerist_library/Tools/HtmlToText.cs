@@ -4,6 +4,50 @@ namespace landerist_library.Tools
 {
     public class HtmlToText
     {
+        private static readonly List<string> TagsToRemove = new()
+        {
+            "//script",
+            "//nav",
+            "//footer",
+            "//style",
+            "//head",
+            "//a",
+            "//code",
+            "//canvas",
+            "//meta",
+            "//option",
+            "//select",
+            "//progress",
+            "//svg",
+            "//textarea",
+            "//del",
+            "//aside",
+            "//button",
+            "//form[not(.//input[@id='__VIEWSTATE' or @id='__VIEWSTATEGENERATOR' or @id='__EVENTVALIDATION'])]",
+            "//input",
+            "//*[contains(@style, 'text-decoration: line-through')]",
+            "//*[contains(@style, 'text-decoration:line-through')]"
+        };
+
+        private static readonly List<string> IdOrClassContains = new()
+        {
+            "similar",
+            "results",
+            "resultados",
+            "propiedades",
+            "properties",
+            "busca",            
+            "search",
+            "suscrib",
+            "privac",
+            "cookie",
+            "danger",
+            "hipoteca",
+            "filtro",
+            "filter",
+            "news",
+            "noticias",            
+        };
 
         private static readonly List<string> TextContains = new()
         {
@@ -45,23 +89,12 @@ namespace landerist_library.Tools
             "no pudimos encontrar",
             "comparte este inmueble",
             "suscríbete",
-            "loading"
-
-        };
-
-        private static readonly List<string> ClassAndIdContains = new()
-        {
-            "similar",
-            //"result",            
-            "busca",            
-            "search",
-            "suscrib",
-            "privac",
-            "cookie",
-            "danger",
-            "hipoteca",
-            "filtro",
-            "filter"
+            "loading",
+            "cargando",
+            "derechos reservados",
+            "contraseña",
+            "password",
+            "registrarse"
         };
 
         private static readonly List<string> TextEquals = new()
@@ -92,58 +125,43 @@ namespace landerist_library.Tools
             "filters",
             "buscar",
             "search",
-            "financiación"
+            "financiación",
+            "legal",
+            "necesarias",
+            "necessary",
+            "siempre activado"
         };
 
-        private static readonly List<string> TagsToRemove = new()
-        {
-            "//script",
-            "//nav",
-            "//footer",
-            "//style",
-            "//head",
-            "//a",
-            "//code",
-            "//canvas",
-            "//meta",
-            "//option",
-            "//select",
-            "//progress",
-            "//svg",
-            "//textarea",
-            "//del",
-            "//aside",
-            "//button",
-            "//form[not(.//input[@id='__VIEWSTATE' or @id='__VIEWSTATEGENERATOR' or @id='__EVENTVALIDATION'])]",
-            "//input",
-            "//*[contains(@style, 'text-decoration: line-through')]",
-            "//*[contains(@style, 'text-decoration:line-through')]"
-        };
 
-        private static readonly string XpathTextContains = InitXpathTextContains();
+        private static readonly string XpathTagsToRemove = InitXpathTagsToRemove();
 
         private static readonly string XpathIdContains = InitXpathIdContains();
 
         private static readonly string XpathClassContains = InitXpathClassContains();
 
+        private static readonly string XpathTextContains = InitXpathTextContains();
+
         private static readonly string XpathTextEquals = InitXpathTextEquals();
 
-        private static readonly string XpathTagsToRemove = InitXpathTagsToRemove();
+        private static string InitXpathTagsToRemove()
+        {
+            return string.Join(" | ", TagsToRemove.ToList());
+        }
+
+        private static string InitXpathIdContains()
+        {
+            return ToXpathContains(IdOrClassContains, "@id");
+        }
+
+        private static string InitXpathClassContains()
+        {
+            return ToXpathContains(IdOrClassContains, "@class");
+        }
 
         private static string InitXpathTextContains()
         {
             string xpath = ToXpathContains(TextContains, ".");
             return xpath.Replace("//*", "//*[text()") + "]";
-        }
-
-        private static string InitXpathIdContains()
-        {
-            return ToXpathContains(ClassAndIdContains, "@id");
-        }
-
-        private static string InitXpathClassContains()
-        {
-            return ToXpathContains(ClassAndIdContains, "@class");
         }
 
         private static string InitXpathTextEquals()
@@ -157,11 +175,7 @@ namespace landerist_library.Tools
             return "//*[" + string.Join(" or ", enumerable) + "]";
         }
 
-        private static string InitXpathTagsToRemove()
-        {
-            return string.Join(" | ", TagsToRemove.ToList());
-        }
-
+     
         public static string GetText(HtmlDocument htmlDocument)
         {
             string text = string.Empty;

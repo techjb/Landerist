@@ -4,6 +4,7 @@ using landerist_library.Database;
 using landerist_library.Index;
 using System.Data;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 
 namespace landerist_library.Websites
@@ -33,10 +34,9 @@ namespace landerist_library.Websites
 
         public short? HttpStatusCode { get; set; }
 
-        public int NumPages { get; set; } = 0;
+        private int NumPages { get; set; } = 0;
 
-        //todo: add NumListings
-        //public int NumListings { get; set; } = 0;
+        private int NumListings { get; set; } = 0;
 
 
         private Robots? Robots = null;
@@ -102,6 +102,7 @@ namespace landerist_library.Websites
             IpAddress = dataRow["IpAddress"] is DBNull ? null : dataRow["IpAddress"].ToString();
             HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
             NumPages = (int)dataRow["NumPages"];
+            NumListings = (int)dataRow["NumListings"];
         }
 
         public bool Insert()
@@ -109,7 +110,7 @@ namespace landerist_library.Websites
             string query =
                 "INSERT INTO " + Websites.TABLE_WEBSITES + " " +
                 "VALUES (@MainUri, @Host, @LanguageCode, @CountryCode, @RobotsTxt, " +
-                "@IpAddress, @HttpStatusCode, @NumPages)";
+                "@IpAddress, @HttpStatusCode, @NumPages, @NumListings)";
 
             var parameters = GetQueryParameters();
             return new DataBase().Query(query, parameters);
@@ -125,7 +126,8 @@ namespace landerist_library.Websites
                 "[RobotsTxt] = @RobotsTxt, " +
                 "[IpAddress] = @IpAddress, " +
                 "[HttpStatusCode] = @HttpStatusCode, " +
-                "[NumPages] = @NumPages " +
+                "[NumPages] = @NumPages, " +
+                "[NumListings] = @NumListings " +
                 "WHERE [Host] = @Host";
 
             var parameters = GetQueryParameters();
@@ -143,6 +145,7 @@ namespace landerist_library.Websites
                 {"IpAddress", IpAddress },
                 {"HttpStatusCode", HttpStatusCode },
                 {"NumPages", NumPages },
+                {"NumListings", NumListings },
             };
         }
 
@@ -153,12 +156,13 @@ namespace landerist_library.Websites
                 AllowAutoRedirect = false
             };
 
-            using var client = new HttpClient(handler);
-            client.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
+            using var httpClient = new HttpClient(handler);
+            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
+            httpClient.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
             try
             {
                 HttpRequestMessage request = new(HttpMethod.Head, MainUri);
-                var response = client.SendAsync(request).GetAwaiter().GetResult();
+                var response = httpClient.SendAsync(request).GetAwaiter().GetResult();
                 HttpStatusCode = (short)response.StatusCode;
                 if (response != null && response.Headers != null && response.Headers.Location != null)
                 {
@@ -282,7 +286,7 @@ namespace landerist_library.Websites
                 var listing = ES_Listings.GetListing(page, false);
                 if (listing != null)
                 {
-                    if (ES_Listings.Delete(listing) &&
+                    if (ES_Listings.Delete(page.Website, listing) &&
                         ES_Media.Delete(listing))
                     {
                         counter++;
@@ -366,6 +370,11 @@ namespace landerist_library.Websites
             return Pages.GetIsNotListingPages(this);
         }
 
+        public int GetNumPages()
+        {
+            return NumPages;
+        }
+
         public bool SetNumPagesToZero()
         {
             NumPages = 0;
@@ -398,6 +407,46 @@ namespace landerist_library.Websites
             return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"Host", Host },
                 {"NumPages", NumPages }
+            });
+        }
+
+        public int GetNumListings()
+        {
+            return NumListings;
+        }
+
+        public bool SetNumListingsToZero()
+        {
+            NumListings = 0;
+            return UpdateNumListings();
+        }
+
+        public bool IncreaseNumListings()
+        {
+            NumListings++;
+            return UpdateNumListings();
+        }
+
+        public bool DecreaseNumListings()
+        {
+            NumListings--;
+            if (NumListings < 0)
+            {
+                NumListings = 0;
+            }
+            return UpdateNumListings();
+        }
+
+        public bool UpdateNumListings()
+        {
+            string query =
+                "UPDATE " + Websites.TABLE_WEBSITES + " " +
+                "SET [NumListings] = @NumListings " +
+                "WHERE [Host] = @Host";
+
+            return new DataBase().Query(query, new Dictionary<string, object?> {
+                {"Host", Host },
+                {"NumListings", NumListings }
             });
         }
     }

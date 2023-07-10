@@ -71,9 +71,9 @@ namespace landerist_library.Index
             InsertUri(uriBuilder.Uri);
         }
 
-        private bool CanInsertNewUrls()
+        private static bool CanInsertNewUrls()
         {
-            return Page.Website.NumPages < Configuration.Config.MAX_PAGES_PER_WEBSITE;
+            return Page.Website.GetNumPages() < Configuration.Config.MAX_PAGES_PER_WEBSITE;
         }
 
         protected void InsertUri(Uri uri)

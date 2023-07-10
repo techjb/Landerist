@@ -9,8 +9,21 @@ using System.Text;
 
 namespace landerist_library.Websites
 {
+    public enum PageType
+    {
+        DownloadError,
+        IncorrectLanguage,
+        MainPage,
+        ForbiddenLastSegment,
+        ResponseBodyError,
+        MayContainListing,
+        Listing,
+        DoesNotContainsListing,        
+    };
+
     public class Page : Pages
     {
+
         public string Host { get; set; } = string.Empty;
 
         public Uri Uri { get; set; } = new Uri("about:blank");
@@ -25,9 +38,9 @@ namespace landerist_library.Websites
 
         public string? ResponseBody { get; set; }
 
-        public string? ResponseBodyText { get; set; }
+        public PageType? PageType { get; set; }
 
-        public bool? IsListing { get; set; }
+        public string? ResponseBodyText { get; set; }
 
 
         public Website Website = new();
@@ -88,8 +101,9 @@ namespace landerist_library.Websites
             Inserted = (DateTime)dataRow["Inserted"];
             Updated = dataRow["Updated"] is DBNull ? null : (DateTime)dataRow["Updated"];
             HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
+            PageType = dataRow["PageType"] is DBNull ? null : 
+                (landerist_library.Websites.PageType)Enum.Parse(typeof(landerist_library.Websites.PageType), dataRow["PageType"].ToString()!);
             ResponseBodyText = dataRow["ResponseBodyText"] is DBNull ? null : dataRow["ResponseBodyText"].ToString();
-            IsListing = dataRow["IsListing"] is DBNull ? null : (bool)dataRow["IsListing"];            
         }
 
         public DataRow? GetDataRow()
@@ -150,16 +164,17 @@ namespace landerist_library.Websites
                 "UPDATE " + TABLE_PAGES + " SET " +
                 "[Updated] = @Updated, " +
                 "[HttpStatusCode] = @HttpStatusCode, " +
-                "[ResponseBodyText] = @ResponseBodyText, " +
-                "[IsListing] = @IsListing " +                
+                "[PageType] = @PageType, " +
+                "[ResponseBodyText] = @ResponseBodyText " +
                 "WHERE [UriHash] = @UriHash";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"UriHash", UriHash },
                 {"Updated", Updated },
                 {"HttpStatusCode", HttpStatusCode},
+                {"PageType", PageType},
                 {"ResponseBodyText", ResponseBodyText},
-                {"IsListing", IsListing },
+
             });
         }
 
@@ -272,6 +287,11 @@ namespace landerist_library.Websites
                 }
             }
             return false;
+        }
+
+        public void SetPageType(PageType? pageType)
+        {
+            PageType = pageType;
         }
     }
 }

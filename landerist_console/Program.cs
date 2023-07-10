@@ -45,7 +45,7 @@ namespace landerist_console
 
         private static void Run()
         {
-            var uriPage = new Uri("https://www.viviz.es/ads/venta/inmueble/balearsilles-palmademallorca/ref-90908");
+            var uriPage = new Uri("http://paraisoasturias.com/index.php/property/513/es/ref_599_casa");
 
             //SeleniumDownloader.GetChrome(uriPage);
             //PuppeteerDownloader.Get(uriPage);
@@ -89,7 +89,7 @@ namespace landerist_console
 
             //Scraper.ScrapeMainPage(website);
 
-            Scraper.ScrapeNonScrapped(500, false);
+            //Scraper.ScrapeNonScrapped(500, false);
 
             //Scraper.ScrapeUnknowHttpStatusCode();
             //Scraper.ScrapeUnknowIsListing(uri, true);
