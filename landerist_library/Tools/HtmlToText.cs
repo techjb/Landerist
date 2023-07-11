@@ -266,7 +266,11 @@ namespace landerist_library.Tools
                 }
 
                 cleanedLines.Add(decodedLine);
-                InsertWords(decodedLine);
+
+                if (Configuration.Config.WORDS_ENABLED)
+                {
+                    InsertWords(decodedLine);
+                }                
             }
             string text = string.Join(" ", cleanedLines);
             return Strings.Clean(text);

@@ -30,9 +30,7 @@ namespace landerist_library.Download
 
             using var httpClient = new HttpClient(handler);
             httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
-            httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("es-ES"));
-            httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("es", 0.9));
-
+            SetAccepLanguage(httpClient, page);
             httpClient.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
 
             HttpRequestMessage request = new(HttpMethod.Get, page.Uri);
@@ -55,6 +53,18 @@ namespace landerist_library.Download
                 Logs.Log.WriteLogErrors(page.Uri, exception);
             }
             return sucess;
+        }
+
+        private void SetAccepLanguage(HttpClient httpClient, Page page)
+        {
+            switch (page.Website.LanguageCode)
+            {
+                case LanguageCode.es:
+                    {
+                        httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("es-ES"));
+                        httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("es", 0.9));
+                    }break;
+            }            
         }
 
         public string? GetRedirectUrl()
