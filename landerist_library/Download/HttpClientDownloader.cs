@@ -1,5 +1,6 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Websites;
+using System.Net.Http.Headers;
 
 namespace landerist_library.Download
 {
@@ -29,9 +30,13 @@ namespace landerist_library.Download
 
             using var httpClient = new HttpClient(handler);
             httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
+            httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("es-ES"));
+            httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("es", 0.9));
+
             httpClient.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
 
             HttpRequestMessage request = new(HttpMethod.Get, page.Uri);
+            
             bool sucess = false;
             HttpResponseMessage = null;
 

@@ -1,7 +1,7 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Download;
 using landerist_library.Index;
-using landerist_library.Parse.Listing;
+using landerist_library.Parse.PageType;
 using landerist_library.Websites;
 
 namespace landerist_library.Scrape

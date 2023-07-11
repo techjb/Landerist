@@ -1,7 +1,8 @@
 ﻿using landerist_library.Index;
 using landerist_library.Websites;
 
-namespace landerist_library.Parse.Listing
+
+namespace landerist_library.Parse.PageType
 {
     public class PageTypeParser
     {
@@ -146,7 +147,7 @@ namespace landerist_library.Parse.Listing
             "properties",
         };
 
-        public static PageType? GetPageType(Page page)
+        public static Websites.PageType? GetPageType(Page page)
         {
             if (page == null)
             {
@@ -154,11 +155,11 @@ namespace landerist_library.Parse.Listing
             }
             if (page.IsMainPage())
             {
-                return PageType.MainPage;
+                return Websites.PageType.MainPage;
             }
             if (LastSegmentIsForbidden(page.Uri))
             {
-                return PageType.ForbiddenLastSegment;
+                return Websites.PageType.ForbiddenLastSegment;
             }
 
             page.SetResponseBodyText();
@@ -166,10 +167,15 @@ namespace landerist_library.Parse.Listing
             if (ResponseBodyIsError(page.ResponseBodyText))
             {
                 page.ResponseBodyText = null;
-                return PageType.ResponseBodyError;
+                return Websites.PageType.ResponseBodyError;
+            }
+            if (ResponseBodyIsTooLarge(page.ResponseBodyText))
+            {
+                page.ResponseBodyText = null;
+                return Websites.PageType.ResponseBodyTooLarge;
             }
 
-            return PageType.MayContainListing;
+            return Websites.PageType.MayContainListing;
         }
 
         public static bool LastSegmentIsForbidden(Uri uri)
@@ -206,10 +212,19 @@ namespace landerist_library.Parse.Listing
             }
             return
                 responseBodyText.StartsWith("Error", StringComparison.OrdinalIgnoreCase) ||
-                responseBodyText.StartsWith("404", StringComparison.OrdinalIgnoreCase) ||                                
+                responseBodyText.StartsWith("404", StringComparison.OrdinalIgnoreCase) ||
                 responseBodyText.Contains("Página no encontrada", StringComparison.OrdinalIgnoreCase) ||
                 responseBodyText.Contains("Page Not found", StringComparison.OrdinalIgnoreCase)
                 ;
+        }
+
+        private static bool ResponseBodyIsTooLarge(string? responseBodyText)
+        {
+            if (responseBodyText == null)
+            {
+                return false;
+            }
+            return responseBodyText.Length > Configuration.Config.MAX_RESPONSEBODYTEXT_LENGTH;
         }
 
         public static void FindProhibitedEndsSegments()

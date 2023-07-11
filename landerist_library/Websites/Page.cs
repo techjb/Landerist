@@ -16,6 +16,7 @@ namespace landerist_library.Websites
         MainPage,
         ForbiddenLastSegment,
         ResponseBodyError,
+        ResponseBodyTooLarge,
         MayContainListing,
         Listing,
         DoesNotContainsListing,        
@@ -172,9 +173,8 @@ namespace landerist_library.Websites
                 {"UriHash", UriHash },
                 {"Updated", Updated },
                 {"HttpStatusCode", HttpStatusCode},
-                {"PageType", PageType},
+                {"PageType", PageType?.ToString()},
                 {"ResponseBodyText", ResponseBodyText},
-
             });
         }
 

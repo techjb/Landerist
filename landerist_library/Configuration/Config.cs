@@ -18,6 +18,8 @@
 
         //public static readonly int MAX_LISTINGS_PER_WEBSITE = 100;
 
+        public static readonly int MAX_RESPONSEBODYTEXT_LENGTH = 5000;
+
         public static readonly bool LOGS_ENABLED = false;
 
         public static readonly bool TIMERS_ENABLED = false;

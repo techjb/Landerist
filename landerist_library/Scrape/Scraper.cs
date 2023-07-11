@@ -172,16 +172,17 @@ namespace landerist_library.Scrape
 
         private static void WriteConsole()
         {
-            var downloadErrorPercentage = Math.Round((float)DownloadErrorCounter * TotalCounter / 100, 2);
-            var downloadMayContainListingPercentage = Math.Round((float)MayContainListingsCounter * TotalCounter / 100, 2);
-            var OtherPageTypePercentage = Math.Round((float)OtherPageType * TotalCounter / 100, 2);
+            var scrappedPercentage = Math.Round((float)Scraped * 100 / TotalCounter, 0);
+            var downloadErrorPercentage = Math.Round((float)DownloadErrorCounter * 100 / TotalCounter, 0);
+            var downloadMayContainListingPercentage = Math.Round((float)MayContainListingsCounter * 100 / TotalCounter, 0);
+            var OtherPageTypePercentage = Math.Round((float)OtherPageType * 100 / TotalCounter, 0);
 
             Console.WriteLine(
-               "Remaining: " + TotalCounter + " - " + Scraped + " = " + Remaining + " " +
+               "Scraped: " + Scraped + " (" + scrappedPercentage + "%) " +
                "Threads: " + ThreadCounter + " " +
                "BlockingCollection: " + BlockingCollection.Count + " " +
-               "DownloadError: " + DownloadErrorCounter + " ("+ downloadErrorPercentage + "%) " +
-               "MayContainListing: " + MayContainListingsCounter + " ("+ downloadMayContainListingPercentage + "%) " +
+               "DownloadError: " + DownloadErrorCounter + " (" + downloadErrorPercentage + "%) " +
+               "MayContainListing: " + MayContainListingsCounter + " (" + downloadMayContainListingPercentage + "%) " +
                "OtherPageType: " + OtherPageType + " (" + OtherPageTypePercentage + "%) "
                );
         }
@@ -243,20 +244,22 @@ namespace landerist_library.Scrape
         {
             switch (page.PageType)
             {
-                case PageType.Listing:
-                    {
-                        Interlocked.Increment(ref MayContainListingsCounter);
-                    }
-                    break;
                 case PageType.DownloadError:
                     {
                         Interlocked.Increment(ref DownloadErrorCounter);
                     }
                     break;
+                case PageType.MayContainListing:
+                    {
+                        Interlocked.Increment(ref MayContainListingsCounter);
+                    }
+                    break;
+
                 default:
                     {
                         Interlocked.Increment(ref OtherPageType);
-                    }break;
+                    }
+                    break;
             }
 
         }

@@ -1,4 +1,6 @@
 ﻿using HtmlAgilityPack;
+using landerist_library.Database;
+using System.Text.RegularExpressions;
 
 namespace landerist_library.Tools
 {
@@ -36,7 +38,7 @@ namespace landerist_library.Tools
             "resultados",
             "propiedades",
             "properties",
-            "busca",            
+            "busca",
             "search",
             "suscrib",
             "privac",
@@ -46,7 +48,7 @@ namespace landerist_library.Tools
             "filtro",
             "filter",
             "news",
-            "noticias",            
+            "noticias",
         };
 
         private static readonly List<string> TextContains = new()
@@ -117,7 +119,7 @@ namespace landerist_library.Tools
             "favorito",
             "favorit",
             "descartar",
-            "imprimir",            
+            "imprimir",
             "print",
             "cerrar",
             "close",
@@ -129,7 +131,30 @@ namespace landerist_library.Tools
             "legal",
             "necesarias",
             "necessary",
-            "siempre activado"
+            "siempre activado",
+            "botón",
+            "síganos",
+            "linkedin",
+            "menú",
+            "facebook",
+            "twitter",
+            "idioma",
+            "fotos",
+            "fotografías",
+            "imagenes",
+            "mapa",
+            "plano",
+            "vídeo",
+            "vídeos",
+            "recomendar",
+            "portada",
+            "login",
+            "financiación",
+            "galería",
+            "registro",
+            "admin",
+            "favoritos",
+
         };
 
 
@@ -166,7 +191,7 @@ namespace landerist_library.Tools
 
         private static string InitXpathTextEquals()
         {
-            return "//*[" + string.Join(" or ", TextEquals.Select(word => $"translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='{word.Trim()}'")) + "]";
+            return "//*[" + string.Join(" or ", TextEquals.Select(word => $"translate(normalize-space(text()), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='{word.Trim()}'")) + "]";
         }
 
         private static string ToXpathContains(List<string> list, string selector)
@@ -175,7 +200,7 @@ namespace landerist_library.Tools
             return "//*[" + string.Join(" or ", enumerable) + "]";
         }
 
-     
+
         public static string GetText(HtmlDocument htmlDocument)
         {
             string text = string.Empty;
@@ -230,19 +255,24 @@ namespace landerist_library.Tools
                 if (string.IsNullOrEmpty(decodedLine))
                 {
                     continue;
-                }
+                }               
                 if (IsSymbol(decodedLine))
                 {
                     continue;
                 }
+                if (TextEquals.Contains(decodedLine, StringComparer.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
                 cleanedLines.Add(decodedLine);
+                InsertWords(decodedLine);
             }
             string text = string.Join(" ", cleanedLines);
-            text = Strings.Clean(text);
-            return text;
+            return Strings.Clean(text);
         }
 
-        private static bool IsSymbol(string input)
+        public static bool IsSymbol(string input)
         {
             foreach (char c in input)
             {
@@ -252,6 +282,20 @@ namespace landerist_library.Tools
                 }
             }
             return true;
+        }
+
+        public static void InsertWords(string text)
+        {
+            string cleaned = Strings.Clean(text);
+            if (string.IsNullOrWhiteSpace(cleaned))
+            {
+                return;
+            }
+
+            if(Regex.IsMatch(cleaned, @"^\p{L}+$"))
+            {
+                Words.Insert(cleaned);
+            }
         }
     }
 }

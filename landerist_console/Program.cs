@@ -1,6 +1,7 @@
 ﻿using CsvHelper;
 using HtmlAgilityPack;
 using landerist_library.Configuration;
+using landerist_library.Database;
 using landerist_library.Insert;
 using landerist_library.Parse.Listing;
 using landerist_library.Scrape;
@@ -45,7 +46,7 @@ namespace landerist_console
 
         private static void Run()
         {
-            var uriPage = new Uri("http://paraisoasturias.com/index.php/property/513/es/ref_599_casa");
+            var uriPage = new Uri("https://www.bloquezeroinmobiliaria.com/");
 
             //SeleniumDownloader.GetChrome(uriPage);
             //PuppeteerDownloader.Get(uriPage);
@@ -89,13 +90,13 @@ namespace landerist_console
 
             //Scraper.ScrapeMainPage(website);
 
-            //Scraper.ScrapeNonScrapped(500, false);
+            //Scraper.ScrapeNonScrapped(5000, false);
 
             //Scraper.ScrapeUnknowHttpStatusCode();
             //Scraper.ScrapeUnknowIsListing(uri, true);
             //Scraper.ScrapeIsNotListing(uri);
             //Scraper.Scrape(website);
-            //Scraper.Scrape(uriPage);
+            Scraper.Scrape(uriPage);
             //Scraper.ScrapeAllPages();
 
             //Csv.Export(true);
@@ -123,6 +124,9 @@ namespace landerist_console
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.Danyalktk().Run();
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.AWSComprehend().Run();
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.GoogleCNL().Run();
+
+            
+            
         }
     }
 }
