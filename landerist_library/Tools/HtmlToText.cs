@@ -255,7 +255,7 @@ namespace landerist_library.Tools
                 if (string.IsNullOrEmpty(decodedLine))
                 {
                     continue;
-                }               
+                }
                 if (IsSymbol(decodedLine))
                 {
                     continue;
@@ -270,7 +270,7 @@ namespace landerist_library.Tools
                 if (Configuration.Config.WORDS_ENABLED)
                 {
                     InsertWords(decodedLine);
-                }                
+                }
             }
             string text = string.Join(" ", cleanedLines);
             return Strings.Clean(text);
@@ -296,7 +296,7 @@ namespace landerist_library.Tools
                 return;
             }
 
-            if(Regex.IsMatch(cleaned, @"^\p{L}+$"))
+            if (Strings.CountWords(cleaned) <= 3)
             {
                 Words.Insert(cleaned);
             }

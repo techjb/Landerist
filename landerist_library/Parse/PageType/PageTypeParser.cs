@@ -166,16 +166,18 @@ namespace landerist_library.Parse.PageType
 
             if (ResponseBodyIsError(page.ResponseBodyText))
             {
-                page.ResponseBodyText = null;
                 return Websites.PageType.ResponseBodyError;
             }
             if (ResponseBodyIsTooLarge(page.ResponseBodyText))
             {
-                page.ResponseBodyText = null;
                 return Websites.PageType.ResponseBodyTooLarge;
             }
+            if (ResponseBodyIsTooShort(page.ResponseBodyText))
+            {
+                return Websites.PageType.ResponseBodyTooShort;
+            }
 
-            return Websites.PageType.MayContainListing;
+            return Websites.PageType.ResponseBodyValid;
         }
 
         public static bool LastSegmentIsForbidden(Uri uri)
@@ -225,6 +227,15 @@ namespace landerist_library.Parse.PageType
                 return false;
             }
             return responseBodyText.Length > Configuration.Config.MAX_RESPONSEBODYTEXT_LENGTH;
+        }
+
+        private static bool ResponseBodyIsTooShort(string? responseBodyText)
+        {
+            if (responseBodyText == null)
+            {
+                return false;
+            }
+            return responseBodyText.Length < Configuration.Config.MIN_RESPONSEBODYTEXT_LENGTH;
         }
 
         public static void FindProhibitedEndsSegments()

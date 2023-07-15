@@ -17,6 +17,8 @@ namespace landerist_library.Websites
         ForbiddenLastSegment,
         ResponseBodyError,
         ResponseBodyTooLarge,
+        ResponseBodyTooShort,
+        ResponseBodyValid,
         MayContainListing,
         Listing,
         DoesNotContainsListing,        

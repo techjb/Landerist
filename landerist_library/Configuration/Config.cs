@@ -22,6 +22,8 @@
 
         public static readonly int MAX_RESPONSEBODYTEXT_LENGTH = 5000;
 
+        public static readonly int MIN_RESPONSEBODYTEXT_LENGTH = 50;
+
         public static readonly bool LOGS_ENABLED = false;
 
         public static readonly bool TIMERS_ENABLED = false;

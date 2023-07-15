@@ -62,5 +62,11 @@ namespace landerist_library.Tools
                 .Replace(" :", ":")
                 ;
         }
+
+        public static int CountWords(string text)
+        {
+            char[] delimiters = new char[] { ' ', '\r', '\n' };
+            return text.Split(delimiters, StringSplitOptions.RemoveEmptyEntries).Length;
+        }
     }
 }

@@ -8,6 +8,7 @@ using landerist_library.Scrape;
 using landerist_library.Tools;
 using landerist_library.Websites;
 using OpenQA.Selenium.DevTools.V114.Database;
+using System.IO.Compression;
 using System.Text;
 
 namespace landerist_console
@@ -96,7 +97,7 @@ namespace landerist_console
             //Scraper.ScrapeUnknowIsListing(uri, true);
             //Scraper.ScrapeIsNotListing(uri);
             //Scraper.Scrape(website);
-            Scraper.Scrape(uriPage);
+            //Scraper.Scrape(uriPage);
             //Scraper.ScrapeAllPages();
 
             //Csv.Export(true);
@@ -125,8 +126,7 @@ namespace landerist_console
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.AWSComprehend().Run();
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.GoogleCNL().Run();
 
-            
-            
+
         }
     }
 }

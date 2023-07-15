@@ -11,7 +11,7 @@ namespace landerist_library.Scrape
 
         private static int DownloadErrorCounter = 0;
 
-        private static int MayContainListingsCounter = 0;
+        private static int ResponseBodyValidCounter = 0;
 
         private static int OtherPageType = 0;
 
@@ -174,7 +174,7 @@ namespace landerist_library.Scrape
         {
             var scrappedPercentage = Math.Round((float)Scraped * 100 / TotalCounter, 0);
             var downloadErrorPercentage = Math.Round((float)DownloadErrorCounter * 100 / TotalCounter, 0);
-            var downloadMayContainListingPercentage = Math.Round((float)MayContainListingsCounter * 100 / TotalCounter, 0);
+            var responseBodyValidPercentage = Math.Round((float)ResponseBodyValidCounter * 100 / TotalCounter, 0);
             var OtherPageTypePercentage = Math.Round((float)OtherPageType * 100 / TotalCounter, 0);
 
             Console.WriteLine(
@@ -182,7 +182,7 @@ namespace landerist_library.Scrape
                "Threads: " + ThreadCounter + " " +
                "BlockingCollection: " + BlockingCollection.Count + " " +
                "DownloadError: " + DownloadErrorCounter + " (" + downloadErrorPercentage + "%) " +
-               "MayContainListing: " + MayContainListingsCounter + " (" + downloadMayContainListingPercentage + "%) " +
+               "ResponseBodyValid: " + ResponseBodyValidCounter + " (" + responseBodyValidPercentage + "%) " +
                "OtherPageType: " + OtherPageType + " (" + OtherPageTypePercentage + "%) "
                );
         }
@@ -249,9 +249,9 @@ namespace landerist_library.Scrape
                         Interlocked.Increment(ref DownloadErrorCounter);
                     }
                     break;
-                case PageType.MayContainListing:
+                case PageType.ResponseBodyValid:
                     {
-                        Interlocked.Increment(ref MayContainListingsCounter);
+                        Interlocked.Increment(ref ResponseBodyValidCounter);
                     }
                     break;
 
@@ -261,7 +261,6 @@ namespace landerist_library.Scrape
                     }
                     break;
             }
-
         }
     }
 }
