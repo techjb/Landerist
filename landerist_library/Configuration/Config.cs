@@ -14,7 +14,7 @@
 
         public static readonly bool INDEXER_ENABLED = true;
 
-        public static readonly bool WORDS_ENABLED = true;
+        public static readonly bool WORDS_ENABLED = false;
 
         public static readonly int MAX_PAGES_PER_WEBSITE = 20;
 

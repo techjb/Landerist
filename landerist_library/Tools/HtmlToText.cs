@@ -1,6 +1,5 @@
 ﻿using HtmlAgilityPack;
 using landerist_library.Database;
-using System.Text.RegularExpressions;
 
 namespace landerist_library.Tools
 {
@@ -96,7 +95,8 @@ namespace landerist_library.Tools
             "derechos reservados",
             "contraseña",
             "password",
-            "registrarse"
+            "registrarse",            
+            "full screen"
         };
 
         private static readonly List<string> TextEquals = new()
@@ -154,7 +154,12 @@ namespace landerist_library.Tools
             "registro",
             "admin",
             "favoritos",
-
+            "leer más",
+            "ver más",
+            "read more",
+            "posted by",
+            "publicado por",
+            "analytics"
         };
 
 
@@ -291,7 +296,11 @@ namespace landerist_library.Tools
         public static void InsertWords(string text)
         {
             string cleaned = Strings.Clean(text);
-            if (string.IsNullOrWhiteSpace(cleaned))
+            if (string.IsNullOrEmpty(cleaned))
+            {
+                return;
+            }            
+            if (Strings.IsNumeric(text))
             {
                 return;
             }

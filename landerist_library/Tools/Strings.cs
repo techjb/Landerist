@@ -13,7 +13,7 @@ namespace landerist_library.Tools
             text = RemoveMultipleDots(text);
             text = RemoveMultipleComas(text);
             text = RemoveMultipleSpaces(text);            
-            return text;
+            return text.Trim();
         }
 
         private static string BreaklinesToSpace(string text)
@@ -67,6 +67,11 @@ namespace landerist_library.Tools
         {
             char[] delimiters = new char[] { ' ', '\r', '\n' };
             return text.Split(delimiters, StringSplitOptions.RemoveEmptyEntries).Length;
+        }
+
+        public static bool IsNumeric(string text)
+        {
+            return int.TryParse(text, out _);
         }
     }
 }
