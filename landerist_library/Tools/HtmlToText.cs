@@ -48,6 +48,8 @@ namespace landerist_library.Tools
             "filter",
             "news",
             "noticias",
+            "modal-dialog",
+            "poi-container"
         };
 
         private static readonly List<string> TextContains = new()

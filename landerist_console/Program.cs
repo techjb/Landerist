@@ -47,7 +47,7 @@ namespace landerist_console
 
         private static void Run()
         {
-            var uriPage = new Uri("https://www.bloquezeroinmobiliaria.com/");
+            //var uriPage = new Uri("https://zaragoza15.tecnocasa.es/zaragoza/local-comercial-en-alquiler-551636");
 
             //SeleniumDownloader.GetChrome(uriPage);
             //PuppeteerDownloader.Get(uriPage);
