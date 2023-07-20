@@ -31,7 +31,7 @@ namespace landerist_library.Tools
             "//*[contains(@style, 'text-decoration:line-through')]"
         };
 
-        private static readonly List<string> TagsToClearClass= new()
+        private static readonly List<string> TagsToClearClassAndId= new()
         {
             "//html",
             "//body",
@@ -176,7 +176,7 @@ namespace landerist_library.Tools
 
         private static readonly string XpathTagsToRemove = InitXpathTagsToRemove();
 
-        private static readonly string XpathTagsToClearClass = InitXpathTagsToClearClass();
+        private static readonly string XpathTagsToClearClassAndId = InitXpathTagsToClearClassAndId();
 
         private static readonly string XpathIdContains = InitXpathIdContains();
 
@@ -191,9 +191,9 @@ namespace landerist_library.Tools
             return string.Join(" | ", TagsToRemove.ToList());
         }
 
-        private static string InitXpathTagsToClearClass()
+        private static string InitXpathTagsToClearClassAndId()
         {
-            return string.Join(" | ", TagsToClearClass.ToList());
+            return string.Join(" | ", TagsToClearClassAndId.ToList());
         }
 
         private static string InitXpathIdContains()
@@ -229,7 +229,7 @@ namespace landerist_library.Tools
             try
             {
                 RemoveNodes(htmlDocument, XpathTagsToRemove);
-                ClearClasses(htmlDocument, XpathTagsToClearClass);
+                ClearClassAndId(htmlDocument, XpathTagsToClearClassAndId);
                 RemoveNodes(htmlDocument, XpathIdContains);
                 RemoveNodes(htmlDocument, XpathClassContains);
                 RemoveNodes(htmlDocument, XpathTextContains);
@@ -242,7 +242,7 @@ namespace landerist_library.Tools
             return text;
         }
 
-        private static void ClearClasses(HtmlDocument htmlDocument, string select)
+        private static void ClearClassAndId(HtmlDocument htmlDocument, string select)
         {
             var htmlNodeCollection = htmlDocument.DocumentNode.SelectNodes(select);
             if (htmlNodeCollection != null)
@@ -253,7 +253,11 @@ namespace landerist_library.Tools
                     if (node.Attributes.Any(att => att.Name == "class"))
                     {
                         node.Attributes["class"].Value = string.Empty;
-                    }                    
+                    }
+                    if (node.Attributes.Any(att => att.Name == "id"))
+                    {
+                        node.Attributes["id"].Value = string.Empty;
+                    }
                 }
             }
         }
