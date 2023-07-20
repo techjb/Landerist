@@ -49,7 +49,8 @@ namespace landerist_library.Tools
             "news",
             "noticias",
             "modal-dialog",
-            "poi-container"
+            "poi-container",
+            "-slider"
         };
 
         private static readonly List<string> TextContains = new()
@@ -206,7 +207,6 @@ namespace landerist_library.Tools
             var enumerable = list.Select(word => $"contains(translate({selector}, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '{word.ToLower()}')");
             return "//*[" + string.Join(" or ", enumerable) + "]";
         }
-
 
         public static string GetText(HtmlDocument htmlDocument)
         {

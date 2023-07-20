@@ -47,7 +47,7 @@ namespace landerist_console
 
         private static void Run()
         {
-            //var uriPage = new Uri("https://zaragoza15.tecnocasa.es/zaragoza/local-comercial-en-alquiler-551636");
+            var uriPage = new Uri("https://www.toledoap.com/apartamentos-toledo/apartamento-ruh-sara/");
 
             //SeleniumDownloader.GetChrome(uriPage);
             //PuppeteerDownloader.Get(uriPage);
@@ -95,7 +95,7 @@ namespace landerist_console
             //Scraper.ScrapeUnknowIsListing(uri, true);
             //Scraper.ScrapeIsNotListing(uri);
             //Scraper.Scrape(website);
-            //Scraper.Scrape(uriPage);
+            Scraper.Scrape(uriPage);
             //Scraper.ScrapeAllPages();
 
             //Csv.Export(true);
