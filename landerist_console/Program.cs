@@ -47,7 +47,7 @@ namespace landerist_console
 
         private static void Run()
         {
-            var uriPage = new Uri("http://inmopisotarragona.com/es/chalet-en-venta-en-montealegre-leliana/144417/s2");
+            //var uriPage = new Uri("http://inmopisotarragona.com/es/chalet-en-venta-en-montealegre-leliana/144417/s2");
 
             //SeleniumDownloader.GetChrome(uriPage);
             //PuppeteerDownloader.Get(uriPage);
@@ -95,7 +95,7 @@ namespace landerist_console
             //Scraper.ScrapeUnknowIsListing(uri, true);
             //Scraper.ScrapeIsNotListing(uri);
             //Scraper.Scrape(website);
-            Scraper.Scrape(uriPage);
+            //Scraper.Scrape(uriPage);
             //Scraper.ScrapeAllPages();
 
             //Csv.Export(true);

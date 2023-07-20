@@ -250,15 +250,17 @@ namespace landerist_library.Tools
                 List<HtmlNode> nodesToRemove = htmlNodeCollection.ToList();
                 foreach (var node in nodesToRemove)
                 {
-                    if (node.Attributes.Any(att => att.Name == "class"))
-                    {
-                        node.Attributes["class"].Value = string.Empty;
-                    }
-                    if (node.Attributes.Any(att => att.Name == "id"))
-                    {
-                        node.Attributes["id"].Value = string.Empty;
-                    }
+                    ClearClassAndId(node, "class");
+                    ClearClassAndId(node, "id");
                 }
+            }
+        }
+
+        private static void ClearClassAndId(HtmlNode htmlNode, string attributeName)
+        {
+            if (htmlNode.Attributes.Any(att => att.Name == attributeName))
+            {
+                htmlNode.Attributes[attributeName].Value = string.Empty;
             }
         }
 
