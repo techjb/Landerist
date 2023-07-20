@@ -7,11 +7,13 @@ namespace landerist_library.Tools
     {
         private static readonly List<string> TagsToRemove = new()
         {
-            "//script",
-            "//nav",
-            "//footer",
-            "//style",
             "//head",
+            "//script",
+            "//style",
+            //"//header",
+            "//nav",            
+            "//footer",
+            "//aside",            
             "//a",
             "//code",
             "//canvas",
@@ -21,13 +23,19 @@ namespace landerist_library.Tools
             "//progress",
             "//svg",
             "//textarea",
-            "//del",
-            "//aside",
+            "//del",            
             "//button",
             "//form[not(.//input[@id='__VIEWSTATE' or @id='__VIEWSTATEGENERATOR' or @id='__EVENTVALIDATION'])]",
             "//input",
             "//*[contains(@style, 'text-decoration: line-through')]",
             "//*[contains(@style, 'text-decoration:line-through')]"
+        };
+
+        private static readonly List<string> TagsToClearClass= new()
+        {
+            "//html",
+            "//body",
+            "//main",
         };
 
         private static readonly List<string> IdOrClassContains = new()
@@ -168,6 +176,8 @@ namespace landerist_library.Tools
 
         private static readonly string XpathTagsToRemove = InitXpathTagsToRemove();
 
+        private static readonly string XpathTagsToClearClass = InitXpathTagsToClearClass();
+
         private static readonly string XpathIdContains = InitXpathIdContains();
 
         private static readonly string XpathClassContains = InitXpathClassContains();
@@ -179,6 +189,11 @@ namespace landerist_library.Tools
         private static string InitXpathTagsToRemove()
         {
             return string.Join(" | ", TagsToRemove.ToList());
+        }
+
+        private static string InitXpathTagsToClearClass()
+        {
+            return string.Join(" | ", TagsToClearClass.ToList());
         }
 
         private static string InitXpathIdContains()
@@ -214,6 +229,7 @@ namespace landerist_library.Tools
             try
             {
                 RemoveNodes(htmlDocument, XpathTagsToRemove);
+                ClearClasses(htmlDocument, XpathTagsToClearClass);
                 RemoveNodes(htmlDocument, XpathIdContains);
                 RemoveNodes(htmlDocument, XpathClassContains);
                 RemoveNodes(htmlDocument, XpathTextContains);
@@ -224,6 +240,22 @@ namespace landerist_library.Tools
             }
             catch { }
             return text;
+        }
+
+        private static void ClearClasses(HtmlDocument htmlDocument, string select)
+        {
+            var htmlNodeCollection = htmlDocument.DocumentNode.SelectNodes(select);
+            if (htmlNodeCollection != null)
+            {
+                List<HtmlNode> nodesToRemove = htmlNodeCollection.ToList();
+                foreach (var node in nodesToRemove)
+                {
+                    if (node.Attributes.Any(att => att.Name == "class"))
+                    {
+                        node.Attributes["class"].Value = string.Empty;
+                    }                    
+                }
+            }
         }
 
         private static void RemoveNodes(HtmlDocument htmlDocument, string select)

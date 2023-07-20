@@ -47,7 +47,7 @@ namespace landerist_console
 
         private static void Run()
         {
-            var uriPage = new Uri("https://www.toledoap.com/apartamentos-toledo/apartamento-ruh-sara/");
+            var uriPage = new Uri("http://inmopisotarragona.com/es/chalet-en-venta-en-montealegre-leliana/144417/s2");
 
             //SeleniumDownloader.GetChrome(uriPage);
             //PuppeteerDownloader.Get(uriPage);
@@ -123,8 +123,6 @@ namespace landerist_console
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.Danyalktk().Run();
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.AWSComprehend().Run();
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.GoogleCNL().Run();
-
-
         }
     }
 }
