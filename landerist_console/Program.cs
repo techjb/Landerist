@@ -47,7 +47,7 @@ namespace landerist_console
 
         private static void Run()
         {
-            //var uriPage = new Uri("http://inmopisotarragona.com/es/chalet-en-venta-en-montealegre-leliana/144417/s2");
+            var uriPage = new Uri("http://cdeoca.es/verinmuebles/250/traspaso-de-discoteca-en-ourense-zona-centro-/traspaso-de-discoteca-en-ourense-zona-centro-/inmuebles.asp?title=inmuebles");
 
             //SeleniumDownloader.GetChrome(uriPage);
             //PuppeteerDownloader.Get(uriPage);
@@ -68,7 +68,7 @@ namespace landerist_console
 
             //var website = new Website(uri);
             //var page = new Page(website, uriPage);
-            //var page = new Page(uriPage);
+            var page = new Page(uriPage);
 
             //Websites.Delete(website); return;
             //Websites.Delete(uri); return;
@@ -112,7 +112,8 @@ namespace landerist_console
 
             //landerist_library.Index.ProhibitedUrls.FindNewProhibitedStartsWith();
             //landerist_library.Parse.PageType.LastSegment.FindProhibitedEndsSegments();
-            landerist_library.Parse.PageType.PageTypeParser.ResponseBodyValidToListing();
+            landerist_library.Parse.PageType.PageTypeParser.ResponseBodyValidToIsListing();
+            //landerist_library.Parse.PageType.PageTypeParser.ResponseBodyValidToIsListing(page);
 
             //landerist_library.Parse.Listing.MLModel.TrainingData.TestData();
             //landerist_library.Parse.Listing.MLModel.TrainingData.CreateIsListing();

@@ -93,7 +93,7 @@ namespace landerist_library.Parse.PageType
             return responseBodyText.Length < Configuration.Config.MIN_RESPONSEBODYTEXT_LENGTH;
         }
 
-        public static void ResponseBodyValidToListing()
+        public static void ResponseBodyValidToIsListing()
         {
             var pages = Pages.GetPages(PageType.ResponseBodyValid);
             Total = pages.Count;
@@ -102,15 +102,15 @@ namespace landerist_library.Parse.PageType
             NotListingsCounter = 0;
             ErrorsCounter = 0;
             Parallel.ForEach(pages,
-                new ParallelOptions() { MaxDegreeOfParallelism = 1 },
+                //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
                 page =>
             {
-                ResponseBodyValidToListing(page);
+                ResponseBodyValidToIsListing(page);
                 Thread.Sleep(1000);
             });
         }
 
-        public static void ResponseBodyValidToListing(Page page)
+        public static void ResponseBodyValidToIsListing(Page page)
         {
             bool? IsListing = new ChatGPTIsListing().IsListing(page.ResponseBodyText);
             Interlocked.Increment(ref Counter);

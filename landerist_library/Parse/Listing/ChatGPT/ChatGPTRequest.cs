@@ -4,6 +4,7 @@ using OpenAI.Chat;
 using OpenAI;
 using OpenAI.Models;
 using Newtonsoft.Json;
+using System.Text.Json.Nodes;
 
 namespace landerist_library.Parse.Listing.ChatGPT
 {
@@ -26,13 +27,16 @@ namespace landerist_library.Parse.Listing.ChatGPT
         public ChatGPTRequest(string systemMessage)
         {
             SystemMessage = systemMessage;
-            OpenAIClient = new OpenAIClient(Config.OPENAI_API_KEY);            
+            OpenAIClient = new OpenAIClient(Config.OPENAI_API_KEY);
         }
 
-        public ChatGPTRequest(string systemMessage, List<Function> functions, string functionCall): this(systemMessage)
+        public ChatGPTRequest(string systemMessage, List<Function> functions, string functionCall) : this(systemMessage)
         {
             Functions = functions;
-            FunctionCall = functionCall;
+            // Will be fixed here: https://github.com/RageAgainstThePixel/OpenAI-DotNet/pull/127
+            //FunctionCall = functionCall;
+            FunctionCall = "auto";
+
         }
 
         protected ChatResponse? GetResponse(string? userInput)
@@ -46,11 +50,13 @@ namespace landerist_library.Parse.Listing.ChatGPT
                 new Message(Role.System, SystemMessage),
                 new Message(Role.User, userInput),
             };
+
             var chatRequest = new ChatRequest(
-                messages, 
+                messages,
                 functions: Functions,
                 functionCall: FunctionCall,
-                model: Model.GPT3_5_Turbo_16K, 
+                model: Model.GPT3_5_Turbo_16K,
+                //model: Model.GPT4,
                 temperature: 0
                 );
 
@@ -63,7 +69,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception.Message.ToString());
+                Logs.Log.WriteLogErrors("ChatGPT_Request", exception);
                 return null;
             }
         }

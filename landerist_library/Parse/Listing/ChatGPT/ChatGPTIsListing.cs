@@ -1,12 +1,10 @@
-﻿using Amazon.Auth.AccessControlPolicy;
-using Newtonsoft.Json;
+﻿using landerist_library.Logs;
 using OpenAI.Chat;
 using System.Text.Json.Nodes;
-using System.Text.Json.Serialization;
 
 namespace landerist_library.Parse.Listing.ChatGPT
 {
-    
+
 
     public class ChatGPTIsListing : ChatGPTRequest
     {
@@ -18,17 +16,20 @@ namespace landerist_library.Parse.Listing.ChatGPT
             "4. Descripción detallada de la propiedad (número de habitaciones, baños, tamaño en metros cuadrados, etc.).\r\n\r\n" +
             "Evalúa el siguiente texto y determina si contiene todos los datos completos de un anuncio de oferta inmobiliaria. " +
             "Asegúrate de identificar la presencia de cada uno de los puntos anteriores en el texto. " +
-            "Si encuentras títulos de otros anuncios en el texto, ignóralos a menos que vengan acompañados de toda la información requerida.";
+            "Si encuentras títulos de otros anuncios en el texto, ignóralos a menos que vengan acompañados de toda la información requerida.\r\n\r\n" +
+            "Response sólo con \"sí\" o \"no\""
+            ;
 
-
-        private static readonly string FunctionCallValidarTexto = "validar_texto";
-        private static readonly string ParameterEsAnuncioDeOfertaInmobiliaria = "EsAnuncioDeOfertaInmobiliaria";
+        private static readonly string FunctionCallValidarTexto = "obtener_resultados";
+        private static readonly string FunctionCallValidarTextoDescription = "Obtiene el resultados de la evaluación";
+        private static readonly string ParameterEsAnuncioDeOfertaInmobiliaria = "EsUnAnuncioDeOfertaInmobiliaria";
+        private static readonly string ParameterEsAnuncioDeOfertaInmobiliariaDescription = "El texto sí es un anuncio de oferta inmobiliaria";
 
         private static readonly List<Function> Functions = new()
         {
             new Function(
                 FunctionCallValidarTexto,
-                "Valida el texto introducido por el usuario",
+                FunctionCallValidarTextoDescription,
                 new JsonObject()
                 {
                     ["type"] = "object",
@@ -37,8 +38,8 @@ namespace landerist_library.Parse.Listing.ChatGPT
                         [ParameterEsAnuncioDeOfertaInmobiliaria] = new JsonObject
                         {
                             ["type"] = "boolean",
-                            ["description"] = "El texto es un anuncio de oferta inmobiliaria"
-                        },                        
+                            ["description"] = ParameterEsAnuncioDeOfertaInmobiliariaDescription
+                        },
                     },
                     ["required"] = new JsonArray { ParameterEsAnuncioDeOfertaInmobiliaria }
                 }
@@ -47,7 +48,9 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
 
 
-        public ChatGPTIsListing() : base(SystemMessage, Functions, FunctionCallValidarTexto)
+        //public ChatGPTIsListing() : base(SystemMessage, Functions, FunctionCallValidarTexto)
+        // Not working
+        public ChatGPTIsListing() : base(SystemMessage)
         {
 
         }
@@ -62,14 +65,24 @@ namespace landerist_library.Parse.Listing.ChatGPT
             {
                 return null;
             }
-            
+
             var response = GetResponse(text);
-            if (response!=null)
+            if (response == null)
             {
-                var arguments = response.FirstChoice.Message.Function.Arguments.ToString();
-                var responseObject = JsonConvert.DeserializeObject(response.FirstChoice.Message.Function.Arguments.ToString());
-                object d = responseObject.GetType().GetProperty(ParameterEsAnuncioDeOfertaInmobiliaria).GetValue(responseObject, null);
-                //return response.ToLower().StartsWith("sí");
+                return null;
+            }
+            try
+            {
+                string message = response.FirstChoice.Message;
+                return message.ToLower().Equals("sí");
+
+                //var arguments = response.FirstChoice.Message.Function.Arguments.ToString();
+                //JObject json = JObject.Parse(arguments);
+                //return (bool?)json[ParameterEsAnuncioDeOfertaInmobiliaria];
+            }
+            catch (Exception exception)
+            {
+                Log.WriteLogErrors("ChatGPT IsListing", exception);
             }
             return null;
         }
