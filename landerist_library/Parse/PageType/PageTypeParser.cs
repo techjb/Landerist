@@ -102,7 +102,7 @@ namespace landerist_library.Parse.PageType
             NotListingsCounter = 0;
             ErrorsCounter = 0;
             Parallel.ForEach(pages,
-                //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
+                new ParallelOptions() { MaxDegreeOfParallelism = 1 },
                 page =>
             {
                 ResponseBodyValidToListing(page);

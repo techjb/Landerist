@@ -1,8 +1,9 @@
 ﻿using AI.Dev.OpenAI.GPT;
 using landerist_library.Configuration;
-using OpenAI_API;
-using OpenAI_API.Chat;
-using OpenAI_API.Models;
+using OpenAI.Chat;
+using OpenAI;
+using OpenAI.Models;
+using Newtonsoft.Json;
 
 namespace landerist_library.Parse.Listing.ChatGPT
 {
@@ -17,37 +18,50 @@ namespace landerist_library.Parse.Listing.ChatGPT
         //public static readonly int MAX_TOKENS = 8192;
         public static readonly int MAX_TOKENS = 4096;
 
-        private readonly Conversation Conversation;
+        private readonly OpenAIClient OpenAIClient;
+        private readonly string SystemMessage;
+        private readonly List<Function>? Functions;
+        private readonly string? FunctionCall;
 
         public ChatGPTRequest(string systemMessage)
         {
-            OpenAIAPI openAIAPI = new(Config.OPENAI_API_KEY);
-            var chatRequest = new ChatRequest()
-            {
-                Model = Model.ChatGPTTurbo,
-                //Model = Model.GPT4,
-                Temperature = 0,                
-            };
-
-            Conversation = openAIAPI.Chat.CreateConversation(chatRequest);
-            Conversation.AppendSystemMessage(systemMessage);
+            SystemMessage = systemMessage;
+            OpenAIClient = new OpenAIClient(Config.OPENAI_API_KEY);            
         }
 
-        protected string? GetResponse(string? userInput)
+        public ChatGPTRequest(string systemMessage, List<Function> functions, string functionCall): this(systemMessage)
+        {
+            Functions = functions;
+            FunctionCall = functionCall;
+        }
+
+        protected ChatResponse? GetResponse(string? userInput)
         {
             if (string.IsNullOrEmpty(userInput))
             {
                 return null;
             }
-            Conversation.AppendUserInput(userInput);
+            var messages = new List<Message>
+            {
+                new Message(Role.System, SystemMessage),
+                new Message(Role.User, userInput),
+            };
+            var chatRequest = new ChatRequest(
+                messages, 
+                functions: Functions,
+                functionCall: FunctionCall,
+                model: Model.GPT3_5_Turbo_16K, 
+                temperature: 0
+                );
+
             try
             {
                 DateTime dateStart = DateTime.Now;
-                string response = Task.Run(async () => await Conversation.GetResponseFromChatbotAsync()).Result;
+                var response = Task.Run(async () => await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest)).Result;
                 Timers.Timer.SaveTimerChatGPT(string.Empty, dateStart);
                 return response;
             }
-            catch(Exception exception) 
+            catch (Exception exception)
             {
                 Console.WriteLine(exception.Message.ToString());
                 return null;
