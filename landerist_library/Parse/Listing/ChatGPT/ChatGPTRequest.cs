@@ -3,8 +3,6 @@ using landerist_library.Configuration;
 using OpenAI.Chat;
 using OpenAI;
 using OpenAI.Models;
-using Newtonsoft.Json;
-using System.Text.Json.Nodes;
 
 namespace landerist_library.Parse.Listing.ChatGPT
 {

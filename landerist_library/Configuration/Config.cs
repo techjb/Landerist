@@ -24,7 +24,7 @@
 
         public static readonly int MIN_RESPONSEBODYTEXT_LENGTH = 50;
 
-        public static readonly bool LOGS_ENABLED = false;
+        public static readonly bool LOGS_ENABLED = true;
 
         public static readonly bool TIMERS_ENABLED = true;
 

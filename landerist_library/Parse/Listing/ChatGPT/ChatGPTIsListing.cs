@@ -5,7 +5,6 @@ using System.Text.Json.Nodes;
 namespace landerist_library.Parse.Listing.ChatGPT
 {
 
-
     public class ChatGPTIsListing : ChatGPTRequest
     {
         public static readonly string SystemMessage =
