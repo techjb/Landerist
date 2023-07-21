@@ -89,7 +89,7 @@ namespace landerist_console
             //Websites.CountRobotsSiteMaps();            
             //Websites.InsertMainPages();
 
-            Scraper.ScrapeNonScrapped(1000, false);
+            //Scraper.ScrapeNonScrapped(1000, false);
             //Scraper.ScrapeMainPage(website);
             //Scraper.ScrapeUnknowHttpStatusCode();
             //Scraper.ScrapeUnknowIsListing(uri, true);
@@ -111,7 +111,8 @@ namespace landerist_console
             //Console.WriteLine(tuple2);
 
             //landerist_library.Index.ProhibitedUrls.FindNewProhibitedStartsWith();
-            //landerist_library.Parse.Listing.IsListingParser.FindProhibitedEndsSegments();
+            //landerist_library.Parse.PageType.LastSegment.FindProhibitedEndsSegments();
+            landerist_library.Parse.PageType.PageTypeParser.ResponseBodyValidToListing();
 
             //landerist_library.Parse.Listing.MLModel.TrainingData.TestData();
             //landerist_library.Parse.Listing.MLModel.TrainingData.CreateIsListing();

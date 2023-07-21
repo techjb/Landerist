@@ -26,8 +26,16 @@
             return UserMessageHeader + text;
         }
 
-        public bool? IsListing(string text)
+        public bool? IsListing(string? text)
         {
+            if(string.IsNullOrEmpty(text))
+            {
+                return null;
+            }
+            if (!IsTextAllowed(text))
+            {
+                return null;
+            }
             text = GetUserMessage(text);
             var response = GetResponse(text);
             if (!string.IsNullOrEmpty(response))

@@ -1,4 +1,5 @@
 ﻿using landerist_library.Database;
+using landerist_library.Parse.PageType;
 using System.Data;
 
 namespace landerist_library.Websites
@@ -36,6 +37,22 @@ namespace landerist_library.Websites
             return GetPages(website, dataTable);
         }
 
+        public static List<Page> GetPages(PageType pageType)
+        {
+            string query =
+                "SELECT " + TABLE_PAGES + ".*, " + Websites.TABLE_WEBSITES + ".* " +
+                "FROM " + TABLE_PAGES + " " +
+                "INNER JOIN " + Websites.TABLE_WEBSITES + " ON " + TABLE_PAGES + ".[Host] = " + Websites.TABLE_WEBSITES + ".[Host] " +
+                "WHERE [PageType] = @PageType";
+
+            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+                {"PageType", pageType.ToString() }
+            });
+
+            return GetPages(dataTable);
+        }
+
+
         public static List<Page> GetNonScrapedPages(Website website)
         {
             string query =
@@ -61,8 +78,9 @@ namespace landerist_library.Websites
                 orderBy = "ORDER BY NEWID()";
             }
             string query =
-                "SELECT " + topRows + "* " +
+                "SELECT " + topRows + TABLE_PAGES + ".*, " + Websites.TABLE_WEBSITES + ".* " +
                 "FROM " + TABLE_PAGES + " " +
+                "INNER JOIN " + Websites.TABLE_WEBSITES + " ON " + TABLE_PAGES + ".[Host] = " + Websites.TABLE_WEBSITES + ".[Host] " +
                 "WHERE [Updated] IS NULL " +
                 orderBy;
 
@@ -74,8 +92,9 @@ namespace landerist_library.Websites
         public static List<Page> GetUnknowHttpStatusCode()
         {
             string query =
-                "SELECT * " +
+                "SELECT " + TABLE_PAGES + ".*, " + Websites.TABLE_WEBSITES + ".* " +
                 "FROM " + TABLE_PAGES + " " +
+                "INNER JOIN " + Websites.TABLE_WEBSITES + " ON " + TABLE_PAGES + ".[Host] = " + Websites.TABLE_WEBSITES + ".[Host] " +
                 "WHERE [HttpStatusCode] IS NULL";
 
             DataTable dataTable = new DataBase().QueryTable(query);
@@ -117,15 +136,12 @@ namespace landerist_library.Websites
         {
             Console.WriteLine("Parsing to pages ..");
             List<Page> pages = new();
-            var sync = new object();
-            Parallel.ForEach(dataTable.AsEnumerable(), dataRow =>
+            foreach (DataRow dataRow in dataTable.Rows)
             {
-                Page page = new(dataRow);
-                lock (sync)
-                {
-                    pages.Add(page);
-                }
-            });
+                Website website = new(dataRow);
+                Page page = new(website, dataRow);
+                pages.Add(page);
+            }
             return pages;
         }
 
@@ -224,7 +240,7 @@ namespace landerist_library.Websites
                 "SELECT [Uri] " +
                 "FROM " + TABLE_PAGES + " " +
                 "WHERE IsListing = @IsListing";
-            return new DataBase().QueryListString(query, new Dictionary<string, object?>() 
+            return new DataBase().QueryListString(query, new Dictionary<string, object?>()
             {
                 { "IsListing", isListing }
             });

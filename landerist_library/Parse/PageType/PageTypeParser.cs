@@ -1,153 +1,34 @@
-﻿using landerist_library.Index;
+﻿using landerist_library.Parse.Listing.ChatGPT;
 using landerist_library.Websites;
+using landerist_orels.ES;
 
 
 namespace landerist_library.Parse.PageType
 {
+    public enum PageType
+    {
+        DownloadError,
+        IncorrectLanguage,
+        MainPage,
+        ForbiddenLastSegment,
+        ResponseBodyError,
+        ResponseBodyTooLarge,
+        ResponseBodyTooShort,
+        ResponseBodyValid,
+        MayContainListing,
+        Listing,
+        NotListing,
+    };
+
     public class PageTypeParser
     {
-        private static readonly HashSet<string> ProhibitedLatestSegments = new(StringComparer.OrdinalIgnoreCase)
-        {
-            "promociones",
-            "propiedades",
-            "inmuebles",
-            "mapa",
-            "casas",
-            "pisos",
-            "alquiler",
-            "garajes",
-            "locales",
-            "venta",
-            "solares",
-            "buscador",
-            "oficinas",
-            "destacados",
-            "mapa-del-sitio",
-            "privado",
-            "naves-industriales",
-            "propietarios",
-            "venta-alquiler",
-            "obra-nueva",
-            "chalets",
-            "en_venta",
-            "vender",
-            "comprar",
-            "trabajos",
-            "inmobiliaria",
-            "edificios",
-            "venta-chalets",
-            "alquiler-locales",
-            "trasteros",
-            "venta-garajes",
-            "promociones.php",
-            "barcelona",
-            "madrid",
-            "en-barcelona",
-            "en-madrid",
-            "marbella",
-            "valencia",
-            "all",
-            "alquilar",
-            "centro",
-            "%c3%baltima-hora",
-            "última-hora",
-            "captación",
-            "captacion",
-            "piso",
-            "casa",
-            "inicio",
-            "apartamento",
-            "alquiler.php",
-            "alquiler_vacacional.php",
-            "venta.php",
-            "novedades.php",
-            "promociones.php",
-            "agencia-inmobiliaria.php",
-            "setup-config.php",
-            "search-form-top.php",
-            "buscador.php",
-            "destacados.php",
-            "alquilar-tu-vivienda.php",
-            "search-form-top-obra-nueva.php",
-            "popup.php",
-            "ventas.php",
-            "comprar.php",
-            "propiedades.php",
-            "ventas.php",
-            "index.php",
-            "vender.php",
-            "alertas.php",
-            "destacados.php",
-            "arquitectura.php",
-            "vender_alquiler.php",
-            "ipc.php",
-            "inmuebles.php",
-            "legislacion.php",
-            "venta-casas",
-            "venta-garajes",
-            "vacacional",
-            "alquiler-pisos",
-            "venta-pisos",
-            "venta-locales",
-            "alquiler-locales",
-            "locales-o-naves",
-            "venta-oficinas",
-            "alquiler.html",
-            "venta.html",
-            "inicio.html",
-            "index.html",
-            "mis-propiedades.html",
-            "inmuebles.html",
-            "inmuebles.html",
-            "404.html",
-            "alertas.html",
-            "locales-comerciales.html",
-            "mapa.html",
-            "vender.html",
-            "buscador.html",
-            "en-venta-1.html",
-            "en-alquiler-2.html",
-            "inmobiliaria.html",
-            "propiedades.html",
-            "venta-edificios_singulares",
-            "terrenos",
-            "parcelas",
-            "unifamiliares",
-            "alquiler-oficinas",
-            "pisos-apartamentos",
-            "busqueda-avanzada",
-            "alquiler-naves",
-            "email-protection",
-            "venta-naves",
-            "vivienda",
-            "registro",
-            "mapa-footer",
-            "eres-propietario",
-            "otros-tipos",
-            "es",
-            "en",
-            "fr",
-            "de",
-            "ca",
-            "ru",
-            "zh",
-            "es-es",
-            "1",
-            "2",
-            "3",
-            "4",
-            "&",
-            "i-t-e-inspeccion-tecnica-de-edificios",
-            "preguntas-frecuentes",
-            "comercializados",
-            "alquile-o-venda-su-propiedad",
-            "obra-nueva-en-",
-            "terms_of_use",
-            "garaje-trastero-en-",
-            "properties",
-        };
+        private static int Total;
+        private static int Counter;
+        private static int ListingsCounter;
+        private static int NotListingsCounter;
+        private static int ErrorsCounter;
 
-        public static Websites.PageType? GetPageType(Page page)
+        public static PageType? GetPageType(Page page)
         {
             if (page == null)
             {
@@ -155,55 +36,29 @@ namespace landerist_library.Parse.PageType
             }
             if (page.IsMainPage())
             {
-                return Websites.PageType.MainPage;
+                return PageType.MainPage;
             }
-            if (LastSegmentIsForbidden(page.Uri))
+            if (LastSegment.LastSegmentIsForbidden(page.Uri))
             {
-                return Websites.PageType.ForbiddenLastSegment;
+                return PageType.ForbiddenLastSegment;
             }
 
             page.SetResponseBodyText();
 
             if (ResponseBodyIsError(page.ResponseBodyText))
             {
-                return Websites.PageType.ResponseBodyError;
+                return PageType.ResponseBodyError;
             }
             if (ResponseBodyIsTooLarge(page.ResponseBodyText))
             {
-                return Websites.PageType.ResponseBodyTooLarge;
+                return PageType.ResponseBodyTooLarge;
             }
             if (ResponseBodyIsTooShort(page.ResponseBodyText))
             {
-                return Websites.PageType.ResponseBodyTooShort;
+                return PageType.ResponseBodyTooShort;
             }
 
-            return Websites.PageType.ResponseBodyValid;
-        }
-
-        public static bool LastSegmentIsForbidden(Uri uri)
-        {
-            if (!string.IsNullOrEmpty(uri.Query))
-            {
-                return false;
-            }
-            var lastSegment = GetLastSegment(uri);
-            return ProhibitedLatestSegments.Any(item => lastSegment.Equals(item, StringComparison.OrdinalIgnoreCase));
-        }
-
-        private static string GetLastSegment(Uri uri)
-        {
-            string[] segments = uri.Segments;
-            string segment = segments[0].TrimEnd('/').ToLower();
-            for (int i = segments.Length - 1; i >= 0; i--)
-            {
-                var currentSegment = segments[i].TrimEnd('/').ToLower();
-                if (!currentSegment.Equals(string.Empty))
-                {
-                    segment = currentSegment;
-                    break;
-                }
-            }
-            return segment;
+            return PageType.ResponseBodyValid;
         }
 
         private static bool ResponseBodyIsError(string? responseBodyText)
@@ -238,74 +93,53 @@ namespace landerist_library.Parse.PageType
             return responseBodyText.Length < Configuration.Config.MIN_RESPONSEBODYTEXT_LENGTH;
         }
 
-        public static void FindProhibitedEndsSegments()
+        public static void ResponseBodyValidToListing()
         {
-            var urls = Pages.GetUris();
-            var dictionary = ToDictionary(urls);
-            int count = dictionary.Count;
-            dictionary = dictionary.Take(100).ToDictionary(x => x.Key, x => x.Value);
-            foreach (var entry in dictionary)
+            var pages = Pages.GetPages(PageType.ResponseBodyValid);
+            Total = pages.Count;
+            Counter = 0;
+            ListingsCounter = 0;
+            NotListingsCounter = 0;
+            ErrorsCounter = 0;
+            Parallel.ForEach(pages,
+                //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
+                page =>
             {
-                float percentage = entry.Value * 100 / count;
-                Console.WriteLine(entry.Key + " " + entry.Value + " (" + Math.Round(percentage, 2) + "%)");
-            }
+                ResponseBodyValidToListing(page);
+                Thread.Sleep(1000);
+            });
         }
 
-        private static Dictionary<string, int> ToDictionary(List<string> urls)
+        public static void ResponseBodyValidToListing(Page page)
         {
-            Dictionary<string, int> dictionary = new();
-            int total = urls.Count;
-            var sync = new object();
-            int counter = 0;
-            Parallel.ForEach(urls,
-              //new ParallelOptions() { MaxDegreeOfParallelism = 1},                
-              url =>
-              {
-                  Interlocked.Increment(ref counter);
-                  Console.WriteLine(counter + " / " + total);
+            bool? IsListing = new ChatGPTIsListing().IsListing(page.ResponseBodyText);
+            Interlocked.Increment(ref Counter);
+            if (IsListing.HasValue)
+            {
+                PageType? pageType = (bool)IsListing ? PageType.Listing : PageType.NotListing;
+                page.Update(pageType);
+                switch (pageType)
+                {
+                    case PageType.Listing: Interlocked.Increment(ref ListingsCounter); break;
+                    case PageType.NotListing: Interlocked.Increment(ref NotListingsCounter); break;
+                }
+            }
+            else
+            {
+                Interlocked.Increment(ref ErrorsCounter);
+            }            
+                        
+            var percentageTotal = Counter * 100 / Total;
+            var percentageListings = ListingsCounter * 100 / Counter;
+            var percentageNotListings = NotListingsCounter * 100 / Counter;
+            var percentageErrors = ErrorsCounter * 100 / Counter;
 
-                  if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
-                  {
-                      return;
-                  }
-                  if (!string.IsNullOrEmpty(uri.Query))
-                  {
-                      return;
-                  }
-                  if (ProhibitedUrls.IsProhibited(uri, LanguageCode.es))
-                  {
-                      return;
-                  }
-
-                  var lastSegment = GetLastSegment(uri);
-                  if (ProhibitedLatestSegments.Contains(lastSegment))
-                  {
-                      return;
-                  }
-
-                  if (!lastSegment.EndsWith(".html"))
-                  {
-                      return;
-                  }
-
-                  lock (sync)
-                  {
-                      if (dictionary.ContainsKey(lastSegment))
-                      {
-                          dictionary[lastSegment] = dictionary[lastSegment] + 1;
-                      }
-                      else
-                      {
-                          dictionary[lastSegment] = 1;
-                      }
-                  }
-              });
-
-
-            dictionary = dictionary.Where(pair => pair.Value > 2).ToDictionary(pair => pair.Key, pair => pair.Value);
-            var sortedDict = from entry in dictionary orderby entry.Value descending select entry;
-            dictionary = sortedDict.ToDictionary(x => x.Key, x => x.Value);
-            return dictionary;
+            Console.WriteLine(
+                Counter + "/" + Total + " (" + percentageTotal + "%) " +
+                "Listing: " + ListingsCounter + " (" + percentageListings + "%) " +
+                "NotListing: " + NotListingsCounter + " (" + percentageNotListings + "%) " +
+                "Errors: " + ErrorsCounter + " (" + percentageErrors + "%) " 
+                );
         }
     }
 }

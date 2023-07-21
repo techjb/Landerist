@@ -1,4 +1,5 @@
-﻿using landerist_library.Websites;
+﻿using landerist_library.Parse.PageType;
+using landerist_library.Websites;
 using System.Collections.Concurrent;
 
 namespace landerist_library.Scrape

@@ -26,7 +26,7 @@
 
         public static readonly bool LOGS_ENABLED = false;
 
-        public static readonly bool TIMERS_ENABLED = false;
+        public static readonly bool TIMERS_ENABLED = true;
 
         public static readonly string USER_AGENT = "Mozilla/5.0 (compatible; AcmeInc/1.0)";
 

@@ -1,6 +1,7 @@
 ﻿using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Database;
+using landerist_library.Parse.PageType;
 using landerist_library.Tools;
 using landerist_orels.ES;
 using System.Data;
@@ -9,21 +10,7 @@ using System.Text;
 
 namespace landerist_library.Websites
 {
-    public enum PageType
-    {
-        DownloadError,
-        IncorrectLanguage,
-        MainPage,
-        ForbiddenLastSegment,
-        ResponseBodyError,
-        ResponseBodyTooLarge,
-        ResponseBodyTooShort,
-        ResponseBodyValid,
-        MayContainListing,
-        Listing,
-        DoesNotContainsListing,        
-    };
-
+    
     public class Page : Pages
     {
 
@@ -105,7 +92,7 @@ namespace landerist_library.Websites
             Updated = dataRow["Updated"] is DBNull ? null : (DateTime)dataRow["Updated"];
             HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
             PageType = dataRow["PageType"] is DBNull ? null : 
-                (landerist_library.Websites.PageType)Enum.Parse(typeof(landerist_library.Websites.PageType), dataRow["PageType"].ToString()!);
+                (PageType)Enum.Parse(typeof(PageType), dataRow["PageType"].ToString()!);
             ResponseBodyText = dataRow["ResponseBodyText"] is DBNull ? null : dataRow["ResponseBodyText"].ToString();
         }
 
@@ -177,6 +164,20 @@ namespace landerist_library.Websites
                 {"HttpStatusCode", HttpStatusCode},
                 {"PageType", PageType?.ToString()},
                 {"ResponseBodyText", ResponseBodyText},
+            });
+        }
+
+        public bool Update(PageType? pageType)
+        {
+            SetPageType(pageType);
+            string query =
+               "UPDATE " + TABLE_PAGES + " SET " +
+               "[PageType] = @PageType " +
+               "WHERE [UriHash] = @UriHash";
+
+            return new DataBase().Query(query, new Dictionary<string, object?> {
+                {"UriHash", UriHash },                
+                {"PageType", PageType?.ToString()},                
             });
         }
 

@@ -14,7 +14,8 @@ namespace landerist_library.Parse.Listing.ChatGPT
         // gpt-3.5-turbo-16k: 16384
         // GPT-4-8K: 8192
         // GPT-4-32K: 32768
-        public static readonly int MAX_TOKENS = 8192;
+        //public static readonly int MAX_TOKENS = 8192;
+        public static readonly int MAX_TOKENS = 4096;
 
         private readonly Conversation Conversation;
 
@@ -23,8 +24,8 @@ namespace landerist_library.Parse.Listing.ChatGPT
             OpenAIAPI openAIAPI = new(Config.OPENAI_API_KEY);
             var chatRequest = new ChatRequest()
             {
-                //Model = Model.ChatGPTTurbo,
-                Model = Model.GPT4,
+                Model = Model.ChatGPTTurbo,
+                //Model = Model.GPT4,
                 Temperature = 0,                
             };
 
@@ -46,8 +47,9 @@ namespace landerist_library.Parse.Listing.ChatGPT
                 Timers.Timer.SaveTimerChatGPT(string.Empty, dateStart);
                 return response;
             }
-            catch
+            catch(Exception exception) 
             {
+                Console.WriteLine(exception.Message.ToString());
                 return null;
             }
         }
