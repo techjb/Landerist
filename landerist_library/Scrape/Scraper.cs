@@ -27,9 +27,9 @@ namespace landerist_library.Scrape
 
         private static BlockingCollection<Page> BlockingCollection = new();
 
-        public static void ScrapeNonScrapped(int? rows = null, bool recursive = false)
+        public static void ScrapeUnknowPageType(int? rows = null, bool recursive = false)
         {
-            List<Page> pages = Pages.GetNonScraped(rows);
+            List<Page> pages = Pages.GetUnknowPageType(rows);
             if (pages.Count.Equals(0))
             {
                 return;
@@ -40,7 +40,7 @@ namespace landerist_library.Scrape
             }
             if (recursive)
             {
-                ScrapeNonScrapped(rows, recursive);
+                ScrapeUnknowPageType(rows, recursive);
             }
         }
 

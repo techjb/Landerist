@@ -68,7 +68,7 @@ namespace landerist_library.Websites
             return GetPages(website, dataTable);
         }
 
-        public static List<Page> GetNonScraped(int? rows = null)
+        public static List<Page> GetUnknowPageType(int? rows = null)
         {
             string topRows = string.Empty;
             string orderBy = string.Empty;
@@ -81,7 +81,7 @@ namespace landerist_library.Websites
                 "SELECT " + topRows + TABLE_PAGES + ".*, " + Websites.TABLE_WEBSITES + ".* " +
                 "FROM " + TABLE_PAGES + " " +
                 "INNER JOIN " + Websites.TABLE_WEBSITES + " ON " + TABLE_PAGES + ".[Host] = " + Websites.TABLE_WEBSITES + ".[Host] " +
-                "WHERE [Updated] IS NULL " +
+                "WHERE [PageType] IS NULL " +
                 orderBy;
 
             Console.WriteLine("Reading non scraped ..");
