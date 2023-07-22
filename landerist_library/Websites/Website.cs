@@ -270,6 +270,12 @@ namespace landerist_library.Websites
             return 0;
         }
 
+        public bool CrawlDelayTooBig()
+        {
+            var crawlDelay = CrawlDelay();
+            return crawlDelay > Config.MAX_CRAW_DELAY_SECONDS;
+        }
+
         public bool Delete()
         {
             DeleteListings();

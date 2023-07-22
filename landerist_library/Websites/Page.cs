@@ -169,14 +169,18 @@ namespace landerist_library.Websites
 
         public bool Update(PageType? pageType)
         {
+            Updated = DateTime.Now;
+
             SetPageType(pageType);
             string query =
                "UPDATE " + TABLE_PAGES + " SET " +
+               "[Updated] = @Updated, " +
                "[PageType] = @PageType " +
                "WHERE [UriHash] = @UriHash";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
-                {"UriHash", UriHash },                
+                {"UriHash", UriHash },
+                {"Updated", Updated },
                 {"PageType", PageType?.ToString()},                
             });
         }
@@ -210,6 +214,8 @@ namespace landerist_library.Websites
             }
             return true;
         }
+
+        
 
 
         public void LoadHtmlDocument(bool forceReload = false)

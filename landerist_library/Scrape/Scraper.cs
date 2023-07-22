@@ -1,6 +1,7 @@
 ﻿using landerist_library.Parse.PageType;
 using landerist_library.Websites;
 using System.Collections.Concurrent;
+using ThirdParty.BouncyCastle.Utilities.IO.Pem;
 
 namespace landerist_library.Scrape
 {
@@ -149,7 +150,7 @@ namespace landerist_library.Scrape
 
         private static bool Scrape(HashSet<Page> pages)
         {
-            pages.RemoveWhere(p => !p.CanScrape());
+            //pages.RemoveWhere(p => !p.CanScrape());
             InitBlockingCollection(pages);
             if(pages.Count == 0)
             {
@@ -177,6 +178,11 @@ namespace landerist_library.Scrape
 
         private static void ProcessThread(Page page)
         {
+            if (!IsScrapeable(page))
+            {
+                return;
+            }
+
             if (IsBlocked(page) && !BlockingCollection.IsCompleted)
             {
                 BlockingCollection.Add(page);
@@ -189,6 +195,21 @@ namespace landerist_library.Scrape
             }
 
             WriteConsole();
+        }
+
+        private static bool IsScrapeable(Page page)
+        {
+            if (!page.Website.IsAllowedByRobotsTxt(page.Uri))
+            {
+                page.Update(PageType.BlockedByRobotsTxt);
+                return false;
+            }
+            if (page.Website.CrawlDelayTooBig())
+            {
+                page.Update(PageType.RobotsTxtCrawlDelayTooBig);
+                return false;
+            }
+            return true;
         }
 
         private static void WriteConsole()

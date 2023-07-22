@@ -9,6 +9,8 @@ namespace landerist_library.Parse.PageType
     {
         DownloadError,
         IncorrectLanguage,
+        BlockedByRobotsTxt,
+        RobotsTxtCrawlDelayTooBig,
         MainPage,
         NotIndexable,
         ForbiddenLastSegment,
