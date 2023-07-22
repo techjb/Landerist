@@ -10,6 +10,7 @@ namespace landerist_library.Parse.PageType
         DownloadError,
         IncorrectLanguage,
         MainPage,
+        NotIndexable,
         ForbiddenLastSegment,
         ResponseBodyError,
         ResponseBodyTooLarge,
@@ -37,6 +38,10 @@ namespace landerist_library.Parse.PageType
             if (page.IsMainPage())
             {
                 return PageType.MainPage;
+            }
+            if (!page.CanIndexContent())
+            {
+                return PageType.NotIndexable;
             }
             if (LastSegment.LastSegmentIsForbidden(page.Uri))
             {
@@ -86,9 +91,9 @@ namespace landerist_library.Parse.PageType
 
         private static bool ResponseBodyIsTooShort(string? responseBodyText)
         {
-            if (responseBodyText == null)
+            if (string.IsNullOrEmpty(responseBodyText))
             {
-                return false;
+                return true;
             }
             return responseBodyText.Length < Configuration.Config.MIN_RESPONSEBODYTEXT_LENGTH;
         }

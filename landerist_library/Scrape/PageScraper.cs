@@ -47,10 +47,7 @@ namespace landerist_library.Scrape
             {
                 IndexPages();
             }
-            if (Page.CanIndexContent())
-            {
-                SetPageType();
-            }
+            SetPageType();
         }
 
         private bool IsCorrectLanguage()

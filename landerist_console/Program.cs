@@ -47,7 +47,7 @@ namespace landerist_console
 
         private static void Run()
         {
-            //var uriPage = new Uri("http://cdeoca.es/verinmuebles/250/traspaso-de-discoteca-en-ourense-zona-centro-/traspaso-de-discoteca-en-ourense-zona-centro-/inmuebles.asp?title=inmuebles");
+            var uriPage = new Uri("https://www.brextom.com/alquiler-pisos-murcia/");
 
             //SeleniumDownloader.GetChrome(uriPage);
             //PuppeteerDownloader.Get(uriPage);
@@ -112,7 +112,7 @@ namespace landerist_console
 
             //landerist_library.Index.ProhibitedUrls.FindNewProhibitedStartsWith();
             //landerist_library.Parse.PageType.LastSegment.FindProhibitedEndsSegments();
-            landerist_library.Parse.PageType.PageTypeParser.ResponseBodyValidToIsListing();
+            //landerist_library.Parse.PageType.PageTypeParser.ResponseBodyValidToIsListing();
             //landerist_library.Parse.PageType.PageTypeParser.ResponseBodyValidToIsListing(page);
 
             //landerist_library.Parse.Listing.MLModel.TrainingData.TestData();
