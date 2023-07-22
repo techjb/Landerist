@@ -120,7 +120,10 @@ namespace landerist_library.Scrape
             {
                 return;
             }
-            Scrape(pages);
+            if (!Scrape(pages))
+            {
+                return;
+            }
             if (recursive)
             {
                 ScrapeIsNotListing(website, recursive);
