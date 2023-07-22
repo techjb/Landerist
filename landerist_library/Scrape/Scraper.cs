@@ -33,7 +33,10 @@ namespace landerist_library.Scrape
             {
                 return;
             }
-            Scrape(pages);
+            if (!Scrape(pages))
+            {
+                return;
+            }
             if (recursive)
             {
                 ScrapeNonScrapped(rows, recursive);
@@ -53,7 +56,10 @@ namespace landerist_library.Scrape
             {
                 return;
             }
-            Scrape(pages);
+            if (!Scrape(pages))
+            {
+                return;
+            }
             if (recursive)
             {
                 ScrapeNonScrapped(website, recursive);
@@ -67,7 +73,10 @@ namespace landerist_library.Scrape
             {
                 return;
             }
-            Scrape(pages);
+            if (!Scrape(pages))
+            {
+                return;
+            }
             if (recursive)
             {
                 ScrapeUnknowHttpStatusCode(recursive);
@@ -88,7 +97,10 @@ namespace landerist_library.Scrape
             {
                 return;
             }
-            Scrape(pages);
+            if (!Scrape(pages))
+            {
+                return;
+            }
             if (recursive)
             {
                 ScrapeUnknowIsListing(website, recursive);
@@ -120,22 +132,26 @@ namespace landerist_library.Scrape
             Scrape(page);
         }
 
-        public static void Scrape(Website website)
+        public static bool Scrape(Website website)
         {
             var pages = website.GetPages();
-            Scrape(pages);
+            return Scrape(pages);
         }
 
-        private static void Scrape(List<Page> pages)
+        private static bool Scrape(List<Page> pages)
         {
             HashSet<Page> hashSet = new(pages, new PageComparer());
-            Scrape(hashSet);
+            return Scrape(hashSet);
         }
 
-        private static void Scrape(HashSet<Page> pages)
+        private static bool Scrape(HashSet<Page> pages)
         {
             pages.RemoveWhere(p => !p.CanScrape());
             InitBlockingCollection(pages);
+            if(pages.Count == 0)
+            {
+                return false;
+            }
             TotalCounter = pages.Count;
             Scraped = 0;
             Remaining = TotalCounter;
@@ -149,6 +165,7 @@ namespace landerist_library.Scrape
                     ProcessThread(page);
                     EndThread();
                 });
+            return true;
         }
         private static void StartThread()
         {
@@ -179,7 +196,7 @@ namespace landerist_library.Scrape
             var OtherPageTypePercentage = Math.Round((float)OtherPageType * 100 / TotalCounter, 0);
 
             Console.WriteLine(
-               "Scraped: " + Scraped + " (" + scrappedPercentage + "%) " +
+               "Scraped: " + Scraped + "/" + TotalCounter + " (" + scrappedPercentage + "%) " +
                "Threads: " + ThreadCounter + " " +
                "BlockingCollection: " + BlockingCollection.Count + " " +
                "Errors: " + DownloadErrorCounter + " (" + downloadErrorPercentage + "%) " +
