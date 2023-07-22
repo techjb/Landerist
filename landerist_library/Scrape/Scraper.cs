@@ -182,9 +182,9 @@ namespace landerist_library.Scrape
                "Scraped: " + Scraped + " (" + scrappedPercentage + "%) " +
                "Threads: " + ThreadCounter + " " +
                "BlockingCollection: " + BlockingCollection.Count + " " +
-               "DownloadError: " + DownloadErrorCounter + " (" + downloadErrorPercentage + "%) " +
-               "ResponseBodyValid: " + ResponseBodyValidCounter + " (" + responseBodyValidPercentage + "%) " +
-               "OtherPageType: " + OtherPageType + " (" + OtherPageTypePercentage + "%) "
+               "Errors: " + DownloadErrorCounter + " (" + downloadErrorPercentage + "%) " +
+               "Valids: " + ResponseBodyValidCounter + " (" + responseBodyValidPercentage + "%) " +
+               "Others: " + OtherPageType + " (" + OtherPageTypePercentage + "%) "
                );
         }
 
