@@ -37,7 +37,7 @@ namespace landerist_library.Parse.Media.Image
         private void DownloadImage(landerist_orels.ES.Media image)
         {
 
-            if (!ImageParser.MediaParser.Page.Website.IsUriAllowed(image.url))
+            if (!ImageParser.MediaParser.Page.Website.IsAllowedByRobotsTxt(image.url))
             {
                 return;
             }

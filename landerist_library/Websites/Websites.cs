@@ -269,7 +269,7 @@ namespace landerist_library.Websites
             int counterNo = 0;
             foreach (var website in websites)
             {
-                bool canAccess = website.IsMainUriAllowed();
+                bool canAccess = website.IsMainUriAllowedByRobotsTxt();
                 if (canAccess)
                 {
                     counterYes++;

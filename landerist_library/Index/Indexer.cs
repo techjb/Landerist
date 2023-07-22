@@ -108,7 +108,7 @@ namespace landerist_library.Index
                 return;
             }
 
-            if (!Page.Website.IsUriAllowed(uri))
+            if (!Page.Website.IsAllowedByRobotsTxt(uri))
             {
                 return;
             }

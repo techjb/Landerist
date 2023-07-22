@@ -199,11 +199,12 @@ namespace landerist_library.Websites
 
         public bool CanScrape()
         {
-            if (!Website.IsUriAllowed(Uri))
+            if (!Website.IsAllowedByRobotsTxt(Uri))
             {
                 return false;
             }
-            if (Website.CrawlDelay() > Config.MAX_CRAW_DELAY_SECONDS)
+            var crawlDelay = Website.CrawlDelay();
+            if (crawlDelay > Config.MAX_CRAW_DELAY_SECONDS)
             {
                 return false;
             }

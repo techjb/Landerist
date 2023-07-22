@@ -232,12 +232,12 @@ namespace landerist_library.Websites
             return false;
         }
 
-        public bool IsMainUriAllowed()
+        public bool IsMainUriAllowedByRobotsTxt()
         {
-            return IsUriAllowed(MainUri);
+            return IsAllowedByRobotsTxt(MainUri);
         }
 
-        public bool IsUriAllowed(Uri uri)
+        public bool IsAllowedByRobotsTxt(Uri uri)
         {
             if (RobotsTxt != null)
             {
