@@ -32,7 +32,7 @@
 
         public static readonly int HTTPCLIENT_SECONDS_TIMEOUT = 10;
 
-        public static readonly int MAX_CRAW_DELAY_SECONDS = 60;
+        public static readonly int MAX_CRAW_DELAY_SECONDS = 120;
 
         private static readonly string VERSION_LOCAL = new Random().Next(1000, 9999).ToString();
         public static string? VERSION { get; set; }
