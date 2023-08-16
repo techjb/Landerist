@@ -221,8 +221,8 @@ namespace landerist_library.Scrape
 
             Console.WriteLine(
                "Scraped: " + Scraped + "/" + TotalCounter + " (" + scrappedPercentage + "%) " +
-               "Threads: " + ThreadCounter + " " +
-               "BlockingCollection: " + BlockingCollection.Count + " " +
+               //"Threads: " + ThreadCounter + " " +
+               //"BlockingCollection: " + BlockingCollection.Count + " " +
                "Errors: " + DownloadErrorCounter + " (" + downloadErrorPercentage + "%) " +
                "Valids: " + ResponseBodyValidCounter + " (" + responseBodyValidPercentage + "%) " +
                "Others: " + OtherPageType + " (" + OtherPageTypePercentage + "%) "

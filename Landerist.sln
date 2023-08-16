@@ -19,6 +19,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "landerist_orels_viewer", "l
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "landerist_webserver", "landerist_webserver\landerist_webserver.pyproj", "{D5FDAAA4-4E71-470E-892E-F30A86DCB2D6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "landerist_website", "landerist_website", "{B0045D1A-422C-4327-8A3C-F90D55CFF0A8}"
+	ProjectSection(SolutionItems) = preProject
+		index.html = index.html
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
