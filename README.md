@@ -1,6 +1,6 @@
 # Landerist
 
-[Landerist](https://landerist.com)
+[Landerist website](https://landerist.com)
 
 Open project for the decentralization of real estate listings using the following methodology:
 
