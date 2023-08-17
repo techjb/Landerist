@@ -7,8 +7,7 @@ Open project for the decentralization of real estate listings using the followin
 3. Distribute the dataset for free in [ORELS](https://github.com/techjb/Open-Real-Estate-Listings-Schema) format.
 4. Keep the dataset updated daily.
 
-## Website
-[Landerist](https://landerist.com)
+Visit the [Landerist website](https://landerist.com)
 
 ## Installation
 
