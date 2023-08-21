@@ -142,6 +142,12 @@ namespace landerist_library.Scrape
             return Scrape(pages);
         }
 
+        public static bool ScrapeUnknowPageType(Website website)
+        {
+            var pages = website.GetPagesUnknowPageType();
+            return Scrape(pages);
+        }
+
         private static bool Scrape(List<Page> pages)
         {
             HashSet<Page> hashSet = new(pages, new PageComparer());
@@ -150,7 +156,6 @@ namespace landerist_library.Scrape
 
         private static bool Scrape(HashSet<Page> pages)
         {
-            //pages.RemoveWhere(p => !p.CanScrape());
             InitBlockingCollection(pages);
             if(pages.Count == 0)
             {

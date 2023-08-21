@@ -37,6 +37,21 @@ namespace landerist_library.Websites
             return GetPages(website, dataTable);
         }
 
+        public static List<Page> GetPagesUnknowPageType(Website website)
+        {
+            string query =
+                "SELECT * " +
+                "FROM " + TABLE_PAGES + " " +
+                "WHERE [Host] = @Host AND " +
+                "[PageType] IS NULL";
+
+            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+                {"Host", website.Host },                
+            });
+
+            return GetPages(website, dataTable);
+        }
+
         public static List<Page> GetPages(PageType pageType)
         {
             string query =

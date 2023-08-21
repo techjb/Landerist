@@ -2,6 +2,7 @@
 using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Index;
+using landerist_library.Parse.PageType;
 using System.Data;
 using System.Net;
 using System.Net.Http;
@@ -359,6 +360,11 @@ namespace landerist_library.Websites
         public List<Page> GetPages()
         {
             return Pages.GetPages(this);
+        }
+
+        public List<Page> GetPagesUnknowPageType()
+        {
+            return Pages.GetPagesUnknowPageType(this);
         }
 
         public List<Page> GetNonScrapedPages()

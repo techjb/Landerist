@@ -16,7 +16,7 @@
 
         public static readonly bool WORDS_ENABLED = false;
 
-        public static readonly int MAX_PAGES_PER_WEBSITE = 20;
+        public static readonly int MAX_PAGES_PER_WEBSITE = 100;
 
         //public static readonly int MAX_LISTINGS_PER_WEBSITE = 100;
 

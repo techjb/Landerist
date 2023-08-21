@@ -47,7 +47,7 @@ namespace landerist_console
 
         private static void Run()
         {
-            var uriPage = new Uri("https://www.brextom.com/alquiler-pisos-murcia/");
+            var uriPage = new Uri("https://www.badainmobiliaria.com/search-form-top/");
 
             //SeleniumDownloader.GetChrome(uriPage);
             //PuppeteerDownloader.Get(uriPage);
@@ -64,10 +64,10 @@ namespace landerist_console
             //var uri = new Uri("http://casavida.es/");
             //var uri = new Uri("https://www.inmobiliariamarbella.es/");
             //var uri = new Uri("https://www.inmoarregi.com/");
-            //var uri = new Uri("https://www.fincasvistamar.com/");
+            var uri = new Uri("https://www.badainmobiliaria.com");
 
-            //var website = new Website(uri);
-            //var page = new Page(website, uriPage);
+            var website = new Website(uri);
+            var page = new Page(website, uriPage);
             //var page = new Page(uriPage);
 
             //Websites.Delete(website); return;
@@ -89,13 +89,14 @@ namespace landerist_console
             //Websites.CountRobotsSiteMaps();            
             //Websites.InsertMainPages();
 
-            //Scraper.ScrapeUnknowPageType(50000, true);
+            Scraper.ScrapeUnknowPageType(50000, true);
 
             //Scraper.ScrapeMainPage(website);
             //Scraper.ScrapeUnknowHttpStatusCode();
             //Scraper.ScrapeUnknowIsListing(uri, true);
             //Scraper.ScrapeIsNotListing(uri);
             //Scraper.Scrape(website);
+            //Scraper.ScrapeUnknowPageType(website);
             //Scraper.Scrape(uriPage);
             //Scraper.ScrapeAllPages();
 
