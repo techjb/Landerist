@@ -88,51 +88,6 @@ namespace landerist_library.Scrape
             Page.SetPageType(pageType);
         }
 
-        //private void GetListing()
-        //{
-        //    if (!IsListingParser.IsListing(Page))
-        //    {
-        //        return;
-        //    }
-
-        //    landerist_orels.ES.Listing? listing;            
-        //    if (Config.LISTING_PARSER_ENABLED)
-        //    {
-        //        var listingParser = new ListingParser(Page).GetListing();
-        //        if (listingParser.Item1==null)
-        //        {
-
-        //        }
-        //        else
-        //        {
-
-        //        }
-        //        Page.IsListing = listingParser.Item1;
-        //        listing = listingParser.Item2;
-        //    }
-        //    else
-        //    {
-        //        listing = ES_Listings.GetListing(Page, false);
-        //        Page.IsListing = listing != null;                
-        //    }
-        //    if (listing == null)
-        //    {
-        //        return;
-        //    }
-
-        //    if (Config.SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING)
-        //    {
-        //        new LatLngParser(Page, listing).SetLatLng();
-        //        new LauIdParser(Page, listing).SetLauId();
-        //        new MediaParser(Page).AddMedia(listing);
-        //        ES_Listings.InsertUpdate(Page.Website, listing);
-        //    }
-        //    else
-        //    {
-        //        ES_Listings.Insert(Page.Website, listing);
-        //    }
-        //}
-
         private void DownloadError()
         {
             Page.SetPageType(PageType.DownloadError);
