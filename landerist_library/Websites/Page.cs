@@ -11,7 +11,7 @@ using System.Text;
 namespace landerist_library.Websites
 {
     
-    public class Page : Pages
+    public class Page : Pages, IDisposable
     {
 
         public string Host { get; set; } = string.Empty;
@@ -37,6 +37,9 @@ namespace landerist_library.Websites
 
 
         public HtmlDocument? HtmlDocument = null;
+
+
+        private bool disposed;
 
 
         public Page()
@@ -215,9 +218,6 @@ namespace landerist_library.Websites
             return true;
         }
 
-        
-
-
         public void LoadHtmlDocument(bool forceReload = false)
         {
             if (HtmlDocument != null && !forceReload)
@@ -302,6 +302,28 @@ namespace landerist_library.Websites
         public void SetPageType(PageType? pageType)
         {
             PageType = pageType;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    
+                }
+                HtmlDocument = null;
+                ResponseBody = null;
+                ResponseBodyText = null;                
+            }
+
+            disposed = true;
         }
     }
 }

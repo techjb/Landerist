@@ -8,7 +8,6 @@ namespace landerist_library.Download
     {
         private HttpResponseMessage? HttpResponseMessage;
 
-
         public bool Get(Page page)
         {
             page.HttpStatusCode = null;
@@ -33,21 +32,21 @@ namespace landerist_library.Download
             SetAccepLanguage(httpClient, page);
             httpClient.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
 
-            HttpRequestMessage request = new(HttpMethod.Get, page.Uri);
-            
+            HttpRequestMessage httpRequestMessage = new(HttpMethod.Get, page.Uri);
+
             bool sucess = false;
             HttpResponseMessage = null;
 
             try
             {
                 DateTime dateStart = DateTime.Now;
-                HttpResponseMessage = await httpClient.SendAsync(request);
+                HttpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
                 Timers.Timer.SaveTimerDownloadPage(page.Uri.ToString(), dateStart);
                 sucess = HttpResponseMessage.IsSuccessStatusCode;
                 page.HttpStatusCode = (short)HttpResponseMessage.StatusCode;
-                page.ResponseBody = await HttpResponseMessage.Content.ReadAsStringAsync();                
+                page.ResponseBody = await HttpResponseMessage.Content.ReadAsStringAsync();
 
-            }          
+            }
             catch (Exception exception)
             {
                 Logs.Log.WriteLogErrors(page.Uri, exception);
@@ -55,7 +54,7 @@ namespace landerist_library.Download
             return sucess;
         }
 
-        private void SetAccepLanguage(HttpClient httpClient, Page page)
+        private static void SetAccepLanguage(HttpClient httpClient, Page page)
         {
             switch (page.Website.LanguageCode)
             {
@@ -63,8 +62,9 @@ namespace landerist_library.Download
                     {
                         httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("es-ES"));
                         httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("es", 0.9));
-                    }break;
-            }            
+                    }
+                    break;
+            }
         }
 
         public string? GetRedirectUrl()

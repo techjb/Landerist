@@ -1,10 +1,5 @@
 ﻿using landerist_library.Index;
 using landerist_library.Websites;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace landerist_library.Parse.PageType
 {

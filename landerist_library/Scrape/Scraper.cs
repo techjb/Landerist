@@ -202,7 +202,8 @@ namespace landerist_library.Scrape
             }
             else
             {
-                Scrape(page);                
+                Scrape(page);
+                page.Dispose();
                 Interlocked.Increment(ref Scraped);
                 Interlocked.Decrement(ref Remaining);
             }
@@ -273,7 +274,7 @@ namespace landerist_library.Scrape
             AddToPageBlocker(page);
             try
             {
-                new PageScraper(page).Scrape();                
+                new PageScraper(page).Scrape();
             }
             catch (Exception exception)
             {

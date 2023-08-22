@@ -28,8 +28,8 @@ namespace landerist_library.Scrape
             {
                 DownloadError();
             }
+            return Page.Update();                        
             
-            return Page.Update();
         }
 
         private void DownloadSucess()

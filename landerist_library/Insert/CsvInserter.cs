@@ -11,7 +11,7 @@ namespace landerist_library.Insert
         }
 
 
-        public void InsertBancodedatos_es()
+        public static void InsertBancodedatos_es()
         {
             string file = Configuration.Config.INSERT_DIRECTORY + @"bancodedatos.es\Excel\Pedido_completo.csv";
             DataTable dataTable = Csv.ToDataTable(file);
@@ -19,7 +19,7 @@ namespace landerist_library.Insert
             Insert(uris);
         }
 
-        public void InsertBasededatosempresas_net()
+        public static void InsertBasededatosempresas_net()
         {
             string file = Configuration.Config.INSERT_DIRECTORY + @"basededatosempresas.net\Inmobiliarias.csv";
             DataTable dataTable = Csv.ToDataTable(file);
@@ -27,7 +27,7 @@ namespace landerist_library.Insert
             Insert(uris);
         }
 
-        private List<Uri> ToList(DataTable dataTable, string columnName)
+        private static List<Uri> ToList(DataTable dataTable, string columnName)
         {
             List<Uri> uris = new();
             foreach (DataRow row in dataTable.Rows)
