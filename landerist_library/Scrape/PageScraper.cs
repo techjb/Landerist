@@ -28,7 +28,7 @@ namespace landerist_library.Scrape
             {
                 DownloadError();
             }
-
+            
             return Page.Update();
         }
 

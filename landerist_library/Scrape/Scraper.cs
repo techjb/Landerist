@@ -1,7 +1,6 @@
 ﻿using landerist_library.Parse.PageType;
 using landerist_library.Websites;
 using System.Collections.Concurrent;
-using ThirdParty.BouncyCastle.Utilities.IO.Pem;
 
 namespace landerist_library.Scrape
 {
@@ -38,6 +37,7 @@ namespace landerist_library.Scrape
             {
                 return;
             }
+            pages.Clear();
             if (recursive)
             {
                 ScrapeUnknowPageType(rows, recursive);
@@ -61,6 +61,7 @@ namespace landerist_library.Scrape
             {
                 return;
             }
+            pages.Clear();
             if (recursive)
             {
                 ScrapeNonScrapped(website, recursive);
@@ -78,6 +79,7 @@ namespace landerist_library.Scrape
             {
                 return;
             }
+            pages.Clear();
             if (recursive)
             {
                 ScrapeUnknowHttpStatusCode(recursive);
@@ -102,6 +104,7 @@ namespace landerist_library.Scrape
             {
                 return;
             }
+            pages.Clear();
             if (recursive)
             {
                 ScrapeUnknowIsListing(website, recursive);
@@ -125,6 +128,7 @@ namespace landerist_library.Scrape
             {
                 return;
             }
+            pages.Clear();
             if (recursive)
             {
                 ScrapeIsNotListing(website, recursive);
@@ -165,8 +169,12 @@ namespace landerist_library.Scrape
             Scraped = 0;
             Remaining = TotalCounter;
             ThreadCounter = 0;
+            DownloadErrorCounter = 0;
+            ResponseBodyValidCounter = 0;
+            OtherPageType = 0;
+            var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
             Parallel.ForEach(
-                Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering),
+                orderablePartitioner,
                 //new ParallelOptions() { MaxDegreeOfParallelism = 1},                
                 (page, state) =>
                 {
@@ -194,7 +202,7 @@ namespace landerist_library.Scrape
             }
             else
             {
-                Scrape(page);
+                Scrape(page);                
                 Interlocked.Increment(ref Scraped);
                 Interlocked.Decrement(ref Remaining);
             }
@@ -265,13 +273,13 @@ namespace landerist_library.Scrape
             AddToPageBlocker(page);
             try
             {
-                new PageScraper(page).Scrape();
+                new PageScraper(page).Scrape();                
             }
             catch (Exception exception)
             {
                 Logs.Log.WriteLogErrors(page.Uri, exception);
             }
-            IncrementListingsCounter(page);
+            IncrementListingsCounter(page);            
         }
 
         private static bool IsBlocked(Page page)

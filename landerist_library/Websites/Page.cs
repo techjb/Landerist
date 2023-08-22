@@ -232,7 +232,7 @@ namespace landerist_library.Websites
             catch (Exception exception)
             {
                 Logs.Log.WriteLogErrors(Uri, exception);
-                HtmlDocument = null;
+                HtmlDocument = null;                
             }
         }
 
