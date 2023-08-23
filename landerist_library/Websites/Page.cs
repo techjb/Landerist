@@ -10,7 +10,7 @@ using System.Text;
 
 namespace landerist_library.Websites
 {
-    
+
     public class Page : Pages, IDisposable
     {
 
@@ -94,7 +94,7 @@ namespace landerist_library.Websites
             Inserted = (DateTime)dataRow["Inserted"];
             Updated = dataRow["Updated"] is DBNull ? null : (DateTime)dataRow["Updated"];
             HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
-            PageType = dataRow["PageType"] is DBNull ? null : 
+            PageType = dataRow["PageType"] is DBNull ? null :
                 (PageType)Enum.Parse(typeof(PageType), dataRow["PageType"].ToString()!);
             ResponseBodyText = dataRow["ResponseBodyText"] is DBNull ? null : dataRow["ResponseBodyText"].ToString();
         }
@@ -184,7 +184,7 @@ namespace landerist_library.Websites
             return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"UriHash", UriHash },
                 {"Updated", Updated },
-                {"PageType", PageType?.ToString()},                
+                {"PageType", PageType?.ToString()},
             });
         }
 
@@ -232,7 +232,7 @@ namespace landerist_library.Websites
             catch (Exception exception)
             {
                 Logs.Log.WriteLogErrors(Uri, exception);
-                HtmlDocument = null;                
+                HtmlDocument = null;
             }
         }
 
@@ -306,24 +306,17 @@ namespace landerist_library.Websites
 
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
             if (!disposed)
             {
-                if (disposing)
-                {
-                    
-                }
                 HtmlDocument = null;
                 ResponseBody = null;
-                ResponseBodyText = null;                
+                ResponseBodyText = null;
+                Website.Robots = null;
+                Website.RobotsTxt = null;
             }
 
             disposed = true;
+            GC.SuppressFinalize(this);
         }
     }
 }

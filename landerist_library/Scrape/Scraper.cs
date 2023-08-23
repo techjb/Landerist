@@ -24,114 +24,107 @@ namespace landerist_library.Scrape
 
         private static int ThreadCounter = 0;
 
-        private static BlockingCollection<Page> BlockingCollection = new();
+        private static BlockingCollection<(int, Page)> BlockingCollection = new();
 
-        public static void ScrapeUnknowPageType(int? rows = null, bool recursive = false)
+        private const int MAX_REPETITIONS_BLOCKINGCOLLECTION = 2;
+
+        private static bool Recursive = false;
+
+        private List<Page> Pages = new();
+
+        private readonly HashSet<(int, Page)> Tuples = new();
+
+        public Scraper()
         {
-            List<Page> pages = Pages.GetUnknowPageType(rows);
-            if (pages.Count.Equals(0))
+
+        }
+
+        public Scraper(bool recursive)
+        {
+            Recursive = recursive;
+        }
+
+        public void ScrapeUnknowPageType(int? rows = null)
+        {
+            Pages = Websites.Pages.GetUnknowPageType(rows);
+            if (!Scrape())
             {
                 return;
             }
-            if (!Scrape(pages))
+            if (Recursive)
             {
-                return;
-            }
-            pages.Clear();
-            if (recursive)
-            {
-                ScrapeUnknowPageType(rows, recursive);
+                ScrapeUnknowPageType(rows);
             }
         }
 
-        public static void ScrapeNonScrapped(Uri uri, bool recursive = false)
+        public void ScrapeNonScrapped(Uri uri)
         {
             Website website = new(uri);
-            ScrapeNonScrapped(website, recursive);
+            ScrapeNonScrapped(website);
         }
 
-        public static void ScrapeNonScrapped(Website website, bool recursive)
+        public void ScrapeNonScrapped(Website website)
         {
-            var pages = website.GetNonScrapedPages();
-            if (pages.Count == 0)
+            Pages = website.GetNonScrapedPages();
+            if (!Scrape())
             {
                 return;
             }
-            if (!Scrape(pages))
+            if (Recursive)
             {
-                return;
-            }
-            pages.Clear();
-            if (recursive)
-            {
-                ScrapeNonScrapped(website, recursive);
+                ScrapeNonScrapped(website);
             }
         }
 
-        public static void ScrapeUnknowHttpStatusCode(bool recursive = false)
+        public void ScrapeUnknowHttpStatusCode()
         {
-            List<Page> pages = Pages.GetUnknowHttpStatusCode();
-            if (pages.Count.Equals(0))
+            Pages = Websites.Pages.GetUnknowHttpStatusCode();
+            if (!Scrape())
             {
                 return;
             }
-            if (!Scrape(pages))
+            if (Recursive)
             {
-                return;
-            }
-            pages.Clear();
-            if (recursive)
-            {
-                ScrapeUnknowHttpStatusCode(recursive);
+                ScrapeUnknowHttpStatusCode();
             }
         }
 
         // Can be infinite loops
-        public static void ScrapeUnknowIsListing(Uri uri, bool recursive = false)
+        public void ScrapeUnknowIsListing(Uri uri)
         {
             Website website = new(uri);
-            ScrapeUnknowIsListing(website, recursive);
+            ScrapeUnknowIsListing(website);
         }
 
-        public static void ScrapeUnknowIsListing(Website website, bool recursive)
+        public void ScrapeUnknowIsListing(Website website)
         {
-            var pages = website.GetUnknowIsListingPages();
-            if (pages.Count == 0)
+            Pages = website.GetUnknowIsListingPages();
+            if (!Scrape())
             {
                 return;
             }
-            if (!Scrape(pages))
+            if (Recursive)
             {
-                return;
-            }
-            pages.Clear();
-            if (recursive)
-            {
-                ScrapeUnknowIsListing(website, recursive);
+                ScrapeUnknowIsListing(website);
             }
         }
 
-        public static void ScrapeIsNotListing(Uri uri, bool recursive = false)
+        public void ScrapeIsNotListing(Uri uri)
         {
             Website website = new(uri);
-            ScrapeIsNotListing(website, recursive);
+            ScrapeIsNotListing(website);
         }
 
-        public static void ScrapeIsNotListing(Website website, bool recursive)
+        public void ScrapeIsNotListing(Website website)
         {
-            var pages = website.GetIsNotListingPages();
-            if (pages.Count == 0)
+            Pages = website.GetIsNotListingPages();
+            if (!Scrape())
             {
                 return;
             }
-            if (!Scrape(pages))
+            if (Recursive)
             {
-                return;
-            }
-            pages.Clear();
-            if (recursive)
-            {
-                ScrapeIsNotListing(website, recursive);
+                ScrapeIsNotListing(website);
             }
         }
         public static void ScrapeMainPage(Website website)
@@ -140,32 +133,26 @@ namespace landerist_library.Scrape
             Scrape(page);
         }
 
-        public static bool Scrape(Website website)
+        public bool Scrape(Website website)
         {
-            var pages = website.GetPages();
-            return Scrape(pages);
+            Pages = website.GetPages();
+            return Scrape();
         }
 
-        public static bool ScrapeUnknowPageType(Website website)
+        public bool ScrapeUnknowPageType(Website website)
         {
-            var pages = website.GetPagesUnknowPageType();
-            return Scrape(pages);
+            Pages = website.GetPagesUnknowPageType();
+            return Scrape();
         }
 
-        private static bool Scrape(List<Page> pages)
+        private bool Scrape()
         {
-            HashSet<Page> hashSet = new(pages, new PageComparer());
-            return Scrape(hashSet);
-        }
-
-        private static bool Scrape(HashSet<Page> pages)
-        {
-            InitBlockingCollection(pages);
-            if(pages.Count == 0)
+            InitBlockingCollection();
+            if (Tuples.Count.Equals(0))
             {
                 return false;
             }
-            TotalCounter = pages.Count;
+            TotalCounter = Tuples.Count;
             Scraped = 0;
             Remaining = TotalCounter;
             ThreadCounter = 0;
@@ -176,21 +163,23 @@ namespace landerist_library.Scrape
             Parallel.ForEach(
                 orderablePartitioner,
                 //new ParallelOptions() { MaxDegreeOfParallelism = 1},                
-                (page, state) =>
+                (tuple, state) =>
                 {
                     StartThread();
-                    ProcessThread(page);
+                    ProcessThread(tuple);
                     EndThread();
                 });
             return true;
         }
+
         private static void StartThread()
         {
             Interlocked.Increment(ref ThreadCounter);
         }
 
-        private static void ProcessThread(Page page)
+        private static void ProcessThread((int, Page) tuple)
         {
+            var page = tuple.Item2;
             if (!IsScrapeable(page))
             {
                 return;
@@ -198,7 +187,15 @@ namespace landerist_library.Scrape
 
             if (IsBlocked(page) && !BlockingCollection.IsCompleted)
             {
-                BlockingCollection.Add(page);
+                if (Recursive)
+                {
+                    tuple.Item1++;
+                    if (tuple.Item1 >= MAX_REPETITIONS_BLOCKINGCOLLECTION)
+                    {
+                        return;
+                    }
+                }
+                BlockingCollection.Add(tuple);
             }
             else
             {
@@ -254,12 +251,20 @@ namespace landerist_library.Scrape
             }
         }
 
-        private static void InitBlockingCollection(HashSet<Page> pages)
+        private void InitBlockingCollection()
         {
-            BlockingCollection = new();
-            foreach (var page in pages)
+            HashSet<Page> hashSet = new(Pages, new PageComparer());
+            Pages.Clear();
+            Tuples.Clear();
+            foreach (var page in hashSet)
             {
-                BlockingCollection.Add(page);
+                Tuples.Add(new(0, page));
+            }
+
+            BlockingCollection = new();
+            foreach (var tuple in Tuples)
+            {
+                BlockingCollection.Add(tuple);
             }
         }
 
@@ -280,7 +285,7 @@ namespace landerist_library.Scrape
             {
                 Logs.Log.WriteLogErrors(page.Uri, exception);
             }
-            IncrementListingsCounter(page);            
+            IncrementListingsCounter(page);
         }
 
         private static bool IsBlocked(Page page)

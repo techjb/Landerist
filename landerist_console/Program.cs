@@ -89,16 +89,16 @@ namespace landerist_console
             //Websites.CountRobotsSiteMaps();            
             //Websites.InsertMainPages();
 
-            Scraper.ScrapeUnknowPageType(5000, true);
+            new Scraper(true).ScrapeUnknowPageType(2000);
 
-            //Scraper.ScrapeMainPage(website);
-            //Scraper.ScrapeUnknowHttpStatusCode();
-            //Scraper.ScrapeUnknowIsListing(uri, true);
-            //Scraper.ScrapeIsNotListing(uri);
-            //Scraper.Scrape(website);
-            //Scraper.ScrapeUnknowPageType(website);
-            //Scraper.Scrape(uriPage);
-            //Scraper.ScrapeAllPages();
+            //new Scraper().ScrapeMainPage(website);
+            //new Scraper().ScrapeUnknowHttpStatusCode();
+            //new Scraper(true).ScrapeUnknowIsListing(uri);
+            //new Scraper().ScrapeIsNotListing(uri);
+            //new Scraper().Scrape(website);
+            //new Scraper().ScrapeUnknowPageType(website);
+            //new Scraper().Scrape(uriPage);
+            //new Scraper().ScrapeAllPages();
 
             //Csv.Export(true);
             //Json.Export(true);

@@ -38,7 +38,7 @@ namespace landerist_library.Websites
         private int NumListings { get; set; } = 0;
 
 
-        private Robots? Robots = null;
+        public Robots? Robots = null;
 
 
         public LanguageCode LanguageCode = LanguageCode.es;
