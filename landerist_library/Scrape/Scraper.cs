@@ -24,15 +24,11 @@ namespace landerist_library.Scrape
 
         private static int ThreadCounter = 0;
 
-        private static BlockingCollection<(int, Page)> BlockingCollection = new();
-
-        private const int MAX_REPETITIONS_BLOCKINGCOLLECTION = 2;
+        private static BlockingCollection<Page> BlockingCollection = new();
 
         private static bool Recursive = false;
 
         private List<Page> Pages = new();
-
-        private readonly HashSet<(int, Page)> Tuples = new();
 
         public Scraper()
         {
@@ -50,7 +46,7 @@ namespace landerist_library.Scrape
             if (!Scrape())
             {
                 return;
-            }
+            }            
             if (Recursive)
             {
                 ScrapeUnknowPageType(rows);
@@ -148,11 +144,11 @@ namespace landerist_library.Scrape
         private bool Scrape()
         {
             InitBlockingCollection();
-            if (Tuples.Count.Equals(0))
+            if (BlockingCollection.Count.Equals(0))
             {
                 return false;
             }
-            TotalCounter = Tuples.Count;
+            TotalCounter = BlockingCollection.Count;
             Scraped = 0;
             Remaining = TotalCounter;
             ThreadCounter = 0;
@@ -163,10 +159,10 @@ namespace landerist_library.Scrape
             Parallel.ForEach(
                 orderablePartitioner,
                 //new ParallelOptions() { MaxDegreeOfParallelism = 1},                
-                (tuple, state) =>
+                (page, state) =>
                 {
                     StartThread();
-                    ProcessThread(tuple);
+                    ProcessThread(page);
                     EndThread();
                 });
             return true;
@@ -177,9 +173,8 @@ namespace landerist_library.Scrape
             Interlocked.Increment(ref ThreadCounter);
         }
 
-        private static void ProcessThread((int, Page) tuple)
+        private static void ProcessThread(Page page)
         {
-            var page = tuple.Item2;
             if (!IsScrapeable(page))
             {
                 return;
@@ -187,20 +182,12 @@ namespace landerist_library.Scrape
 
             if (IsBlocked(page) && !BlockingCollection.IsCompleted)
             {
-                if (Recursive)
-                {
-                    tuple.Item1++;
-                    if (tuple.Item1 >= MAX_REPETITIONS_BLOCKINGCOLLECTION)
-                    {
-                        return;
-                    }
-                }
-                BlockingCollection.Add(tuple);
+                BlockingCollection.Add(page);
             }
             else
             {
                 Scrape(page);
-                page.Dispose();
+                page.Dispose();                
                 Interlocked.Increment(ref Scraped);
                 Interlocked.Decrement(ref Remaining);
             }
@@ -229,10 +216,10 @@ namespace landerist_library.Scrape
             var downloadErrorPercentage = Math.Round((float)DownloadErrorCounter * 100 / TotalCounter, 0);
             var responseBodyValidPercentage = Math.Round((float)ResponseBodyValidCounter * 100 / TotalCounter, 0);
             var OtherPageTypePercentage = Math.Round((float)OtherPageType * 100 / TotalCounter, 0);
-
+            
             Console.WriteLine(
                "Scraped: " + Scraped + "/" + TotalCounter + " (" + scrappedPercentage + "%) " +
-               //"Threads: " + ThreadCounter + " " +
+               "Threads: " + ThreadCounter + " " +
                //"BlockingCollection: " + BlockingCollection.Count + " " +
                "Errors: " + DownloadErrorCounter + " (" + downloadErrorPercentage + "%) " +
                "Valids: " + ResponseBodyValidCounter + " (" + responseBodyValidPercentage + "%) " +
@@ -255,17 +242,12 @@ namespace landerist_library.Scrape
         {
             HashSet<Page> hashSet = new(Pages, new PageComparer());
             Pages.Clear();
-            Tuples.Clear();
+            BlockingCollection = new();
             foreach (var page in hashSet)
             {
-                Tuples.Add(new(0, page));
+                BlockingCollection.Add(page);
             }
-
-            BlockingCollection = new();
-            foreach (var tuple in Tuples)
-            {
-                BlockingCollection.Add(tuple);
-            }
+            hashSet.Clear();
         }
 
         public static void Scrape(Uri uri)

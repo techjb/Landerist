@@ -1,4 +1,5 @@
 ﻿using Com.Bekijkhet.RobotsTxt;
+using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Index;
@@ -21,7 +22,7 @@ namespace landerist_library.Websites
         es
     }
 
-    public class Website
+    public class Website : IDisposable
     {
         public Uri MainUri { get; set; }
 
@@ -45,6 +46,9 @@ namespace landerist_library.Websites
 
 
         public CountryCode CountryCode = CountryCode.ES;
+
+
+        private bool Disposed;
 
         public Website()
         {
@@ -458,6 +462,21 @@ namespace landerist_library.Websites
                 {"Host", Host },
                 {"NumListings", NumListings }
             });
+        }
+
+        public void Dispose()
+        {
+            if (!Disposed)
+            {
+                Host = string.Empty;
+                IpAddress = null;
+                HttpStatusCode = null;                
+                Robots = null;
+                RobotsTxt = null;
+            }
+
+            Disposed = true;
+            GC.SuppressFinalize(this);
         }
     }
 }

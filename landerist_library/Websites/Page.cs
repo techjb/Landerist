@@ -39,7 +39,7 @@ namespace landerist_library.Websites
         public HtmlDocument? HtmlDocument = null;
 
 
-        private bool disposed;
+        private bool Disposed;
 
 
         public Page()
@@ -306,16 +306,18 @@ namespace landerist_library.Websites
 
         public void Dispose()
         {
-            if (!disposed)
+            if (!Disposed)
             {
-                HtmlDocument = null;
+                Host = string.Empty;
+                UriHash = string.Empty;
+                HtmlDocument = null;                
                 ResponseBody = null;
                 ResponseBodyText = null;
-                Website.Robots = null;
-                Website.RobotsTxt = null;
+
+                Website.Dispose();
             }
 
-            disposed = true;
+            Disposed = true;
             GC.SuppressFinalize(this);
         }
     }
