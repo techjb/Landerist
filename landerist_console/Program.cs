@@ -89,7 +89,7 @@ namespace landerist_console
             //Websites.CountRobotsSiteMaps();            
             //Websites.InsertMainPages();
 
-            new Scraper(true).ScrapeUnknowPageType();
+            new Scraper(false).ScrapeUnknowPageType();
 
             //new Scraper().ScrapeMainPage(website);
             //new Scraper().ScrapeUnknowHttpStatusCode();
