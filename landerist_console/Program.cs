@@ -1,15 +1,7 @@
-﻿using CsvHelper;
-using HtmlAgilityPack;
-using landerist_library.Configuration;
-using landerist_library.Database;
-using landerist_library.Insert;
-using landerist_library.Parse.Listing;
+﻿using landerist_library.Configuration;
 using landerist_library.Scrape;
-using landerist_library.Tools;
 using landerist_library.Websites;
-using OpenQA.Selenium.DevTools.V114.Database;
-using System.IO.Compression;
-using System.Text;
+
 
 namespace landerist_console
 {
@@ -42,7 +34,9 @@ namespace landerist_console
                 "\nDuration: " + (dateFinished - DateStart).ToString(@"dd\:hh\:mm\:ss\.fff") + ". ";
             Console.WriteLine("\n" + textFinished);
 
+#pragma warning disable CA1416 // Validate platform compatibility
             Console.Beep(500, 500);
+#pragma warning restore CA1416 // Validate platform compatibility
         }
 
         private static void Run()
