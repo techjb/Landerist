@@ -146,7 +146,7 @@ namespace landerist_library.Parse.PageType
             "properties",
         };
 
-        public static bool LastSegmentIsForbidden(Uri uri)
+        public static bool LastSegmentOfUrlIsForbidden(Uri uri)
         {
             if (!string.IsNullOrEmpty(uri.Query))
             {
@@ -155,7 +155,6 @@ namespace landerist_library.Parse.PageType
             var lastSegment = GetLastSegment(uri);
             return ProhibitedLatestSegments.Any(item => lastSegment.Equals(item, StringComparison.OrdinalIgnoreCase));
         }
-
 
 
         private static string GetLastSegment(Uri uri)

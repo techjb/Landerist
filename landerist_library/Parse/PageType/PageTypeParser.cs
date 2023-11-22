@@ -40,11 +40,11 @@ namespace landerist_library.Parse.PageType
             {
                 return PageType.MainPage;
             }
-            if (!page.CanIndexContent())
+            if (!page.IsIndexable())
             {
                 return PageType.NotIndexable;
             }
-            if (LastSegment.LastSegmentIsForbidden(page.Uri))
+            if (LastSegment.LastSegmentOfUrlIsForbidden(page.Uri))
             {
                 return PageType.ForbiddenLastSegment;
             }

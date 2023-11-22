@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="AI.Dev.OpenAI.GPT" Version="1.0.2" />
-    <PackageReference Include="AWSSDK.Comprehend" Version="3.7.300.6" />
+    <PackageReference Include="AWSSDK.Comprehend" Version="3.7.300.7" />
     <PackageReference Include="Com.Bekijkhet.RobotsTxt" Version="1.0.0" />
     <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="Google.Cloud.Language.V1" Version="3.3.0" />
@@ -23,7 +23,7 @@
     <PackageReference Include="NetTopologySuite" Version="2.5.0" />
     <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="4.0.0" />
     <PackageReference Include="OpenAI" Version="1.7.2" />
-    <PackageReference Include="OpenAI-DotNet" Version="7.2.3" />
+    <PackageReference Include="OpenAI-DotNet" Version="7.3.1" />
     <PackageReference Include="OpenCvSharp4" Version="4.8.0.20230708" />
     <PackageReference Include="OpenCvSharp4.Extensions" Version="4.8.0.20230708" />
     <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.8.0.20230708" />

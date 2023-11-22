@@ -259,7 +259,7 @@ namespace landerist_library.Websites
             return ES_Listings.GetListing(this, false);
         }
 
-        public bool CanIndexContent()
+        public bool IsIndexable()
         {
             return !ContainsMetaRobots("noindex");
         }

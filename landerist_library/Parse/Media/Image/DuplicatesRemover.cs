@@ -60,7 +60,7 @@ namespace landerist_library.Parse.Media.Image
         {
             Mat hist = new();
             Cv2.CalcHist(new Mat[] { mat }, new int[] { 0 }, null, hist, 1,
-                new int[] { 256 }, new Rangef[] { new Rangef(0, 256) });
+                new int[] { 256 }, new Rangef[] { new(0, 256) });
             return hist;
         }
 

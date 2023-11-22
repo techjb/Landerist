@@ -1,5 +1,7 @@
 ﻿using landerist_library.Logs;
+using OpenAI;
 using OpenAI.Chat;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace landerist_library.Parse.Listing.ChatGPT
@@ -24,7 +26,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
         private static readonly string ParameterEsAnuncioDeOfertaInmobiliaria = "EsUnAnuncioDeOfertaInmobiliaria";
         private static readonly string ParameterEsAnuncioDeOfertaInmobiliariaDescription = "El texto sí es un anuncio de oferta inmobiliaria";
 
-        private static readonly List<Function> Functions = new()
+        private static readonly List<Tool> Tools = new()
         {
             new Function(
                 FunctionCallValidarTexto,
@@ -45,11 +47,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             )
         };
 
-
-
-        //public ChatGPTIsListing() : base(SystemMessage, Functions, FunctionCallValidarTexto)
-        // Not working
-        public ChatGPTIsListing() : base(SystemMessage)
+        public ChatGPTIsListing() : base(SystemMessage, Tools, FunctionCallValidarTexto)
         {
 
         }
@@ -72,8 +70,13 @@ namespace landerist_library.Parse.Listing.ChatGPT
             }
             try
             {
-                string message = response.FirstChoice.Message;
-                return message.ToLower().Equals("sí");
+                var usedTool = response.FirstChoice.Message.ToolCalls[0];
+                bool isListing = JsonSerializer.Deserialize<bool>(usedTool.Function.Arguments.ToString());
+                return isListing;
+                //var functionResult = FunctionCallValidarTexto(functionArgs);
+
+                //string message = response.FirstChoice.Message;
+                //return message.ToLower().Equals("sí");
 
                 //var arguments = response.FirstChoice.Message.Function.Arguments.ToString();
                 //JObject json = JObject.Parse(arguments);

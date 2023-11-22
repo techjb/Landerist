@@ -17,24 +17,20 @@ namespace landerist_library.Parse.Listing.ChatGPT
         //public static readonly int MAX_TOKENS = 8192;
         public static readonly int MAX_TOKENS = 4096;
 
-        private readonly OpenAIClient OpenAIClient;
+        private readonly OpenAIClient OpenAIClient = new (Config.OPENAI_API_KEY);
         private readonly string SystemMessage;
-        private readonly List<Function>? Functions;
-        private readonly string? FunctionCall;
+        private readonly List<Tool>? Tools;
+        private readonly string? ToolChoice;
 
-        public ChatGPTRequest(string systemMessage)
+        public ChatGPTRequest(string systemMessage = "")
         {
-            SystemMessage = systemMessage;
-            OpenAIClient = new OpenAIClient(Config.OPENAI_API_KEY);
+            SystemMessage = systemMessage;            
         }
 
-        public ChatGPTRequest(string systemMessage, List<Function> functions, string functionCall) : this(systemMessage)
+        public ChatGPTRequest(string systemMessage, List<Tool> tools, string toolChoice = "auto") : this(systemMessage)
         {
-            Functions = functions;
-            // Will be fixed here: https://github.com/RageAgainstThePixel/OpenAI-DotNet/pull/127
-            //FunctionCall = functionCall;
-            FunctionCall = "auto";
-
+            Tools = tools;           
+            ToolChoice = toolChoice;
         }
 
         protected ChatResponse? GetResponse(string? userInput)
@@ -45,18 +41,26 @@ namespace landerist_library.Parse.Listing.ChatGPT
             }
             var messages = new List<Message>
             {
-                new Message(Role.System, SystemMessage),
-                new Message(Role.User, userInput),
+                new(Role.System, SystemMessage),
+                new(Role.User, userInput),
             };
 
             var chatRequest = new ChatRequest(
-                messages,
-                functions: Functions,
-                functionCall: FunctionCall,
-                model: Model.GPT3_5_Turbo_16K,
-                //model: Model.GPT4,
-                temperature: 0
+                messages: messages,                
+                model: "gpt-4-1106-preview",
+                //responseFormat: ChatResponseFormat.Json,
+                temperature: 0,
+                tools: Tools,
+                toolChoice: ToolChoice
                 );
+
+            //var chatRequest = new ChatRequest(
+            //    messages: messages,
+            //    functions: Functions,
+            //    functionCall: FunctionCall,
+            //    model: Model.GPT3_5_Turbo_16K,                
+            //    temperature: 0
+            //    );
 
             try
             {
@@ -81,5 +85,20 @@ namespace landerist_library.Parse.Listing.ChatGPT
             int totalTokens = systemTokens + userTokens;
             return totalTokens < MAX_TOKENS;
         }
+
+        public void ListModels()
+        {
+            var models = Task.Run(async () => await OpenAIClient.ModelsEndpoint.GetModelsAsync()).Result;
+            List<string> list = new ();
+            foreach (var model in models)
+            {
+                list.Add(model.ToString());
+            }
+            list.Sort();
+            foreach (var model in list)
+            {
+                Console.WriteLine(model.ToString());    
+            }
+        }       
     }
 }

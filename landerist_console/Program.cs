@@ -1,6 +1,8 @@
 ﻿using landerist_library.Configuration;
+using landerist_library.Parse.Listing.ChatGPT;
 using landerist_library.Scrape;
 using landerist_library.Websites;
+using OpenAI;
 
 
 namespace landerist_console
@@ -41,7 +43,7 @@ namespace landerist_console
 
         private static void Run()
         {
-            var uriPage = new Uri("https://www.badainmobiliaria.com/search-form-top/");
+            //var uriPage = new Uri("https://www.badainmobiliaria.com/search-form-top/");
 
             //SeleniumDownloader.GetChrome(uriPage);
             //PuppeteerDownloader.Get(uriPage);
@@ -58,10 +60,10 @@ namespace landerist_console
             //var uri = new Uri("http://casavida.es/");
             //var uri = new Uri("https://www.inmobiliariamarbella.es/");
             //var uri = new Uri("https://www.inmoarregi.com/");
-            var uri = new Uri("https://www.badainmobiliaria.com");
+            //var uri = new Uri("https://www.badainmobiliaria.com");
 
-            var website = new Website(uri);
-            var page = new Page(website, uriPage);
+            //var website = new Website(uri);
+            //var page = new Page(website, uriPage);
             //var page = new Page(uriPage);
 
             //Websites.Delete(website); return;
@@ -83,7 +85,7 @@ namespace landerist_console
             //Websites.CountRobotsSiteMaps();            
             //Websites.InsertMainPages();
 
-            new Scraper(false).ScrapeUnknowPageType();
+            new Scraper(true).ScrapeUnknowPageType();
 
             //new Scraper().ScrapeMainPage(website);
             //new Scraper().ScrapeUnknowHttpStatusCode();
@@ -121,6 +123,8 @@ namespace landerist_console
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.Danyalktk().Run();
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.AWSComprehend().Run();
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.GoogleCNL().Run();
+
+            //new ChatGPTRequest().ListModels();            
         }
     }
 }

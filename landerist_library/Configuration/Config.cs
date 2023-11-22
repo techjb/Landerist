@@ -10,7 +10,7 @@
 
         public static readonly bool STORE_RESPONSE_BODY_TEXT_IN_DATABASE = true;
 
-        public static readonly bool LISTING_PARSER_ENABLED = false;
+        //public static readonly bool LISTING_PARSER_ENABLED = false;
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -20,7 +20,7 @@
 
         //public static readonly int MAX_LISTINGS_PER_WEBSITE = 100;
 
-        public static readonly int MAX_RESPONSEBODYTEXT_LENGTH = 5000;
+        public static readonly int MAX_RESPONSEBODYTEXT_LENGTH = 10000;
 
         public static readonly int MIN_RESPONSEBODYTEXT_LENGTH = 50;
 
@@ -80,7 +80,7 @@
 
         public static readonly string DELIMITATIONS_DIRECTORY = PrivateConfig.DELIMITATIONS_DIRECTORY;
 
-        public static readonly string GOOGLEMAPS_API = PrivateConfig.GOOGLE_MAPS_API;
+        public static readonly string GOOGLE_MAPS_API = PrivateConfig.GOOGLE_MAPS_API;
 
         public static readonly string GOOGLE_NATURAL_LANGUAGE_API_KEY = PrivateConfig.GOOGLE_NATURAL_LANGUAGE_API_KEY;
 
