@@ -10,8 +10,6 @@
 
         public static readonly bool STORE_RESPONSE_BODY_TEXT_IN_DATABASE = true;
 
-        //public static readonly bool LISTING_PARSER_ENABLED = false;
-
         public static readonly bool INDEXER_ENABLED = true;
 
         public static readonly bool WORDS_ENABLED = false;
