@@ -3,6 +3,7 @@ using landerist_library.Parse.Listing.ChatGPT;
 using landerist_library.Scrape;
 using landerist_library.Websites;
 using OpenAI;
+using System.Net;
 
 
 namespace landerist_console
@@ -110,6 +111,7 @@ namespace landerist_console
 
             //landerist_library.Index.ProhibitedUrls.FindNewProhibitedStartsWith();
             //landerist_library.Parse.PageType.LastSegment.FindProhibitedEndsSegments();
+
             //landerist_library.Parse.PageType.PageTypeParser.ResponseBodyValidToIsListing();
             //landerist_library.Parse.PageType.PageTypeParser.ResponseBodyValidToIsListing(page);
 
@@ -119,12 +121,19 @@ namespace landerist_console
             //landerist_library.Parse.Listing.MLModel.TrainingData.CreateIsListing(1000);
             //landerist_library.Parse.Listing.MLModel.TrainingData.CreateUriResponseBodyText();
             //landerist_library.Parse.Listing.MLModel.IsListingUrl.IsListingUrl.CreateCsv();
+            //landerist_library.Parse.Listing.MLModel.TrainingData.CreateIsListing();
+            
+            landerist_library.Parse.Listing.Classifier.IsListing.Create();
+
 
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.Danyalktk().Run();
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.AWSComprehend().Run();
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.GoogleCNL().Run();
 
             //new ChatGPTRequest().ListModels();            
+
+
+
         }
     }
 }

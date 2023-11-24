@@ -1,11 +1,14 @@
 ﻿using landerist_library.Logs;
 using OpenAI;
-using OpenAI.Chat;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace landerist_library.Parse.Listing.ChatGPT
 {
+    public class IsListingResponse
+    {
+        public bool EsUnAnuncioDeOfertaInmobiliaria { get; set; }
+    }
 
     public class ChatGPTIsListing : ChatGPTRequest
     {
@@ -18,7 +21,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             "Evalúa el siguiente texto y determina si contiene todos los datos completos de un anuncio de oferta inmobiliaria. " +
             "Asegúrate de identificar la presencia de cada uno de los puntos anteriores en el texto. " +
             "Si encuentras títulos de otros anuncios en el texto, ignóralos a menos que vengan acompañados de toda la información requerida.\r\n\r\n" +
-            "Response sólo con \"sí\" o \"no\""
+            "Response sólo con \"si\" o \"no\" en formato Json"
             ;
 
         private static readonly string FunctionCallValidarTexto = "obtener_resultados";
@@ -71,16 +74,9 @@ namespace landerist_library.Parse.Listing.ChatGPT
             try
             {
                 var usedTool = response.FirstChoice.Message.ToolCalls[0];
-                bool isListing = JsonSerializer.Deserialize<bool>(usedTool.Function.Arguments.ToString());
-                return isListing;
-                //var functionResult = FunctionCallValidarTexto(functionArgs);
-
-                //string message = response.FirstChoice.Message;
-                //return message.ToLower().Equals("sí");
-
-                //var arguments = response.FirstChoice.Message.Function.Arguments.ToString();
-                //JObject json = JObject.Parse(arguments);
-                //return (bool?)json[ParameterEsAnuncioDeOfertaInmobiliaria];
+                string arguments = usedTool.Function.Arguments.ToString();
+                var isListingResponse = JsonSerializer.Deserialize<IsListingResponse>(arguments);
+                return isListingResponse?.EsUnAnuncioDeOfertaInmobiliaria;               
             }
             catch (Exception exception)
             {

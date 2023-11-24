@@ -2,7 +2,6 @@
 using landerist_library.Configuration;
 using OpenAI.Chat;
 using OpenAI;
-using OpenAI.Models;
 
 namespace landerist_library.Parse.Listing.ChatGPT
 {
@@ -14,8 +13,11 @@ namespace landerist_library.Parse.Listing.ChatGPT
         // gpt-3.5-turbo-16k: 16384
         // GPT-4-8K: 8192
         // GPT-4-32K: 32768
-        //public static readonly int MAX_TOKENS = 8192;
-        public static readonly int MAX_TOKENS = 4096;
+        // public static readonly int MAX_TOKENS = 8192;
+        // gpt-3.5-turbo-1106: 16,385 
+        // gpt-4-1106-preview: 128,000
+        public static readonly int MAX_TOKENS = 128000;
+        public static readonly string Model = "gpt-4-1106-preview";
 
         private readonly OpenAIClient OpenAIClient = new (Config.OPENAI_API_KEY);
         private readonly string SystemMessage;
@@ -27,7 +29,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             SystemMessage = systemMessage;            
         }
 
-        public ChatGPTRequest(string systemMessage, List<Tool> tools, string toolChoice = "auto") : this(systemMessage)
+        public ChatGPTRequest(string systemMessage, List<Tool> tools, string toolChoice) : this(systemMessage)
         {
             Tools = tools;           
             ToolChoice = toolChoice;
@@ -47,20 +49,12 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
             var chatRequest = new ChatRequest(
                 messages: messages,                
-                model: "gpt-4-1106-preview",
-                //responseFormat: ChatResponseFormat.Json,
+                model: Model,
+                responseFormat: ChatResponseFormat.Json,
                 temperature: 0,
                 tools: Tools,
-                toolChoice: ToolChoice
-                );
-
-            //var chatRequest = new ChatRequest(
-            //    messages: messages,
-            //    functions: Functions,
-            //    functionCall: FunctionCall,
-            //    model: Model.GPT3_5_Turbo_16K,                
-            //    temperature: 0
-            //    );
+                toolChoice: ToolChoice                
+                );            
 
             try
             {

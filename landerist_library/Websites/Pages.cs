@@ -1,4 +1,5 @@
 ﻿using landerist_library.Database;
+using landerist_library.Parse.Listing.Classifier;
 using landerist_library.Parse.PageType;
 using System.Data;
 
@@ -201,7 +202,7 @@ namespace landerist_library.Websites
             page.Insert();
         }
 
-        public static DataTable GetIsListingResponseBodyText(int? top = null)
+        public static DataTable GetListingsResponseBodyText(int? top = null)
         {
             string queryTop = string.Empty;
             if (top != null)
@@ -209,11 +210,29 @@ namespace landerist_library.Websites
                 queryTop = " TOP " + top;
             }
             string query =
-                "SELECT " + queryTop + " [IsListing], [ResponseBodyText] " +
+                "SELECT " + queryTop + " [ResponseBodyText] " +
                 "FROM " + TABLE_PAGES + " " +
-                "WHERE [IsListing] IS NOT NULL";
+                "WHERE [PageType] ='Listing'";
 
             return new DataBase().QueryTable(query);
+        }
+
+        public static DataTable GetResponseBodyText(PageType pageType, int? top = null)
+        {
+            string queryTop = string.Empty;
+            if (top != null)
+            {
+                queryTop = " TOP " + top;
+            }
+            string query =
+                "SELECT " + queryTop + " [ResponseBodyText] " +
+                "FROM " + TABLE_PAGES + " " +
+                "WHERE [PageType] = @PageType";
+
+            return new DataBase().QueryTable(query, new Dictionary<string, object?>()
+            {
+                {"PageType", pageType.ToString() }
+            });
         }
 
         public static DataTable GetUriResponseBodyText(int? top = null)

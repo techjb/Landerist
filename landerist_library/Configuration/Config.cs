@@ -74,7 +74,10 @@
 
         public static readonly string MLMODEL_DIRECTORY = PrivateConfig.MLMODEL_DIRECTORY;
 
+
         public static readonly string MLMODEL_TRAINING_DATA_DIRECTORY = MLMODEL_DIRECTORY + @"TrainingData\";
+
+        public static readonly string CLASSIFIER_DIRECTORY = PrivateConfig.CLASIFFIER_DIRECTORY;
 
         public static readonly string DELIMITATIONS_DIRECTORY = PrivateConfig.DELIMITATIONS_DIRECTORY;
 

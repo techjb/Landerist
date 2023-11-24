@@ -101,6 +101,7 @@ namespace landerist_library.Parse.PageType
 
         public static void ResponseBodyValidToIsListing()
         {
+            Console.WriteLine("Reading ResponseBodyValid pages..");
             var pages = Pages.GetPages(PageType.ResponseBodyValid);
             Total = pages.Count;
             Counter = 0;
@@ -112,7 +113,7 @@ namespace landerist_library.Parse.PageType
                 page =>
             {
                 ResponseBodyValidToIsListing(page);
-                Thread.Sleep(1000);
+                Thread.Sleep(8000); // openia limits
             });
         }
 

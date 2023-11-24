@@ -11,7 +11,7 @@ namespace landerist_library.Parse.Listing.MLModel
 
         public static void TestData()
         {
-            DataTable dataTable = Pages.GetIsListingResponseBodyText();
+            DataTable dataTable = Pages.GetListingsResponseBodyText();
             int charCounter = 0;
             foreach (DataRow row in dataTable.Rows)
             {
@@ -22,7 +22,6 @@ namespace landerist_library.Parse.Listing.MLModel
             }
             Console.WriteLine("Total chars: " + charCounter);
         }
-
 
         public static void Create()
         {
@@ -46,7 +45,7 @@ namespace landerist_library.Parse.Listing.MLModel
         public static void CreateIsListing()
         {
             Console.WriteLine("Reading IsListing ..");
-            DataTable dataTable = Pages.GetIsListingResponseBodyText();
+            DataTable dataTable = Pages.GetListingsResponseBodyText();
             string file = Config.MLMODEL_TRAINING_DATA_DIRECTORY + "IsListing.csv";
             CreateFile(dataTable, file);
         }
