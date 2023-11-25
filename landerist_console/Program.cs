@@ -123,8 +123,7 @@ namespace landerist_console
             //landerist_library.Parse.Listing.MLModel.IsListingUrl.IsListingUrl.CreateCsv();
             //landerist_library.Parse.Listing.MLModel.TrainingData.CreateIsListing();
             
-            landerist_library.Parse.Listing.Classifier.IsListing.Create();
-
+            //landerist_library.Parse.Listing.Classifier.IsListing.Create();
 
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.Danyalktk().Run();
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.AWSComprehend().Run();
