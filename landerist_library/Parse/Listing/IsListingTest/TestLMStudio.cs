@@ -37,7 +37,6 @@ namespace landerist_library.Parse.Listing.IsListingTest
                 }
                 else
                 {
-                    Processed++;
                     if ((bool)testResult)
                     {
                         Sucess++;
@@ -46,7 +45,8 @@ namespace landerist_library.Parse.Listing.IsListingTest
                     {
                         NoSucess++;
                     }
-                }                
+                }
+                Processed++;
                 OutputConsole();
             }
         }

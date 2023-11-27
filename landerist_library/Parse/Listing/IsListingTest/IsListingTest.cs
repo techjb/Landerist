@@ -60,18 +60,15 @@ namespace landerist_library.Parse.Listing.IsListingTest
 
         protected static void OutputConsole()
         {
-            var successRatio = GetSucessRatio();
+            var noErrors = Processed - Errors;
             var processedPercentage = Math.Round((float)Processed * 100 / Total, 2);
+            var successRatio = Math.Round((float)Sucess / noErrors, 3);
             Console.WriteLine(
-            "Processed: " + Processed + "/" + Total + " (" + processedPercentage + "%) " +
+                "Processed: " + Processed + "/" + Total + " (" + processedPercentage + "%) " +
+                "Errors: " + Errors + " " +
+                "No error: " + noErrors + " " +
                 "Sucess: " + Sucess + " (" + successRatio + ") " +
-                "NoSucess: " + NoSucess + " " + 
-                "Errors: " + Errors );
-        }
-
-        private static double GetSucessRatio()
-        {
-            return Math.Round((float)Sucess / Processed, 3);
+                "NoSucess: " + NoSucess);
         }
     }
 }
