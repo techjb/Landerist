@@ -8,7 +8,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
     {
         public static readonly string SystemMessage = "";
 
-        private static readonly Tool Tool = ParseListingTool.Tool;
+        private static readonly Tool Tool = ParseListingTool.GetTool();
 
         public ParseListingRequest() : base(SystemMessage, Tool)
         {

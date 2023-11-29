@@ -22,7 +22,7 @@ namespace landerist_library.Parse.Listing
             ParsedCounter = 0;
             ErrorsCounter = 0;
             Parallel.ForEach(pages,
-                //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
+                new ParallelOptions() { MaxDegreeOfParallelism = 1 },
                 page =>
                 {
                     ParseListing(page);

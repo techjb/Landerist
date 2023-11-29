@@ -9,10 +9,9 @@ namespace landerist_library.Parse.Listing.ChatGPT
 {
     public class ParseListingResponse
     {
-
         public string? FechaDePublicación { get; set; } = null;
 
-        public string? TipoDeOperacion { get; set; } = null;
+        public string? TipoDeOperación { get; set; } = null;
 
         public string? TipoDeInmueble { get; set; } = null;
 
@@ -77,59 +76,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
         public bool? PermiteMascotas { get; set; } = null;
 
         public bool? TieneSistemasDeSeguridad { get; set; } = null;
-
-
-        protected const string OPERACION_VENTA = "venta";
-
-        protected const string OPERACION_ALQUILER = "alquiler";
-
-        protected const string TIPO_DE_INMUEBLE_VIVIENDA = "vivienda";
-
-        protected const string TIPO_DE_INMUEBLE_DORMITORIO = "dormitorio";
-
-        protected const string TIPO_DE_INMUEBLE_LOCAL_COMERCIAL = "local_comercial";
-
-        protected const string TIPO_DE_INMUEBLE_NAVE_INDUSTRIAL = "nave_industrial";
-
-        protected const string TIPO_DE_INMUEBLE_GARAJE = "garaje";
-
-        protected const string TIPO_DE_INMUEBLE_TRASTERO = "trastero";
-
-        protected const string TIPO_DE_INMUEBLE_OFICINA = "oficina";
-
-        protected const string TIPO_DE_INMUEBLE_PARCELA = "terreno_o_parcela";
-
-        protected const string TIPO_DE_INMUEBLE_EDIFICIO = "edificio";
-
-        protected const string SUBTIPO_DE_INMUEBLE_PISO = "piso";
-
-        protected const string SUBTIPO_DE_INMUEBLE_APARTAMENTO = "apartamento";
-
-        protected const string SUBTIPO_DE_INMUEBLE_ÁTICO = "ático";
-
-        protected const string SUBTIPO_DE_INMUEBLE_BUNGALOW = "bungalow";
-
-        protected const string SUBTIPO_DE_INMUEBLE_DUPLEX = "dúplex";
-
-        protected const string SUBTIPO_DE_INMUEBLE_CHALET_INDEPENDIENTE = "chalet_independiente";
-
-        protected const string SUBTIPO_DE_INMUEBLE_CHALET_PAREADO = "chalet_pareado";
-
-        protected const string SUBTIPO_DE_INMUEBLE_CHALET_ADOSADO = "chalet_adosado";
-
-        protected const string SUBTIPO_DE_INMUEBLE_PARCELA_URBANA = "parcela_urbana";
-
-        protected const string SUBTIPO_DE_INMUEBLE_PARCELA_URBANIZABLE = "parcela_urbanizable";
-
-        protected const string SUBTIPO_DE_INMUEBLE_PARCELA_NO_URBANIZABLE = "parcela_no_urbanizable";
-
-        protected const string ESTADO_DE_LA_CONSTRUCCIÓN_OBRA_NUEVA = "obra_nueva";
-
-        protected const string ESTADO_DE_LA_CONSTRUCCIÓN_BUENO = "buen_estado";
-
-        protected const string ESTADO_DE_LA_CONSTRUCCIÓN_A_REFORMAR = "a_reformar";
-
-        protected const string ESTADO_DE_LA_CONSTRUCCIÓN_EN_RUINAS = "en_ruinas";
+        
 
         public landerist_orels.ES.Listing? ToListing(Page page)
         {
