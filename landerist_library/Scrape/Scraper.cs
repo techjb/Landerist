@@ -297,7 +297,6 @@ namespace landerist_library.Scrape
                         Interlocked.Increment(ref ResponseBodyValidCounter);
                     }
                     break;
-
                 default:
                     {
                         Interlocked.Increment(ref OtherPageType);

@@ -99,7 +99,7 @@ namespace landerist_library.Websites
                 "WHERE [PageType] IS NULL " +
                 orderBy;
 
-            Console.WriteLine("Reading non scraped ..");
+            Console.WriteLine("Reading non scraped pages ..");
             DataTable dataTable = new DataBase().QueryTable(query);
             return GetPages(dataTable);
         }

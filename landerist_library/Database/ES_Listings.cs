@@ -25,7 +25,7 @@ namespace landerist_library.Database
             }
         }
 
-        public static void Insert(Website website, Listing listing)
+        private static void Insert(Website website, Listing listing)
         {
             if (InsertData(listing))
             {

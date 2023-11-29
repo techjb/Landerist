@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace landerist_library.Parse.Listing.ChatGPT
 {
-    public class ChatGPTGetListing : ChatGPTRequest
+    public class ChatGPTParseListing : ChatGPTRequest
     {
 
         public static string SystemMessage =
@@ -11,14 +11,14 @@ namespace landerist_library.Parse.Listing.ChatGPT
             ChatGPTResponseSchema.GetSchema() + "\n\n" +
             "Escribe null en los campos que falten.";
 
-        public ChatGPTGetListing() : base(SystemMessage)
+        public ChatGPTParseListing() : base(SystemMessage)
         {
 
         }
 
-        public landerist_orels.ES.Listing? GetListing(Page page)
+        public landerist_orels.ES.Listing? Parse(Page page)
         {
-            var response = GetResponse(page.ResponseBodyText);
+            var response = GetResponse(page.ResponseBodyText, true);
             if (!string.IsNullOrEmpty(response))
             {
                 try

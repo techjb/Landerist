@@ -1,16 +1,10 @@
 ﻿using landerist_library.Logs;
 using OpenAI;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 
 namespace landerist_library.Parse.Listing.ChatGPT
 {
-    public class IsListingResponse
-    {
-        public bool EsUnAnuncioDeOfertaInmobiliaria { get; set; }
-    }
-
-    public class ChatGPTIsListing : ChatGPTRequest
+    public class IsListingRequest : ChatGPTRequest
     {
         public static readonly string SystemMessage =
             "Un anuncio completo de oferta inmobiliaria debe contener la siguiente información:\r\n\r\n" +
@@ -24,33 +18,9 @@ namespace landerist_library.Parse.Listing.ChatGPT
             "Response sólo con \"si\" o \"no\" en formato Json"
             ;
 
-        private static readonly string FunctionCallValidarTexto = "obtener_resultados";
-        private static readonly string FunctionCallValidarTextoDescription = "Obtiene el resultados de la evaluación";
-        private static readonly string ParameterEsAnuncioDeOfertaInmobiliaria = "EsUnAnuncioDeOfertaInmobiliaria";
-        private static readonly string ParameterEsAnuncioDeOfertaInmobiliariaDescription = "El texto sí es un anuncio de oferta inmobiliaria";
+        private static readonly Tool Tool = IsListingTool.Tool;
 
-        private static readonly List<Tool> Tools = new()
-        {
-            new Function(
-                FunctionCallValidarTexto,
-                FunctionCallValidarTextoDescription,
-                new JsonObject()
-                {
-                    ["type"] = "object",
-                    ["properties"] = new JsonObject
-                    {
-                        [ParameterEsAnuncioDeOfertaInmobiliaria] = new JsonObject
-                        {
-                            ["type"] = "boolean",
-                            ["description"] = ParameterEsAnuncioDeOfertaInmobiliariaDescription
-                        },
-                    },
-                    ["required"] = new JsonArray { ParameterEsAnuncioDeOfertaInmobiliaria }
-                }
-            )
-        };
-
-        public ChatGPTIsListing() : base(SystemMessage, Tools, FunctionCallValidarTexto)
+        public IsListingRequest() : base(SystemMessage, Tool)
         {
 
         }
@@ -61,12 +31,8 @@ namespace landerist_library.Parse.Listing.ChatGPT
             {
                 return null;
             }
-            if (!IsTextAllowed(text))
-            {
-                return null;
-            }
 
-            var response = GetResponse(text);
+            var response = GetResponse(text, false);
             if (response == null)
             {
                 return null;
@@ -76,16 +42,19 @@ namespace landerist_library.Parse.Listing.ChatGPT
                 var usedTool = response.FirstChoice.Message.ToolCalls[0];
                 string arguments = usedTool.Function.Arguments.ToString();
                 var isListingResponse = JsonSerializer.Deserialize<IsListingResponse>(arguments);
-                return isListingResponse?.EsUnAnuncioDeOfertaInmobiliaria;               
+                if (isListingResponse != null)
+                {
+                    return isListingResponse?.EsUnAnuncioDeOfertaInmobiliaria;
+                }
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors("ChatGPT IsListing", exception);
+                Log.WriteLogErrors("IsListingRequest IsListing", exception);
             }
             return null;
         }
 
-        public static bool IsTextAllowed(string? text)
+        public static bool IsLengthAllowed(string? text)
         {
             if (text == null)
             {

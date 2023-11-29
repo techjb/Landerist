@@ -16,6 +16,7 @@ namespace landerist_library.Parse.PageType
         ResponseBodyError,
         ResponseBodyTooLarge,
         ResponseBodyTooShort,
+        ResponseBodyTooManyTokens,
         ResponseBodyValid,
         MayContainListing,
         Listing,
@@ -54,16 +55,19 @@ namespace landerist_library.Parse.PageType
             if (ResponseBodyIsError(page.ResponseBodyText))
             {
                 return PageType.ResponseBodyError;
+            }            
+            if (ResponseBodyIsTooShort(page.ResponseBodyText))
+            {
+                return PageType.ResponseBodyTooShort;
             }
             if (ResponseBodyIsTooLarge(page.ResponseBodyText))
             {
                 return PageType.ResponseBodyTooLarge;
             }
-            if (ResponseBodyIsTooShort(page.ResponseBodyText))
+            if (!IsListingRequest.IsLengthAllowed(page.ResponseBodyText))
             {
-                return PageType.ResponseBodyTooShort;
+                return PageType.ResponseBodyTooManyTokens;
             }
-
             return PageType.ResponseBodyValid;
         }
 
@@ -113,13 +117,13 @@ namespace landerist_library.Parse.PageType
                 page =>
             {
                 ResponseBodyValidToIsListing(page);
-                Thread.Sleep(8000); // openia limits
+                //Thread.Sleep(8000); // openia limits
             });
         }
 
         public static void ResponseBodyValidToIsListing(Page page)
         {
-            bool? IsListing = new ChatGPTIsListing().IsListing(page.ResponseBodyText);
+            bool? IsListing = new IsListingRequest().IsListing(page.ResponseBodyText);
             Interlocked.Increment(ref Counter);
             if (IsListing.HasValue)
             {

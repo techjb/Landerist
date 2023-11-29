@@ -9,33 +9,30 @@ namespace landerist_library.Parse.Listing.ChatGPT
     {
 
         //https://platform.openai.com/docs/models/overview  
-        //gpt-3.5-turbo: 4096
-        // gpt-3.5-turbo-16k: 16384
-        // GPT-4-8K: 8192
-        // GPT-4-32K: 32768
-        // public static readonly int MAX_TOKENS = 8192;
         // gpt-3.5-turbo-1106: 16,385 
         // gpt-4-1106-preview: 128,000
-        public static readonly int MAX_TOKENS = 128000;
-        public static readonly string Model = "gpt-4-1106-preview";
+        public static readonly int MAX_TOKENS = 16385;
+        public static readonly string ModelGPT_4 = "gpt-4-1106-preview";
+        public static readonly string ModelGPT_3_5 = "gpt-3.5-turbo-1106";
 
-        private readonly OpenAIClient OpenAIClient = new (Config.OPENAI_API_KEY);
+        private readonly OpenAIClient OpenAIClient = new(Config.OPENAI_API_KEY);
         private readonly string SystemMessage;
         private readonly List<Tool>? Tools;
         private readonly string? ToolChoice;
 
         public ChatGPTRequest(string systemMessage = "")
         {
-            SystemMessage = systemMessage;            
+            SystemMessage = systemMessage;
         }
 
-        public ChatGPTRequest(string systemMessage, List<Tool> tools, string toolChoice) : this(systemMessage)
+        public ChatGPTRequest(string systemMessage, Tool tool)             
         {
-            Tools = tools;           
-            ToolChoice = toolChoice;
+            SystemMessage = systemMessage;
+            Tools = new List<Tool> { tool };
+            ToolChoice = tool.Function.Name;
         }
-
-        protected ChatResponse? GetResponse(string? userInput)
+       
+        protected ChatResponse? GetResponse(string? userInput, bool modelGPT_4)
         {
             if (string.IsNullOrEmpty(userInput))
             {
@@ -47,14 +44,15 @@ namespace landerist_library.Parse.Listing.ChatGPT
                 new(Role.User, userInput),
             };
 
+            var model = modelGPT_4 ? ModelGPT_4 : ModelGPT_3_5;
             var chatRequest = new ChatRequest(
-                messages: messages,                
-                model: Model,
+                messages: messages,
+                model: model,
                 responseFormat: ChatResponseFormat.Json,
                 temperature: 0,
                 tools: Tools,
-                toolChoice: ToolChoice                
-                );            
+                toolChoice: ToolChoice
+                );
 
             try
             {
@@ -83,7 +81,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
         public void ListModels()
         {
             var models = Task.Run(async () => await OpenAIClient.ModelsEndpoint.GetModelsAsync()).Result;
-            List<string> list = new ();
+            List<string> list = new();
             foreach (var model in models)
             {
                 list.Add(model.ToString());
@@ -91,8 +89,8 @@ namespace landerist_library.Parse.Listing.ChatGPT
             list.Sort();
             foreach (var model in list)
             {
-                Console.WriteLine(model.ToString());    
+                Console.WriteLine(model.ToString());
             }
-        }       
+        }
     }
 }

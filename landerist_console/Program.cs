@@ -86,7 +86,7 @@ namespace landerist_console
             //Websites.CountRobotsSiteMaps();            
             //Websites.InsertMainPages();
 
-            //new Scraper(true).ScrapeUnknowPageType();
+            //new Scraper(true).ScrapeUnknowPageType(1000);
 
             //new Scraper().ScrapeMainPage(website);
             //new Scraper().ScrapeUnknowHttpStatusCode();
@@ -96,6 +96,8 @@ namespace landerist_console
             //new Scraper().ScrapeUnknowPageType(website);
             //new Scraper().Scrape(uriPage);
             //new Scraper().ScrapeAllPages();
+
+            landerist_library.Parse.Listing.ListingsParser.Start();
 
             //Csv.Export(true);
             //Json.Export(true);
@@ -113,7 +115,7 @@ namespace landerist_console
             //landerist_library.Parse.PageType.LastSegment.FindProhibitedEndsSegments();
 
             //landerist_library.Parse.PageType.PageTypeParser.ResponseBodyValidToIsListing();
-            //landerist_library.Parse.PageType.PageTypeParser.ResponseBodyValidToIsListing(page);
+            //landerist_library.Parse.PageType.PageTypeParser.ResponseBodyValidToIsListing(page);            
 
             //landerist_library.Parse.Listing.MLModel.TrainingData.TestData();
             //landerist_library.Parse.Listing.MLModel.TrainingData.CreateIsListing();
@@ -124,7 +126,7 @@ namespace landerist_console
             //landerist_library.Parse.Listing.MLModel.TrainingData.CreateIsListing();
 
             //landerist_library.Parse.Listing.IsListingTest.TestFTTC.Start();
-            landerist_library.Parse.Listing.IsListingTest.TestLMStudio.Start();
+            //landerist_library.Parse.Listing.IsListingTest.TestLMStudio.Start();
 
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.Danyalktk().Run();
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.AWSComprehend().Run();
