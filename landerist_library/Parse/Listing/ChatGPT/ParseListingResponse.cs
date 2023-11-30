@@ -1,6 +1,7 @@
 ﻿using landerist_library.Tools;
 using landerist_library.Websites;
 using landerist_orels.ES;
+using System.ComponentModel;
 using System.Text.Json.Nodes;
 
 namespace landerist_library.Parse.Listing.ChatGPT
@@ -234,16 +235,31 @@ namespace landerist_library.Parse.Listing.ChatGPT
         {
             if (TipoDeOperación != null)
             {
-                return TiposDeOperación.Contains(TipoDeOperación);
+                return JsonArrayContains(TiposDeOperación, TipoDeOperación);
             }
             return false;
+        }
+
+
+        private static bool JsonArrayContains(JsonArray jsonArray, string value)
+        {
+            var contains = false;
+            foreach (var item in jsonArray)
+            {
+                if (item.ToString().Equals(value, StringComparison.OrdinalIgnoreCase))
+                {
+                    contains = true;
+                    break;
+                }
+            }
+            return contains;
         }
 
         private bool IsValidTipoDeInmueble()
         {
             if (TipoDeInmueble != null)
             {
-                return TipoDeInmueble.Contains(TipoDeInmueble);
+                return JsonArrayContains(TiposDeInmueble, TipoDeInmueble); 
             }
             return false;
         }
@@ -299,7 +315,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
         {
             if (SubtipoDeInmueble != null)
             {
-                PropertySubtype? propertySubtype = GetPropertySubtipeValue();
+                PropertySubtype? propertySubtype = GetPropertySubtypeValue();
                 if (IsValidPropertySubtype(propertySubtype))
                 {
                     return propertySubtype;
@@ -308,7 +324,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             return null;
         }
 
-        private PropertySubtype? GetPropertySubtipeValue()
+        private PropertySubtype? GetPropertySubtypeValue()
         {
             return SubtipoDeInmueble switch
             {

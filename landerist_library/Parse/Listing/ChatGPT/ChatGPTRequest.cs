@@ -12,8 +12,8 @@ namespace landerist_library.Parse.Listing.ChatGPT
         // gpt-3.5-turbo-1106: 16,385 
         // gpt-4-1106-preview: 128,000
         public static readonly int MAX_TOKENS = 16385;
-        public static readonly string ModelGPT_4 = "gpt-4-1106-preview";
-        public static readonly string ModelGPT_3_5 = "gpt-3.5-turbo-1106";
+        public static readonly string Model_GPT_4 = "gpt-4-1106-preview";
+        public static readonly string Model_GPT_3_5 = "gpt-3.5-turbo-1106";
 
         private readonly OpenAIClient OpenAIClient = new(Config.OPENAI_API_KEY);
         private readonly string SystemMessage;
@@ -44,7 +44,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
                 new(Role.User, userInput),
             };
 
-            var model = modelGPT_4 ? ModelGPT_4 : ModelGPT_3_5;
+            var model = modelGPT_4 ? Model_GPT_4 : Model_GPT_3_5;
             var chatRequest = new ChatRequest(
                 messages: messages,
                 model: model,
@@ -58,14 +58,14 @@ namespace landerist_library.Parse.Listing.ChatGPT
             {
                 DateTime dateStart = DateTime.Now;
                 var response = Task.Run(async () => await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest)).Result;
-                Timers.Timer.SaveTimerChatGPT(string.Empty, dateStart);
+                Timers.Timer.SaveTimerChatGPT("ChatGPTRequest", dateStart);
                 return response;
             }
             catch (Exception exception)
             {
                 Logs.Log.WriteLogErrors("ChatGPT_Request", exception);
-                return null;
             }
+            return null;
         }
 
         protected static bool IsLengthAllowed(string systemMessage, string userMessage)

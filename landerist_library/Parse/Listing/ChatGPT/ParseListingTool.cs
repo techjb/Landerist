@@ -5,8 +5,8 @@ namespace landerist_library.Parse.Listing.ChatGPT
 {
     public class ParseListingTool : ParseListingResponse
     {
-        private static readonly string FunctionName = "data_extractor";
-        private static readonly string FunctionDescription = "Extract the data from the advertisement.";
+        private static readonly string FunctionName = "procesador_de_anuncio";
+        private static readonly string FunctionDescription = "Procesa los datos del anuncio inmobiliario en formato json";
 
         public static Function GetTool()
         {
@@ -76,7 +76,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             Add(jsonObject, name, "boolean", description);
         }
 
-        private static void Add(JsonObject jsonObject, string name, string type, string description, JsonArray? jsonArray = null
+        private static void Add(JsonObject jsonObject, string name, string type, string description, JsonArray? jsonArray = null)
         {
             var property = new JsonObject
             {
