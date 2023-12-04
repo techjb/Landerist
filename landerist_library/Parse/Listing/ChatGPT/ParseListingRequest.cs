@@ -33,8 +33,8 @@ namespace landerist_library.Parse.Listing.ChatGPT
             {
                 var usedTool = response.FirstChoice.Message.ToolCalls[0];                
                 string arguments = usedTool.Function.Arguments.ToString();
-                string argumentsEncoded = EncodeToUTF8(arguments);
-                var parseListingResponse = JsonSerializer.Deserialize<ParseListingResponse>(argumentsEncoded);
+                //string argumentsEncoded = EncodeToUTF8(arguments);
+                var parseListingResponse = JsonSerializer.Deserialize<ParseListingResponse>(arguments);
                 if (parseListingResponse != null)
                 {
                     return parseListingResponse.ToListing(page);
@@ -42,7 +42,6 @@ namespace landerist_library.Parse.Listing.ChatGPT
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception.Message);
                 Logs.Log.WriteLogErrors("ParseListingRequest Parse", exception);
             }
             return null;
