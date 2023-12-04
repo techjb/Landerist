@@ -128,7 +128,7 @@ namespace landerist_library.Parse.PageType
             if (IsListing.HasValue)
             {
                 PageType? pageType = (bool)IsListing ? PageType.Listing : PageType.NotListing;
-                page.Update(pageType);
+                page.UpdatePageType(pageType);
                 switch (pageType)
                 {
                     case PageType.Listing: Interlocked.Increment(ref ListingsCounter); break;

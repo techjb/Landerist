@@ -8,43 +8,60 @@ namespace landerist_library.Parse.Listing.ChatGPT
     public class ParseListingRequest : ChatGPTRequest
     {
         public static readonly string SystemMessage =
-            "Analiza detenidamente el anuncio inmobiliario proporcionado por el usuario. " +
-            "Identifica y extrae de manera precisa los elementos clave, como por el precio del inmueble, " +
-            "ubicación exacta, tamaño en metros cuadrados, tipo de inmueble, una descripción, etc. " +
-            "Extrae además las características especiales como el estado de la propiedad, año de construcción, " +
-            "datos de contacto, etc. Presenta los datos de manera clara, concisa y estructurada en formato json. " +
+            "Analiza detenidamente el texto proporcionado por el usuario. " +
+            "Determina si se trata o no de un anuncio inmobiliario. " +
+            "En caso afirmativo identifica y extrae de manera precisa los elementos clave, como por el precio del inmueble, " +
+            "ubicación exacta, tamaño en metros cuadrados, tipo de inmueble, datos de contacto, etc. " +
+            "Presenta los datos de manera clara, concisa y estructurada en formato json. " +
             "Mantente enfocado y da tu mejor respuesta.";
 
-        private static readonly Tool Tool = ParseListingTool.GetTool();
+        private static readonly List<Tool> Tools = ParseListingTool.GetTools();
 
-        public ParseListingRequest() : base(SystemMessage, Tool)
+        public ParseListingRequest() : base(SystemMessage, Tools)
         {
-            
+
         }
 
-        public landerist_orels.ES.Listing? Parse(Page page)
+        public (bool, landerist_orels.ES.Listing?) Parse(Page page)
         {
+            bool sucess = false;
+            landerist_orels.ES.Listing? listing = null;
             var response = GetResponse(page.ResponseBodyText, false);
             if (response == null)
             {
-                return null;
+                return (sucess, listing);
             }
             try
             {
-                var usedTool = response.FirstChoice.Message.ToolCalls[0];                
-                string arguments = usedTool.Function.Arguments.ToString();
-                //string argumentsEncoded = EncodeToUTF8(arguments);
-                var parseListingResponse = JsonSerializer.Deserialize<ParseListingResponse>(arguments);
-                if (parseListingResponse != null)
+                var usedTool = response.FirstChoice.Message.ToolCalls[0];
+                string functionName = usedTool.Function.Name;
+                switch (functionName)
                 {
-                    return parseListingResponse.ToListing(page);
+                    case ParseListingTool.FunctionNameIsNotListing:
+                        {
+                            page.UpdatePageType(PageType.PageType.NotListing);                            
+                            sucess = true;
+                        }
+                        break;
+                    case ParseListingTool.FunctionNameIsListing:
+                        {
+                            string arguments = usedTool.Function.Arguments.ToString();
+                            var parseListingResponse = JsonSerializer.Deserialize<ParseListingResponse>(arguments);
+                            if (parseListingResponse != null)
+                            {
+                                listing = parseListingResponse.ToListing(page);
+                            }
+                            sucess = true;
+                        }
+                        break;
                 }
             }
             catch (Exception exception)
             {
+                Console.WriteLine(exception.Message);
                 Logs.Log.WriteLogErrors("ParseListingRequest Parse", exception);
             }
-            return null;
+            return (sucess, listing);
         }
 
         // Problem with encoding should be fixed in the future:

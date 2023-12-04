@@ -4,6 +4,7 @@ using landerist_library.Scrape;
 using landerist_library.Websites;
 using OpenAI;
 using System.Net;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 
 
@@ -98,9 +99,8 @@ namespace landerist_console
             //new Scraper().Scrape(uriPage);
             //new Scraper().ScrapeAllPages();
 
-
             landerist_library.Parse.Listing.ListingsParser.Start();
-            
+
             //Csv.Export(true);
             //Json.Export(true);
 

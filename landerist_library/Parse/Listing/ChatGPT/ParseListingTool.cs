@@ -5,10 +5,21 @@ namespace landerist_library.Parse.Listing.ChatGPT
 {
     public class ParseListingTool : ParseListingResponse
     {
-        private static readonly string FunctionName = "procesador_de_anuncio";
-        private static readonly string FunctionDescription = "Procesa los datos del anuncio inmobiliario en formato json";
+        public const string FunctionNameIsListing = "si_es_un_anuncio";
+        public static readonly string FunctionDescriptionIsListing = "El texto introducido corresponde a un único anuncio inmobiliario";
 
-        public static Function GetTool()
+        public const string FunctionNameIsNotListing = "no_es_un_anuncio";
+        public static readonly string FunctionDescriptionIsNotListing = "El texto introducido no corresponde a un único anuncio inmobiliario";
+
+        public static List<Tool> GetTools()
+        {
+            var functionIsListing = GetToolIsListing();
+            var functionIsNotListing = GetToolIsNotListing();
+
+            return new List<Tool> { functionIsListing, functionIsNotListing };            
+        }
+
+        private static Tool GetToolIsListing()
         {
             var properties = new JsonObject();
 
@@ -28,7 +39,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             AddNumber(properties, nameof(AñoDeConstrucción), "año de construcción");
             AddEnum(properties, nameof(EstadoDeLaConstrucción), "estado de la construcción", EstadosDeLaConstrucción);
             AddNumber(properties, nameof(PlantasDelEdificio), "plantas del edificio");
-            AddNumber(properties, nameof(PlantaDelInmueble), "planta del inmueble");
+            AddString(properties, nameof(PlantaDelInmueble), "planta del inmueble");
             AddNumber(properties, nameof(NúmeroDeDormitorios), "número de dormitorios");
             AddNumber(properties, nameof(NúmeroDeBaños), "número de baños");
             AddNumber(properties, nameof(NúmeroDeParkings), "número de parkings");
@@ -54,12 +65,32 @@ namespace landerist_library.Parse.Listing.ChatGPT
                 ["required"] = new JsonArray { }
             };
 
-            return new Function(FunctionName, FunctionDescription, parameters);
+            return new Function(FunctionNameIsListing, FunctionDescriptionIsListing, parameters);
+        }
+
+        private static Tool GetToolIsNotListing()
+        {
+            var properties = new JsonObject();
+            JsonArray NoEsUnAnuncio = new()
+            {
+                "NO_ES_UN_ANUNCIO"
+            };
+
+            AddEnum(properties, "NoEsUnAnuncio", "No es un anuncio", NoEsUnAnuncio);
+
+            var parameters = new JsonObject()
+            {
+                ["type"] = "object",
+                ["properties"] = properties,
+                ["required"] = new JsonArray { }
+            };
+
+            return new Function(FunctionNameIsNotListing, FunctionDescriptionIsNotListing, parameters);
         }
 
         private static void AddString(JsonObject jsonObject, string name, string description)
         {
-            Add(jsonObject, name, "string", description);            
+            Add(jsonObject, name, "string", description);
         }
 
         private static void AddEnum(JsonObject jsonObject, string name, string description, JsonArray jsonArray)

@@ -9,7 +9,8 @@ namespace landerist_library.Parse.Listing
     {
         private static int Total;
         private static int Counter;
-        private static int ParsedCounter;
+        private static int SucessCounter;
+        private static int ListingsCounter;
         private static int ErrorsCounter;
 
         public static void Start()
@@ -20,7 +21,8 @@ namespace landerist_library.Parse.Listing
             Console.WriteLine("Parsing listings ..");
             Total = pages.Count;
             Counter = 0;
-            ParsedCounter = 0;
+            SucessCounter = 0;
+            ListingsCounter = 0;
             ErrorsCounter = 0;
             Parallel.ForEach(pages,
                 //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
@@ -51,12 +53,16 @@ namespace landerist_library.Parse.Listing
 
         public static void ParseListing(Page page)
         {
-            var listing = new ParseListingRequest().Parse(page);
+            var result = new ParseListingRequest().Parse(page);
             Interlocked.Increment(ref Counter);
-            if (listing != null)
+            if (result.Item1)
             {
-                Interlocked.Increment(ref ParsedCounter);
-                ES_Listings.InsertUpdate(page.Website, listing);
+                Interlocked.Increment(ref SucessCounter);
+                if(result.Item2 != null)
+                {
+                    Interlocked.Increment(ref ListingsCounter);
+                    ES_Listings.InsertUpdate(page.Website, result.Item2);
+                }
             }
             else
             {
@@ -69,13 +75,15 @@ namespace landerist_library.Parse.Listing
         private static void ConsoleOutput()
         {
             var percentageTotal = Counter * 100 / Total;
-            var percentageParsed = ParsedCounter * 100 / Counter;
+            var percentageParsed = SucessCounter * 100 / Counter;
             var percentageErrors = ErrorsCounter * 100 / Counter;
+            var percentageListings = ListingsCounter * 100 / SucessCounter;
 
             Console.WriteLine(
                 Counter + "/" + Total + " (" + percentageTotal + "%) " +
-                "Parsed: " + ParsedCounter + " (" + percentageParsed + "%) " +
-                "Errors: " + ErrorsCounter + " (" + percentageErrors + "%) "
+                "Sucess: " + SucessCounter + " (" + percentageParsed + "%) " +
+                "Errors: " + ErrorsCounter + " (" + percentageErrors + "%) " +
+                "Listings: " + ListingsCounter + " (" + percentageListings + "%) "
                 );
         }
     }

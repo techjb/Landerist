@@ -199,12 +199,12 @@ namespace landerist_library.Scrape
         {
             if (!page.Website.IsAllowedByRobotsTxt(page.Uri))
             {
-                page.Update(PageType.BlockedByRobotsTxt);
+                page.UpdatePageType(PageType.BlockedByRobotsTxt);
                 return false;
             }
             if (page.Website.CrawlDelayTooBig())
             {
-                page.Update(PageType.RobotsTxtDisallow);
+                page.UpdatePageType(PageType.RobotsTxtDisallow);
                 return false;
             }
             return true;

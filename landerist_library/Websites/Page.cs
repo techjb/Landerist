@@ -169,7 +169,7 @@ namespace landerist_library.Websites
             });
         }
 
-        public bool Update(PageType? pageType)
+        public bool UpdatePageType(PageType? pageType)
         {
             Updated = DateTime.Now;
 
