@@ -71,6 +71,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
         {
             Add(jsonObject, name, "number", description);
         }
+
         private static void AddBoolean(JsonObject jsonObject, string name, string description)
         {
             Add(jsonObject, name, "boolean", description);

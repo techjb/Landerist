@@ -13,7 +13,6 @@ namespace landerist_library.Websites
 
     public class Page : Pages, IDisposable
     {
-
         public string Host { get; set; } = string.Empty;
 
         public Uri Uri { get; set; } = new Uri("about:blank");
@@ -257,6 +256,12 @@ namespace landerist_library.Websites
         public Listing? GetLising()
         {
             return ES_Listings.GetListing(this, false);
+        }
+
+        public bool ContainsListing()
+        {
+            var listing = GetLising();
+            return listing is not null;
         }
 
         public bool IsIndexable()

@@ -1,6 +1,5 @@
 ﻿using landerist_library.Parse.Listing.ChatGPT;
 using landerist_library.Websites;
-using landerist_orels.ES;
 using landerist_library.Database;
 
 
@@ -15,19 +14,39 @@ namespace landerist_library.Parse.Listing
 
         public static void Start()
         {
-            Console.WriteLine("Reading Listings pages..");
+            Console.WriteLine("Reading Listings pages ..");
             var pages = Pages.GetPages(PageType.PageType.Listing);
+            pages = FilterNewListings(pages);
+            Console.WriteLine("Parsing listings ..");
             Total = pages.Count;
             Counter = 0;
             ParsedCounter = 0;
             ErrorsCounter = 0;
             Parallel.ForEach(pages,
-                new ParallelOptions() { MaxDegreeOfParallelism = 1 },
+                //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
                 page =>
                 {
                     ParseListing(page);
                     //Thread.Sleep(8000); // openia limits
                 });
+        }
+
+        private static List<Page> FilterNewListings(List<Page> pages)
+        {
+            Console.WriteLine("Filtering new pages ..");
+            List<Page> list = new();
+            var sync = new object();
+            Parallel.ForEach(pages, page =>
+            {
+                if (!page.ContainsListing())
+                {
+                    lock (sync)
+                    {
+                        list.Add(page);
+                    }
+                }
+            });
+            return list;
         }
 
         public static void ParseListing(Page page)

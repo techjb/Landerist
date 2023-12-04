@@ -48,7 +48,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             var chatRequest = new ChatRequest(
                 messages: messages,
                 model: model,
-                responseFormat: ChatResponseFormat.Json,
+                //responseFormat: ChatResponseFormat.Json,
                 temperature: 0,
                 tools: Tools,
                 toolChoice: ToolChoice

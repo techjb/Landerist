@@ -246,6 +246,10 @@ namespace landerist_library.Parse.Listing.ChatGPT
             var contains = false;
             foreach (var item in jsonArray)
             {
+                if(item is null)
+                {
+                    continue;
+                }
                 if (item.ToString().Equals(value, StringComparison.OrdinalIgnoreCase))
                 {
                     contains = true;
