@@ -11,9 +11,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
         public static readonly string SystemMessage =
             "Analiza detenidamente el texto proporcionado por el usuario. " +
             "Determina si se trata o no de un anuncio inmobiliario. " +
-            "En caso afirmativo identifica y extrae de manera precisa los elementos clave, como por el precio del inmueble, " +
-            "ubicación exacta, tamaño en metros cuadrados, tipo de inmueble, datos de contacto, etc. " +
-            "Presenta los datos de manera clara, concisa y estructurada en formato json. " +
+            "En caso de que sea un anuncio inmobiliario, extrae de manera precisa los elementos clave en formato json. " +
             "Mantente enfocado y da tu mejor respuesta.";
 
         private static readonly List<Tool> Tools = ParseListingTool.GetTools();
@@ -23,19 +21,19 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
         }
 
-        public (PageType.PageType?, landerist_orels.ES.Listing?) Parse(Page page)
+        public (PageType.PageType pageType, landerist_orels.ES.Listing? listing) Parse(Page page)
         {
             var chatResponse = GetResponse(page.ResponseBodyText, false);
             if (chatResponse == null)
             {
-                return (null, null);
+                return (PageType.PageType.MayBeListing, null);
             }
             return Parse(page, chatResponse);
         }
 
-        private static (PageType.PageType?, landerist_orels.ES.Listing?) Parse(Page page, ChatResponse chatResponse)
+        private static (PageType.PageType, landerist_orels.ES.Listing?) Parse(Page page, ChatResponse chatResponse)
         {
-            PageType.PageType? pageType = null;
+            PageType.PageType pageType = PageType.PageType.MayBeListing;
             landerist_orels.ES.Listing? listing = null;
 
             try
@@ -62,7 +60,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
                                 }
                                 else
                                 {
-                                    pageType = PageType.PageType.MayBeListing;
+
                                 }
                             }
                         }

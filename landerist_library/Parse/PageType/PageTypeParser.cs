@@ -17,7 +17,6 @@ namespace landerist_library.Parse.PageType
         ResponseBodyTooLarge,
         ResponseBodyTooShort,
         ResponseBodyTooManyTokens,
-        ResponseBodyValid,
         MayBeListing,
         Listing,
         NotListing,
@@ -31,44 +30,45 @@ namespace landerist_library.Parse.PageType
         private static int NotListingsCounter;
         private static int ErrorsCounter;
 
-        public static PageType? GetPageType(Page page)
+        public static (PageType? pageType, landerist_orels.ES.Listing? listing) GetPageType(Page page)
         {
             if (page == null)
             {
-                return null;
+                return (null, null);
             }
             if (page.IsMainPage())
             {
-                return PageType.MainPage;
+                return (PageType.MainPage, null);
             }
             if (!page.IsIndexable())
             {
-                return PageType.NotIndexable;
+                return (PageType.NotIndexable, null);
             }
             if (LastSegment.LastSegmentOfUrlIsForbidden(page.Uri))
             {
-                return PageType.ForbiddenLastSegment;
+                return (PageType.ForbiddenLastSegment, null);
             }
 
             page.SetResponseBodyText();
 
             if (ResponseBodyIsError(page.ResponseBodyText))
             {
-                return PageType.ResponseBodyError;
-            }            
+                return (PageType.ResponseBodyError, null);
+            }
             if (ResponseBodyIsTooShort(page.ResponseBodyText))
             {
-                return PageType.ResponseBodyTooShort;
+                return (PageType.ResponseBodyTooShort, null);
             }
             if (ResponseBodyIsTooLarge(page.ResponseBodyText))
             {
-                return PageType.ResponseBodyTooLarge;
+                return (PageType.ResponseBodyTooLarge, null);
             }
             if (!IsListingRequest.IsLengthAllowed(page.ResponseBodyText))
             {
-                return PageType.ResponseBodyTooManyTokens;
+                return (PageType.ResponseBodyTooManyTokens, null);
             }
-            return PageType.ResponseBodyValid;
+
+            return new ParseListingRequest().Parse(page);            
         }
 
         private static bool ResponseBodyIsError(string? responseBodyText)
@@ -103,10 +103,10 @@ namespace landerist_library.Parse.PageType
             return responseBodyText.Length < Configuration.Config.MIN_RESPONSEBODYTEXT_LENGTH;
         }
 
-        public static void ResponseBodyValidToIsListing()
+        public static void MayBeListingToIsListing()
         {
-            Console.WriteLine("Reading ResponseBodyValid pages..");
-            var pages = Pages.GetPages(PageType.ResponseBodyValid);
+            Console.WriteLine("Reading MayBeListing pages..");
+            var pages = Pages.GetPages(PageType.MayBeListing);
             Total = pages.Count;
             Counter = 0;
             ListingsCounter = 0;
@@ -138,8 +138,8 @@ namespace landerist_library.Parse.PageType
             else
             {
                 Interlocked.Increment(ref ErrorsCounter);
-            }            
-                        
+            }
+
             var percentageTotal = Counter * 100 / Total;
             var percentageListings = ListingsCounter * 100 / Counter;
             var percentageNotListings = NotListingsCounter * 100 / Counter;
@@ -149,7 +149,7 @@ namespace landerist_library.Parse.PageType
                 Counter + "/" + Total + " (" + percentageTotal + "%) " +
                 "Listing: " + ListingsCounter + " (" + percentageListings + "%) " +
                 "NotListing: " + NotListingsCounter + " (" + percentageNotListings + "%) " +
-                "Errors: " + ErrorsCounter + " (" + percentageErrors + "%) " 
+                "Errors: " + ErrorsCounter + " (" + percentageErrors + "%) "
                 );
         }
     }

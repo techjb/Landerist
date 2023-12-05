@@ -88,7 +88,7 @@ namespace landerist_console
             //Websites.CountRobotsSiteMaps();            
             //Websites.InsertMainPages();
 
-            //new Scraper(true).ScrapeUnknowPageType(1000);
+            new Scraper(true).ScrapeUnknowPageType(1000);
 
             //new Scraper().ScrapeMainPage(website);
             //new Scraper().ScrapeUnknowHttpStatusCode();
@@ -99,7 +99,7 @@ namespace landerist_console
             //new Scraper().Scrape(uriPage);
             //new Scraper().ScrapeAllPages();
 
-            landerist_library.Parse.Listing.ListingsParser.Start();            
+            //landerist_library.Parse.Listing.ListingsParser.Start();            
 
             //Csv.Export(true);
             //Json.Export(true);

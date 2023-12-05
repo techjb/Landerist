@@ -12,7 +12,9 @@ namespace landerist_library.Scrape
 
         private static int DownloadErrorCounter = 0;
 
-        private static int ResponseBodyValidCounter = 0;
+        private static int MayBeListingCounter = 0;
+
+        private static int ListingCounter = 0;
 
         private static int OtherPageType = 0;
 
@@ -46,7 +48,7 @@ namespace landerist_library.Scrape
             if (!Scrape())
             {
                 return;
-            }            
+            }
             if (Recursive)
             {
                 ScrapeUnknowPageType(rows);
@@ -153,7 +155,7 @@ namespace landerist_library.Scrape
             Remaining = TotalCounter;
             ThreadCounter = 0;
             DownloadErrorCounter = 0;
-            ResponseBodyValidCounter = 0;
+            MayBeListingCounter = 0;
             OtherPageType = 0;
             var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
             Parallel.ForEach(
@@ -187,7 +189,7 @@ namespace landerist_library.Scrape
             else
             {
                 Scrape(page);
-                page.Dispose();                
+                page.Dispose();
                 Interlocked.Increment(ref Scraped);
                 Interlocked.Decrement(ref Remaining);
             }
@@ -214,15 +216,16 @@ namespace landerist_library.Scrape
         {
             var scrappedPercentage = Math.Round((float)Scraped * 100 / TotalCounter, 0);
             var downloadErrorPercentage = Math.Round((float)DownloadErrorCounter * 100 / TotalCounter, 0);
-            var responseBodyValidPercentage = Math.Round((float)ResponseBodyValidCounter * 100 / TotalCounter, 0);
-            var OtherPageTypePercentage = Math.Round((float)OtherPageType * 100 / TotalCounter, 0);
-            
+            var mayBeListingPercentage = Math.Round((float)MayBeListingCounter * 100 / Scraped, 0);
+            var listingPercentage = Math.Round((float)ListingCounter * 100 / Scraped, 0);
+            var OtherPageTypePercentage = Math.Round((float)OtherPageType * 100 / Scraped, 0);
+
             Console.WriteLine(
-               "Scraped: " + Scraped + "/" + TotalCounter + " (" + scrappedPercentage + "%) " +
                "Threads: " + ThreadCounter + " " +
-               //"BlockingCollection: " + BlockingCollection.Count + " " +
+               "Scraped: " + Scraped + "/" + TotalCounter + " (" + scrappedPercentage + "%) " +
                "Errors: " + DownloadErrorCounter + " (" + downloadErrorPercentage + "%) " +
-               "Valids: " + ResponseBodyValidCounter + " (" + responseBodyValidPercentage + "%) " +
+               "MayBeListing: " + MayBeListingCounter + " (" + mayBeListingPercentage + "%) " +
+               "Listing: " + ListingCounter + " (" + listingPercentage + "%) " +
                "Others: " + OtherPageType + " (" + OtherPageTypePercentage + "%) "
                );
         }
@@ -267,7 +270,7 @@ namespace landerist_library.Scrape
             {
                 Logs.Log.WriteLogErrors(page.Uri, exception);
             }
-            IncrementListingsCounter(page);
+            IncrementCounters(page);
         }
 
         private static bool IsBlocked(Page page)
@@ -283,7 +286,7 @@ namespace landerist_library.Scrape
             }
         }
 
-        private static void IncrementListingsCounter(Page page)
+        private static void IncrementCounters(Page page)
         {
             switch (page.PageType)
             {
@@ -292,9 +295,14 @@ namespace landerist_library.Scrape
                         Interlocked.Increment(ref DownloadErrorCounter);
                     }
                     break;
-                case PageType.ResponseBodyValid:
+                case PageType.MayBeListing:
                     {
-                        Interlocked.Increment(ref ResponseBodyValidCounter);
+                        Interlocked.Increment(ref MayBeListingCounter);
+                    }
+                    break;
+                case PageType.Listing:
+                    {
+                        Interlocked.Increment(ref ListingCounter);
                     }
                     break;
                 default:

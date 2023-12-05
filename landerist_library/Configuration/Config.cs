@@ -8,7 +8,7 @@
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
-        public static readonly bool STORE_RESPONSE_BODY_TEXT_IN_DATABASE = true;
+        public static readonly bool STORE_RESPONSE_BODY_TEXT_IN_DATABASE = false;
 
         public static readonly bool INDEXER_ENABLED = true;
 

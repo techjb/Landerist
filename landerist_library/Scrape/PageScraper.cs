@@ -1,4 +1,5 @@
 ﻿using landerist_library.Configuration;
+using landerist_library.Database;
 using landerist_library.Download;
 using landerist_library.Index;
 using landerist_library.Parse.PageType;
@@ -28,8 +29,7 @@ namespace landerist_library.Scrape
             {
                 DownloadError();
             }
-            return Page.Update();                        
-            
+            return Page.Update();            
         }
 
         private void DownloadSucess()
@@ -47,7 +47,13 @@ namespace landerist_library.Scrape
             {
                 IndexPages();
             }
-            SetPageType();
+
+            var result = PageTypeParser.GetPageType(Page);
+            Page.SetPageType(result.pageType);
+            if (result.listing != null)
+            {
+                ES_Listings.InsertUpdate(Page.Website, result.listing);
+            }
         }
 
         private bool IsCorrectLanguage()
@@ -80,12 +86,6 @@ namespace landerist_library.Scrape
                 return;
             }
             new HyperlinksIndexer(Page).Insert();
-        }
-
-        private void SetPageType()
-        {
-            var pageType = PageTypeParser.GetPageType(Page);
-            Page.SetPageType(pageType);
         }
 
         private void DownloadError()

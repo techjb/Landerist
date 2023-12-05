@@ -9,10 +9,7 @@ namespace landerist_library.Parse.Listing
     {
         private static int Total;
         private static int Counter;
-        private static int SucessCounter;
-        private static int ListingsCounter;        
-        private static int ErrorsCounter;
-
+        private static int ListingsCounter;
 
         public static void Start()
         {
@@ -21,9 +18,7 @@ namespace landerist_library.Parse.Listing
             Console.WriteLine("Parsing listings ..");
             Total = pages.Count;
             Counter = 0;
-            SucessCounter = 0;
             ListingsCounter = 0;
-            ErrorsCounter = 0;
             Parallel.ForEach(pages,
                 //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
                 page =>
@@ -32,45 +27,28 @@ namespace landerist_library.Parse.Listing
                     //Thread.Sleep(8000); // openia limits
                 });
         }
-     
+
         public static void ParseListing(Page page)
         {
             var result = new ParseListingRequest().Parse(page);
             Interlocked.Increment(ref Counter);
-            var pageType = result.Item1;
-            var listing = result.Item2;
-
-            if (pageType != null)
+            page.UpdatePageType(result.pageType);
+            if (result.listing != null)
             {
-                Interlocked.Increment(ref SucessCounter);                
-                page.UpdatePageType(pageType);                
-                if (listing != null)
-                {
-                    Interlocked.Increment(ref ListingsCounter);
-                    ES_Listings.InsertUpdate(page.Website, listing);
-                }
+                Interlocked.Increment(ref ListingsCounter);
+                ES_Listings.InsertUpdate(page.Website, result.listing);
             }
-            else
-            {
-                Interlocked.Increment(ref ErrorsCounter);
-            }
-
             ConsoleOutput();
         }
 
         private static void ConsoleOutput()
         {
             var percentageTotal = Counter * 100 / Total;
-            var percentageSucess = SucessCounter * 100 / Counter;
-            var percentageErrors = ErrorsCounter * 100 / Counter;
-            var percentageListings = ListingsCounter * 100 / SucessCounter;
+            var percentageListings = ListingsCounter * 100 / Counter;
 
             Console.WriteLine(
                 Counter + "/" + Total + " (" + percentageTotal + "%) " +
-                "Sucess: " + SucessCounter + " (" + percentageSucess + "%) " +
-                "Errors: " + ErrorsCounter + " (" + percentageErrors + "%) " +
-                "Listings: " + ListingsCounter + " (" + percentageListings + "%) "
-                );
+                "Listings: " + ListingsCounter + " (" + percentageListings + "%) ");
         }
     }
 }
