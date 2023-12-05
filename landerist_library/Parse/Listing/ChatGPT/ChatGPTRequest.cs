@@ -13,7 +13,6 @@ namespace landerist_library.Parse.Listing.ChatGPT
         // gpt-4-1106-preview: 128,000
         public static readonly int MAX_TOKENS = 16385;
         public static readonly string Model_GPT_4_1106_Preview = "gpt-4-1106-preview";
-        //public static readonly string Model_GPT_3_5_Turbo_1106 = "gpt-3.5-turbo-1106";
         public static readonly string Model_GPT_3_5_Turbo_16k = "gpt-3.5-turbo-16k";
 
 
@@ -49,7 +48,6 @@ namespace landerist_library.Parse.Listing.ChatGPT
             var chatRequest = new ChatRequest(
                 messages: messages,
                 model: model,
-                //responseFormat: ChatResponseFormat.Json,
                 temperature: 0,
                 tools: Tools,
                 toolChoice: ToolChoice

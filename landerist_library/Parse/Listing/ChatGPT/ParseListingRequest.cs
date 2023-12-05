@@ -1,5 +1,6 @@
 ﻿using landerist_library.Websites;
 using OpenAI;
+using OpenAI.Chat;
 using System.Text;
 using System.Text.Json;
 
@@ -22,50 +23,62 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
         }
 
-        public (bool, landerist_orels.ES.Listing?) Parse(Page page)
+        public (PageType.PageType?, landerist_orels.ES.Listing?) Parse(Page page)
         {
-            bool sucess = false;
-            landerist_orels.ES.Listing? listing = null;
-            var response = GetResponse(page.ResponseBodyText, false);
-            if (response == null)
+            var chatResponse = GetResponse(page.ResponseBodyText, false);
+            if (chatResponse == null)
             {
-                return (sucess, listing);
+                return (null, null);
             }
+            return Parse(page, chatResponse);
+        }
+
+        private static (PageType.PageType?, landerist_orels.ES.Listing?) Parse(Page page, ChatResponse chatResponse)
+        {
+            PageType.PageType? pageType = null;
+            landerist_orels.ES.Listing? listing = null;
+
             try
             {
-                var usedTool = response.FirstChoice.Message.ToolCalls[0];
-                string functionName = usedTool.Function.Name;
+                var tool = chatResponse.FirstChoice.Message.ToolCalls[0];
+                string functionName = tool.Function.Name;
                 switch (functionName)
                 {
                     case ParseListingTool.FunctionNameIsNotListing:
                         {
-                            page.UpdatePageType(PageType.PageType.NotListing);                            
-                            sucess = true;
+                            pageType = PageType.PageType.NotListing;
                         }
                         break;
                     case ParseListingTool.FunctionNameIsListing:
                         {
-                            string arguments = usedTool.Function.Arguments.ToString();
+                            string arguments = tool.Function.Arguments.ToString();
                             var parseListingResponse = JsonSerializer.Deserialize<ParseListingResponse>(arguments);
                             if (parseListingResponse != null)
                             {
                                 listing = parseListingResponse.ToListing(page);
+                                if (listing != null)
+                                {
+                                    pageType = PageType.PageType.Listing;
+                                }
+                                else
+                                {
+                                    pageType = PageType.PageType.MayBeListing;
+                                }
                             }
-                            sucess = true;
                         }
                         break;
                 }
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception.Message);
                 Logs.Log.WriteLogErrors("ParseListingRequest Parse", exception);
             }
-            return (sucess, listing);
+            return (pageType, listing);
         }
 
         // Problem with encoding should be fixed in the future:
         // https://community.openai.com/t/gpt-4-1106-preview-messes-up-function-call-parameters-encoding/478500?page=2
+        // Has to do with JSON Mode (response format)
         static string EncodeToUTF8(string texto)
         {
             byte[] bytes = Encoding.GetEncoding("Windows-1252").GetBytes(texto);

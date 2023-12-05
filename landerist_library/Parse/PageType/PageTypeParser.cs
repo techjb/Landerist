@@ -18,7 +18,7 @@ namespace landerist_library.Parse.PageType
         ResponseBodyTooShort,
         ResponseBodyTooManyTokens,
         ResponseBodyValid,
-        MayContainListing,
+        MayBeListing,
         Listing,
         NotListing,
     };

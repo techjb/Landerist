@@ -99,7 +99,7 @@ namespace landerist_console
             //new Scraper().Scrape(uriPage);
             //new Scraper().ScrapeAllPages();
 
-            landerist_library.Parse.Listing.ListingsParser.Start();
+            landerist_library.Parse.Listing.ListingsParser.Start();            
 
             //Csv.Export(true);
             //Json.Export(true);
