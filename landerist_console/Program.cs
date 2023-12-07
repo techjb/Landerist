@@ -67,7 +67,7 @@ namespace landerist_console
 
             //var website = new Website(uri);
             //var page = new Page(website, uriPage);
-            //var page = new Page(uriPage);
+            //var page = new Page(uriPage);            
 
             //Websites.Delete(website); return;
             //Websites.Delete(uri); return;
@@ -88,7 +88,7 @@ namespace landerist_console
             //Websites.CountRobotsSiteMaps();            
             //Websites.InsertMainPages();
 
-            new Scraper(false).ScrapeUnknowPageType(10000);
+            //new Scraper(false).ScrapeUnknowPageType(10000);
 
             //new Scraper().ScrapeMainPage(website);
             //new Scraper().ScrapeUnknowHttpStatusCode();
@@ -134,10 +134,7 @@ namespace landerist_console
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.AWSComprehend().Run();
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.GoogleCNL().Run();
 
-            //new ChatGPTRequest().ListModels();            
-
-
-
+            //new ChatGPTRequest().ListModels();
         }
     }
 }

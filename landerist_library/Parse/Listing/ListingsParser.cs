@@ -32,7 +32,7 @@ namespace landerist_library.Parse.Listing
         {
             var result = new ParseListingRequest().Parse(page);
             Interlocked.Increment(ref Counter);
-            page.UpdatePageType(result.pageType);
+            page.Update(result.pageType);
             if (result.listing != null)
             {
                 Interlocked.Increment(ref ListingsCounter);

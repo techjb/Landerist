@@ -1,5 +1,7 @@
 ﻿using landerist_library.Database;
 using landerist_library.Parse.PageType;
+using OpenQA.Selenium.DevTools.V117.Debugger;
+using System.Collections.Specialized;
 using System.Data;
 
 namespace landerist_library.Websites
@@ -13,14 +15,17 @@ namespace landerist_library.Websites
 
         }
 
-        public static DataTable GetAll()
+        public static List<Page> GetPages()
         {
             Console.WriteLine("Reading all pages");
             string query =
-                "SELECT * " +
-                "FROM " + TABLE_PAGES + " ";
+                 "SELECT " + TABLE_PAGES + ".*, " + Websites.TABLE_WEBSITES + ".* " +
+                 "FROM " + TABLE_PAGES + " " +
+                 "INNER JOIN " + Websites.TABLE_WEBSITES + " ON " + TABLE_PAGES + ".[Host] = " + Websites.TABLE_WEBSITES + ".[Host]";
 
-            return new DataBase().QueryTable(query);
+
+            var dataTable = new DataBase().QueryTable(query);
+            return GetPages(dataTable);
         }
 
         public static List<Page> GetPages(Website website)
@@ -46,7 +51,7 @@ namespace landerist_library.Websites
                 "[PageType] IS NULL";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"Host", website.Host },                
+                {"Host", website.Host },
             });
 
             return GetPages(website, dataTable);
@@ -66,7 +71,6 @@ namespace landerist_library.Websites
 
             return GetPages(dataTable);
         }
-
 
         public static List<Page> GetNonScrapedPages(Website website)
         {
@@ -285,6 +289,25 @@ namespace landerist_library.Websites
                 "SELECT [Uri] " +
                 "FROM " + TABLE_PAGES;
             return new DataBase().QueryListString(query);
+        }
+
+        public static void UpdateResponseBodyTextHash()
+        {
+            var pages = GetPages();
+            var sync = new object();
+            int counter = 0;
+            int changed = 0;
+            Parallel.ForEach(pages, page =>
+            {            
+                Console.WriteLine(counter + "/" + pages.Count + " Changed: " + changed);
+                page.SetResponseBodyTextHash();
+                if (page.ResponseBodyTextHashChanged)
+                {
+                    page.Update();
+                    Interlocked.Increment(ref changed);                    
+                }
+                Interlocked.Increment(ref counter);                
+            });
         }
     }
 }
