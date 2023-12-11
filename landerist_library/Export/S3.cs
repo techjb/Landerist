@@ -41,8 +41,8 @@ namespace landerist_library.Export
                 BucketName = bucketName,
                 Key = key,
                 FilePath = file
-            };       
-            
+            };
+
             TransferUtility transferUtitlity = new(AmazonS3Client);
 
             try

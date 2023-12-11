@@ -24,8 +24,8 @@ namespace landerist_library.Export
         {
             Console.WriteLine("Exporting all listings ..");
             var listings = ES_Listings.GetListings(true);
-            string fileName = JsonFileName("es_listings");
-            bool sucess = Export(listings, fileName);
+            DateTime dateTime = DateTime.Now.AddDays(-1);
+            bool sucess = Export(listings, "es_listings", dateTime);
             Log.WriteLogInfo("ExportAllListings", "Sucess: " + sucess.ToString());
         }
 
@@ -33,49 +33,51 @@ namespace landerist_library.Export
         {
             Console.WriteLine("Exporting updated yesterday ..");
             DateTime dateTime = DateTime.Now.AddDays(-6);
-            string fileName = JsonFileName("es_listings_update", dateTime);            
             var listings = ES_Listings.GetListings(true, dateTime);
-            bool sucess = Export(listings, fileName);
+            bool sucess = Export(listings, "es_listings_update", dateTime);
             Log.WriteLogInfo("ExportUpdatedYesterday", "Sucess: " + sucess.ToString());
         }
 
-        private static bool Export(SortedSet<Listing> listings, string fileNameJson)
+        private static bool Export(SortedSet<Listing> listings, string fileName, DateTime dateTime)
         {
-            string fileNameZip = fileNameJson + ".zip";
-            string jsonFile = Config.EXPORT_DIRECTORY + fileNameJson;
-            string zipFile = Config.EXPORT_DIRECTORY + fileNameZip;
+            string filePathJson = Config.EXPORT_DIRECTORY + fileName + ".json";
+            string fileNameZip = fileName + ".zip";
+            string filePathZip = Config.EXPORT_DIRECTORY + fileNameZip;
+
+            File.Delete(filePathJson);
+            File.Delete(filePathZip);
 
             bool sucess = false;
 
             if (listings.Count > 0)
             {
-                if (Json.ExportListings(listings, jsonFile))
+                if (Json.ExportListings(listings, filePathJson))
                 {
-                    if (Zip.Compress(jsonFile, zipFile))
+                    if (Zip.Compress(filePathJson, filePathZip))
                     {
-                        if (new S3().UploadFile(zipFile, fileNameZip))
+                        if (new S3().UploadFile(filePathZip, fileNameZip))
                         {
-                            sucess = true;
+                            string newFileNameZip = GetFileName(fileName, dateTime) + ".zip";
+                            string newFilePathZip = Config.EXPORT_DIRECTORY + newFileNameZip;
+
+                            File.Copy(filePathZip, newFilePathZip, true);
+
+                            if (new S3().UploadFile(newFilePathZip, newFileNameZip))
+                            {
+                                sucess = true;
+                            }
                         }
                     }
                 }
             }
 
-            File.Delete(jsonFile);
-            File.Delete(zipFile);
-
             return sucess;
         }
 
-        private static string JsonFileName(string prefix)
-        {
-            return JsonFileName(prefix, DateTime.Now);
-        }
-
-        private static string JsonFileName(string prefix, DateTime dateTime)
+        private static string GetFileName(string prefix, DateTime dateTime)
         {
             string datePart = dateTime.ToString("yyyyMMdd");
-            return prefix + "_" + datePart + ".json";
+            return prefix + "_" + datePart;
         }
     }
 }

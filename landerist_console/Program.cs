@@ -136,7 +136,7 @@ namespace landerist_console
 
             //new ChatGPTRequest().ListModels();
 
-            landerist_library.Export.Exports.Start();
+            //landerist_library.Export.Exports.Start();
         }
     }
 }
