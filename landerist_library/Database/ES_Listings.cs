@@ -30,8 +30,8 @@ namespace landerist_library.Database
             if (InsertData(listing))
             {
                 website.IncreaseNumListings();
-                ES_Media.Insert(listing);                
-            }            
+                ES_Media.Insert(listing);
+            }
         }
 
         private static bool InsertData(Listing listing)
@@ -180,14 +180,29 @@ namespace landerist_library.Database
             return new DataBase().Query(query, queryParameters);
         }
 
-        public static SortedSet<Listing> GetAll(bool loadMedia)
+        public static SortedSet<Listing> GetListings(bool loadMedia = true)
         {
             string query =
                 "SELECT * " +
                 "FROM " + TABLE_ES_LISTINGS;
 
             DataTable dataTable = new DataBase().QueryTable(query);
+            return GetListings(dataTable, loadMedia);
+        }
 
+        public static SortedSet<Listing> GetListings(bool loadMedia, DateTime dataSourceUpdate)
+        {
+            string query =
+                "SELECT * " +
+                "FROM " + TABLE_ES_LISTINGS + " " +
+                "WHERE CONVERT(date, [dataSourceUpdate]) = CONVERT(date, @DataSourceUpdate)";
+
+            DataTable dataTable = new DataBase().QueryTable(query, "DataSourceUpdate", dataSourceUpdate);
+            return GetListings(dataTable, loadMedia);
+        }
+
+        public static SortedSet<Listing> GetListings(DataTable dataTable, bool loadMedia)
+        {
             SortedSet<Listing> listings = new(new ListingComparer());
             foreach (DataRow dataRow in dataTable.Rows)
             {

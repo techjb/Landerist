@@ -21,19 +21,19 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
         }
 
-        public (PageType.PageType pageType, landerist_orels.ES.Listing? listing) Parse(Page page)
+        public (PageType pageType, landerist_orels.ES.Listing? listing) Parse(Page page)
         {
             var chatResponse = GetResponse(page.ResponseBodyText, false);
             if (chatResponse == null)
             {
-                return (PageType.PageType.MayBeListing, null);
+                return (PageType.MayBeListing, null);
             }
             return Parse(page, chatResponse);
         }
 
-        private static (PageType.PageType, landerist_orels.ES.Listing?) Parse(Page page, ChatResponse chatResponse)
+        private static (PageType, landerist_orels.ES.Listing?) Parse(Page page, ChatResponse chatResponse)
         {
-            PageType.PageType pageType = PageType.PageType.MayBeListing;
+            PageType pageType = PageType.MayBeListing;
             landerist_orels.ES.Listing? listing = null;
 
             try
@@ -44,7 +44,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
                 {
                     case ParseListingTool.FunctionNameIsNotListing:
                         {
-                            pageType = PageType.PageType.NotListing;
+                            pageType = PageType.NotListing;
                         }
                         break;
                     case ParseListingTool.FunctionNameIsListing:
@@ -56,7 +56,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
                                 listing = parseListingResponse.ToListing(page);
                                 if (listing != null)
                                 {
-                                    pageType = PageType.PageType.Listing;
+                                    pageType = PageType.Listing;
                                 }
                                 else
                                 {

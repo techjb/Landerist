@@ -2,7 +2,7 @@
 using landerist_library.Database;
 using landerist_library.Download;
 using landerist_library.Index;
-using landerist_library.Parse.PageType;
+using landerist_library.Parse.PageTypeParser;
 using landerist_library.Websites;
 
 namespace landerist_library.Scrape

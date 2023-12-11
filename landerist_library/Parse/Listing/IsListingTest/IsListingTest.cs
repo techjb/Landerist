@@ -15,11 +15,11 @@ namespace landerist_library.Parse.Listing.IsListingTest
         {
             int halfRows = totalRows / 2;
             Console.WriteLine("Reading Listing ..");
-            DataTable dataTableListings = Pages.GetResponseBodyText(PageType.PageType.Listing, halfRows);
+            DataTable dataTableListings = Pages.GetResponseBodyText(PageType.Listing, halfRows);
             AddColumnLabel(dataTableListings, true);
             Console.WriteLine("Reading NotListing ..");
             int rows = dataTableListings.Rows.Count;
-            DataTable dataTableNotListings = Pages.GetResponseBodyText(PageType.PageType.NotListing, rows);
+            DataTable dataTableNotListings = Pages.GetResponseBodyText(PageType.NotListing, rows);
             AddColumnLabel(dataTableNotListings, false);
             return Combine(dataTableListings, dataTableNotListings);
         }

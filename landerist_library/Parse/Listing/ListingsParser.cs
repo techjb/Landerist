@@ -14,7 +14,7 @@ namespace landerist_library.Parse.Listing
         public static void Start()
         {
             Console.WriteLine("Reading MayBeListing pages ..");
-            var pages = Pages.GetPages(PageType.PageType.MayBeListing);
+            var pages = Pages.GetPages(PageType.MayBeListing);
             Console.WriteLine("Parsing listings ..");
             Total = pages.Count;
             Counter = 0;

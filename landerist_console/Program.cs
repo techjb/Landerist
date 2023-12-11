@@ -102,7 +102,7 @@ namespace landerist_console
             //landerist_library.Parse.Listing.ListingsParser.Start();            
 
             //Csv.Export(true);
-            //Json.Export(true);
+            //landerist_library.Export.Json.Export("es_listings_full.json", true);
 
             //var tuple1 = landerist_library.Parse.Location.GoogleMaps.AddressToLatLng.Parse("Alondra 8, las rozas de madrid", landerist_library.Websites.CountryCode.ES);
             //Console.WriteLine(tuple1);
@@ -135,6 +135,8 @@ namespace landerist_console
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.GoogleCNL().Run();
 
             //new ChatGPTRequest().ListModels();
+
+            landerist_library.Export.Exports.Start();
         }
     }
 }

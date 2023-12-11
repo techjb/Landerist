@@ -9,12 +9,12 @@
   <ItemGroup>
     <Compile Remove="Parse\Listing\MLModel\IMLSharpPython.cs" />
     <Compile Remove="Parse\Listing\MLModel\MLSharpPython.cs" />
-    <Compile Remove="Websites\PageType.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AI.Dev.OpenAI.GPT" Version="1.0.2" />
     <PackageReference Include="AWSSDK.Comprehend" Version="3.7.300.7" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.304.5" />
     <PackageReference Include="Com.Bekijkhet.RobotsTxt" Version="1.0.0" />
     <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="Google.Cloud.Language.V1" Version="3.3.0" />

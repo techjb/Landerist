@@ -1,5 +1,5 @@
 ﻿using landerist_library.Database;
-using landerist_library.Parse.PageType;
+using landerist_library.Parse.PageTypeParser;
 using OpenQA.Selenium.DevTools.V117.Debugger;
 using System.Collections.Specialized;
 using System.Data;

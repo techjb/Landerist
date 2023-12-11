@@ -4,12 +4,13 @@ namespace landerist_library.Export
 {
     public class Zip
     {
-        public static bool Export(string inputFile, string zipFile)
+        public static bool Compress(string inputFile, string zipFile)
         {
-            return Export(new string[] { inputFile }, zipFile);
+            string[] files = new string[] { inputFile };
+            return Compress(files, zipFile);
         }
 
-        public static bool Export(string[] files, string zipFile)
+        public static bool Compress(string[] files, string zipFile)
         {
             if (files.Length == 0)
             {
@@ -35,7 +36,10 @@ namespace landerist_library.Export
                 }
                 return true;
             }
-            catch { }
+            catch (Exception exception)
+            {
+                Logs.Log.WriteLogErrors("Compress", exception);
+            }
             return false;
         }
     }

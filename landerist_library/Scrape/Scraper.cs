@@ -1,4 +1,4 @@
-﻿using landerist_library.Parse.PageType;
+﻿using landerist_library.Parse.PageTypeParser;
 using landerist_library.Websites;
 using System.Collections.Concurrent;
 

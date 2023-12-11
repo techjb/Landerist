@@ -1,7 +1,7 @@
 ﻿using landerist_library.Index;
 using landerist_library.Websites;
 
-namespace landerist_library.Parse.PageType
+namespace landerist_library.Parse.PageTypeParser
 {
     public class LastSegment
     {

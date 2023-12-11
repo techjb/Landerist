@@ -1,7 +1,7 @@
 ﻿using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Database;
-using landerist_library.Parse.PageType;
+using landerist_library.Parse.PageTypeParser;
 using landerist_library.Tools;
 using landerist_orels.ES;
 using PuppeteerSharp;

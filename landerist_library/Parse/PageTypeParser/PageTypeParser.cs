@@ -2,26 +2,8 @@
 using landerist_library.Websites;
 
 
-namespace landerist_library.Parse.PageType
+namespace landerist_library.Parse.PageTypeParser
 {
-    public enum PageType
-    {
-        DownloadError,
-        IncorrectLanguage,
-        BlockedByRobotsTxt,
-        RobotsTxtDisallow,
-        MainPage,
-        NotIndexable,
-        ForbiddenLastSegment,
-        ResponseBodyError,
-        ResponseBodyTooLarge,
-        ResponseBodyTooShort,
-        ResponseBodyTooManyTokens,
-        MayBeListing,
-        Listing,
-        NotListing,
-    };
-
     public class PageTypeParser
     {
         private static int Total;

@@ -74,7 +74,6 @@
 
         public static readonly string MLMODEL_DIRECTORY = PrivateConfig.MLMODEL_DIRECTORY;
 
-
         public static readonly string MLMODEL_TRAINING_DATA_DIRECTORY = MLMODEL_DIRECTORY + @"TrainingData\";
 
         public static readonly string CLASSIFIER_DIRECTORY = PrivateConfig.CLASIFFIER_DIRECTORY;
@@ -86,6 +85,12 @@
         public static readonly string GOOGLE_NATURAL_LANGUAGE_API_KEY = PrivateConfig.GOOGLE_NATURAL_LANGUAGE_API_KEY;
 
         public static readonly string GOOLZOOM_API = PrivateConfig.GOOLZOOM_API;
+
+        public static readonly string AWS_ACESSKEYID = PrivateConfig.AWS_ACESSKEYID;
+
+        public static readonly string AWS_SECRETACCESSKEY = PrivateConfig.AWS_SECRETACCESSKEY;
+
+        public static readonly string AWS_S3_PUBLIC_BUCKET = PrivateConfig.AWS_S3_PUBLIC_BUCKET;
 
         public static bool IsConfigurationProduction()
         {
