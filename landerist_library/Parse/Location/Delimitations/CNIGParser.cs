@@ -25,7 +25,12 @@ namespace landerist_library.Parse.Location.Delimitations
             int errors = 0;
 
             var wKBWriter = new WKBWriter();
-            Parallel.ForEach(featureCollection.Cast<Feature>(), feature =>
+            Parallel.ForEach(featureCollection.Cast<Feature>(), 
+                new ParallelOptions()
+                {
+                    MaxDegreeOfParallelism = Environment.ProcessorCount - 1
+                }, 
+                feature =>
             {
                 byte[] wkb = wKBWriter.Write(feature.Geometry);
                 string the_geom = WKBWriter.ToHex(wkb);

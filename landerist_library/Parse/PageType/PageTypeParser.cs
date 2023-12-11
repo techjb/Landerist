@@ -50,6 +50,10 @@ namespace landerist_library.Parse.PageType
             }
 
             page.SetResponseBodyText();
+            if (!page.ResponseBodyTextHasChanged)
+            {
+                return (page.PageType, null);
+            }
 
             if (ResponseBodyIsError(page.ResponseBodyText))
             {

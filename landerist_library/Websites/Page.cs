@@ -35,7 +35,7 @@ namespace landerist_library.Websites
 
         public string? ResponseBodyTextHash { get; set; }
 
-        public bool ResponseBodyTextHashChanged { get; set; } = false;
+        public bool ResponseBodyTextHasChanged { get; set; } = false;
 
 
         public Website Website = new();
@@ -257,7 +257,7 @@ namespace landerist_library.Websites
                 return;
             }
             string responseBodyTextHash = CalculateHash(ResponseBodyText);
-            ResponseBodyTextHashChanged = ResponseBodyTextHash == null || !responseBodyTextHash.Equals(ResponseBodyTextHash);
+            ResponseBodyTextHasChanged = ResponseBodyTextHash == null || !responseBodyTextHash.Equals(ResponseBodyTextHash);
             ResponseBodyTextHash = responseBodyTextHash;
         }
 

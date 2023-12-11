@@ -301,7 +301,7 @@ namespace landerist_library.Websites
             {            
                 Console.WriteLine(counter + "/" + pages.Count + " Changed: " + changed);
                 page.SetResponseBodyTextHash();
-                if (page.ResponseBodyTextHashChanged)
+                if (page.ResponseBodyTextHasChanged)
                 {
                     page.Update();
                     Interlocked.Increment(ref changed);                    

@@ -18,7 +18,12 @@ namespace landerist_library.Parse.Media.Image
         {
             if (ImageParser.UnknowIsValidImages.Count > 2)
             {
-                Parallel.ForEach(ImageParser.UnknowIsValidImages, image =>
+                Parallel.ForEach(ImageParser.UnknowIsValidImages,
+                    new ParallelOptions()
+                    {
+                        MaxDegreeOfParallelism = Environment.ProcessorCount - 1
+                    },
+                    image =>
                 {
                     DownloadImage(image);
                 });
