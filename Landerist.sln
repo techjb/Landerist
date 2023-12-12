@@ -24,6 +24,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "landerist_website", "lander
 		landerist_website\index.html = landerist_website\index.html
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "landerist_service", "landerist_service\landerist_service.csproj", "{8D90C19B-543F-45AF-A0E3-F9DD12979200}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,6 +52,10 @@ Global
 		{D5FDAAA4-4E71-470E-892E-F30A86DCB2D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5FDAAA4-4E71-470E-892E-F30A86DCB2D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D5FDAAA4-4E71-470E-892E-F30A86DCB2D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D90C19B-543F-45AF-A0E3-F9DD12979200}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D90C19B-543F-45AF-A0E3-F9DD12979200}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D90C19B-543F-45AF-A0E3-F9DD12979200}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D90C19B-543F-45AF-A0E3-F9DD12979200}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -32,7 +32,7 @@ namespace landerist_library.Export
         private static void ExportUpdatedYesterday()
         {
             Console.WriteLine("Exporting updated yesterday ..");
-            DateTime dateTime = DateTime.Now.AddDays(-6);
+            DateTime dateTime = DateTime.Now.AddDays(-1);
             var listings = ES_Listings.GetListings(true, dateTime);
             bool sucess = Export(listings, "es_listings_update", dateTime);
             Log.WriteLogInfo("ExportUpdatedYesterday", "Sucess: " + sucess.ToString());
