@@ -2,14 +2,9 @@
 
 namespace landerist_library.Parse.Media.Image
 {
-    public class DuplicatesRemover
+    public class DuplicatesRemover(ImageParser imageParser)
     {
-        private readonly ImageParser ImageParser;
-
-        public DuplicatesRemover(ImageParser imageParser)
-        {
-            ImageParser = imageParser;
-        }
+        private readonly ImageParser ImageParser = imageParser;
 
         public void RemoveDuplicatedImages()
         {
@@ -59,8 +54,8 @@ namespace landerist_library.Parse.Media.Image
         private static Mat CalculateHystogram(Mat mat)
         {
             Mat hist = new();
-            Cv2.CalcHist(new Mat[] { mat }, new int[] { 0 }, null, hist, 1,
-                new int[] { 256 }, new Rangef[] { new(0, 256) });
+            Cv2.CalcHist([mat], [0], null, hist, 1,
+                [256], new Rangef[] { new(0, 256) });
             return hist;
         }
 

@@ -68,7 +68,6 @@ namespace landerist_library.Logs
                 });
         }
 
-
         private static string GetText(Exception exception)
         {
             return

@@ -10,32 +10,27 @@ namespace landerist_library.Parse.Media.Image
     /// In Linux need to add another package. See:
     /// https://stackoverflow.com/questions/44105973/opencvsharp-unable-to-load-dll-opencvsharpextern
     /// </summary>
-    public class ImageParser
+    public class ImageParser(MediaParser mediaParser)
     {
-        public readonly MediaParser MediaParser;
+        public readonly MediaParser MediaParser = mediaParser;
 
         private const int MIN_IMAGE_SIZE = 256 * 256;
 
         private readonly SortedSet<landerist_orels.ES.Media> MediaImages = new(new MediaComparer());
 
-        public readonly List<landerist_orels.ES.Media> MediaToRemove = new();
+        public readonly List<landerist_orels.ES.Media> MediaToRemove = [];
 
         public readonly SortedSet<landerist_orels.ES.Media> UnknowIsValidImages = new(new MediaComparer());
 
-        public readonly Dictionary<Uri, Mat> DictionaryMats = new();
+        public readonly Dictionary<Uri, Mat> DictionaryMats = [];
 
-        public readonly Dictionary<Uri, Mat> NotDuplicatedMats = new();
+        public readonly Dictionary<Uri, Mat> NotDuplicatedMats = [];
 
         private static readonly HashSet<string> ProhibitedWords = new(StringComparer.OrdinalIgnoreCase)
         {
             "icon",
             "logo",
         };
-
-        public ImageParser(MediaParser mediaParser)
-        {
-            MediaParser = mediaParser;
-        }
 
         public void AddImages()
         {

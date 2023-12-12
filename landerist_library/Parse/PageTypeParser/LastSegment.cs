@@ -188,7 +188,7 @@ namespace landerist_library.Parse.PageTypeParser
 
         private static Dictionary<string, int> ToDictionary(List<string> urls)
         {
-            Dictionary<string, int> dictionary = new();
+            Dictionary<string, int> dictionary = [];
             int total = urls.Count;
             var sync = new object();
             int counter = 0;

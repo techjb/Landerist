@@ -4,19 +4,19 @@ namespace landerist_library.Download
 {
     public class PuppeteerDownloader
     {
-        private static readonly HashSet<ResourceType> BlockResources = new()
-        {
+        private static readonly HashSet<ResourceType> BlockResources =
+        [
             ResourceType.Image,
             ResourceType.StyleSheet,
             ResourceType.Font,
             ResourceType.Media,
             ResourceType.Other
-        };
+        ];
 
-        private static readonly HashSet<string> BlockDomains = new()
-        {
+        private static readonly HashSet<string> BlockDomains =
+        [
             "www.google-analytics.com"
-        };
+        ];
 
         public static string Get(Uri uri)
         {

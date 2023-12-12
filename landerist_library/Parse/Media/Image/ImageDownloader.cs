@@ -3,16 +3,11 @@ using OpenCvSharp;
 
 namespace landerist_library.Parse.Media.Image
 {
-    public class ImageDownloader
+    public class ImageDownloader(ImageParser imageParser)
     {
-        private readonly ImageParser ImageParser;
+        private readonly ImageParser ImageParser = imageParser;
         private readonly object Sync1 = new();
         private readonly object Sync2 = new();
-
-        public ImageDownloader(ImageParser imageParser)
-        {
-            ImageParser = imageParser;
-        }
 
         public void DownloadImages()
         {

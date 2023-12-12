@@ -4,14 +4,9 @@ using System.Text.RegularExpressions;
 
 namespace landerist_library.Parse.Media.Video
 {
-    public class VideoParser
+    public class VideoParser(MediaParser mediaParser)
     {
-        private readonly MediaParser MediaParser;
-
-        public VideoParser(MediaParser mediaParser)
-        {
-            MediaParser = mediaParser;
-        }
+        private readonly MediaParser MediaParser = mediaParser;
 
         public void GetVideos()
         {

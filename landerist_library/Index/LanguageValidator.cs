@@ -42,7 +42,7 @@ namespace landerist_library.Index
 
         protected static bool ContainsNotAllowed(string path, LanguageCode allowedLanguage)
         {
-            string[] pathItems = new string[] { path };
+            string[] pathItems = [path];
             if (path.Contains('-'))
             {
                 pathItems = path.Split('-');

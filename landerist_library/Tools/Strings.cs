@@ -65,7 +65,7 @@ namespace landerist_library.Tools
 
         public static int CountWords(string text)
         {
-            char[] delimiters = new char[] { ' ', '\r', '\n' };
+            char[] delimiters = [' ', '\r', '\n'];
             return text.Split(delimiters, StringSplitOptions.RemoveEmptyEntries).Length;
         }
 

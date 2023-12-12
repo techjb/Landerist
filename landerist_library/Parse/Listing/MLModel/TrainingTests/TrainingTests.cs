@@ -11,7 +11,7 @@ namespace landerist_library.Parse.Listing.MLModel.TrainingTests
         private int Successful = 0;
         private int Unsuccessful = 0;
         private int Errors = 0;
-        private readonly ConcurrentBag<long> Times = new();
+        private readonly ConcurrentBag<long> Times = [];
 
         public void StartTestsIsListing()
         {

@@ -3,10 +3,8 @@ using landerist_library.Websites;
 
 namespace landerist_library.Index
 {
-    public class LinkAlternateIndexer : Indexer
+    public class LinkAlternateIndexer(Page page) : Indexer(page)
     {
-        public LinkAlternateIndexer(Page page) : base(page) { }
-
         public void InsertLinksAlternate()
         {
             if (Page.HtmlDocument == null)
@@ -48,7 +46,5 @@ namespace landerist_library.Index
             }
             catch { }
         }
-
-
     }
 }

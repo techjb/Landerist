@@ -14,7 +14,7 @@ namespace landerist_console
     {
         private static DateTime DateStart;
 
-        static void Main(string[] args)
+        static void Main()
         {
             Console.Title = "Landerist Console";
             Config.Init(false);

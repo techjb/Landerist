@@ -5,17 +5,17 @@ using System.Text;
 
 namespace landerist_library.Database
 {
-    public class DataBase
+    public class DataBase(string connectionString)
     {
         #region Private Variables
 
         private SqlConnection SqlConnection = new();
         private SqlCommand SqlCommand = new();
-        private readonly SqlDataAdapter SqlDataAdapter;
+        private readonly SqlDataAdapter SqlDataAdapter = new();
         private readonly StringBuilder StringBuilder = new();
         private int StackCounter = 0;
         private int TimeOut = 120;
-        public string ConnectionString;
+        public string ConnectionString = connectionString;
 
         #endregion Private Variables
 
@@ -24,13 +24,6 @@ namespace landerist_library.Database
         public DataBase() : this(Config.DATABASE_USER, Config.DATABASE_PW, Config.DATABASE_NAME)
         {
 
-        }
-
-        public DataBase(string connectionString)
-        {
-            SqlDataAdapter = new SqlDataAdapter();
-            ConnectionString = connectionString;
-            //InitialiceConnection();
         }
 
         public DataBase(string userId, string pw, string databaseName) :
@@ -348,7 +341,7 @@ namespace landerist_library.Database
             IDictionary<string, object?>? parameters = null,
             SqlParameter[]? sqlParameters = null)
         {
-            List<string> list = new();
+            List<string> list = [];
             try
             {
                 Init(query, parameters, sqlParameters);
@@ -373,7 +366,7 @@ namespace landerist_library.Database
             IDictionary<string, object?>? parameters = null,
             SqlParameter[]? sqlParameters = null)
         {
-            List<int> list = new();
+            List<int> list = [];
             try
             {
                 Init(query, parameters, sqlParameters);
@@ -397,7 +390,7 @@ namespace landerist_library.Database
         public HashSet<string> QueryHashSet(string query,
             IDictionary<string, object?>? parameters = null, SqlParameter[]? sqlParameters = null)
         {
-            HashSet<string> hashSet = new();
+            HashSet<string> hashSet = [];
             try
             {
                 Init(query, parameters, sqlParameters);

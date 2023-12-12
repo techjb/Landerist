@@ -2,8 +2,8 @@
 {
     internal class BlockedDomains
     {
-        private static readonly HashSet<string> Domains = new()
-        {
+        private static readonly HashSet<string> Domains =
+        [
             "idealista.com",
             "fotocasa.es",
             "yaencontre.com",
@@ -56,7 +56,7 @@
             "viveku.es",
             "blogspot.com",
 
-        };
+        ];
 
         public static bool IsBlocked(Uri uri)
         {

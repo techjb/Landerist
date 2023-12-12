@@ -6,7 +6,7 @@ namespace landerist_library.Export
     {
         public static bool Compress(string inputFile, string zipFile)
         {
-            string[] files = new string[] { inputFile };
+            string[] files = [inputFile];
             return Compress(files, zipFile);
         }
 

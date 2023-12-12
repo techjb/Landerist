@@ -16,7 +16,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             var functionIsListing = GetToolIsListing();
             var functionIsNotListing = GetToolIsNotListing();
 
-            return new List<Tool> { functionIsListing, functionIsNotListing };            
+            return [functionIsListing, functionIsNotListing];            
         }
 
         private static Tool GetToolIsListing()
@@ -71,10 +71,10 @@ namespace landerist_library.Parse.Listing.ChatGPT
         private static Tool GetToolIsNotListing()
         {
             var properties = new JsonObject();
-            JsonArray NoEsUnAnuncio = new()
-            {
+            JsonArray NoEsUnAnuncio =
+            [
                 "NO_ES_UN_ANUNCIO"
-            };
+            ];
 
             AddEnum(properties, "NoEsUnAnuncio", "No es un anuncio", NoEsUnAnuncio);
 

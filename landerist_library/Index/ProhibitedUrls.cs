@@ -132,11 +132,11 @@ namespace landerist_library.Index
 
         private static HashSet<string> GetProhibitedContains(LanguageCode languageCode)
         {
-            switch (languageCode)
+            return languageCode switch
             {
-                case LanguageCode.es: return ProhibitedContains_ES;
-                default: return new HashSet<string>();
-            }
+                LanguageCode.es => ProhibitedContains_ES,
+                _ => [],
+            };
         }       
 
         public static void FindNewProhibitedStartsWith()
@@ -151,7 +151,7 @@ namespace landerist_library.Index
 
         private static Dictionary<string, int> ToDictionary(List<string> urls)
         {
-            Dictionary<string, int> dictionary = new();
+            Dictionary<string, int> dictionary = [];
             foreach (var url in urls)
             {
                 if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
@@ -162,9 +162,9 @@ namespace landerist_library.Index
                 var directories = GetDirectories(uri);
                 foreach (var directory in directories)
                 {
-                    if (dictionary.ContainsKey(directory))
+                    if (dictionary.TryGetValue(directory, out int value))
                     {
-                        dictionary[directory] = dictionary[directory] + 1;
+                        dictionary[directory] = value + 1;
                     }
                     else
                     {
@@ -187,7 +187,7 @@ namespace landerist_library.Index
 
             var directories = absolutePath.Split('/');
 
-            List<string> dirs = new();            
+            List<string> dirs = [];            
             foreach (var directory in directories)
             {
                 if (string.IsNullOrEmpty(directory))

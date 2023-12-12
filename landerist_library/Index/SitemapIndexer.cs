@@ -3,10 +3,8 @@ using Louw.SitemapParser;
 
 namespace landerist_library.Index
 {
-    public class SitemapIndexer : Indexer
+    public class SitemapIndexer(Website website) : Indexer(website)
     {
-        public SitemapIndexer(Website website) : base(website) { }
-
         public void InsertSitemaps(List<Com.Bekijkhet.RobotsTxt.Sitemap> sitemaps)
         {
             foreach (var sitemap in sitemaps)
@@ -77,7 +75,7 @@ namespace landerist_library.Index
             return siteMap;
         }
 
-        private static bool IsValidSitemap(Sitemap sitemap)
+        private bool IsValidSitemap(Sitemap sitemap)
         {
             if (sitemap == null)
             {

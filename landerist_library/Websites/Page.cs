@@ -1,12 +1,9 @@
 ﻿using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Database;
-using landerist_library.Parse.PageTypeParser;
 using landerist_library.Tools;
 using landerist_orels.ES;
-using PuppeteerSharp;
 using System.Data;
-using System.Reflection.Metadata;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -126,7 +123,7 @@ namespace landerist_library.Websites
         private static string CalculateHash(string text)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(text);
-            byte[] hash = SHA256.Create().ComputeHash(bytes);
+            byte[] hash = SHA256.HashData(bytes);
             return BitConverter.ToString(hash).Replace("-", "");
         }
 

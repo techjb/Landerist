@@ -5,7 +5,7 @@ using landerist_orels.ES;
 
 namespace landerist_library.Export
 {
-    public class Exports
+    public class FilesUpdater
     {
         public static void Start()
         {

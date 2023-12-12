@@ -6,19 +6,13 @@ using System.Text.RegularExpressions;
 
 namespace landerist_library.Parse.Location
 {
-    public class LatLngParser
+    public class LatLngParser(Page page, landerist_orels.ES.Listing listing)
     {
-        private readonly Page Page;
+        private readonly Page Page = page;
 
-        private readonly landerist_orels.ES.Listing Listing;
+        private readonly landerist_orels.ES.Listing Listing = listing;
 
-        private readonly HashSet<Tuple<double, double, bool>> LatLngs = new();
-
-        public LatLngParser(Page page, landerist_orels.ES.Listing listing)
-        {
-            Page = page;
-            Listing = listing;
-        }
+        private readonly HashSet<Tuple<double, double, bool>> LatLngs = [];
 
         public void SetLatLng()
         {
@@ -104,11 +98,11 @@ namespace landerist_library.Parse.Location
 
         private void LatLngInHtmlLatLng(HtmlDocument htmlDocument)
         {
-            List<string> listRegex = new()
-            {
+            List<string> listRegex =
+            [
                 @"(latitude|lat|latitud)\s*(=|:)\s*(-?\d+(\.\d+)?).*(longitude|lng|longitud)\s*(=|:)\s*(-?\d+(\.\d+)?)",
                 @"LatLng\s*\(\s*(-?\d+\.\d+)\s*(,|\s*)\s*(-?\d+\.\d+)\s*\)"
-            };
+            ];
 
             string text = htmlDocument.DocumentNode.InnerHtml
                 .Replace("\n", string.Empty)

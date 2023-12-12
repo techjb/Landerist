@@ -5,8 +5,8 @@ namespace landerist_library.Tools
 {
     public class HtmlToText
     {
-        private static readonly List<string> TagsToRemove = new()
-        {
+        private static readonly List<string> TagsToRemove =
+        [
             "//head",
             "//script",
             "//style",
@@ -29,17 +29,17 @@ namespace landerist_library.Tools
             "//input",
             "//*[contains(@style, 'text-decoration: line-through')]",
             "//*[contains(@style, 'text-decoration:line-through')]"
-        };
+        ];
 
-        private static readonly List<string> TagsToClearClassAndId= new()
-        {
+        private static readonly List<string> TagsToClearClassAndId=
+        [
             "//html",
             "//body",
             "//main",
-        };
+        ];
 
-        private static readonly List<string> IdOrClassContains = new()
-        {
+        private static readonly List<string> IdOrClassContains =
+        [
             "similar",
             "results",
             "resultados",
@@ -59,10 +59,10 @@ namespace landerist_library.Tools
             "modal-dialog",
             "poi-container",
             "-slider"
-        };
+        ];
 
-        private static readonly List<string> TextContains = new()
-        {
+        private static readonly List<string> TextContains =
+        [
             " cookie",
             " javascript",
             " navegador",
@@ -108,10 +108,10 @@ namespace landerist_library.Tools
             "password",
             "registrarse",            
             "full screen"
-        };
+        ];
 
-        private static readonly List<string> TextEquals = new()
-        {
+        private static readonly List<string> TextEquals =
+        [
             "aceptar",
             "enviar",
             "enviar por e-mail",
@@ -171,7 +171,7 @@ namespace landerist_library.Tools
             "posted by",
             "publicado por",
             "analytics"
-        };
+        ];
 
 
         private static readonly string XpathTagsToRemove = InitXpathTagsToRemove();
@@ -289,7 +289,7 @@ namespace landerist_library.Tools
 
         private static string CleanText(IEnumerable<string>? lines)
         {
-            List<string> cleanedLines = new();
+            List<string> cleanedLines = [];
             if (lines == null)
             {
                 return string.Empty;

@@ -2,17 +2,11 @@
 
 namespace landerist_library.Parse.Location
 {
-    public class LauIdParser
+    public class LauIdParser(Page page, landerist_orels.ES.Listing listing)
     {
-        private readonly Page Page;
+        private readonly Page Page = page;
 
-        private readonly landerist_orels.ES.Listing Listing;
-
-        public LauIdParser(Page page, landerist_orels.ES.Listing listing)
-        {
-            Page = page;
-            Listing = listing;
-        }
+        private readonly landerist_orels.ES.Listing Listing = listing;
 
         public void SetLauId()
         {

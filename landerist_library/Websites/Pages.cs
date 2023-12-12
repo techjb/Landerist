@@ -1,7 +1,4 @@
 ﻿using landerist_library.Database;
-using landerist_library.Parse.PageTypeParser;
-using OpenQA.Selenium.DevTools.V117.Debugger;
-using System.Collections.Specialized;
 using System.Data;
 
 namespace landerist_library.Websites
@@ -154,7 +151,7 @@ namespace landerist_library.Websites
         private static List<Page> GetPages(DataTable dataTable)
         {
             Console.WriteLine("Parsing to pages ..");
-            List<Page> pages = new();
+            List<Page> pages = [];
             foreach (DataRow dataRow in dataTable.Rows)
             {
                 Website website = new(dataRow);
@@ -166,7 +163,7 @@ namespace landerist_library.Websites
 
         private static List<Page> GetPages(Website website, DataTable dataTable)
         {
-            List<Page> pages = new();
+            List<Page> pages = [];
             foreach (DataRow dataRow in dataTable.Rows)
             {
                 Page page = new(website, dataRow);

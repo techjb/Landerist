@@ -1,5 +1,4 @@
-﻿using landerist_library.Parse.PageTypeParser;
-using landerist_library.Websites;
+﻿using landerist_library.Websites;
 using System.Collections.Concurrent;
 
 namespace landerist_library.Scrape
@@ -26,11 +25,11 @@ namespace landerist_library.Scrape
 
         private static int ThreadCounter = 0;
 
-        private static BlockingCollection<Page> BlockingCollection = new();
+        private static BlockingCollection<Page> BlockingCollection = [];
 
         private static bool Recursive = false;
 
-        private List<Page> Pages = new();
+        private List<Page> Pages = [];
 
         public Scraper()
         {
@@ -247,11 +246,7 @@ namespace landerist_library.Scrape
         {
             HashSet<Page> hashSet = new(Pages, new PageComparer());
             Pages.Clear();
-            BlockingCollection = new();
-            foreach (var page in hashSet)
-            {
-                BlockingCollection.Add(page);
-            }
+            BlockingCollection = [.. hashSet];
             hashSet.Clear();
         }
 

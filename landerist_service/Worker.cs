@@ -3,21 +3,15 @@ using landerist_library.Export;
 
 namespace landerist_service
 {
-    public class Worker : BackgroundService
+    public class Worker(ILogger<Worker> logger) : BackgroundService
     {
-        private readonly ILogger<Worker> Logger;
+        private readonly ILogger<Worker> Logger = logger;
 
-        private Timer Timer1;
+        private Timer? Timer1;
         private const int OneSeccond = 1000;
         private const int OneMinute = 60 * OneSeccond;
         private const int OneHour = 60 * OneMinute;
         private const int OneDay = 24 * OneHour;
-
-        public Worker(ILogger<Worker> logger)
-        {
-            Logger = logger;
-        }
-
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -48,13 +42,13 @@ namespace landerist_service
 
             int dueTimeOneAM = (int)(oneAM - nowTime).TotalMilliseconds;
 
-            Timer1 = new Timer(TimerCallback1, null, dueTimeOneAM, OneDay);
+            Timer1 = new Timer(TimerCallback1!, null, dueTimeOneAM, OneDay);
         }
         private void TimerCallback1(object state)
         {
             try
             {
-                Exports.Start();
+                FilesUpdater.Start();
             }
             catch (Exception exception)
             {

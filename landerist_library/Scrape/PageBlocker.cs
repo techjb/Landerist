@@ -4,9 +4,9 @@ namespace landerist_library.Scrape
 {
     public class PageBlocker
     {
-        private readonly Dictionary<string, DateTime> IpBlocker = new();
+        private readonly Dictionary<string, DateTime> IpBlocker = [];
 
-        private readonly Dictionary<string, DateTime> HostBlocker = new();
+        private readonly Dictionary<string, DateTime> HostBlocker = [];
 
         private const int MinSecconds = 4;
 

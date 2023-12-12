@@ -129,14 +129,14 @@ namespace landerist_library.Parse.Listing.ChatGPT
         protected const string ESTADO_DE_LA_CONSTRUCCIÓN_EN_RUINAS = "en_ruinas";
 
 
-        protected static readonly JsonArray TiposDeOperación = new()
-        {
+        protected static readonly JsonArray TiposDeOperación =
+        [
             OPERACION_VENTA,
             OPERACION_ALQUILER
-        };
+        ];
 
-        protected static readonly JsonArray TiposDeInmueble = new()
-        {
+        protected static readonly JsonArray TiposDeInmueble =
+        [
             TIPO_DE_INMUEBLE_VIVIENDA,
             TIPO_DE_INMUEBLE_DORMITORIO,
             TIPO_DE_INMUEBLE_LOCAL_COMERCIAL,
@@ -146,10 +146,10 @@ namespace landerist_library.Parse.Listing.ChatGPT
             TIPO_DE_INMUEBLE_OFICINA,
             TIPO_DE_INMUEBLE_PARCELA,
             TIPO_DE_INMUEBLE_EDIFICIO
-        };
+        ];
 
-        protected static readonly JsonArray SubtiposDeInmueble = new()
-        {
+        protected static readonly JsonArray SubtiposDeInmueble =
+        [
             SUBTIPO_DE_INMUEBLE_PISO,
             SUBTIPO_DE_INMUEBLE_APARTAMENTO,
             SUBTIPO_DE_INMUEBLE_ÁTICO,
@@ -161,15 +161,15 @@ namespace landerist_library.Parse.Listing.ChatGPT
             SUBTIPO_DE_INMUEBLE_PARCELA_URBANA,
             SUBTIPO_DE_INMUEBLE_PARCELA_URBANIZABLE,
             SUBTIPO_DE_INMUEBLE_PARCELA_NO_URBANIZABLE
-        };
+        ];
 
-        protected static readonly JsonArray EstadosDeLaConstrucción = new()
-        {
+        protected static readonly JsonArray EstadosDeLaConstrucción =
+        [
             ESTADO_DE_LA_CONSTRUCCIÓN_OBRA_NUEVA,
             ESTADO_DE_LA_CONSTRUCCIÓN_BUENO,
             ESTADO_DE_LA_CONSTRUCCIÓN_A_REFORMAR,
             ESTADO_DE_LA_CONSTRUCCIÓN_EN_RUINAS
-        };
+        ];
 
         public landerist_orels.ES.Listing? ToListing(Page page)
         {

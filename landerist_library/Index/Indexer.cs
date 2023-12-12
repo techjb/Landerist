@@ -2,24 +2,19 @@
 
 namespace landerist_library.Index
 {
-    public class Indexer
+    public class Indexer(Page page)
     {
-        protected static Page Page = new();
+        protected Page Page = page;
 
-        private readonly HashSet<Uri> Inserted = new();
+        private readonly HashSet<Uri> Inserted = [];
 
-        private static readonly string[] MultimediaExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".mp3", ".mp4", ".avi", ".mov", ".mkv", ".flv", ".ogg", ".webm" };
+        private static readonly string[] MultimediaExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".mp3", ".mp4", ".avi", ".mov", ".mkv", ".flv", ".ogg", ".webm"];
 
-        private static readonly string[] WebPageExtensions = { ".htm", ".html", ".xhtml", ".asp", ".aspx", ".php", ".jsp", ".cshtml", ".vbhtml", "razor" };
+        private static readonly string[] WebPageExtensions = [".htm", ".html", ".xhtml", ".asp", ".aspx", ".php", ".jsp", ".cshtml", ".vbhtml", "razor"];
 
         public Indexer(Website website) : this(new Page(website))
         {
 
-        }
-
-        public Indexer(Page page)
-        {
-            Page = page;
         }
 
         public void InsertUrls(List<string?> urls)
@@ -71,7 +66,7 @@ namespace landerist_library.Index
             InsertUri(uriBuilder.Uri);
         }
 
-        private static bool CanInsertNewUrls()
+        private bool CanInsertNewUrls()
         {
             return Page.Website.GetNumPages() < Configuration.Config.MAX_PAGES_PER_WEBSITE;
         }

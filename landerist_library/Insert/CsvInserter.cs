@@ -4,13 +4,8 @@ using System.Data;
 
 namespace landerist_library.Insert
 {
-    public class CsvInserter : WebsitesInserter
+    public class CsvInserter(bool initInsertedUris) : WebsitesInserter(initInsertedUris)
     {
-        public CsvInserter(bool initInsertedUris) : base(initInsertedUris)
-        {
-        }
-
-
         public static void InsertBancodedatos_es()
         {
             string file = Configuration.Config.INSERT_DIRECTORY + @"bancodedatos.es\Excel\Pedido_completo.csv";
@@ -29,7 +24,7 @@ namespace landerist_library.Insert
 
         private static List<Uri> ToList(DataTable dataTable, string columnName)
         {
-            List<Uri> uris = new();
+            List<Uri> uris = [];
             foreach (DataRow row in dataTable.Rows)
             {
                 string url = row[columnName].ToString() ?? string.Empty;
@@ -53,6 +48,5 @@ namespace landerist_library.Insert
             }
             return uris;
         }
-
     }
 }

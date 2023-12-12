@@ -3,14 +3,9 @@ using landerist_orels.ES;
 
 namespace landerist_library.Parse.Media.Other
 {
-    public class OtherParser
+    public class OtherParser(MediaParser mediaParser)
     {
-        private readonly MediaParser MediaParser;
-
-        public OtherParser(MediaParser mediaParser)
-        {
-            MediaParser = mediaParser;
-        }
+        private readonly MediaParser MediaParser = mediaParser;
 
         public void GetOthers()
         {

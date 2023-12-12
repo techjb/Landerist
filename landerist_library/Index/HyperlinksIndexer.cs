@@ -4,10 +4,8 @@ using System.Text.RegularExpressions;
 
 namespace landerist_library.Index
 {
-    public class HyperlinksIndexer : Indexer
+    public class HyperlinksIndexer(Page page) : Indexer(page)
     {
-        public HyperlinksIndexer(Page page) : base(page) { }
-
         public void Insert()
         {
             if (Page.HtmlDocument == null)

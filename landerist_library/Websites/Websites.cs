@@ -15,7 +15,7 @@ namespace landerist_library.Websites
 
         public static Dictionary<string, Website> GetDicionaryStatusCodeOk()
         {
-            Dictionary<string, Website> dictionary = new();
+            Dictionary<string, Website> dictionary = [];
             var websites = GetStatusCodeOk();
             foreach (var website in websites)
             {

@@ -5,7 +5,7 @@ using OpenAI;
 
 namespace landerist_library.Parse.Listing.ChatGPT
 {
-    public class ChatGPTRequest
+    public class ChatGPTRequest(string systemMessage, List<Tool> tools)
     {
 
         //https://platform.openai.com/docs/models/overview  
@@ -17,17 +17,11 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
 
         private readonly OpenAIClient OpenAIClient = new(Config.OPENAI_API_KEY);
-        private readonly string SystemMessage;
-        private readonly List<Tool>? Tools;
+        private readonly string SystemMessage = systemMessage;
+        private readonly List<Tool>? Tools = tools;
         private readonly string? ToolChoice = "auto";
 
-        public ChatGPTRequest(string systemMessage, List<Tool> tools)
-        {
-            SystemMessage = systemMessage;
-            Tools = tools;
-        }
-
-        public ChatGPTRequest(string systemMessage, Tool tool) : this(systemMessage, new List<Tool> { tool })
+        public ChatGPTRequest(string systemMessage, Tool tool) : this(systemMessage, [tool])
         {
             ToolChoice = tool.Function.Name;
         }
@@ -80,7 +74,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
         public void ListModels()
         {
             var models = Task.Run(async () => await OpenAIClient.ModelsEndpoint.GetModelsAsync()).Result;
-            List<string> list = new();
+            List<string> list = [];
             foreach (var model in models)
             {
                 list.Add(model.ToString());

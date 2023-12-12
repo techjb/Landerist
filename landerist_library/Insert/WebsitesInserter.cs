@@ -6,7 +6,7 @@ namespace landerist_library.Insert
 {
     public class WebsitesInserter
     {
-        private readonly static HashSet<Uri> InsertedUris = new();
+        private readonly static HashSet<Uri> InsertedUris = [];
 
         private static int Inserted = 0;
         private static int ErrorsMainUri = 0;

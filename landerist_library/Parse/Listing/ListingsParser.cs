@@ -30,13 +30,13 @@ namespace landerist_library.Parse.Listing
 
         public static void ParseListing(Page page)
         {
-            var result = new ParseListingRequest().Parse(page);
+            var (pageType, listing) = new ParseListingRequest().Parse(page);
             Interlocked.Increment(ref Counter);
-            page.Update(result.pageType);
-            if (result.listing != null)
+            page.Update(pageType);
+            if (listing != null)
             {
                 Interlocked.Increment(ref ListingsCounter);
-                ES_Listings.InsertUpdate(page.Website, result.listing);
+                ES_Listings.InsertUpdate(page.Website, listing);
             }
             ConsoleOutput();
         }

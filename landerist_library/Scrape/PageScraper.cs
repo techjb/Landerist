@@ -7,17 +7,11 @@ using landerist_library.Websites;
 
 namespace landerist_library.Scrape
 {
-    public class PageScraper
+    public class PageScraper(Page page)
     {
-        private readonly Page Page;
+        private readonly Page Page = page;
 
-        private readonly HttpClientDownloader HttpClientDownloader;
-
-        public PageScraper(Page page)
-        {
-            Page = page;
-            HttpClientDownloader = new HttpClientDownloader();
-        }
+        private readonly HttpClientDownloader HttpClientDownloader = new();
 
         public bool Scrape()
         {
@@ -48,11 +42,11 @@ namespace landerist_library.Scrape
                 IndexPages();
             }
 
-            var result = PageTypeParser.GetPageType(Page);
-            Page.SetPageType(result.pageType);
-            if (result.listing != null)
+            var (pageType, listing) = PageTypeParser.GetPageType(Page);
+            Page.SetPageType(pageType);
+            if (listing != null)
             {
-                ES_Listings.InsertUpdate(Page.Website, result.listing);
+                ES_Listings.InsertUpdate(Page.Website, listing);
             }
         }
 
