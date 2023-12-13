@@ -31,11 +31,6 @@ namespace landerist_library.Scrape
 
         private List<Page> Pages = [];
 
-        public Scraper()
-        {
-
-        }
-
         public Scraper(bool recursive)
         {
             Recursive = recursive;

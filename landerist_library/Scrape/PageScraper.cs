@@ -23,25 +23,18 @@ namespace landerist_library.Scrape
             {
                 DownloadError();
             }
-            return Page.Update();            
+            return Page.Update();
         }
 
         private void DownloadSucess()
         {
-            if (!IsCorrectLanguage())
-            {
-                Page.SetPageType(PageType.IncorrectLanguage);
-                if (Config.INDEXER_ENABLED)
-                {
-                    new LinkAlternateIndexer(Page).InsertLinksAlternate();
-                }
-                return;
-            }
-            if (Page.CanFollowLinks())
-            {
-                IndexPages();
-            }
+            SetPageType();
+            IndexPages();
+        }
 
+        private void SetPageType()
+        {
+            Page.LoadHtmlDocument();
             var (pageType, listing) = PageTypeParser.GetPageType(Page);
             Page.SetPageType(pageType);
             if (listing != null)
@@ -50,36 +43,26 @@ namespace landerist_library.Scrape
             }
         }
 
-        private bool IsCorrectLanguage()
-        {
-            Page.LoadHtmlDocument();
-            if (Page.HtmlDocument != null)
-            {
-                var htmlNode = Page.HtmlDocument.DocumentNode.SelectSingleNode("/html");
-                if (htmlNode != null)
-                {
-                    var lang = htmlNode.Attributes["lang"];
-                    if (lang != null)
-                    {
-                        return LanguageValidator.IsValidLanguageAndCountry(Page.Website, lang.Value);
-                    }
-                }
-            }
-            return true;
-        }
-
         private void IndexPages()
         {
             if (!Config.INDEXER_ENABLED)
             {
                 return;
             }
-            Page.LoadHtmlDocument();
+
             if (Page.HtmlDocument == null || Page.Website == null)
             {
                 return;
             }
-            new HyperlinksIndexer(Page).Insert();
+            if (Page.PageType.Equals(PageType.IncorrectLanguage))
+            {
+                new LinkAlternateIndexer(Page).InsertLinksAlternate();
+                return;
+            }
+            if (Page.CanFollowLinks())
+            {
+                new HyperlinksIndexer(Page).Insert();
+            }
         }
 
         private void DownloadError()

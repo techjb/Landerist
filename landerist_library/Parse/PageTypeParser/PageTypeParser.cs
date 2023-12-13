@@ -1,4 +1,5 @@
-﻿using landerist_library.Parse.Listing.ChatGPT;
+﻿using landerist_library.Index;
+using landerist_library.Parse.Listing.ChatGPT;
 using landerist_library.Websites;
 
 
@@ -30,8 +31,13 @@ namespace landerist_library.Parse.PageTypeParser
             {
                 return (PageType.ForbiddenLastSegment, null);
             }
+            if (!IsCorrectLanguage(page))
+            {
+                return (PageType.IncorrectLanguage, null);
+            }
 
             page.SetResponseBodyText();
+
             if (!page.ResponseBodyTextHasChanged)
             {
                 return (page.PageType, null);
@@ -54,8 +60,26 @@ namespace landerist_library.Parse.PageTypeParser
                 return (PageType.ResponseBodyTooManyTokens, null);
             }
 
-            return new ParseListingRequest().Parse(page);            
+            return new ParseListingRequest().Parse(page);
         }
+
+        private static bool IsCorrectLanguage(Page page)
+        {
+            if (page.HtmlDocument != null)
+            {
+                var htmlNode = page.HtmlDocument.DocumentNode.SelectSingleNode("/html");
+                if (htmlNode != null)
+                {
+                    var lang = htmlNode.Attributes["lang"];
+                    if (lang != null)
+                    {
+                        return LanguageValidator.IsValidLanguageAndCountry(page.Website, lang.Value);
+                    }
+                }
+            }
+            return true;
+        }
+
 
         private static bool ResponseBodyIsError(string? responseBodyText)
         {
