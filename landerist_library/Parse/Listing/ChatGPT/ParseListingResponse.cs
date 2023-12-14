@@ -501,14 +501,14 @@ namespace landerist_library.Parse.Listing.ChatGPT
             {
                 return null;
             }
-            switch (EstadoDeLaConstrucción)
+            return EstadoDeLaConstrucción switch
             {
-                case ESTADO_DE_LA_CONSTRUCCIÓN_OBRA_NUEVA: return ConstructionStatus.@new;
-                case ESTADO_DE_LA_CONSTRUCCIÓN_BUENO: return ConstructionStatus.good;
-                case ESTADO_DE_LA_CONSTRUCCIÓN_A_REFORMAR: return ConstructionStatus.for_renovation;
-                case ESTADO_DE_LA_CONSTRUCCIÓN_EN_RUINAS: return ConstructionStatus.refurbished;
-                default: return null;
-            }
+                ESTADO_DE_LA_CONSTRUCCIÓN_OBRA_NUEVA => (ConstructionStatus?)ConstructionStatus.@new,
+                ESTADO_DE_LA_CONSTRUCCIÓN_BUENO => (ConstructionStatus?)ConstructionStatus.good,
+                ESTADO_DE_LA_CONSTRUCCIÓN_A_REFORMAR => (ConstructionStatus?)ConstructionStatus.for_renovation,
+                ESTADO_DE_LA_CONSTRUCCIÓN_EN_RUINAS => (ConstructionStatus?)ConstructionStatus.refurbished,
+                _ => null,
+            };
         }
 
         private int? GetFloors()

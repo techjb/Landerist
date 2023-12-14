@@ -169,7 +169,7 @@ namespace landerist_library.Websites
                 if (response != null && response.Headers != null && response.Headers.Location != null)
                 {
                     var uriLocation = response.Headers.Location;
-                    if (uriLocation.ToString().StartsWith("/"))
+                    if (uriLocation.ToString().StartsWith('/'))
                     {
                         Uri.TryCreate(MainUri, uriLocation, out uriLocation);
                     }

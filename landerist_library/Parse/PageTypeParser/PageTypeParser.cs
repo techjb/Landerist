@@ -15,10 +15,10 @@ namespace landerist_library.Parse.PageTypeParser
 
         public static (PageType? pageType, landerist_orels.ES.Listing? listing) GetPageType(Page page)
         {
-            if (page == null)
+            if (page == null || page.ResponseBody == null)
             {
                 return (null, null);
-            }
+            }            
             if (page.IsMainPage())
             {
                 return (PageType.MainPage, null);

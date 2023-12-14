@@ -7,12 +7,12 @@ namespace landerist_library.Export
 {
     public class FilesUpdater
     {
-        public static void Start()
+        public static void Update()
         {
             try
             {
-                ExportAllListings();
-                ExportUpdatedYesterday();
+                FileAllListings();
+                FileUpdatedYesterday();
             }
             catch (Exception exception)
             {
@@ -20,7 +20,7 @@ namespace landerist_library.Export
             }
         }
 
-        private static void ExportAllListings()
+        private static void FileAllListings()
         {
             Console.WriteLine("Exporting all listings ..");
             var listings = ES_Listings.GetListings(true);
@@ -29,7 +29,7 @@ namespace landerist_library.Export
             Log.WriteLogInfo("ExportAllListings", "Sucess: " + sucess.ToString());
         }
 
-        private static void ExportUpdatedYesterday()
+        private static void FileUpdatedYesterday()
         {
             Console.WriteLine("Exporting updated yesterday ..");
             DateTime dateTime = DateTime.Now.AddDays(-1);

@@ -74,11 +74,11 @@ namespace landerist_library.Parse.Location.GoogleMaps
 
         private static string GetRegion(CountryCode countryCode)
         {
-            switch (countryCode)
+            return countryCode switch
             {
-                case CountryCode.ES: return "es";
-                default: return string.Empty;
-            }
+                CountryCode.ES => "es",
+                _ => string.Empty,
+            };
         }
     }
 }

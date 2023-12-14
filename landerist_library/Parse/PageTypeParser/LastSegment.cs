@@ -225,9 +225,9 @@ namespace landerist_library.Parse.PageTypeParser
 
                   lock (sync)
                   {
-                      if (dictionary.ContainsKey(lastSegment))
+                      if (dictionary.TryGetValue(lastSegment, out int value))
                       {
-                          dictionary[lastSegment] = dictionary[lastSegment] + 1;
+                          dictionary[lastSegment] = value + 1;
                       }
                       else
                       {

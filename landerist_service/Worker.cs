@@ -1,5 +1,6 @@
 using landerist_library.Logs;
 using landerist_library.Export;
+using landerist_library.Statistics;
 
 namespace landerist_service
 {
@@ -48,7 +49,8 @@ namespace landerist_service
         {
             try
             {
-                FilesUpdater.Start();
+                FilesUpdater.Update();
+                StatisticsSnapshot.TakeSnapshots();
             }
             catch (Exception exception)
             {

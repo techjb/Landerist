@@ -25,9 +25,9 @@ namespace landerist_library.Scrape
 
         private static bool IsBlocked(Dictionary<string, DateTime> keyValuePairs, string? key)
         {
-            if (key != null && keyValuePairs.ContainsKey(key))
+            if (key != null && keyValuePairs.TryGetValue(key, out DateTime value))
             {
-                var blockUntil = keyValuePairs[key];
+                var blockUntil = value;
                 return blockUntil > DateTime.Now;
             }
             return false;
