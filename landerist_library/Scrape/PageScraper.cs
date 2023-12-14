@@ -75,23 +75,14 @@ namespace landerist_library.Scrape
             }
 
             int code = (int)Page.HttpStatusCode;
-            if (code >= 300 && code < 400)
+            if (code >= 300 && code < 400 && Config.INDEXER_ENABLED)
             {
-                DownloadErrorRedirect();
+                var redirectUrl = HttpClientDownloader.GetRedirectUrl();
+                if (redirectUrl != null)
+                {
+                    new Indexer(Page).InsertUrl(redirectUrl);
+                }
             };
-        }
-
-        private void DownloadErrorRedirect()
-        {
-            if (!Config.INDEXER_ENABLED)
-            {
-                return;
-            }
-            var redirectUrl = HttpClientDownloader.GetRedirectUrl();
-            if (redirectUrl != null)
-            {
-                new Indexer(Page).InsertUrl(redirectUrl);
-            }
         }
     }
 }

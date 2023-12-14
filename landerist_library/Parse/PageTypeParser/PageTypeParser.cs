@@ -126,12 +126,12 @@ namespace landerist_library.Parse.PageTypeParser
                 //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
                 page =>
             {
-                ResponseBodyValidToIsListing(page);
+                MayBeListingToIsListing(page);
                 //Thread.Sleep(8000); // openia limits
             });
         }
 
-        public static void ResponseBodyValidToIsListing(Page page)
+        public static void MayBeListingToIsListing(Page page)
         {
             bool? IsListing = new IsListingRequest().IsListing(page.ResponseBodyText);
             Interlocked.Increment(ref Counter);
