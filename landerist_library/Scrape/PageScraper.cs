@@ -39,6 +39,7 @@ namespace landerist_library.Scrape
             Page.SetPageType(pageType);
             if (listing != null)
             {
+                // todo: media
                 ES_Listings.InsertUpdate(Page.Website, listing);
             }
         }
