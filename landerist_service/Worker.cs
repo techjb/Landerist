@@ -13,9 +13,9 @@ namespace landerist_service
         private Timer? Timer2;
         private bool RunningTimer2 = false;
 
-        private const int OneSeccond = 1000;
-        private const int TenSeconds = 10 * OneSeccond;
-        private const int OneMinute = 60 * OneSeccond;
+        private const int OneSecond = 1000;
+        private const int TenSeconds = 10 * OneSecond;
+        private const int OneMinute = 60 * OneSecond;
         private const int OneHour = 60 * OneMinute;
         private const int OneDay = 24 * OneHour;
 

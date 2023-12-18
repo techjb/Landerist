@@ -26,7 +26,9 @@ namespace landerist_library.Websites
 
         public string? ResponseBody { get; set; }
 
-        public PageType? PageType { get; set; }
+        public PageType? PageType { get; private set; }
+
+        public short? PageTypeCounter { get; private set; }
 
         public string? ResponseBodyText { get; set; }
 
@@ -42,12 +44,6 @@ namespace landerist_library.Websites
 
 
         private bool Disposed;
-
-
-        public Page()
-        {
-
-        }
 
         public Page(Uri uri) : this(Websites.GetWebsite(uri.Host), uri)
         {
@@ -96,8 +92,8 @@ namespace landerist_library.Websites
             Inserted = (DateTime)dataRow["Inserted"];
             Updated = dataRow["Updated"] is DBNull ? null : (DateTime)dataRow["Updated"];
             HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
-            PageType = dataRow["PageType"] is DBNull ? null :
-                (PageType)Enum.Parse(typeof(PageType), dataRow["PageType"].ToString()!);
+            PageType = dataRow["PageType"] is DBNull ? null : (PageType)Enum.Parse(typeof(PageType), dataRow["PageType"].ToString()!);
+            PageTypeCounter = dataRow["PageTypeCounter"] is DBNull ? null : (short)dataRow["PageTypeCounter"];
             ResponseBodyText = dataRow["ResponseBodyText"] is DBNull ? null : dataRow["ResponseBodyText"].ToString();
             ResponseBodyTextHash = dataRow["ResponseBodyTextHash"] is DBNull ? null : dataRow["ResponseBodyTextHash"].ToString();
         }
@@ -131,7 +127,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "INSERT INTO " + TABLE_PAGES + " " +
-                "VALUES(@Host, @Uri, @UriHash, @Inserted, NULL, NULL, NULL, NULL, NULL)";
+                "VALUES(@Host, @Uri, @UriHash, @Inserted, NULL, NULL, NULL, NULL, NULL, NULL)";
 
             bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
                 {"Host", Host },
@@ -160,6 +156,7 @@ namespace landerist_library.Websites
                 "[Updated] = @Updated, " +
                 "[HttpStatusCode] = @HttpStatusCode, " +
                 "[PageType] = @PageType, " +
+                "[PageTypeCounter] = @PageTypeCounter, " +
                 "[ResponseBodyText] = @ResponseBodyText, " +
                 "[ResponseBodyTextHash] = @ResponseBodyTextHash " +
                 "WHERE [UriHash] = @UriHash";
@@ -169,6 +166,7 @@ namespace landerist_library.Websites
                 {"Updated", Updated },
                 {"HttpStatusCode", HttpStatusCode},
                 {"PageType", PageType?.ToString()},
+                {"PageTypeCounter", PageTypeCounter},
                 {"ResponseBodyText", ResponseBodyText},
                 {"ResponseBodyTextHash", ResponseBodyTextHash},
             });
@@ -311,7 +309,30 @@ namespace landerist_library.Websites
 
         public void SetPageType(PageType? pageType)
         {
+            if (PageType == pageType)
+            {
+                IncreasePageTypeCounter();
+            }
+            else
+            {
+                PageTypeCounter = 1;
+            }
+
             PageType = pageType;
+        }
+
+        private void IncreasePageTypeCounter()
+        {
+            if (PageTypeCounter is null)
+            {
+                PageTypeCounter = 1;
+                return;
+            }
+            if (PageTypeCounter >= Config.MAX_PAGE_TYPE_COUNTER)
+            {
+                return;
+            }
+            PageTypeCounter = (short)(PageTypeCounter + 1);
         }
 
         public void Dispose()

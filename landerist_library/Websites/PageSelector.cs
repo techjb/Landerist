@@ -24,7 +24,7 @@
             }
 
             var pages = landerist_library.Websites.Pages.GetPages(PageType.Listing, -3);
-            Pages.AddRange(pages);
+            AddPages(pages);
         }
 
         private static void NewPages()
@@ -34,8 +34,8 @@
                 return;
             }
 
-            var pages = landerist_library.Websites.Pages.GetUnknowPageType();
-            Pages.AddRange(pages);
+            var pages = landerist_library.Websites.Pages.GetUnknownPageType();
+            AddPages(pages);
         }
 
         private static void DownloadError()
@@ -46,7 +46,7 @@
             }
 
             var pages = landerist_library.Websites.Pages.GetPages(PageType.DownloadError, -3);
-            Pages.AddRange(pages);
+            AddPages(pages);
         }
 
         private static void MayBeListing()
@@ -57,12 +57,26 @@
             }
 
             var pages = landerist_library.Websites.Pages.GetPages(PageType.MayBeListing, -1);
-            Pages.AddRange(pages);
+            AddPages(pages);
         }
 
         private static bool CanAddNewPages()
         {
-            return Pages.Count < Configuration.Config.SCRAPER_PAGES_BUNCH;
+            return Pages.Count < Configuration.Config.PAGES_PER_SCRAPE;
+        }
+
+        private static void AddPages(List<Page> pages)
+        {
+            var remaining = Configuration.Config.PAGES_PER_SCRAPE - Pages.Count;
+            if (remaining <= 0)
+            {
+                return;
+            }
+            if (pages.Count > remaining)
+            {
+                pages = pages.Take(remaining).ToList();
+            }
+            Pages.AddRange(pages);
         }
     }
 }

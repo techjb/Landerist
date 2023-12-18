@@ -7,19 +7,10 @@ namespace landerist_library.Websites
     {
         public const string TABLE_PAGES = "[PAGES]";
 
-        public Pages()
-        {
-
-        }
-
         public static List<Page> GetPages()
         {
             Console.WriteLine("Reading all pages");
-            string query =
-                 "SELECT " + TABLE_PAGES + ".*, " + Websites.TABLE_WEBSITES + ".* " +
-                 "FROM " + TABLE_PAGES + " " +
-                 "INNER JOIN " + Websites.TABLE_WEBSITES + " ON " + TABLE_PAGES + ".[Host] = " + Websites.TABLE_WEBSITES + ".[Host]";
-
+            string query = QueryPages();
 
             var dataTable = new DataBase().QueryTable(query);
             return GetPages(dataTable);
@@ -42,9 +33,7 @@ namespace landerist_library.Websites
         public static List<Page> GetPages(PageType pageType)
         {
             string query =
-                "SELECT " + TABLE_PAGES + ".*, " + Websites.TABLE_WEBSITES + ".* " +
-                "FROM " + TABLE_PAGES + " " +
-                "INNER JOIN " + Websites.TABLE_WEBSITES + " ON " + TABLE_PAGES + ".[Host] = " + Websites.TABLE_WEBSITES + ".[Host] " +
+                QueryPages() +
                 "WHERE [PageType] = @PageType";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
@@ -63,9 +52,7 @@ namespace landerist_library.Websites
         public static List<Page> GetPages(PageType pageType, DateTime updated)
         {
             string query =
-                "SELECT " + TABLE_PAGES + ".*, " + Websites.TABLE_WEBSITES + ".* " +
-                "FROM " + TABLE_PAGES + " " +
-                "INNER JOIN " + Websites.TABLE_WEBSITES + " ON " + TABLE_PAGES + ".[Host] = " + Websites.TABLE_WEBSITES + ".[Host] " +
+                QueryPages() +
                 "WHERE [PageType] = @PageType AND [Updated] < @Updated ";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
@@ -106,19 +93,15 @@ namespace landerist_library.Websites
             return GetPages(website, dataTable);
         }
 
-        public static List<Page> GetUnknowPageType(int? rows = null)
+        public static List<Page> GetUnknownPageType(int? rows = null)
         {
-            string topRows = string.Empty;
             string orderBy = string.Empty;
             if (rows != null)
             {
-                topRows = "TOP " + rows + " ";
                 orderBy = "ORDER BY NEWID()";
             }
             string query =
-                "SELECT " + topRows + TABLE_PAGES + ".*, " + Websites.TABLE_WEBSITES + ".* " +
-                "FROM " + TABLE_PAGES + " " +
-                "INNER JOIN " + Websites.TABLE_WEBSITES + " ON " + TABLE_PAGES + ".[Host] = " + Websites.TABLE_WEBSITES + ".[Host] " +
+                QueryPages(rows) +
                 "WHERE [PageType] IS NULL " +
                 orderBy;
 
@@ -127,17 +110,31 @@ namespace landerist_library.Websites
             return GetPages(dataTable);
         }
 
+    
         public static List<Page> GetUnknowHttpStatusCode()
         {
             string query =
-                "SELECT " + TABLE_PAGES + ".*, " + Websites.TABLE_WEBSITES + ".* " +
-                "FROM " + TABLE_PAGES + " " +
-                "INNER JOIN " + Websites.TABLE_WEBSITES + " ON " + TABLE_PAGES + ".[Host] = " + Websites.TABLE_WEBSITES + ".[Host] " +
+                QueryPages() +
                 "WHERE [HttpStatusCode] IS NULL";
 
             DataTable dataTable = new DataBase().QueryTable(query);
             return GetPages(dataTable);
         }
+
+        private static string QueryPages(int? rows = null)
+        {
+            string topRows = string.Empty;
+            if (rows != null)
+            {
+                topRows = "TOP " + rows + " ";
+            }
+
+            return
+                "SELECT " + topRows + TABLE_PAGES + ".*, " + Websites.TABLE_WEBSITES + ".* " +
+                "FROM " + TABLE_PAGES + " " +
+                "INNER JOIN " + Websites.TABLE_WEBSITES + " ON " + TABLE_PAGES + ".[Host] = " + Websites.TABLE_WEBSITES + ".[Host] ";
+        }
+
 
         private static List<Page> GetPages(DataTable dataTable)
         {

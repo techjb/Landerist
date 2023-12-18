@@ -38,7 +38,7 @@ namespace landerist_library.Scrape
 
         public void ScrapeUnknowPageType(int? rows = null)
         {
-            Pages = Websites.Pages.GetUnknowPageType(rows);
+            Pages = Websites.Pages.GetUnknownPageType(rows);
             if (!Scrape())
             {
                 return;
@@ -70,39 +70,8 @@ namespace landerist_library.Scrape
                 return;
             }
             ScrapeUnknowHttpStatusCode();
-        }
+        }     
 
-        public void ScrapeUnknowIsListing(Uri uri)
-        {
-            Website website = new(uri);
-            ScrapeUnknowIsListing(website);
-        }
-
-        public void ScrapeUnknowIsListing(Website website)
-        {
-            Pages = website.GetUnknowIsListingPages();
-            if (!Scrape())
-            {
-                return;
-            }
-            ScrapeUnknowIsListing(website);
-        }
-
-        public void ScrapeIsNotListing(Uri uri)
-        {
-            Website website = new(uri);
-            ScrapeIsNotListing(website);
-        }
-
-        public void ScrapeIsNotListing(Website website)
-        {
-            Pages = website.GetIsNotListingPages();
-            if (!Scrape())
-            {
-                return;
-            }
-            ScrapeIsNotListing(website);
-        }
         public static void ScrapeMainPage(Website website)
         {
             var page = new Page(website);
