@@ -45,7 +45,7 @@ namespace landerist_library.Parse.PageTypeParser
 
             if (ResponseBodyIsError(page.ResponseBodyText))
             {
-                return (PageType.ResponseBodyError, null);
+                return (PageType.ResponseBodyIsError, null);
             }
             if (ResponseBodyIsTooShort(page.ResponseBodyText))
             {

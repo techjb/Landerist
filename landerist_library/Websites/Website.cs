@@ -365,24 +365,14 @@ namespace landerist_library.Websites
 
         public List<Page> GetPagesUnknowPageType()
         {
-            return Pages.GetPagesUnknowPageType(this);
+            return Pages.GetUnknowPageType(this);
         }
 
         public List<Page> GetNonScrapedPages()
         {
             return Pages.GetNonScrapedPages(this);
         }
-
-        public List<Page> GetUnknowIsListingPages()
-        {
-            return Pages.GetUnknowIsListingPages(this);
-        }
-
-        public List<Page> GetIsNotListingPages()
-        {
-            return Pages.GetIsNotListingPages(this);
-        }
-
+       
         public int GetNumPages()
         {
             return NumPages;

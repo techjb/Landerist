@@ -27,13 +27,13 @@ namespace landerist_library.Scrape
 
         private static BlockingCollection<Page> BlockingCollection = [];
 
-        private static bool Recursive = false;
-
         private List<Page> Pages = [];
 
-        public Scraper(bool recursive)
+
+        public void Start()
         {
-            Recursive = recursive;
+            Pages = PageSelector.Select();
+            Scrape();
         }
 
         public void ScrapeUnknowPageType(int? rows = null)
@@ -43,10 +43,7 @@ namespace landerist_library.Scrape
             {
                 return;
             }
-            if (Recursive)
-            {
-                ScrapeUnknowPageType(rows);
-            }
+            ScrapeUnknowPageType(rows);
         }
 
         public void ScrapeNonScrapped(Uri uri)
@@ -62,10 +59,7 @@ namespace landerist_library.Scrape
             {
                 return;
             }
-            if (Recursive)
-            {
-                ScrapeNonScrapped(website);
-            }
+            ScrapeNonScrapped(website);
         }
 
         public void ScrapeUnknowHttpStatusCode()
@@ -75,13 +69,9 @@ namespace landerist_library.Scrape
             {
                 return;
             }
-            if (Recursive)
-            {
-                ScrapeUnknowHttpStatusCode();
-            }
+            ScrapeUnknowHttpStatusCode();
         }
 
-        // Can be infinite loops
         public void ScrapeUnknowIsListing(Uri uri)
         {
             Website website = new(uri);
@@ -95,10 +85,7 @@ namespace landerist_library.Scrape
             {
                 return;
             }
-            if (Recursive)
-            {
-                ScrapeUnknowIsListing(website);
-            }
+            ScrapeUnknowIsListing(website);
         }
 
         public void ScrapeIsNotListing(Uri uri)
@@ -114,10 +101,7 @@ namespace landerist_library.Scrape
             {
                 return;
             }
-            if (Recursive)
-            {
-                ScrapeIsNotListing(website);
-            }
+            ScrapeIsNotListing(website);
         }
         public static void ScrapeMainPage(Website website)
         {

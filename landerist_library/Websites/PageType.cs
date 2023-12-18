@@ -9,7 +9,7 @@
         MainPage,
         NotIndexable,
         ForbiddenLastSegment,
-        ResponseBodyError,
+        ResponseBodyIsError,
         ResponseBodyTooLarge,
         ResponseBodyTooShort,
         ResponseBodyTooManyTokens,

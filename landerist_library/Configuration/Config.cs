@@ -16,6 +16,8 @@
 
         public static readonly int MAX_PAGES_PER_WEBSITE = 100;
 
+        public static readonly int SCRAPER_PAGES_BUNCH = 10000;
+
         //public static readonly int MAX_LISTINGS_PER_WEBSITE = 100;
 
         public static readonly int MAX_RESPONSEBODYTEXT_LENGTH = 10000;

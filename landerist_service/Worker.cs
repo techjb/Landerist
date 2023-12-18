@@ -1,6 +1,7 @@
 using landerist_library.Logs;
 using landerist_library.Export;
 using landerist_library.Statistics;
+using landerist_library.Scrape;
 
 namespace landerist_service
 {
@@ -9,27 +10,26 @@ namespace landerist_service
         private readonly ILogger<Worker> Logger = logger;
 
         private Timer? Timer1;
+        private Timer? Timer2;
+        private bool RunningTimer2 = false;
+
         private const int OneSeccond = 1000;
+        private const int TenSeconds = 10 * OneSeccond;
         private const int OneMinute = 60 * OneSeccond;
         private const int OneHour = 60 * OneMinute;
         private const int OneDay = 24 * OneHour;
+
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             Logger.LogInformation("ExecuteAsync");
             while (!stoppingToken.IsCancellationRequested)
             {
-                Start();
+                Log.WriteLogInfo("service", "Service started");
+                SetTimers();
                 await Task.Delay(Timeout.Infinite, stoppingToken);
             }
-        }
-
-        private void Start()
-        {
-            Log.WriteLogInfo("service", "Service started");
-            SetTimers();
-            // todo: start scrapper
-        }
+        }        
 
         private void SetTimers()
         {
@@ -44,7 +44,9 @@ namespace landerist_service
             int dueTimeOneAM = (int)(oneAM - nowTime).TotalMilliseconds;
 
             Timer1 = new Timer(TimerCallback1!, null, dueTimeOneAM, OneDay);
+            Timer2 = new Timer(TimerCallback2!, null, 0, TenSeconds);
         }
+
         private void TimerCallback1(object state)
         {
             try
@@ -58,11 +60,34 @@ namespace landerist_service
             }
         }
 
+        private void TimerCallback2(object state)
+        {
+            if (RunningTimer2)
+            {
+                return;
+            }
+
+            RunningTimer2 = true;
+            try
+            {
+                new Scraper().Start();
+            }
+            catch (Exception exception)
+            {
+                Log.WriteLogErrors(exception);
+            }
+            finally
+            {
+                RunningTimer2 = false;
+            }
+        }
+
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
             Logger.LogInformation("StopAsync");
             Log.WriteLogInfo("service", "Service stopped");
             Timer1?.Change(Timeout.Infinite, 0);
+            Timer2?.Change(Timeout.Infinite, 0);
             await base.StopAsync(cancellationToken);
         }
     }

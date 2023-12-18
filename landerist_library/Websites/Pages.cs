@@ -39,21 +39,6 @@ namespace landerist_library.Websites
             return GetPages(website, dataTable);
         }
 
-        public static List<Page> GetPagesUnknowPageType(Website website)
-        {
-            string query =
-                "SELECT * " +
-                "FROM " + TABLE_PAGES + " " +
-                "WHERE [Host] = @Host AND " +
-                "[PageType] IS NULL";
-
-            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"Host", website.Host },
-            });
-
-            return GetPages(website, dataTable);
-        }
-
         public static List<Page> GetPages(PageType pageType)
         {
             string query =
@@ -69,6 +54,28 @@ namespace landerist_library.Websites
             return GetPages(dataTable);
         }
 
+        public static List<Page> GetPages(PageType pageType, int daysUpdated)
+        {
+            DateTime dateTime = DateTime.Now.AddDays(daysUpdated);
+            return GetPages(pageType, dateTime);
+        }
+
+        public static List<Page> GetPages(PageType pageType, DateTime updated)
+        {
+            string query =
+                "SELECT " + TABLE_PAGES + ".*, " + Websites.TABLE_WEBSITES + ".* " +
+                "FROM " + TABLE_PAGES + " " +
+                "INNER JOIN " + Websites.TABLE_WEBSITES + " ON " + TABLE_PAGES + ".[Host] = " + Websites.TABLE_WEBSITES + ".[Host] " +
+                "WHERE [PageType] = @PageType AND [Updated] < @Updated ";
+
+            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+                {"PageType", pageType.ToString() },
+                {"Updated", updated }
+            });
+
+            return GetPages(dataTable);
+        }
+
         public static List<Page> GetNonScrapedPages(Website website)
         {
             string query =
@@ -79,6 +86,21 @@ namespace landerist_library.Websites
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"Host", website.Host }
+            });
+
+            return GetPages(website, dataTable);
+        }
+
+        public static List<Page> GetUnknowPageType(Website website)
+        {
+            string query =
+                "SELECT * " +
+                "FROM " + TABLE_PAGES + " " +
+                "WHERE [Host] = @Host AND " +
+                "[PageType] IS NULL";
+
+            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+                {"Host", website.Host },
             });
 
             return GetPages(website, dataTable);
@@ -115,37 +137,6 @@ namespace landerist_library.Websites
 
             DataTable dataTable = new DataBase().QueryTable(query);
             return GetPages(dataTable);
-        }
-
-        public static List<Page> GetUnknowIsListingPages(Website website)
-        {
-            string query =
-                "SELECT * " +
-                "FROM " + TABLE_PAGES + " " +
-                "WHERE [Host] = @Host AND " +
-                "[IsListing] IS NULL";
-
-            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"Host", website.Host }
-            });
-
-            return GetPages(website, dataTable);
-        }
-
-
-        public static List<Page> GetIsNotListingPages(Website website)
-        {
-            string query =
-                "SELECT * " +
-                "FROM " + TABLE_PAGES + " " +
-                "WHERE [Host] = @Host AND " +
-                "[IsListing] = 0";
-
-            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"Host", website.Host }
-            });
-
-            return GetPages(website, dataTable);
         }
 
         private static List<Page> GetPages(DataTable dataTable)
@@ -295,15 +286,15 @@ namespace landerist_library.Websites
             int counter = 0;
             int changed = 0;
             Parallel.ForEach(pages, page =>
-            {            
+            {
                 Console.WriteLine(counter + "/" + pages.Count + " Changed: " + changed);
                 page.SetResponseBodyTextHash();
                 if (page.ResponseBodyTextHasChanged)
                 {
                     page.Update();
-                    Interlocked.Increment(ref changed);                    
+                    Interlocked.Increment(ref changed);
                 }
-                Interlocked.Increment(ref counter);                
+                Interlocked.Increment(ref counter);
             });
         }
     }
