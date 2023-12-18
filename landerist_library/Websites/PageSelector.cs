@@ -23,7 +23,7 @@
                 return;
             }
 
-            var pages = landerist_library.Websites.Pages.GetPages(PageType.Listing, -3);
+            var pages = landerist_library.Websites.Pages.GetPages(PageType.Listing, 3, 2);
             AddPages(pages);
         }
 
@@ -45,7 +45,7 @@
                 return;
             }
 
-            var pages = landerist_library.Websites.Pages.GetPages(PageType.DownloadError, -3);
+            var pages = landerist_library.Websites.Pages.GetPages(PageType.DownloadError, 3, 4);
             AddPages(pages);
         }
 
@@ -56,7 +56,7 @@
                 return;
             }
 
-            var pages = landerist_library.Websites.Pages.GetPages(PageType.MayBeListing, -1);
+            var pages = landerist_library.Websites.Pages.GetPages(PageType.MayBeListing, 1);
             AddPages(pages);
         }
 

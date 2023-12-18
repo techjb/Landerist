@@ -43,21 +43,23 @@ namespace landerist_library.Websites
             return GetPages(dataTable);
         }
 
-        public static List<Page> GetPages(PageType pageType, int daysUpdated)
+        public static List<Page> GetPages(PageType pageType, int daysLastUpdate, int? pageTypeCounterMultiplier = null)
         {
-            DateTime dateTime = DateTime.Now.AddDays(daysUpdated);
-            return GetPages(pageType, dateTime);
-        }
+            DateTime updated = DateTime.Now.AddDays(-daysLastUpdate);
 
-        public static List<Page> GetPages(PageType pageType, DateTime updated)
-        {
             string query =
                 QueryPages() +
                 "WHERE [PageType] = @PageType AND [Updated] < @Updated ";
 
+            if (pageTypeCounterMultiplier != null)
+            {
+                query += "AND DATEADD(DAY, -(PageTypeCounter * @PageTypeCounterMultiplier), GETDATE())";
+            }
+
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"PageType", pageType.ToString() },
-                {"Updated", updated }
+                {"Updated", updated },
+                {"PageTypeCounterMultiplier", pageTypeCounterMultiplier }
             });
 
             return GetPages(dataTable);
@@ -110,7 +112,7 @@ namespace landerist_library.Websites
             return GetPages(dataTable);
         }
 
-    
+
         public static List<Page> GetUnknowHttpStatusCode()
         {
             string query =
