@@ -1,13 +1,18 @@
 ﻿using Amazon;
+using Amazon.Comprehend.Model.Internal.MarshallTransformations;
 using Amazon.S3;
+using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using landerist_library.Configuration;
+using landerist_library.Logs;
+using System.Collections.Generic;
 
 namespace landerist_library.Export
 {
     public class S3
     {
         private readonly AmazonS3Client AmazonS3Client;
+
         public S3()
         {
             AmazonS3Client = new AmazonS3Client(Config.AWS_ACESSKEYID, Config.AWS_SECRETACCESSKEY, RegionEndpoint.EUWest3);
@@ -30,7 +35,7 @@ namespace landerist_library.Export
             {
                 return success;
             }
-            // todo: not tested
+
             if (!string.IsNullOrEmpty(subDirectoryInBucket))
             {
                 key = subDirectoryInBucket + @"/" + key;
@@ -52,10 +57,63 @@ namespace landerist_library.Export
             }
             catch (Exception exception)
             {
-                Console.WriteLine("Upload: " + exception.Message);
+                Log.WriteLogErrors(exception);
             }
             transferUtitlity.Dispose();
             return success;
+        }
+
+        public async Task<List<S3Object>> ListObjects(string bucketName, string directory = "")
+        {
+            List<S3Object> list = [];
+
+            ListObjectsV2Request listObjectsV2Request = new()
+            {
+                BucketName = bucketName
+            };
+            if (!directory.Equals(string.Empty))
+            {
+                listObjectsV2Request.Prefix = directory;
+            }
+
+            var listObjectsV2Response = new ListObjectsV2Response();
+            try
+            {
+                do
+                {
+                    listObjectsV2Response = await AmazonS3Client.ListObjectsV2Async(listObjectsV2Request);
+                    list.AddRange(listObjectsV2Response.S3Objects);
+                    listObjectsV2Request.ContinuationToken = listObjectsV2Response.NextContinuationToken;
+                }
+                while (listObjectsV2Response.IsTruncated);
+            }
+            catch (Exception exception)
+            {
+                Log.WriteLogErrors(exception);
+            }
+            return list;
+        }
+
+        public async Task<List<DeletedObject>> DeleteObjects(string bucketName, List<string> objectKeys)
+        {
+            List<DeletedObject> list = [];            
+            var deleteObjectsRequest = new DeleteObjectsRequest
+            {
+                BucketName = bucketName,
+                Objects = new List<KeyVersion>(objectKeys.ConvertAll(k => new KeyVersion() { Key = k })),
+                Quiet = true
+            };            
+            try
+            {
+                var response = await AmazonS3Client.DeleteObjectsAsync(deleteObjectsRequest);
+                list = response.DeletedObjects;
+            }
+            catch (Exception exception)
+            {
+                Log.WriteLogErrors(exception);
+            }
+
+            return list;
         }
     }
 }

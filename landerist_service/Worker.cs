@@ -2,6 +2,7 @@ using landerist_library.Logs;
 using landerist_library.Export;
 using landerist_library.Statistics;
 using landerist_library.Scrape;
+using landerist_library.Database;
 
 namespace landerist_service
 {
@@ -35,13 +36,13 @@ namespace landerist_service
         {
             DateTime nowTime = DateTime.Now;
 
-            DateTime oneAM = new(nowTime.Year, nowTime.Month, nowTime.Day, 1, 0, 0);
-            if (nowTime > oneAM)
+            DateTime twelveAM = new(nowTime.Year, nowTime.Month, nowTime.Day, 0, 0, 0);
+            if (nowTime > twelveAM)
             {
-                oneAM = oneAM.AddDays(1);
+                twelveAM = twelveAM.AddDays(1);
             }
 
-            int dueTimeOneAM = (int)(oneAM - nowTime).TotalMilliseconds;
+            int dueTimeOneAM = (int)(twelveAM - nowTime).TotalMilliseconds;
 
             Timer1 = new Timer(TimerCallback1!, null, dueTimeOneAM, OneDay);
             Timer2 = new Timer(TimerCallback2!, null, 0, TenSeconds);
@@ -53,6 +54,7 @@ namespace landerist_service
             {
                 FilesUpdater.Update();
                 StatisticsSnapshot.TakeSnapshots();
+                Backup.Update();
             }
             catch (Exception exception)
             {

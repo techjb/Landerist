@@ -1,4 +1,5 @@
 ﻿using landerist_library.Configuration;
+using landerist_library.Database;
 using landerist_library.Parse.Listing.ChatGPT;
 using landerist_library.Scrape;
 using landerist_library.Websites;
@@ -137,6 +138,8 @@ namespace landerist_console
             //new ChatGPTRequest().ListModels();
 
             //landerist_library.Export.Exports.Start();
+
+            //Backup.Update();
 
             //landerist_library.Statistics.StatisticsSnapshot.TakeSnapshots();
         }

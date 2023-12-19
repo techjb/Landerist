@@ -84,6 +84,8 @@
 
         public static readonly string DELIMITATIONS_DIRECTORY = PrivateConfig.DELIMITATIONS_DIRECTORY;
 
+        public static readonly string BACKUPS_DIRECTORY = PrivateConfig.BACKUPS_DIRECTORY;
+
         public static readonly string GOOGLE_MAPS_API = PrivateConfig.GOOGLE_MAPS_API;
 
         public static readonly string GOOGLE_NATURAL_LANGUAGE_API_KEY = PrivateConfig.GOOGLE_NATURAL_LANGUAGE_API_KEY;
@@ -94,7 +96,11 @@
 
         public static readonly string AWS_SECRETACCESSKEY = PrivateConfig.AWS_SECRETACCESSKEY;
 
-        public static readonly string AWS_S3_PUBLIC_BUCKET = PrivateConfig.AWS_S3_PUBLIC_BUCKET;
+        public static readonly string AWS_S3_PUBLIC_BUCKET = PrivateConfig.AWS_S3_BUCKET_PUBLIC;
+
+        public static readonly string AWS_S3_BUCKET_BACKUPS = PrivateConfig.AWS_S3_BUCKET_BACKUPS;
+
+        public static readonly int DAYS_TO_DELETE_BACKUP = 15;
 
         public static bool IsConfigurationProduction()
         {
