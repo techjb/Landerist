@@ -1,11 +1,9 @@
 ﻿using Amazon;
-using Amazon.Comprehend.Model.Internal.MarshallTransformations;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using landerist_library.Configuration;
 using landerist_library.Logs;
-using System.Collections.Generic;
 
 namespace landerist_library.Export
 {
