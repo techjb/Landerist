@@ -45,7 +45,8 @@ namespace landerist_library.Websites
 
         public static List<Page> GetPages(PageType pageType, int daysLastUpdate, int? pageTypeCounterMultiplier = null)
         {
-            DateTime updated = DateTime.Now.AddDays(-daysLastUpdate);
+            DateTime now = DateTime.Now;
+            DateTime updated = now.AddDays(-daysLastUpdate);
 
             string query =
                 QueryPages() +
@@ -53,12 +54,13 @@ namespace landerist_library.Websites
 
             if (pageTypeCounterMultiplier != null)
             {
-                query += "AND DATEADD(DAY, -(PageTypeCounter * @PageTypeCounterMultiplier), GETDATE())";
+                query += "AND [Updated] < DATEADD(DAY, -(PageTypeCounter * @PageTypeCounterMultiplier), @Now)";
             }
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"PageType", pageType.ToString() },
                 {"Updated", updated },
+                {"Now", now },
                 {"PageTypeCounterMultiplier", pageTypeCounterMultiplier }
             });
 
@@ -107,7 +109,6 @@ namespace landerist_library.Websites
                 "WHERE [PageType] IS NULL " +
                 orderBy;
 
-            Console.WriteLine("Reading non scraped pages ..");
             DataTable dataTable = new DataBase().QueryTable(query);
             return GetPages(dataTable);
         }
@@ -140,7 +141,6 @@ namespace landerist_library.Websites
 
         private static List<Page> GetPages(DataTable dataTable)
         {
-            Console.WriteLine("Parsing to pages ..");
             List<Page> pages = [];
             foreach (DataRow dataRow in dataTable.Rows)
             {

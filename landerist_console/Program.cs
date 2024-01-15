@@ -99,6 +99,7 @@ namespace landerist_console
             //new Scraper().ScrapeUnknowPageType(website);
             //new Scraper().Scrape(uriPage);
             //new Scraper().ScrapeAllPages();
+            //new Scraper().Start();
 
             //landerist_library.Parse.Listing.ListingsParser.Start();            
 
@@ -142,6 +143,7 @@ namespace landerist_console
             //Backup.Update();
 
             //landerist_library.Statistics.StatisticsSnapshot.TakeSnapshots();
+
         }
     }
 }
