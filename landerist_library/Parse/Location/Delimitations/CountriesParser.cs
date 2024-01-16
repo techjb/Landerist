@@ -110,14 +110,32 @@ namespace landerist_library.Parse.Location.Delimitations
 
         public static bool ContainsCountry(CountryCode countryCode, double latitude, double longitude)
         {
-            string iso_3 = Database.Countries.Get(latitude, longitude).Trim();
             switch (countryCode)
             {
-                case CountryCode.ES: return iso_3 == "ESP";
+                //case CountryCode.ES: break; // todo: needed more detailed map
                 default:
-                    break;
+                    {
+                        return ContainsCountryAll(countryCode, latitude, longitude);
+                    }
+            }
+        }
+
+
+        public static bool ContainsCountryAll(CountryCode countryCode, double latitude, double longitude)
+        {
+            string? iso_3 = Database.Countries.Get(latitude, longitude);
+            if (iso_3 != null)
+            {
+                switch (countryCode)
+                {
+                    case CountryCode.ES: return iso_3 == "ESP";
+                    default:
+                        break;
+                }
             }
             return false;
         }
+
+
     }
 }

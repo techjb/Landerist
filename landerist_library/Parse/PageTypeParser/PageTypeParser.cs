@@ -15,7 +15,7 @@ namespace landerist_library.Parse.PageTypeParser
 
         public static (PageType? pageType, landerist_orels.ES.Listing? listing) GetPageType(Page page)
         {
-            if (page == null || page.ResponseBody == null)
+            if (page == null || page.GetResponseBody() == null)
             {
                 return (null, null);
             }            

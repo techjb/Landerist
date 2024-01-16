@@ -30,7 +30,7 @@ namespace landerist_library.Database
             return new DataBase().Query(query);
         }
 
-        protected static string GetString(string tableName, string columnName, double latitude, double longitude)
+        protected static string? GetString(string tableName, string columnName, double latitude, double longitude)
         {
             string point =
                 "POINT(" + longitude.ToString(CultureInfo.InvariantCulture) + " " +

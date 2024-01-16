@@ -4,8 +4,6 @@ using landerist_library.Database;
 using landerist_library.Tools;
 using landerist_orels.ES;
 using System.Data;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace landerist_library.Websites
 {
@@ -24,11 +22,11 @@ namespace landerist_library.Websites
 
         public short? HttpStatusCode { get; set; }
 
-        public string? ResponseBody { get; set; }
-
         public PageType? PageType { get; private set; }
 
         public short? PageTypeCounter { get; private set; }
+
+        private string? ResponseBody { get; set; }        
 
         public string? ResponseBodyText { get; set; }
 
@@ -60,7 +58,7 @@ namespace landerist_library.Websites
             Website = website;
             Host = uri.Host;
             Uri = uri;
-            UriHash = CalculateHash(uri.ToString());
+            UriHash = Strings.GetHash(uri.ToString());
             Inserted = DateTime.Now;
             Updated = DateTime.Now;
 
@@ -94,7 +92,6 @@ namespace landerist_library.Websites
             HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
             PageType = dataRow["PageType"] is DBNull ? null : (PageType)Enum.Parse(typeof(PageType), dataRow["PageType"].ToString()!);
             PageTypeCounter = dataRow["PageTypeCounter"] is DBNull ? null : (short)dataRow["PageTypeCounter"];
-            ResponseBodyText = dataRow["ResponseBodyText"] is DBNull ? null : dataRow["ResponseBodyText"].ToString();
             ResponseBodyTextHash = dataRow["ResponseBodyTextHash"] is DBNull ? null : dataRow["ResponseBodyTextHash"].ToString();
         }
 
@@ -116,18 +113,12 @@ namespace landerist_library.Websites
             return null;
         }
 
-        private static string CalculateHash(string text)
-        {
-            byte[] bytes = Encoding.UTF8.GetBytes(text);
-            byte[] hash = SHA256.HashData(bytes);
-            return BitConverter.ToString(hash).Replace("-", "");
-        }
 
         public bool Insert()
         {
             string query =
                 "INSERT INTO " + TABLE_PAGES + " " +
-                "VALUES(@Host, @Uri, @UriHash, @Inserted, NULL, NULL, NULL, NULL, NULL, NULL)";
+                "VALUES(@Host, @Uri, @UriHash, @Inserted, NULL, NULL, NULL, NULL, NULL)";
 
             bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
                 {"Host", Host },
@@ -144,11 +135,6 @@ namespace landerist_library.Websites
 
         public bool Update()
         {
-            if (!Config.STORE_RESPONSE_BODY_TEXT_IN_DATABASE)
-            {
-                ResponseBodyText = null;
-            }
-
             Updated = DateTime.Now;
 
             string query =
@@ -157,7 +143,6 @@ namespace landerist_library.Websites
                 "[HttpStatusCode] = @HttpStatusCode, " +
                 "[PageType] = @PageType, " +
                 "[PageTypeCounter] = @PageTypeCounter, " +
-                "[ResponseBodyText] = @ResponseBodyText, " +
                 "[ResponseBodyTextHash] = @ResponseBodyTextHash " +
                 "WHERE [UriHash] = @UriHash";
 
@@ -167,7 +152,6 @@ namespace landerist_library.Websites
                 {"HttpStatusCode", HttpStatusCode},
                 {"PageType", PageType?.ToString()},
                 {"PageTypeCounter", PageTypeCounter},
-                {"ResponseBodyText", ResponseBodyText},
                 {"ResponseBodyTextHash", ResponseBodyTextHash},
             });
         }
@@ -235,6 +219,22 @@ namespace landerist_library.Websites
             return Uri.Equals(Website.MainUri);
         }
 
+        public void InitializeResponseBody()
+        {
+            ResponseBody = null;
+            ResponseBodyText = null;
+        }
+
+        public string? GetResponseBody()
+        {
+            return ResponseBody;
+        }
+
+        public void SetResponseBody(string responseBody)
+        {
+            ResponseBody = responseBody;
+        }
+
         public void SetResponseBodyText()
         {
             LoadHtmlDocument();
@@ -251,19 +251,19 @@ namespace landerist_library.Websites
             {
                 return;
             }
-            string responseBodyTextHash = CalculateHash(ResponseBodyText);
+            string responseBodyTextHash = Strings.GetHash(ResponseBodyText);
             ResponseBodyTextHasChanged = ResponseBodyTextHash == null || !responseBodyTextHash.Equals(ResponseBodyTextHash);
             ResponseBodyTextHash = responseBodyTextHash;
         }
 
-        public Listing? GetLising()
+        public Listing? GetListing(bool loadMedia)
         {
-            return ES_Listings.GetListing(this, false);
+            return ES_Listings.GetListing(this, loadMedia);
         }
 
         public bool ContainsListing()
         {
-            var listing = GetLising();
+            var listing = GetListing(false);
             return listing is not null;
         }
 

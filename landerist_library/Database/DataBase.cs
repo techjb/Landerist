@@ -254,14 +254,17 @@ namespace landerist_library.Database
             return result;
         }
 
-        public string QueryString(string query, IDictionary<string, object?>? parameters = null)
+        public string? QueryString(string query, IDictionary<string, object?>? parameters = null)
         {
-            string result = string.Empty;
+            string? result = null;
             try
             {
                 Init(query, parameters);
                 var value = SqlCommand.ExecuteScalar();
-                result = value.ToString() ?? string.Empty;
+                if (value != null)
+                {
+                    result = (string)value;
+                }
             }
             catch (Exception exception)
             {

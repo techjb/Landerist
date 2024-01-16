@@ -64,7 +64,7 @@ namespace landerist_library.Database
         {
             string text = uri.ToString();
             byte[] bytes = Encoding.UTF8.GetBytes(text);
-            byte[] hash = SHA256.Create().ComputeHash(bytes);
+            byte[] hash = SHA256.HashData(bytes);
             return BitConverter.ToString(hash).Replace("-", "");
         }
     }

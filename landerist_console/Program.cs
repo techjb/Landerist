@@ -65,10 +65,11 @@ namespace landerist_console
             //var uri = new Uri("https://www.inmobiliariamarbella.es/");
             //var uri = new Uri("https://www.inmoarregi.com/");
             //var uri = new Uri("https://www.badainmobiliaria.com");
+            //var uri = new Uri("http://alicante-casas.com/ad/100262248");
+            //var uri = new Uri("http://www.abbeyproperties.eu/ficha-inmueble.php/?cod_inmueble=888933");
 
             //var website = new Website(uri);
-            //var page = new Page(website, uriPage);
-            //var page = new Page(uriPage);            
+            //var page = new Page(website, uriPage);            
 
             //Websites.Delete(website); return;
             //Websites.Delete(uri); return;
@@ -97,7 +98,7 @@ namespace landerist_console
             //new Scraper().ScrapeIsNotListing(uri);
             //new Scraper().Scrape(website);
             //new Scraper().ScrapeUnknowPageType(website);
-            //new Scraper().Scrape(uriPage);
+            //Scraper.Scrape(uri);
             //new Scraper().ScrapeAllPages();
             //new Scraper().Start();
 

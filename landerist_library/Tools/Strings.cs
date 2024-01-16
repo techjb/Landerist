@@ -1,8 +1,10 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Security.Cryptography;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace landerist_library.Tools
 {
-    public class Strings
+    public partial class Strings
     {
         public static string Clean(string text)
         {
@@ -16,43 +18,56 @@ namespace landerist_library.Tools
             return text.Trim();
         }
 
+        [GeneratedRegex(@"\r\n?|\n")]
+        private static partial Regex RegexBreaklines();
         private static string BreaklinesToSpace(string text)
         {
-            return Regex.Replace(text, @"\r\n?|\n", " ");
+            return RegexBreaklines().Replace(text, " ");
         }
+
+        [GeneratedRegex(@"\s+")]
+        private static partial Regex RegexSpace();
 
         public static string RemoveSpaces(string text)
         {
-            return Regex.Replace(text, @"\s+", string.Empty);
+            return RegexSpace().Replace(text, string.Empty);
         }
 
+        [GeneratedRegex(@"[ ]{2,}")]
+        private static partial Regex RegexTabs();
         private static string TabsToSpaces(string text)
         {
-            text = text.Replace("\t", " ");
-            const string reduceMultiSpace = @"[ ]{2,}";
-            return Regex.Replace(text, reduceMultiSpace, " ");
+            text = text.Replace("\t", " ");            
+            return RegexTabs().Replace(text, " ");
         }
 
+        [GeneratedRegex(@"(\s*\.)+")]
+        private static partial Regex RegexMultipleDots();
         public static string RemoveMultipleDots(string text)
         {
-            return Regex.Replace(text, @"(\s*\.)+", ".");
+            return RegexMultipleDots().Replace(text, ".");
         }
 
+        [GeneratedRegex(@"(\s*,)+")]
+        private static partial Regex RegexMultipleComas();
         public static string RemoveMultipleComas(string text)
         {
-            return Regex.Replace(text, @"(\s*,)+", ",");
+            return RegexMultipleComas().Replace(text, ",");
         }
 
+        [GeneratedRegex(@"\s+")]
+        private static partial Regex RegexMultipleSpaces();
         public static string RemoveMultipleSpaces(string text)
         {
-            return Regex.Replace(text, @"\s+", " ");
+            return RegexMultipleSpaces().Replace(text, " ");
         }
 
+        [GeneratedRegex(@"http[^\s]+|www\.[^\s]+")]
+        private static partial Regex RegexUrl();
         public static string RemoveUrls(string text)
         {
-            return Regex.Replace(text, @"http[^\s]+|www\.[^\s]+", string.Empty);
+            return RegexUrl().Replace(text, string.Empty);
         }
-
         public static string Replace(string text)
         {
             return text
@@ -73,5 +88,13 @@ namespace landerist_library.Tools
         {
             return int.TryParse(text, out _);
         }
+
+        public static string GetHash(string text)
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(text);
+            byte[] hash = SHA256.HashData(bytes);
+            return BitConverter.ToString(hash).Replace("-", "");
+        }
+
     }
 }

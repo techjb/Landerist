@@ -11,8 +11,7 @@ namespace landerist_library.Download
         public bool Get(Page page)
         {
             page.HttpStatusCode = null;
-            page.ResponseBody = null;
-            page.ResponseBodyText = null;
+            page.InitializeResponseBody();
 
             var task = Task.Run(async () => await GetAsync(page));
             return task.Result;
@@ -44,7 +43,8 @@ namespace landerist_library.Download
                 Timers.Timer.SaveTimerDownloadPage(page.Uri.ToString(), dateStart);
                 sucess = HttpResponseMessage.IsSuccessStatusCode;
                 page.HttpStatusCode = (short)HttpResponseMessage.StatusCode;
-                page.ResponseBody = await HttpResponseMessage.Content.ReadAsStringAsync();
+                string responseBody = await HttpResponseMessage.Content.ReadAsStringAsync();
+                page.SetResponseBody(responseBody);
 
             }
             catch (Exception exception)

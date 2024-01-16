@@ -30,7 +30,7 @@
             return ReorientTheGeomIfNeccesary(TABLE_COUNTRIES);
         }
 
-        public static string Get(double latitude, double longitude)
+        public static string? Get(double latitude, double longitude)
         {
             return GetString(TABLE_COUNTRIES, "iso_a3", latitude, longitude);
         }
