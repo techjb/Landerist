@@ -110,14 +110,11 @@ namespace landerist_library.Parse.Location.Delimitations
 
         public static bool ContainsCountry(CountryCode countryCode, double latitude, double longitude)
         {
-            switch (countryCode)
+            return countryCode switch
             {
-                //case CountryCode.ES: break; // todo: needed more detailed map
-                default:
-                    {
-                        return ContainsCountryAll(countryCode, latitude, longitude);
-                    }
-            }
+                CountryCode.ES => Database.CountrySpain.Contains(latitude, longitude),
+                _ => ContainsCountryAll(countryCode, latitude, longitude),
+            };
         }
 
 
