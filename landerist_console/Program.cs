@@ -65,7 +65,7 @@ namespace landerist_console
             //var uri = new Uri("https://www.inmobiliariamarbella.es/");
             //var uri = new Uri("https://www.inmoarregi.com/");
             //var uri = new Uri("https://www.badainmobiliaria.com");
-            var uri = new Uri("http://alicante-casas.com/ad/100262248");
+            //var uri = new Uri("http://alicante-casas.com/ad/100262248");
             //var uri = new Uri("http://www.abbeyproperties.eu/ficha-inmueble.php/?cod_inmueble=888933");
 
             //var website = new Website(uri);
@@ -89,17 +89,15 @@ namespace landerist_console
             //Websites.CountCanAccesToMainUri();
             //Websites.CountRobotsSiteMaps();            
             //Websites.InsertMainPages();
-
             //new Scraper(false).ScrapeUnknowPageType(10000);
-
             //new Scraper().ScrapeMainPage(website);
             //new Scraper().ScrapeUnknowHttpStatusCode();
             //new Scraper(true).ScrapeUnknowIsListing(uri);
             //new Scraper().ScrapeIsNotListing(uri);
             //new Scraper().Scrape(website);
             //new Scraper().ScrapeUnknowPageType(website);
-            new Scraper().Scrape(uri);
-            //new Scraper().ScrapeAllPages();
+            //new Scraper().Scrape(uri);
+            //new Scraper().ScrapeAllPages();            
             //new Scraper().Start();
 
             //landerist_library.Parse.Listing.ListingsParser.Start();            
@@ -144,7 +142,6 @@ namespace landerist_console
             //Backup.Update();
 
             //landerist_library.Statistics.StatisticsSnapshot.TakeSnapshots();
-
         }
     }
 }
