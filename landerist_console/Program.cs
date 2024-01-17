@@ -1,7 +1,10 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Database;
+using landerist_library.Export;
+using landerist_library.Logs;
 using landerist_library.Parse.Listing.ChatGPT;
 using landerist_library.Scrape;
+using landerist_library.Statistics;
 using landerist_library.Websites;
 using OpenAI;
 using System.Net;
@@ -18,7 +21,7 @@ namespace landerist_console
         static void Main()
         {
             Console.Title = "Landerist Console";
-            Config.Init(false);
+            Config.SetToLocal();
             Start();
             Run();
             End();
@@ -142,6 +145,7 @@ namespace landerist_console
             //Backup.Update();
 
             //landerist_library.Statistics.StatisticsSnapshot.TakeSnapshots();
+            
         }
     }
 }

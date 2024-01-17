@@ -7,7 +7,7 @@
         private static readonly string VERSION_PRODUCTION = "1.00";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
-        
+
         public static readonly bool INDEXER_ENABLED = true;
 
         public static readonly bool WORDS_ENABLED = false;
@@ -81,8 +81,12 @@
         public static readonly string CLASSIFIER_DIRECTORY = PrivateConfig.CLASIFFIER_DIRECTORY;
 
         public static readonly string DELIMITATIONS_DIRECTORY = PrivateConfig.DELIMITATIONS_DIRECTORY;
+        public static string? BACKUPS_DIRECTORY { get; set; }
 
-        public static readonly string BACKUPS_DIRECTORY = PrivateConfig.BACKUPS_DIRECTORY;
+        public static readonly string BACKUPS_LOCAL_DIRECTORY = PrivateConfig.BACKUPS_LOCAL_DIRECTORY;
+
+        public static readonly string BACKUPS_PRODUCTION_DIRECTORY = PrivateConfig.BACKUPS_PRODUCTION_DIRECTORY;
+
 
         public static readonly string GOOGLE_MAPS_API = PrivateConfig.GOOGLE_MAPS_API;
 
@@ -98,14 +102,24 @@
 
         public static readonly string AWS_S3_BUCKET_BACKUPS = PrivateConfig.AWS_S3_BUCKET_BACKUPS;
 
-        public static readonly int DAYS_TO_DELETE_BACKUP = 15;
+        public static readonly int DAYS_TO_DELETE_BACKUP = 60;
 
         public static bool IsConfigurationProduction()
         {
             return ConfigurationProduction;
         }
 
-        public static void Init(bool configurationProduction)
+        public static void SetToProduction()
+        {
+            Init(true);
+        }
+
+        public static void SetToLocal()
+        {
+            Init(false);
+        }
+
+        private static void Init(bool configurationProduction)
         {
             ConfigurationProduction = configurationProduction;
 
@@ -121,9 +135,13 @@
                 DATABASE_CONNECTION_PRODUCTION :
                 DATABASE_CONNECTION_LOCAL;
 
-            EXPORT_DIRECTORY = configurationProduction ?
-                EXPORT_DIRECTORY_LOCAL :
-                EXPORT_DIRECTORY_PRODUCTION;
+            EXPORT_DIRECTORY = ConfigurationProduction ?
+                EXPORT_DIRECTORY_PRODUCTION :
+                EXPORT_DIRECTORY_LOCAL;
+
+            BACKUPS_DIRECTORY = ConfigurationProduction ?
+                BACKUPS_PRODUCTION_DIRECTORY :
+                BACKUPS_LOCAL_DIRECTORY;
         }
     }
 }

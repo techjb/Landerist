@@ -8,7 +8,7 @@ namespace landerist_service
         public static void Main(string[] args)
         {
             // todo: uncomment
-            //Config.Init(true);
+            //Config.SetToProduction();
 
             var host = Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
