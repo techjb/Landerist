@@ -72,15 +72,5 @@ namespace landerist_library.Parse.Listing.ChatGPT
             }
             return (pageType, listing);
         }
-
-        // todo:
-        // Problem with encoding should be fixed in january 2024:
-        // https://community.openai.com/t/gpt-4-1106-preview-messes-up-function-call-parameters-encoding/478500?page=2
-        // Has to do with JSON Mode (response format)
-        //static string EncodeToUTF8(string texto)
-        //{
-        //    byte[] bytes = Encoding.GetEncoding("Windows-1252").GetBytes(texto);
-        //    return Encoding.UTF8.GetString(bytes);
-        //}
     }
 }

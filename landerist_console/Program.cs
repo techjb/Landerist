@@ -144,8 +144,7 @@ namespace landerist_console
 
             //Backup.Update();
 
-            //landerist_library.Statistics.StatisticsSnapshot.TakeSnapshots();
-            
+            //landerist_library.Statistics.StatisticsSnapshot.TakeSnapshots();            
         }
     }
 }

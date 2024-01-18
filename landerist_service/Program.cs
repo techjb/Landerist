@@ -7,15 +7,14 @@ namespace landerist_service
     {
         public static void Main(string[] args)
         {
-            // todo: uncomment
-            //Config.SetToProduction();
+            Config.SetToProduction();
 
             var host = Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddHostedService<Worker>();
                 })
-                //UseWindowsService()
+                .UseWindowsService()
                 .Build();            
 
             host.Run();

@@ -13,26 +13,26 @@
 
   <ItemGroup>
     <PackageReference Include="AI.Dev.OpenAI.GPT" Version="1.0.2" />
-    <PackageReference Include="AWSSDK.Comprehend" Version="3.7.300.7" />
-    <PackageReference Include="AWSSDK.S3" Version="3.7.304.5" />
+    <PackageReference Include="AWSSDK.Comprehend" Version="3.7.300.37" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.305.12" />
     <PackageReference Include="Com.Bekijkhet.RobotsTxt" Version="1.0.0" />
     <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="Google.Cloud.Language.V1" Version="3.3.0" />
     <PackageReference Include="Gzip.TextClassifier" Version="1.0.1" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.54" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.57" />
     <PackageReference Include="Louw.SitemapParser" Version="0.0.2" />
     <PackageReference Include="NetTopologySuite" Version="2.5.0" />
     <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="4.0.0" />
-    <PackageReference Include="OpenAI" Version="1.7.2" />
-    <PackageReference Include="OpenAI-DotNet" Version="7.3.3" />
-    <PackageReference Include="OpenCvSharp4" Version="4.8.0.20230708" />
-    <PackageReference Include="OpenCvSharp4.Extensions" Version="4.8.0.20230708" />
-    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.8.0.20230708" />
-    <PackageReference Include="PuppeteerSharp" Version="13.0.1" />
+    <PackageReference Include="OpenAI" Version="1.10.0" />
+    <PackageReference Include="OpenAI-DotNet" Version="7.6.2" />
+    <PackageReference Include="OpenCvSharp4" Version="4.9.0.20240103" />
+    <PackageReference Include="OpenCvSharp4.Extensions" Version="4.9.0.20240103" />
+    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.9.0.20240103" />
+    <PackageReference Include="PuppeteerSharp" Version="13.0.2" />
     <PackageReference Include="Selenium.Firefox.WebDriver" Version="0.27.0" />
-    <PackageReference Include="Selenium.WebDriver" Version="4.15.0" />
-    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="119.0.6045.10500" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+    <PackageReference Include="Selenium.WebDriver" Version="4.16.2" />
+    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="120.0.6099.10900" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
   </ItemGroup>
 
   <ItemGroup>

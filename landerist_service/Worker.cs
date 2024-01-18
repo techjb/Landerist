@@ -72,7 +72,7 @@ namespace landerist_service
             RunningTimer2 = true;
             try
             {
-                new Scraper().Start();
+                //new Scraper().Start();
             }
             catch (Exception exception)
             {
