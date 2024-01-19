@@ -16,9 +16,14 @@ namespace landerist_library.Export
             AmazonS3Client = new AmazonS3Client(Config.AWS_ACESSKEYID, Config.AWS_SECRETACCESSKEY, RegionEndpoint.EUWest3);
         }
 
-        public bool UploadFile(string file, string key)
+        public bool UploadFilePublicBucket(string file, string key)
         {
             return UploadFile(file, key, Config.AWS_S3_PUBLIC_BUCKET, string.Empty);
+        }
+
+        public bool UploadFilePublicBucket(string file, string key, string subdirectoryInBucket)
+        {
+            return UploadFile(file, key, Config.AWS_S3_PUBLIC_BUCKET, subdirectoryInBucket);
         }
 
         public bool UploadFile(string file, string key, string bucketName)
@@ -26,7 +31,7 @@ namespace landerist_library.Export
             return UploadFile(file, key, bucketName, string.Empty);
         }
 
-        public bool UploadFile(string file, string key, string bucketName, string subDirectoryInBucket)
+        public bool UploadFile(string file, string key, string bucketName, string subdirectoryInBucket)
         {
             bool success = false;
             if (!File.Exists(file))
@@ -34,9 +39,9 @@ namespace landerist_library.Export
                 return success;
             }
 
-            if (!string.IsNullOrEmpty(subDirectoryInBucket))
+            if (!string.IsNullOrEmpty(subdirectoryInBucket))
             {
-                key = subDirectoryInBucket + @"/" + key;
+                key = subdirectoryInBucket + @"/" + key;
             }
 
             TransferUtilityUploadRequest transferUtilityUploadRequest = new()

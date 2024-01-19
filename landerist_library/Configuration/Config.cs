@@ -4,7 +4,7 @@
     {
         private static bool ConfigurationProduction = true;
 
-        private static readonly string VERSION_PRODUCTION = "1.00";
+        public static readonly string VERSION = "1.01";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
@@ -32,10 +32,8 @@
 
         public static readonly int HTTPCLIENT_SECONDS_TIMEOUT = 10;
 
-        public static readonly int MAX_CRAW_DELAY_SECONDS = 120;
-
-        private static readonly string VERSION_LOCAL = new Random().Next(1000, 9999).ToString();
-        public static string? VERSION { get; set; }
+        public static readonly int MAX_CRAW_DELAY_SECONDS = 120;        
+        
 
         public const string DATABASE_NAME = PrivateConfig.DATABASE_NAME;
 
@@ -122,10 +120,6 @@
         private static void Init(bool configurationProduction)
         {
             ConfigurationProduction = configurationProduction;
-
-            VERSION = ConfigurationProduction ?
-                VERSION_PRODUCTION :
-                VERSION_LOCAL;
 
             DATASOURCE = ConfigurationProduction ?
                 DATASOURCE_PRODUCTION :

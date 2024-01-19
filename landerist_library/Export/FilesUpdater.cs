@@ -2,17 +2,20 @@
 using landerist_library.Database;
 using landerist_library.Logs;
 using landerist_orels.ES;
+using landerist_library.Websites;
 
 namespace landerist_library.Export
 {
     public class FilesUpdater
     {
-        public static void Update()
+        private static DateTime DateTime;
+        public static void UpdateFiles()
         {
+            DateTime = DateTime.Now.AddDays(-1);
             try
             {
-                FileAllListings();
-                FileUpdatedYesterday();
+                UpdatFilesAllListings();
+                UpdateFilesUpdatedYesterday();
             }
             catch (Exception exception)
             {
@@ -20,63 +23,63 @@ namespace landerist_library.Export
             }
         }
 
-        private static void FileAllListings()
+        private static void UpdatFilesAllListings()
         {
             Console.WriteLine("Exporting all listings ..");
             var listings = ES_Listings.GetListings(true);
-            DateTime dateTime = DateTime.Now.AddDays(-1);
-            bool sucess = Export(listings, "es_listings", dateTime);
-            Log.WriteLogInfo("ExportAllListings", "Sucess: " + sucess.ToString());
+            bool sucess = Update(listings, "es_listings", "ES\\listings");
+            Log.WriteLogInfo("UpdatFilesAllListings", "Sucess: " + sucess.ToString());
         }
 
-        private static void FileUpdatedYesterday()
+        private static void UpdateFilesUpdatedYesterday()
         {
             Console.WriteLine("Exporting updated yesterday ..");
-            DateTime dateTime = DateTime.Now.AddDays(-1);
-            var listings = ES_Listings.GetListings(true, dateTime);
-            bool sucess = Export(listings, "es_listings_update", dateTime);
-            Log.WriteLogInfo("ExportUpdatedYesterday", "Sucess: " + sucess.ToString());
+            var listings = ES_Listings.GetListings(true, DateTime);
+            bool sucess = Update(listings, "es_listings_update", "ES\\updated");
+            Log.WriteLogInfo("UpdateFilesUpdatedYesterday", "Sucess: " + sucess.ToString());
         }
 
-        private static bool Export(SortedSet<Listing> listings, string fileName, DateTime dateTime)
+        private static bool Update(SortedSet<Listing> listings, string fileNameWithoutExtension, string subdirectory)
         {
-            string filePathJson = Config.EXPORT_DIRECTORY + fileName + ".json";
-            string fileNameZip = fileName + ".zip";
-            string filePathZip = Config.EXPORT_DIRECTORY + fileNameZip;
-
-            File.Delete(filePathJson);
-            File.Delete(filePathZip);
-
-            bool sucess = false;
-
-            if (listings.Count > 0)
+            if (listings.Count.Equals(0))
             {
-                if (Json.ExportListings(listings, filePathJson))
+                return false;
+            }
+
+            string fileNameZip = fileNameWithoutExtension + ".zip";
+            string filePathZip = GetFilePath(subdirectory, fileNameZip);
+
+            string filePathJson = GetFilePath(subdirectory, fileNameWithoutExtension + ".json");
+
+            string subdirectoryInBucket = subdirectory.Replace("\\", "/");
+
+            if (Json.ExportListings(listings, filePathJson))
+            {
+                if (Zip.Compress(filePathJson, filePathZip))
                 {
-                    if (Zip.Compress(filePathJson, filePathZip))
+                    if (new S3().UploadFilePublicBucket(filePathZip, fileNameZip, subdirectoryInBucket))
                     {
-                        if (new S3().UploadFile(filePathZip, fileNameZip))
-                        {
-                            string newFileNameZip = GetFileName(fileName, dateTime) + ".zip";
-                            string newFilePathZip = Config.EXPORT_DIRECTORY + newFileNameZip;
+                        string newFileNameZip = GetFileNameWidhDate(fileNameWithoutExtension) + ".zip";
+                        string newFilePathZip = GetFilePath(subdirectory, newFileNameZip);
 
-                            File.Copy(filePathZip, newFilePathZip, true);
+                        File.Copy(filePathZip, newFilePathZip, true);
 
-                            if (new S3().UploadFile(newFilePathZip, newFileNameZip))
-                            {
-                                sucess = true;
-                            }
-                        }
+                        return new S3().UploadFilePublicBucket(newFilePathZip, newFileNameZip, subdirectoryInBucket);                        
                     }
                 }
             }
 
-            return sucess;
+            return false;
         }
 
-        private static string GetFileName(string prefix, DateTime dateTime)
+        private static string GetFilePath(string subdirectory, string fileName)
         {
-            string datePart = dateTime.ToString("yyyyMMdd");
+            return Config.EXPORT_DIRECTORY + subdirectory + "\\" + fileName;
+        }
+
+        private static string GetFileNameWidhDate(string prefix)
+        {
+            string datePart = DateTime.ToString("yyyyMMdd");
             return prefix + "_" + datePart;
         }
     }

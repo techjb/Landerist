@@ -10,7 +10,10 @@ namespace landerist_library.Export
             {
                 var schema = new Schema(listings);
                 string json = schema.Serialize();                
-                File.Delete(filePath);
+                if(File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                }                
                 File.WriteAllText(filePath, json);
                 return true;
             }

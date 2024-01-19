@@ -3,6 +3,7 @@ using landerist_library.Export;
 using landerist_library.Statistics;
 using landerist_library.Scrape;
 using landerist_library.Database;
+using landerist_library.Configuration;
 
 namespace landerist_service
 {
@@ -26,11 +27,11 @@ namespace landerist_service
             Logger.LogInformation("ExecuteAsync");
             while (!stoppingToken.IsCancellationRequested)
             {
-                Log.WriteLogInfo("service", "Service started");
+                Log.WriteLogInfo("service", "Started. Version: " + Config.VERSION);
                 SetTimers();
                 await Task.Delay(Timeout.Infinite, stoppingToken);
             }
-        }        
+        }
 
         private void SetTimers()
         {
@@ -52,7 +53,7 @@ namespace landerist_service
         {
             try
             {
-                FilesUpdater.Update();
+                FilesUpdater.UpdateFiles();
                 StatisticsSnapshot.TakeSnapshots();
                 Backup.Update();
             }
@@ -87,7 +88,7 @@ namespace landerist_service
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
             Logger.LogInformation("StopAsync");
-            Log.WriteLogInfo("service", "Service stopped");
+            Log.WriteLogInfo("service", "Stopped. Version: " + Config.VERSION);
             Timer1?.Change(Timeout.Infinite, 0);
             Timer2?.Change(Timeout.Infinite, 0);
             await base.StopAsync(cancellationToken);
