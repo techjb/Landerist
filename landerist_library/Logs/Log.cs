@@ -106,11 +106,6 @@ namespace landerist_library.Logs
             WriteLog(LogKeyInfo, source, text);
         }
 
-        public static void WriteLogScrapper(string source, string text)
-        {
-            WriteLog(LogKeyScrapper, source, text);
-        }
-
         public static void WriteLogInfo(Exception exception)
         {
             WriteLogInfo(string.Empty, exception);

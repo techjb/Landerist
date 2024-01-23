@@ -4,7 +4,7 @@
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "1.02";
+        public static readonly string VERSION = "1.05";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
@@ -14,13 +14,13 @@
 
         public static readonly int MAX_PAGES_PER_WEBSITE = 100;
 
-        public static readonly int PAGES_PER_SCRAPE = 10000;
+        public static readonly int PAGES_PER_SCRAPE = 20000;
 
         //public static readonly int MAX_LISTINGS_PER_WEBSITE = 100;
 
         public static readonly int MAX_RESPONSEBODYTEXT_LENGTH = 10000;
 
-        public static readonly int MAX_PAGE_TYPE_COUNTER = 1000;
+        public static readonly int MAX_PAGETYPE_COUNTER = 1000;
 
         public static readonly int MIN_RESPONSEBODYTEXT_LENGTH = 50;
 
@@ -32,8 +32,8 @@
 
         public static readonly int HTTPCLIENT_SECONDS_TIMEOUT = 10;
 
-        public static readonly int MAX_CRAW_DELAY_SECONDS = 120;        
-        
+        public static readonly int MAX_CRAW_DELAY_SECONDS = 120;
+
 
         public const string DATABASE_NAME = PrivateConfig.DATABASE_NAME;
 

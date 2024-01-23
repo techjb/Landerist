@@ -327,7 +327,7 @@ namespace landerist_library.Websites
                 PageTypeCounter = 1;
                 return;
             }
-            if (PageTypeCounter >= Config.MAX_PAGE_TYPE_COUNTER)
+            if (PageTypeCounter >= Config.MAX_PAGETYPE_COUNTER)
             {
                 return;
             }
