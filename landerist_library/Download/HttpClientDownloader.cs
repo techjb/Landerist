@@ -8,7 +8,7 @@ namespace landerist_library.Download
     {
         private HttpResponseMessage? HttpResponseMessage;
 
-        public bool Get(Page page)
+        public string? Get(Page page)
         {
             page.HttpStatusCode = null;
             page.InitializeResponseBody();
@@ -17,7 +17,7 @@ namespace landerist_library.Download
             return task.Result;
         }
 
-        private async Task<bool> GetAsync(Page page)
+        private async Task<string?> GetAsync(Page page)
         {
             HttpClientHandler handler = new()
             {
@@ -32,26 +32,21 @@ namespace landerist_library.Download
             httpClient.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
 
             HttpRequestMessage httpRequestMessage = new(HttpMethod.Get, page.Uri);
-
-            bool sucess = false;
-            HttpResponseMessage = null;
+            HttpResponseMessage = null;            
 
             try
             {
                 DateTime dateStart = DateTime.Now;
                 HttpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
                 Timers.Timer.SaveTimerDownloadPage(page.Uri.ToString(), dateStart);
-                sucess = HttpResponseMessage.IsSuccessStatusCode;
                 page.HttpStatusCode = (short)HttpResponseMessage.StatusCode;
-                string responseBody = await HttpResponseMessage.Content.ReadAsStringAsync();
-                page.SetResponseBody(responseBody);
-
+                return await HttpResponseMessage.Content.ReadAsStringAsync();                
             }
             catch (Exception exception)
             {
                 Logs.Log.WriteLogErrors(page.Uri, exception);
             }
-            return sucess;
+            return null;
         }
 
         private static void SetAccepLanguage(HttpClient httpClient, Page page)

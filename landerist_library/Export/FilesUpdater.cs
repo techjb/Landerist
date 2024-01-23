@@ -8,10 +8,10 @@ namespace landerist_library.Export
 {
     public class FilesUpdater
     {
-        private static DateTime DateTime;
+        private static DateTime Yesterday;
         public static void UpdateFiles()
         {
-            DateTime = DateTime.Now.AddDays(-1);
+            Yesterday = DateTime.Now.AddDays(-1);
             try
             {
                 UpdatFilesAllListings();
@@ -34,7 +34,7 @@ namespace landerist_library.Export
         private static void UpdateFilesUpdatedYesterday()
         {
             Console.WriteLine("Exporting updated yesterday ..");
-            var listings = ES_Listings.GetListings(true, DateTime);
+            var listings = ES_Listings.GetListings(true, Yesterday);
             bool sucess = Update(listings, "es_listings_update", "ES\\updated");
             Log.WriteLogInfo("UpdateFilesUpdatedYesterday", "Sucess: " + sucess.ToString());
         }
@@ -79,7 +79,7 @@ namespace landerist_library.Export
 
         private static string GetFileNameWidhDate(string prefix)
         {
-            string datePart = DateTime.ToString("yyyyMMdd");
+            string datePart = Yesterday.ToString("yyyyMMdd");
             return prefix + "_" + datePart;
         }
     }

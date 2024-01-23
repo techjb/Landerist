@@ -26,7 +26,7 @@ namespace landerist_library.Websites
 
         public short? PageTypeCounter { get; private set; }
 
-        private string? ResponseBody { get; set; }        
+        private string? ResponseBody { get; set; }
 
         public string? ResponseBodyText { get; set; }
 
@@ -194,7 +194,7 @@ namespace landerist_library.Websites
 
         public void LoadHtmlDocument(bool forceReload = false)
         {
-            if (HtmlDocument != null && !forceReload)
+            if (string.IsNullOrEmpty(ResponseBody) || (HtmlDocument != null && !forceReload))
             {
                 return;
             }
@@ -224,13 +224,12 @@ namespace landerist_library.Websites
             ResponseBody = null;
             ResponseBodyText = null;
         }
-
-        public string? GetResponseBody()
+        public bool ResponseBodyIsNullOrEmpty()
         {
-            return ResponseBody;
+            return string.IsNullOrEmpty(ResponseBody);
         }
 
-        public void SetResponseBody(string responseBody)
+        public void SetResponseBody(string? responseBody)
         {
             ResponseBody = responseBody;
         }

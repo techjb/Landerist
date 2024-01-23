@@ -2,7 +2,6 @@
 using landerist_library.Parse.Listing.ChatGPT;
 using landerist_library.Websites;
 
-
 namespace landerist_library.Parse.PageTypeParser
 {
     public class PageTypeParser
@@ -15,9 +14,9 @@ namespace landerist_library.Parse.PageTypeParser
 
         public static (PageType? pageType, landerist_orels.ES.Listing? listing) GetPageType(Page page)
         {
-            if (page == null || page.GetResponseBody() == null)
+            if (page == null || page.ResponseBodyIsNullOrEmpty())
             {
-                return (null, null);
+                return (PageType.DownloadError, null);
             }            
             if (page.IsMainPage())
             {

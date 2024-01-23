@@ -15,6 +15,7 @@
         ResponseBodyTooManyTokens,
         MayBeListing,
         Listing,
+        UnpublishedListing,
         NotListing,
     };
 }

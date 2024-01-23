@@ -1,5 +1,6 @@
 ﻿using landerist_library.Websites;
 using System.Collections.Concurrent;
+using landerist_library.Logs;
 
 namespace landerist_library.Scrape
 {
@@ -104,6 +105,9 @@ namespace landerist_library.Scrape
             DownloadErrorCounter = 0;
             MayBeListingCounter = 0;
             OtherPageType = 0;
+
+            Log.WriteLogScrapper("Scrape", "TotalCounter: " + TotalCounter);
+
             var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
             Parallel.ForEach(
                 orderablePartitioner,
@@ -115,7 +119,7 @@ namespace landerist_library.Scrape
                     StartThread();
                     ProcessThread(page);
                     EndThread();
-                });
+                });            
             return true;
         }
 

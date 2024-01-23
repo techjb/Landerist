@@ -16,6 +16,11 @@ namespace landerist_library.Parse.Location
 
         public void SetLatLng()
         {
+            if (Listing.latitude != null && Listing.longitude != null)
+            {
+                return;
+            }
+
             CatastralReferenceToLatLng();
             if (LatLngs.Count > 0)
             {

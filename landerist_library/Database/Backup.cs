@@ -21,7 +21,7 @@ namespace landerist_library.Database
             {
                 sucess = UploadBackup(fileName);
             }
-            Log.WriteLogInfo("backup", "CreateNewBackup " + fileName + " Sucess: " + sucess.ToString());
+            Log.WriteLogInfo("backup", fileName + " Sucess: " + sucess.ToString());
         }
 
         private static bool SaveBackup(string fileName)

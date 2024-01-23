@@ -10,6 +10,7 @@ namespace landerist_library.Logs
 
         public const string LogKeyError = "error";
         public const string LogKeyInfo = "info";
+        public const string LogKeyScrapper = "scrapper";
 
         private static void WriteLog(string logKey, string source, string text)
         {
@@ -103,6 +104,11 @@ namespace landerist_library.Logs
         public static void WriteLogInfo(string source, string text)
         {
             WriteLog(LogKeyInfo, source, text);
+        }
+
+        public static void WriteLogScrapper(string source, string text)
+        {
+            WriteLog(LogKeyScrapper, source, text);
         }
 
         public static void WriteLogInfo(Exception exception)

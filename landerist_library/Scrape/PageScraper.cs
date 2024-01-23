@@ -20,30 +20,39 @@ namespace landerist_library.Scrape
 
         public bool Scrape()
         {
-            if (HttpClientDownloader.Get(Page))
-            {
-                DownloadSucess();
-            }
-            else
-            {
-                DownloadError();
-            }
-            return Page.Update();
-        }
+            string? responseBody = HttpClientDownloader.Get(Page);
+            Page.SetResponseBody(responseBody);
 
-        private void DownloadSucess()
-        {
             SetPageType();
             UpdateIfListing();
+            RedirectIfError();
             IndexPages();
-        }
 
+            return Page.Update();
+        }
         private void SetPageType()
         {
             Page.LoadHtmlDocument();
-            var (pageType, listing) = PageTypeParser.GetPageType(Page);
-            Page.SetPageType(pageType);
+            var (newPageType, listing) = PageTypeParser.GetPageType(Page);
             Listing = listing;
+
+            SetToUnpublished(newPageType);
+            Page.SetPageType(newPageType);
+        }
+
+        private void SetToUnpublished(PageType? newPageType)
+        {
+            if (Page.PageType != null && Page.PageType.Equals(PageType.Listing))
+            {
+                if (newPageType != PageType.Listing)
+                {
+                    Listing ??= Page.GetListing(true);
+                    if (Listing != null)
+                    {
+                        Listing.listingStatus = ListingStatus.unpublished;
+                    }
+                }
+            }
         }
 
         private void UpdateIfListing()
@@ -90,7 +99,7 @@ namespace landerist_library.Scrape
                 return;
             }
 
-            if (Page.HtmlDocument == null || Page.Website == null)
+            if (Page.HtmlDocument == null)
             {
                 return;
             }
@@ -105,11 +114,9 @@ namespace landerist_library.Scrape
             }
         }
 
-        private void DownloadError()
+        private void RedirectIfError()
         {
-            Page.SetPageType(PageType.DownloadError);
-
-            if (Page.HttpStatusCode == null)
+            if (!Page.PageType.Equals(PageType.DownloadError) || Page.HttpStatusCode == null)
             {
                 return;
             }
