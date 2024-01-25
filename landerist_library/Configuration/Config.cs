@@ -4,7 +4,7 @@
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "1.05";
+        public static readonly string VERSION = "1.06";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
@@ -25,8 +25,7 @@
         public static readonly int MIN_RESPONSEBODYTEXT_LENGTH = 50;
 
         public static readonly bool LOGS_ENABLED = true;
-
-        public static readonly bool TIMERS_ENABLED = true;
+        public static bool TIMERS_ENABLED { get; set; }
 
         public static readonly string USER_AGENT = "Mozilla/5.0 (compatible; AcmeInc/1.0)";
 
@@ -136,6 +135,8 @@
             BACKUPS_DIRECTORY = ConfigurationProduction ?
                 BACKUPS_PRODUCTION_DIRECTORY :
                 BACKUPS_LOCAL_DIRECTORY;
+
+            TIMERS_ENABLED = !ConfigurationProduction;
         }
     }
 }

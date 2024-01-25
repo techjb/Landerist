@@ -202,7 +202,7 @@ namespace landerist_library.Scrape
             hashSet.Clear();
         }
 
-        public void Scrape(Uri uri)
+        public static void Scrape(Uri uri)
         {
             var page = new Page(uri);
             Scrape(page);

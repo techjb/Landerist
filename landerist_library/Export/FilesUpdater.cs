@@ -2,7 +2,6 @@
 using landerist_library.Database;
 using landerist_library.Logs;
 using landerist_orels.ES;
-using landerist_library.Websites;
 
 namespace landerist_library.Export
 {
@@ -14,8 +13,8 @@ namespace landerist_library.Export
             Yesterday = DateTime.Now.AddDays(-1);
             try
             {
-                UpdatFilesAllListings();
-                UpdateFilesUpdatedYesterday();
+                UpdateAllListings();
+                UpdateUpdatedYesterday();
             }
             catch (Exception exception)
             {
@@ -23,20 +22,18 @@ namespace landerist_library.Export
             }
         }
 
-        private static void UpdatFilesAllListings()
+        private static void UpdateAllListings()
         {
             Console.WriteLine("Exporting all listings ..");
             var listings = ES_Listings.GetListings(true);
-            bool sucess = Update(listings, "es_listings", "ES\\listings");
-            Log.WriteLogInfo("UpdatFilesAllListings", "Sucess: " + sucess.ToString());
+            Update(listings, "es_listings", "ES\\listings");
         }
 
-        private static void UpdateFilesUpdatedYesterday()
+        private static void UpdateUpdatedYesterday()
         {
             Console.WriteLine("Exporting updated yesterday ..");
             var listings = ES_Listings.GetListings(true, Yesterday);
-            bool sucess = Update(listings, "es_listings_update", "ES\\updated");
-            Log.WriteLogInfo("UpdateFilesUpdatedYesterday", "Sucess: " + sucess.ToString());
+            Update(listings, "es_listings_update", "ES\\updated");            
         }
 
         private static bool Update(SortedSet<Listing> listings, string fileNameWithoutExtension, string subdirectory)
@@ -48,10 +45,10 @@ namespace landerist_library.Export
 
             string fileNameZip = fileNameWithoutExtension + ".zip";
             string filePathZip = GetFilePath(subdirectory, fileNameZip);
-
             string filePathJson = GetFilePath(subdirectory, fileNameWithoutExtension + ".json");
-
             string subdirectoryInBucket = subdirectory.Replace("\\", "/");
+
+            bool sucess = false;
 
             if (Json.ExportListings(listings, filePathJson))
             {
@@ -64,12 +61,13 @@ namespace landerist_library.Export
 
                         File.Copy(filePathZip, newFilePathZip, true);
 
-                        return new S3().UploadFilePublicBucket(newFilePathZip, newFileNameZip, subdirectoryInBucket);                        
+                        sucess = new S3().UploadFilePublicBucket(newFilePathZip, newFileNameZip, subdirectoryInBucket);                        
                     }
                 }
             }
 
-            return false;
+            Log.WriteLogInfo("filesupdater", fileNameZip + " Sucess: " + sucess.ToString());
+            return sucess;
         }
 
         private static string GetFilePath(string subdirectory, string fileName)

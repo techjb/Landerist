@@ -19,7 +19,7 @@
             Console.WriteLine("Selecting pages ..");
 
             //Listings();
-            //NewPages();
+            NewPages();
             DownloadError();
             //MayBeListing();
         }

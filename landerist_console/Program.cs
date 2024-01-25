@@ -99,7 +99,7 @@ namespace landerist_console
             //new Scraper().ScrapeIsNotListing(uri);
             //new Scraper().Scrape(website);
             //new Scraper().ScrapeUnknowPageType(website);
-            //new Scraper().Scrape(uri);
+            //Scraper.Scrape(uri);
             //new Scraper().ScrapeAllPages();            
             //new Scraper().Start();
 
