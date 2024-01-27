@@ -38,7 +38,7 @@
 
         private static void DownloadError()
         {
-            var pages = landerist_library.Websites.Pages.GetPages(PageType.DownloadError, 3, 4);
+            var pages = landerist_library.Websites.Pages.GetPages(PageType.DownloadError, 3, 5);
             Pages.AddRange(pages);
         }
 
@@ -53,7 +53,7 @@
             if (Pages.Count > Configuration.Config.PAGES_PER_SCRAPE)
             {
                 Console.WriteLine("Filtering pages ..");
-                Pages = [.. Pages.OrderBy(o => o.Updated)];
+                Pages = [.. Pages.AsParallel().OrderBy(o => o.Updated)];
                 Pages = Pages.Take(Configuration.Config.PAGES_PER_SCRAPE).ToList();
             }
         }
