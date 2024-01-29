@@ -14,7 +14,7 @@ namespace landerist_library.Scrape
     {
         private readonly Page Page = page;
 
-        private Listing? Listing;
+        private Listing? NewListing;
 
         private readonly HttpClientDownloader HttpClientDownloader = new();
 
@@ -25,6 +25,7 @@ namespace landerist_library.Scrape
 
             SetPageType();
             UpdateIfListing();
+            UpdateIfUnPublishedListing();
             RedirectIfError();
             IndexPages();
 
@@ -33,62 +34,72 @@ namespace landerist_library.Scrape
         private void SetPageType()
         {
             Page.LoadHtmlDocument();
-            var (newPageType, listing) = PageTypeParser.GetPageType(Page);
-            Listing = listing;
+            var (newPageType, newListing) = PageTypeParser.GetPageType(Page);
+            NewListing = newListing;
 
-            SetToUnpublished(newPageType);
+            newPageType = SetToUnpublished(newPageType);
             Page.SetPageType(newPageType);
         }
 
-        private void SetToUnpublished(PageType? newPageType)
+        private PageType? SetToUnpublished(PageType? newPageType)
         {
-            if (Page.PageType != null && Page.PageType.Equals(PageType.Listing))
+            if (Page.PageType != null && Page.PageType.Equals(PageType.Listing) && newPageType != PageType.Listing)
             {
-                if (newPageType != PageType.Listing)
-                {
-                    Listing ??= Page.GetListing(true);
-                    if (Listing != null)
-                    {
-                        Listing.listingStatus = ListingStatus.unpublished;
-                    }
-                }
+                newPageType = PageType.UnpublishedListing;               
             }
+            return newPageType;
         }
 
         private void UpdateIfListing()
         {
             if (Page.PageType.Equals(PageType.Listing))
             {
-                Listing ??= Page.GetListing(true);
+                NewListing ??= Page.GetListing(true);
                 SetMedia();
                 SetLocation();
                 UpdateListing();
+            }            
+        }
+
+        private void UpdateIfUnPublishedListing()
+        {
+            if (Page.PageType.Equals(PageType.UnpublishedListing))
+            {
+                NewListing ??= Page.GetListing(true);
+                if (NewListing != null)
+                {
+                    NewListing.listingStatus = ListingStatus.unpublished;
+                    NewListing.unlistingDate = DateTime.Now;
+                    UpdateListing();
+                }
             }
         }
 
+
+
         private void SetMedia()
         {
-            if (Listing != null)
+            if (NewListing != null)
             {
                 MediaParser mediaParser = new(Page);
-                mediaParser.AddMedia(Listing);
+                mediaParser.AddMedia(NewListing);
             }
         }
 
         private void SetLocation()
         {
-            if (Listing != null)
+            if (NewListing != null)
             {
-                LatLngParser latLngParser = new(Page, Listing);
+                LatLngParser latLngParser = new(Page, NewListing);
                 latLngParser.SetLatLng();
             }
         }
 
         private void UpdateListing()
         {
-            if (Listing != null)
+            if (NewListing != null)
             {
-                ES_Listings.InsertUpdate(Page.Website, Listing);
+                ES_Listings.InsertUpdate(Page.Website, NewListing);
             }
         }
 

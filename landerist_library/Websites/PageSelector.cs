@@ -50,11 +50,42 @@
 
         private static void FilterPages()
         {
-            if (Pages.Count > Configuration.Config.PAGES_PER_SCRAPE)
+            FilterMaxPagesPerHost();
+            FilterMaxTotalPages();
+        }
+
+        private static void FilterMaxPagesPerHost()
+        {
+            List<Page> pages = [];
+            Dictionary<string, int> dictionary = [];
+            foreach (var page in Pages)
+            {
+                var host = page.Website.Host;
+                if (!dictionary.TryGetValue(host, out int value))
+                {
+                    pages.Add(page);
+                    dictionary.Add(host, 1);
+                }
+                else
+                {
+                    if (value < Configuration.Config.MAX_PAGES_PER_HOSTS_PER_SCRAPE)
+                    {
+                        pages.Add(page);
+                        dictionary[host] += 1;
+                    }
+                }
+            }
+
+            Pages = pages;
+        }
+
+        private static void FilterMaxTotalPages()
+        {
+            if (Pages.Count > Configuration.Config.MAX_TOTAL_PAGES_PER_SCRAPE)
             {
                 Console.WriteLine("Filtering pages ..");
                 Pages = [.. Pages.AsParallel().OrderBy(o => o.Updated)];
-                Pages = Pages.Take(Configuration.Config.PAGES_PER_SCRAPE).ToList();
+                Pages = Pages.Take(Configuration.Config.MAX_TOTAL_PAGES_PER_SCRAPE).ToList();
             }
         }
     }

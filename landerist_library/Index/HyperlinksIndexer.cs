@@ -14,11 +14,38 @@ namespace landerist_library.Index
             }
             try
             {
+                //var nodes = Page.HtmlDocument.DocumentNode.SelectNodes("//a");
+                //if (nodes == null)
+                //{
+                //    return;
+                //}
+                //List<string?> urls = [];
+                //foreach ( var node in nodes )
+                //{
+                //    if (IsHoneypotTrap(node))
+                //    {
+                //        continue;
+                //    }
+
+                //    string rel = node.GetAttributeValue("rel", null);
+                //    if(rel != null && rel.ToLower().Equals("nofollow"))
+                //    {
+                //        continue;
+                //    }
+
+                //    string href = node.GetAttributeValue("href", null);                    
+                //    if (string.IsNullOrEmpty(href))
+                //    {
+                //        continue;
+                //    }
+                //    urls.Add(href);
+                //}
+
                 var urls = Page.HtmlDocument.DocumentNode.Descendants("a")
                    .Where(a => !a.Attributes["rel"]?.Value.Contains("nofollow") ?? true)
                    .Where(a => !IsHoneypotTrap(a))
                    .Select(a => a.Attributes["href"]?.Value)
-                   .Where(href => !string.IsNullOrWhiteSpace(href))
+                   .Where(href => !string.IsNullOrEmpty(href))
                    .ToList();
 
                 if (urls != null)

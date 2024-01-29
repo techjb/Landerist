@@ -372,11 +372,29 @@ namespace landerist_library.Websites
         {
             return Pages.GetNonScrapedPages(this);
         }
-       
+
         public int GetNumPages()
         {
             return NumPages;
         }
+
+        public bool CanAddNewPages(bool readFromDataBase)
+        {
+            if (readFromDataBase)
+            {
+                string query =
+                "SELECT [NumPages] " +
+                "FROM " + Websites.TABLE_WEBSITES + " " +
+                "WHERE [Host] = @Host";
+
+                NumPages = new DataBase().QueryInt(query, new Dictionary<string, object?> {
+                    {"Host", Host }
+                });
+            }
+
+            return NumPages < Config.MAX_PAGES_PER_WEBSITE;
+        }
+
 
         public bool SetNumPagesToZero()
         {
@@ -459,7 +477,7 @@ namespace landerist_library.Websites
             {
                 Host = string.Empty;
                 IpAddress = null;
-                HttpStatusCode = null;                
+                HttpStatusCode = null;
                 Robots = null;
                 RobotsTxt = null;
             }

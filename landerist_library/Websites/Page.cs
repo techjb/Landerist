@@ -116,6 +116,10 @@ namespace landerist_library.Websites
 
         public bool Insert()
         {
+            if (!Website.CanAddNewPages(true))
+            {
+                return false;
+            }
             string query =
                 "INSERT INTO " + TABLE_PAGES + " " +
                 "VALUES(@Host, @Uri, @UriHash, @Inserted, NULL, NULL, NULL, NULL, NULL)";
