@@ -321,7 +321,7 @@ namespace landerist_library.Websites
         public static void Delete(Website website)
         {
             website.Delete();
-        }
+        }        
 
         private static bool Delete()
         {

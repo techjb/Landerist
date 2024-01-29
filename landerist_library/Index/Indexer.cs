@@ -31,10 +31,6 @@ namespace landerist_library.Index
 
         public void InsertUrl(string? link)
         {
-            if (!CanInsertNewUrls())
-            {
-                return;
-            }
             if (string.IsNullOrEmpty(link))
             {
                 return;
@@ -69,7 +65,7 @@ namespace landerist_library.Index
         
         protected void InsertUri(Uri uri)
         {
-            if (!Page.Website.CanAddNewPages(false))
+            if (!Page.Website.CanAddNewPages())
             {
                 return;
             }

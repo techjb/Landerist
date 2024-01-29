@@ -54,14 +54,16 @@ namespace landerist_library.Websites
             MainUri = new Uri("about:blank", UriKind.RelativeOrAbsolute);
         }
 
+        public Website(string host) : this()
+        {
+            Host = host;
+            LoadDataRow();
+        }
+
         public Website(Uri mainUri) : this()
         {
             SetMainUri(mainUri);
-            var dataRow = GetDataRow();
-            if (dataRow != null)
-            {
-                Load(dataRow);
-            }
+            LoadDataRow();
         }
 
         private void SetMainUri(Uri mainUri)
@@ -73,6 +75,15 @@ namespace landerist_library.Websites
         public Website(DataRow dataRow) : this()
         {
             Load(dataRow);
+        }
+
+        private void LoadDataRow()
+        {
+            var dataRow = GetDataRow();
+            if (dataRow != null)
+            {
+                Load(dataRow);
+            }
         }
 
         private DataRow? GetDataRow()
@@ -288,21 +299,24 @@ namespace landerist_library.Websites
         public void DeleteListings()
         {
             int counter = 0;
-            var pages = GetPages();
-            foreach (var page in pages)
+            var pages = GetPages();            
+            Parallel.ForEach(pages, page =>
             {
                 var listing = ES_Listings.GetListing(page, false);
                 if (listing != null)
                 {
-                    if (ES_Listings.Delete(page.Website, listing) &&
-                        ES_Media.Delete(listing))
+                    if (ES_Listings.Delete(listing))
                     {
+                        DecreaseNumListings();
+                        ES_Media.Delete(listing);
                         counter++;
                     }
                 }
-            }
+            });
+            
             Console.WriteLine("Deleted " + counter + " listings");
         }
+       
 
         private bool DeleteWebsite()
         {
@@ -378,19 +392,21 @@ namespace landerist_library.Websites
             return NumPages;
         }
 
-        public bool CanAddNewPages(bool readFromDataBase)
+        public bool CanAddNewPages()
         {
-            if (readFromDataBase)
+            if (NumPages >= Config.MAX_PAGES_PER_WEBSITE)
             {
-                string query =
+                return false;
+            }
+
+            string query =
                 "SELECT [NumPages] " +
                 "FROM " + Websites.TABLE_WEBSITES + " " +
                 "WHERE [Host] = @Host";
 
-                NumPages = new DataBase().QueryInt(query, new Dictionary<string, object?> {
+            NumPages = new DataBase().QueryInt(query, new Dictionary<string, object?> {
                     {"Host", Host }
                 });
-            }
 
             return NumPages < Config.MAX_PAGES_PER_WEBSITE;
         }

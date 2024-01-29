@@ -336,24 +336,19 @@ namespace landerist_library.Database
             return dataRow[columnName] is DBNull ? null : new Uri((string)dataRow[columnName]);
         }
 
-        public static bool Delete(Website website, Listing listing)
+        public static bool Delete(Listing listing)
         {
-            bool sucess = Delete(listing);
-            if (sucess)
-            {
-                website.DecreaseNumListings();
-            }
-            return sucess;
+            return Delete(listing.guid);            
         }
 
-        private static bool Delete(Listing listing)
+        public static bool Delete(string guid)
         {
             string query =
                 "DELETE FROM " + TABLE_ES_LISTINGS + " " +
                 "WHERE [guid] = @guid";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
-                {"guid", listing.guid }
+                {"guid", guid }
             });
         }
 

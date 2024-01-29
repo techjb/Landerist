@@ -296,5 +296,38 @@ namespace landerist_library.Websites
                 Interlocked.Increment(ref counter);
             });
         }
+
+        public static void DeleteNumPagesExceded()
+        {
+            string query =
+                "SELECT [Host] " +
+                "FROM " + TABLE_PAGES + " " +
+                "GROUP BY [Host] " +
+                "HAVING COUNT(*) > " + Configuration.Config.MAX_PAGES_PER_WEBSITE;
+
+            DataTable dataTable = new DataBase().QueryTable(query);
+            int total = dataTable.Rows.Count;
+            int counter = 0;
+            Parallel.ForEach(dataTable.AsEnumerable(), dataRow =>
+            {
+                Console.WriteLine(counter++ + "/" + total);
+                string host = (string)dataRow[0];
+                Website website = new(host);
+                var pages = website.GetPages();
+                int pageCounter = 0;
+                foreach (var page in pages)
+                {
+                    pageCounter++;
+                    if (page.IsMainPage())
+                    {
+                        continue;
+                    }
+                    if (pageCounter > Configuration.Config.MAX_PAGES_PER_WEBSITE)
+                    {
+                        page.Delete();
+                    }
+                }
+            });
+        }
     }
 }

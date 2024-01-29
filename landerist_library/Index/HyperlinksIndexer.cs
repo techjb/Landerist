@@ -41,6 +41,7 @@ namespace landerist_library.Index
                 //    urls.Add(href);
                 //}
 
+                // todo: select all nodes: Page.HtmlDocument.DocumentNode.SelectNodes("//a");
                 var urls = Page.HtmlDocument.DocumentNode.Descendants("a")
                    .Where(a => !a.Attributes["rel"]?.Value.Contains("nofollow") ?? true)
                    .Where(a => !IsHoneypotTrap(a))

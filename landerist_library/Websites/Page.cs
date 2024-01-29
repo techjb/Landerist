@@ -116,10 +116,6 @@ namespace landerist_library.Websites
 
         public bool Insert()
         {
-            if (!Website.CanAddNewPages(true))
-            {
-                return false;
-            }
             string query =
                 "INSERT INTO " + TABLE_PAGES + " " +
                 "VALUES(@Host, @Uri, @UriHash, @Inserted, NULL, NULL, NULL, NULL, NULL)";
@@ -178,7 +174,9 @@ namespace landerist_library.Websites
             if (sucess)
             {
                 Website.DecreaseNumPages();
-            }
+                ES_Listings.Delete(UriHash);
+                ES_Media.Delete(UriHash);
+    }
             return sucess;
         }
 
