@@ -308,26 +308,27 @@ namespace landerist_library.Websites
             DataTable dataTable = new DataBase().QueryTable(query);
             int total = dataTable.Rows.Count;
             int counter = 0;
-            Parallel.ForEach(dataTable.AsEnumerable(), dataRow =>
+            foreach(DataRow dataRow in dataTable.Rows) 
             {
                 Console.WriteLine(counter++ + "/" + total);
-                string host = (string)dataRow[0];
+                string host = (string)dataRow[0];                
                 Website website = new(host);
                 var pages = website.GetPages();
                 int pageCounter = 0;
-                foreach (var page in pages)
+
+                Parallel.ForEach(pages, page =>
                 {
-                    pageCounter++;
+                    Interlocked.Increment(ref pageCounter);
                     if (page.IsMainPage())
                     {
-                        continue;
+                        return;
                     }
                     if (pageCounter > Configuration.Config.MAX_PAGES_PER_WEBSITE)
                     {
                         page.Delete();
                     }
-                }
-            });
+                });
+            };
         }
     }
 }

@@ -65,11 +65,6 @@ namespace landerist_library.Index
         
         protected void InsertUri(Uri uri)
         {
-            if (!Page.Website.CanAddNewPages())
-            {
-                return;
-            }
-
             if (Inserted.Contains(uri))
             {
                 return;
@@ -100,6 +95,10 @@ namespace landerist_library.Index
                 return;
             }
             if (Page.Website.MainUri.Equals(uri))
+            {
+                return;
+            }
+            if (!Page.Website.CanAddNewPages())
             {
                 return;
             }

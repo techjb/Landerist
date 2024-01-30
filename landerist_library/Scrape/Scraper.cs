@@ -111,8 +111,9 @@ namespace landerist_library.Scrape
             var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
             Parallel.ForEach(
                 orderablePartitioner,
-                new ParallelOptions() { 
+                new ParallelOptions() {
                     MaxDegreeOfParallelism = Environment.ProcessorCount - 1 
+                    //MaxDegreeOfParallelism = 1
                 },
                 (page, state) =>
                 {

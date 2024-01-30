@@ -72,6 +72,8 @@ namespace landerist_console
             //var uri = new Uri("http://www.abbeyproperties.eu/ficha-inmueble.php/?cod_inmueble=888933");
             //var uri = new Uri("https://www.bonninsanso.com/es/fincas/compra/menorca/zona/mercadal-zona/addaya/");
 
+            //Config.SetToProduction();
+
             //var website = new Website(uri);
             //var page = new Page(website, uriPage);            
 
@@ -93,11 +95,9 @@ namespace landerist_console
             //Websites.CountCanAccesToMainUri();
             //Websites.CountRobotsSiteMaps();            
             //Websites.InsertMainPages();
+            //Websites.UpdateNumPages();
 
-            Config.SetToProduction();
-            //Website website = new ("www.bonninsanso.com");
-            //website.Delete();
-            Pages.DeleteNumPagesExceded();
+            //Pages.DeleteNumPagesExceded();
 
             //new Scraper(false).ScrapeUnknowPageType(10000);
             //new Scraper().ScrapeMainPage(website);
@@ -108,6 +108,7 @@ namespace landerist_console
             //new Scraper().ScrapeUnknowPageType(website);
             //Scraper.Scrape(uri);
             //new Scraper().ScrapeAllPages();            
+            
             //new Scraper().Start();
 
             //landerist_library.Parse.Listing.ListingsParser.Start();            

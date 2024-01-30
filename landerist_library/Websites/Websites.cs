@@ -1,5 +1,6 @@
 ﻿using landerist_library.Database;
 using System.Data;
+using System.Runtime.InteropServices;
 
 namespace landerist_library.Websites
 {
@@ -321,7 +322,7 @@ namespace landerist_library.Websites
         public static void Delete(Website website)
         {
             website.Delete();
-        }        
+        }
 
         private static bool Delete()
         {
@@ -337,6 +338,47 @@ namespace landerist_library.Websites
             Pages.DeleteAll();
             ES_Listings.Delete();
             ES_Media.Delete();
+        }
+
+        public static void UpdateNumPages()
+        {
+            var websites = GetAll();
+            int total = websites.Count;
+            int counter = 0;
+            Parallel.ForEach(websites, website =>
+            {
+                counter++;
+                Console.WriteLine(counter + "/" + total);
+                UpdateNumPages(website);
+            });
+        }
+
+        public static bool UpdateNumPages(Website website)
+        {
+            int numPages = CalculateNumPages(website);
+            string query =
+                "UPDATE " + TABLE_WEBSITES + " " +
+                "SET [NumPages] = @NumPages " +
+                "WHERE [Host] = @Host";
+
+            return new DataBase().Query(query, new Dictionary<string, object?>()
+            {
+                {"Host", website.Host},
+                {"NumPages",numPages }
+            });
+        }
+
+        private static int CalculateNumPages(Website website)
+        {
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + Pages.TABLE_PAGES + " " +
+                "WHERE [Host] = @Host";
+
+            return new DataBase().QueryInt(query, new Dictionary<string, object?>()
+            {
+                {"Host", website.Host}
+            });
         }
     }
 }

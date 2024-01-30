@@ -50,6 +50,7 @@
 
         private static void FilterPages()
         {
+            Console.WriteLine("Filtering pages ..");
             FilterMaxPagesPerHost();
             FilterMaxTotalPages();
         }
@@ -83,7 +84,6 @@
         {
             if (Pages.Count > Configuration.Config.MAX_TOTAL_PAGES_PER_SCRAPE)
             {
-                Console.WriteLine("Filtering pages ..");
                 Pages = [.. Pages.AsParallel().OrderBy(o => o.Updated)];
                 Pages = Pages.Take(Configuration.Config.MAX_TOTAL_PAGES_PER_SCRAPE).ToList();
             }
