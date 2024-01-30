@@ -46,10 +46,22 @@ namespace landerist_library.Parse.Media
                 "//code | //canvas | //input | //option | " +
                 "//select | //progress | //svg | //textarea | //del";
 
-            var nodesToRemove = Page.HtmlDocument.DocumentNode.SelectNodes(xPath).ToList();
-            foreach (var node in nodesToRemove)
+            List<HtmlNode>? nodesToRemove = null;
+
+            try
             {
-                node.Remove();
+                nodesToRemove = [.. Page.HtmlDocument.DocumentNode.SelectNodes(xPath)];                 
+            }
+            catch
+            {
+
+            }
+            if (nodesToRemove is not null)
+            {
+                foreach (var node in nodesToRemove)
+                {
+                    node.Remove();
+                }
             }
         }
 

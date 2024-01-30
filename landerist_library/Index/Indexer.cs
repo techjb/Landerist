@@ -65,7 +65,7 @@ namespace landerist_library.Index
         
         protected void InsertUri(Uri uri)
         {
-            if (Page.Website.AddNewPagesBlocked())
+            if (Page.Website.AchievedMaxNumberOfPages())
             {
                 return;
             }

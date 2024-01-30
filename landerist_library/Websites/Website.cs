@@ -392,14 +392,14 @@ namespace landerist_library.Websites
             return NumPages;
         }
 
-        public bool AddNewPagesBlocked()
+        public bool AchievedMaxNumberOfPages()
         {
             return NumPages >= Config.MAX_PAGES_PER_WEBSITE;
         }
 
         public bool CanAddNewPages()
         {
-            if (AddNewPagesBlocked())
+            if (AchievedMaxNumberOfPages())
             {
                 return false;
             }

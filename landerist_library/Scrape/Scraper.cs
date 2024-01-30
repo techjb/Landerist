@@ -106,21 +106,23 @@ namespace landerist_library.Scrape
             MayBeListingCounter = 0;
             OtherPageType = 0;
 
-            Log.WriteLogInfo("scraper", "TotalCounter: " + TotalCounter);
+            Log.WriteLogInfo("scraper", "Start: " + TotalCounter);
 
             var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
             Parallel.ForEach(
                 orderablePartitioner,
                 new ParallelOptions() {
-                    MaxDegreeOfParallelism = Environment.ProcessorCount - 1 
-                    //MaxDegreeOfParallelism = 1
+                    //MaxDegreeOfParallelism = Environment.ProcessorCount - 1 
+                    MaxDegreeOfParallelism = 1
                 },
                 (page, state) =>
                 {
                     StartThread();
                     ProcessThread(page);
                     EndThread();
-                });            
+                });
+
+            Log.WriteLogInfo("scraper", "End: " + Scraped + "/" + TotalCounter);
             return true;
         }
 
@@ -131,43 +133,38 @@ namespace landerist_library.Scrape
 
         private static void ProcessThread(Page page)
         {
-            if (!IsScrapeable(page))
+            if (!page.Website.IsAllowedByRobotsTxt(page.Uri))
             {
-                return;
+                page.Update(PageType.BlockedByRobotsTxt);
             }
-
-            if (IsBlocked(page) && !BlockingCollection.IsCompleted)
+            else if (page.Website.CrawlDelayTooBig())
             {
-                BlockingCollection.Add(page);
+                page.Update(PageType.RobotsTxtDisallow);
             }
             else
             {
-                Scrape(page);
-                page.Dispose();
-                Interlocked.Increment(ref Scraped);
-                Interlocked.Decrement(ref Remaining);
+                if (IsBlocked(page) && !BlockingCollection.IsCompleted)
+                {
+                    BlockingCollection.Add(page);
+                }
+                else
+                {
+                    Scrape(page);
+                    page.Dispose();
+                    Interlocked.Increment(ref Scraped);
+                    Interlocked.Decrement(ref Remaining);
+                }
             }
 
             WriteConsole();
         }
 
-        private static bool IsScrapeable(Page page)
-        {
-            if (!page.Website.IsAllowedByRobotsTxt(page.Uri))
-            {
-                page.Update(PageType.BlockedByRobotsTxt);
-                return false;
-            }
-            if (page.Website.CrawlDelayTooBig())
-            {
-                page.Update(PageType.RobotsTxtDisallow);
-                return false;
-            }
-            return true;
-        }
-
         private static void WriteConsole()
         {
+            if (Configuration.Config.IsConfigurationProduction())
+            {
+                return;
+            }
             var scrappedPercentage = Math.Round((float)Scraped * 100 / TotalCounter, 0);
             var downloadErrorPercentage = Math.Round((float)DownloadErrorCounter * 100 / TotalCounter, 0);
             var mayBeListingPercentage = Math.Round((float)MayBeListingCounter * 100 / Scraped, 0);
@@ -218,7 +215,7 @@ namespace landerist_library.Scrape
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors(page.Uri, exception);
+                Log.WriteLogErrors(page.Uri, exception);
             }
             IncrementCounters(page);
         }
