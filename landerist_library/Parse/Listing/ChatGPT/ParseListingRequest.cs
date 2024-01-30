@@ -68,7 +68,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("ParseListingRequest Parse", exception);
+                Logs.Log.WriteLogErrors("ParseListingRequest Parse", page.Uri, exception);
             }
             return (pageType, listing);
         }

@@ -198,7 +198,7 @@ namespace landerist_library.Websites
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors(MainUri, exception);
+                Logs.Log.WriteLogErrors("Website SetMainUriAndStatusCode", MainUri, exception);
             }
             return false;
         }
@@ -221,7 +221,7 @@ namespace landerist_library.Websites
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors(robotsTxtUrl, exception);
+                Logs.Log.WriteLogErrors("Website SetRobotsTxt", robotsTxtUrl, exception);
             }
             return false;
         }

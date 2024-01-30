@@ -44,7 +44,7 @@ namespace landerist_library.Download
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors(page.Uri, exception);
+                Logs.Log.WriteLogErrors("HttpClientDownloader GetAsync", page.Uri, exception);
             }
             return null;
         }

@@ -215,7 +215,7 @@ namespace landerist_library.Scrape
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors(page.Uri, exception);
+                Log.WriteLogErrors("Scraper Scrape", page.Uri, exception);
             }
             IncrementCounters(page);
         }

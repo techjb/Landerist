@@ -25,7 +25,7 @@ namespace landerist_library.Index
             }
             catch (Exception ecception)
             {
-                Logs.Log.WriteLogErrors(Page.Uri, ecception);
+                Logs.Log.WriteLogErrors("LinkAlternateIndexer InsertLinksAlternate", Page.Uri, ecception);
             }
         }
 

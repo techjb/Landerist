@@ -96,9 +96,16 @@ namespace landerist_library.Logs
             WriteLogErrors(source, textError);
         }
 
+        public static void WriteLogErrors(string source, Uri uri, Exception exception)
+        {
+            source += " " + uri.ToString();
+            WriteLogErrors(source, exception);
+        }
+
         public static void WriteLogErrors(Uri uri, Exception exception)
         {
-            WriteLogErrors(uri.ToString(), exception);
+            string source = uri.ToString();
+            WriteLogErrors(source, exception);
         }
 
         public static void WriteLogInfo(string source, string text)
