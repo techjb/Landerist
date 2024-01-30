@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace landerist_library.Index
 {
-    public class HyperlinksIndexer(Page page) : Indexer(page)
+    public partial class HyperlinksIndexer(Page page) : Indexer(page)
     {
         public void Insert()
         {
@@ -67,7 +67,7 @@ namespace landerist_library.Index
                 var style = link.GetAttributeValue("style", string.Empty);
                 if (!string.IsNullOrEmpty(style))
                 {
-                    var regex = new Regex(@"display\s*:\s*none|visibility\s*:\s*hidden", RegexOptions.IgnoreCase);
+                    var regex = DisplayNoneOrVisibilityHidden();
                     return regex.IsMatch(style);
                 }
             }
@@ -77,5 +77,8 @@ namespace landerist_library.Index
 
             return false;
         }
+
+        [GeneratedRegex(@"display\s*:\s*none|visibility\s*:\s*hidden", RegexOptions.IgnoreCase, "es-ES")]
+        private static partial Regex DisplayNoneOrVisibilityHidden();
     }
 }
