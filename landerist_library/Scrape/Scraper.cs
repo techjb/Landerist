@@ -122,7 +122,7 @@ namespace landerist_library.Scrape
                     EndThread();
                 });
 
-            Log.WriteLogInfo("scraper", "End: " + Scraped + "/" + TotalCounter);
+            Log.WriteLogInfo("scraper", "End");
             return true;
         }
 

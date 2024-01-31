@@ -3,10 +3,14 @@ using landerist_library.Database;
 using landerist_library.Export;
 using landerist_library.Logs;
 using landerist_library.Parse.Listing.ChatGPT;
+using landerist_library.Parse.Location;
+using landerist_library.Parse.Location.Delimitations;
 using landerist_library.Scrape;
 using landerist_library.Statistics;
 using landerist_library.Websites;
 using OpenAI;
+using OpenQA.Selenium;
+using System.Globalization;
 using System.Net;
 using System.Reflection;
 using System.Text.Json;
@@ -155,7 +159,6 @@ namespace landerist_console
             //Backup.Update();
 
             //landerist_library.Statistics.StatisticsSnapshot.TakeSnapshots();            
-            
         }
     }
 }

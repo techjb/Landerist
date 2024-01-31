@@ -76,24 +76,42 @@ namespace landerist_library.Parse.Location
             }
         }
 
-        private void LatLngIframeGoogleMaps(string src)
+        public void LatLngIframeGoogleMaps(string src)
         {
-            if (!src.Contains("https://www.google.com/maps/embed?pb=") &&
-                !src.Contains("!2d") &&
-                !src.Contains("!3d"))
+            if (!src.Contains("https://www.google.com/maps/embed?pb="))
             {
                 return;
             }
 
+            // in this order.
+            if(src.Contains("!2d") && src.Contains("!3d"))
+            {
+                LatLngIframeGoogleMaps(src, "!2d", "!3d", false);
+            }
+            else if (src.Contains("!1d") && src.Contains("!2d"))
+            {
+                LatLngIframeGoogleMaps(src, "!1d", "!2d", true);
+            }
+        }
+
+        private void LatLngIframeGoogleMaps(string src, string key1, string key2, bool inverted)
+        {
             try
             {
-                var lng = src[(src.IndexOf("!2d") + 3)..];
-                lng = lng[..lng.IndexOf("!3d")];
+                var lng = src[(src.IndexOf(key1) + key1.Length)..];
+                lng = lng[..lng.IndexOf('!')];
 
-                var lat = src[(src.IndexOf("!3d") + 3)..];
+                var lat = src[(src.IndexOf(key2) + key2.Length)..];
                 lat = lat[..lat.IndexOf('!')];
 
-                AddLatLng(lat, lng, false);
+                if(inverted)
+                {
+                    AddLatLng(lat, lng, false);
+                }
+                else
+                {
+                    AddLatLng(lng, lat, false);
+                }                
             }
             catch (Exception exception)
             {

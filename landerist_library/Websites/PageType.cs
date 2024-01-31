@@ -7,7 +7,7 @@
         BlockedByRobotsTxt,
         RobotsTxtDisallow,
         MainPage,
-        NotIndexable,
+        NotIndexable,        
         ResponseBodyIsError,
         ResponseBodyTooLarge,
         ResponseBodyTooShort,
@@ -16,5 +16,6 @@
         Listing,
         UnpublishedListing,
         NotListing,
+        NotListingByLastSegment,
     };
 }

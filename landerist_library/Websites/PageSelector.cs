@@ -15,8 +15,8 @@
         private static void SelectPages()
         {
             Console.WriteLine("Selecting pages ..");
+            
             AddUnknowPageType();
-
             AddPages(PageType.DownloadError, 3, 5);
             AddPages(PageType.IncorrectLanguage, 3, 5);
             AddPages(PageType.BlockedByRobotsTxt, 3, 5);
@@ -31,6 +31,7 @@
             //AddPages(PageType.Listing, 3, 1);
             AddPages(PageType.UnpublishedListing, 3, 2);
             //AddPages(PageType.NotListing, 3, 5);
+            AddPages(PageType.NotListingByLastSegment, 3, 5);
         }
 
         private static void AddUnknowPageType()

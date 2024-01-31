@@ -101,11 +101,7 @@ namespace landerist_library.Index
             if (Page.Website.MainUri.Equals(uri))
             {
                 return;
-            }
-            if (LastSegment.LastSegmentIsForbidden(uri))
-            {
-                return;
-            }
+            }            
             if (!Page.Website.CanAddNewPages())
             {
                 return;
