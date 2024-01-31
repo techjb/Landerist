@@ -1,4 +1,5 @@
-﻿using landerist_library.Websites;
+﻿using landerist_library.Parse.PageTypeParser;
+using landerist_library.Websites;
 
 namespace landerist_library.Index
 {
@@ -93,12 +94,15 @@ namespace landerist_library.Index
             {
                 return;
             }
-
             if (!Page.Website.IsAllowedByRobotsTxt(uri))
             {
                 return;
             }
             if (Page.Website.MainUri.Equals(uri))
+            {
+                return;
+            }
+            if (LastSegment.LastSegmentIsForbidden(uri))
             {
                 return;
             }

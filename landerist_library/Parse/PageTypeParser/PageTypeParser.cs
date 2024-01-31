@@ -25,11 +25,7 @@ namespace landerist_library.Parse.PageTypeParser
             if (!page.IsIndexable())
             {
                 return (PageType.NotIndexable, null);
-            }
-            if (LastSegment.LastSegmentOfUrlIsForbidden(page.Uri))
-            {
-                return (PageType.ForbiddenLastSegment, null);
-            }
+            }            
             if (!IsCorrectLanguage(page))
             {
                 return (PageType.IncorrectLanguage, null);

@@ -70,7 +70,7 @@ namespace landerist_console
             //var uri = new Uri("https://www.badainmobiliaria.com");
             //var uri = new Uri("http://alicante-casas.com/ad/100262248");
             //var uri = new Uri("http://www.abbeyproperties.eu/ficha-inmueble.php/?cod_inmueble=888933");
-            var uri = new Uri("https://aquitienesloquebuscas.com/inmobiliaria/index.php/las-ofertas-de-apartamentos?start=20");
+            //var uri = new Uri("https://aquitienesloquebuscas.com/inmobiliaria/index.php/las-ofertas-de-apartamentos?start=20");
 
             Config.SetToProduction();
 
@@ -98,6 +98,7 @@ namespace landerist_console
             //Websites.UpdateNumPages();
 
             //Pages.DeleteNumPagesExceded();
+            //Pages.Delete(PageType.ForbiddenLastSegment);
 
             //new Scraper(false).ScrapeUnknowPageType(10000);
             //new Scraper().ScrapeMainPage(website);
@@ -106,7 +107,7 @@ namespace landerist_console
             //new Scraper().ScrapeIsNotListing(uri);
             //new Scraper().Scrape(website);
             //new Scraper().ScrapeUnknowPageType(website);
-            Scraper.Scrape(uri);
+            //Scraper.Scrape(uri);
             //new Scraper().ScrapeAllPages();            
             
             //new Scraper().Start();

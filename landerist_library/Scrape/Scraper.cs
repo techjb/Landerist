@@ -112,8 +112,8 @@ namespace landerist_library.Scrape
             Parallel.ForEach(
                 orderablePartitioner,
                 new ParallelOptions() {
-                    //MaxDegreeOfParallelism = Environment.ProcessorCount - 1 
-                    MaxDegreeOfParallelism = 1
+                    MaxDegreeOfParallelism = Environment.ProcessorCount - 1 
+                    //MaxDegreeOfParallelism = 1
                 },
                 (page, state) =>
                 {

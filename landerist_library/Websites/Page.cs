@@ -176,7 +176,7 @@ namespace landerist_library.Websites
                 Website.DecreaseNumPages();
                 ES_Listings.Delete(UriHash);
                 ES_Media.Delete(UriHash);
-    }
+            }
             return sucess;
         }
 

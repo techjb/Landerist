@@ -7,44 +7,41 @@
         public static List<Page> Select()
         {
             Pages.Clear();
-
             SelectPages();
             FilterPages();
-
             return Pages;
         }
 
         private static void SelectPages()
         {
             Console.WriteLine("Selecting pages ..");
+            AddUnknowPageType();
 
-            //Listings();
-            NewPages();
-            DownloadError();
-            MayBeListing();
+            AddPages(PageType.DownloadError, 3, 5);
+            AddPages(PageType.IncorrectLanguage, 3, 5);
+            AddPages(PageType.BlockedByRobotsTxt, 3, 5);
+            AddPages(PageType.RobotsTxtDisallow, 3, 5);
+            AddPages(PageType.MainPage, 3);
+            AddPages(PageType.NotIndexable, 3, 5);
+            AddPages(PageType.ResponseBodyIsError, 3, 5);
+            AddPages(PageType.ResponseBodyTooLarge, 3, 5);
+            AddPages(PageType.ResponseBodyTooShort, 3, 5);
+            AddPages(PageType.ResponseBodyTooManyTokens, 3, 5);
+            AddPages(PageType.MayBeListing, 1);
+            //AddPages(PageType.Listing, 3, 1);
+            AddPages(PageType.UnpublishedListing, 3, 2);
+            //AddPages(PageType.NotListing, 3, 5);
         }
 
-        private static void Listings()
-        {
-            var pages = landerist_library.Websites.Pages.GetPages(PageType.Listing, 3, 2);
-            Pages.AddRange(pages);
-        }
-
-        private static void NewPages()
+        private static void AddUnknowPageType()
         {
             var pages = landerist_library.Websites.Pages.GetUnknownPageType();
             Pages.AddRange(pages);
         }
 
-        private static void DownloadError()
+        private static void AddPages(PageType pageType, int lastUpdate, int? pageTypeCounterMultiplier = null)
         {
-            var pages = landerist_library.Websites.Pages.GetPages(PageType.DownloadError, 3, 5);
-            Pages.AddRange(pages);
-        }
-
-        private static void MayBeListing()
-        {
-            var pages = landerist_library.Websites.Pages.GetPages(PageType.MayBeListing, 1);
+            var pages = landerist_library.Websites.Pages.GetPages(pageType, lastUpdate, pageTypeCounterMultiplier);
             Pages.AddRange(pages);
         }
 
@@ -53,6 +50,7 @@
             Console.WriteLine("Filtering pages ..");
             FilterMaxPagesPerHost();
             FilterMaxTotalPages();
+            FilterMinTotalPages();
         }
 
         private static void FilterMaxPagesPerHost()
@@ -64,17 +62,17 @@
                 var host = page.Website.Host;
                 if (!dictionary.TryGetValue(host, out int value))
                 {
-                    pages.Add(page);
-                    dictionary.Add(host, 1);
+                    dictionary[host] = 1;
                 }
                 else
                 {
-                    if (value < Configuration.Config.MAX_PAGES_PER_HOSTS_PER_SCRAPE)
+                    if (value >= Configuration.Config.MAX_PAGES_PER_HOSTS_PER_SCRAPE)
                     {
-                        pages.Add(page);
-                        dictionary[host] += 1;
+                        continue;
                     }
+                    dictionary[host] = value + 1;
                 }
+                pages.Add(page);
             }
 
             Pages = pages;
@@ -82,10 +80,18 @@
 
         private static void FilterMaxTotalPages()
         {
-            if (Pages.Count > Configuration.Config.MAX_TOTAL_PAGES_PER_SCRAPE)
+            if (Pages.Count > Configuration.Config.MAX_PAGES_PER_SCRAPE)
             {
                 Pages = [.. Pages.AsParallel().OrderBy(o => o.Updated)];
-                Pages = Pages.Take(Configuration.Config.MAX_TOTAL_PAGES_PER_SCRAPE).ToList();
+                Pages = Pages.Take(Configuration.Config.MAX_PAGES_PER_SCRAPE).ToList();
+            }
+        }
+
+        private static void FilterMinTotalPages()
+        {
+            if (Pages.Count < Configuration.Config.MIN_PAGES_PER_SCRAPE)
+            {
+                Pages.Clear();
             }
         }
     }

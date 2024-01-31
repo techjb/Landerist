@@ -8,7 +8,6 @@
         RobotsTxtDisallow,
         MainPage,
         NotIndexable,
-        ForbiddenLastSegment,
         ResponseBodyIsError,
         ResponseBodyTooLarge,
         ResponseBodyTooShort,

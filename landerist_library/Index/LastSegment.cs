@@ -146,7 +146,7 @@ namespace landerist_library.Parse.PageTypeParser
             "properties",
         };
 
-        public static bool LastSegmentOfUrlIsForbidden(Uri uri)
+        public static bool LastSegmentIsForbidden(Uri uri)
         {
             if (!string.IsNullOrEmpty(uri.Query))
             {

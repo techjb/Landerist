@@ -308,10 +308,10 @@ namespace landerist_library.Websites
             DataTable dataTable = new DataBase().QueryTable(query);
             int total = dataTable.Rows.Count;
             int counter = 0;
-            foreach(DataRow dataRow in dataTable.Rows) 
+            foreach (DataRow dataRow in dataTable.Rows)
             {
                 Console.WriteLine(counter++ + "/" + total);
-                string host = (string)dataRow[0];                
+                string host = (string)dataRow[0];
                 Website website = new(host);
                 var pages = website.GetPages();
                 int pageCounter = 0;
@@ -329,6 +329,19 @@ namespace landerist_library.Websites
                     }
                 });
             };
+        }
+
+        public static void Delete(PageType pageType)
+        {
+            var pages = GetPages(pageType);
+            int total = pages.Count;
+            int counter = 0;
+            Parallel.ForEach(pages, page =>
+            {
+                Interlocked.Increment(ref counter);
+                Console.WriteLine(counter + "/" + total);
+                page.Delete();
+            });
         }
     }
 }
