@@ -91,13 +91,13 @@ namespace landerist_library.Parse.Location
                 lng = lng[..lng.IndexOf("!3d")];
 
                 var lat = src[(src.IndexOf("!3d") + 3)..];
-                lat = lat[..lat.IndexOf("!")];
+                lat = lat[..lat.IndexOf('!')];
 
                 AddLatLng(lat, lng, false);
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors(exception);
+                Logs.Log.WriteLogErrors("LatLngParser LatLngIframeGoogleMaps", src, exception);
             }
         }
 
@@ -131,7 +131,7 @@ namespace landerist_library.Parse.Location
                 foreach (Group group in match.Groups.Cast<Group>())
                 {
                     var value = group.Value;
-                    if (value.StartsWith("."))
+                    if (value.StartsWith('.'))
                     {
                         continue;
                     }

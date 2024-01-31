@@ -69,6 +69,11 @@ namespace landerist_library.Logs
                 });
         }
 
+        private static string GetText(string text, Exception exception)
+        {
+            return text + " " + GetText(exception);
+        }
+
         private static string GetText(Exception exception)
         {
             return
@@ -85,9 +90,10 @@ namespace landerist_library.Logs
             WriteLog(LogKeyError, source, text);
         }
 
-        public static void WriteLogErrors(Exception exception)
+        public static void WriteLogErrors(string source, string text, Exception exception)
         {
-            WriteLogErrors(string.Empty, exception);
+            string textError = GetText(text, exception);
+            WriteLogErrors(source, textError);
         }
 
         public static void WriteLogErrors(string source, Exception exception)

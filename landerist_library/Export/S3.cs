@@ -60,7 +60,7 @@ namespace landerist_library.Export
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors(exception);
+                Log.WriteLogErrors("S3 UploadFile", exception);
             }
             transferUtitlity.Dispose();
             return success;
@@ -92,7 +92,7 @@ namespace landerist_library.Export
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors(exception);
+                Log.WriteLogErrors("S3 ListObjects", exception);
             }
             return list;
         }
@@ -113,7 +113,7 @@ namespace landerist_library.Export
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors(exception);
+                Log.WriteLogErrors("S3 DeleteObjects", exception);
             }
 
             return list;

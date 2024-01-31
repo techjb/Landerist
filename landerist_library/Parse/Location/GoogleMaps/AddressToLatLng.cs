@@ -4,9 +4,11 @@ using Newtonsoft.Json;
 
 namespace landerist_library.Parse.Location.GoogleMaps
 {
+#pragma warning disable IDE1006
     public class Geometry
     {
         public Location? location { get; set; }
+
     }
 
     public class Location
@@ -18,6 +20,7 @@ namespace landerist_library.Parse.Location.GoogleMaps
     public class Result
     {
         public Geometry? geometry { get; set; }
+
     }
 
     public class GeocodeData
@@ -47,7 +50,7 @@ namespace landerist_library.Parse.Location.GoogleMaps
                     GeocodeData? geocodeData = JsonConvert.DeserializeObject<GeocodeData>(content);
                     if (geocodeData != null && geocodeData.results != null)
                     {
-                        if (geocodeData.results.Count() > 0)
+                        if (geocodeData.results.Length > 0)
                         {
                             var result = geocodeData.results[0];
                             if (result.geometry != null &&
@@ -81,4 +84,5 @@ namespace landerist_library.Parse.Location.GoogleMaps
             };
         }
     }
+#pragma warning restore IDE1006
 }

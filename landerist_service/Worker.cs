@@ -59,7 +59,7 @@ namespace landerist_service
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors(exception);
+                Log.WriteLogErrors("Worker TimerCallback1", exception);
             }
         }
 
@@ -77,7 +77,7 @@ namespace landerist_service
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors(exception);
+                Log.WriteLogErrors("Worker TimerCallback2", exception);
             }
             finally
             {

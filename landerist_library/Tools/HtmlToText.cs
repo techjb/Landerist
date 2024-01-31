@@ -247,7 +247,7 @@ namespace landerist_library.Tools
             var htmlNodeCollection = htmlDocument.DocumentNode.SelectNodes(select);
             if (htmlNodeCollection != null)
             {
-                List<HtmlNode> nodesToRemove = htmlNodeCollection.ToList();
+                List<HtmlNode> nodesToRemove = [.. htmlNodeCollection];
                 foreach (var node in nodesToRemove)
                 {
                     ClearClassAndId(node, "class");
@@ -269,7 +269,7 @@ namespace landerist_library.Tools
             var htmlNodeCollection = htmlDocument.DocumentNode.SelectNodes(select);
             if (htmlNodeCollection != null)
             {
-                List<HtmlNode> nodesToRemove = htmlNodeCollection.ToList();
+                List<HtmlNode> nodesToRemove = [.. htmlNodeCollection];
                 foreach (var node in nodesToRemove)
                 {
                     node.Remove();

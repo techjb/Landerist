@@ -8,6 +8,7 @@ using landerist_library.Statistics;
 using landerist_library.Websites;
 using OpenAI;
 using System.Net;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -109,7 +110,7 @@ namespace landerist_console
             //new Scraper().ScrapeUnknowPageType(website);
             //Scraper.Scrape(uri);
             //new Scraper().ScrapeAllPages();            
-            
+
             //new Scraper().Start();
 
             //landerist_library.Parse.Listing.ListingsParser.Start();            
@@ -154,6 +155,7 @@ namespace landerist_console
             //Backup.Update();
 
             //landerist_library.Statistics.StatisticsSnapshot.TakeSnapshots();            
+            
         }
     }
 }

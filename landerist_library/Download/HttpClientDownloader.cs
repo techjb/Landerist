@@ -42,9 +42,9 @@ namespace landerist_library.Download
                 page.HttpStatusCode = (short)HttpResponseMessage.StatusCode;
                 return await HttpResponseMessage.Content.ReadAsStringAsync();                
             }
-            catch (Exception exception)
+            catch //(Exception exception)
             {
-                Logs.Log.WriteLogErrors("HttpClientDownloader GetAsync", page.Uri, exception);
+                //Logs.Log.WriteLogErrors("HttpClientDownloader GetAsync", page.Uri, exception);
             }
             return null;
         }
