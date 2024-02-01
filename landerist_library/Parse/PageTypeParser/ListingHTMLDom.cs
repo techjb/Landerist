@@ -63,8 +63,6 @@ namespace landerist_library.Parse.PageTypeParser
             "//cite",            
             "//dfn",
             "//address",
-
-
         ];
 
         private static readonly string XpathTagsToRemove = InitXpathTagsToRemove();
