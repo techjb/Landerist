@@ -12,7 +12,7 @@ namespace landerist_library.Parse.PageTypeParser
 {
     public class ListingHTMLDom
     {
-        private static HashSet<string> Tags = [];
+        private static readonly HashSet<string> Tags = [];
         private static readonly List<string> TagsToRemove =
         [
             "//head",
