@@ -5,6 +5,7 @@ using landerist_library.Logs;
 using landerist_library.Parse.Listing.ChatGPT;
 using landerist_library.Parse.Location;
 using landerist_library.Parse.Location.Delimitations;
+using landerist_library.Parse.PageTypeParser;
 using landerist_library.Scrape;
 using landerist_library.Statistics;
 using landerist_library.Websites;
@@ -159,6 +160,10 @@ namespace landerist_console
             //Backup.Update();
 
             //landerist_library.Statistics.StatisticsSnapshot.TakeSnapshots();            
+
+            //string url1 = "https://www.inmobiliaria-teval.com/inmueble/salou-apartamento-ln-23523-eva-2/";            
+            //string url2 = "https://www.inmobiliaria-teval.com/inmueble/miami-playa-el-casalot-chalet-adosado/";
+            //ListingHTMLDom.Test(url1, url2);
         }
     }
 }
