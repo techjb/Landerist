@@ -1,12 +1,6 @@
 ﻿using HtmlAgilityPack;
 using SimMetrics.Net.Metric;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using SimMetrics.Net;
 
 namespace landerist_library.Parse.PageTypeParser
 {
