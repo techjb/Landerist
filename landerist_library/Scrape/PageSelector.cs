@@ -28,9 +28,10 @@
             AddPages(PageType.ResponseBodyTooShort, 3, 5);
             AddPages(PageType.ResponseBodyTooManyTokens, 3, 5);
             AddPages(PageType.MayBeListing, 1);
-            //AddPages(PageType.Listing, 3, 1);
+            AddPages(PageType.Listing, 7);
             AddPages(PageType.UnpublishedListing, 3, 2);
-            //AddPages(PageType.NotListing, 3, 5);
+            AddPages(PageType.NotListingByParser, 3, 5);
+            AddPages(PageType.ListingButNotParsed, 3, 5);
             AddPages(PageType.NotListingByLastSegment, 3, 5);
         }
 

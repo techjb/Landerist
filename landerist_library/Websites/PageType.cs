@@ -15,7 +15,8 @@
         MayBeListing,
         Listing,
         UnpublishedListing,
-        NotListing,
+        NotListingByParser,
+        ListingButNotParsed,
         NotListingByLastSegment,
     };
 }

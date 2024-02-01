@@ -68,13 +68,9 @@ namespace landerist_library.Scrape
                 return;
             }
 
-            if (keyValuePairs.ContainsKey(key))
+            if (!keyValuePairs.TryAdd(key, blockUntil))
             {
                 keyValuePairs[key] = blockUntil;
-            }
-            else
-            {
-                keyValuePairs.Add(key, blockUntil);
             }
         }
 

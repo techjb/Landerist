@@ -19,7 +19,7 @@ namespace landerist_library.Parse.Listing.IsListingTest
             AddColumnLabel(dataTableListings, true);
             Console.WriteLine("Reading NotListing ..");
             int rows = dataTableListings.Rows.Count;
-            DataTable dataTableNotListings = Pages.GetResponseBodyText(PageType.NotListing, rows);
+            DataTable dataTableNotListings = Pages.GetResponseBodyText(PageType.NotListingByParser, rows);
             AddColumnLabel(dataTableNotListings, false);
             return Combine(dataTableListings, dataTableNotListings);
         }

@@ -33,6 +33,7 @@ namespace landerist_library.Scrape
 
         public void Start()
         {
+            PageBlocker.Clean();
             Pages = PageSelector.Select();
             Scrape();
         }

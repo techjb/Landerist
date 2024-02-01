@@ -136,12 +136,12 @@ namespace landerist_library.Parse.PageTypeParser
             Interlocked.Increment(ref Counter);
             if (IsListing.HasValue)
             {
-                PageType? pageType = (bool)IsListing ? PageType.Listing : PageType.NotListing;
+                PageType? pageType = (bool)IsListing ? PageType.Listing : PageType.NotListingByParser;
                 page.Update(pageType);
                 switch (pageType)
                 {
                     case PageType.Listing: Interlocked.Increment(ref ListingsCounter); break;
-                    case PageType.NotListing: Interlocked.Increment(ref NotListingsCounter); break;
+                    case PageType.NotListingByParser: Interlocked.Increment(ref NotListingsCounter); break;
                 }
             }
             else
