@@ -107,8 +107,6 @@ namespace landerist_library.Scrape
             MayBeListingCounter = 0;
             OtherPageType = 0;
 
-            Log.WriteLogInfo("scraper", "Scrapping " + TotalCounter + " pages");
-
             var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
             Parallel.ForEach(
                 orderablePartitioner,
@@ -123,7 +121,7 @@ namespace landerist_library.Scrape
                     EndThread();
                 });
 
-            Log.WriteLogInfo("scraper", "End");
+            Log.WriteLogInfo("scraper", "Updated " + Scraped + " pages");
             return true;
         }
 
