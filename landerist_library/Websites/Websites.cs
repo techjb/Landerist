@@ -1,6 +1,5 @@
 ﻿using landerist_library.Database;
 using System.Data;
-using System.Runtime.InteropServices;
 
 namespace landerist_library.Websites
 {
@@ -45,7 +44,9 @@ namespace landerist_library.Websites
 
         private static DataTable GetDataTableAll()
         {
-            string query = "SELECT * FROM " + TABLE_WEBSITES;
+            string query =
+                "SELECT * " +
+                "FROM " + TABLE_WEBSITES;
             return new DataBase().QueryTable(query);
         }
 
@@ -380,5 +381,53 @@ namespace landerist_library.Websites
                 {"Host", website.Host}
             });
         }
+
+        public static void Update()
+        {
+            var websites = GetNeedToUpdate();
+            if (websites.Count.Equals(0))
+            {
+                return;
+            }
+            Parallel.ForEach(websites, new ParallelOptions()
+            {
+                MaxDegreeOfParallelism = Environment.ProcessorCount - 1
+            },
+            Update);
+
+            Logs.Log.WriteLogInfo("scrapper", "Updated " + websites.Count + " websites");
+        }
+
+        private static void Update(Website website)
+        {
+            try
+            {
+                website.SetRobotsTxt();
+                website.SetIpAddress();
+                website.InsertPagesFromSiteMap();
+            }
+            catch (Exception exception)
+            {
+                Logs.Log.WriteLogErrors("Websites Update", website.Host, exception);
+            }
+            website.Update();
+        }
+
+        private static HashSet<Website> GetNeedToUpdate()
+        {
+            DateTime websiteUpdated = DateTime.Now.AddDays(-Configuration.Config.DAYS_TO_UPDATE_WEBSITES);
+
+            string query =
+                "SELECT * " +
+                "FROM " + TABLE_WEBSITES + " " +
+                "WHERE [WebsiteUpdated] < @WebsiteUpdated ";
+
+            var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+                {"WebsiteUpdated", websiteUpdated },
+            });
+
+            return GetWebsites(dataTable);
+        }
+
     }
 }

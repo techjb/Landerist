@@ -107,7 +107,7 @@ namespace landerist_library.Scrape
             MayBeListingCounter = 0;
             OtherPageType = 0;
 
-            Log.WriteLogInfo("scraper", "Start: " + TotalCounter);
+            Log.WriteLogInfo("scraper", "Scrapping " + TotalCounter + " pages");
 
             var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
             Parallel.ForEach(

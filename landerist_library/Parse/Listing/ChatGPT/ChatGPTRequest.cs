@@ -9,11 +9,11 @@ namespace landerist_library.Parse.Listing.ChatGPT
     {
 
         //https://platform.openai.com/docs/models/overview  
-        // gpt-3.5-turbo-1106: 16,385 
+        // gpt-3.5-turbo-0125: 16,385 
         // gpt-4-1106-preview: 128,000
         public static readonly int MAX_TOKENS = 16385;
         public static readonly string Model_GPT_4_1106_Preview = "gpt-4-1106-preview";
-        public static readonly string Model_GPT_3_5_Turbo_16k = "gpt-3.5-turbo-16k";
+        public static readonly string Model_GPT_3_5_Turbo = "gpt-3.5-turbo-0125";
 
 
         private readonly OpenAIClient OpenAIClient = new(Config.OPENAI_API_KEY);
@@ -38,7 +38,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
                 new(Role.User, userInput),
             };
 
-            var model = modelGPT_4 ? Model_GPT_4_1106_Preview : Model_GPT_3_5_Turbo_16k;
+            var model = modelGPT_4 ? Model_GPT_4_1106_Preview : Model_GPT_3_5_Turbo;
             var chatRequest = new ChatRequest(
                 messages: messages,
                 model: model,

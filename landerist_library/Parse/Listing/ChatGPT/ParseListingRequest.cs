@@ -11,7 +11,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             "Analiza detenidamente el texto proporcionado por el usuario. " +
             "Determina si se trata o no de un único anuncio inmobiliario. " +
             "Si el texto no está en el idioma español, entonces no se trata de un anuncio inmobilario. " +
-            "En caso de que sea un anuncio inmobiliario, extrae de manera precisa los elementos clave en formato json. " +            
+            "En caso de que sea un anuncio inmobiliario, extrae de manera precisa los elementos clave en formato json. " +
             "Mantente enfocado y da tu mejor respuesta.";
 
         private static readonly List<Tool> Tools = ParseListingTool.GetTools();
@@ -24,53 +24,49 @@ namespace landerist_library.Parse.Listing.ChatGPT
         public (PageType pageType, landerist_orels.ES.Listing? listing) Parse(Page page)
         {
             var chatResponse = GetResponse(page.ResponseBodyText, false);
-            if (chatResponse == null)
-            {
-                return (PageType.MayBeListing, null);
-            }
-            return Parse(page, chatResponse);
-        }
 
-        private static (PageType, landerist_orels.ES.Listing?) Parse(Page page, ChatResponse chatResponse)
-        {
             PageType pageType = PageType.MayBeListing;
             landerist_orels.ES.Listing? listing = null;
 
-            try
+            if (chatResponse != null)
             {
-                var tool = chatResponse.FirstChoice.Message.ToolCalls[0];
-                string functionName = tool.Function.Name;
-                switch (functionName)
+                try
                 {
-                    case ParseListingTool.FunctionNameIsNotListing:
-                        {
-                            pageType = PageType.NotListingByParser;
-                        }
-                        break;
-                    case ParseListingTool.FunctionNameIsListing:
-                        {
-                            string arguments = tool.Function.Arguments.ToString();
-                            var parseListingResponse = JsonSerializer.Deserialize<ParseListingResponse>(arguments);
-                            if (parseListingResponse != null)
+                    var tool = chatResponse.FirstChoice.Message.ToolCalls[0];
+                    string functionName = tool.Function.Name;
+                    switch (functionName)
+                    {
+                        case ParseListingTool.FunctionNameIsNotListing:
                             {
-                                listing = parseListingResponse.ToListing(page);
-                                if (listing != null)
+                                pageType = PageType.NotListingByParser;
+                            }
+                            break;
+                        case ParseListingTool.FunctionNameIsListing:
+                            {
+                                string arguments = tool.Function.Arguments.ToString();
+                                var parseListingResponse = JsonSerializer.Deserialize<ParseListingResponse>(arguments);
+                                if (parseListingResponse != null)
                                 {
-                                    pageType = PageType.Listing;
-                                }
-                                else
-                                {
-                                    pageType = PageType.ListingButNotParsed;
+                                    listing = parseListingResponse.ToListing(page);
+                                    if (listing != null)
+                                    {
+                                        pageType = PageType.Listing;
+                                    }
+                                    else
+                                    {
+                                        pageType = PageType.ListingButNotParsed;
+                                    }
                                 }
                             }
-                        }
-                        break;
+                            break;
+                    }
+                }
+                catch (Exception exception)
+                {
+                    Logs.Log.WriteLogErrors("ParseListingRequest Parse", page.Uri, exception);
                 }
             }
-            catch (Exception exception)
-            {
-                Logs.Log.WriteLogErrors("ParseListingRequest Parse", page.Uri, exception);
-            }
+
             return (pageType, listing);
         }
     }

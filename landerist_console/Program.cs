@@ -102,6 +102,7 @@ namespace landerist_console
             //Websites.CountRobotsSiteMaps();            
             //Websites.InsertMainPages();
             //Websites.UpdateNumPages();
+            //Websites.Update();
 
             //Pages.DeleteNumPagesExceded();
             //Pages.Delete(PageType.ForbiddenLastSegment);
@@ -164,6 +165,8 @@ namespace landerist_console
             //string url1 = "https://www.inmobiliaria-teval.com/inmueble/salou-apartamento-ln-23523-eva-2/";            
             //string url2 = "https://www.inmobiliaria-teval.com/inmueble/miami-playa-el-casalot-chalet-adosado/";
             //ListingHTMLDom.Test(url1, url2);
+
+            //PageSelector.Select();
         }
     }
 }

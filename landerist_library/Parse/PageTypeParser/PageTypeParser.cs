@@ -17,7 +17,7 @@ namespace landerist_library.Parse.PageTypeParser
             if (page == null || page.ResponseBodyIsNullOrEmpty())
             {
                 return (PageType.DownloadError, null);
-            }            
+            }
             if (page.IsMainPage())
             {
                 return (PageType.MainPage, null);
@@ -37,7 +37,9 @@ namespace landerist_library.Parse.PageTypeParser
 
             page.SetResponseBodyText();
 
-            if (!page.ResponseBodyTextHasChanged)
+            if (!page.ResponseBodyTextHasChanged &&
+                page.PageType != null &&
+                !page.PageType.Equals(PageType.MayBeListing))
             {
                 return (page.PageType, null);
             }
@@ -78,7 +80,6 @@ namespace landerist_library.Parse.PageTypeParser
             }
             return true;
         }
-
 
         private static bool ResponseBodyIsError(string? responseBodyText)
         {

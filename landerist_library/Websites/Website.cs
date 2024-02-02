@@ -2,6 +2,7 @@
 using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Index;
+using System;
 using System.Data;
 using System.Net;
 using System.Text;
@@ -23,6 +24,8 @@ namespace landerist_library.Websites
 
     public class Website : IDisposable
     {
+        public DateTime WebsiteUpdated { get; set; } = DateTime.Now;
+
         public Uri MainUri { get; set; }
 
         public string Host { get; set; } = string.Empty;
@@ -106,6 +109,7 @@ namespace landerist_library.Websites
 
         private void Load(DataRow dataRow)
         {
+            WebsiteUpdated = (DateTime)dataRow["WebsiteUpdated"];
             string mainUriString = dataRow["MainUri"].ToString()!;
             MainUri = new(mainUriString);
             Host = dataRow["Host"].ToString()!;
@@ -122,7 +126,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "INSERT INTO " + Websites.TABLE_WEBSITES + " " +
-                "VALUES (@MainUri, @Host, @LanguageCode, @CountryCode, @RobotsTxt, " +
+                "VALUES (@WebsiteUpdated, @MainUri, @Host, @LanguageCode, @CountryCode, @RobotsTxt, " +
                 "@IpAddress, @HttpStatusCode, @NumPages, @NumListings)";
 
             var parameters = GetQueryParameters();
@@ -131,8 +135,11 @@ namespace landerist_library.Websites
 
         public bool Update()
         {
+            WebsiteUpdated = DateTime.Now;
+
             string query =
                 "UPDATE " + Websites.TABLE_WEBSITES + " SET " +
+                "[WebsiteUpdated] = @WebsiteUpdated, " +
                 "[MainUri] = @MainUri, " +
                 "[LanguageCode] = @LanguageCode, " +
                 "[CountryCode] = @CountryCode, " +
@@ -150,6 +157,7 @@ namespace landerist_library.Websites
         private Dictionary<string, object?> GetQueryParameters()
         {
             return new Dictionary<string, object?> {
+                {"WebsiteUpdated", WebsiteUpdated },
                 {"MainUri", MainUri.ToString() },
                 {"Host", Host },
                 {"LanguageCode", LanguageCode.ToString() },
@@ -299,7 +307,7 @@ namespace landerist_library.Websites
         public void DeleteListings()
         {
             int counter = 0;
-            var pages = GetPages();            
+            var pages = GetPages();
             Parallel.ForEach(pages, page =>
             {
                 var listing = ES_Listings.GetListing(page, false);
@@ -313,10 +321,10 @@ namespace landerist_library.Websites
                     }
                 }
             });
-            
+
             Console.WriteLine("Deleted " + counter + " listings");
         }
-       
+
 
         private bool DeleteWebsite()
         {
@@ -341,18 +349,23 @@ namespace landerist_library.Websites
             {
                 return;
             }
-            var sitemaps = GetSiteMaps();
-            if (sitemaps != null && sitemaps.Count > 0)
+            try
             {
-                new SitemapIndexer(this).InsertSitemaps(sitemaps);
-            }
-            else
-            {
+                var sitemaps = GetSiteMaps();
+                if (sitemaps != null && sitemaps.Count > 0)
+                {
+                    new SitemapIndexer(this).InsertSitemaps(sitemaps);
+                    return;
+                }
                 var uri = GetDefaultSiteMap();
                 if (uri != null)
                 {
                     new SitemapIndexer(this).InsertSitemap(uri);
                 }
+            }
+            catch (Exception exception)
+            {
+                Logs.Log.WriteLogErrors("Website InsertPagesFromSiteMap", Host, exception);
             }
         }
 

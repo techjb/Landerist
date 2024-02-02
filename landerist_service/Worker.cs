@@ -4,6 +4,7 @@ using landerist_library.Statistics;
 using landerist_library.Scrape;
 using landerist_library.Database;
 using landerist_library.Configuration;
+using landerist_library.Websites;
 
 namespace landerist_service
 {
@@ -20,6 +21,7 @@ namespace landerist_service
         private const int OneMinute = 60 * OneSecond;
         private const int OneHour = 60 * OneMinute;
         private const int OneDay = 24 * OneHour;
+        private readonly Scraper Scraper = new ();
 
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -73,7 +75,8 @@ namespace landerist_service
             RunningTimer2 = true;
             try
             {
-                new Scraper().Start();
+                Websites.Update();
+                Scraper.Start();
             }
             catch (Exception exception)
             {
