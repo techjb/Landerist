@@ -77,10 +77,10 @@ namespace landerist_library.Logs
         private static string GetText(Exception exception)
         {
             return
-                "Message: " + exception.Message + Environment.NewLine +
-                "Source: " + exception.Source + Environment.NewLine +
-                "StackTrace: " + exception.StackTrace + Environment.NewLine +
-                "TargetSite: " + exception.TargetSite;
+                "Message: " + exception.Message + "\r\n" +
+                "Source: " + exception.Source + "\r\n" +
+                "StackTrace: " + exception.StackTrace + "\r\n" +
+                "TargetSite: " + exception.TargetSite + "\r\n";
         }
 
         #region Write Logs

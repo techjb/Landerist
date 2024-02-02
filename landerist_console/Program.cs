@@ -76,7 +76,7 @@ namespace landerist_console
             //var uri = new Uri("https://www.badainmobiliaria.com");
             //var uri = new Uri("http://alicante-casas.com/ad/100262248");
             //var uri = new Uri("http://www.abbeyproperties.eu/ficha-inmueble.php/?cod_inmueble=888933");
-            //var uri = new Uri("https://aquitienesloquebuscas.com/inmobiliaria/index.php/las-ofertas-de-apartamentos?start=20");
+            var uri = new Uri("https://inmobiliariaconcasa.es/como-dar-de-baja-una-propiedad-en-booking/");
 
             Config.SetToProduction();
 
@@ -116,7 +116,6 @@ namespace landerist_console
             //new Scraper().ScrapeUnknowPageType(website);
             //Scraper.Scrape(uri);
             //new Scraper().ScrapeAllPages();            
-
             //new Scraper().Start();
 
             //landerist_library.Parse.Listing.ListingsParser.Start();            
