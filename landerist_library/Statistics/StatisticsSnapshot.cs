@@ -9,31 +9,53 @@ namespace landerist_library.Statistics
 
         public static void TakeSnapshots()
         {
-            StatisticsWebsites();
-            StatisticsPages();
-            StatisticsEs_Listings();
-            StatisticsEs_Media();            
+            Websites();
+            UpdatedWebsites();
+            Pages();
+            UpdatedPages();
+            Es_Listings();
+            Es_Media();            
         }
 
-        private static void StatisticsWebsites()
+        private static void Websites()
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + Websites.Websites.TABLE_WEBSITES;
+                "FROM " + landerist_library.Websites.Websites.TABLE_WEBSITES;
 
             Insert("Websites", query);
         }
 
-        private static void StatisticsPages()
+        private static void UpdatedWebsites()
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + Websites.Pages.TABLE_PAGES;
+                "FROM " + landerist_library.Websites.Websites.TABLE_WEBSITES + " " +
+                "WHERE CONVERT(date, [WebsiteUpdated]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
+
+            Insert("Updated Websites", query);
+        }
+
+        private static void Pages()
+        {
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + landerist_library.Websites.Pages.TABLE_PAGES;
 
             Insert("Pages", query);
         }
 
-        private static void StatisticsEs_Listings()
+        private static void UpdatedPages()
+        {
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + landerist_library.Websites.Pages.TABLE_PAGES + " " +
+                "WHERE CONVERT(date, [Updated]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
+
+            Insert("Updated Pages", query);
+        }
+
+        private static void Es_Listings()
         {
             string query =
                 "SELECT COUNT(*) " +
@@ -42,7 +64,7 @@ namespace landerist_library.Statistics
             Insert("Es_Listings", query);
         }
 
-        private static void StatisticsEs_Media()
+        private static void Es_Media()
         {
             string query =
                 "SELECT COUNT(*) " +
