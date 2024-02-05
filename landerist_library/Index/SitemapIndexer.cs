@@ -3,10 +3,14 @@ using Louw.SitemapParser;
 
 namespace landerist_library.Index
 {
+
     public class SitemapIndexer(Website website) : Indexer(website)
     {
+        readonly HashSet<string> SitemapsUrls = [];
+
         public void InsertSitemaps(List<Com.Bekijkhet.RobotsTxt.Sitemap> sitemaps)
         {
+            sitemaps = sitemaps.Take(Configuration.Config.MAX_SITEMAPS_PER_WEBSITE).ToList();
             foreach (var sitemap in sitemaps)
             {
                 InsertSitemap(sitemap.Url);
@@ -19,6 +23,7 @@ namespace landerist_library.Index
             {
                 return;
             }
+            
             var sitemap = new Sitemap(uri);
             InsertSitemap(sitemap);
         }
@@ -29,6 +34,12 @@ namespace landerist_library.Index
             {
                 return;
             }
+
+            if (!CannAddMoreSitemaps())
+            {
+                return;
+            }
+
             if (!sitemap.IsLoaded)
             {
                 sitemap = DownloadSitemap(sitemap);
@@ -46,11 +57,29 @@ namespace landerist_library.Index
             }
             else if (sitemap.SitemapType == SitemapType.Items)
             {
-                foreach (var item in sitemap.Items)
+                InsertSitemapItems(sitemap);
+            }
+        }
+
+        private void InsertSitemapItems(Sitemap sitemap)
+        {
+            foreach (var item in sitemap.Items)
+            {
+                if (!CannAddMoreSitemaps())
+                {
+                    return;
+                }
+                string url = item.Location.ToString();                
+                if (SitemapsUrls.Add(url))
                 {
                     InsertUri(item.Location);
                 }
             }
+        }
+
+        private bool CannAddMoreSitemaps()
+        {
+            return SitemapsUrls.Count < Configuration.Config.MAX_SITEMAPS_PER_WEBSITE;
         }
 
         private static Sitemap DownloadSitemap(Sitemap siteMap)

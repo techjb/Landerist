@@ -425,7 +425,8 @@ namespace landerist_library.Websites
             }
             Parallel.ForEach(websites, new ParallelOptions()
             {
-                MaxDegreeOfParallelism = Environment.ProcessorCount - 1
+                //MaxDegreeOfParallelism = Environment.ProcessorCount - 1
+                MaxDegreeOfParallelism = 1
             }, website =>
             {
                 website.SetSitemap();

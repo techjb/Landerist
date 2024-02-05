@@ -166,6 +166,7 @@ namespace landerist_console
             //ListingHTMLDom.Test(url1, url2);
 
             //PageSelector.Select();
+            Websites.UpdateSitemaps();
         }
     }
 }

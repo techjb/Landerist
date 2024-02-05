@@ -362,7 +362,7 @@ namespace landerist_library.Websites
             }
             try
             {
-                var sitemaps = GetSiteMaps();
+                var sitemaps = GetSiteMapsFromRobotsTxt();
                 if (sitemaps != null && sitemaps.Count > 0)
                 {
                     new SitemapIndexer(this).InsertSitemaps(sitemaps);
@@ -386,7 +386,7 @@ namespace landerist_library.Websites
             return uri;
         }
 
-        public List<Sitemap>? GetSiteMaps()
+        public List<Sitemap>? GetSiteMapsFromRobotsTxt()
         {
             if (RobotsTxt != null)
             {
