@@ -155,7 +155,7 @@ namespace landerist_library.Websites
                 //new ParallelOptions() { MaxDegreeOfParallelism = 1}, 
                 website =>
                 {
-                    bool success = website.SetMainUriAndStatusCode();
+                    bool success = website.SetMainUri();
                     if (success)
                     {
                         website.Update();
@@ -382,9 +382,9 @@ namespace landerist_library.Websites
             });
         }
 
-        public static void Update()
+        public static void UpdateRobotsTxt()
         {
-            var websites = GetNeedToUpdate();
+            var websites = GetNeedToUpdateRobotsTxt();
             if (websites.Count.Equals(0))
             {
                 return;
@@ -392,42 +392,96 @@ namespace landerist_library.Websites
             Parallel.ForEach(websites, new ParallelOptions()
             {
                 MaxDegreeOfParallelism = Environment.ProcessorCount - 1
-            },
-            Update);
-
-            Logs.Log.WriteLogInfo("scrapper", "Updated " + websites.Count + " websites");
-        }
-
-        private static void Update(Website website)
-        {
-            try
+            }, website =>
             {
                 website.SetRobotsTxt();
-                website.SetIpAddress();
-                website.InsertPagesFromSiteMap();
-            }
-            catch (Exception exception)
-            {
-                Logs.Log.WriteLogErrors("Websites Update", website.Host, exception);
-            }
-            website.Update();
+                website.Update();
+            });
+            Logs.Log.WriteLogInfo("scraper", "Updated " + websites.Count + " RobotsTxt");
         }
 
-        private static HashSet<Website> GetNeedToUpdate()
+        private static HashSet<Website> GetNeedToUpdateRobotsTxt()
         {
-            DateTime websiteUpdated = DateTime.Now.AddDays(-Configuration.Config.DAYS_TO_UPDATE_WEBSITES);
+            DateTime robotsTxtUpdated = DateTime.Now.AddDays(-Configuration.Config.DAYS_TO_UPDATE_ROBOTS_TXT);
 
             string query =
                 "SELECT * " +
                 "FROM " + TABLE_WEBSITES + " " +
-                "WHERE [WebsiteUpdated] < @WebsiteUpdated ";
+                "WHERE [RobotsTxtUpdated] < @RobotsTxtUpdated ";
 
             var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"WebsiteUpdated", websiteUpdated },
+                {"RobotsTxtUpdated", robotsTxtUpdated },
             });
 
             return GetWebsites(dataTable);
         }
 
+        public static void UpdateSitemaps()
+        {
+            var websites = GetNeedToUpdateSitemaps();
+            if (websites.Count.Equals(0))
+            {
+                return;
+            }
+            Parallel.ForEach(websites, new ParallelOptions()
+            {
+                MaxDegreeOfParallelism = Environment.ProcessorCount - 1
+            }, website =>
+            {
+                website.SetSitemap();
+                website.Update();
+            });
+            Logs.Log.WriteLogInfo("scraper", "Updated " + websites.Count + " Sitemaps");
+        }
+
+        private static HashSet<Website> GetNeedToUpdateSitemaps()
+        {
+            DateTime sitemapUpdated = DateTime.Now.AddDays(-Configuration.Config.DAYS_TO_UPDATE_SITEMAP);
+
+            string query =
+                "SELECT * " +
+                "FROM " + TABLE_WEBSITES + " " +
+                "WHERE [SitemapUpdated] < @SitemapUpdated ";
+
+            var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+                {"SitemapUpdated", sitemapUpdated },
+            });
+
+            return GetWebsites(dataTable);
+        }
+
+        public static void UpdateIpAddress()
+        {
+            var websites = GetNeedToUpdateIpAddress();
+            if (websites.Count.Equals(0))
+            {
+                return;
+            }
+            Parallel.ForEach(websites, new ParallelOptions()
+            {
+                MaxDegreeOfParallelism = Environment.ProcessorCount - 1
+            }, website =>
+            {
+                website.SetIpAddress();
+                website.Update();
+            });
+            Logs.Log.WriteLogInfo("scraper", "Updated " + websites.Count + " IpAddress");
+        }       
+       
+        private static HashSet<Website> GetNeedToUpdateIpAddress()
+        {
+            DateTime ipAddressUpdated = DateTime.Now.AddDays(-Configuration.Config.DAYS_TO_UPDATE_IP_ADDRESS);
+
+            string query =
+                "SELECT * " +
+                "FROM " + TABLE_WEBSITES + " " +
+                "WHERE [IpAddressUpdated] < @IpAddressUpdated ";
+
+            var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+                {"IpAddressUpdated", ipAddressUpdated },
+            });
+
+            return GetWebsites(dataTable);
+        }
     }
 }

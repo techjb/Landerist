@@ -75,7 +75,9 @@ namespace landerist_service
             RunningTimer2 = true;
             try
             {
-                Websites.Update();
+                Websites.UpdateRobotsTxt();
+                Websites.UpdateSitemaps();
+                Websites.UpdateIpAddress();
                 Scraper.Start();
             }
             catch (Exception exception)

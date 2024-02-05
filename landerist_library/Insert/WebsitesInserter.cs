@@ -135,7 +135,7 @@ namespace landerist_library.Insert
 
         private static void InsertWebsite(Website website)
         {
-            if (!website.SetMainUriAndStatusCode())
+            if (!website.SetMainUri())
             {
                 Interlocked.Increment(ref ErrorsMainUri);
                 return;
@@ -170,7 +170,7 @@ namespace landerist_library.Insert
             try
             {
                 website.InsertMainPage();
-                website.InsertPagesFromSiteMap();
+                website.SetSitemap();
             }
             catch (Exception exception)
             {

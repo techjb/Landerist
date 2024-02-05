@@ -4,7 +4,7 @@
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "1.24";
+        public static readonly string VERSION = "1.25";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
@@ -20,7 +20,11 @@
 
         public static readonly int MAX_PAGES_PER_HOSTS_PER_SCRAPE = 5;
 
-        public static readonly int DAYS_TO_UPDATE_WEBSITES = 3;
+        public static readonly int DAYS_TO_UPDATE_ROBOTS_TXT = 3;
+
+        public static readonly int DAYS_TO_UPDATE_SITEMAP = 3;
+
+        public static readonly int DAYS_TO_UPDATE_IP_ADDRESS = 7;
 
         //public static readonly int MAX_LISTINGS_PER_WEBSITE = 100;
 
