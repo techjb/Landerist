@@ -14,6 +14,7 @@ using OpenQA.Selenium;
 using System.Globalization;
 using System.Net;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -79,6 +80,7 @@ namespace landerist_console
             var uri = new Uri("https://inmobiliariaconcasa.es/como-dar-de-baja-una-propiedad-en-booking/");
 
             Config.SetToProduction();
+            //Config.SetDatabaseToProduction();
 
             //var website = new Website(uri);
             //var page = new Page(website, uriPage);            
@@ -166,7 +168,7 @@ namespace landerist_console
             //ListingHTMLDom.Test(url1, url2);
 
             //PageSelector.Select();
-            Websites.UpdateSitemaps();
+            //Csv.ExportHostsMainUri();
         }
     }
 }

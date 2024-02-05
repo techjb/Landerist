@@ -50,6 +50,15 @@ namespace landerist_library.Websites
             return new DataBase().QueryTable(query);
         }
 
+        public static DataTable GetDataTableHostMainUri()
+        {
+            string query =
+                "SELECT [Host], [MainUri] " +
+                "FROM " + TABLE_WEBSITES;
+            return new DataBase().QueryTable(query);
+        }
+
+
         private static DataTable ToDataTableHttpStatusCodeOk()
         {
             string query =
@@ -425,8 +434,7 @@ namespace landerist_library.Websites
             }
             Parallel.ForEach(websites, new ParallelOptions()
             {
-                //MaxDegreeOfParallelism = Environment.ProcessorCount - 1
-                MaxDegreeOfParallelism = 1
+                MaxDegreeOfParallelism = Environment.ProcessorCount - 1                
             }, website =>
             {
                 website.SetSitemap();

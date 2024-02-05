@@ -1,5 +1,6 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Database;
+using OpenCvSharp;
 
 namespace landerist_library.Export
 {
@@ -58,6 +59,13 @@ namespace landerist_library.Export
                "'bcp \"SELECT * FROM " + tableName + ";\" queryout \"" + fileName + "\" -T -c -t,';  ";
 
             return new DataBase().Query(query);
+        }
+
+        public static void ExportHostsMainUri()
+        {
+            var dataTable = Websites.Websites.GetDataTableHostMainUri();
+            string fileName = Config.EXPORT_DIRECTORY + "HostMainUri.csv";            
+            Tools.Csv.Write(dataTable, fileName, true);
         }
     }
 }

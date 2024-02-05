@@ -123,6 +123,11 @@
             Init(true);
         }
 
+        public static void SetDatabaseToProduction()
+        {
+            InitDatabase(true);
+        }
+
         public static void SetToLocal()
         {
             Init(false);
@@ -132,13 +137,7 @@
         {
             ConfigurationProduction = configurationProduction;
 
-            DATASOURCE = ConfigurationProduction ?
-                DATASOURCE_PRODUCTION :
-                DATASOURCE_LOCAL;
-
-            DATABASE_CONNECTION = ConfigurationProduction ?
-                DATABASE_CONNECTION_PRODUCTION :
-                DATABASE_CONNECTION_LOCAL;
+            InitDatabase(configurationProduction);
 
             EXPORT_DIRECTORY = ConfigurationProduction ?
                 EXPORT_DIRECTORY_PRODUCTION :
@@ -149,6 +148,17 @@
                 BACKUPS_LOCAL_DIRECTORY;
 
             TIMERS_ENABLED = !ConfigurationProduction;
+        }
+
+        private static void InitDatabase(bool configurationProduction)
+        {
+            DATASOURCE = configurationProduction ?
+                DATASOURCE_PRODUCTION :
+                DATASOURCE_LOCAL;
+
+            DATABASE_CONNECTION = configurationProduction ?
+                DATABASE_CONNECTION_PRODUCTION :
+                DATABASE_CONNECTION_LOCAL;
         }
     }
 }

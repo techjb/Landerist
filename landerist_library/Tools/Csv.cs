@@ -73,15 +73,7 @@ namespace landerist_library.Tools
             {
                 for (var i = 0; i < dataTable.Columns.Count; i++)
                 {
-                    var field = row[i];
-                    if (field is DBNull)
-                    {
-                        field = "null";
-                    }
-                    if (field.GetType() == typeof(string))
-                    {
-                        field = Strings.Clean((string)field);
-                    }
+                    var field = row[i];                    
                     csvWriter.WriteField(field);
                 }
                 csvWriter.NextRecord();
