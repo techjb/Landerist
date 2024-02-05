@@ -1,6 +1,5 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Database;
-using OpenCvSharp;
 
 namespace landerist_library.Export
 {

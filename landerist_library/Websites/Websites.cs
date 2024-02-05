@@ -406,7 +406,6 @@ namespace landerist_library.Websites
                 website.SetRobotsTxt();
                 website.Update();
             });
-            Logs.Log.WriteLogInfo("scraper", "Updated " + websites.Count + " RobotsTxt");
         }
 
         private static HashSet<Website> GetNeedToUpdateRobotsTxt()
@@ -439,8 +438,7 @@ namespace landerist_library.Websites
             {
                 website.SetSitemap();
                 website.Update();
-            });
-            Logs.Log.WriteLogInfo("scraper", "Updated " + websites.Count + " Sitemaps");
+            });            
         }
 
         private static HashSet<Website> GetNeedToUpdateSitemaps()
@@ -473,8 +471,7 @@ namespace landerist_library.Websites
             {
                 website.SetIpAddress();
                 website.Update();
-            });
-            Logs.Log.WriteLogInfo("scraper", "Updated " + websites.Count + " IpAddress");
+            });            
         }       
        
         private static HashSet<Website> GetNeedToUpdateIpAddress()

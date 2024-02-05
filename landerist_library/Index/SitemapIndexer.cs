@@ -6,7 +6,7 @@ namespace landerist_library.Index
 
     public class SitemapIndexer(Website website) : Indexer(website)
     {
-        readonly HashSet<string> SitemapsUrls = [];
+        readonly HashSet<string> SitemapsIndexes = [];
 
         public void InsertSitemaps(List<Com.Bekijkhet.RobotsTxt.Sitemap> sitemaps)
         {
@@ -50,36 +50,30 @@ namespace landerist_library.Index
             }
             if (sitemap.SitemapType == SitemapType.Index)
             {
-                foreach (var indexSiteMap in sitemap.Sitemaps)
+                foreach (var sitemapIndex in sitemap.Sitemaps)
                 {
-                    InsertSitemap(indexSiteMap);
+                    if (!CannAddMoreSitemaps())
+                    {
+                        break;
+                    }
+                    if (SitemapsIndexes.Add(sitemapIndex.SitemapLocation.ToString()))
+                    {
+                        InsertSitemap(sitemapIndex);
+                    }
                 }
             }
             else if (sitemap.SitemapType == SitemapType.Items)
             {
-                InsertSitemapItems(sitemap);
-            }
-        }
-
-        private void InsertSitemapItems(Sitemap sitemap)
-        {
-            foreach (var item in sitemap.Items)
-            {
-                if (!CannAddMoreSitemaps())
-                {
-                    return;
-                }
-                string url = item.Location.ToString();                
-                if (SitemapsUrls.Add(url))
+                foreach (var item in sitemap.Items)
                 {
                     InsertUri(item.Location);
                 }
             }
-        }
+        }        
 
         private bool CannAddMoreSitemaps()
         {
-            return SitemapsUrls.Count < Configuration.Config.MAX_SITEMAPS_PER_WEBSITE;
+            return SitemapsIndexes.Count < Configuration.Config.MAX_SITEMAPS_PER_WEBSITE;
         }
 
         private static Sitemap DownloadSitemap(Sitemap siteMap)

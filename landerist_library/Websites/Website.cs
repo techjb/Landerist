@@ -2,7 +2,6 @@
 using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Index;
-using System;
 using System.Data;
 using System.Net;
 using System.Text;
@@ -439,7 +438,6 @@ namespace landerist_library.Websites
 
             return NumPages < Config.MAX_PAGES_PER_WEBSITE;
         }
-
 
         public bool SetNumPagesToZero()
         {
