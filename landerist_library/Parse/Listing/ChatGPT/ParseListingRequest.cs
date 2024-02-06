@@ -1,5 +1,6 @@
 ﻿using landerist_library.Websites;
 using OpenAI;
+using OpenAI.Chat;
 using System.Text.Json;
 
 namespace landerist_library.Parse.Listing.ChatGPT
@@ -27,14 +28,13 @@ namespace landerist_library.Parse.Listing.ChatGPT
             {
                 return result;
             }
-            if (chatResponse.FirstChoice.Message.ToolCalls.Count <= 0)
+
+            var tool = GetTool(chatResponse);
+            if (tool == null)
             {
                 return result;
             }
-
-            var tool = chatResponse.FirstChoice.Message.ToolCalls[0];
-            string functionName = tool.Function.Name;
-            switch (functionName)
+            switch (tool.Function.Name)
             {
                 case ParseListingTool.FunctionNameIsNotListing:
                     {
@@ -49,6 +49,18 @@ namespace landerist_library.Parse.Listing.ChatGPT
             }
 
             return result;
+        }
+
+        private static Tool? GetTool(ChatResponse chatResponse)
+        {
+            try
+            {
+                return chatResponse.FirstChoice.Message.ToolCalls[0];                
+            }
+            catch 
+            {
+            }
+            return null;
         }
 
         public static (PageType pageType, landerist_orels.ES.Listing? listing) ParseListing(Page page, Tool tool)
