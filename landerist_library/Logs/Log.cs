@@ -76,35 +76,12 @@ namespace landerist_library.Logs
 
         private static string GetText(Exception exception)
         {
-            string stackTrace = GetStackTrace(exception);
-
             return
                 "Message: " + exception.Message + "\r\n" +
                 "Source: " + exception.Source + "\r\n" +
-                "StackTrace: " + stackTrace + "\r\n" +
+                "StackTrace: " + exception.StackTrace + "\r\n" +
                 "TargetSite: " + exception.TargetSite + "\r\n";
         }
-
-        private static string GetStackTrace(Exception exception)
-        {
-            string stackTrace = exception.StackTrace ?? "";
-
-            System.Diagnostics.StackTrace trace = new(exception, true);
-            if (trace.FrameCount > 0)
-            {
-                System.Diagnostics.StackFrame? frame = trace.GetFrame(0);
-                if (frame != null)
-                {
-                    int lineNumber = frame.GetFileLineNumber();
-                    if(lineNumber > 0)
-                    {
-                        stackTrace += " \r\nLine number: " + lineNumber;
-                    }                    
-                }
-            }
-            return stackTrace;
-        }
-             
 
         #region Write Logs
 
