@@ -14,7 +14,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
         public static readonly int MAX_TOKENS = 16385;
         public static readonly string Model_GPT_4_1106_Preview = "gpt-4-1106-preview";
         //public static readonly string Model_GPT_3_5_Turbo = "gpt-3.5-turbo-0125";
-        public static readonly string Model_GPT_3_5_Turbo = "gpt-3.5-turbo-16k";
+        public static readonly string Model_GPT_3_5_Turbo = "gpt-3.5-turbo-1106";
 
 
         private readonly OpenAIClient OpenAIClient = new(Config.OPENAI_API_KEY);

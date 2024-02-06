@@ -234,9 +234,9 @@ namespace landerist_library.Websites
                 }
                 return true;
             }
-            catch (Exception exception)
+            catch //(Exception exception)
             {
-                Logs.Log.WriteLogErrors("Website SetRobotsTxt", robotsTxtUrl, exception);
+                //Logs.Log.WriteLogErrors("Website SetRobotsTxt", robotsTxtUrl, exception);
             }
             return false;
         }

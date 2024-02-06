@@ -10,7 +10,6 @@ namespace landerist_library.Parse.Listing.ChatGPT
         public static readonly string SystemMessage =
             "Analiza detenidamente el texto proporcionado por el usuario. " +
             "Determina si se trata o no de un único anuncio inmobiliario. " +
-            "Si el texto no está en el idioma español, entonces no se trata de un anuncio inmobilario. " +
             "En caso de que sea un anuncio inmobiliario, extrae de manera precisa los elementos clave en formato json. " +
             "Mantente enfocado y da tu mejor respuesta.";
 
