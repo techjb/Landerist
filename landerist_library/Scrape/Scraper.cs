@@ -1,6 +1,7 @@
 ﻿using landerist_library.Websites;
 using System.Collections.Concurrent;
 using landerist_library.Logs;
+using landerist_library.Configuration;
 
 namespace landerist_library.Scrape
 {
@@ -72,7 +73,7 @@ namespace landerist_library.Scrape
                 return;
             }
             ScrapeUnknowHttpStatusCode();
-        }     
+        }
 
         public static void ScrapeMainPage(Website website)
         {
@@ -108,11 +109,13 @@ namespace landerist_library.Scrape
             OtherPageType = 0;
 
             var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
+            var maxDegreeOfParallelism = Config.SCRAPE_WITH_PARALELISM ? Environment.ProcessorCount - 1 : 1;
+
             Parallel.ForEach(
                 orderablePartitioner,
-                new ParallelOptions() {
-                    MaxDegreeOfParallelism = Environment.ProcessorCount - 1 
-                    //MaxDegreeOfParallelism = 1
+                new ParallelOptions()
+                {
+                    MaxDegreeOfParallelism = maxDegreeOfParallelism
                 },
                 (page, state) =>
                 {
@@ -160,7 +163,7 @@ namespace landerist_library.Scrape
 
         private static void WriteConsole()
         {
-            if (Configuration.Config.IsConfigurationProduction())
+            if (Config.IsConfigurationProduction())
             {
                 return;
             }

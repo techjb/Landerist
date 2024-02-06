@@ -77,10 +77,10 @@ namespace landerist_console
             //var uri = new Uri("https://www.badainmobiliaria.com");
             //var uri = new Uri("http://alicante-casas.com/ad/100262248");
             //var uri = new Uri("http://www.abbeyproperties.eu/ficha-inmueble.php/?cod_inmueble=888933");
-            //var uri = new Uri("https://inmobiliariaconcasa.es/como-dar-de-baja-una-propiedad-en-booking/");
+            //var uri = new Uri("https://www.inmobiliariaalameda.com/index.php?vistas=1");
 
-            Config.SetToProduction();
-            //Config.SetDatabaseToProduction();
+            //Config.SetToProduction();
+            Config.SetDatabaseToProduction();
 
             //var website = new Website(uri);
             //var page = new Page(website, uriPage);            

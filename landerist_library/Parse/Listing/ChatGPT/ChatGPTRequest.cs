@@ -13,8 +13,8 @@ namespace landerist_library.Parse.Listing.ChatGPT
         // gpt-4-1106-preview: 128,000
         public static readonly int MAX_TOKENS = 16385;
         public static readonly string Model_GPT_4_1106_Preview = "gpt-4-1106-preview";
-        //public static readonly string Model_GPT_3_5_Turbo = "gpt-3.5-turbo-0125";
-        public static readonly string Model_GPT_3_5_Turbo = "gpt-3.5-turbo-1106";
+        //public static readonly string Model_GPT_3_5_Turbo = "gpt-3.5-turbo-16k-0613";        
+        public static readonly string Model_GPT_3_5_Turbo = "gpt-3.5-turbo-0125";
 
 
         private readonly OpenAIClient OpenAIClient = new(Config.OPENAI_API_KEY);
@@ -45,7 +45,8 @@ namespace landerist_library.Parse.Listing.ChatGPT
                 model: model,
                 temperature: 0,
                 tools: Tools,
-                toolChoice: ToolChoice
+                toolChoice: ToolChoice,
+                responseFormat: ChatResponseFormat.Json
                 );
 
             try

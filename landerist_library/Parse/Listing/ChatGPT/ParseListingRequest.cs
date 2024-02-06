@@ -1,6 +1,5 @@
 ﻿using landerist_library.Websites;
 using OpenAI;
-using OpenAI.Chat;
 using System.Text.Json;
 
 namespace landerist_library.Parse.Listing.ChatGPT
@@ -23,50 +22,58 @@ namespace landerist_library.Parse.Listing.ChatGPT
         public (PageType pageType, landerist_orels.ES.Listing? listing) Parse(Page page)
         {
             var chatResponse = GetResponse(page.ResponseBodyText, false);
-
-            PageType pageType = PageType.MayBeListing;
-            landerist_orels.ES.Listing? listing = null;
-
-            if (chatResponse != null)
+            (PageType pageType, landerist_orels.ES.Listing? listing) result = (PageType.MayBeListing, null);
+            if (chatResponse == null)
             {
-                try
-                {
-                    var tool = chatResponse.FirstChoice.Message.ToolCalls[0];
-                    string functionName = tool.Function.Name;
-                    switch (functionName)
-                    {
-                        case ParseListingTool.FunctionNameIsNotListing:
-                            {
-                                pageType = PageType.NotListingByParser;
-                            }
-                            break;
-                        case ParseListingTool.FunctionNameIsListing:
-                            {
-                                string arguments = tool.Function.Arguments.ToString();
-                                var parseListingResponse = JsonSerializer.Deserialize<ParseListingResponse>(arguments);
-                                if (parseListingResponse != null)
-                                {
-                                    listing = parseListingResponse.ToListing(page);
-                                    if (listing != null)
-                                    {
-                                        pageType = PageType.Listing;
-                                    }
-                                    else
-                                    {
-                                        pageType = PageType.ListingButNotParsed;
-                                    }
-                                }
-                            }
-                            break;
-                    }
-                }
-                catch (Exception exception)
-                {
-                    Logs.Log.WriteLogErrors("ParseListingRequest Parse", page.Uri, exception);
-                }
+                return result;
+            }
+            if (chatResponse.FirstChoice.Message.ToolCalls.Count <= 0)
+            {
+                return result;
             }
 
-            return (pageType, listing);
+            var tool = chatResponse.FirstChoice.Message.ToolCalls[0];
+            string functionName = tool.Function.Name;
+            switch (functionName)
+            {
+                case ParseListingTool.FunctionNameIsNotListing:
+                    {
+                        result.pageType = PageType.NotListingByParser;
+                    }
+                    break;
+                case ParseListingTool.FunctionNameIsListing:
+                    {
+                        result = ParseListing(page, tool);
+                    }
+                    break;
+            }
+
+            return result;
+        }
+
+        public static (PageType pageType, landerist_orels.ES.Listing? listing) ParseListing(Page page, Tool tool)
+        {
+            (PageType pageType, landerist_orels.ES.Listing? listing) result = (PageType.MayBeListing, null);
+            try
+            {
+                string arguments = tool.Function.Arguments.ToString();
+                var parseListingResponse = JsonSerializer.Deserialize<ParseListingResponse>(arguments);
+                if (parseListingResponse != null)
+                {
+                    result.pageType = PageType.ListingButNotParsed;
+                    result.listing = parseListingResponse.ToListing(page);
+                    if (result.listing != null)
+                    {
+                        result.pageType = PageType.Listing;
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                Logs.Log.WriteLogErrors("ParseListingRequest ParseListing", page.Uri, exception);
+            }
+
+            return result;
         }
     }
 }
