@@ -1,10 +1,11 @@
 ﻿using HtmlAgilityPack;
+using landerist_library.Websites;
 using SimMetrics.Net.Metric;
 using System.Net;
 
 namespace landerist_library.Parse.PageTypeParser
 {
-    public class ListingHTMLDom
+    public class ListingSimilarity
     {
         private static readonly HashSet<string> Tags = [];
         private static readonly List<string> TagsToRemove =
@@ -71,6 +72,43 @@ namespace landerist_library.Parse.PageTypeParser
         {
             return string.Join(" | ", TagsToRemove.ToList());
         }
+
+        public static async Task<string?> GetListingUrlHtml(Website website)
+        {
+            if (website.ListingUri == null)
+            {
+                return null;
+            }
+            var httpClient = new HttpClient();
+            try
+            {
+                var html = await httpClient.GetStringAsync(website.ListingUri);
+                var htmlDoc = new HtmlDocument();
+                htmlDoc.LoadHtml(html);
+                RemoveTextContent(htmlDoc.DocumentNode);
+                return htmlDoc.DocumentNode.OuterHtml;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        private static void RemoveTextContent(HtmlNode node)
+        {
+            if (node.NodeType == HtmlNodeType.Text)
+            {
+                node.Remove();
+            }
+            else
+            {
+                foreach (var child in node.ChildNodes.ToArray())
+                {
+                    RemoveTextContent(child);
+                }
+            }
+        }
+
 
         public static void Test(string url1, string url2)
         {

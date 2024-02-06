@@ -23,8 +23,6 @@ namespace landerist_library.Websites
 
     public class Website : IDisposable
     {
-        //public DateTime WebsiteUpdated { get; set; } = DateTime.Now;
-
         public Uri MainUri { get; set; }
 
         public string Host { get; set; } = string.Empty;
@@ -38,12 +36,16 @@ namespace landerist_library.Websites
         public string? IpAddress { get; set; }
 
         public DateTime? IpAddressUpdated { get; set; }
-        
-        //public short? HttpStatusCode { get; set; }
 
         private int NumPages { get; set; } = 0;
 
         private int NumListings { get; set; } = 0;
+
+        public Uri? ListingUri { get; set; }
+
+        public string? ListingHtml { get; set; }
+
+        public DateTime? ListingHtmlUpdated { get; set; }
 
 
         public Robots? Robots = null;
@@ -123,17 +125,21 @@ namespace landerist_library.Websites
             RobotsTxtUpdated = dataRow["RobotsTxtUpdated"] is DBNull ? null : (DateTime)dataRow["RobotsTxtUpdated"];
             SitemapUpdated = dataRow["SitemapUpdated"] is DBNull ? null : (DateTime)dataRow["SitemapUpdated"];
             IpAddress = dataRow["IpAddress"] is DBNull ? null : dataRow["IpAddress"].ToString();
-            IpAddressUpdated = dataRow["IpAddressUpdated"] is DBNull ? null : (DateTime)dataRow["IpAddressUpdated"];            
+            IpAddressUpdated = dataRow["IpAddressUpdated"] is DBNull ? null : (DateTime)dataRow["IpAddressUpdated"];
             NumPages = (int)dataRow["NumPages"];
             NumListings = (int)dataRow["NumListings"];
+            ListingUri = dataRow["ListingUri"] is DBNull ? null : new Uri(dataRow["ListingUri"].ToString()!);            
+            ListingHtml = dataRow["ListingHtml"] is DBNull ? null : dataRow["ListingHtml"].ToString();
+            ListingHtmlUpdated = dataRow["ListingHtmlUpdated"] is DBNull ? null : (DateTime)dataRow["ListingHtmlUpdated"];
         }
 
         public bool Insert()
         {
             string query =
-                "INSERT INTO " + Websites.TABLE_WEBSITES + " " +
-                "VALUES (@MainUri, @Host, @LanguageCode, @CountryCode, @RobotsTxt, @RobotsTxtUpdated, " +
-                "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @NumPages, @NumListings)";
+                "INSERT INTO " + Websites.TABLE_WEBSITES + " VALUES " +
+                "(@MainUri, @Host, @LanguageCode, @CountryCode, @RobotsTxt, @RobotsTxtUpdated, " +
+                "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @NumPages, @NumListings, " +
+                "@ListingUri, @ListingHtml, @ListingHtmlUpdated)";
 
             var parameters = GetQueryParameters();
             return new DataBase().Query(query, parameters);
@@ -150,9 +156,12 @@ namespace landerist_library.Websites
                 "[RobotsTxtUpdated] = @RobotsTxtUpdated, " +
                 "[SitemapUpdated] = @SitemapUpdated, " +
                 "[IpAddress] = @IpAddress, " +
-                "[IpAddressUpdated] = @IpAddressUpdated, " +                
+                "[IpAddressUpdated] = @IpAddressUpdated, " +
                 "[NumPages] = @NumPages, " +
-                "[NumListings] = @NumListings " +
+                "[NumListings] = @NumListings, " +
+                "[ListingUri] = @ListingUri, " +
+                "[ListingHtml] = @ListingHtml, " +
+                "[ListingHtmlUpdated] = @ListingHtmlUpdated " +
                 "WHERE [Host] = @Host";
 
             var parameters = GetQueryParameters();
@@ -173,6 +182,9 @@ namespace landerist_library.Websites
                 {"IpAddressUpdated", IpAddressUpdated},
                 {"NumPages", NumPages },
                 {"NumListings", NumListings },
+                {"ListingUri", ListingUri?.ToString() },
+                {"ListingHtml", ListingHtml },
+                {"ListingHtmlUpdated", ListingHtmlUpdated },
             };
         }
 
@@ -189,7 +201,7 @@ namespace landerist_library.Websites
             try
             {
                 HttpRequestMessage request = new(HttpMethod.Head, MainUri);
-                var response = httpClient.SendAsync(request).GetAwaiter().GetResult();                
+                var response = httpClient.SendAsync(request).GetAwaiter().GetResult();
                 if (response != null && response.Headers != null && response.Headers.Location != null)
                 {
                     var uriLocation = response.Headers.Location;
@@ -220,7 +232,7 @@ namespace landerist_library.Websites
         {
             RobotsTxtUpdated = DateTime.Now;
 
-            var robotsTxtUrl = new Uri(MainUri, "/robots.txt");            
+            var robotsTxtUrl = new Uri(MainUri, "/robots.txt");
             try
             {
                 var httpClient = new HttpClient();

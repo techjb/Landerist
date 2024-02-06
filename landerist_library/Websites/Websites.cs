@@ -1,4 +1,6 @@
-﻿using landerist_library.Database;
+﻿using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
+using HtmlAgilityPack;
+using landerist_library.Database;
 using System.Data;
 
 namespace landerist_library.Websites
@@ -510,6 +512,58 @@ namespace landerist_library.Websites
                     {
                         deleted++;
                     }
+                }
+            }
+        }
+
+        public static void UpdateListingUrisFromFile()
+        {
+            string file = Configuration.Config.INSERT_DIRECTORY + "HostMainUri.csv";
+            DataTable dataTable = Tools.Csv.ToDataTable(file);
+            int total = dataTable.Rows.Count;
+            int processed = 0;
+            int inserted = 0;
+            foreach (DataRow row in dataTable.Rows)
+            {
+                processed++;
+                Console.WriteLine(processed + "/" + total + " Inserted: " + inserted);
+                string host = (string)row[0];
+                string listingUrl = ((string)row[2]).Trim();
+                if (Uri.TryCreate(listingUrl, UriKind.Absolute, out Uri? listingUri))
+                {
+                    Website website = new(host)
+                    {
+                        ListingUri = listingUri
+                    };
+                    if (website.Update())
+                    {
+                        inserted++;
+                    }
+                }
+            }
+        }
+
+        public async static void UpdateListingsHtmls()
+        {
+            var websites = GetAll();
+            int total = websites.Count;
+            int processed = 0;
+            int updated = 0;
+            foreach (var website in websites)
+            {
+                processed++;
+                Console.WriteLine(processed + "/" + total + " Updated: " + updated);
+
+                var html = await Parse.PageTypeParser.ListingSimilarity.GetListingUrlHtml(website);
+                if(html == null)
+                {
+                    continue;
+                }
+                website.ListingHtml = html;
+                website.ListingHtmlUpdated = DateTime.Now;
+                if (website.Update())
+                {
+                    updated++;
                 }
             }
         }
