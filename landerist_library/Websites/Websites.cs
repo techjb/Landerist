@@ -433,12 +433,12 @@ namespace landerist_library.Websites
             }
             Parallel.ForEach(websites, new ParallelOptions()
             {
-                MaxDegreeOfParallelism = Environment.ProcessorCount - 1                
+                MaxDegreeOfParallelism = Environment.ProcessorCount - 1
             }, website =>
             {
                 website.SetSitemap();
                 website.Update();
-            });            
+            });
         }
 
         private static HashSet<Website> GetNeedToUpdateSitemaps()
@@ -471,9 +471,9 @@ namespace landerist_library.Websites
             {
                 website.SetIpAddress();
                 website.Update();
-            });            
-        }       
-       
+            });
+        }
+
         private static HashSet<Website> GetNeedToUpdateIpAddress()
         {
             DateTime ipAddressUpdated = DateTime.Now.AddDays(-Configuration.Config.DAYS_TO_UPDATE_IP_ADDRESS);
@@ -488,6 +488,30 @@ namespace landerist_library.Websites
             });
 
             return GetWebsites(dataTable);
+        }
+
+        public static void RemoveFromFile()
+        {
+            string file = Configuration.Config.INSERT_DIRECTORY + "HostMainUri.csv";
+            DataTable dataTable = Tools.Csv.ToDataTable(file);
+            int total = dataTable.Rows.Count;
+            int processed = 0;
+            int deleted = 0;
+            foreach (DataRow row in dataTable.Rows)
+            {
+                processed++;
+                Console.WriteLine(processed + "/" + total + " Deleted: " + deleted);
+                string host = (string)row[0];
+                string listingUrl = ((string)row[2]).Trim();
+                if (listingUrl.Equals(string.Empty))
+                {
+                    Website website = new(host);
+                    if (website.Delete())
+                    {
+                        deleted++;
+                    }
+                }
+            }
         }
     }
 }

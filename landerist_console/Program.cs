@@ -169,6 +169,9 @@ namespace landerist_console
 
             //PageSelector.Select();
             //Csv.ExportHostsMainUri();
+            
+            //Websites.RemoveFromFile();
+
         }
     }
 }
