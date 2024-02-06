@@ -96,7 +96,10 @@ namespace landerist_library.Logs
                 if (frame != null)
                 {
                     int lineNumber = frame.GetFileLineNumber();
-                    stackTrace += " \r\nLine number: " + lineNumber;
+                    if(lineNumber > 0)
+                    {
+                        stackTrace += " \r\nLine number: " + lineNumber;
+                    }                    
                 }
             }
             return stackTrace;
