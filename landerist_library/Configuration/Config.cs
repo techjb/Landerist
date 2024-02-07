@@ -101,8 +101,9 @@
 
         public static readonly string BACKUPS_PRODUCTION_DIRECTORY = PrivateConfig.BACKUPS_PRODUCTION_DIRECTORY;
 
+        public static readonly string GOOGLE_CLOUD_LANDERIST_API_KEY = PrivateConfig.GOOGLE_GLOUD_LANDERIST_API_KEY;
 
-        public static readonly string GOOGLE_MAPS_API = PrivateConfig.GOOGLE_MAPS_API;
+        public static readonly string GOOGLE_SEARCH_ENGINE_ID = PrivateConfig.GOOGLE_SEARCH_ENGINE_ID;
 
         public static readonly string GOOGLE_NATURAL_LANGUAGE_API_KEY = PrivateConfig.GOOGLE_NATURAL_LANGUAGE_API_KEY;
 

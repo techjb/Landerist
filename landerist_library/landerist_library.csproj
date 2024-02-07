@@ -17,6 +17,7 @@
     <PackageReference Include="AWSSDK.S3" Version="3.7.305.12" />
     <PackageReference Include="Com.Bekijkhet.RobotsTxt" Version="1.0.0" />
     <PackageReference Include="CsvHelper" Version="30.0.1" />
+    <PackageReference Include="Google.Apis.CustomSearchAPI.v1" Version="1.66.0.3290" />
     <PackageReference Include="Google.Cloud.Language.V1" Version="3.3.0" />
     <PackageReference Include="Gzip.TextClassifier" Version="1.0.1" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.57" />

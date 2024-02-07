@@ -88,7 +88,7 @@ namespace landerist_library.Parse.PageTypeParser
                 RemoveTextContent(htmlDoc.DocumentNode);
                 return htmlDoc.DocumentNode.OuterHtml;
             }
-            catch (Exception ex)
+            catch
             {
                 return null;
             }
