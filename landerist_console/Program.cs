@@ -3,7 +3,7 @@ using landerist_library.Database;
 using landerist_library.Export;
 using landerist_library.Insert.GoogleCustomSearch;
 using landerist_library.Insert.GooglePlaces;
-using landerist_library.Insert.IdealistaAgencies;
+using landerist_library.Insert.IdAgenciesScraper;
 using landerist_library.Logs;
 using landerist_library.Parse.Listing.ChatGPT;
 using landerist_library.Parse.Location;
