@@ -1,49 +1,66 @@
 ﻿using landerist_library.Configuration;
-using landerist_library.Insert.GooglePlaces;
-using Newtonsoft.Json;
 using Google.Apis.CustomSearchAPI.v1;
 using Google.Apis.Services;
 using Google.Apis.CustomSearchAPI.v1.Data;
-using OpenQA.Selenium.DevTools.V118.Browser;
 
 namespace landerist_library.Insert.GoogleCustomSearch
 {
     public class CustomSearch
     {
-        private static readonly HashSet<string> Hosts = [];
+        private static readonly Dictionary<string, int> Hosts = [];
         private static readonly string CUSTOM_SEARCH_URL = "https://places.googleapis.com/v1/places:searchNearby";
-        private const int TOTAL_RESULTS_DESIRED = 30; 
+        private const int TOTAL_RESULTS_DESIRED = 30;
 
-        public static void Search()
+        public static void Start()
         {
-            SearhQuery();
+            var municipalities = GetMunicipalities();
+            Search(municipalities);
             Output();
         }
 
-        private static void SearhQuery()
+        private static HashSet<string> GetMunicipalities()
         {
-            string query = "inmobiliaria las rozas de madrid";
+            HashSet<string> result = [];
+            return result;
+        }
+
+        private static void Search(HashSet<string> municipalities)
+        {
+            int total = municipalities.Count;
+            int processed = 0;
+            foreach(var municipality in municipalities)
+            {
+                processed++;
+                Console.WriteLine(processed + "/" + total);
+                Searh(municipality);
+            }
+        }
+
+        private static void Searh(string municipality)
+        {
+            string query = "inmobiliaria " + municipality;
 
             var initializer = new BaseClientService.Initializer
             {
-                ApiKey = Config.GOOGLE_CLOUD_LANDERIST_API_KEY,
-                //GZipEnabled = true,
-            };
+                ApiKey = Config.GOOGLE_CLOUD_LANDERIST_API_KEY,                
+            };            
 
             int totalResultsObtained = 0;
             int startIndex = 1;
 
             while (totalResultsObtained < TOTAL_RESULTS_DESIRED)
-            {                
+            {
                 var customSearchAPIService = new CustomSearchAPIService(initializer);
                 var listRequest = customSearchAPIService.Cse.List();
                 listRequest.Q = query;
                 listRequest.Start = startIndex;
                 listRequest.Cx = Config.GOOGLE_SEARCH_ENGINE_ID;
-                listRequest.Gl = "es";
+                listRequest.Gl = "es";                
 
-                var items = Execute(listRequest, ref totalResultsObtained);
+                var items = ExecuteRequest(listRequest, ref totalResultsObtained);
                 startIndex += items;
+                
+                break;
                 if (startIndex >= 100)
                 {
                     break;
@@ -51,7 +68,7 @@ namespace landerist_library.Insert.GoogleCustomSearch
             }
         }
 
-        private static int Execute(CseResource.ListRequest listRequest, ref int totalResultsObtained)
+        private static int ExecuteRequest(CseResource.ListRequest listRequest, ref int totalResultsObtained)
         {
             try
             {
@@ -60,7 +77,7 @@ namespace landerist_library.Insert.GoogleCustomSearch
                 {
                     if (Uri.TryCreate(item.Link, UriKind.Absolute, out Uri? uri))
                     {
-                        Hosts.Add(uri.Host);
+                        AddHost(uri.Host);
                     }
                     totalResultsObtained++;
                     if (totalResultsObtained >= TOTAL_RESULTS_DESIRED)
@@ -77,12 +94,26 @@ namespace landerist_library.Insert.GoogleCustomSearch
             return 0;
         }
 
+        private static void AddHost(string host)
+        {
+            if (Hosts.TryGetValue(host, out int value))
+            {
+                Hosts[host] = ++value;
+            }
+            else
+            {
+                Hosts.Add(host, 1);
+            }
+        }
+
         private static void Output()
         {
             Console.WriteLine("Counter: " + Hosts.Count);
-            foreach (var host in Hosts)
+            var hosts = Hosts.OrderByDescending(x => x.Value).Take(50);
+
+            foreach (var host in hosts)
             {
-                Console.WriteLine(host);
+                Console.WriteLine($"{host.Key} : {host.Value}");
             }
         }
     }

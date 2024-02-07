@@ -3,6 +3,7 @@ using landerist_library.Database;
 using landerist_library.Export;
 using landerist_library.Insert.GoogleCustomSearch;
 using landerist_library.Insert.GooglePlaces;
+using landerist_library.Insert.IdealistaAgencies;
 using landerist_library.Logs;
 using landerist_library.Parse.Listing.ChatGPT;
 using landerist_library.Parse.Location;
@@ -13,6 +14,7 @@ using landerist_library.Statistics;
 using landerist_library.Websites;
 using OpenAI;
 using OpenQA.Selenium;
+using OpenQA.Selenium.DevTools.V118.Input;
 using System.Globalization;
 using System.Net;
 using System.Reflection;
@@ -175,7 +177,8 @@ namespace landerist_console
             //Websites.RemoveFromFile();
 
             //PlacesSearch.Search();
-            CustomSearch.Search();
+            //CustomSearch.Start();
+            IdAgenciesScraper.Start();
         }
     }
 }
