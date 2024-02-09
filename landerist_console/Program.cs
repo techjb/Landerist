@@ -178,7 +178,7 @@ namespace landerist_console
 
             //PlacesSearch.Search();
             //CustomSearch.Start();
-            IdAgenciesScraper.Start();
+            //IdAgenciesScraper.Start();            
         }
     }
 }

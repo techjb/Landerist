@@ -117,6 +117,8 @@
 
         public static readonly string AWS_S3_BUCKET_BACKUPS = PrivateConfig.AWS_S3_BUCKET_BACKUPS;
 
+        public static readonly string IDAGENCIES_URL = PrivateConfig.IDAGENCIES_URL;
+
         public static readonly int DAYS_TO_DELETE_BACKUP = 60;
 
         public static bool IsConfigurationProduction()

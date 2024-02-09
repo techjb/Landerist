@@ -268,7 +268,7 @@ namespace landerist_library.Websites
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors(Host, exception);
+                Logs.Log.WriteLogErrors("Website SetIpAddress", Host, exception);
             }
             return false;
         }
