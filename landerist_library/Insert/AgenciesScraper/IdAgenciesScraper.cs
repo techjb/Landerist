@@ -83,7 +83,7 @@ namespace landerist_library.Insert.IdAgenciesScraper
                     var url = (string)agencie.commercialData.microsite.url;
                     HashSetUrls.Add(url);
                 }
-                catch (Exception ex)
+                catch //(Exception ex)
                 {
 
                 }

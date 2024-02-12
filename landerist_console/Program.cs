@@ -172,9 +172,11 @@ namespace landerist_console
             //ListingHTMLDom.Test(url1, url2);
 
             //PageSelector.Select();
-            //Csv.ExportHostsMainUri();
 
-            //Websites.RemoveFromFile();
+            //Csv.ExportHostsMainUri();
+            //Websites.DeleteFromFile();
+            //Websites.UpdateListingUrisFromFile();
+            Websites.UpdateListingsHtmlsNulls();
 
             //PlacesSearch.Search();
             //CustomSearch.Start();

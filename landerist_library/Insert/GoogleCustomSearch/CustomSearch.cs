@@ -8,7 +8,6 @@ namespace landerist_library.Insert.GoogleCustomSearch
     public class CustomSearch
     {
         private static readonly Dictionary<string, int> Hosts = [];
-        private static readonly string CUSTOM_SEARCH_URL = "https://places.googleapis.com/v1/places:searchNearby";
         private const int TOTAL_RESULTS_DESIRED = 30;
 
         public static void Start()
@@ -59,8 +58,8 @@ namespace landerist_library.Insert.GoogleCustomSearch
 
                 var items = ExecuteRequest(listRequest, ref totalResultsObtained);
                 startIndex += items;
-                
-                break;
+
+                //break;
                 if (startIndex >= 100)
                 {
                     break;
@@ -87,7 +86,7 @@ namespace landerist_library.Insert.GoogleCustomSearch
                 }
                 return search.Items.Count;
             }
-            catch (Exception ex)
+            catch //(Exception ex)
             {
 
             }

@@ -1,7 +1,7 @@
 ﻿using HtmlAgilityPack;
+using landerist_library.Download;
 using landerist_library.Websites;
 using SimMetrics.Net.Metric;
-using System.Net;
 
 namespace landerist_library.Parse.PageTypeParser
 {
@@ -73,16 +73,17 @@ namespace landerist_library.Parse.PageTypeParser
             return string.Join(" | ", TagsToRemove.ToList());
         }
 
-        public static async Task<string?> GetListingUrlHtml(Website website)
+        public static string? GetListingUrlHtml(Website website)
         {
             if (website.ListingUri == null)
             {
                 return null;
-            }
-            var httpClient = new HttpClient();
+            }           
+
+            HttpClientDownloader httpClientDownloader = new();
             try
             {
-                var html = await httpClient.GetStringAsync(website.ListingUri);
+                var html = httpClientDownloader.GetAsync(website, website.ListingUri).Result;
                 var htmlDoc = new HtmlDocument();
                 htmlDoc.LoadHtml(html);
                 RemoveTextContent(htmlDoc.DocumentNode);
@@ -93,6 +94,22 @@ namespace landerist_library.Parse.PageTypeParser
                 return null;
             }
         }
+        //private static async Task<string?> GetHtml(Uri uri)
+        //{
+        //    var httpClient = new HttpClient();
+        //    try
+        //    {
+        //        var html = await httpClient.GetStringAsync(uri);
+        //        var htmlDoc = new HtmlDocument();
+        //        htmlDoc.LoadHtml(html);
+        //        RemoveTextContent(htmlDoc.DocumentNode);
+        //        return htmlDoc.DocumentNode.OuterHtml;
+        //    }
+        //    catch
+        //    {
+        //        return null;
+        //    }
+        //}
 
         private static void RemoveTextContent(HtmlNode node)
         {
@@ -110,36 +127,36 @@ namespace landerist_library.Parse.PageTypeParser
         }
 
 
-        public static void Test(string url1, string url2)
-        {
-            var htmlDocument1 = LoadUrlToHtmlDocument(url1);
-            var htmlDocument2 = LoadUrlToHtmlDocument(url2);
+        //public static void Test(string url1, string url2)
+        //{
+        //    var htmlDocument1 = LoadUrlToHtmlDocument(url1);
+        //    var htmlDocument2 = LoadUrlToHtmlDocument(url2);
 
-            Clean(htmlDocument1);
-            Clean(htmlDocument2);
+        //    Clean(htmlDocument1);
+        //    Clean(htmlDocument2);
 
-            //SimpleCompare(htmlDocument1, htmlDocument2);
-            JacardCompare(htmlDocument1, htmlDocument2);
-            //LevenshteinCompare(htmlDocument1, htmlDocument2);
-        }
+        //    //SimpleCompare(htmlDocument1, htmlDocument2);
+        //    JacardCompare(htmlDocument1, htmlDocument2);
+        //    //LevenshteinCompare(htmlDocument1, htmlDocument2);
+        //}
 
-        private static HtmlDocument LoadUrlToHtmlDocument(string url)
-        {
-            var htmlDocument = new HtmlDocument();
-            try
-            {
-                using WebClient client = new();
-                string pageContent = client.DownloadString(url);
+        //private static HtmlDocument LoadUrlToHtmlDocument(string url)
+        //{
+        //    var htmlDocument = new HtmlDocument();
+        //    try
+        //    {
+        //        Uri uri = new(url);
+        //        string? pageContent = GetHtml(uri).Result;
 
-                htmlDocument = new HtmlDocument();
-                htmlDocument.LoadHtml(pageContent);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error loading URL to HtmlDocument: " + ex.Message);
-            }
-            return htmlDocument;
-        }
+        //        htmlDocument = new HtmlDocument();
+        //        htmlDocument.LoadHtml(pageContent);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine("Error loading URL to HtmlDocument: " + ex.Message);
+        //    }
+        //    return htmlDocument;
+        //}
 
         private static void LevenshteinCompare(HtmlDocument htmlDocument1, HtmlDocument htmlDocument2)
         {
@@ -150,6 +167,7 @@ namespace landerist_library.Parse.PageTypeParser
             var similarity = cosine.GetSimilarity(text1, text2);
             Console.WriteLine($"GetSimilarity: {similarity}");
         }
+
         private static string ConvertDomToStructuralString(HtmlNode node)
         {
             if (node.NodeType == HtmlNodeType.Document)
@@ -163,8 +181,6 @@ namespace landerist_library.Parse.PageTypeParser
             }
             return "";
         }
-
-
 
         private static void JacardCompare(HtmlDocument htmlDocument1, HtmlDocument htmlDocument2)
         {

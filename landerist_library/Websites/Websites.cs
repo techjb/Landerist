@@ -1,6 +1,8 @@
 ﻿using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
+using Google.Api.Gax.Grpc;
 using HtmlAgilityPack;
 using landerist_library.Database;
+using System.Collections.Generic;
 using System.Data;
 
 namespace landerist_library.Websites
@@ -492,28 +494,34 @@ namespace landerist_library.Websites
             return GetWebsites(dataTable);
         }
 
-        public static void RemoveFromFile()
+        public static void DeleteFromFile()
         {
             string file = Configuration.Config.INSERT_DIRECTORY + "HostMainUri.csv";
             DataTable dataTable = Tools.Csv.ToDataTable(file);
-            int total = dataTable.Rows.Count;
-            int processed = 0;
-            int deleted = 0;
+
+            HashSet<string> hosts = [];
             foreach (DataRow row in dataTable.Rows)
             {
-                processed++;
-                Console.WriteLine(processed + "/" + total + " Deleted: " + deleted);
                 string host = (string)row[0];
                 string listingUrl = ((string)row[2]).Trim();
                 if (listingUrl.Equals(string.Empty))
                 {
-                    Website website = new(host);
-                    if (website.Delete())
-                    {
-                        deleted++;
-                    }
+                    hosts.Add(host);
                 }
             }
+            int total = hosts.Count;
+            int processed = 0;
+
+            Parallel.ForEach(hosts.AsEnumerable(), host =>
+            {
+                Website website = new(host);
+                if (website.GetNumPages() > 0)
+                {
+                    website.Delete();
+                }
+                Interlocked.Increment(ref processed);
+                Console.WriteLine(processed + "/" + total);
+            });
         }
 
         public static void UpdateListingUrisFromFile()
@@ -522,13 +530,17 @@ namespace landerist_library.Websites
             DataTable dataTable = Tools.Csv.ToDataTable(file);
             int total = dataTable.Rows.Count;
             int processed = 0;
-            int inserted = 0;
+            int updated = 0;
             foreach (DataRow row in dataTable.Rows)
             {
                 processed++;
-                Console.WriteLine(processed + "/" + total + " Inserted: " + inserted);
+                Console.WriteLine(processed + "/" + total + " Updated: " + updated);
                 string host = (string)row[0];
                 string listingUrl = ((string)row[2]).Trim();
+                if (listingUrl.Equals(string.Empty))
+                {
+                    continue;
+                }
                 if (Uri.TryCreate(listingUrl, UriKind.Absolute, out Uri? listingUri))
                 {
                     Website website = new(host)
@@ -537,27 +549,30 @@ namespace landerist_library.Websites
                     };
                     if (website.Update())
                     {
-                        inserted++;
+                        updated++;
                     }
                 }
             }
         }
 
-        public async static void UpdateListingsHtmls()
+        public static void UpdateListingsHtmlsNulls()
         {
             var websites = GetAll();
+            websites = websites.Where(website => website.ListingHtml is null).ToHashSet();
             int total = websites.Count;
             int processed = 0;
             int updated = 0;
-            foreach (var website in websites)
+            Parallel.ForEach(websites,
+                new ParallelOptions() { MaxDegreeOfParallelism = 1 },
+                website =>
             {
                 processed++;
                 Console.WriteLine(processed + "/" + total + " Updated: " + updated);
 
-                var html = await Parse.PageTypeParser.ListingSimilarity.GetListingUrlHtml(website);
-                if(html == null)
+                var html = Parse.PageTypeParser.ListingSimilarity.GetListingUrlHtml(website);
+                if (html == null)
                 {
-                    continue;
+                    return;
                 }
                 website.ListingHtml = html;
                 website.ListingHtmlUpdated = DateTime.Now;
@@ -565,7 +580,7 @@ namespace landerist_library.Websites
                 {
                     updated++;
                 }
-            }
+            });
         }
     }
 }

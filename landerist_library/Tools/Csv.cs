@@ -13,7 +13,7 @@ namespace landerist_library.Tools
             var csvConfiguration = new CsvConfiguration(CultureInfo.CurrentCulture)
             {
                 BadDataFound = null
-            };
+            };            
             using var csvReader = new CsvReader(streamReader, csvConfiguration);            
             using var csvDataReader = new CsvDataReader(csvReader);
 
@@ -22,6 +22,7 @@ namespace landerist_library.Tools
             return dataTable;
         }
 
+        
         public static void Write(DataTable dataTable, string fileName, bool addHeaders)
         {
             using StreamWriter streamWriter = new(fileName);

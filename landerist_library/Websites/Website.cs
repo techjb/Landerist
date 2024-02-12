@@ -128,7 +128,7 @@ namespace landerist_library.Websites
             IpAddressUpdated = dataRow["IpAddressUpdated"] is DBNull ? null : (DateTime)dataRow["IpAddressUpdated"];
             NumPages = (int)dataRow["NumPages"];
             NumListings = (int)dataRow["NumListings"];
-            ListingUri = dataRow["ListingUri"] is DBNull ? null : new Uri(dataRow["ListingUri"].ToString()!);            
+            ListingUri = dataRow["ListingUri"] is DBNull ? null : new Uri(dataRow["ListingUri"].ToString()!);
             ListingHtml = dataRow["ListingHtml"] is DBNull ? null : dataRow["ListingHtml"].ToString();
             ListingHtmlUpdated = dataRow["ListingHtmlUpdated"] is DBNull ? null : (DateTime)dataRow["ListingHtmlUpdated"];
         }
@@ -266,9 +266,9 @@ namespace landerist_library.Websites
                 }
                 return true;
             }
-            catch (Exception exception)
+            catch// (Exception exception)
             {
-                Logs.Log.WriteLogErrors("Website SetIpAddress", Host, exception);
+                //Logs.Log.WriteLogErrors("Website SetIpAddress", Host, exception);
             }
             return false;
         }
@@ -327,8 +327,8 @@ namespace landerist_library.Websites
         public void DeleteListings()
         {
             int counter = 0;
-            var pages = GetPages();
-            Parallel.ForEach(pages, page =>
+            var pages = GetPages();                        
+            foreach(var page in pages) 
             {
                 var listing = ES_Listings.GetListing(page, false);
                 if (listing != null)
@@ -340,7 +340,7 @@ namespace landerist_library.Websites
                         counter++;
                     }
                 }
-            });
+            };
 
             Console.WriteLine("Deleted " + counter + " listings");
         }

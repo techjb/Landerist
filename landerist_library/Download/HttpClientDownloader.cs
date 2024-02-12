@@ -12,12 +12,16 @@ namespace landerist_library.Download
         {
             page.HttpStatusCode = null;
             page.InitializeResponseBody();
-
-            var task = Task.Run(async () => await GetAsync(page));
-            return task.Result;
+            
+            var result = GetAsync(page.Website, page.Uri);
+            if(HttpResponseMessage != null)
+            {
+                page.HttpStatusCode = (short)HttpResponseMessage.StatusCode;
+            }            
+            return result.Result;
         }
-
-        private async Task<string?> GetAsync(Page page)
+        
+        public async Task<string?> GetAsync(Website website, Uri uri)
         {
             HttpClientHandler handler = new()
             {
@@ -28,19 +32,18 @@ namespace landerist_library.Download
 
             using var httpClient = new HttpClient(handler);
             httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
-            SetAccepLanguage(httpClient, page);
+            SetAccepLanguage(httpClient, website.LanguageCode);
             httpClient.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
 
-            HttpRequestMessage httpRequestMessage = new(HttpMethod.Get, page.Uri);
-            HttpResponseMessage = null;            
+            HttpRequestMessage httpRequestMessage = new(HttpMethod.Get, uri);
+            HttpResponseMessage = null;
 
             try
             {
                 DateTime dateStart = DateTime.Now;
                 HttpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
-                Timers.Timer.SaveTimerDownloadPage(page.Uri.ToString(), dateStart);
-                page.HttpStatusCode = (short)HttpResponseMessage.StatusCode;
-                return await HttpResponseMessage.Content.ReadAsStringAsync();                
+                Timers.Timer.SaveTimerDownloadPage(uri.ToString(), dateStart);
+                return await HttpResponseMessage.Content.ReadAsStringAsync();
             }
             catch //(Exception exception)
             {
@@ -49,9 +52,9 @@ namespace landerist_library.Download
             return null;
         }
 
-        private static void SetAccepLanguage(HttpClient httpClient, Page page)
+        private static void SetAccepLanguage(HttpClient httpClient, LanguageCode languageCode)
         {
-            switch (page.Website.LanguageCode)
+            switch (languageCode)
             {
                 case LanguageCode.es:
                     {
@@ -71,5 +74,7 @@ namespace landerist_library.Download
             }
             return null;
         }
+
+
     }
 }
