@@ -54,6 +54,15 @@ namespace landerist_library.Websites
             return new DataBase().QueryTable(query);
         }
 
+        public static DataTable GetAllListingHtmlNull()
+        {
+            string query =
+                "SELECT * " +
+                "FROM " + TABLE_WEBSITES + " " +
+                "WHERE [ListingHtml] is null";
+            return new DataBase().QueryTable(query);
+        }
+
         public static DataTable GetDataTableHostMainUri()
         {
             string query =
@@ -557,29 +566,32 @@ namespace landerist_library.Websites
 
         public static void UpdateListingsHtmlsNulls()
         {
-            var websites = GetAll();
-            websites = websites.Where(website => website.ListingHtml is null).ToHashSet();
+            var dataTable = GetAllListingHtmlNull();
+            var websites = GetWebsites(dataTable);            
             int total = websites.Count;
             int processed = 0;
             int updated = 0;
+            int errors = 0;
             Parallel.ForEach(websites,
-                new ParallelOptions() { MaxDegreeOfParallelism = 1 },
+                //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
                 website =>
             {
-                processed++;
-                Console.WriteLine(processed + "/" + total + " Updated: " + updated);
-
                 var html = Parse.PageTypeParser.ListingSimilarity.GetListingUrlHtml(website);
-                if (html == null)
+                if (html != null)
                 {
-                    return;
+                    website.ListingHtml = html;
+                    website.ListingHtmlUpdated = DateTime.Now;
+                    if (website.Update())
+                    {
+                        Interlocked.Increment(ref updated);
+                    }                    
                 }
-                website.ListingHtml = html;
-                website.ListingHtmlUpdated = DateTime.Now;
-                if (website.Update())
+                else
                 {
-                    updated++;
+                    Interlocked.Increment(ref errors);                    
                 }
+                Interlocked.Increment(ref processed);
+                Console.WriteLine(processed + "/" + total + " Updated: " + updated + " Errors: " + errors);
             });
         }
     }

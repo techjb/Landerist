@@ -12,6 +12,7 @@
         ResponseBodyTooLarge,
         ResponseBodyTooShort,
         ResponseBodyTooManyTokens,
+        HtmlNotSimilarToListing,
         MayBeListing,
         Listing,
         UnpublishedListing,

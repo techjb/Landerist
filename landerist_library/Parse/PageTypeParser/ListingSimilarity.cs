@@ -1,7 +1,6 @@
 ﻿using HtmlAgilityPack;
 using landerist_library.Download;
 using landerist_library.Websites;
-using SimMetrics.Net.Metric;
 
 namespace landerist_library.Parse.PageTypeParser
 {
@@ -61,7 +60,7 @@ namespace landerist_library.Parse.PageTypeParser
             "//blockquote",
             "//q",
             "//abbr",
-            "//cite",            
+            "//cite",
             "//dfn",
             "//address",
         ];
@@ -78,38 +77,26 @@ namespace landerist_library.Parse.PageTypeParser
             if (website.ListingUri == null)
             {
                 return null;
-            }           
+            }
 
             HttpClientDownloader httpClientDownloader = new();
             try
             {
                 var html = httpClientDownloader.GetAsync(website, website.ListingUri).Result;
-                var htmlDoc = new HtmlDocument();
-                htmlDoc.LoadHtml(html);
-                RemoveTextContent(htmlDoc.DocumentNode);
-                return htmlDoc.DocumentNode.OuterHtml;
+                if (html != null)
+                {
+                    var htmlDoc = new HtmlDocument();
+                    htmlDoc.LoadHtml(html);
+                    RemoveTextContent(htmlDoc.DocumentNode);
+                    return htmlDoc.DocumentNode.OuterHtml;
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                return null;
+                Console.WriteLine(ex.Message);
             }
+            return null;
         }
-        //private static async Task<string?> GetHtml(Uri uri)
-        //{
-        //    var httpClient = new HttpClient();
-        //    try
-        //    {
-        //        var html = await httpClient.GetStringAsync(uri);
-        //        var htmlDoc = new HtmlDocument();
-        //        htmlDoc.LoadHtml(html);
-        //        RemoveTextContent(htmlDoc.DocumentNode);
-        //        return htmlDoc.DocumentNode.OuterHtml;
-        //    }
-        //    catch
-        //    {
-        //        return null;
-        //    }
-        //}
 
         private static void RemoveTextContent(HtmlNode node)
         {
@@ -127,18 +114,37 @@ namespace landerist_library.Parse.PageTypeParser
         }
 
 
-        //public static void Test(string url1, string url2)
-        //{
-        //    var htmlDocument1 = LoadUrlToHtmlDocument(url1);
-        //    var htmlDocument2 = LoadUrlToHtmlDocument(url2);
+        public static bool IsSimilarHtml(Page page)
+        {
+            if (page.Website.ListingHtml == null)
+            {
+                return true;
+            }
+            page.LoadHtmlDocument(true);
+            if (page.HtmlDocument == null)
+            {
+                return true;
+            }
+            try
+            {
+                var listingHtml = new string(page.Website.ListingHtml);
+                var listingHtmlDocument = new HtmlDocument();
+                listingHtmlDocument.LoadHtml(listingHtml);
+                Clean(listingHtmlDocument);
 
-        //    Clean(htmlDocument1);
-        //    Clean(htmlDocument2);
+                RemoveTextContent(page.HtmlDocument.DocumentNode);
+                Clean(page.HtmlDocument);
 
-        //    //SimpleCompare(htmlDocument1, htmlDocument2);
-        //    JacardCompare(htmlDocument1, htmlDocument2);
-        //    //LevenshteinCompare(htmlDocument1, htmlDocument2);
-        //}
+                double similarity = JacardCompare(listingHtmlDocument, page.HtmlDocument);
+                Console.WriteLine(similarity);
+            }
+            catch (Exception exception)
+            {
+                Logs.Log.WriteLogErrors("ListingSimilarity IsSimilar", exception);
+            }
+
+            return true;
+        }
 
         //private static HtmlDocument LoadUrlToHtmlDocument(string url)
         //{
@@ -158,31 +164,31 @@ namespace landerist_library.Parse.PageTypeParser
         //    return htmlDocument;
         //}
 
-        private static void LevenshteinCompare(HtmlDocument htmlDocument1, HtmlDocument htmlDocument2)
-        {
-            string text1 = ConvertDomToStructuralString(htmlDocument1.DocumentNode);
-            string text2 = ConvertDomToStructuralString(htmlDocument2.DocumentNode);
+        //private static void LevenshteinCompare(HtmlDocument htmlDocument1, HtmlDocument htmlDocument2)
+        //{
+        //    string text1 = ConvertDomToStructuralString(htmlDocument1.DocumentNode);
+        //    string text2 = ConvertDomToStructuralString(htmlDocument2.DocumentNode);
 
-            var cosine = new Levenstein();
-            var similarity = cosine.GetSimilarity(text1, text2);
-            Console.WriteLine($"GetSimilarity: {similarity}");
-        }
+        //    var cosine = new Levenstein();
+        //    var similarity = cosine.GetSimilarity(text1, text2);
+        //    Console.WriteLine($"GetSimilarity: {similarity}");
+        //}
 
-        private static string ConvertDomToStructuralString(HtmlNode node)
-        {
-            if (node.NodeType == HtmlNodeType.Document)
-            {
-                return string.Join("", node.ChildNodes.Select(n => ConvertDomToStructuralString(n)));
-            }
-            if (node.NodeType == HtmlNodeType.Element)
-            {
-                var childStructure = string.Join("", node.ChildNodes.Select(n => ConvertDomToStructuralString(n)));
-                return $"<{node.Name}>{childStructure}</{node.Name}>";
-            }
-            return "";
-        }
+        //private static string ConvertDomToStructuralString(HtmlNode node)
+        //{
+        //    if (node.NodeType == HtmlNodeType.Document)
+        //    {
+        //        return string.Join("", node.ChildNodes.Select(n => ConvertDomToStructuralString(n)));
+        //    }
+        //    if (node.NodeType == HtmlNodeType.Element)
+        //    {
+        //        var childStructure = string.Join("", node.ChildNodes.Select(n => ConvertDomToStructuralString(n)));
+        //        return $"<{node.Name}>{childStructure}</{node.Name}>";
+        //    }
+        //    return "";
+        //}
 
-        private static void JacardCompare(HtmlDocument htmlDocument1, HtmlDocument htmlDocument2)
+        private static double JacardCompare(HtmlDocument htmlDocument1, HtmlDocument htmlDocument2)
         {
             HashSet<string> nodeSet1 = [];
             HashSet<string> nodeSet2 = [];
@@ -199,26 +205,22 @@ namespace landerist_library.Parse.PageTypeParser
             var except = new HashSet<string>(nodeSet1);
             except.ExceptWith(nodeSet2);
 
-            double jaccardSimilarity = (double)intersection.Count / union.Count;
-            Console.WriteLine($"{(double)intersection.Count }/{union.Count} = {jaccardSimilarity:P2}");
-
-            Console.WriteLine(" -- EXCEPT -- ");
-            foreach (var tag in except)
-            {
-                Console.WriteLine(tag);
-            }
+            return (double)intersection.Count / union.Count;
         }
 
         static void BuildNodeSet(HtmlNode node, HashSet<string> nodeSet)
         {
-            string nodeRepresentation =
-                node.NodeType == HtmlNodeType.Element ?
+            string nodeRepresentation = (node.NodeType == HtmlNodeType.Element) ?
                 node.Name.ToLower() :
                 node.NodeType.ToString();
 
             nodeSet.Add(nodeRepresentation);
             foreach (HtmlNode child in node.ChildNodes)
             {
+                if (child.Name.ToLower().Equals("nav"))
+                {
+
+                }
                 BuildNodeSet(child, nodeSet);
             }
         }
@@ -246,8 +248,8 @@ namespace landerist_library.Parse.PageTypeParser
 
             int matches = 0, total = 0;
 
-            Compare(htmlDocumentListing.DocumentNode, htmlDocumentTest.DocumentNode, ref matches, ref total);
-            foreach(var tag in Tags)
+            SimpleCompare(htmlDocumentListing.DocumentNode, htmlDocumentTest.DocumentNode, ref matches, ref total);
+            foreach (var tag in Tags)
             {
                 Console.WriteLine(tag);
             }
@@ -255,9 +257,9 @@ namespace landerist_library.Parse.PageTypeParser
             double similarityPercentage = total > 0 ? (double)matches / total * 100 : 0;
             Console.WriteLine($"Similarity: {similarityPercentage}%");
         }
-        
 
-        private static void Compare(HtmlNode node1, HtmlNode node2, ref int matches, ref int total)
+
+        private static void SimpleCompare(HtmlNode node1, HtmlNode node2, ref int matches, ref int total)
         {
             total++;
             matches += CompareNodeTypes(node1, node2);
@@ -267,7 +269,7 @@ namespace landerist_library.Parse.PageTypeParser
             {
                 var node1ChildNode = node1.ChildNodes[i];
                 var node2ChildNode = node2.ChildNodes[i];
-                Compare(node1ChildNode, node2ChildNode, ref matches, ref total);
+                SimpleCompare(node1ChildNode, node2ChildNode, ref matches, ref total);
             }
         }
 
@@ -279,7 +281,7 @@ namespace landerist_library.Parse.PageTypeParser
             }
             if (node1.NodeType == HtmlNodeType.Element && node2.NodeType == HtmlNodeType.Element)
             {
-                Tags.Add(node1.Name);                
+                Tags.Add(node1.Name);
                 return node1.Name.Equals(node2.Name, StringComparison.OrdinalIgnoreCase) ? 1 : 0;
             }
             return 1;

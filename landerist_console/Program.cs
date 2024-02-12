@@ -81,7 +81,7 @@ namespace landerist_console
             //var uri = new Uri("https://www.badainmobiliaria.com");
             //var uri = new Uri("http://alicante-casas.com/ad/100262248");
             //var uri = new Uri("http://www.abbeyproperties.eu/ficha-inmueble.php/?cod_inmueble=888933");
-            //var uri = new Uri("https://www.inmobiliariaalameda.com/index.php?vistas=1");
+            //var uri = new Uri("https://tongas.es/inmueble.php?id_inmueble=3482");
 
             //Config.SetToProduction();
             Config.SetDatabaseToProduction();
@@ -122,7 +122,7 @@ namespace landerist_console
             //new Scraper().ScrapeUnknowPageType(website);
             //Scraper.Scrape(uri);
             //new Scraper().ScrapeAllPages();            
-            //new Scraper().Start();
+            new Scraper().Start();
 
             //landerist_library.Parse.Listing.ListingsParser.Start();            
 
@@ -176,7 +176,7 @@ namespace landerist_console
             //Csv.ExportHostsMainUri();
             //Websites.DeleteFromFile();
             //Websites.UpdateListingUrisFromFile();
-            Websites.UpdateListingsHtmlsNulls();
+            //Websites.UpdateListingsHtmlsNulls();
 
             //PlacesSearch.Search();
             //CustomSearch.Start();

@@ -37,9 +37,7 @@ namespace landerist_library.Parse.PageTypeParser
 
             page.SetResponseBodyText();
 
-            if (!page.ResponseBodyTextHasChanged &&
-                page.PageType != null &&
-                !page.PageType.Equals(PageType.MayBeListing))
+            if (ResponseBodyTextHasNotChanged(page))
             {
                 return (page.PageType, null);
             }
@@ -60,8 +58,21 @@ namespace landerist_library.Parse.PageTypeParser
             {
                 return (PageType.ResponseBodyTooManyTokens, null);
             }
+            if (!ListingSimilarity.IsSimilarHtml(page))
+            {
+                return (PageType.HtmlNotSimilarToListing, null);
+            }
 
             return new ParseListingRequest().Parse(page);
+        }
+
+        private static bool ResponseBodyTextHasNotChanged(Page page)
+        {
+            return
+                !page.ResponseBodyTextHasChanged &&
+                page.PageType != null &&
+                !page.PageType.Equals(PageType.MayBeListing) &&
+                Configuration.Config.IsConfigurationProduction();
         }
 
         private static bool IsCorrectLanguage(Page page)
