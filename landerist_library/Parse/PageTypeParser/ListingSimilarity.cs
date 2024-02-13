@@ -1,5 +1,4 @@
 ﻿using HtmlAgilityPack;
-using landerist_library.Download;
 using landerist_library.Websites;
 
 namespace landerist_library.Parse.PageTypeParser
@@ -14,7 +13,7 @@ namespace landerist_library.Parse.PageTypeParser
             "//style",
             //"//header",
             //"//nav",
-            "//footer",
+            //"//footer",
             "//aside",
             "//a",
             "//code",
@@ -27,7 +26,7 @@ namespace landerist_library.Parse.PageTypeParser
             "//textarea",
             "//del",
             //"//button",
-            "//form[not(.//input[@id='__VIEWSTATE' or @id='__VIEWSTATEGENERATOR' or @id='__EVENTVALIDATION'])]",
+            //"//form[not(.//input[@id='__VIEWSTATE' or @id='__VIEWSTATEGENERATOR' or @id='__EVENTVALIDATION'])]",
             //"//input",
             //"//*[contains(@style, 'text-decoration: line-through')]",
             //"//*[contains(@style, 'text-decoration:line-through')]"
@@ -109,7 +108,7 @@ namespace landerist_library.Parse.PageTypeParser
                 Clean(htmlDocument);
 
                 double similarity = JacardCompare(htmlDocumentExample, htmlDocument);
-                return similarity < Configuration.Config.MIN_PERCENTAGE_TO_BE_SIMILAR_PAGE;        
+                return similarity < Configuration.Config.MINIMUM_PERCENTAGE_TO_BE_SIMILAR_PAGE;        
             }
             catch (Exception exception)
             {
@@ -158,8 +157,11 @@ namespace landerist_library.Parse.PageTypeParser
             var union = new HashSet<string>(nodeSet1);
             union.UnionWith(nodeSet2);
 
-            var except = new HashSet<string>(nodeSet1);
-            except.ExceptWith(nodeSet2);
+            var except1 = new HashSet<string>(nodeSet1);
+            except1.ExceptWith(nodeSet2);
+
+            var except2 = new HashSet<string>(nodeSet2);
+            except2.ExceptWith(nodeSet1);
 
             return (double)intersection.Count / union.Count;
         }

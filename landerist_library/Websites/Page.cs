@@ -277,12 +277,7 @@ namespace landerist_library.Websites
         public bool CanIndexImages()
         {
             return !ContainsMetaRobots("noimageindex");
-        }
-
-        public bool CanNotFollowLinks()
-        {
-            return ContainsMetaRobots("noindex");
-        }
+        }        
 
         private bool ContainsMetaRobots(string content)
         {

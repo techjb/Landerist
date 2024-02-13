@@ -118,7 +118,7 @@ namespace landerist_library.Scrape
                 new LinkAlternateIndexer(Page).InsertLinksAlternate();
                 return;
             }
-            if (!Page.CanNotFollowLinks())
+            if (Page.NotIndexable())
             {
                 return;
             }

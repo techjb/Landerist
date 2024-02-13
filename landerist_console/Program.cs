@@ -82,7 +82,7 @@ namespace landerist_console
             //var uri = new Uri("https://www.badainmobiliaria.com");
             //var uri = new Uri("http://alicante-casas.com/ad/100262248");
             //var uri = new Uri("http://www.abbeyproperties.eu/ficha-inmueble.php/?cod_inmueble=888933");
-            //var uri = new Uri("https://tongas.es/inmueble.php?id_inmueble=3482");
+            var uri = new Uri("https://www.manuelaperez.com/inmuebles/7593/venta-alquiler/inmuebles/7599/agencia-inmobiliaria-en-caceres.html");
 
             //Config.SetToProduction();
             Config.SetDatabaseToProduction();
@@ -121,7 +121,7 @@ namespace landerist_console
             //new Scraper().ScrapeIsNotListing(uri);
             //new Scraper().Scrape(website);
             //new Scraper().ScrapeUnknowPageType(website);
-            //Scraper.Scrape(uri);
+            Scraper.Scrape(uri);
             //new Scraper().ScrapeAllPages();            
             //new Scraper().Start();
 
