@@ -44,7 +44,7 @@ namespace landerist_library.Scrape
         {
             if (Page.PageType != null && Page.PageType.Equals(PageType.Listing) && newPageType != PageType.Listing)
             {
-                newPageType = PageType.UnpublishedListing;               
+                newPageType = PageType.UnpublishedListing;
             }
             return newPageType;
         }
@@ -57,7 +57,7 @@ namespace landerist_library.Scrape
                 SetMedia();
                 SetLocation();
                 UpdateListing();
-            }            
+            }
         }
 
         private void UpdateIfUnPublishedListing()
@@ -112,16 +112,17 @@ namespace landerist_library.Scrape
             {
                 return;
             }
-           
+
             if (Page.PageType.Equals(PageType.IncorrectLanguage))
             {
                 new LinkAlternateIndexer(Page).InsertLinksAlternate();
                 return;
             }
-            if (Page.CanFollowLinks())
+            if (!Page.CanNotFollowLinks())
             {
-                new HyperlinksIndexer(Page).Insert();
+                return;
             }
+            new HyperlinksIndexer(Page).Insert();
         }
 
         private void RedirectIfError()

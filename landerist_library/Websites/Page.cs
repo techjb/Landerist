@@ -269,9 +269,9 @@ namespace landerist_library.Websites
             return listing is not null;
         }
 
-        public bool IsIndexable()
+        public bool NotIndexable()
         {
-            return !ContainsMetaRobots("noindex");
+            return ContainsMetaRobots("noindex");
         }
 
         public bool CanIndexImages()
@@ -279,9 +279,9 @@ namespace landerist_library.Websites
             return !ContainsMetaRobots("noimageindex");
         }
 
-        public bool CanFollowLinks()
+        public bool CanNotFollowLinks()
         {
-            return !ContainsMetaRobots("noindex");
+            return ContainsMetaRobots("noindex");
         }
 
         private bool ContainsMetaRobots(string content)

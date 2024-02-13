@@ -27,6 +27,7 @@
             AddPages(PageType.ResponseBodyTooLarge, 3, 5);
             AddPages(PageType.ResponseBodyTooShort, 3, 5);
             AddPages(PageType.ResponseBodyTooManyTokens, 3, 5);
+            AddPages(PageType.HtmlNotSimilarToListing, 3, 5);
             AddPages(PageType.MayBeListing, 1);
             AddPages(PageType.Listing, 7);
             AddPages(PageType.UnpublishedListing, 3, 2);

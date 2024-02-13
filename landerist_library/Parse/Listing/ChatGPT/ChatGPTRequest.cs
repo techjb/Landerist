@@ -63,14 +63,14 @@ namespace landerist_library.Parse.Listing.ChatGPT
             return null;
         }
 
-        protected static bool IsLengthAllowed(string systemMessage, string userMessage)
+        protected static bool TooManyTokens(string systemMessage, string userMessage)
         {
             //https://github.com/dluc/openai-tools
             int systemTokens = GPT3Tokenizer.Encode(systemMessage).Count;
             int userTokens = GPT3Tokenizer.Encode(userMessage).Count;
 
             int totalTokens = systemTokens + userTokens;
-            return totalTokens < MAX_TOKENS;
+            return totalTokens > MAX_TOKENS;
         }
 
         public void ListModels()

@@ -88,37 +88,35 @@ namespace landerist_library.Parse.PageTypeParser
         }
 
 
-        public static bool IsSimilarHtml(Page page)
+        public static bool HtmlNotSimilarToListing(Page page)
         {
             if (page.Website.ListingExampleHtml == null)
             {
-                return true;
+                return false;
             }
             var htmlDocument = page.GetHtmlDocument();
             if (htmlDocument == null)
             {
-                return true;
+                return false;
             }
             try
             {
-                var listingHtml = new string(page.Website.ListingExampleHtml);
-                var listingHtmlDocument = new HtmlDocument();
-                listingHtmlDocument.LoadHtml(listingHtml);
-                Clean(listingHtmlDocument);
+                var htmlDocumentExample = new HtmlDocument();
+                htmlDocumentExample.LoadHtml(new string(page.Website.ListingExampleHtml));
+                Clean(htmlDocumentExample);
 
                 RemoveTextContent(htmlDocument.DocumentNode);
                 Clean(htmlDocument);
 
-                double similarity = JacardCompare(listingHtmlDocument, htmlDocument);
-                //return similarity >= Configuration.Config.MIN_PERCENTAGE_TO_BE_SIMILAR_PAGE;                
-                return true;
+                double similarity = JacardCompare(htmlDocumentExample, htmlDocument);
+                return similarity < Configuration.Config.MIN_PERCENTAGE_TO_BE_SIMILAR_PAGE;        
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("ListingSimilarity IsSimilar", exception);
+                Logs.Log.WriteLogErrors("ListingSimilarity HtmlNotSimilarToListing", exception);
             }
 
-            return true;
+            return false;
         }
 
 

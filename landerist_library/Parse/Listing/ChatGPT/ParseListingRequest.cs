@@ -20,6 +20,15 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
         }
 
+        public static bool TooManyTokens(string? text)
+        {
+            if (text == null)
+            {
+                return false;
+            }
+            return TooManyTokens(SystemMessage, text);
+        }
+
         public (PageType pageType, landerist_orels.ES.Listing? listing) Parse(Page page)
         {
             var chatResponse = GetResponse(page.ResponseBodyText, false);
@@ -84,7 +93,6 @@ namespace landerist_library.Parse.Listing.ChatGPT
             {
                 Logs.Log.WriteLogErrors("ParseListingRequest ParseListing", page.Uri, exception);
             }
-
             return result;
         }
     }
