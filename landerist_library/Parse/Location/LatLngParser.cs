@@ -28,13 +28,13 @@ namespace landerist_library.Parse.Location
                 return;
             }
 
-            Page.LoadHtmlDocument(true);
-            if (Page.HtmlDocument == null)
+            var htmlDocument = Page.GetHtmlDocument();
+            if (htmlDocument == null)
             {
                 return;
             }
-            LatLngIframeGoogleMaps(Page.HtmlDocument);
-            LatLngInHtmlLatLng(Page.HtmlDocument);
+            LatLngIframeGoogleMaps(htmlDocument);
+            LatLngInHtmlLatLng(htmlDocument);
             AddressToLatLng();
             SetLatLngToListing();
         }

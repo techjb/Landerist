@@ -13,6 +13,8 @@ namespace landerist_library.Parse.Media
 
         public readonly SortedSet<landerist_orels.ES.Media> Media = new(new MediaComparer());
 
+        public HtmlDocument? HtmlDocument { get; set; }
+
         public MediaParser(Page page)
         {
             Page = page;
@@ -21,7 +23,7 @@ namespace landerist_library.Parse.Media
 
         public void AddMedia(landerist_orels.ES.Listing listing)
         {
-            if (Page.HtmlDocument == null)
+            if (HtmlDocument == null)
             {
                 return;
             }
@@ -36,8 +38,8 @@ namespace landerist_library.Parse.Media
 
         private void InitHtmlDocument()
         {
-            Page.LoadHtmlDocument(true);
-            if (Page.HtmlDocument == null)
+            HtmlDocument = Page.GetHtmlDocument();
+            if (HtmlDocument == null)
             {
                 return;
             }
@@ -50,7 +52,7 @@ namespace landerist_library.Parse.Media
 
             try
             {
-                nodesToRemove = [.. Page.HtmlDocument.DocumentNode.SelectNodes(xPath)];                 
+                nodesToRemove = [.. HtmlDocument.DocumentNode.SelectNodes(xPath)];                 
             }
             catch
             {

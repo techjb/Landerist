@@ -3,6 +3,7 @@ using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Tools;
 using landerist_orels.ES;
+using System;
 using System.Data;
 
 namespace landerist_library.Websites
@@ -38,7 +39,7 @@ namespace landerist_library.Websites
         public Website Website = new();
 
 
-        public HtmlDocument? HtmlDocument = null;
+        //public HtmlDocument? HtmlDocument = null;
 
 
         private bool Disposed;
@@ -193,23 +194,23 @@ namespace landerist_library.Websites
             }
             return true;
         }
-
-        public void LoadHtmlDocument(bool forceReload = false)
+        
+        public HtmlDocument? GetHtmlDocument()
         {
-            if (string.IsNullOrEmpty(ResponseBody) || (HtmlDocument != null && !forceReload))
+            if (!string.IsNullOrEmpty(ResponseBody))
             {
-                return;
+                try
+                {
+                    HtmlDocument htmlDocument = new();
+                    htmlDocument.LoadHtml(ResponseBody);                    
+                    return htmlDocument;
+                }
+                catch(Exception exception) 
+                {
+                    Logs.Log.WriteLogErrors("Page GetHtmlDocument", Uri, exception);
+                }
             }
-            try
-            {
-                HtmlDocument = new();
-                HtmlDocument.LoadHtml(ResponseBody);
-            }
-            catch (Exception exception)
-            {
-                Logs.Log.WriteLogErrors("Page LoadHtmlDocument", Uri, exception);
-                HtmlDocument = null;
-            }
+            return null;
         }
 
         public bool IsMainPage()
@@ -238,10 +239,10 @@ namespace landerist_library.Websites
 
         public void SetResponseBodyText()
         {
-            LoadHtmlDocument();
-            if (HtmlDocument != null)
+            var htmlDocument = GetHtmlDocument();
+            if (htmlDocument != null)
             {
-                ResponseBodyText = HtmlToText.GetText(HtmlDocument);
+                ResponseBodyText = HtmlToText.GetText(htmlDocument);
                 SetResponseBodyTextHash();
             }
         }
@@ -285,10 +286,10 @@ namespace landerist_library.Websites
 
         private bool ContainsMetaRobots(string content)
         {
-            LoadHtmlDocument();
-            if (HtmlDocument != null)
+            var htmlDocument = GetHtmlDocument();
+            if (htmlDocument != null)
             {
-                var node = HtmlDocument.DocumentNode.SelectSingleNode("//meta[@name='robots']");
+                var node = htmlDocument.DocumentNode.SelectSingleNode("//meta[@name='robots']");
                 if (node != null)
                 {
                     var contentAttribute = node.GetAttributeValue("content", "");
@@ -342,7 +343,7 @@ namespace landerist_library.Websites
             {
                 Host = string.Empty;
                 UriHash = string.Empty;
-                HtmlDocument = null;
+                //HtmlDocument = null;
                 ResponseBody = null;
                 ResponseBodyText = null;
                 ResponseBodyTextHash = null;

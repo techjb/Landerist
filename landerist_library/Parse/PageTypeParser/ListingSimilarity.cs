@@ -72,33 +72,7 @@ namespace landerist_library.Parse.PageTypeParser
             return string.Join(" | ", TagsToRemove.ToList());
         }
 
-        public static string? GetListingUrlHtml(Website website)
-        {
-            if (website.ListingUri == null)
-            {
-                return null;
-            }
-
-            HttpClientDownloader httpClientDownloader = new();
-            try
-            {
-                var html = httpClientDownloader.GetAsync(website, website.ListingUri).Result;
-                if (html != null)
-                {
-                    var htmlDoc = new HtmlDocument();
-                    htmlDoc.LoadHtml(html);
-                    RemoveTextContent(htmlDoc.DocumentNode);
-                    return htmlDoc.DocumentNode.OuterHtml;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            return null;
-        }
-
-        private static void RemoveTextContent(HtmlNode node)
+        public static void RemoveTextContent(HtmlNode node)
         {
             if (node.NodeType == HtmlNodeType.Text)
             {
@@ -116,27 +90,28 @@ namespace landerist_library.Parse.PageTypeParser
 
         public static bool IsSimilarHtml(Page page)
         {
-            if (page.Website.ListingHtml == null)
+            if (page.Website.ListingExampleHtml == null)
             {
                 return true;
             }
-            page.LoadHtmlDocument(true);
-            if (page.HtmlDocument == null)
+            var htmlDocument = page.GetHtmlDocument();
+            if (htmlDocument == null)
             {
                 return true;
             }
             try
             {
-                var listingHtml = new string(page.Website.ListingHtml);
+                var listingHtml = new string(page.Website.ListingExampleHtml);
                 var listingHtmlDocument = new HtmlDocument();
                 listingHtmlDocument.LoadHtml(listingHtml);
                 Clean(listingHtmlDocument);
 
-                RemoveTextContent(page.HtmlDocument.DocumentNode);
-                Clean(page.HtmlDocument);
+                RemoveTextContent(htmlDocument.DocumentNode);
+                Clean(htmlDocument);
 
-                double similarity = JacardCompare(listingHtmlDocument, page.HtmlDocument);
-                Console.WriteLine(similarity);
+                double similarity = JacardCompare(listingHtmlDocument, htmlDocument);
+                //return similarity >= Configuration.Config.MIN_PERCENTAGE_TO_BE_SIMILAR_PAGE;                
+                return true;
             }
             catch (Exception exception)
             {
@@ -146,23 +121,6 @@ namespace landerist_library.Parse.PageTypeParser
             return true;
         }
 
-        //private static HtmlDocument LoadUrlToHtmlDocument(string url)
-        //{
-        //    var htmlDocument = new HtmlDocument();
-        //    try
-        //    {
-        //        Uri uri = new(url);
-        //        string? pageContent = GetHtml(uri).Result;
-
-        //        htmlDocument = new HtmlDocument();
-        //        htmlDocument.LoadHtml(pageContent);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine("Error loading URL to HtmlDocument: " + ex.Message);
-        //    }
-        //    return htmlDocument;
-        //}
 
         //private static void LevenshteinCompare(HtmlDocument htmlDocument1, HtmlDocument htmlDocument2)
         //{

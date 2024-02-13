@@ -10,7 +10,7 @@ namespace landerist_library.Parse.Media.Image
     /// In Linux need to add another package. See:
     /// https://stackoverflow.com/questions/44105973/opencvsharp-unable-to-load-dll-opencvsharpextern
     /// </summary>
-    public class ImageParser(MediaParser mediaParser)
+    public partial class ImageParser(MediaParser mediaParser)
     {
         public readonly MediaParser MediaParser = mediaParser;
 
@@ -46,22 +46,22 @@ namespace landerist_library.Parse.Media.Image
 
         private void AddImagesOpenGraph()
         {
-            var imageNodes = MediaParser.Page.HtmlDocument!.DocumentNode.SelectNodes("//meta[@property='og:image']");
+            var imageNodes = MediaParser.HtmlDocument!.DocumentNode.SelectNodes("//meta[@property='og:image']");
             AddImages(imageNodes, "content");
 
-            imageNodes = MediaParser.Page.HtmlDocument!.DocumentNode.SelectNodes("//meta[@property='og:image:secure_url']");
+            imageNodes = MediaParser.HtmlDocument!.DocumentNode.SelectNodes("//meta[@property='og:image:secure_url']");
             AddImages(imageNodes, "content");
         }
 
         private void AddImagesImgSrc()
         {
-            var imageNodes = MediaParser.Page.HtmlDocument!.DocumentNode.SelectNodes("//img");
+            var imageNodes = MediaParser.HtmlDocument!.DocumentNode.SelectNodes("//img");
             AddImages(imageNodes, "src");
         }
 
         private void AddImagesA()
         {
-            var imageNodes = MediaParser.Page.HtmlDocument!.DocumentNode.SelectNodes("//a");
+            var imageNodes = MediaParser.HtmlDocument!.DocumentNode.SelectNodes("//a");
             AddImages(imageNodes, "href");
         }
 
@@ -151,7 +151,7 @@ namespace landerist_library.Parse.Media.Image
 
         private static bool FileNameContainsSmallSize(string fileName)
         {
-            Regex regex = new(@"(\d+)x(\d+)");
+            Regex regex = RegexFileNameWidthXHeigth();
             Match match = regex.Match(fileName);
 
             if (!match.Success)
@@ -251,5 +251,8 @@ namespace landerist_library.Parse.Media.Image
                 ValidInvalidImages.InsertValid(image.url);
             }
         }
+
+        [GeneratedRegex(@"(\d+)x(\d+)")]
+        private static partial Regex RegexFileNameWidthXHeigth();
     }
 }

@@ -1,8 +1,4 @@
-﻿using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
-using Google.Api.Gax.Grpc;
-using HtmlAgilityPack;
-using landerist_library.Database;
-using System.Collections.Generic;
+﻿using landerist_library.Database;
 using System.Data;
 
 namespace landerist_library.Websites
@@ -54,12 +50,12 @@ namespace landerist_library.Websites
             return new DataBase().QueryTable(query);
         }
 
-        public static DataTable GetAllListingHtmlNull()
+        public static DataTable GetListingExampleHtmlNull()
         {
             string query =
                 "SELECT * " +
                 "FROM " + TABLE_WEBSITES + " " +
-                "WHERE [ListingHtml] is null";
+                "WHERE [ListingExampleHtml] is null";
             return new DataBase().QueryTable(query);
         }
 
@@ -533,7 +529,7 @@ namespace landerist_library.Websites
             });
         }
 
-        public static void UpdateListingUrisFromFile()
+        public static void UpdateListingExampleUriFromFile()
         {
             string file = Configuration.Config.INSERT_DIRECTORY + "HostMainUri.csv";
             DataTable dataTable = Tools.Csv.ToDataTable(file);
@@ -550,11 +546,11 @@ namespace landerist_library.Websites
                 {
                     continue;
                 }
-                if (Uri.TryCreate(listingUrl, UriKind.Absolute, out Uri? listingUri))
+                if (Uri.TryCreate(listingUrl, UriKind.Absolute, out Uri? listingExampleUri))
                 {
                     Website website = new(host)
                     {
-                        ListingUri = listingUri
+                        ListingExampleUri = listingExampleUri
                     };
                     if (website.Update())
                     {
@@ -564,35 +560,58 @@ namespace landerist_library.Websites
             }
         }
 
-        public static void UpdateListingsHtmlsNulls()
+        public static void UpdateListingsExampleHtmlNulls()
         {
-            var dataTable = GetAllListingHtmlNull();
-            var websites = GetWebsites(dataTable);            
+            var dataTable = GetListingExampleHtmlNull();
+            var websites = GetWebsites(dataTable);
             int total = websites.Count;
             int processed = 0;
             int updated = 0;
             int errors = 0;
-            Parallel.ForEach(websites,
-                //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
+            Parallel.ForEach(websites, new ParallelOptions()
+            {
+                MaxDegreeOfParallelism = Environment.ProcessorCount - 1
+            },
                 website =>
             {
-                var html = Parse.PageTypeParser.ListingSimilarity.GetListingUrlHtml(website);
-                if (html != null)
+                if (website.SetListingExampleHtml())
                 {
-                    website.ListingHtml = html;
-                    website.ListingHtmlUpdated = DateTime.Now;
-                    if (website.Update())
-                    {
-                        Interlocked.Increment(ref updated);
-                    }                    
+                    website.Update();
+                    Interlocked.Increment(ref updated);
                 }
                 else
                 {
-                    Interlocked.Increment(ref errors);                    
+                    Interlocked.Increment(ref errors);
                 }
+
                 Interlocked.Increment(ref processed);
                 Console.WriteLine(processed + "/" + total + " Updated: " + updated + " Errors: " + errors);
             });
+        }
+
+        public static void DeleteNullListingExampleHtml()
+        {
+            var dataTable = GetListingExampleHtmlNull();
+            var websites = GetWebsites(dataTable);
+
+            int total = websites.Count;
+            int processed = 0;
+            int deleted = 0;
+
+            Parallel.ForEach(websites, new ParallelOptions()
+            {
+                MaxDegreeOfParallelism = Environment.ProcessorCount - 1
+            },
+                website =>
+                {
+                    if (website.Delete())
+                    {
+                        Interlocked.Increment(ref deleted);
+                    }
+
+                    Interlocked.Increment(ref processed);
+                    Console.WriteLine(processed + "/" + total + " Deleted: " + deleted);
+                });
         }
     }
 }

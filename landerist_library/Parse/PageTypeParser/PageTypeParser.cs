@@ -26,7 +26,7 @@ namespace landerist_library.Parse.PageTypeParser
             {
                 return (PageType.NotIndexable, null);
             }
-            if (LastSegment.IsNotListing(page.Uri))
+            if (LastSegment.IsNotListingByLastSegment(page.Uri))
             {
                 return (PageType.NotListingByLastSegment, null);
             }
@@ -77,9 +77,10 @@ namespace landerist_library.Parse.PageTypeParser
 
         private static bool IsCorrectLanguage(Page page)
         {
-            if (page.HtmlDocument != null)
+            var htmlDocument = page.GetHtmlDocument();
+            if (htmlDocument != null)
             {
-                var htmlNode = page.HtmlDocument.DocumentNode.SelectSingleNode("/html");
+                var htmlNode = htmlDocument.DocumentNode.SelectSingleNode("/html");
                 if (htmlNode != null)
                 {
                     var lang = htmlNode.Attributes["lang"];

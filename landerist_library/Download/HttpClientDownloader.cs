@@ -1,6 +1,7 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Websites;
 using System.Net.Http.Headers;
+using System.Text;
 
 namespace landerist_library.Download
 {
@@ -31,7 +32,8 @@ namespace landerist_library.Download
             };
 
             using var httpClient = new HttpClient(handler);
-            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
+            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);            
+
             SetAccepLanguage(httpClient, website.LanguageCode);
             httpClient.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
 
@@ -40,12 +42,12 @@ namespace landerist_library.Download
 
             try
             {
-                DateTime dateStart = DateTime.Now;
-                HttpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
+                DateTime dateStart = DateTime.Now;                
+                HttpResponseMessage = await httpClient.SendAsync(httpRequestMessage);                
                 Timers.Timer.SaveTimerDownloadPage(uri.ToString(), dateStart);
                 return await HttpResponseMessage.Content.ReadAsStringAsync();
             }
-            catch //(Exception exception)
+            catch// (Exception exception)
             {
                 //Logs.Log.WriteLogErrors("HttpClientDownloader GetAsync", page.Uri, exception);
             }

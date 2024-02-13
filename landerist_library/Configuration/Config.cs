@@ -4,7 +4,7 @@
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "1.38";
+        public static readonly string VERSION = "1.39";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
@@ -50,6 +50,7 @@
 
         public static readonly int MAX_CRAW_DELAY_SECONDS = 120;
 
+        public static readonly double MIN_PERCENTAGE_TO_BE_SIMILAR_PAGE = 0.8;
 
         public const string DATABASE_NAME = PrivateConfig.DATABASE_NAME;
 

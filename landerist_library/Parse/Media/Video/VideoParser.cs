@@ -4,16 +4,21 @@ using System.Text.RegularExpressions;
 
 namespace landerist_library.Parse.Media.Video
 {
-    public class VideoParser(MediaParser mediaParser)
+    public partial class VideoParser(MediaParser mediaParser)
     {
         private readonly MediaParser MediaParser = mediaParser;
 
         public void GetVideos()
         {
-            HtmlNodeCollection linkNodes = MediaParser.Page.HtmlDocument!.DocumentNode.SelectNodes("//a[@href]");
+            if(MediaParser.HtmlDocument == null)
+            {
+                return;
+            }
+            
+            HtmlNodeCollection linkNodes = MediaParser.HtmlDocument.DocumentNode.SelectNodes("//a[@href]");
             GetYoutubeVideos(linkNodes, "href");
 
-            linkNodes = MediaParser.Page.HtmlDocument!.DocumentNode.SelectNodes("//iframe[@src]");
+            linkNodes = MediaParser.HtmlDocument.DocumentNode.SelectNodes("//iframe[@src]");
             GetYoutubeVideos(linkNodes, "src");
         }
 
@@ -24,7 +29,7 @@ namespace landerist_library.Parse.Media.Video
                 return;
             }
 
-            Regex regex = new(@"(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:embed\/|watch\?v=)|youtu\.be\/)([\w\d_-]+)");
+            Regex regex = RegexYoutube();
             foreach (HtmlNode linkNode in linkNodes)
             {
                 string attributeValue = linkNode.GetAttributeValue(attributeName, string.Empty);
@@ -62,5 +67,8 @@ namespace landerist_library.Parse.Media.Video
             };
             MediaParser.Media.Add(media);
         }
+
+        [GeneratedRegex(@"(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:embed\/|watch\?v=)|youtu\.be\/)([\w\d_-]+)")]
+        private static partial Regex RegexYoutube();
     }
 }

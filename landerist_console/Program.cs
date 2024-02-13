@@ -19,6 +19,7 @@ using System.Globalization;
 using System.Net;
 using System.Reflection;
 using System.Reflection.Metadata;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -43,7 +44,7 @@ namespace landerist_console
             DateStart = DateTime.Now;
             string textStarted =
                 "STARTED at " + DateStart.ToShortDateString() + " " + DateStart.ToString(@"hh\:mm\:ss") + "\n";
-            Console.WriteLine(textStarted);
+            Console.WriteLine(textStarted);            
         }
 
         private static void End()
@@ -122,7 +123,7 @@ namespace landerist_console
             //new Scraper().ScrapeUnknowPageType(website);
             //Scraper.Scrape(uri);
             //new Scraper().ScrapeAllPages();            
-            new Scraper().Start();
+            //new Scraper().Start();
 
             //landerist_library.Parse.Listing.ListingsParser.Start();            
 
@@ -177,6 +178,7 @@ namespace landerist_console
             //Websites.DeleteFromFile();
             //Websites.UpdateListingUrisFromFile();
             //Websites.UpdateListingsHtmlsNulls();
+            //Websites.DeleteNullListingHtml();
 
             //PlacesSearch.Search();
             //CustomSearch.Start();

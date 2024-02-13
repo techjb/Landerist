@@ -7,13 +7,14 @@ namespace landerist_library.Index
     {
         public void InsertLinksAlternate()
         {
-            if (Page.HtmlDocument == null)
+            var htmlDocument = Page.GetHtmlDocument();
+            if (htmlDocument == null)
             {
                 return;
             }
             try
             {
-                var linkNodes = Page.HtmlDocument.DocumentNode.SelectNodes("//link[@rel='alternate']");
+                var linkNodes = htmlDocument.DocumentNode.SelectNodes("//link[@rel='alternate']");
                 if (linkNodes == null)
                 {
                     return;

@@ -1,6 +1,8 @@
 ﻿using Com.Bekijkhet.RobotsTxt;
+using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Database;
+using landerist_library.Download;
 using landerist_library.Index;
 using System.Data;
 using System.Net;
@@ -41,11 +43,11 @@ namespace landerist_library.Websites
 
         private int NumListings { get; set; } = 0;
 
-        public Uri? ListingUri { get; set; }
+        public Uri? ListingExampleUri { get; set; }
 
-        public string? ListingHtml { get; set; }
+        public string? ListingExampleHtml { get; set; }
 
-        public DateTime? ListingHtmlUpdated { get; set; }
+        public DateTime? ListingExampleHtmlUpdated { get; set; }
 
 
         public Robots? Robots = null;
@@ -128,9 +130,9 @@ namespace landerist_library.Websites
             IpAddressUpdated = dataRow["IpAddressUpdated"] is DBNull ? null : (DateTime)dataRow["IpAddressUpdated"];
             NumPages = (int)dataRow["NumPages"];
             NumListings = (int)dataRow["NumListings"];
-            ListingUri = dataRow["ListingUri"] is DBNull ? null : new Uri(dataRow["ListingUri"].ToString()!);
-            ListingHtml = dataRow["ListingHtml"] is DBNull ? null : dataRow["ListingHtml"].ToString();
-            ListingHtmlUpdated = dataRow["ListingHtmlUpdated"] is DBNull ? null : (DateTime)dataRow["ListingHtmlUpdated"];
+            ListingExampleUri = dataRow["ListingExampleUri"] is DBNull ? null : new Uri(dataRow["ListingExampleUri"].ToString()!);
+            ListingExampleHtml = dataRow["ListingExampleHtml"] is DBNull ? null : dataRow["ListingExampleHtml"].ToString();
+            ListingExampleHtmlUpdated = dataRow["ListingExampleHtmlUpdated"] is DBNull ? null : (DateTime)dataRow["ListingExampleHtmlUpdated"];
         }
 
         public bool Insert()
@@ -182,9 +184,9 @@ namespace landerist_library.Websites
                 {"IpAddressUpdated", IpAddressUpdated},
                 {"NumPages", NumPages },
                 {"NumListings", NumListings },
-                {"ListingUri", ListingUri?.ToString() },
-                {"ListingHtml", ListingHtml },
-                {"ListingHtmlUpdated", ListingHtmlUpdated },
+                {"ListingExampleUri", ListingExampleUri?.ToString() },
+                {"ListingExampleHtml", ListingExampleHtml },
+                {"ListingExampleHtmlUpdated", ListingExampleHtmlUpdated },
             };
         }
 
@@ -405,6 +407,34 @@ namespace landerist_library.Websites
                 return Robots.Sitemaps;
             }
             return null;
+        }
+
+        public bool SetListingExampleHtml()
+        {
+            if (ListingExampleUri == null)
+            {
+                return false;
+            }
+
+            HttpClientDownloader httpClientDownloader = new();
+            try
+            {
+                var html = httpClientDownloader.GetAsync(this, ListingExampleUri).Result;
+                if (html != null)
+                {
+                    var htmlDoc = new HtmlDocument();
+                    htmlDoc.LoadHtml(html);
+                    Parse.PageTypeParser.ListingSimilarity.RemoveTextContent(htmlDoc.DocumentNode);
+                    ListingExampleHtml = htmlDoc.DocumentNode.OuterHtml;
+                    ListingExampleHtmlUpdated = DateTime.Now;
+                    return true;
+                }
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception.Message);
+            }
+            return false;
         }
 
         public List<Page> GetPages()

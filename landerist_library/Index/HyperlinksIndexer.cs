@@ -8,7 +8,8 @@ namespace landerist_library.Index
     {
         public void Insert()
         {
-            if (Page.HtmlDocument == null)
+            var htmlDocument = Page.GetHtmlDocument();
+            if (htmlDocument == null)
             {
                 return;
             }
@@ -42,7 +43,7 @@ namespace landerist_library.Index
                 //}
 
                 // todo: select all nodes: Page.HtmlDocument.DocumentNode.SelectNodes("//a");
-                var urls = Page.HtmlDocument.DocumentNode.Descendants("a")
+                var urls = htmlDocument.DocumentNode.Descendants("a")
                    .Where(a => !a.Attributes["rel"]?.Value.Contains("nofollow") ?? true)
                    .Where(a => !IsHoneypotTrap(a))
                    .Select(a => a.Attributes["href"]?.Value)

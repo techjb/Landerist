@@ -33,7 +33,6 @@ namespace landerist_library.Scrape
         }
         private void SetPageType()
         {
-            Page.LoadHtmlDocument();
             var (newPageType, newListing) = PageTypeParser.GetPageType(Page);
             NewListing = newListing;
 
@@ -109,11 +108,11 @@ namespace landerist_library.Scrape
             {
                 return;
             }
-
-            if (Page.HtmlDocument == null)
+            if (Page.Website.AchievedMaxNumberOfPages())
             {
                 return;
             }
+           
             if (Page.PageType.Equals(PageType.IncorrectLanguage))
             {
                 new LinkAlternateIndexer(Page).InsertLinksAlternate();
