@@ -80,9 +80,9 @@ namespace landerist_console
             //var uri = new Uri("https://www.inmobiliariamarbella.es/");
             //var uri = new Uri("https://www.inmoarregi.com/");
             //var uri = new Uri("https://www.badainmobiliaria.com");
-            //var uri = new Uri("http://alicante-casas.com/ad/100262248");
+            //var uri = new Uri("https://99casas.com/ref/127920/?impresion=S");
             //var uri = new Uri("http://www.abbeyproperties.eu/ficha-inmueble.php/?cod_inmueble=888933");
-            var uri = new Uri("https://www.manuelaperez.com/inmuebles/7593/venta-alquiler/inmuebles/7599/agencia-inmobiliaria-en-caceres.html");
+            //var uri = new Uri("https://www.tierraygestion.com/detalle/en_venta/atico/murcia/alcantarilla/25017155722.194200/");
 
             //Config.SetToProduction();
             Config.SetDatabaseToProduction();
@@ -121,7 +121,7 @@ namespace landerist_console
             //new Scraper().ScrapeIsNotListing(uri);
             //new Scraper().Scrape(website);
             //new Scraper().ScrapeUnknowPageType(website);
-            Scraper.Scrape(uri);
+            //Scraper.Scrape(uri);
             //new Scraper().ScrapeAllPages();            
             //new Scraper().Start();
 
@@ -176,9 +176,14 @@ namespace landerist_console
 
             //Csv.ExportHostsMainUri();
             //Websites.DeleteFromFile();
-            //Websites.UpdateListingUrisFromFile();
-            //Websites.UpdateListingsHtmlsNulls();
-            //Websites.DeleteNullListingHtml();
+
+            //new Website("promoaguilera.com").Delete();
+            //new Website("inmobiliariainsignia.com").UpdateListingExample("https://inmobiliariainsignia.com/inmueble/preciosa-casa-reformada-a-capricho-en-la-localidad-urrugne/");
+            //new Website("aransahomes.es").RemoveListingExample();
+            //Websites.UpdateListingExampleUriFromFile();
+            //Websites.TestListingExampleUri();
+            //Websites.UpdateListingsExampleNodeSetNulls();
+            //Websites.DeleteNullListingExampleHtml();
 
             //PlacesSearch.Search();
             //CustomSearch.Start();

@@ -1,4 +1,6 @@
-﻿using landerist_library.Database;
+﻿using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
+using Google.Apis.Util;
+using landerist_library.Database;
 using System.Data;
 
 namespace landerist_library.Websites
@@ -50,12 +52,12 @@ namespace landerist_library.Websites
             return new DataBase().QueryTable(query);
         }
 
-        public static DataTable GetListingExampleHtmlNull()
+        public static DataTable GetListingExampleNodeSetNull()
         {
             string query =
                 "SELECT * " +
                 "FROM " + TABLE_WEBSITES + " " +
-                "WHERE [ListingExampleHtml] is null";
+                "WHERE [ListingExampleNodeSet] is null";
             return new DataBase().QueryTable(query);
         }
 
@@ -535,34 +537,79 @@ namespace landerist_library.Websites
             DataTable dataTable = Tools.Csv.ToDataTable(file);
             int total = dataTable.Rows.Count;
             int processed = 0;
-            int updated = 0;
+            int inserted = 0;
+            int deleted = 0;
+            int invalidHosts = 0;            
+            
             foreach (DataRow row in dataTable.Rows)
             {
-                processed++;
-                Console.WriteLine(processed + "/" + total + " Updated: " + updated);
                 string host = (string)row[0];
                 string listingUrl = ((string)row[2]).Trim();
                 if (listingUrl.Equals(string.Empty))
                 {
                     continue;
                 }
-                if (Uri.TryCreate(listingUrl, UriKind.Absolute, out Uri? listingExampleUri))
+                if (!Uri.TryCreate(listingUrl, UriKind.Absolute, out Uri? listingExampleUri))
+                {                    
+                    continue;
+                }
+                
+                continue;
+
+                if (!host.Equals(listingExampleUri.Host))
                 {
-                    Website website = new(host)
+                    invalidHosts++;
+                    if (Insert.WebsitesInserter.InsertFromListingExampleUri(listingExampleUri))
                     {
-                        ListingExampleUri = listingExampleUri
-                    };
-                    if (website.Update())
-                    {
-                        updated++;
+                        inserted++;
+                        Website website = new(host);
+                        if (website.Delete())
+                        {
+                            deleted++;
+                        }                        
                     }
                 }
+                processed++;
+                Console.WriteLine(processed + "/" + total + " " +
+                    "invalidHosts: " + invalidHosts + " " +
+                    "inserted: " + inserted + " " +
+                    "deleted: " + deleted + " " +
+                    "");
+
             }
         }
 
-        public static void UpdateListingsExampleHtmlNulls()
+        public static void TestListingExampleUri()
         {
-            var dataTable = GetListingExampleHtmlNull();
+            var websites = GetAll();
+            int total = websites.Count;
+            int errors = 0;
+            int counter = 0;
+            foreach (var website in websites)
+            {
+                counter++;
+                if (website.ListingExampleNodeSet == null)
+                {
+                    continue;
+                }
+                //if(website.Host.Equals())
+                //if (!website.Host.Equals(website.ListingExampleUri.Host))
+                //{
+                //    //Console.WriteLine(website.Host + " " + website.ListingExampleUri.Host);
+                //    //website.ListingExampleUri = null;
+                //    //website.ListingExampleHtml = null;
+                //    //website.ListingExampleHtmlUpdated = null;
+                //    //website.Update();
+                //    errors++;
+                //    Console.WriteLine(counter + "/" + total + " errors: " + errors);
+                //}
+            }
+            Console.WriteLine("total: " + total + " errors: " + errors);
+        }
+
+        public static void UpdateListingsExampleNodeSetNulls()
+        {
+            var dataTable = GetListingExampleNodeSetNull();
             var websites = GetWebsites(dataTable);
             int total = websites.Count;
             int processed = 0;
@@ -570,13 +617,12 @@ namespace landerist_library.Websites
             int errors = 0;
             Parallel.ForEach(websites, new ParallelOptions()
             {
-                MaxDegreeOfParallelism = Environment.ProcessorCount - 1
+                MaxDegreeOfParallelism = Environment.ProcessorCount - 1                
             },
                 website =>
             {
-                if (website.SetListingExampleHtml())
+                if (website.UpdateListingExampleNodeSet())
                 {
-                    website.Update();
                     Interlocked.Increment(ref updated);
                 }
                 else
@@ -591,7 +637,7 @@ namespace landerist_library.Websites
 
         public static void DeleteNullListingExampleHtml()
         {
-            var dataTable = GetListingExampleHtmlNull();
+            var dataTable = GetListingExampleNodeSetNull();
             var websites = GetWebsites(dataTable);
 
             int total = websites.Count;

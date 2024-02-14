@@ -4,9 +4,13 @@ using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Download;
 using landerist_library.Index;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Data;
 using System.Net;
 using System.Text;
+using landerist_library.Parse.PageTypeParser;
+using landerist_library.Export;
 
 namespace landerist_library.Websites
 {
@@ -43,11 +47,11 @@ namespace landerist_library.Websites
 
         private int NumListings { get; set; } = 0;
 
-        public Uri? ListingExampleUri { get; set; }
+        private Uri? ListingExampleUri { get; set; }
+        
+        public string? ListingExampleNodeSet { get; set; }
 
-        public string? ListingExampleHtml { get; set; }
-
-        public DateTime? ListingExampleHtmlUpdated { get; set; }
+        public DateTime? ListingExampleNodeSetUpdated { get; set; }
 
 
         public Robots? Robots = null;
@@ -131,8 +135,8 @@ namespace landerist_library.Websites
             NumPages = (int)dataRow["NumPages"];
             NumListings = (int)dataRow["NumListings"];
             ListingExampleUri = dataRow["ListingExampleUri"] is DBNull ? null : new Uri(dataRow["ListingExampleUri"].ToString()!);
-            ListingExampleHtml = dataRow["ListingExampleHtml"] is DBNull ? null : dataRow["ListingExampleHtml"].ToString();
-            ListingExampleHtmlUpdated = dataRow["ListingExampleHtmlUpdated"] is DBNull ? null : (DateTime)dataRow["ListingExampleHtmlUpdated"];
+            ListingExampleNodeSet = dataRow["ListingExampleNodeSet"] is DBNull ? null : dataRow["ListingExampleNodeSet"].ToString();
+            ListingExampleNodeSetUpdated = dataRow["ListingExampleNodeSetUpdated"] is DBNull ? null : (DateTime)dataRow["ListingExampleNodeSetUpdated"];
         }
 
         public bool Insert()
@@ -141,7 +145,7 @@ namespace landerist_library.Websites
                 "INSERT INTO " + Websites.TABLE_WEBSITES + " VALUES " +
                 "(@MainUri, @Host, @LanguageCode, @CountryCode, @RobotsTxt, @RobotsTxtUpdated, " +
                 "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @NumPages, @NumListings, " +
-                "@ListingUri, @ListingHtml, @ListingHtmlUpdated)";
+                "@ListingExampleUri, @ListingExampleNodeSet, @ListingExampleNodeSetUpdated)";
 
             var parameters = GetQueryParameters();
             return new DataBase().Query(query, parameters);
@@ -161,9 +165,9 @@ namespace landerist_library.Websites
                 "[IpAddressUpdated] = @IpAddressUpdated, " +
                 "[NumPages] = @NumPages, " +
                 "[NumListings] = @NumListings, " +
-                "[ListingUri] = @ListingUri, " +
-                "[ListingHtml] = @ListingHtml, " +
-                "[ListingHtmlUpdated] = @ListingHtmlUpdated " +
+                "[ListingExampleUri] = @ListingExampleUri, " +
+                "[ListingExampleNodeSet] = @ListingExampleNodeSet, " +
+                "[ListingExampleNodeSetUpdated] = @ListingExampleNodeSetUpdated " +
                 "WHERE [Host] = @Host";
 
             var parameters = GetQueryParameters();
@@ -185,8 +189,8 @@ namespace landerist_library.Websites
                 {"NumPages", NumPages },
                 {"NumListings", NumListings },
                 {"ListingExampleUri", ListingExampleUri?.ToString() },
-                {"ListingExampleHtml", ListingExampleHtml },
-                {"ListingExampleHtmlUpdated", ListingExampleHtmlUpdated },
+                {"ListingExampleNodeSet", ListingExampleNodeSet },
+                {"ListingExampleNodeSetUpdated", ListingExampleNodeSetUpdated },
             };
         }
 
@@ -329,8 +333,8 @@ namespace landerist_library.Websites
         public void DeleteListings()
         {
             int counter = 0;
-            var pages = GetPages();                        
-            foreach(var page in pages) 
+            var pages = GetPages();
+            foreach (var page in pages)
             {
                 var listing = ES_Listings.GetListing(page, false);
                 if (listing != null)
@@ -409,7 +413,29 @@ namespace landerist_library.Websites
             return null;
         }
 
-        public bool SetListingExampleHtml()
+        public bool UpdateListingExample(string url)
+        {
+            if(Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
+            {
+                return UpdateListingExample(uri);
+            }
+            return false;
+        }
+
+        public bool UpdateListingExample(Uri listingExampleUri)
+        {
+            if (!listingExampleUri.Host.Equals(Host) ||
+                listingExampleUri.Equals(MainUri))
+            {
+                return false;
+            }            
+            ListingExampleUri = listingExampleUri;
+            ListingExampleNodeSet = null;
+            ListingExampleNodeSetUpdated = null;
+            return UpdateListingExampleNodeSet();
+        }
+
+        public bool UpdateListingExampleNodeSet()
         {
             if (ListingExampleUri == null)
             {
@@ -422,12 +448,11 @@ namespace landerist_library.Websites
                 var html = httpClientDownloader.GetAsync(this, ListingExampleUri).Result;
                 if (html != null)
                 {
-                    var htmlDoc = new HtmlDocument();
-                    htmlDoc.LoadHtml(html);
-                    Parse.PageTypeParser.ListingSimilarity.RemoveTextContent(htmlDoc.DocumentNode);
-                    ListingExampleHtml = htmlDoc.DocumentNode.OuterHtml;
-                    ListingExampleHtmlUpdated = DateTime.Now;
-                    return true;
+                    var htmlDocument = new HtmlDocument();
+                    htmlDocument.LoadHtml(html);
+                    ListingExampleNodeSet = ListingSimilarity.GetNodeSetSerialized(htmlDocument);
+                    ListingExampleNodeSetUpdated = DateTime.Now;
+                    return Update();
                 }
             }
             catch (Exception exception)
@@ -435,6 +460,14 @@ namespace landerist_library.Websites
                 Console.WriteLine(exception.Message);
             }
             return false;
+        }
+
+        public bool RemoveListingExample()
+        {
+            ListingExampleUri = null;
+            ListingExampleNodeSet = null;
+            ListingExampleNodeSetUpdated = null;
+            return Update();
         }
 
         public List<Page> GetPages()

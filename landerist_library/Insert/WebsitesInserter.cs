@@ -47,21 +47,18 @@ namespace landerist_library.Insert
             Insert(website.MainUri);
         }
 
-        public static void Insert(string url)
+        public static bool Insert(string url)
         {
             if (Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
             {
-                Insert(uri);
+                return Insert(uri);
             }
+            return false;
         }
 
-        public static void Insert(Uri uri)
+        public static bool Insert(Uri uri)
         {
-            var list = new List<Uri>()
-            {
-                uri
-            };
-            Insert(list);
+            return InsertWebsite(uri);
         }
 
         public static void Insert(List<Uri> uris)
@@ -90,14 +87,14 @@ namespace landerist_library.Insert
             });
         }
 
-        private static void InsertWebsite(Uri uri)
+        private static bool InsertWebsite(Uri uri)
         {
             try
             {
                 if (!CanInsert(uri))
                 {
                     Interlocked.Increment(ref Skipped);
-                    return;
+                    return false;
                 }
 
                 Website website = new()
@@ -105,16 +102,28 @@ namespace landerist_library.Insert
                     MainUri = uri,
                     Host = uri.Host,
                 };
-                InsertWebsite(website);
+                return InsertWebsite(website);                
             }
             catch (Exception exception)
             {
                 Interlocked.Increment(ref ErrorsException);
                 Log.WriteLogErrors(uri, exception);
             }
+            return false;
         }
 
-        private static bool CanInsert(Uri uri)
+        public static bool InsertFromListingExampleUri(Uri listingExampleUri)
+        {
+            string uri = listingExampleUri.GetLeftPart(UriPartial.Authority);
+            if (Insert(uri))
+            {
+                Website website = new(listingExampleUri.Host);
+                return website.UpdateListingExample(listingExampleUri);                
+            }
+            return false;
+        }
+
+        public static bool CanInsert(Uri uri)
         {
             if (BlockedDomains.IsBlocked(uri))
             {
@@ -133,32 +142,32 @@ namespace landerist_library.Insert
             return true;
         }
 
-        private static void InsertWebsite(Website website)
+        private static bool InsertWebsite(Website website)
         {
             if (!website.SetMainUri())
             {
                 Interlocked.Increment(ref ErrorsMainUri);
-                return;
+                return false;
             }
             if (!CanInsert(website.MainUri))
             {
                 Interlocked.Increment(ref Skipped);
-                return;
+                return false;
             }
             if (!website.SetRobotsTxt())
             {
                 Interlocked.Increment(ref ErrorsRobotsTxt);
-                return;
+                return false;
             }
             if (!website.SetIpAddress())
             {
                 Interlocked.Increment(ref ErrorsIpAddress);
-                return;
+                return false;
             }
             if (!website.Insert())
             {
                 Interlocked.Increment(ref ErrorsInsert);
-                return;
+                return false;
             }
 
             Interlocked.Increment(ref Inserted);
@@ -177,6 +186,7 @@ namespace landerist_library.Insert
                 Interlocked.Increment(ref ErrorsException);
                 Log.WriteLogErrors(website.Host, exception);
             }
+            return true;
         }
     }
 }

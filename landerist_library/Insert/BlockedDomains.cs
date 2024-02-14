@@ -4,6 +4,8 @@
     {
         private static readonly HashSet<string> Domains =
         [
+            "google.com",
+            "google.es",
             "idealista.com",
             "fotocasa.es",
             "yaencontre.com",
