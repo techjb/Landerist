@@ -21,13 +21,13 @@ namespace landerist_library.Download
             ResourceType.Img,
             //ResourceType.StyleSheet,
             ResourceType.Font,
-            ResourceType.Media,
+            ResourceType.Media,            
             //ResourceType.Other
         ];
 
         private static readonly LaunchOptions launchOptions = new()
         {
-            Headless = false,
+            Headless = Config.IsConfigurationProduction(),
             Devtools = false,
             Args = new string[] {
                 "--no-sandbox",

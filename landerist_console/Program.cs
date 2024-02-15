@@ -71,7 +71,8 @@ namespace landerist_console
 
             //SeleniumDownloader.GetChrome(uriPage);
             var text = new PuppeteerDownloader().GetText(uri);
-            Console.WriteLine(text);            
+            Console.WriteLine(text);
+
 
             //new HttpClientDownloader().Get(uriPage);
 
