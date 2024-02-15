@@ -1,5 +1,7 @@
-﻿using landerist_library.Configuration;
+﻿using HtmlAgilityPack;
+using landerist_library.Configuration;
 using landerist_library.Database;
+using landerist_library.Download;
 using landerist_library.Export;
 using landerist_library.Insert.GoogleCustomSearch;
 using landerist_library.Insert.GooglePlaces;
@@ -14,7 +16,6 @@ using landerist_library.Statistics;
 using landerist_library.Websites;
 using OpenAI;
 using OpenQA.Selenium;
-using OpenQA.Selenium.DevTools.V118.Input;
 using System.Globalization;
 using System.Net;
 using System.Reflection;
@@ -65,10 +66,13 @@ namespace landerist_console
             //Config.SetToProduction();
             Config.SetDatabaseToProduction();
 
-            var uri = new Uri("https://aicimmobiliaria.com/property/terreno-en-caldes-de-malavella/");
+            var uri = new Uri("http://34mallorca.com/detalles-del-inmueble/carismatico-edificio-en-el-centro-de-palma/19675687");
+            //var uri = new Uri("https://inmocolsol.es/valladolid/local-comercial-en-alquiler-372235");
 
             //SeleniumDownloader.GetChrome(uriPage);
-            //PuppeteerDownloader.Get(uriPage);
+            var text = new PuppeteerDownloader().GetText(uri);
+            Console.WriteLine(text);            
+
             //new HttpClientDownloader().Get(uriPage);
 
             //var website = new Website(uri);
@@ -105,9 +109,10 @@ namespace landerist_console
             //new Scraper().ScrapeIsNotListing(uri);
             //new Scraper().Scrape(website);
             //new Scraper().ScrapeUnknowPageType(website);
-            //Scraper.Scrape(uri);
             //new Scraper().ScrapeAllPages();            
+            Scraper.Scrape(uri);
             //new Scraper().Start();
+
 
             //landerist_library.Parse.Listing.ListingsParser.Start();            
 

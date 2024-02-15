@@ -539,8 +539,8 @@ namespace landerist_library.Websites
             int processed = 0;
             int inserted = 0;
             int deleted = 0;
-            int invalidHosts = 0;            
-            
+            int invalidHosts = 0;
+
             foreach (DataRow row in dataTable.Rows)
             {
                 string host = (string)row[0];
@@ -553,7 +553,7 @@ namespace landerist_library.Websites
                 {                    
                     continue;
                 }
-                
+
                 continue;
 
                 if (!host.Equals(listingExampleUri.Host))
@@ -566,7 +566,7 @@ namespace landerist_library.Websites
                         if (website.Delete())
                         {
                             deleted++;
-                        }                        
+                        }
                     }
                 }
                 processed++;

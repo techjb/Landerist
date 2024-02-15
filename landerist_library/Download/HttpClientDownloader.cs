@@ -1,7 +1,6 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Websites;
 using System.Net.Http.Headers;
-using System.Text;
 
 namespace landerist_library.Download
 {
