@@ -269,15 +269,20 @@ namespace landerist_library.Websites
             return listing is not null;
         }
 
-        public bool NotIndexable()
+        public bool ContainsMetaRobotsNoIndex()
         {
             return ContainsMetaRobots("noindex");
         }
 
-        public bool CanIndexImages()
+        public bool ContainsMetaRobotsNoFollow()
         {
-            return !ContainsMetaRobots("noimageindex");
-        }        
+            return ContainsMetaRobots("nofollow");
+        }
+
+        public bool ContainsMetaRobotsNoImageIndex()
+        {
+            return ContainsMetaRobots("noimageindex");
+        }
 
         private bool ContainsMetaRobots(string content)
         {

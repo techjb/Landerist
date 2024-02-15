@@ -16,7 +16,7 @@ namespace landerist_library.Parse.PageTypeParser
             {
                 return (PageType.MainPage, null);
             }
-            if (page.NotIndexable())
+            if (page.ContainsMetaRobotsNoIndex())
             {
                 return (PageType.NotIndexable, null);
             }

@@ -62,30 +62,14 @@ namespace landerist_console
 
         private static void Run()
         {
-            //var uriPage = new Uri("https://www.badainmobiliaria.com/search-form-top/");
+            //Config.SetToProduction();
+            Config.SetDatabaseToProduction();
+
+            var uri = new Uri("https://aicimmobiliaria.com/property/terreno-en-caldes-de-malavella/");
 
             //SeleniumDownloader.GetChrome(uriPage);
             //PuppeteerDownloader.Get(uriPage);
             //new HttpClientDownloader().Get(uriPage);
-
-            //var uri = new Uri("https://www.goolzoom.com/");
-            //var uri = new Uri("https://www.saroga.es/");
-            //var uri = new Uri("https://mabelan.es/");
-            //var uri = new Uri("https://www.saguar.immo/");
-            //var uri = new Uri("https://www.inmolocalgestion.com/");
-            //var uri = new Uri("https://www.expimad.com/");
-            //var uri = new Uri("https://www.prorealty.es/");
-            //var uri = new Uri("http://real-viv.com/");
-            //var uri = new Uri("http://casavida.es/");
-            //var uri = new Uri("https://www.inmobiliariamarbella.es/");
-            //var uri = new Uri("https://www.inmoarregi.com/");
-            //var uri = new Uri("https://www.badainmobiliaria.com");
-            //var uri = new Uri("https://99casas.com/ref/127920/?impresion=S");
-            //var uri = new Uri("http://www.abbeyproperties.eu/ficha-inmueble.php/?cod_inmueble=888933");
-            //var uri = new Uri("https://www.tierraygestion.com/detalle/en_venta/atico/murcia/alcantarilla/25017155722.194200/");
-
-            //Config.SetToProduction();
-            Config.SetDatabaseToProduction();
 
             //var website = new Website(uri);
             //var page = new Page(website, uriPage);            
@@ -175,8 +159,8 @@ namespace landerist_console
             //PageSelector.Select();
 
             //Csv.ExportHostsMainUri();
-            //Websites.DeleteFromFile();
 
+            //Websites.DeleteFromFile();
             //new Website("promoaguilera.com").Delete();
             //new Website("inmobiliariainsignia.com").UpdateListingExample("https://inmobiliariainsignia.com/inmueble/preciosa-casa-reformada-a-capricho-en-la-localidad-urrugne/");
             //new Website("aransahomes.es").RemoveListingExample();

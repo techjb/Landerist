@@ -112,13 +112,16 @@ namespace landerist_library.Scrape
             {
                 return;
             }
-
+            if (Page.ContainsMetaRobotsNoFollow())
+            {
+                return;
+            }
             if (Page.PageType.Equals(PageType.IncorrectLanguage))
             {
                 new LinkAlternateIndexer(Page).InsertLinksAlternate();
                 return;
             }
-            if (Page.NotIndexable())
+            if (Page.ContainsMetaRobotsNoIndex())
             {
                 return;
             }
@@ -127,7 +130,7 @@ namespace landerist_library.Scrape
 
         private void RedirectIfError()
         {
-            if (!Page.PageType.Equals(PageType.DownloadError) || Page.HttpStatusCode == null)
+            if (Page.HttpStatusCode == null)
             {
                 return;
             }

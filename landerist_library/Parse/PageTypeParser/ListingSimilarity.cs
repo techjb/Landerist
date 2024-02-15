@@ -1,8 +1,6 @@
 ﻿using HtmlAgilityPack;
-using landerist_library.Export;
 using landerist_library.Websites;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 
 namespace landerist_library.Parse.PageTypeParser
 {
@@ -73,23 +71,7 @@ namespace landerist_library.Parse.PageTypeParser
         {
             return string.Join(" | ", TagsToRemove.ToList());
         }
-
-        public static void RemoveTextContent(HtmlNode node)
-        {
-            if (node.NodeType == HtmlNodeType.Text)
-            {
-                node.Remove();
-            }
-            else
-            {
-                foreach (var child in node.ChildNodes.ToArray())
-                {
-                    RemoveTextContent(child);
-                }
-            }
-        }
-
-
+        
         public static bool HtmlNotSimilarToListing(Page page)
         {
             if (page.Website.ListingExampleNodeSet == null)
@@ -170,17 +152,18 @@ namespace landerist_library.Parse.PageTypeParser
             BuildNodeSet(htmlDocument.DocumentNode, nodeSet);
             return nodeSet;
         }
-
-        private static void BuildNodeSet(HtmlNode node, HashSet<string> nodeSet)
+        public static void RemoveTextContent(HtmlNode node)
         {
-            string nodeRepresentation = (node.NodeType == HtmlNodeType.Element) ?
-                node.Name.ToLower() :
-                node.NodeType.ToString();
-
-            nodeSet.Add(nodeRepresentation);
-            foreach (HtmlNode child in node.ChildNodes)
+            if (node.NodeType == HtmlNodeType.Text)
             {
-                BuildNodeSet(child, nodeSet);
+                node.Remove();
+            }
+            else
+            {
+                foreach (var child in node.ChildNodes.ToArray())
+                {
+                    RemoveTextContent(child);
+                }
             }
         }
 
@@ -197,53 +180,17 @@ namespace landerist_library.Parse.PageTypeParser
             }
         }
 
-
-        private static void SimpleCompare(HtmlDocument htmlDocumentListing, HtmlDocument htmlDocumentTest)
+        private static void BuildNodeSet(HtmlNode node, HashSet<string> nodeSet)
         {
-            int nodesListing = htmlDocumentListing.DocumentNode.SelectNodes("//*").Count;
-            int nodesTest = htmlDocumentTest.DocumentNode.SelectNodes("//*").Count;
+            string nodeRepresentation = (node.NodeType == HtmlNodeType.Element) ?
+                node.Name.ToLower() :
+                node.NodeType.ToString();
 
-            Console.WriteLine(nodesListing + " " + nodesTest);
-
-            int matches = 0, total = 0;
-
-            SimpleCompare(htmlDocumentListing.DocumentNode, htmlDocumentTest.DocumentNode, ref matches, ref total);
-            foreach (var tag in Tags)
+            nodeSet.Add(nodeRepresentation);
+            foreach (HtmlNode child in node.ChildNodes)
             {
-                Console.WriteLine(tag);
+                BuildNodeSet(child, nodeSet);
             }
-
-            double similarityPercentage = total > 0 ? (double)matches / total * 100 : 0;
-            Console.WriteLine($"Similarity: {similarityPercentage}%");
-        }
-
-
-        private static void SimpleCompare(HtmlNode node1, HtmlNode node2, ref int matches, ref int total)
-        {
-            total++;
-            matches += CompareNodeTypes(node1, node2);
-
-            int minCount = Math.Min(node1.ChildNodes.Count, node2.ChildNodes.Count);
-            for (int i = 0; i < minCount; i++)
-            {
-                var node1ChildNode = node1.ChildNodes[i];
-                var node2ChildNode = node2.ChildNodes[i];
-                SimpleCompare(node1ChildNode, node2ChildNode, ref matches, ref total);
-            }
-        }
-
-        private static int CompareNodeTypes(HtmlNode node1, HtmlNode node2)
-        {
-            if (node1.NodeType != node2.NodeType)
-            {
-                return 0;
-            }
-            if (node1.NodeType == HtmlNodeType.Element && node2.NodeType == HtmlNodeType.Element)
-            {
-                Tags.Add(node1.Name);
-                return node1.Name.Equals(node2.Name, StringComparison.OrdinalIgnoreCase) ? 1 : 0;
-            }
-            return 1;
-        }
+        }   
     }
 }

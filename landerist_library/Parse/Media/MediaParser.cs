@@ -27,7 +27,7 @@ namespace landerist_library.Parse.Media
             {
                 return;
             }
-            if (Page.CanIndexImages())
+            if (!Page.ContainsMetaRobotsNoImageIndex())
             {
                 new ImageParser(this).AddImages();
             }

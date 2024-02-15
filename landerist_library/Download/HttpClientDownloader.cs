@@ -14,12 +14,12 @@ namespace landerist_library.Download
             page.HttpStatusCode = null;
             page.InitializeResponseBody();
             
-            var result = GetAsync(page.Website, page.Uri);
+            var result = GetAsync(page.Website, page.Uri).Result;
             if(HttpResponseMessage != null)
             {
                 page.HttpStatusCode = (short)HttpResponseMessage.StatusCode;
             }            
-            return result.Result;
+            return result;
         }
         
         public async Task<string?> GetAsync(Website website, Uri uri)
@@ -76,7 +76,5 @@ namespace landerist_library.Download
             }
             return null;
         }
-
-
     }
 }
