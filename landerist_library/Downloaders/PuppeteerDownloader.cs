@@ -105,9 +105,9 @@ namespace landerist_library.Downloaders
             {
                 Html = Task.Run(async () => await GetAsync(page.Website.LanguageCode, page.Uri)).Result;
             }
-            catch
+            catch(Exception exception) 
             {
-
+                Logs.Log.WriteLogErrors("PuppeterDownloader GetResponseBody", exception);
             }
             return Html;
         }
