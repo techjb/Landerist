@@ -16,13 +16,12 @@ namespace landerist_library.Scrape
 
         private Listing? NewListing;
 
-        private readonly HttpClientDownloader HttpClientDownloader = new();
+        //private readonly HttpClientDownloader Downloader = new();
+        private readonly PuppeteerDownloader Downloader = new();
 
         public bool Scrape()
         {
-            string? responseBody = HttpClientDownloader.Get(Page);
-            Page.SetResponseBody(responseBody);
-
+            Downloader.SetResponseBody(Page);
             SetPageType();
             UpdateIfListing();
             UpdateIfUnPublishedListing();
@@ -138,7 +137,7 @@ namespace landerist_library.Scrape
             int code = (int)Page.HttpStatusCode;
             if (code >= 300 && code < 400 && Config.INDEXER_ENABLED)
             {
-                var redirectUrl = HttpClientDownloader.GetRedirectUrl();
+                var redirectUrl = Downloader.GetRedirectUrl();
                 if (redirectUrl != null)
                 {
                     new Indexer(Page).InsertUrl(redirectUrl);

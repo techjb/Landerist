@@ -6,22 +6,23 @@ namespace landerist_library.Download
 {
     public class HttpClientDownloader
     {
+        private short? HttpStatusCode = null;
+
+        private string? RedirectUrl = null;
+
         private HttpResponseMessage? HttpResponseMessage;
 
-        public string? Get(Page page)
+        public void SetResponseBody(Page page)
         {
-            page.HttpStatusCode = null;
-            page.InitializeResponseBody();
-            
-            var result = GetAsync(page.Website, page.Uri).Result;
-            if(HttpResponseMessage != null)
+            page.InitializeResponseBodyAndStatusCode();
+            var html = GetAsync(page.Website.LanguageCode, page.Uri).Result;
+            if (HttpResponseMessage != null)
             {
-                page.HttpStatusCode = (short)HttpResponseMessage.StatusCode;
-            }            
-            return result;
+                HttpStatusCode = (short)HttpResponseMessage.StatusCode;
+            }
+            page.SetResponseBodyAndStatusCode(html, HttpStatusCode);
         }
-        
-        public async Task<string?> GetAsync(Website website, Uri uri)
+        public async Task<string?> GetAsync(LanguageCode languageCode, Uri uri)
         {
             HttpClientHandler handler = new()
             {
@@ -31,9 +32,9 @@ namespace landerist_library.Download
             };
 
             using var httpClient = new HttpClient(handler);
-            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);            
+            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
 
-            SetAccepLanguage(httpClient, website.LanguageCode);
+            SetAccepLanguage(httpClient, languageCode);
             httpClient.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
 
             HttpRequestMessage httpRequestMessage = new(HttpMethod.Get, uri);
@@ -41,9 +42,10 @@ namespace landerist_library.Download
 
             try
             {
-                DateTime dateStart = DateTime.Now;                
-                HttpResponseMessage = await httpClient.SendAsync(httpRequestMessage);                
+                DateTime dateStart = DateTime.Now;
+                HttpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
                 Timers.Timer.SaveTimerDownloadPage(uri.ToString(), dateStart);
+                SetRedirectUrl();
                 return await HttpResponseMessage.Content.ReadAsStringAsync();
             }
             catch// (Exception exception)
@@ -66,14 +68,18 @@ namespace landerist_library.Download
             }
         }
 
-        public string? GetRedirectUrl()
+        private void SetRedirectUrl()
         {
             if (HttpResponseMessage != null &&
                 HttpResponseMessage.Headers.TryGetValues("Location", out var locations))
             {
-                return locations.FirstOrDefault();
+                RedirectUrl = locations.FirstOrDefault();
             }
-            return null;
+        }
+
+        public string? GetRedirectUrl()
+        {
+            return RedirectUrl;
         }
     }
 }

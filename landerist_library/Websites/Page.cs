@@ -39,10 +39,14 @@ namespace landerist_library.Websites
         public Website Website = new();
 
 
-        //public HtmlDocument? HtmlDocument = null;
 
 
         private bool Disposed;
+
+        public Page(string url) : this(new Uri(url))
+        {
+
+        }
 
         public Page(Uri uri) : this(Websites.GetWebsite(uri.Host), uri)
         {
@@ -222,19 +226,21 @@ namespace landerist_library.Websites
             return Uri.Equals(Website.MainUri);
         }
 
-        public void InitializeResponseBody()
+        public void InitializeResponseBodyAndStatusCode()
         {
             ResponseBody = null;
             ResponseBodyText = null;
+            HttpStatusCode = null;            
         }
         public bool ResponseBodyIsNullOrEmpty()
         {
             return string.IsNullOrEmpty(ResponseBody);
         }
 
-        public void SetResponseBody(string? responseBody)
+        public void SetResponseBodyAndStatusCode(string? responseBody, short? httpStatusCode)
         {
             ResponseBody = responseBody;
+            HttpStatusCode = httpStatusCode;
         }
 
         public void SetResponseBodyText()

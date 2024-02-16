@@ -445,7 +445,7 @@ namespace landerist_library.Websites
             HttpClientDownloader httpClientDownloader = new();
             try
             {
-                var html = httpClientDownloader.GetAsync(this, ListingExampleUri).Result;
+                var html = httpClientDownloader.GetAsync(LanguageCode, ListingExampleUri).Result;
                 if (html != null)
                 {
                     var htmlDocument = new HtmlDocument();

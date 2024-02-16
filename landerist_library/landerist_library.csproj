@@ -14,7 +14,7 @@
   <ItemGroup>
     <PackageReference Include="AI.Dev.OpenAI.GPT" Version="1.0.2" />
     <PackageReference Include="AWSSDK.Comprehend" Version="3.7.300.50" />
-    <PackageReference Include="AWSSDK.S3" Version="3.7.305.26" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.305.27" />
     <PackageReference Include="Com.Bekijkhet.RobotsTxt" Version="1.0.0" />
     <PackageReference Include="CsvHelper" Version="31.0.0" />
     <PackageReference Include="Google.Apis.CustomSearchAPI.v1" Version="1.66.0.3290" />
@@ -29,7 +29,7 @@
     <PackageReference Include="OpenCvSharp4" Version="4.9.0.20240103" />
     <PackageReference Include="OpenCvSharp4.Extensions" Version="4.9.0.20240103" />
     <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.9.0.20240103" />
-    <PackageReference Include="PuppeteerSharp" Version="14.0.0" />
+    <PackageReference Include="PuppeteerSharp" Version="14.1.0" />
     <PackageReference Include="Selenium.Firefox.WebDriver" Version="0.27.0" />
     <PackageReference Include="Selenium.WebDriver" Version="4.17.0" />
     <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="121.0.6167.8500" />

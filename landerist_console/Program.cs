@@ -66,18 +66,16 @@ namespace landerist_console
             //Config.SetToProduction();
             Config.SetDatabaseToProduction();
 
-            var uri = new Uri("http://34mallorca.com/detalles-del-inmueble/carismatico-edificio-en-el-centro-de-palma/19675687");
+            //var page = new Page("http://34mallorca.com/detalles-del-inmueble/carismatico-edificio-en-el-centro-de-palma/19675687");
+            //var page = new Page("https://www.inverolid.es/propiedades/piso-en-alquiler-arroyo-de-la-encomienda/");
             //var uri = new Uri("https://inmocolsol.es/valladolid/local-comercial-en-alquiler-372235");
+            //var website = new Website(uri);            
 
-            //SeleniumDownloader.GetChrome(uriPage);
-            var text = new PuppeteerDownloader().GetText(uri);
-            Console.WriteLine(text);
-
-
+            //SeleniumDownloader.GetChrome(uriPage);           
             //new HttpClientDownloader().Get(uriPage);
 
-            //var website = new Website(uri);
-            //var page = new Page(website, uriPage);            
+            //new PuppeteerDownloader().DoTest();
+            //Console.WriteLine(text);
 
             //Websites.Delete(website); return;
             //Websites.Delete(uri); return;
@@ -111,7 +109,7 @@ namespace landerist_console
             //new Scraper().Scrape(website);
             //new Scraper().ScrapeUnknowPageType(website);
             //new Scraper().ScrapeAllPages();            
-            Scraper.Scrape(uri);
+            //Scraper.Scrape(page);            
             //new Scraper().Start();
 
 
