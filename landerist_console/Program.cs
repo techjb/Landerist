@@ -1,7 +1,7 @@
 ﻿using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Database;
-using landerist_library.Download;
+using landerist_library.Downloaders;
 using landerist_library.Export;
 using landerist_library.Insert.GoogleCustomSearch;
 using landerist_library.Insert.GooglePlaces;
@@ -73,7 +73,6 @@ namespace landerist_console
 
             //SeleniumDownloader.GetChrome(uriPage);           
             //new HttpClientDownloader().Get(uriPage);
-
             //new PuppeteerDownloader().DoTest();
             //Console.WriteLine(text);
 

@@ -2,9 +2,9 @@
 using landerist_library.Websites;
 using System.Net.Http.Headers;
 
-namespace landerist_library.Download
+namespace landerist_library.Downloaders
 {
-    public class HttpClientDownloader
+    public class HttpClientDownloader: IDownloader
     {
         private short? HttpStatusCode = null;
 
@@ -12,7 +12,7 @@ namespace landerist_library.Download
 
         private HttpResponseMessage? HttpResponseMessage;
 
-        public void SetResponseBody(Page page)
+        public void SetResponseBodyAndStatusCode(Page page)
         {
             page.InitializeResponseBodyAndStatusCode();
             var html = GetAsync(page.Website.LanguageCode, page.Uri).Result;
@@ -22,6 +22,7 @@ namespace landerist_library.Download
             }
             page.SetResponseBodyAndStatusCode(html, HttpStatusCode);
         }
+
         public async Task<string?> GetAsync(LanguageCode languageCode, Uri uri)
         {
             HttpClientHandler handler = new()

@@ -1,6 +1,6 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Database;
-using landerist_library.Download;
+using landerist_library.Downloaders;
 using landerist_library.Index;
 using landerist_library.Parse.Location;
 using landerist_library.Parse.Media;
@@ -21,7 +21,7 @@ namespace landerist_library.Scrape
 
         public bool Scrape()
         {
-            Downloader.SetResponseBody(Page);
+            Downloader.SetResponseBodyAndStatusCode(Page);
             SetPageType();
             UpdateIfListing();
             UpdateIfUnPublishedListing();

@@ -5,7 +5,7 @@ using landerist_library.Scrape;
 using landerist_library.Database;
 using landerist_library.Configuration;
 using landerist_library.Websites;
-using landerist_library.Download;
+using landerist_library.Downloaders;
 
 namespace landerist_service
 {

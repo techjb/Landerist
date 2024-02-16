@@ -2,7 +2,7 @@
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
 
-namespace landerist_library.Download
+namespace landerist_library.Downloaders
 {
     public class SeleniumDownloader
     {

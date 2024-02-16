@@ -2,7 +2,7 @@
 using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Database;
-using landerist_library.Download;
+using landerist_library.Downloaders;
 using landerist_library.Index;
 using Newtonsoft.Json;
 using System.Collections.Generic;

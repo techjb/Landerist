@@ -4,9 +4,9 @@ using landerist_library.Configuration;
 using landerist_library.Websites;
 
 
-namespace landerist_library.Download
+namespace landerist_library.Downloaders
 {
-    public class PuppeteerDownloader
+    public class PuppeteerDownloader : IDownloader
     {
         private short? HttpStatusCode = null;
 
@@ -37,9 +37,9 @@ namespace landerist_library.Download
                 "--window-position=0,0",
                 "--ignore-certifcate-errors",
                 "--ignore-certifcate-errors-spki-list"
-            },            
+            },
         };
-        
+
 
         private static readonly HashSet<string> BlockDomains =
         [
@@ -58,18 +58,19 @@ namespace landerist_library.Download
 
         public void DoTest()
         {
-            //var page = new Websites.Page("http://34mallorca.com/detalles-del-inmueble/carismatico-edificio-en-el-centro-de-palma/19675687");
-            var page = new Websites.Page("https://www.realestate.bnpparibas.es/es/soluciones-medida/soluciones-para-inversores");
+            var page = new Websites.Page("http://34mallorca.com/detalles-del-inmueble/carismatico-edificio-en-el-centro-de-palma/19675687");
+            //var page = new Websites.Page("https://www.realestate.bnpparibas.es/es/soluciones-medida/soluciones-para-inversores");
             var text = new PuppeteerDownloader().GetText(page);
-            if(text != null)
+            if (text != null)
             {
+                Console.WriteLine(text);
                 Logs.Log.WriteLogInfo("PuppeterTest", text);
             }
             else
             {
                 Logs.Log.WriteLogInfo("PuppeterTest", "Text is null");
             }
-            
+
         }
 
         public string? GetText(Websites.Page page)
@@ -90,47 +91,55 @@ namespace landerist_library.Download
             }
             return null;
         }
-
-        public string? GetResponseBody(Websites.Page page)
-        {
-            Html = Task.Run(async () => await GetAsync(page.Website.LanguageCode, page.Uri)).Result;
-            return Html;
-        }
-
-        public void SetResponseBody(Websites.Page page)
+        
+        public void SetResponseBodyAndStatusCode(Websites.Page page)
         {
             page.InitializeResponseBodyAndStatusCode();
             var responseBody = GetResponseBody(page);
-            page.SetResponseBodyAndStatusCode(responseBody, HttpStatusCode);            
+            page.SetResponseBodyAndStatusCode(responseBody, HttpStatusCode);
         }
 
-        private async Task<string?> GetAsync(LanguageCode languageCode, Uri uri)
+        public string? GetResponseBody(Websites.Page page)
         {
             try
             {
-                // Download chromium browser. Run only the first time.
-                await new BrowserFetcher().DownloadAsync();
-                using var browser = await Puppeteer.LaunchAsync(launchOptions);
-                var browserPage = await GetBroserPage(browser, languageCode, uri);                                
+                Html = Task.Run(async () => await GetAsync(page.Website.LanguageCode, page.Uri)).Result;
+            }
+            catch
+            {
+
+            }
+            return Html;
+        }
+
+
+        private async Task<string?> GetAsync(LanguageCode languageCode, Uri uri)
+        {
+            //await new BrowserFetcher().DownloadAsync();
+            using var browser = await Puppeteer.LaunchAsync(launchOptions);            
+            try
+            {
+                var browserPage = await GetBroserPage(browser, languageCode, uri);
                 await browserPage.GoToAsync(uri.ToString(), WaitUntilNavigation.Networkidle0);
                 return await browserPage.GetContentAsync();
             }
-            catch //(Exception exception)
+            catch
             {
-                //Logs.Log.WriteLogErrors("PuppeteerDownloader GetAsync", exception);
+                await browser.CloseAsync();
+                browser.Dispose();
             }
             return null;
         }
 
         private async Task<IPage> GetBroserPage(IBrowser browser, LanguageCode languageCode, Uri uri)
-        {            
+        {
             var browserPage = await browser.NewPageAsync();
             browserPage.DefaultNavigationTimeout = Config.HTTPCLIENT_SECONDS_TIMEOUT * 1000;
             SetAccepLanguage(browserPage, languageCode);
             await browserPage.SetUserAgentAsync(Config.USER_AGENT);
             await browserPage.SetRequestInterceptionAsync(true);
             browserPage.Request += async (sender, e) => await HandleRequestAsync(e, uri);
-            browserPage.Response += (sender, e) => HandleResponseAsync(e, uri);            
+            browserPage.Response += (sender, e) => HandleResponseAsync(e, uri);
             return browserPage;
         }
 
@@ -182,12 +191,9 @@ namespace landerist_library.Download
                 return;
             }
             HttpStatusCode = (short)e.Response.Status;
-            if (HttpStatusCode >= 300 && HttpStatusCode < 400)
+            if (e.Response.Headers.TryGetValue("Location", out string? location))
             {
-                if (e.Response.Headers.TryGetValue("Location", out string? location))
-                {
-                    RedirectUrl = location;
-                }
+                RedirectUrl = location;
             }
         }
 
