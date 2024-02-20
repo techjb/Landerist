@@ -1,4 +1,6 @@
-﻿namespace landerist_library.Websites
+﻿using landerist_library.Configuration;
+
+namespace landerist_library.Websites
 {
     public class PageSelector
     {
@@ -69,7 +71,7 @@
                 }
                 else
                 {
-                    if (value >= Configuration.Config.MAX_PAGES_PER_HOSTS_PER_SCRAPE)
+                    if (value >= Config.MAX_PAGES_PER_HOSTS_PER_SCRAPE)
                     {
                         continue;
                     }
@@ -83,16 +85,21 @@
 
         private static void FilterMaxTotalPages()
         {
-            if (Pages.Count > Configuration.Config.MAX_PAGES_PER_SCRAPE)
+            if (Pages.Count > Config.MAX_PAGES_PER_SCRAPE)
             {
                 Pages = [.. Pages.AsParallel().OrderBy(o => o.Updated)];
-                Pages = Pages.Take(Configuration.Config.MAX_PAGES_PER_SCRAPE).ToList();
+                Pages = Pages.Take(Config.MAX_PAGES_PER_SCRAPE).ToList();
             }
         }
 
         private static void FilterMinTotalPages()
         {
-            if (Pages.Count < Configuration.Config.MIN_PAGES_PER_SCRAPE)
+            if (!Config.IsConfigurationProduction())
+            {
+                return;
+            }
+
+            if (Pages.Count < Config.MIN_PAGES_PER_SCRAPE)
             {
                 Pages.Clear();
             }

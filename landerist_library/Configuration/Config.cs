@@ -4,7 +4,7 @@
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "1.49";
+        public static readonly string VERSION = "1.50";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
@@ -16,11 +16,7 @@
 
         public static readonly int MAX_PAGES_PER_SCRAPE = 10000;
 
-        public static int MIN_PAGES_PER_SCRAPE { get; set; }
-
-        private const int MIN_PAGES_PER_SCRAPE_PRODUCTION = 20;
-
-        private const int MIN_PAGES_PER_SCRAPE_LOCAL = 0;
+        public static readonly int MIN_PAGES_PER_SCRAPE = 20;     
 
         public static readonly int MAX_PAGES_PER_HOSTS_PER_SCRAPE = 5;
 
@@ -34,11 +30,12 @@
 
         //public static readonly int MAX_LISTINGS_PER_WEBSITE = 100;
 
+        public static readonly int MIN_RESPONSEBODYTEXT_LENGTH = 50;
+
         public static readonly int MAX_RESPONSEBODYTEXT_LENGTH = 10000;
 
         public static readonly int MAX_PAGETYPE_COUNTER = 1000;
-
-        public static readonly int MIN_RESPONSEBODYTEXT_LENGTH = 50;
+        
         public static bool SCRAPE_WITH_PARALELISM { get; set; }
 
         public static readonly bool LOGS_ENABLED = true;
@@ -155,10 +152,6 @@
             BACKUPS_DIRECTORY = ConfigurationProduction ?
                 BACKUPS_PRODUCTION_DIRECTORY :
                 BACKUPS_LOCAL_DIRECTORY;
-
-            MIN_PAGES_PER_SCRAPE = ConfigurationProduction ?
-                MIN_PAGES_PER_SCRAPE_PRODUCTION :
-                MIN_PAGES_PER_SCRAPE_LOCAL;
 
             TIMERS_ENABLED = !ConfigurationProduction;
 
