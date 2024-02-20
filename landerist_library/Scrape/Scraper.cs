@@ -100,7 +100,7 @@ namespace landerist_library.Scrape
             {
                 return false;
             }
-            TotalCounter = BlockingCollection.Count;
+            TotalCounter = BlockingCollection.Count;            
             Scraped = 0;
             Remaining = TotalCounter;
             ThreadCounter = 0;
@@ -109,7 +109,7 @@ namespace landerist_library.Scrape
             OtherPageType = 0;
 
             var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
-            var maxDegreeOfParallelism = Config.SCRAPE_WITH_PARALELISM ? Environment.ProcessorCount - 1 : 5;
+            var maxDegreeOfParallelism = Config.SCRAPE_WITH_PARALELISM ? Environment.ProcessorCount - 1 : 1;
 
             Parallel.ForEach(
                 orderablePartitioner,
@@ -121,6 +121,7 @@ namespace landerist_library.Scrape
                 {
                     StartThread();
                     ProcessThread(page);
+                    WriteConsole();
                     EndThread();
                 });
 
@@ -138,27 +139,27 @@ namespace landerist_library.Scrape
             if (!page.Website.IsAllowedByRobotsTxt(page.Uri))
             {
                 page.Update(PageType.BlockedByRobotsTxt);
+                return;
             }
-            else if (page.Website.CrawlDelayTooBig())
+            if (page.Website.CrawlDelayTooBig())
             {
                 page.Update(PageType.RobotsTxtDisallow);
+                return;
             }
-            else
+            if (IsBlocked(page))
             {
-                if (IsBlocked(page) && !BlockingCollection.IsCompleted)
+                if (!BlockingCollection.IsAddingCompleted)
                 {
                     BlockingCollection.Add(page);
                 }
-                else
-                {
-                    Scrape(page);
-                    page.Dispose();
-                    Interlocked.Increment(ref Scraped);
-                    Interlocked.Decrement(ref Remaining);
-                }
             }
-
-            WriteConsole();
+            else
+            {
+                Scrape(page);
+                page.Dispose();
+                Interlocked.Increment(ref Scraped);
+                Interlocked.Decrement(ref Remaining);
+            }
         }
 
         private static void WriteConsole()
@@ -187,7 +188,7 @@ namespace landerist_library.Scrape
         {
             Interlocked.Decrement(ref ThreadCounter);
 
-            if (ThreadCounter == 0 && BlockingCollection.Count == 0)
+            if (ThreadCounter.Equals(0) && BlockingCollection.Count.Equals(0))
             {
                 BlockingCollection.CompleteAdding();
                 Console.WriteLine("Finished");
