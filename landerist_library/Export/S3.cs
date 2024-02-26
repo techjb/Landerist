@@ -118,5 +118,22 @@ namespace landerist_library.Export
 
             return list;
         }
+
+        public async Task<(DateTime? lastModified, long? contentLength)> GetFileInfo(string bucketName, string objectKey)
+        {
+            try
+            {
+                var metadataResponse = await AmazonS3Client.GetObjectMetadataAsync(bucketName, objectKey);
+                var lastModified = metadataResponse.LastModified;
+                var contentLength = metadataResponse.ContentLength; // Tamaño en bytes
+
+                return (lastModified, contentLength);
+            }
+            catch (AmazonS3Exception e)
+            {
+                Log.WriteLogErrors("S3 GetFileInfo", e);
+            }
+            return (null, null);
+        }
     }
 }

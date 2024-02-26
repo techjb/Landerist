@@ -66,6 +66,7 @@ namespace landerist_console
             //Config.SetToProduction();
             Config.SetDatabaseToProduction();
 
+            #region Pages & Websites
             //var page = new Page("http://34mallorca.com/detalles-del-inmueble/carismatico-edificio-en-el-centro-de-palma/19675687");
             //var page = new Page("https://www.inverolid.es/propiedades/piso-en-alquiler-arroyo-de-la-encomienda/");
             //var uri = new Uri("https://inmocolsol.es/valladolid/local-comercial-en-alquiler-372235");
@@ -100,6 +101,20 @@ namespace landerist_console
             //Pages.DeleteNumPagesExceded();
             //Pages.Delete(PageType.ForbiddenLastSegment);
 
+            //Websites.DeleteFromFile();
+            //new Website("promoaguilera.com").Delete();
+            //new Website("inmobiliariainsignia.com").UpdateListingExample("https://inmobiliariainsignia.com/inmueble/preciosa-casa-reformada-a-capricho-en-la-localidad-urrugne/");
+            //new Website("aransahomes.es").RemoveListingExample();
+            //Websites.UpdateListingExampleUriFromFile();
+            //Websites.TestListingExampleUri();
+            //Websites.UpdateListingsExampleNodeSetNulls();
+            //Websites.DeleteNullListingExampleHtml();
+
+
+            #endregion
+
+            #region Scrapper
+
             //new Scraper(false).ScrapeUnknowPageType(10000);
             //new Scraper().ScrapeMainPage(website);
             //new Scraper().ScrapeUnknowHttpStatusCode();
@@ -111,11 +126,11 @@ namespace landerist_console
             //Scraper.Scrape(page);            
             //new Scraper().Start();
 
+            #endregion
 
-            //landerist_library.Parse.Listing.ListingsParser.Start();            
+            #region Parsers
 
-            //Csv.Export(true);
-            //landerist_library.Export.Json.Export("es_listings_full.json", true);
+            //landerist_library.Parse.Listing.ListingsParser.Start();
 
             //var tuple1 = landerist_library.Parse.Location.GoogleMaps.AddressToLatLng.Parse("Alondra 8, las rozas de madrid", landerist_library.Websites.CountryCode.ES);
             //Console.WriteLine(tuple1);
@@ -149,32 +164,34 @@ namespace landerist_console
 
             //new ChatGPTRequest().ListModels();
 
+            #endregion
+
+            #region Export Backup Statistics
+
+            //Csv.Export(true);
+            //landerist_library.Export.Json.Export("es_listings_full.json", true);
+
             //FilesUpdater.UpdateFiles();
-
             //Backup.Update();
-
             //landerist_library.Statistics.StatisticsSnapshot.TakeSnapshots();            
 
+            new landerist_library.Export.DownloadsPage().Update();
+
+            #endregion
+
+            #region ListingExample
             //string url1 = "https://www.inmobiliaria-teval.com/inmueble/salou-apartamento-ln-23523-eva-2/";            
             //string url2 = "https://www.inmobiliaria-teval.com/inmueble/miami-playa-el-casalot-chalet-adosado/";
             //ListingHTMLDom.Test(url1, url2);
 
-            //PageSelector.Select();
-
             //Csv.ExportHostsMainUri();
-
-            //Websites.DeleteFromFile();
-            //new Website("promoaguilera.com").Delete();
-            //new Website("inmobiliariainsignia.com").UpdateListingExample("https://inmobiliariainsignia.com/inmueble/preciosa-casa-reformada-a-capricho-en-la-localidad-urrugne/");
-            //new Website("aransahomes.es").RemoveListingExample();
-            //Websites.UpdateListingExampleUriFromFile();
-            //Websites.TestListingExampleUri();
-            //Websites.UpdateListingsExampleNodeSetNulls();
-            //Websites.DeleteNullListingExampleHtml();
 
             //PlacesSearch.Search();
             //CustomSearch.Start();
-            //IdAgenciesScraper.Start();            
+            //IdAgenciesScraper.Start();
+
+            #endregion
+
         }
     }
 }

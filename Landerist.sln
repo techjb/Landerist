@@ -24,7 +24,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "landerist_website", "lander
 		landerist_website\index.html = landerist_website\index.html
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "landerist_service", "landerist_service\landerist_service.csproj", "{8D90C19B-543F-45AF-A0E3-F9DD12979200}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "landerist_service", "landerist_service\landerist_service.csproj", "{8D90C19B-543F-45AF-A0E3-F9DD12979200}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "downloads", "downloads", "{5675164B-9D23-4E7F-9A02-0CCA92FB79F0}"
+	ProjectSection(SolutionItems) = preProject
+		E:\Landerist\Export\downloads_template.html = E:\Landerist\Export\downloads_template.html
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +64,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5675164B-9D23-4E7F-9A02-0CCA92FB79F0} = {B0045D1A-422C-4327-8A3C-F90D55CFF0A8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F392E95A-422C-40BC-A9C9-32A571641854}

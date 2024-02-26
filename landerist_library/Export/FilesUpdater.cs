@@ -13,23 +13,23 @@ namespace landerist_library.Export
             Yesterday = DateTime.Now.AddDays(-1);
             try
             {
-                UpdateAllListings();
-                UpdateUpdatedYesterday();
+                Listings();
+                UpdatedYesterday();
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors("ExportAllListings", exception);
+                Log.WriteLogErrors("UpdateFiles", exception);
             }
         }
 
-        private static void UpdateAllListings()
+        private static void Listings()
         {
-            Console.WriteLine("Exporting all listings ..");
+            Console.WriteLine("Exporting listings ..");
             var listings = ES_Listings.GetListings(true);
             Update(listings, "es_listings", "ES\\listings");
         }
 
-        private static void UpdateUpdatedYesterday()
+        private static void UpdatedYesterday()
         {
             Console.WriteLine("Exporting updated yesterday ..");
             var listings = ES_Listings.GetListings(true, Yesterday);
