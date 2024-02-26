@@ -175,7 +175,7 @@ namespace landerist_console
             //Backup.Update();
             //landerist_library.Statistics.StatisticsSnapshot.TakeSnapshots();            
 
-            new landerist_library.Export.DownloadsPage().Update();
+            //new landerist_library.Export.DownloadsPage().Update();
 
             #endregion
 
