@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="AI.Dev.OpenAI.GPT" Version="1.0.2" />
+    <PackageReference Include="AWSSDK.CloudFront" Version="3.7.301.47" />
     <PackageReference Include="AWSSDK.Comprehend" Version="3.7.300.50" />
     <PackageReference Include="AWSSDK.S3" Version="3.7.305.27" />
     <PackageReference Include="Com.Bekijkhet.RobotsTxt" Version="1.0.0" />

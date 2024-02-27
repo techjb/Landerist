@@ -18,12 +18,17 @@ namespace landerist_library.Export
 
         public bool UploadFilePublicBucket(string file, string key)
         {
-            return UploadFile(file, key, Config.AWS_S3_PUBLIC_BUCKET, string.Empty);
+            return UploadFile(file, key, Config.AWS_S3_DOWNLOADS_BUCKET, string.Empty);
         }
 
-        public bool UploadFilePublicBucket(string file, string key, string subdirectoryInBucket)
+        public bool UploadToDownloadsBucket(string file, string key, string subdirectoryInBucket)
         {
-            return UploadFile(file, key, Config.AWS_S3_PUBLIC_BUCKET, subdirectoryInBucket);
+            return UploadFile(file, key, Config.AWS_S3_DOWNLOADS_BUCKET, subdirectoryInBucket);
+        }
+
+        public bool UploadToWebsiteBucket(string file, string key, string subdirectoryInBucket)
+        {
+            return UploadFile(file, key, Config.AWS_S3_WEBSITE_BUCKET, subdirectoryInBucket);
         }
 
         public bool UploadFile(string file, string key, string bucketName)
@@ -99,13 +104,13 @@ namespace landerist_library.Export
 
         public async Task<List<DeletedObject>> DeleteObjects(string bucketName, List<string> objectKeys)
         {
-            List<DeletedObject> list = [];            
+            List<DeletedObject> list = [];
             var deleteObjectsRequest = new DeleteObjectsRequest
             {
                 BucketName = bucketName,
                 Objects = new List<KeyVersion>(objectKeys.ConvertAll(k => new KeyVersion() { Key = k })),
                 Quiet = true
-            };            
+            };
             try
             {
                 var response = await AmazonS3Client.DeleteObjectsAsync(deleteObjectsRequest);
@@ -119,13 +124,13 @@ namespace landerist_library.Export
             return list;
         }
 
-        public async Task<(DateTime? lastModified, long? contentLength)> GetFileInfo(string bucketName, string objectKey)
+        public (DateTime? lastModified, long? contentLength) GetFileInfo(string bucketName, string objectKey)
         {
             try
             {
-                var metadataResponse = await AmazonS3Client.GetObjectMetadataAsync(bucketName, objectKey);
+                var metadataResponse = AmazonS3Client.GetObjectMetadataAsync(bucketName, objectKey).Result;
                 var lastModified = metadataResponse.LastModified;
-                var contentLength = metadataResponse.ContentLength; // Tamaño en bytes
+                var contentLength = metadataResponse.ContentLength; // Tamaño en bytes                
 
                 return (lastModified, contentLength);
             }

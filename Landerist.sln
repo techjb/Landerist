@@ -28,7 +28,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "landerist_service", "lander
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "downloads", "downloads", "{5675164B-9D23-4E7F-9A02-0CCA92FB79F0}"
 	ProjectSection(SolutionItems) = preProject
-		E:\Landerist\Export\downloads_template.html = E:\Landerist\Export\downloads_template.html
+		E:\Landerist\Export\Landerist.com\downloads_template.html = E:\Landerist\Export\Landerist.com\downloads_template.html
 	EndProjectSection
 EndProject
 Global

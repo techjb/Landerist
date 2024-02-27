@@ -1,11 +1,10 @@
 using landerist_library.Logs;
-using landerist_library.Export;
 using landerist_library.Statistics;
 using landerist_library.Scrape;
 using landerist_library.Database;
 using landerist_library.Configuration;
 using landerist_library.Websites;
-using landerist_library.Downloaders;
+using landerist_library.Export.Landerist_com;
 
 namespace landerist_service
 {
@@ -22,7 +21,7 @@ namespace landerist_service
         private const int OneMinute = 60 * OneSecond;
         private const int OneHour = 60 * OneMinute;
         private const int OneDay = 24 * OneHour;
-        private readonly Scraper Scraper = new ();
+        private readonly Scraper Scraper = new();
 
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -57,6 +56,7 @@ namespace landerist_service
             try
             {
                 FilesUpdater.UpdateFiles();
+                new DownloadsPage().Update();
                 StatisticsSnapshot.TakeSnapshots();
                 Backup.Update();
             }

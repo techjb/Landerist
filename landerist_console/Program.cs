@@ -170,12 +170,12 @@ namespace landerist_console
 
             //Csv.Export(true);
             //landerist_library.Export.Json.Export("es_listings_full.json", true);
+            //landerist_library.Export.Landerist_com.FilesUpdater.UpdateFiles();
+            //new landerist_library.Export.Landerist_com.DownloadsPage().Update();            
+            
 
-            //FilesUpdater.UpdateFiles();
             //Backup.Update();
-            //landerist_library.Statistics.StatisticsSnapshot.TakeSnapshots();            
-
-            //new landerist_library.Export.DownloadsPage().Update();
+            //landerist_library.Statistics.StatisticsSnapshot.TakeSnapshots();
 
             #endregion
 
