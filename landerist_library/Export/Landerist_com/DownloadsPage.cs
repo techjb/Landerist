@@ -53,11 +53,11 @@ namespace landerist_library.Export.Landerist_com
             }
 
             string commentCountry = GetTemplateComment(countryCode, exportType, "Country");
-            UpdateDownloadsTemplate(commentCountry, countryCode.ToString());
+            Replace(commentCountry, countryCode.ToString());
 
             string commentModified = GetTemplateComment(countryCode, exportType, "Modified");
             string lastMofifiedString = ((DateTime)lastModified).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ");
-            UpdateDownloadsTemplate(commentModified, lastMofifiedString);
+            Replace(commentModified, lastMofifiedString);
 
 
             string commentSize = GetTemplateComment(countryCode, exportType, "Size");
@@ -66,13 +66,13 @@ namespace landerist_library.Export.Landerist_com
             numberFormatInfo.NumberGroupSeparator = ".";
             numberFormatInfo.NumberGroupSizes = [3];
             string sizeString = ((long)contentLength).ToString("#,0", numberFormatInfo) + " bytes";
-            UpdateDownloadsTemplate(commentSize, sizeString);
+            Replace(commentSize, sizeString);
 
             string comentHyperlink = GetTemplateComment(countryCode, exportType, "Hyperlink");
             var url = $"https://{Config.AWS_S3_DOWNLOADS_BUCKET}.s3.amazonaws.com/{objectKey}";
             string fileName = GetFileName(countryCode, exportType, "zip");
             var hyperlink = "<a title=\"" + fileName + "\" href=\"" + url + "\">Download</a>";
-            UpdateDownloadsTemplate(comentHyperlink, hyperlink);
+            Replace(comentHyperlink, hyperlink);
         }
 
         private static string GetTemplateComment(CountryCode countryCode, ExportType exportType, string key)
@@ -80,9 +80,8 @@ namespace landerist_library.Export.Landerist_com
             return "<!--" + countryCode + "_" + exportType + "_" + key + "-->";
         }
 
-        private static void UpdateDownloadsTemplate(string comment, string text)
+        private static void Replace(string comment, string text)
         {
-            text = comment + text;
             DownloadsTemplate = DownloadsTemplate.Replace(comment, text);
         }
 
