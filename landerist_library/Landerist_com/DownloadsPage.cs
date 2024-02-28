@@ -5,9 +5,9 @@ using Amazon.CloudFront.Model;
 using landerist_library.Configuration;
 using Amazon;
 using landerist_library.Logs;
+using landerist_library.Export;
 
-
-namespace landerist_library.Export.Landerist_com
+namespace landerist_library.Landerist_com
 {
 
     public class DownloadsPage : Landerist_com
@@ -88,43 +88,7 @@ namespace landerist_library.Export.Landerist_com
         private static bool UploadDownloadsFile()
         {
             File.WriteAllText(DownloadsHtmlFile, DownloadsTemplate);
-            if (!new S3().UploadToWebsiteBucket(DownloadsHtmlFile, "index.html", "downloads"))
-            {
-                return false;
-            }
-            return InvalidateCloudFront();
-        }
-
-
-        public static bool InvalidateCloudFront()
-        {
-            var client = new AmazonCloudFrontClient(Config.AWS_ACESSKEYID, Config.AWS_SECRETACCESSKEY, RegionEndpoint.EUWest3);
-            var invalidationBatch = new InvalidationBatch
-            {
-                CallerReference = DateTime.UtcNow.Ticks.ToString(),
-                Paths = new Paths
-                {
-                    Quantity = 1,
-                    Items = ["/*"]
-                }
-            };
-
-            var request = new CreateInvalidationRequest
-            {
-                DistributionId = Config.AWS_CLOUDFRONT_DISTRIBUTION_ID_WEBSITE,
-                InvalidationBatch = invalidationBatch
-            };
-
-            try
-            {
-                var response = client.CreateInvalidationAsync(request).Result;
-                return true;
-            }
-            catch (Exception exception)
-            {
-                Log.WriteLogErrors("DownloadsPage InvalidateCloudFront", exception);
-            }
-            return false;
+            return new S3().UploadToWebsiteBucket(DownloadsHtmlFile, "index.html", "downloads");
         }
     }
 }

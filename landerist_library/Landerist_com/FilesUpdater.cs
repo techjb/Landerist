@@ -1,9 +1,10 @@
 ﻿using landerist_library.Database;
+using landerist_library.Export;
 using landerist_library.Logs;
 using landerist_library.Websites;
 using landerist_orels.ES;
 
-namespace landerist_library.Export.Landerist_com
+namespace landerist_library.Landerist_com
 {
     public class FilesUpdater : Landerist_com
     {

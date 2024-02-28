@@ -4,7 +4,7 @@ using landerist_library.Scrape;
 using landerist_library.Database;
 using landerist_library.Configuration;
 using landerist_library.Websites;
-using landerist_library.Export.Landerist_com;
+using landerist_library.Landerist_com;
 
 namespace landerist_service
 {
@@ -55,9 +55,9 @@ namespace landerist_service
         {
             try
             {
-                FilesUpdater.UpdateFiles();
-                new DownloadsPage().Update();
                 StatisticsSnapshot.TakeSnapshots();
+                FilesUpdater.UpdateFiles();                
+                Landerist_com.UpdateDownloadsAndStatistics();
                 Backup.Update();
             }
             catch (Exception exception)
