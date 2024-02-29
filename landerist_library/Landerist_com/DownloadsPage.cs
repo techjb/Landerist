@@ -13,7 +13,7 @@ namespace landerist_library.Landerist_com
     public class DownloadsPage : Landerist_com
     {
         private static readonly string DownloadsTemplateHtmlFile =
-            Config.LANDERIST_COM_OUTPUT + "downloads_template.html";
+            Config.LANDERIST_COM_TEMPLATES + "downloads_template.html";
 
         private static readonly string DownloadsHtmlFile =
             Config.LANDERIST_COM_OUTPUT + "downloads.html";

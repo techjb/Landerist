@@ -172,8 +172,8 @@ namespace landerist_console
             //landerist_library.Export.Json.Export("es_listings_full.json", true);
             //landerist_library.Landerist_com.FilesUpdater.UpdateFiles();
             //new landerist_library.Landerist_com.DownloadsPage().Update();            
-            //new landerist_library.Landerist_com.StatisticsPage().Update();
-            landerist_library.Landerist_com.Landerist_com.InvalidateCloudFront();
+            //landerist_library.Landerist_com.StatisticsPage.Update();
+            //landerist_library.Landerist_com.Landerist_com.InvalidateCloudFront();
 
 
             //Backup.Update();

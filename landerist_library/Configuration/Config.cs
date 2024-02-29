@@ -58,7 +58,7 @@
             "User ID=" + DATABASE_USER + ";" +
             "Password=" + DATABASE_PW + ";" +
             "Connect Timeout=100000;";
-        
+
 
         public static string? DATASOURCE { get; set; }
 
@@ -73,6 +73,7 @@
         public static string? DATABASE_CONNECTION { get; set; }
         public static string? EXPORT_DIRECTORY { get; set; }
         public static string? LANDERIST_COM_OUTPUT { get; set; }
+        public static string? LANDERIST_COM_TEMPLATES { get; set; }
         public static string? BACKUPS_DIRECTORY { get; set; }
 
         public static readonly int DAYS_TO_DELETE_BACKUP = 60;
@@ -110,6 +111,10 @@
             LANDERIST_COM_OUTPUT = ConfigurationProduction ?
                 PrivateConfig.LANDERIST_COM_OUTPUT_PRODUCTION :
                 PrivateConfig.LANDERIST_COM_OUTPUT_LOCAL;
+
+            LANDERIST_COM_TEMPLATES = configurationProduction ?
+                PrivateConfig.LANDERIST_COM_TEMPLATES_PRODUCTION :
+                PrivateConfig.LANDERIST_COM_TEMPLATES_LOCAL;
 
             BACKUPS_DIRECTORY = ConfigurationProduction ?
                 PrivateConfig.BACKUPS_DIRECTORY_PRODUCTION :

@@ -10,7 +10,7 @@ namespace landerist_library.Landerist_com
     {
 
         private static readonly string StatisticsTemplateHtmlFile =
-            Config.LANDERIST_COM_OUTPUT + "statistics_template.html";
+            Config.LANDERIST_COM_TEMPLATES + "statistics_template.html";
 
         private static readonly string StatisticsHtmlFile =
             Config.LANDERIST_COM_OUTPUT + "statistics.html";
