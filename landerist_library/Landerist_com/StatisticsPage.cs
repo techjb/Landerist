@@ -10,21 +10,18 @@ namespace landerist_library.Landerist_com
     {
 
         private static readonly string StatisticsTemplateHtmlFile =
-            Config.LANDERIST_COM_DIRECTORY + "statistics_template.html";
+            Config.LANDERIST_COM_OUTPUT + "statistics_template.html";
 
         private static readonly string StatisticsHtmlFile =
-            Config.LANDERIST_COM_DIRECTORY + "statistics.html";
+            Config.LANDERIST_COM_OUTPUT + "statistics.html";
 
         private static string StatisticsTemplate = string.Empty;
 
-        public StatisticsPage()
-        {
-            StatisticsTemplate = File.ReadAllText(StatisticsTemplateHtmlFile);
-        }
-        public void Update()
+        public static void Update()
         {
             try
             {
+                StatisticsTemplate = File.ReadAllText(StatisticsTemplateHtmlFile);
                 UpdateTemplate(StatisticsKey.Listings);
                 UpdateTemplate(StatisticsKey.Websites);
                 UpdateTemplate(StatisticsKey.Pages);

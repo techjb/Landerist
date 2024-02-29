@@ -1,5 +1,6 @@
 ﻿using landerist_library.Tools;
 using System.Data;
+using landerist_library.Configuration;
 
 
 namespace landerist_library.Insert
@@ -8,7 +9,7 @@ namespace landerist_library.Insert
     {
         public static void InsertBancodedatos_es()
         {
-            string file = Configuration.Config.INSERT_DIRECTORY + @"bancodedatos.es\Excel\Pedido_completo.csv";
+            string file = PrivateConfig.INSERT_DIRECTORY + @"bancodedatos.es\Excel\Pedido_completo.csv";
             DataTable dataTable = Csv.ToDataTable(file);
             var uris = ToList(dataTable, "SITIO WEB");
             Insert(uris);
@@ -16,7 +17,7 @@ namespace landerist_library.Insert
 
         public static void InsertBasededatosempresas_net()
         {
-            string file = Configuration.Config.INSERT_DIRECTORY + @"basededatosempresas.net\Inmobiliarias.csv";
+            string file = PrivateConfig.INSERT_DIRECTORY + @"basededatosempresas.net\Inmobiliarias.csv";
             DataTable dataTable = Csv.ToDataTable(file);
             var uris = ToList(dataTable, "Website");
             Insert(uris);

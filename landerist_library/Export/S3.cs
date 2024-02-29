@@ -13,22 +13,22 @@ namespace landerist_library.Export
 
         public S3()
         {
-            AmazonS3Client = new AmazonS3Client(Config.AWS_ACESSKEYID, Config.AWS_SECRETACCESSKEY, RegionEndpoint.EUWest3);
+            AmazonS3Client = new AmazonS3Client(PrivateConfig.AWS_ACESSKEYID, PrivateConfig.AWS_SECRETACCESSKEY, RegionEndpoint.EUWest3);
         }
 
         public bool UploadFilePublicBucket(string file, string key)
         {
-            return UploadFile(file, key, Config.AWS_S3_DOWNLOADS_BUCKET, string.Empty);
+            return UploadFile(file, key, PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, string.Empty);
         }
 
         public bool UploadToDownloadsBucket(string file, string key, string subdirectoryInBucket)
         {
-            return UploadFile(file, key, Config.AWS_S3_DOWNLOADS_BUCKET, subdirectoryInBucket);
+            return UploadFile(file, key, PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, subdirectoryInBucket);
         }
 
         public bool UploadToWebsiteBucket(string file, string key, string subdirectoryInBucket)
         {
-            return UploadFile(file, key, Config.AWS_S3_WEBSITE_BUCKET, subdirectoryInBucket);
+            return UploadFile(file, key, PrivateConfig.AWS_S3_WEBSITE_BUCKET, subdirectoryInBucket);
         }
 
         public bool UploadFile(string file, string key, string bucketName)
@@ -84,9 +84,9 @@ namespace landerist_library.Export
                 listObjectsV2Request.Prefix = directory;
             }
 
-            var listObjectsV2Response = new ListObjectsV2Response();
             try
             {
+                ListObjectsV2Response? listObjectsV2Response;
                 do
                 {
                     listObjectsV2Response = await AmazonS3Client.ListObjectsV2Async(listObjectsV2Request);

@@ -1,0 +1,96 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Landerist Statistics" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@techjb" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            line-height: 1.4;
+            font-size: 16px;
+            padding: 0 10px;
+            margin: 50px auto;
+            max-width: 650px;
+        }
+
+        #maincontent {
+            max-width: 42em;
+            margin-top: 70px;
+        }
+    </style>
+    <title>Statistics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div id="maincontent">
+        <a href="../">< Home</a>
+
+        <h2>
+            Statistics
+        </h2>
+
+        <h3>
+            Listings
+        </h3>
+        <div>
+            <canvas id="ChartListings"></canvas>
+        </div>
+
+        <h3>Websites</h3>
+        <div>
+            <canvas id="ChartWebsites"></canvas>
+        </div>
+
+        <h3>Pages</h3>
+        <div>
+            <canvas id="ChartPages"></canvas>
+        </div>
+
+        <h3>Updated Pages</h3>
+        <div>
+            <canvas id="ChartUpdatedPages"></canvas>
+        </div>
+    </div>
+
+    <script>
+
+        const valuesListings = [/*Listings*/];
+        const valuesWebsites = [/*Websites*/];
+        const valuesPages = [/*Pages*/];
+        const valuesUpdatedPages = [/*UpdatedPages*/];
+
+        CreateChart("ChartListings", valuesListings);
+        CreateChart("ChartWebsites", valuesWebsites);
+        CreateChart("ChartPages", valuesPages);
+        CreateChart("ChartUpdatedPages", valuesUpdatedPages);
+
+        function CreateChart(id, values) {
+            const dataListings = {
+                labels: values.map(row => row.date),
+                datasets: [{
+                    data: values.map(row => row.count),
+                }]
+            };
+
+            const config = {
+                type: 'line',
+                data: dataListings,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false // Oculta la leyenda del gráfico
+                        }
+                    }
+                },
+            };
+
+            const listingsChart = document.getElementById(id);
+            new Chart(listingsChart, config);
+        }
+    </script>
+</body>
+</html>

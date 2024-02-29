@@ -11,7 +11,7 @@ namespace landerist_library.Parse.Location.Delimitations
         {
             Database.CNIG.DeleteAll();
 
-            string file = Configuration.Config.DELIMITATIONS_DIRECTORY + @"CNIG\CNIG.geojson";
+            string file = Configuration.PrivateConfig.DELIMITATIONS_DIRECTORY + @"CNIG\CNIG.geojson";
             Console.WriteLine("Reading " + file);
 
             var geoJsonSerializer = GeoJsonSerializer.Create();

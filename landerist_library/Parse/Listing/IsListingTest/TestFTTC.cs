@@ -44,7 +44,7 @@ namespace landerist_library.Parse.Listing.IsListingTest
         private static void SaveFile(DataTable dataTable, string fileName)
         {
             Console.WriteLine("Creating file " + fileName + " ..");
-            string file = Config.CLASSIFIER_DIRECTORY + fileName;
+            string file = PrivateConfig.CLASSIFFIER_DIRECTORY + fileName;
             File.Delete(file);
             Tools.Csv.Write(dataTable, file, true);
         }

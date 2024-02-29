@@ -18,7 +18,7 @@ namespace landerist_library.Insert.IdAgenciesScraper
         {
             var httpClient = new HttpClient();            
 
-            var request = new HttpRequestMessage(HttpMethod.Post, Configuration.Config.IDAGENCIES_URL)
+            var request = new HttpRequestMessage(HttpMethod.Post, Configuration.PrivateConfig.IDAGENCIES_URL)
             {
                 Content = new StringContent(System.Text.Json.JsonSerializer.Serialize(new
                 {

@@ -11,7 +11,7 @@ namespace landerist_library.Parse.Location.Delimitations
         {
             Database.LAU.DeleteAll();
 
-            string file = Configuration.Config.DELIMITATIONS_DIRECTORY + @"LAU\LAU_RG_01M_2021_4326.geojson";
+            string file = Configuration.PrivateConfig.DELIMITATIONS_DIRECTORY + @"LAU\LAU_RG_01M_2021_4326.geojson";
             Console.WriteLine("Reading " + file);
 
             var geoJsonSerializer = GeoJsonSerializer.Create();

@@ -13,22 +13,19 @@ namespace landerist_library.Landerist_com
     public class DownloadsPage : Landerist_com
     {
         private static readonly string DownloadsTemplateHtmlFile =
-            Config.LANDERIST_COM_DIRECTORY + "downloads_template.html";
+            Config.LANDERIST_COM_OUTPUT + "downloads_template.html";
 
         private static readonly string DownloadsHtmlFile =
-            Config.LANDERIST_COM_DIRECTORY + "downloads.html";
+            Config.LANDERIST_COM_OUTPUT + "downloads.html";
 
         private static string DownloadsTemplate = string.Empty;
 
 
-        public DownloadsPage()
-        {
-            DownloadsTemplate = File.ReadAllText(DownloadsTemplateHtmlFile);
-        }
-        public void Update()
+        public static void Update()
         {
             try
             {
+                DownloadsTemplate = File.ReadAllText(DownloadsTemplateHtmlFile);
                 UpdateDownloadsTemplate(CountryCode.ES, ExportType.Listings);
                 UpdateDownloadsTemplate(CountryCode.ES, ExportType.Updates);
                 if (UploadDownloadsFile())
@@ -46,7 +43,7 @@ namespace landerist_library.Landerist_com
         private static void UpdateDownloadsTemplate(CountryCode countryCode, ExportType exportType)
         {
             string objectKey = GetObjectKey(countryCode, exportType, "zip");
-            var (lastModified, contentLength) = new S3().GetFileInfo(Config.AWS_S3_DOWNLOADS_BUCKET, objectKey);
+            var (lastModified, contentLength) = new S3().GetFileInfo(PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey);
             if (lastModified is null || contentLength is null)
             {
                 return;
@@ -69,7 +66,7 @@ namespace landerist_library.Landerist_com
             Replace(commentSize, sizeString);
 
             string comentHyperlink = GetTemplateComment(countryCode, exportType, "Hyperlink");
-            var url = $"https://{Config.AWS_S3_DOWNLOADS_BUCKET}.s3.amazonaws.com/{objectKey}";
+            var url = $"https://{PrivateConfig.AWS_S3_DOWNLOADS_BUCKET}.s3.amazonaws.com/{objectKey}";
             string fileName = GetFileName(countryCode, exportType, "zip");
             var hyperlink = "<a title=\"" + fileName + "\" href=\"" + url + "\">Download</a>";
             Replace(comentHyperlink, hyperlink);

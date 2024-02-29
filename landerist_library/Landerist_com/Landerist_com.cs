@@ -50,14 +50,14 @@ namespace landerist_library.Landerist_com
 
         public static void UpdateDownloadsAndStatistics()
         {
-            new DownloadsPage().Update();
-            new StatisticsPage().Update();
+            DownloadsPage.Update();
+            StatisticsPage.Update();
             InvalidateCloudFront();
         }
 
         public static bool InvalidateCloudFront()
         {
-            var client = new AmazonCloudFrontClient(Config.AWS_ACESSKEYID, Config.AWS_SECRETACCESSKEY, RegionEndpoint.EUWest3);
+            var client = new AmazonCloudFrontClient(PrivateConfig.AWS_ACESSKEYID, PrivateConfig.AWS_SECRETACCESSKEY, RegionEndpoint.EUWest3);
             var invalidationBatch = new InvalidationBatch
             {
                 CallerReference = DateTime.UtcNow.Ticks.ToString(),
@@ -70,7 +70,7 @@ namespace landerist_library.Landerist_com
 
             var request = new CreateInvalidationRequest
             {
-                DistributionId = Config.AWS_CLOUDFRONT_DISTRIBUTION_ID_WEBSITE,
+                DistributionId = PrivateConfig.AWS_CLOUDFRONT_DISTRIBUTION_ID_WEBSITE,
                 InvalidationBatch = invalidationBatch
             };
 

@@ -37,7 +37,7 @@ namespace landerist_library.Parse.Location.GoogleMaps
                 "https://maps.googleapis.com/maps/api/geocode/json?" +
                 "address=" + uriAdress +
                 "&region=" + GetRegion(countryCode) +
-                "&key=" + Config.GOOGLE_CLOUD_LANDERIST_API_KEY;
+                "&key=" + PrivateConfig.GOOGLE_CLOUD_LANDERIST_API_KEY;
 
             try
             {

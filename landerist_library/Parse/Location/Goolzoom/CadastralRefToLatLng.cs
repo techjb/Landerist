@@ -18,7 +18,7 @@ namespace landerist_library.Parse.Location.Goolzoom
                 cadastralReference + "/center";
 
             HttpClient client = new();
-            client.DefaultRequestHeaders.Add("x-api-key", Configuration.Config.GOOLZOOM_API);
+            client.DefaultRequestHeaders.Add("x-api-key", Configuration.PrivateConfig.GOOLZOOM_API);
             try
             {
                 var response = client.GetAsync(requestUrl).Result;

@@ -69,7 +69,7 @@ namespace landerist_library.Parse.Location.Delimitations
         {
             Database.Countries.DeleteAll();
 
-            string file = Configuration.Config.DELIMITATIONS_DIRECTORY + @"Countries\countries.geojson";
+            string file = Configuration.PrivateConfig.DELIMITATIONS_DIRECTORY + @"Countries\countries.geojson";
             Console.WriteLine("Reading " + file);
 
             var geoJsonSerializer = GeoJsonSerializer.Create();

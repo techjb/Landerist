@@ -2,6 +2,7 @@
 using Google.Apis.Util;
 using landerist_library.Database;
 using System.Data;
+using landerist_library.Configuration;
 
 namespace landerist_library.Websites
 {
@@ -503,7 +504,7 @@ namespace landerist_library.Websites
 
         public static void DeleteFromFile()
         {
-            string file = Configuration.Config.INSERT_DIRECTORY + "HostMainUri.csv";
+            string file = PrivateConfig.INSERT_DIRECTORY + "HostMainUri.csv";
             DataTable dataTable = Tools.Csv.ToDataTable(file);
 
             HashSet<string> hosts = [];
@@ -533,7 +534,7 @@ namespace landerist_library.Websites
 
         public static void UpdateListingExampleUriFromFile()
         {
-            string file = Configuration.Config.INSERT_DIRECTORY + "HostMainUri.csv";
+            string file = PrivateConfig.INSERT_DIRECTORY + "HostMainUri.csv";
             DataTable dataTable = Tools.Csv.ToDataTable(file);
             int total = dataTable.Rows.Count;
             int processed = 0;
@@ -554,9 +555,9 @@ namespace landerist_library.Websites
                     continue;
                 }
 
-                continue;
-
-                if (!host.Equals(listingExampleUri.Host))
+                if (!host.Equals(listingExampleUri.Host) 
+                    || false // !remove
+                    )
                 {
                     invalidHosts++;
                     if (Insert.WebsitesInserter.InsertFromListingExampleUri(listingExampleUri))

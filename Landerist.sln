@@ -21,9 +21,9 @@ Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "landerist_webserver", "land
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "landerist_website", "landerist_website", "{B0045D1A-422C-4327-8A3C-F90D55CFF0A8}"
 	ProjectSection(SolutionItems) = preProject
-		E:\Landerist\Export\Landerist.com\downloads_template.html = E:\Landerist\Export\Landerist.com\downloads_template.html
+		landerist_website\downloads_template.html = landerist_website\downloads_template.html
 		landerist_website\index.html = landerist_website\index.html
-		E:\Landerist\Export\Landerist.com\statistics_template.html = E:\Landerist\Export\Landerist.com\statistics_template.html
+		landerist_website\statistics_template.html = landerist_website\statistics_template.html
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "landerist_service", "landerist_service\landerist_service.csproj", "{8D90C19B-543F-45AF-A0E3-F9DD12979200}"

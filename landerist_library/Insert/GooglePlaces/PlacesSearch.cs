@@ -19,7 +19,7 @@ namespace landerist_library.Insert.GooglePlaces
         private static async Task<string?> SearchNearby()
         {
             using var httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Add("X-Goog-Api-Key", Config.GOOGLE_CLOUD_LANDERIST_API_KEY);
+            httpClient.DefaultRequestHeaders.Add("X-Goog-Api-Key", PrivateConfig.GOOGLE_CLOUD_LANDERIST_API_KEY);
             httpClient.DefaultRequestHeaders.Add("X-Goog-FieldMask", "places.websiteUri");
 
             var content = new StringContent(@"{

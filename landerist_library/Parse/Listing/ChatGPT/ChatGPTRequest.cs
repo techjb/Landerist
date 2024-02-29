@@ -17,7 +17,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
         public static readonly string Model_GPT_3_5_Turbo = "gpt-3.5-turbo-0125";
 
 
-        private readonly OpenAIClient OpenAIClient = new(Config.OPENAI_API_KEY);
+        private readonly OpenAIClient OpenAIClient = new(PrivateConfig.OPENAI_API_KEY);
         private readonly string SystemMessage = systemMessage;
         private readonly List<Tool>? Tools = tools;
         private readonly string? ToolChoice = "auto";
