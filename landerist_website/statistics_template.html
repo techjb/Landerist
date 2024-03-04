@@ -19,6 +19,11 @@
             max-width: 42em;
             margin-top: 70px;
         }
+
+        canvas {
+            margin: 20px 0px;
+        }
+
     </style>
     <title>Statistics</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -32,26 +37,8 @@
             Statistics
         </h2>
 
-        <h3>
-            Listings
-        </h3>
-        <div>
-            <canvas id="ChartListings"></canvas>
-        </div>
+        <div id="Statistics">
 
-        <h3>Websites</h3>
-        <div>
-            <canvas id="ChartWebsites"></canvas>
-        </div>
-
-        <h3>Pages</h3>
-        <div>
-            <canvas id="ChartPages"></canvas>
-        </div>
-
-        <h3>Updated Pages</h3>
-        <div>
-            <canvas id="ChartUpdatedPages"></canvas>
         </div>
     </div>
 
@@ -62,12 +49,12 @@
         const valuesPages = [/*Pages*/];
         const valuesUpdatedPages = [/*UpdatedPages*/];
 
-        CreateChart("ChartListings", valuesListings);
-        CreateChart("ChartWebsites", valuesWebsites);
-        CreateChart("ChartPages", valuesPages);
-        CreateChart("ChartUpdatedPages", valuesUpdatedPages);
+        CreateChart("ChartListings", "Listings", valuesListings);
+        CreateChart("ChartWebsites", "Websites", valuesWebsites);
+        CreateChart("ChartPages", "Pages", valuesPages);
+        CreateChart("ChartUpdatedPages", "Updated Pages", valuesUpdatedPages);
 
-        function CreateChart(id, values) {
+        function CreateChart(id, title, values) {
             const dataListings = {
                 labels: values.map(row => row.date),
                 datasets: [{
@@ -82,14 +69,19 @@
                     responsive: true,
                     plugins: {
                         legend: {
-                            display: false // Oculta la leyenda del gráfico
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: title
                         }
                     }
                 },
             };
 
-            const listingsChart = document.getElementById(id);
-            new Chart(listingsChart, config);
+            const canvas = document.createElement('canvas');
+            new Chart(canvas, config);
+            document.getElementById("Statistics").appendChild(canvas);
         }
     </script>
 </body>
