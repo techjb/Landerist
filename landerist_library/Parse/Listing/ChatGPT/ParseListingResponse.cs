@@ -196,8 +196,8 @@ namespace landerist_library.Parse.Listing.ChatGPT
                 contactEmail = GetEmail(),
                 address = GetAddress(),
                 cadastralReference = GetCadastralReference(),
-                propertySize = TamañoDelInmueble,
-                landSize = TamañoDeLaParcela,
+                propertySize = GetPropertySize(),
+                landSize = GetLandSize(),
                 constructionYear = GetConstrunctionYear(),
                 constructionStatus = GetConstructionStatus(),
                 floors = GetFloors(),
@@ -245,7 +245,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             var contains = false;
             foreach (var item in jsonArray)
             {
-                if(item is null)
+                if (item is null)
                 {
                     continue;
                 }
@@ -262,7 +262,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
         {
             if (TipoDeInmueble != null)
             {
-                return JsonArrayContains(TiposDeInmueble, TipoDeInmueble); 
+                return JsonArrayContains(TiposDeInmueble, TipoDeInmueble);
             }
             return false;
         }
@@ -488,6 +488,24 @@ namespace landerist_library.Parse.Listing.ChatGPT
                 return null;
             }
             return ReferenciaCatastral;
+        }
+
+        private double? GetPropertySize()
+        {
+            if (TamañoDelInmueble.HasValue && TamañoDelInmueble > 0)
+            {
+                return TamañoDelInmueble;
+            }
+            return null;
+        }
+
+        private double? GetLandSize()
+        {
+            if (TamañoDeLaParcela.HasValue && TamañoDeLaParcela > 0)
+            {
+                return TamañoDeLaParcela;
+            }
+            return null;
         }
 
         private int? GetConstrunctionYear()
