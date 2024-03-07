@@ -13,6 +13,7 @@ namespace landerist_orels.ES
     }
     public class Media
     {
+#pragma warning disable IDE1006 // Naming Styles
         [JsonProperty(Order = 1)]
         public MediaType? mediaType { get; set; }
 
@@ -21,5 +22,7 @@ namespace landerist_orels.ES
 
         [JsonProperty(Order = 3)]
         public Uri url { get; set; }
+
+#pragma warning restore IDE1006 // Naming Styles
     }
 }

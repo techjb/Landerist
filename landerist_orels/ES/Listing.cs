@@ -56,6 +56,8 @@ namespace landerist_orels.ES
     {
         public const int MAX_MEDIA_ITEMS = 200;
 
+#pragma warning disable IDE1006 // Naming Styles
+
         [JsonProperty(Order = 1)]
         public string guid { get; set; }
 
@@ -199,6 +201,8 @@ namespace landerist_orels.ES
 
         [JsonProperty(Order = 48)]
         public bool? securitySystems { get; set; }
+
+#pragma warning restore IDE1006 // Naming Styles
 
         public void AddMedia(Media media)
         {
