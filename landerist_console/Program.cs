@@ -70,6 +70,7 @@ namespace landerist_console
             //var page = new Page("http://34mallorca.com/detalles-del-inmueble/carismatico-edificio-en-el-centro-de-palma/19675687");
             //var page = new Page("https://www.inverolid.es/propiedades/piso-en-alquiler-arroyo-de-la-encomienda/");
             //var uri = new Uri("https://inmocolsol.es/valladolid/local-comercial-en-alquiler-372235");
+            var page = new Page("https://raymarinmobiliaria.com/listing/piso-en-santiago-el-mayor-murcia/");
             //var website = new Website(uri);            
 
             //SeleniumDownloader.GetChrome(uriPage);           
@@ -123,7 +124,7 @@ namespace landerist_console
             //new Scraper().Scrape(website);
             //new Scraper().ScrapeUnknowPageType(website);
             //new Scraper().ScrapeAllPages();            
-            //Scraper.Scrape(page);            
+            Scraper.Scrape(page);            
             //new Scraper().Start();
 
             #endregion

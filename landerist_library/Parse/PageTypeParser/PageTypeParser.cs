@@ -20,6 +20,10 @@ namespace landerist_library.Parse.PageTypeParser
             {
                 return (PageType.NotIndexable, null);
             }
+            if (page.NotCanonical())
+            {
+                return (PageType.NotCanonical, null);
+            }
             if (LastSegment.NotListingByLastSegment(page.Uri))
             {
                 return (PageType.NotListingByLastSegment, null);
@@ -97,7 +101,9 @@ namespace landerist_library.Parse.PageTypeParser
                 responseBodyText.StartsWith("Not found", StringComparison.OrdinalIgnoreCase) ||
                 responseBodyText.StartsWith("Error", StringComparison.OrdinalIgnoreCase) ||
                 responseBodyText.StartsWith("404", StringComparison.OrdinalIgnoreCase) ||
-                responseBodyText.Contains("Página no encontrada", StringComparison.OrdinalIgnoreCase) ||
+                responseBodyText.Contains("no encontrada", StringComparison.OrdinalIgnoreCase) ||
+                responseBodyText.Contains("no existe", StringComparison.OrdinalIgnoreCase) ||
+                responseBodyText.Contains("algo salió mal", StringComparison.OrdinalIgnoreCase) ||
                 responseBodyText.Contains("Page Not found", StringComparison.OrdinalIgnoreCase)
                 ;
         }

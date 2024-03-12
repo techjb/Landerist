@@ -25,6 +25,7 @@ namespace landerist_library.Websites
             AddPages(PageType.RobotsTxtDisallow, 3, 5);
             AddPages(PageType.MainPage, 3);
             AddPages(PageType.NotIndexable, 3, 5);
+            AddPages(PageType.NotCanonical, 3, 5);
             AddPages(PageType.ResponseBodyIsError, 3, 5);
             AddPages(PageType.ResponseBodyTooLarge, 3, 5);
             AddPages(PageType.ResponseBodyTooShort, 3, 5);

@@ -30,14 +30,14 @@ namespace landerist_library.Downloaders
         {
             Headless = true, // if false, need to comment await browserPage.SetRequestInterceptionAsync(true);
             Devtools = false,
-            Args = new string[] {
+            Args = [
                 "--no-sandbox",
                 "--disable-setuid-sandbox",
                 "--disable-infobars",
                 "--window-position=0,0",
                 "--ignore-certifcate-errors",
                 "--ignore-certifcate-errors-spki-list"
-            },
+            ],
         };
 
 
@@ -56,7 +56,7 @@ namespace landerist_library.Downloaders
             "maps.googleapis.com",
         ];
 
-        public void DoTest()
+        public static void DoTest()
         {
             var page = new Websites.Page("http://34mallorca.com/detalles-del-inmueble/carismatico-edificio-en-el-centro-de-palma/19675687");
             //var page = new Websites.Page("https://www.realestate.bnpparibas.es/es/soluciones-medida/soluciones-para-inversores");
@@ -115,7 +115,6 @@ namespace landerist_library.Downloaders
 
         private async Task<string?> GetAsync(LanguageCode languageCode, Uri uri)
         {
-            //await new BrowserFetcher().DownloadAsync();
             using var browser = await Puppeteer.LaunchAsync(launchOptions);            
             try
             {
@@ -137,13 +136,18 @@ namespace landerist_library.Downloaders
             browserPage.DefaultNavigationTimeout = Config.HTTPCLIENT_SECONDS_TIMEOUT * 1000;
             SetAccepLanguage(browserPage, languageCode);
             await browserPage.SetUserAgentAsync(Config.USER_AGENT);
-            await browserPage.SetRequestInterceptionAsync(true);
-            browserPage.Request += async (sender, e) => await HandleRequestAsync(e, uri);
+
+            if (launchOptions.Headless)
+            {
+                await browserPage.SetRequestInterceptionAsync(true);
+                browserPage.Request += async (sender, e) => await HandleRequestAsync(e, uri);
+            }            
+            
             browserPage.Response += (sender, e) => HandleResponseAsync(e, uri);
             return browserPage;
         }
 
-        private void SetAccepLanguage(IPage browserPage, Websites.LanguageCode languageCode)
+        private static void SetAccepLanguage(IPage browserPage, Websites.LanguageCode languageCode)
         {
             Dictionary<string, string> extraHeaders = [];
             switch (languageCode)
@@ -173,6 +177,11 @@ namespace landerist_library.Downloaders
                 return;
             }
             if (e.Request.IsNavigationRequest && e.Request.RedirectChain.Length != 0)
+            {
+                await e.Request.AbortAsync();
+                return;
+            }
+            if (e.Request.IsNavigationRequest && e.Request.Url != uri.ToString())
             {
                 await e.Request.AbortAsync();
                 return;

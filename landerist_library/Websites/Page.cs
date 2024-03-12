@@ -3,7 +3,6 @@ using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Tools;
 using landerist_orels.ES;
-using System;
 using System.Data;
 
 namespace landerist_library.Websites
@@ -288,6 +287,27 @@ namespace landerist_library.Websites
         public bool ContainsMetaRobotsNoImageIndex()
         {
             return ContainsMetaRobots("noimageindex");
+        }
+
+        public bool NotCanonical()
+        {
+            var htmlDocument = GetHtmlDocument();
+            if (htmlDocument != null)
+            {
+                var node = htmlDocument.DocumentNode.SelectSingleNode("//link[@rel='canonical']");
+                if (node != null)
+                {
+                    var contentAttribute = node.GetAttributeValue("href", "");
+                    if (!string.IsNullOrEmpty(contentAttribute))
+                    {
+                        if(Uri.TryCreate(contentAttribute, UriKind.RelativeOrAbsolute, out Uri? uri))
+                        {
+                            return !Uri.Equals(uri);
+                        }
+                    }
+                }
+            }
+            return false;
         }
 
         private bool ContainsMetaRobots(string content)

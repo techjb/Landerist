@@ -2,7 +2,7 @@
 
 namespace landerist_library.Tools
 {
-    public class Validate
+    public partial class Validate
     {
         public static bool Email(string email)
         {
@@ -24,7 +24,7 @@ namespace landerist_library.Tools
 
         public static bool CadastralReference(string cadastralReference)
         {
-            Regex rgx = new(@"([a-zA-Z0-9]{14}(?:[a-zA-Z0-9]{6})?)+");
+            Regex rgx = RegexCadastralReference();
             return rgx.IsMatch(cadastralReference);
         }
 
@@ -47,5 +47,8 @@ namespace landerist_library.Tools
 
             return false;
         }
+
+        [GeneratedRegex(@"([a-zA-Z0-9]{14}(?:[a-zA-Z0-9]{6})?)+")]
+        private static partial Regex RegexCadastralReference();
     }
 }
