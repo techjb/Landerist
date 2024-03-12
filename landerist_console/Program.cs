@@ -13,6 +13,7 @@ using landerist_library.Parse.Location.Delimitations;
 using landerist_library.Parse.PageTypeParser;
 using landerist_library.Scrape;
 using landerist_library.Statistics;
+using landerist_library.Tools;
 using landerist_library.Websites;
 using OpenAI;
 using OpenQA.Selenium;
@@ -70,7 +71,7 @@ namespace landerist_console
             //var page = new Page("http://34mallorca.com/detalles-del-inmueble/carismatico-edificio-en-el-centro-de-palma/19675687");
             //var page = new Page("https://www.inverolid.es/propiedades/piso-en-alquiler-arroyo-de-la-encomienda/");
             //var uri = new Uri("https://inmocolsol.es/valladolid/local-comercial-en-alquiler-372235");
-            var page = new Page("https://raymarinmobiliaria.com/listing/piso-en-santiago-el-mayor-murcia/");
+            //var page = new Page("https://raymarinmobiliaria.com/listing/piso-en-santiago-el-mayor-murcia/");
             //var website = new Website(uri);            
 
             //SeleniumDownloader.GetChrome(uriPage);           
@@ -99,9 +100,6 @@ namespace landerist_console
             //Websites.UpdateNumPages();
             //Websites.Update();
 
-            //Pages.DeleteNumPagesExceded();
-            //Pages.Delete(PageType.ForbiddenLastSegment);
-
             //Websites.DeleteFromFile();
             //new Website("promoaguilera.com").Delete();
             //new Website("inmobiliariainsignia.com").UpdateListingExample("https://inmobiliariainsignia.com/inmueble/preciosa-casa-reformada-a-capricho-en-la-localidad-urrugne/");
@@ -110,6 +108,10 @@ namespace landerist_console
             //Websites.TestListingExampleUri();
             //Websites.UpdateListingsExampleNodeSetNulls();
             //Websites.DeleteNullListingExampleHtml();
+
+            //Pages.DeleteNumPagesExceded();
+            //Pages.Delete(PageType.ForbiddenLastSegment);
+            //Pages.DeleteDuplicateUriQuery();
 
 
             #endregion
@@ -124,7 +126,7 @@ namespace landerist_console
             //new Scraper().Scrape(website);
             //new Scraper().ScrapeUnknowPageType(website);
             //new Scraper().ScrapeAllPages();            
-            Scraper.Scrape(page);            
+            //Scraper.Scrape(page);            
             //new Scraper().Start();
 
             #endregion
@@ -192,6 +194,19 @@ namespace landerist_console
             //PlacesSearch.Search();
             //CustomSearch.Start();
             //IdAgenciesScraper.Start();
+
+            #endregion
+
+            #region Others
+
+            //Uri uri = new("https://aloasis.com/detalle.php?pk=1077&idioma=es&idioma=es&idioma=es&idioma=es&idioma=es&idioma=es&idioma=es");
+            //Uri uri = new("https://inmocolsol.es/valladolid/local-comercial-en-alquiler-372235");
+            //Uri uri = new("https://www.inmoastefi.com/property-details/?706695-inmueble-Casas%20o%20chalets-Venta-Mata-.html");
+            //Uri uri = new("https://www.pirineoscasa.com/buscador/?pic_pagina=1&pic_pagina=4");
+            //Console.WriteLine(uri);
+            //uri = Uris.CleanUri(uri);
+            //Console.WriteLine(uri);
+
 
             #endregion
 

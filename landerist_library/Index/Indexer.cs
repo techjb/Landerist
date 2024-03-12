@@ -1,4 +1,5 @@
 ﻿using landerist_library.Parse.PageTypeParser;
+using landerist_library.Tools;
 using landerist_library.Websites;
 
 namespace landerist_library.Index
@@ -18,25 +19,25 @@ namespace landerist_library.Index
 
         }
 
-        public void InsertUrls(List<string?> urls)
+        public void Insert(List<string?> urls)
         {
             urls = urls.Distinct().ToList();
             foreach (var url in urls)
             {
                 if (url != null)
                 {
-                    InsertUrl(url);
+                    Insert(url);
                 }
             }
         }
 
-        public void InsertUrl(string? link)
+        public void Insert(string? url)
         {
-            if (string.IsNullOrEmpty(link))
+            if (string.IsNullOrEmpty(url))
             {
                 return;
             }
-            if (!Uri.TryCreate(Page.Uri, link, out Uri? uri))
+            if (!Uri.TryCreate(Page.Uri, url, out Uri? uri))
             {
                 return;
             }
@@ -63,13 +64,22 @@ namespace landerist_library.Index
             InsertUri(uriBuilder.Uri);
         }
 
-        
+        public void Insert(Uri uri)
+        {
+            InsertUri(uri);
+        }
+
+
+
         protected void InsertUri(Uri uri)
         {
             if (Page.Website.AchievedMaxNumberOfPages())
             {
                 return;
             }
+            
+            uri = Uris.CleanUri(uri);
+
             if (Inserted.Contains(uri))
             {
                 return;

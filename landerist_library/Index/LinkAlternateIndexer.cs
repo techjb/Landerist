@@ -42,7 +42,7 @@ namespace landerist_library.Index
                 if (LanguageValidator.IsValidLanguageAndCountry(Page.Website, hreflang))
                 {
                     var href = htmlNode.GetAttributeValue("href", string.Empty);
-                    InsertUrl(href);
+                    Insert(href);
                 }
             }
             catch { }

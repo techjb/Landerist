@@ -1,4 +1,6 @@
 ﻿using landerist_library.Database;
+using landerist_library.Index;
+using landerist_library.Tools;
 using System.Data;
 
 namespace landerist_library.Websites
@@ -342,6 +344,36 @@ namespace landerist_library.Websites
                 Console.WriteLine(counter + "/" + total);
                 page.Delete();
             });
+        }
+
+        public static void DeleteDuplicateUriQuery()
+        {
+            string query =
+                "SELECT [Uri] " +
+                "FROM " + TABLE_PAGES;
+
+            DataTable dataTable = new DataBase().QueryTable(query);
+            int counter = 0;
+            int total = dataTable.Rows.Count;
+            Parallel.ForEach(dataTable.AsEnumerable(), dataRow =>
+            {
+                string uriString = dataRow["Uri"].ToString()!;
+                var uri = new Uri(uriString);
+                var newUri = Uris.CleanUri(uri);
+                if (newUri != uri)
+                {
+                    Page page = new(uri);
+                    var newPage = new Page(newUri);
+                    var indexer = new Indexer(page);
+                    indexer.Insert(page.Uri);
+                    page.Delete();
+
+                    Console.WriteLine(counter + "/" + total);
+
+                    Interlocked.Increment(ref counter);
+                }
+            });            
+            Console.WriteLine(counter + "/" + total);
         }
     }
 }

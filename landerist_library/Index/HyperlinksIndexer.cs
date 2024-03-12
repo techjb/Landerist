@@ -52,7 +52,7 @@ namespace landerist_library.Index
 
                 if (urls != null)
                 {
-                    InsertUrls(urls);
+                    Insert(urls);
                 }
             }
             catch (Exception ecception)

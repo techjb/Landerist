@@ -140,7 +140,7 @@ namespace landerist_library.Scrape
                 var redirectUrl = Downloader.GetRedirectUrl();
                 if (redirectUrl != null)
                 {
-                    new Indexer(Page).InsertUrl(redirectUrl);
+                    new Indexer(Page).Insert(redirectUrl);
                 }
             }
         }
