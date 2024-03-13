@@ -11,6 +11,7 @@ using System.Net;
 using System.Text;
 using landerist_library.Parse.PageTypeParser;
 using landerist_library.Export;
+using System.Diagnostics.Metrics;
 
 namespace landerist_library.Websites
 {
@@ -336,21 +337,16 @@ namespace landerist_library.Websites
             var pages = GetPages();
             foreach (var page in pages)
             {
-                var listing = ES_Listings.GetListing(page, false);
-                if (listing != null)
+                if(page.DeleteListing())
                 {
-                    if (ES_Listings.Delete(listing))
-                    {
-                        DecreaseNumListings();
-                        ES_Media.Delete(listing);
-                        counter++;
-                    }
+                    counter++;
                 }
             };
 
             Console.WriteLine("Deleted " + counter + " listings");
         }
 
+        
 
         private bool DeleteWebsite()
         {
@@ -492,7 +488,9 @@ namespace landerist_library.Websites
 
         public bool AchievedMaxNumberOfPages()
         {
-            return NumPages >= Config.MAX_PAGES_PER_WEBSITE;
+            return NumPages >= Config.MAX_PAGES_PER_WEBSITE 
+                //&& false
+                ;
         }
 
         public bool CanAddNewPages()

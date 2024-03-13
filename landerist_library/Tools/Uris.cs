@@ -15,7 +15,7 @@
 
         private static string CleanQueryString(string query)
         {
-            if (query.StartsWith("?"))
+            if (query.StartsWith('?'))
             {
                 query = query[1..];
             }

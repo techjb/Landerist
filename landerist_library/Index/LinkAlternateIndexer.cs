@@ -5,7 +5,7 @@ namespace landerist_library.Index
 {
     public class LinkAlternateIndexer(Page page) : Indexer(page)
     {
-        public void InsertLinksAlternate()
+        public void Insert()
         {
             var htmlDocument = Page.GetHtmlDocument();
             if (htmlDocument == null)

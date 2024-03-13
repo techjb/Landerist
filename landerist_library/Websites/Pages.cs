@@ -193,72 +193,7 @@ namespace landerist_library.Websites
             var page = new Page(website, uri);
             page.Insert();
         }
-
-        public static DataTable GetListingsResponseBodyText(int? top = null)
-        {
-            string queryTop = string.Empty;
-            if (top != null)
-            {
-                queryTop = " TOP " + top;
-            }
-            string query =
-                "SELECT " + queryTop + " [ResponseBodyText] " +
-                "FROM " + TABLE_PAGES + " " +
-                "WHERE [PageType] ='Listing'";
-
-            return new DataBase().QueryTable(query);
-        }
-
-        public static DataTable GetResponseBodyText(PageType pageType, int? top = null)
-        {
-            string queryTop = string.Empty;
-            if (top != null)
-            {
-                queryTop = " TOP " + top;
-            }
-            string query =
-                "SELECT " + queryTop + " [ResponseBodyText] " +
-                "FROM " + TABLE_PAGES + " " +
-                "WHERE [PageType] = @PageType";
-
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>()
-            {
-                {"PageType", pageType.ToString() }
-            });
-        }
-
-        public static DataTable GetUriResponseBodyText(int? top = null)
-        {
-            string queryTop = string.Empty;
-            if (top != null)
-            {
-                queryTop = " TOP " + top;
-            }
-            string query =
-                "SELECT " + queryTop + " [Uri], [ResponseBodyText] " +
-                "FROM " + TABLE_PAGES + " " +
-                "WHERE [ResponseBodyText] IS NOT NULL";
-
-            return new DataBase().QueryTable(query);
-        }
-
-        public static DataTable GetIsListingResponseBodyText(int top, bool isListing, bool random)
-        {
-            string query =
-                "SELECT  TOP " + top + " [IsListing], [ResponseBodyText] " +
-                "FROM " + TABLE_PAGES + " " +
-                "WHERE [IsListing] = @IsListing";
-
-            if (random)
-            {
-                query += " ORDER BY NEWID()";
-            }
-
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>()
-            {
-                {"IsListing", isListing }
-            });
-        }
+     
 
         public static List<string> GetUris(bool isListing)
         {
@@ -364,8 +299,7 @@ namespace landerist_library.Websites
                 {
                     Page page = new(uri);
                     var newPage = new Page(newUri);
-                    var indexer = new Indexer(page);
-                    indexer.Insert(page.Uri);
+                    new Indexer(page).Insert(page.Uri);
                     page.Delete();
 
                     Console.WriteLine(counter + "/" + total);

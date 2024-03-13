@@ -1,6 +1,7 @@
 ﻿using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Database;
+using landerist_library.Index;
 using landerist_library.Tools;
 using landerist_orels.ES;
 using System.Data;
@@ -8,7 +9,7 @@ using System.Data;
 namespace landerist_library.Websites
 {
 
-    public class Page : Pages, IDisposable
+    public class Page : IDisposable
     {
         public string Host { get; set; } = string.Empty;
 
@@ -33,6 +34,8 @@ namespace landerist_library.Websites
         public string? ResponseBodyTextHash { get; set; }
 
         public bool ResponseBodyTextHasChanged { get; set; } = false;
+
+        private HtmlDocument? HtmlDocument = null;
 
 
         public Website Website = new();
@@ -103,7 +106,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT * " +
-                "FROM " + TABLE_PAGES + " " +
+                "FROM " + Pages.TABLE_PAGES + " " +
                 "WHERE [UriHash] = @UriHash";
 
             var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
@@ -121,7 +124,7 @@ namespace landerist_library.Websites
         public bool Insert()
         {
             string query =
-                "INSERT INTO " + TABLE_PAGES + " " +
+                "INSERT INTO " + Pages.TABLE_PAGES + " " +
                 "VALUES(@Host, @Uri, @UriHash, @Inserted, NULL, NULL, NULL, NULL, NULL)";
 
             bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
@@ -142,7 +145,7 @@ namespace landerist_library.Websites
             Updated = DateTime.Now;
 
             string query =
-                "UPDATE " + TABLE_PAGES + " SET " +
+                "UPDATE " + Pages.TABLE_PAGES + " SET " +
                 "[Updated] = @Updated, " +
                 "[HttpStatusCode] = @HttpStatusCode, " +
                 "[PageType] = @PageType, " +
@@ -169,7 +172,7 @@ namespace landerist_library.Websites
         public bool Delete()
         {
             string query =
-                "DELETE FROM " + TABLE_PAGES + " " +
+                "DELETE FROM " + Pages.TABLE_PAGES + " " +
                 "WHERE [UriHash] = @UriHash";
 
             bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
@@ -184,6 +187,22 @@ namespace landerist_library.Websites
             return sucess;
         }
 
+        public bool DeleteListing()
+        {
+            var listing = ES_Listings.GetListing(this, false);
+            if (listing != null)
+            {
+                if (ES_Listings.Delete(listing))
+                {
+                    ES_Media.Delete(listing);
+                    Website.DecreaseNumListings();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
         public bool CanScrape()
         {
             if (!Website.IsAllowedByRobotsTxt(Uri))
@@ -197,18 +216,22 @@ namespace landerist_library.Websites
             }
             return true;
         }
-        
-        public HtmlDocument? GetHtmlDocument()
+
+        public HtmlDocument? GetHtmlDocument(bool avoidLoadHtml = false)
         {
+            if (avoidLoadHtml && HtmlDocument != null)
+            {
+                return HtmlDocument;
+            }
             if (!string.IsNullOrEmpty(ResponseBody))
             {
                 try
                 {
-                    HtmlDocument htmlDocument = new();
-                    htmlDocument.LoadHtml(ResponseBody);                    
-                    return htmlDocument;
+                    HtmlDocument = new();
+                    HtmlDocument.LoadHtml(ResponseBody);
+                    return HtmlDocument;
                 }
-                catch(Exception exception) 
+                catch (Exception exception)
                 {
                     Logs.Log.WriteLogErrors("Page GetHtmlDocument", Uri, exception);
                 }
@@ -229,7 +252,7 @@ namespace landerist_library.Websites
         {
             ResponseBody = null;
             ResponseBodyText = null;
-            HttpStatusCode = null;            
+            HttpStatusCode = null;
         }
         public bool ResponseBodyIsNullOrEmpty()
         {
@@ -289,25 +312,29 @@ namespace landerist_library.Websites
             return ContainsMetaRobots("noimageindex");
         }
 
-        public bool NotCanonical()
+        public bool IsNotCanonical(bool avoidLoadHtml)
         {
-            var htmlDocument = GetHtmlDocument();
+            var canonicalUri = GetCanonicalUri(avoidLoadHtml);
+            if (canonicalUri != null)
+            {
+                return !Uri.Equals(canonicalUri);
+            }
+            return false;
+        }
+
+        public Uri? GetCanonicalUri(bool avoidLoadHtml)
+        {
+            var htmlDocument = GetHtmlDocument(avoidLoadHtml);
             if (htmlDocument != null)
             {
                 var node = htmlDocument.DocumentNode.SelectSingleNode("//link[@rel='canonical']");
                 if (node != null)
                 {
                     var contentAttribute = node.GetAttributeValue("href", "");
-                    if (!string.IsNullOrEmpty(contentAttribute))
-                    {
-                        if(Uri.TryCreate(contentAttribute, UriKind.RelativeOrAbsolute, out Uri? uri))
-                        {
-                            return !Uri.Equals(uri);
-                        }
-                    }
+                    return new Indexer(this).GetUri(contentAttribute);                    
                 }
             }
-            return false;
+            return null;
         }
 
         private bool ContainsMetaRobots(string content)
@@ -369,7 +396,7 @@ namespace landerist_library.Websites
             {
                 Host = string.Empty;
                 UriHash = string.Empty;
-                //HtmlDocument = null;
+                HtmlDocument = null;
                 ResponseBody = null;
                 ResponseBodyText = null;
                 ResponseBodyTextHash = null;

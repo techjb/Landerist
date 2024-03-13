@@ -72,6 +72,7 @@ namespace landerist_console
             //var page = new Page("https://www.inverolid.es/propiedades/piso-en-alquiler-arroyo-de-la-encomienda/");
             //var uri = new Uri("https://inmocolsol.es/valladolid/local-comercial-en-alquiler-372235");
             //var page = new Page("https://raymarinmobiliaria.com/listing/piso-en-santiago-el-mayor-murcia/");
+            //var page = new Page("http://www.bbilbao.es/es/inmueble/alquiler/oficina/areatza/areatza/691?&return=portada");
             //var website = new Website(uri);            
 
             //SeleniumDownloader.GetChrome(uriPage);           

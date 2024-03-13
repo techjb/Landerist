@@ -20,7 +20,7 @@ namespace landerist_library.Parse.PageTypeParser
             {
                 return (PageType.NotIndexable, null);
             }
-            if (page.NotCanonical())
+            if (page.IsNotCanonical(true))
             {
                 return (PageType.NotCanonical, null);
             }

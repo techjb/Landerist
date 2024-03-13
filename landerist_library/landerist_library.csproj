@@ -7,8 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Parse\Listing\IsListingTest\**" />
     <Compile Remove="Parse\Listing\MLModel\**" />
+    <EmbeddedResource Remove="Parse\Listing\IsListingTest\**" />
     <EmbeddedResource Remove="Parse\Listing\MLModel\**" />
+    <None Remove="Parse\Listing\IsListingTest\**" />
     <None Remove="Parse\Listing\MLModel\**" />
   </ItemGroup>
 

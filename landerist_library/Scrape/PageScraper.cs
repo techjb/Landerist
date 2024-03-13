@@ -117,7 +117,12 @@ namespace landerist_library.Scrape
             }
             if (Page.PageType.Equals(PageType.IncorrectLanguage))
             {
-                new LinkAlternateIndexer(Page).InsertLinksAlternate();
+                new LinkAlternateIndexer(Page).Insert();
+                return;
+            }
+            if (Page.PageType.Equals(PageType.NotCanonical))
+            {
+                new CanonicalIndexer(Page).Insert();
                 return;
             }
             if (Page.ContainsMetaRobotsNoIndex())
