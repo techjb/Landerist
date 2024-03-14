@@ -35,7 +35,11 @@ namespace landerist_library.Websites
 
         public bool ResponseBodyTextHasChanged { get; set; } = false;
 
+
         private HtmlDocument? HtmlDocument = null;
+
+
+        private string? OriginalOuterHtml = null;
 
 
         public Website Website = new();
@@ -217,18 +221,26 @@ namespace landerist_library.Websites
             return true;
         }
 
-        public HtmlDocument? GetHtmlDocument(bool avoidLoadHtml = false)
+        public HtmlDocument? GetHtmlDocument()
         {
-            if (avoidLoadHtml && HtmlDocument != null)
+            if (HtmlDocument != null && OriginalOuterHtml != null)
             {
-                return HtmlDocument;
+                string currentOuterHtml = HtmlDocument.DocumentNode.OuterHtml;
+                if (OriginalOuterHtml.Equals(currentOuterHtml))
+                {
+                    return HtmlDocument;
+                }
             }
             if (!string.IsNullOrEmpty(ResponseBody))
             {
+                HtmlDocument = null;
+                OriginalOuterHtml = null;
+
                 try
                 {
                     HtmlDocument = new();
                     HtmlDocument.LoadHtml(ResponseBody);
+                    OriginalOuterHtml = HtmlDocument.DocumentNode.OuterHtml;
                     return HtmlDocument;
                 }
                 catch (Exception exception)
@@ -239,7 +251,7 @@ namespace landerist_library.Websites
             return null;
         }
 
-        public bool IsMainPage()
+        public bool MainPage()
         {
             if (Website == null)
             {
@@ -286,6 +298,76 @@ namespace landerist_library.Websites
             ResponseBodyTextHash = responseBodyTextHash;
         }
 
+        public bool ResponseBodyTextHasNotChanged()
+        {
+            return
+                !ResponseBodyTextHasChanged &&
+                PageType != null &&
+                !PageType.Equals(landerist_library.Websites.PageType.MayBeListing) &&
+                Config.IsConfigurationProduction();
+        }
+
+        public bool ResponseBodyTextIsError()
+        {
+            if (ResponseBodyText == null)
+            {
+                return false;
+            }
+            return
+                ResponseBodyText.StartsWith("Not found", StringComparison.OrdinalIgnoreCase) ||
+                ResponseBodyText.StartsWith("Error", StringComparison.OrdinalIgnoreCase) ||
+                ResponseBodyText.StartsWith("404", StringComparison.OrdinalIgnoreCase) ||
+                ResponseBodyText.Contains("no encontrada", StringComparison.OrdinalIgnoreCase) ||
+                ResponseBodyText.Contains("no existe", StringComparison.OrdinalIgnoreCase) ||
+                ResponseBodyText.Contains("algo salió mal", StringComparison.OrdinalIgnoreCase) ||
+                ResponseBodyText.Contains("Page Not found", StringComparison.OrdinalIgnoreCase)
+                ;
+        }
+
+        public bool ResponseBodyTextIsTooLarge()
+        {
+            if (ResponseBodyText is null)
+            {
+                return false;
+            }
+            return ResponseBodyText.Length > Config.MAX_RESPONSEBODYTEXT_LENGTH;
+        }
+
+        public bool ResponseBodyTextIsTooShort()
+        {
+            if (string.IsNullOrEmpty(ResponseBodyText))
+            {
+                return true;
+            }
+            return ResponseBodyText.Length < Config.MIN_RESPONSEBODYTEXT_LENGTH;
+        }
+
+        public bool ReponseBodyTextRepeatedInHost()
+        {
+            if (string.IsNullOrEmpty(ResponseBodyText))
+            {
+                return false;
+            }
+
+            string query =
+                "IF EXISTS (" +
+                "   SELECT 1 " +
+                "   FROM " + Pages.TABLE_PAGES + " " +
+                "   WHERE [HOST] = @Host AND " +
+                "   [UriHash] <> @UriHash AND " +
+                "   [ResponseBodyTextHash] = @ResponseBodyTextHash) " +
+                "SELECT 'true' " +
+                "ELSE " +
+                "SELECT 'false' ";
+
+            return new DataBase().QueryBool(query, new Dictionary<string, object?> {
+                {"Host", Host},
+                {"UriHash", UriHash },
+                {"ResponseBodyTextHash", ResponseBodyTextHash },
+            });
+        }
+
+
         public Listing? GetListing(bool loadMedia)
         {
             return ES_Listings.GetListing(this, loadMedia);
@@ -312,9 +394,9 @@ namespace landerist_library.Websites
             return ContainsMetaRobots("noimageindex");
         }
 
-        public bool IsNotCanonical(bool avoidLoadHtml)
+        public bool NotCanonical()
         {
-            var canonicalUri = GetCanonicalUri(avoidLoadHtml);
+            var canonicalUri = GetCanonicalUri();
             if (canonicalUri != null)
             {
                 return !Uri.Equals(canonicalUri);
@@ -322,16 +404,34 @@ namespace landerist_library.Websites
             return false;
         }
 
-        public Uri? GetCanonicalUri(bool avoidLoadHtml)
+        public bool IncorrectLanguage()
         {
-            var htmlDocument = GetHtmlDocument(avoidLoadHtml);
+            var htmlDocument = GetHtmlDocument();
+            if (htmlDocument != null)
+            {
+                var htmlNode = htmlDocument.DocumentNode.SelectSingleNode("/html");
+                if (htmlNode != null)
+                {
+                    var lang = htmlNode.Attributes["lang"];
+                    if (lang != null)
+                    {
+                        return !LanguageValidator.IsValidLanguageAndCountry(Website, lang.Value);
+                    }
+                }
+            }
+            return false;
+        }
+
+        public Uri? GetCanonicalUri()
+        {
+            var htmlDocument = GetHtmlDocument();
             if (htmlDocument != null)
             {
                 var node = htmlDocument.DocumentNode.SelectSingleNode("//link[@rel='canonical']");
                 if (node != null)
                 {
                     var contentAttribute = node.GetAttributeValue("href", "");
-                    return new Indexer(this).GetUri(contentAttribute);                    
+                    return new Indexer(this).GetUri(contentAttribute);
                 }
             }
             return null;

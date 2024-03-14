@@ -193,7 +193,7 @@ namespace landerist_library.Websites
             var page = new Page(website, uri);
             page.Insert();
         }
-     
+
 
         public static List<string> GetUris(bool isListing)
         {
@@ -256,7 +256,7 @@ namespace landerist_library.Websites
                 Parallel.ForEach(pages, page =>
                 {
                     Interlocked.Increment(ref pageCounter);
-                    if (page.IsMainPage())
+                    if (page.MainPage())
                     {
                         return;
                     }
@@ -290,6 +290,7 @@ namespace landerist_library.Websites
             DataTable dataTable = new DataBase().QueryTable(query);
             int counter = 0;
             int total = dataTable.Rows.Count;
+            List<Page> pages = [];
             Parallel.ForEach(dataTable.AsEnumerable(), dataRow =>
             {
                 string uriString = dataRow["Uri"].ToString()!;
@@ -300,14 +301,61 @@ namespace landerist_library.Websites
                     Page page = new(uri);
                     var newPage = new Page(newUri);
                     new Indexer(page).Insert(page.Uri);
-                    page.Delete();
-
+                    pages.Add(page);
                     Console.WriteLine(counter + "/" + total);
-
                     Interlocked.Increment(ref counter);
                 }
-            });            
-            Console.WriteLine(counter + "/" + total);
+            });
+            Delete(pages);
+        }
+
+        public static void DeleteListingsHttpStatusCodeError()
+        {
+            string query =
+               QueryPages() +
+               "WHERE [PageType] = 'Listing' and [HttpStatusCode] <> 200";
+
+            DataTable dataTable = new DataBase().QueryTable(query);
+            var pages = GetPages(dataTable);
+            Delete(pages);
+        }
+
+        public static void DeleteListingsResponseBodyRepeated()
+        {
+            string query =
+               QueryPages() +
+               "WHERE [PageType] = 'Listing' AND [ResponseBodyTextHash] IS NOT NULL";
+
+            DataTable dataTable = new DataBase().QueryTable(query);
+            var pages = GetPages(dataTable);
+            HashSet<string> hashSet = [];
+            List<Page> repeated = [];
+            foreach (var page in pages)
+            {
+                if(page.ResponseBodyTextHash == null)
+                {
+                    continue;
+                }
+                if (!hashSet.Add(page.ResponseBodyTextHash))
+                {
+                    repeated.Add(page);
+                }
+            }
+            Delete(repeated);
+        }
+
+        public static void Delete(List<Page> pages)
+        {
+            Console.WriteLine("Deleting " + pages.Count + " pages..");
+            int counter = 0;
+            foreach (var page in pages)
+            {
+                if (page.Delete())
+                {
+                    counter++;
+                }
+            }
+            Console.WriteLine("Deleted " + pages.Count + " pages");
         }
     }
 }

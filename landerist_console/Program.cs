@@ -3,6 +3,7 @@ using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Downloaders;
 using landerist_library.Export;
+using landerist_library.Index;
 using landerist_library.Insert.GoogleCustomSearch;
 using landerist_library.Insert.GooglePlaces;
 using landerist_library.Insert.IdAgenciesScraper;
@@ -17,6 +18,7 @@ using landerist_library.Tools;
 using landerist_library.Websites;
 using OpenAI;
 using OpenQA.Selenium;
+using System.Diagnostics;
 using System.Globalization;
 using System.Net;
 using System.Reflection;
@@ -46,7 +48,7 @@ namespace landerist_console
             DateStart = DateTime.Now;
             string textStarted =
                 "STARTED at " + DateStart.ToShortDateString() + " " + DateStart.ToString(@"hh\:mm\:ss") + "\n";
-            Console.WriteLine(textStarted);            
+            Console.WriteLine(textStarted);
         }
 
         private static void End()
@@ -67,19 +69,21 @@ namespace landerist_console
             //Config.SetToProduction();
             Config.SetDatabaseToProduction();
 
-            #region Pages & Websites
+            #region Urls
+
             //var page = new Page("http://34mallorca.com/detalles-del-inmueble/carismatico-edificio-en-el-centro-de-palma/19675687");
             //var page = new Page("https://www.inverolid.es/propiedades/piso-en-alquiler-arroyo-de-la-encomienda/");
             //var uri = new Uri("https://inmocolsol.es/valladolid/local-comercial-en-alquiler-372235");
             //var page = new Page("https://raymarinmobiliaria.com/listing/piso-en-santiago-el-mayor-murcia/");
             //var page = new Page("http://www.bbilbao.es/es/inmueble/alquiler/oficina/areatza/areatza/691?&return=portada");
-            //var website = new Website(uri);            
 
-            //SeleniumDownloader.GetChrome(uriPage);           
-            //new HttpClientDownloader().Get(uriPage);
-            //new PuppeteerDownloader().DoTest();
-            //Console.WriteLine(text);
+            //var page = new Page("https://inmobiliariaperelada.com/inmueble/34/casona-");            
 
+            #endregion
+
+            #region Websites
+
+            //var website = new Website(uri);       
             //Websites.Delete(website); return;
             //Websites.Delete(uri); return;
             //Websites.DeleteAll(); return;
@@ -110,14 +114,27 @@ namespace landerist_console
             //Websites.UpdateListingsExampleNodeSetNulls();
             //Websites.DeleteNullListingExampleHtml();
 
-            //Pages.DeleteNumPagesExceded();
-            //Pages.Delete(PageType.ForbiddenLastSegment);
-            //Pages.DeleteDuplicateUriQuery();
+
 
 
             #endregion
 
+            #region Pages
+
+            //Pages.DeleteNumPagesExceded();
+            //Pages.Delete(PageType.ForbiddenLastSegment);
+            //Pages.DeleteDuplicateUriQuery();
+            //Pages.DeleteListingsHttpStatusCodeError();
+            //Pages.DeleteListingsResponseBodyRepeated();
+
+            #endregion
+
             #region Scrapper
+
+            //SeleniumDownloader.GetChrome(uriPage);           
+            //new HttpClientDownloader().Get(uriPage);
+            //new PuppeteerDownloader().DoTest();
+            //Console.WriteLine(text);
 
             //new Scraper(false).ScrapeUnknowPageType(10000);
             //new Scraper().ScrapeMainPage(website);
@@ -179,7 +196,6 @@ namespace landerist_console
             //landerist_library.Landerist_com.StatisticsPage.Update();
             //landerist_library.Landerist_com.Landerist_com.InvalidateCloudFront();
 
-
             //Backup.Update();
             //landerist_library.Statistics.StatisticsSnapshot.TakeSnapshots();
 
@@ -189,8 +205,11 @@ namespace landerist_console
             //string url1 = "https://www.inmobiliaria-teval.com/inmueble/salou-apartamento-ln-23523-eva-2/";            
             //string url2 = "https://www.inmobiliaria-teval.com/inmueble/miami-playa-el-casalot-chalet-adosado/";
             //ListingHTMLDom.Test(url1, url2);
-
             //Csv.ExportHostsMainUri();
+
+            #endregion
+
+            #region New hosts search
 
             //PlacesSearch.Search();
             //CustomSearch.Start();

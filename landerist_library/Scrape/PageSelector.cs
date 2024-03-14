@@ -29,6 +29,7 @@ namespace landerist_library.Websites
             AddPages(PageType.ResponseBodyIsError, 3, 5);
             AddPages(PageType.ResponseBodyTooLarge, 3, 5);
             AddPages(PageType.ResponseBodyTooShort, 3, 5);
+            AddPages(PageType.ResponseBodyRepeatedInHost, 3, 5);
             AddPages(PageType.ResponseBodyTooManyTokens, 3, 5);
             AddPages(PageType.HtmlNotSimilarToListing, 3, 5);
             AddPages(PageType.MayBeListing, 1);

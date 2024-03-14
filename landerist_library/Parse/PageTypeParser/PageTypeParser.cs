@@ -8,11 +8,11 @@ namespace landerist_library.Parse.PageTypeParser
     {
         public static (PageType? pageType, landerist_orels.ES.Listing? listing) GetPageType(Page page)
         {
-            if (page == null || page.ResponseBodyIsNullOrEmpty())
+            if (page == null || page.ResponseBodyIsNullOrEmpty() || page.HttpStatusCode != 200)
             {
                 return (PageType.DownloadError, null);
             }
-            if (page.IsMainPage())
+            if (page.MainPage())
             {
                 return (PageType.MainPage, null);
             }
@@ -20,7 +20,7 @@ namespace landerist_library.Parse.PageTypeParser
             {
                 return (PageType.NotIndexable, null);
             }
-            if (page.IsNotCanonical(true))
+            if (page.NotCanonical())
             {
                 return (PageType.NotCanonical, null);
             }
@@ -28,29 +28,32 @@ namespace landerist_library.Parse.PageTypeParser
             {
                 return (PageType.NotListingByLastSegment, null);
             }
-            if (IncorrectLanguage(page))
+            if (page.IncorrectLanguage())
             {
                 return (PageType.IncorrectLanguage, null);
             }
 
             page.SetResponseBodyText();
 
-            if (ResponseBodyTextHasNotChanged(page))
+            if (page.ResponseBodyTextHasNotChanged())
             {
                 return (page.PageType, null);
             }
-
-            if (ResponseBodyIsError(page.ResponseBodyText))
+            if (page.ResponseBodyTextIsError())
             {
                 return (PageType.ResponseBodyIsError, null);
             }
-            if (ResponseBodyIsTooShort(page.ResponseBodyText))
+            if (page.ResponseBodyTextIsTooShort())
             {
                 return (PageType.ResponseBodyTooShort, null);
             }
-            if (ResponseBodyIsTooLarge(page.ResponseBodyText))
+            if (page.ResponseBodyTextIsTooLarge())
             {
                 return (PageType.ResponseBodyTooLarge, null);
+            }
+            if (page.ReponseBodyTextRepeatedInHost())
+            {
+                return (PageType.ResponseBodyRepeatedInHost, null);
             }
             if (ParseListingRequest.TooManyTokens(page.ResponseBodyText))
             {
@@ -60,70 +63,7 @@ namespace landerist_library.Parse.PageTypeParser
             {
                 return (PageType.HtmlNotSimilarToListing, null);
             }
-
             return new ParseListingRequest().Parse(page);
-        }
-
-        private static bool ResponseBodyTextHasNotChanged(Page page)
-        {
-            return
-                !page.ResponseBodyTextHasChanged &&
-                page.PageType != null &&
-                !page.PageType.Equals(PageType.MayBeListing) &&
-                Configuration.Config.IsConfigurationProduction();
-        }
-
-        private static bool IncorrectLanguage(Page page)
-        {
-            var htmlDocument = page.GetHtmlDocument();
-            if (htmlDocument != null)
-            {
-                var htmlNode = htmlDocument.DocumentNode.SelectSingleNode("/html");
-                if (htmlNode != null)
-                {
-                    var lang = htmlNode.Attributes["lang"];
-                    if (lang != null)
-                    {
-                        return !LanguageValidator.IsValidLanguageAndCountry(page.Website, lang.Value);
-                    }
-                }
-            }
-            return false;
-        }
-
-        private static bool ResponseBodyIsError(string? responseBodyText)
-        {
-            if (responseBodyText == null)
-            {
-                return false;
-            }
-            return
-                responseBodyText.StartsWith("Not found", StringComparison.OrdinalIgnoreCase) ||
-                responseBodyText.StartsWith("Error", StringComparison.OrdinalIgnoreCase) ||
-                responseBodyText.StartsWith("404", StringComparison.OrdinalIgnoreCase) ||
-                responseBodyText.Contains("no encontrada", StringComparison.OrdinalIgnoreCase) ||
-                responseBodyText.Contains("no existe", StringComparison.OrdinalIgnoreCase) ||
-                responseBodyText.Contains("algo salió mal", StringComparison.OrdinalIgnoreCase) ||
-                responseBodyText.Contains("Page Not found", StringComparison.OrdinalIgnoreCase)
-                ;
-        }
-
-        private static bool ResponseBodyIsTooLarge(string? responseBodyText)
-        {
-            if (responseBodyText == null)
-            {
-                return false;
-            }
-            return responseBodyText.Length > Configuration.Config.MAX_RESPONSEBODYTEXT_LENGTH;
-        }
-
-        private static bool ResponseBodyIsTooShort(string? responseBodyText)
-        {
-            if (string.IsNullOrEmpty(responseBodyText))
-            {
-                return true;
-            }
-            return responseBodyText.Length < Configuration.Config.MIN_RESPONSEBODYTEXT_LENGTH;
         }
     }
 }

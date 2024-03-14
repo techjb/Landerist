@@ -6,7 +6,7 @@ namespace landerist_library.Index
     {
         public void Insert()
         {
-            var canonicalUrl = Page.GetCanonicalUri(false);
+            var canonicalUrl = Page.GetCanonicalUri();
             if (canonicalUrl != null)
             {
                 Insert(canonicalUrl);
