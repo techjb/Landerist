@@ -16,8 +16,6 @@ using landerist_library.Scrape;
 using landerist_library.Statistics;
 using landerist_library.Tools;
 using landerist_library.Websites;
-using OpenAI;
-using OpenQA.Selenium;
 using System.Diagnostics;
 using System.Globalization;
 using System.Net;
@@ -76,7 +74,6 @@ namespace landerist_console
             //var uri = new Uri("https://inmocolsol.es/valladolid/local-comercial-en-alquiler-372235");
             //var page = new Page("https://raymarinmobiliaria.com/listing/piso-en-santiago-el-mayor-murcia/");
             //var page = new Page("http://www.bbilbao.es/es/inmueble/alquiler/oficina/areatza/areatza/691?&return=portada");
-
             //var page = new Page("https://inmobiliariaperelada.com/inmueble/34/casona-");            
 
             #endregion
@@ -126,14 +123,14 @@ namespace landerist_console
             //Pages.DeleteDuplicateUriQuery();
             //Pages.DeleteListingsHttpStatusCodeError();
             //Pages.DeleteListingsResponseBodyRepeated();
+            
 
             #endregion
 
             #region Scrapper
 
-            //SeleniumDownloader.GetChrome(uriPage);           
             //new HttpClientDownloader().Get(uriPage);
-            //new PuppeteerDownloader().DoTest();
+            //PuppeteerDownloader.DoTest();
             //Console.WriteLine(text);
 
             //new Scraper(false).ScrapeUnknowPageType(10000);

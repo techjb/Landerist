@@ -16,8 +16,9 @@ namespace landerist_library.Scrape
 
         private Listing? NewListing;
 
-        //private readonly HttpClientDownloader Downloader = new();
         private readonly PuppeteerDownloader Downloader = new();
+
+        private readonly PageType? OldPageType = page.PageType;
 
         public bool Scrape()
         {
@@ -32,20 +33,8 @@ namespace landerist_library.Scrape
         }
         private void SetPageType()
         {
-            var (newPageType, newListing) = PageTypeParser.GetPageType(Page);
-            NewListing = newListing;
-
-            newPageType = SetToUnpublished(newPageType);
+            (var newPageType, NewListing) = PageTypeParser.GetPageType(Page);            
             Page.SetPageType(newPageType);
-        }
-
-        private PageType? SetToUnpublished(PageType? newPageType)
-        {
-            if (Page.PageType != null && Page.PageType.Equals(PageType.Listing) && newPageType != PageType.Listing)
-            {
-                newPageType = PageType.UnpublishedListing;
-            }
-            return newPageType;
         }
 
         private void UpdateIfListing()
@@ -61,7 +50,9 @@ namespace landerist_library.Scrape
 
         private void UpdateIfUnPublishedListing()
         {
-            if (Page.PageType.Equals(PageType.UnpublishedListing))
+            if (OldPageType != null && 
+                OldPageType.Equals(PageType.Listing) && 
+                !Page.PageType.Equals(PageType.Listing))
             {
                 NewListing ??= Page.GetListing(true);
                 if (NewListing != null)
@@ -72,7 +63,6 @@ namespace landerist_library.Scrape
                 }
             }
         }
-
 
 
         private void SetMedia()
@@ -139,14 +129,10 @@ namespace landerist_library.Scrape
                 return;
             }
 
-            int code = (int)Page.HttpStatusCode;
-            if (code >= 300 && code < 400 && Config.INDEXER_ENABLED)
+            var redirectUrl = Downloader.GetRedirectUrl();
+            if (redirectUrl != null)
             {
-                var redirectUrl = Downloader.GetRedirectUrl();
-                if (redirectUrl != null)
-                {
-                    new Indexer(Page).Insert(redirectUrl);
-                }
+                new Indexer(Page).Insert(redirectUrl);
             }
         }
     }

@@ -271,14 +271,7 @@ namespace landerist_library.Websites
         public static void Delete(PageType pageType)
         {
             var pages = GetPages(pageType);
-            int total = pages.Count;
-            int counter = 0;
-            Parallel.ForEach(pages, page =>
-            {
-                Interlocked.Increment(ref counter);
-                Console.WriteLine(counter + "/" + total);
-                page.Delete();
-            });
+            Delete(pages);
         }
 
         public static void DeleteDuplicateUriQuery()
@@ -332,7 +325,7 @@ namespace landerist_library.Websites
             List<Page> repeated = [];
             foreach (var page in pages)
             {
-                if(page.ResponseBodyTextHash == null)
+                if (page.ResponseBodyTextHash == null)
                 {
                     continue;
                 }
@@ -348,13 +341,13 @@ namespace landerist_library.Websites
         {
             Console.WriteLine("Deleting " + pages.Count + " pages..");
             int counter = 0;
-            foreach (var page in pages)
+            Parallel.ForEach(pages, page =>
             {
                 if (page.Delete())
                 {
-                    counter++;
+                    Interlocked.Increment(ref counter);
                 }
-            }
+            });
             Console.WriteLine("Deleted " + pages.Count + " pages");
         }
     }

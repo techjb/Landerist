@@ -14,7 +14,6 @@ namespace landerist_library.Downloaders
 
         public void SetResponseBodyAndStatusCode(Page page)
         {
-            page.InitializeResponseBodyAndStatusCode();
             var html = GetAsync(page.Website.LanguageCode, page.Uri).Result;
             if (HttpResponseMessage != null)
             {

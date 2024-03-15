@@ -34,13 +34,13 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
         }
 
-        public static bool TooManyTokens(string? text)
+        public static bool TooManyTokens(Page page)
         {
-            if (text == null)
+            if (page.ResponseBodyText == null)
             {
                 return false;
             }
-            return TooManyTokens(SystemMessage, text);
+            return TooManyTokens(SystemMessage, page.ResponseBodyText);
         }
 
         public (PageType pageType, landerist_orels.ES.Listing? listing) Parse(Page page)

@@ -260,12 +260,6 @@ namespace landerist_library.Websites
             return Uri.Equals(Website.MainUri);
         }
 
-        public void InitializeResponseBodyAndStatusCode()
-        {
-            ResponseBody = null;
-            ResponseBodyText = null;
-            HttpStatusCode = null;
-        }
         public bool ResponseBodyIsNullOrEmpty()
         {
             return string.IsNullOrEmpty(ResponseBody);
@@ -274,6 +268,7 @@ namespace landerist_library.Websites
         public void SetResponseBodyAndStatusCode(string? responseBody, short? httpStatusCode)
         {
             ResponseBody = responseBody;
+            ResponseBodyText = null;
             HttpStatusCode = httpStatusCode;
         }
 

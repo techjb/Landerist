@@ -1,5 +1,4 @@
-﻿using landerist_library.Index;
-using landerist_library.Parse.Listing.ChatGPT;
+﻿using landerist_library.Parse.Listing.ChatGPT;
 using landerist_library.Websites;
 
 namespace landerist_library.Parse.PageTypeParser
@@ -55,7 +54,7 @@ namespace landerist_library.Parse.PageTypeParser
             {
                 return (PageType.ResponseBodyRepeatedInHost, null);
             }
-            if (ParseListingRequest.TooManyTokens(page.ResponseBodyText))
+            if (ParseListingRequest.TooManyTokens(page))
             {
                 return (PageType.ResponseBodyTooManyTokens, null);
             }

@@ -31,8 +31,15 @@ namespace landerist_service
             {
                 Log.WriteLogInfo("service", "Started. Version: " + Config.VERSION);
                 SetTimers();
+                //await InstallChrome();
                 await Task.Delay(Timeout.Infinite, stoppingToken);
             }
+        }
+
+        private async Task InstallChrome()
+        {
+            await landerist_library.Downloaders.PuppeteerDownloader.DownloadBrowserAsync();
+            Log.WriteLogInfo("service", "Chrome Installed");
         }
 
         private void SetTimers()
