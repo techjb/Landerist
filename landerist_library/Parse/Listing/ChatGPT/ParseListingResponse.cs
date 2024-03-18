@@ -2,6 +2,7 @@
 using landerist_library.Websites;
 using landerist_orels.ES;
 using System.Text.Json.Nodes;
+using landerist_library.Configuration;
 
 namespace landerist_library.Parse.Listing.ChatGPT
 {
@@ -227,7 +228,8 @@ namespace landerist_library.Parse.Listing.ChatGPT
         {
             return
                 IsValidTipoDeOperacion() &&
-                IsValidTipoDeInmueble();
+                IsValidTipoDeInmueble() &&
+                IsValidListingDate();
         }
 
         private bool IsValidTipoDeOperacion()
@@ -239,6 +241,23 @@ namespace landerist_library.Parse.Listing.ChatGPT
             return false;
         }
 
+        private bool IsValidTipoDeInmueble()
+        {
+            if (TipoDeInmueble != null)
+            {
+                return JsonArrayContains(TiposDeInmueble, TipoDeInmueble);
+            }
+            return false;
+        }
+
+        private bool IsValidListingDate()
+        {
+            var listingDate = GetListingDate();
+            var maxListingDate = DateTime.Now.AddDays(1);
+            var minListingDate = DateTime.Now.AddYears(-Config.MAX_YEARS_SINCE_PUBLISHED_LISTING);
+
+            return listingDate <= maxListingDate && listingDate >= minListingDate;
+        }
 
         private static bool JsonArrayContains(JsonArray jsonArray, string value)
         {
@@ -258,14 +277,6 @@ namespace landerist_library.Parse.Listing.ChatGPT
             return contains;
         }
 
-        private bool IsValidTipoDeInmueble()
-        {
-            if (TipoDeInmueble != null)
-            {
-                return JsonArrayContains(TiposDeInmueble, TipoDeInmueble);
-            }
-            return false;
-        }
 
         private static ListingStatus GetListingStatus()
         {
@@ -278,10 +289,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             {
                 if (DateTime.TryParse(FechaDePublicación, out DateTime listingDate))
                 {
-                    if (listingDate < DateTime.Now)
-                    {
-                        return listingDate;
-                    }
+                    return listingDate;
                 }
             }
             return DateTime.Now;
@@ -392,17 +400,15 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
         private Price? GetPropertyPrice()
         {
-            if (PrecioDelAnuncio == null)
+            if (PrecioDelAnuncio.HasValue)
             {
-                return null;
+                var price = (decimal)PrecioDelAnuncio;
+                if (price > 0)
+                {
+                    return new Price(price, Currency.EUR);
+                }
             }
-
-            var price = (decimal)PrecioDelAnuncio;
-            if (price <= 0)
-            {
-                return null;
-            }
-            return new Price(price, Currency.EUR);
+            return null;
         }
 
         private string? GetDescription()
@@ -492,7 +498,9 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
         private double? GetPropertySize()
         {
-            if (TamañoDelInmueble.HasValue && TamañoDelInmueble > 0)
+            if (TamañoDelInmueble.HasValue &&
+                TamañoDelInmueble <= Config.MIN_PROPERTY_SIZE &&
+                TamañoDelInmueble >= Config.MAX_PROPERTY_SIZE)
             {
                 return TamañoDelInmueble;
             }
@@ -501,7 +509,9 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
         private double? GetLandSize()
         {
-            if (TamañoDeLaParcela.HasValue && TamañoDeLaParcela > 0)
+            if (TamañoDeLaParcela.HasValue &&
+                TamañoDeLaParcela >= Config.MIN_LAND_SIZE &&
+                TamañoDeLaParcela <= Config.MAX_LAND_SIZE)
             {
                 return TamañoDeLaParcela;
             }
@@ -510,7 +520,16 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
         private int? GetConstrunctionYear()
         {
-            return (int?)AñoDeConstrucción;
+            var constructionYear = (int?)AñoDeConstrucción;
+            var maxConstructionYear = DateTime.Now.AddYears(Config.MAX_CONSTRUCTION_YEARS_FROM_NOW).Year;
+
+            if (constructionYear.HasValue &&
+                constructionYear >= Config.MIN_CONSTRUCTION_YEAR &&
+                constructionYear <= maxConstructionYear)
+            {
+                return constructionYear;
+            }
+            return null;
         }
 
         private ConstructionStatus? GetConstructionStatus()
@@ -531,7 +550,14 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
         private int? GetFloors()
         {
-            return (int?)PlantasDelEdificio;
+            var floors = (int?)PlantasDelEdificio;
+            if (floors.HasValue &&
+                floors >= Config.MIN_FLOORS &&
+                floors <= Config.MAX_FLOORS)
+            {
+                return floors;
+            }
+            return null;
         }
 
         private string? GetFloor()
@@ -545,17 +571,38 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
         private int? GetBedrooms()
         {
-            return (int?)NúmeroDeDormitorios;
+            var bedrooms = (int?)NúmeroDeDormitorios;
+            if (bedrooms.HasValue &&
+                bedrooms >= Config.MIN_BEDROOMS &&
+                bedrooms <= Config.MAX_BEDROOMS)
+            {
+                return bedrooms;
+            }
+            return null;
         }
 
         private int? GetBathrooms()
         {
-            return (int?)NúmeroDeBaños;
+            var bathrooms = (int?)NúmeroDeBaños;
+            if (bathrooms.HasValue &&
+                bathrooms >= Config.MIN_BATHROOMS &&
+                bathrooms <= Config.MAX_BATHROOMS)
+            {
+                return bathrooms;
+            }
+            return null;
         }
 
         private int? GetParkings()
         {
-            return (int?)NúmeroDeParkings;
+            var parkings = (int?)NúmeroDeParkings;
+            if (parkings.HasValue &&
+                parkings >= Config.MIN_PARKINGS &&
+                parkings <= Config.MAX_PARKINGS)
+            {
+                return parkings;
+            }
+            return null;
         }
     }
 }

@@ -109,7 +109,7 @@ namespace landerist_library.Database
 
         private static void Update(Listing oldListing, Listing newListing)
         {
-            UpdateData(newListing);
+            Update(newListing);
             if (!ListingMediaAreEquals(oldListing, newListing))
             {
                 ES_Media.Update(newListing);
@@ -123,7 +123,7 @@ namespace landerist_library.Database
                 (oldListing.media != null && newListing.media != null && oldListing.media.SetEquals(newListing.media));
         }
 
-        private static bool UpdateData(Listing listing)
+        public static bool Update(Listing listing)
         {
             string query =
                 "UPDATE " + TABLE_ES_LISTINGS + " SET " +

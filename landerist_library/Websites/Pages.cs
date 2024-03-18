@@ -350,5 +350,33 @@ namespace landerist_library.Websites
             });
             Console.WriteLine("Deleted " + pages.Count + " pages");
         }
+
+        public static void UpdateInvalidCadastastralReferences()
+        {
+            var pages = GetPages();
+            int total = pages.Count;
+            int updated = 0;
+            int counter = 0;
+            
+            foreach (var page in pages)
+            {
+                Console.WriteLine(counter++ + "/" + total);
+                var listing = page.GetListing(false);
+                if (listing != null && listing.cadastralReference != null)
+                {
+                    if (!Validate.CadastralReference(listing.cadastralReference))
+                    {
+                        listing.cadastralReference = null;
+                        updated++;
+                        if (ES_Listings.Update(listing))
+                        {
+                            Console.WriteLine("UPDATED: " +updated++);
+                        }
+                    }
+                }
+            }
+            Console.WriteLine(updated + "/" + total);
+        }
+
     }
 }

@@ -122,8 +122,8 @@ namespace landerist_console
             //Pages.Delete(PageType.ForbiddenLastSegment);
             //Pages.DeleteDuplicateUriQuery();
             //Pages.DeleteListingsHttpStatusCodeError();
-            //Pages.DeleteListingsResponseBodyRepeated();
-            
+            //Pages.DeleteListingsResponseBodyRepeated();            
+            //Pages.UpdateInvalidCadastastralReferences();
 
             #endregion
 
@@ -224,6 +224,10 @@ namespace landerist_console
             //uri = Uris.CleanUri(uri);
             //Console.WriteLine(uri);
 
+            //var phone = "";
+            //phone = Strings.Clean(phone);
+            //bool r = Validate.Phone(phone);
+            //Console.WriteLine(r);   
 
             #endregion
 

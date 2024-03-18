@@ -4,7 +4,7 @@
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "1.65";
+        public static readonly string VERSION = "1.66";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
@@ -59,7 +59,6 @@
             "Password=" + DATABASE_PW + ";" +
             "Connect Timeout=100000;";
 
-
         public static string? DATASOURCE { get; set; }
 
         private static readonly string DATABASE_CONNECTION_LOCAL = CONNECTION_USER +
@@ -77,6 +76,36 @@
         public static string? BACKUPS_DIRECTORY { get; set; }
 
         public static readonly int DAYS_TO_DELETE_BACKUP = 60;
+
+        public const int MAX_YEARS_SINCE_PUBLISHED_LISTING = 5;
+
+        public const int MIN_CONSTRUCTION_YEAR = 1980;
+
+        public const int MAX_CONSTRUCTION_YEARS_FROM_NOW = 5;
+
+        public const int MIN_PROPERTY_SIZE = 1;
+
+        public const int MAX_PROPERTY_SIZE = 100000;
+
+        public const int MIN_LAND_SIZE = 1;
+
+        public const int MAX_LAND_SIZE = 10000000;
+
+        public const int MIN_FLOORS = 0;
+
+        public const int MAX_FLOORS = 500;
+
+        public const int MIN_BEDROOMS = 0;
+
+        public const int MAX_BEDROOMS = 50;
+
+        public const int MIN_BATHROOMS = 0;
+
+        public const int MAX_BATHROOMS = 20;
+
+        public const int MIN_PARKINGS = 0;
+
+        public const int MAX_PARKINGS = 10000;
 
         public static bool IsConfigurationProduction()
         {
