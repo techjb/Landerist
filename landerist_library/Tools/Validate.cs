@@ -48,7 +48,6 @@ namespace landerist_library.Tools
             return false;
         }
 
-        //[GeneratedRegex(@"([a-zA-Z0-9]{14}(?:[a-zA-Z0-9]{6})?)+")]
         [GeneratedRegex(@"^([a-zA-Z0-9]{14}|[a-zA-Z0-9]{20})$")]
 
         private static partial Regex RegexCadastralReference();

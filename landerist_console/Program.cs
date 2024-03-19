@@ -131,6 +131,7 @@ namespace landerist_console
 
             //new HttpClientDownloader().Get(uriPage);
             //PuppeteerDownloader.DoTest();
+            //PuppeteerDownloader.KillChrome();
             //Console.WriteLine(text);
 
             //new Scraper(false).ScrapeUnknowPageType(10000);
@@ -229,7 +230,7 @@ namespace landerist_console
             //bool r = Validate.Phone(phone);
             //Console.WriteLine(r);   
 
-            #endregion
+            #endregion            
 
         }
     }

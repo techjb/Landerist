@@ -5,6 +5,7 @@ using landerist_library.Database;
 using landerist_library.Configuration;
 using landerist_library.Websites;
 using landerist_library.Landerist_com;
+using landerist_library.Downloaders;
 
 namespace landerist_service
 {
@@ -101,6 +102,7 @@ namespace landerist_service
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
             Logger.LogInformation("StopAsync");
+            PuppeteerDownloader.KillChrome();
             Log.WriteLogInfo("service", "Stopped. Version: " + Config.VERSION);
             Timer1?.Change(Timeout.Infinite, 0);
             Timer2?.Change(Timeout.Infinite, 0);

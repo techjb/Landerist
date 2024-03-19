@@ -2,6 +2,7 @@
 using PuppeteerSharp;
 using landerist_library.Configuration;
 using landerist_library.Websites;
+using System.Diagnostics;
 
 
 namespace landerist_library.Downloaders
@@ -88,7 +89,7 @@ namespace landerist_library.Downloaders
 
         public string? GetText(Websites.Page page)
         {
-            //var _ = DownloadBrowserAsync().Result;
+            //DownloadBrowserAsync().Result;
             var html = GetResponseBody(page);
             if (html != null)
             {
@@ -108,11 +109,18 @@ namespace landerist_library.Downloaders
 
         public static async Task<bool> DownloadBrowserAsync()
         {
-            using var browserFetcher = new BrowserFetcher();
-            await new BrowserFetcher().DownloadAsync();
-            return true;
+            try
+            {
+                using var browserFetcher = new BrowserFetcher();
+                await browserFetcher.DownloadAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
-        
+
         public void SetResponseBodyAndStatusCode(Websites.Page page)
         {
             var responseBody = GetResponseBody(page);
@@ -127,6 +135,7 @@ namespace landerist_library.Downloaders
             try
             {
                 Html = Task.Run(async () => await GetAsync(page.Website.LanguageCode, page.Uri)).Result;
+                PuppeterLaunched = true;
             }
             catch(Exception exception) 
             {
@@ -137,9 +146,7 @@ namespace landerist_library.Downloaders
 
         private async Task<string?> GetAsync(LanguageCode languageCode, Uri uri)
         {
-            PuppeterLaunched = false;
-            using var browser = await Puppeteer.LaunchAsync(launchOptions);
-            PuppeterLaunched = true;
+            using var browser = await Puppeteer.LaunchAsync(launchOptions);            
             try
             {
                 var browserPage = await GetBroserPage(browser, languageCode, uri);
@@ -199,13 +206,7 @@ namespace landerist_library.Downloaders
             {
                 await e.Request.AbortAsync();
                 return;
-            }
-
-            if (e.Request.IsNavigationRequest)
-            {
-                Console.WriteLine(e.Request.Url);
-            }
-            
+            }            
             if (e.Request.IsNavigationRequest && e.Request.RedirectChain.Length != 0)
             {
                 await e.Request.AbortAsync();
@@ -241,6 +242,22 @@ namespace landerist_library.Downloaders
         public string? GetRedirectUrl()
         {
             return RedirectUrl;
+        }
+
+        public static void KillChrome()
+        {
+            Process[] processes = Process.GetProcessesByName("chrome");
+            foreach (var process in processes)
+            {
+                try
+                {
+                    process.Kill();
+                }
+                catch (Exception exception)
+                {
+                    Logs.Log.WriteLogErrors("PuppeterDownloader", exception);
+                }
+            }
         }
     }
 }
