@@ -69,19 +69,24 @@ namespace landerist_console
 
             #region Urls
 
+            //var uri = new Uri("https://www.viviendasasturias.es/");
+            //var uri = new Uri("https://inmocolsol.es/valladolid/local-comercial-en-alquiler-372235");
             //var page = new Page("http://34mallorca.com/detalles-del-inmueble/carismatico-edificio-en-el-centro-de-palma/19675687");
             //var page = new Page("https://www.inverolid.es/propiedades/piso-en-alquiler-arroyo-de-la-encomienda/");
-            //var uri = new Uri("https://inmocolsol.es/valladolid/local-comercial-en-alquiler-372235");
             //var page = new Page("https://raymarinmobiliaria.com/listing/piso-en-santiago-el-mayor-murcia/");
             //var page = new Page("http://www.bbilbao.es/es/inmueble/alquiler/oficina/areatza/areatza/691?&return=portada");
             //var page = new Page("https://inmobiliariaperelada.com/inmueble/34/casona-");            
             //var page = new Page("https://casasypisosalicante.com/?id=16070639060&amp;idioma=ES");
+            //var page = new Page("https://www.viviendasasturias.es/Venta-Piso-Oviedo-Montecerrao-590?idioma=es");
+            //var page = new Page("https://www.viviendasasturias.es/Venta-Piso-Oviedo-Montecerrao-590");
+
+            var page = new Page("https://www.inmogarcia.es/ficha-inmueble.php?cod_inmueble=725372");
 
             #endregion
 
             #region Websites
 
-            //var website = new Website(uri);       
+            //var website = new Website(uri);
             //Websites.Delete(website); return;
             //Websites.Delete(uri); return;
             //Websites.DeleteAll(); return;
@@ -143,7 +148,7 @@ namespace landerist_console
             //new Scraper().Scrape(website);
             //new Scraper().ScrapeUnknowPageType(website);
             //new Scraper().ScrapeAllPages();            
-            //Scraper.Scrape(page);            
+            Scraper.Scrape(page);            
             //new Scraper().Start();
 
             #endregion
@@ -183,6 +188,12 @@ namespace landerist_console
             //new landerist_library.Parse.Listing.MLModel.TrainingTests.GoogleCNL().Run();
 
             //new ChatGPTRequest().ListModels();
+
+            #endregion
+
+            #region Indexers
+
+            //website.SetSitemap();
 
             #endregion
 
@@ -231,7 +242,7 @@ namespace landerist_console
             //bool r = Validate.Phone(phone);
             //Console.WriteLine(r);   
 
-            #endregion            
+            #endregion
 
         }
     }
