@@ -7,7 +7,7 @@ namespace landerist_library.Tools
         public static bool Email(string email)
         {
             var trimmedEmail = email.Trim();
-            if (trimmedEmail.EndsWith("."))
+            if (trimmedEmail.EndsWith('.'))
             {
                 return false;
             }

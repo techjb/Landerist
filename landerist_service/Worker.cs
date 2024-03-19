@@ -37,11 +37,15 @@ namespace landerist_service
             }
         }
 
+#pragma warning disable CA1822 // Mark members as static
+#pragma warning disable IDE0051 // Remove unused private members
         private async Task InstallChrome()
         {
-            await landerist_library.Downloaders.PuppeteerDownloader.DownloadBrowserAsync();
+            await PuppeteerDownloader.DownloadBrowserAsync();
             Log.WriteLogInfo("service", "Chrome Installed");
         }
+#pragma warning restore CA1822 // Mark members as static
+#pragma warning restore IDE0051 // Remove unused private members
 
         private void SetTimers()
         {

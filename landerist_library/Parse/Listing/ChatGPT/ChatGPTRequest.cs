@@ -12,7 +12,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
         // gpt-3.5-turbo-0125: 16,385 
         // gpt-4-1106-preview: 128,000
         public static readonly int MAX_TOKENS = 16385;
-        public static readonly string Model_GPT_4_1106_Preview = "gpt-4-1106-preview";
+        //public static readonly string Model_GPT_4_1106_Preview = "gpt-4-1106-preview";
         //public static readonly string Model_GPT_3_5_Turbo = "gpt-3.5-turbo-16k-0613";        
         public static readonly string Model_GPT_3_5_Turbo = "gpt-3.5-turbo-0125";
 
@@ -27,7 +27,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             ToolChoice = tool.Function.Name;
         }
 
-        protected ChatResponse? GetResponse(string? userInput, bool modelGPT_4)
+        protected ChatResponse? GetResponse(string? userInput)
         {
             if (string.IsNullOrEmpty(userInput))
             {
@@ -39,7 +39,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
                 new(Role.User, userInput),
             };
 
-            var model = modelGPT_4 ? Model_GPT_4_1106_Preview : Model_GPT_3_5_Turbo;
+            var model = Model_GPT_3_5_Turbo;
             var chatRequest = new ChatRequest(
                 messages: messages,
                 model: model,
