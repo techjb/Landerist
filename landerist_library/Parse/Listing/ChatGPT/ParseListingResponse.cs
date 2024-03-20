@@ -229,7 +229,9 @@ namespace landerist_library.Parse.Listing.ChatGPT
             return
                 IsValidTipoDeOperacion() &&
                 IsValidTipoDeInmueble() &&
-                IsValidListingDate();
+                IsValidListingDate() && 
+                IsValidDescription()
+                ;
         }
 
         private bool IsValidTipoDeOperacion()
@@ -257,6 +259,12 @@ namespace landerist_library.Parse.Listing.ChatGPT
             var minListingDate = DateTime.Now.AddYears(-Config.MAX_YEARS_SINCE_PUBLISHED_LISTING);
 
             return listingDate <= maxListingDate && listingDate >= minListingDate;
+        }
+
+        private bool IsValidDescription()
+        {
+            var description = GetDescription();
+            return !string.IsNullOrEmpty(description);
         }
 
         private static bool JsonArrayContains(JsonArray jsonArray, string value)

@@ -5,15 +5,15 @@ namespace landerist_library.Tools
 {
     public class HtmlToText
     {
-        private static readonly List<string> TagsToRemove =
+        private static readonly HashSet<string> TagsToRemove =
         [
             "//head",
             "//script",
             "//style",
             //"//header",
-            "//nav",            
+            "//nav",
             "//footer",
-            "//aside",            
+            "//aside",
             "//a",
             "//code",
             "//canvas",
@@ -23,7 +23,7 @@ namespace landerist_library.Tools
             "//progress",
             "//svg",
             "//textarea",
-            "//del",            
+            "//del",
             "//button",
             "//form[not(.//input[@id='__VIEWSTATE' or @id='__VIEWSTATEGENERATOR' or @id='__EVENTVALIDATION'])]",
             "//input",
@@ -31,14 +31,14 @@ namespace landerist_library.Tools
             "//*[contains(@style, 'text-decoration:line-through')]"
         ];
 
-        private static readonly List<string> TagsToClearClassAndId=
+        private static readonly HashSet<string> TagsToClearClassAndId =
         [
             "//html",
             "//body",
             "//main",
         ];
 
-        private static readonly List<string> IdOrClassContains =
+        private static readonly HashSet<string> IdOrClassContains =
         [
             "similar",
             "results",
@@ -61,7 +61,7 @@ namespace landerist_library.Tools
             "-slider"
         ];
 
-        private static readonly List<string> TextContains =
+        private static readonly HashSet<string> TextContains =
         [
             " cookie",
             " javascript",
@@ -106,11 +106,11 @@ namespace landerist_library.Tools
             "derechos reservados",
             "contraseña",
             "password",
-            "registrarse",            
+            "registrarse",
             "full screen"
         ];
 
-        private static readonly List<string> TextEquals =
+        private static readonly HashSet<string> TextEquals =
         [
             "aceptar",
             "enviar",
@@ -123,10 +123,10 @@ namespace landerist_library.Tools
             "deja tu respuesta",
             "compartir",
             "compartir esto",
-            //"es",
-            //"en",
-            //"de",
-            //"fr",
+            "es",
+            "en",
+            "de",
+            "fr",
             "favorito",
             "favorit",
             "descartar",
@@ -217,7 +217,7 @@ namespace landerist_library.Tools
             return "//*[" + string.Join(" or ", TextEquals.Select(word => $"translate(normalize-space(text()), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='{word.Trim()}'")) + "]";
         }
 
-        private static string ToXpathContains(List<string> list, string selector)
+        private static string ToXpathContains(HashSet<string> list, string selector)
         {
             var enumerable = list.Select(word => $"contains(translate({selector}, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '{word.ToLower()}')");
             return "//*[" + string.Join(" or ", enumerable) + "]";
@@ -233,7 +233,7 @@ namespace landerist_library.Tools
                 RemoveNodes(htmlDocument, XpathIdContains);
                 RemoveNodes(htmlDocument, XpathClassContains);
                 RemoveNodes(htmlDocument, XpathTextContains);
-                RemoveNodes(htmlDocument, XpathTextEquals);
+                RemoveNodesEquals(htmlDocument, XpathTextEquals);
 
                 var visibleText = GetVisibleText(htmlDocument);
                 text = CleanText(visibleText);
@@ -273,6 +273,23 @@ namespace landerist_library.Tools
                 foreach (var node in nodesToRemove)
                 {
                     node.Remove();
+                }
+            }
+        }
+
+        private static void RemoveNodesEquals(HtmlDocument htmlDocument, string select)
+        {
+            var htmlNodeCollection = htmlDocument.DocumentNode.SelectNodes(select);
+            if (htmlNodeCollection != null)
+            {
+                List<HtmlNode> nodesToRemove = [.. htmlNodeCollection];
+                foreach (var node in nodesToRemove)
+                {
+                    var text = node.InnerText.ToLower();
+                    if(TextEquals.Contains(text))
+                    {
+                        node.Remove();
+                    }                    
                 }
             }
         }
@@ -339,7 +356,7 @@ namespace landerist_library.Tools
             if (string.IsNullOrEmpty(cleaned))
             {
                 return;
-            }            
+            }
             if (Strings.IsNumeric(text))
             {
                 return;

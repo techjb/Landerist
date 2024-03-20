@@ -40,8 +40,8 @@ namespace landerist_library.Downloaders
                 "--disable-infobars",                
                 "--window-position=0,0",                
                 "--ignore-certificate-errors",
-                "--ignore-certificate-errors-spki-list",
-            ],
+                "--ignore-certificate-errors-spki-list",                
+            ],            
         };
         
 
@@ -149,7 +149,7 @@ namespace landerist_library.Downloaders
             using var browser = await Puppeteer.LaunchAsync(launchOptions);            
             try
             {
-                var browserPage = await GetBroserPage(browser, languageCode, uri);
+                var browserPage = await GetBroserPage(browser, languageCode, uri);                
                 await browserPage.GoToAsync(uri.ToString(), WaitUntilNavigation.Networkidle0);
                 return await browserPage.GetContentAsync();
             }
@@ -175,6 +175,7 @@ namespace landerist_library.Downloaders
             browserPage.Request += async (sender, e) => await HandleRequestAsync(e, uri);
 
             browserPage.Response += (sender, e) => HandleResponseAsync(e, uri);
+
             return browserPage;
         }
 
@@ -224,11 +225,11 @@ namespace landerist_library.Downloaders
 
         private void HandleResponseAsync(ResponseCreatedEventArgs e, Uri uri)
         {
-            if (!Uri.TryCreate(e.Response.Url, UriKind.RelativeOrAbsolute, out Uri? requestedUri))
+            if (!Uri.TryCreate(e.Response.Url, UriKind.RelativeOrAbsolute, out Uri? responseUri))
             {
                 return;
             }
-            if (!requestedUri.Equals(uri))
+            if (!responseUri.Equals(uri))
             {
                 return;
             }
