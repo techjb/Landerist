@@ -79,7 +79,8 @@ namespace landerist_console
             //var page = new Page("https://casasypisosalicante.com/?id=16070639060&amp;idioma=ES");
             //var page = new Page("https://www.viviendasasturias.es/Venta-Piso-Oviedo-Montecerrao-590?idioma=es");
             //var page = new Page("https://www.viviendasasturias.es/Venta-Piso-Oviedo-Montecerrao-590");
-            var page = new Page("https://www.fincasbizkaia.com/inmueble/piso-en-venta-en-sestao-de-75-m2-con-3-dormitorios-y-bano-ref-siv667-211243/");
+
+            
 
             #endregion
 
@@ -117,8 +118,6 @@ namespace landerist_console
             //Websites.DeleteNullListingExampleHtml();
 
 
-
-
             #endregion
 
             #region Pages
@@ -147,7 +146,7 @@ namespace landerist_console
             //new Scraper().Scrape(website);
             //new Scraper().ScrapeUnknowPageType(website);
             //new Scraper().ScrapeAllPages();            
-            Scraper.Scrape(page);            
+            //Scraper.Scrape(page);            
             //new Scraper().Start();
 
             #endregion

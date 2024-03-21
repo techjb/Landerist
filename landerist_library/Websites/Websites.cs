@@ -121,15 +121,11 @@ namespace landerist_library.Websites
         public static bool Exists(string host)
         {
             string query =
-                "IF EXISTS (" +
-                "   SELECT 1 " +
-                "   FROM " + TABLE_WEBSITES + " " +
-                "   WHERE Host = @Host) " +
-                "SELECT 'true' " +
-                "ELSE " +
-                "SELECT 'false' ";
+                "SELECT 1 " +
+                "FROM " + TABLE_WEBSITES + " " +
+                "WHERE Host = @Host";                
 
-            return new DataBase().QueryBool(query, new Dictionary<string, object?> {
+            return new DataBase().QueryExists(query, new Dictionary<string, object?> {
                 {"Host", host }
             });
         }

@@ -24,15 +24,11 @@ namespace landerist_library.Database
             string tableName = isValid ? VALID_IMAGES : INVALID_IMAGES;
             string uriHash = CalculateHash(uri);
             string query =
-                "IF EXISTS (" +
-                "   SELECT 1 " +
-                "   FROM " + tableName + " " +
-                "   WHERE UriHash = @UriHash) " +
-                "SELECT 'true' " +
-                "ELSE " +
-                "SELECT 'false' ";
+                "SELECT 1 " +
+                "FROM " + tableName + " " +
+                "WHERE UriHash = @UriHash";               
 
-            return new DataBase().QueryBool(query, new Dictionary<string, object?> {
+            return new DataBase().QueryExists(query, new Dictionary<string, object?> {
                 {"UriHash", uriHash }
             });
         }

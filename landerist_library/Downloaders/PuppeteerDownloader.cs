@@ -33,17 +33,17 @@ namespace landerist_library.Downloaders
         {
             Headless = true, // if false, need to comment await browserPage.SetRequestInterceptionAsync(true);            
             Devtools = false,
-            IgnoreHTTPSErrors = true,            
+            IgnoreHTTPSErrors = true,
             Args = [
                 "--no-sandbox",
                 "--disable-setuid-sandbox",
-                "--disable-infobars",                
-                "--window-position=0,0",                
+                "--disable-infobars",
+                "--window-position=0,0",
                 "--ignore-certificate-errors",
-                "--ignore-certificate-errors-spki-list",                
-            ],            
+                "--ignore-certificate-errors-spki-list",
+            ],
         };
-        
+
 
 
         private static readonly HashSet<string> BlockDomains =
@@ -127,7 +127,7 @@ namespace landerist_library.Downloaders
             if (PuppeterLaunched)
             {
                 page.SetResponseBodyAndStatusCode(responseBody, HttpStatusCode);
-            }            
+            }
         }
 
         public string? GetResponseBody(Websites.Page page)
@@ -137,7 +137,7 @@ namespace landerist_library.Downloaders
                 Html = Task.Run(async () => await GetAsync(page.Website.LanguageCode, page.Uri)).Result;
                 PuppeterLaunched = true;
             }
-            catch(Exception exception) 
+            catch (Exception exception)
             {
                 Logs.Log.WriteLogErrors("PuppeterDownloader GetResponseBody", exception);
             }
@@ -146,17 +146,31 @@ namespace landerist_library.Downloaders
 
         private async Task<string?> GetAsync(LanguageCode languageCode, Uri uri)
         {
-            using var browser = await Puppeteer.LaunchAsync(launchOptions);            
+            IBrowser? browser = null;
+            IPage? browserPage = null;
+
             try
             {
-                var browserPage = await GetBroserPage(browser, languageCode, uri);                
+                browser = await Puppeteer.LaunchAsync(launchOptions);
+                browserPage = await GetBroserPage(browser, languageCode, uri);
                 await browserPage.GoToAsync(uri.ToString(), WaitUntilNavigation.Networkidle0);
                 return await browserPage.GetContentAsync();
             }
             catch
             {
-                await browser.CloseAsync();
-                browser.Dispose();
+                
+            }
+            finally
+            {
+                if (browserPage != null)
+                {
+                    await browserPage.CloseAsync();
+                }
+                if (browser != null)
+                {
+                    await browser.CloseAsync();
+                    browser.Dispose();
+                }
             }
             return null;
         }
@@ -167,7 +181,7 @@ namespace landerist_library.Downloaders
             if (Config.IsConfigurationProduction())
             {
                 browserPage.DefaultNavigationTimeout = Config.HTTPCLIENT_SECONDS_TIMEOUT * 1000;
-            }            
+            }
             SetAccepLanguage(browserPage, languageCode);
             await browserPage.SetUserAgentAsync(Config.USER_AGENT);
 
@@ -207,13 +221,13 @@ namespace landerist_library.Downloaders
             {
                 await e.Request.AbortAsync();
                 return;
-            }            
+            }
             if (e.Request.IsNavigationRequest && e.Request.RedirectChain.Length != 0)
             {
                 await e.Request.AbortAsync();
                 return;
             }
-            
+
             // problematic
             //if (e.Request.IsNavigationRequest && e.Request.Url != uri.ToString())
             //{
@@ -245,7 +259,7 @@ namespace landerist_library.Downloaders
             return RedirectUrl;
         }
 
-        public static void KillChrome()
+        public static void KillChromeProcesses()
         {
             Process[] processes = Process.GetProcessesByName("chrome");
             foreach (var process in processes)

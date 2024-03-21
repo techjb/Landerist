@@ -488,9 +488,8 @@ namespace landerist_library.Websites
 
         public bool AchievedMaxNumberOfPages()
         {
-            return NumPages >= Config.MAX_PAGES_PER_WEBSITE 
-                //&& false
-                ;
+            return Config.IsConfigurationProduction() && 
+                NumPages >= Config.MAX_PAGES_PER_WEBSITE;
         }
 
         public bool CanAddNewPages()

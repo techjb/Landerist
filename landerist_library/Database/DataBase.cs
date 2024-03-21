@@ -1,4 +1,5 @@
 ﻿using landerist_library.Configuration;
+using landerist_library.Websites;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text;
@@ -212,6 +213,17 @@ namespace landerist_library.Database
             }
             CloseConnection();
             return result;
+        }
+
+        public bool QueryExists(string querySelect1, IDictionary<string, object?>? parameters = null)
+        {
+            string query =
+                "IF EXISTS (" + querySelect1 + ") " +
+                "SELECT 'true' " +
+                "ELSE " +
+                "SELECT 'false' ";
+
+            return QueryBool(query, parameters);
         }
 
         public int QueryInt(string query, IDictionary<string, object?>? parameters = null)

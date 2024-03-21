@@ -24,46 +24,39 @@ namespace landerist_library.Scrape
         {
             Downloader.SetResponseBodyAndStatusCode(Page);
             SetPageType();
-            UpdateIfListing();
-            UpdateIfUnPublishedListing();
-            RedirectIfError();
+            UpdateListing();            
             IndexPages();
 
             return Page.Update();
         }
         private void SetPageType()
         {
-            (var newPageType, NewListing) = PageTypeParser.GetPageType(Page);            
+            (var newPageType, NewListing) = PageTypeParser.GetPageType(Page);
             Page.SetPageType(newPageType);
         }
 
-        private void UpdateIfListing()
+        private void UpdateListing()
         {
             if (Page.PageType.Equals(PageType.Listing))
             {
                 NewListing ??= Page.GetListing(true);
                 SetMedia();
                 SetLocation();
-                UpdateListing();
+                UpdateNewListing();
+                return;
             }
-        }
 
-        private void UpdateIfUnPublishedListing()
-        {
-            if (OldPageType != null && 
-                OldPageType.Equals(PageType.Listing) && 
-                !Page.PageType.Equals(PageType.Listing))
+            if (OldPageType != null && OldPageType.Equals(PageType.Listing))
             {
-                NewListing ??= Page.GetListing(true);
+                NewListing ??= Page.GetListing(false);
                 if (NewListing != null)
                 {
                     NewListing.listingStatus = ListingStatus.unpublished;
                     NewListing.unlistingDate = DateTime.Now;
-                    UpdateListing();
+                    UpdateNewListing();
                 }
             }
         }
-
 
         private void SetMedia()
         {
@@ -83,7 +76,7 @@ namespace landerist_library.Scrape
             }
         }
 
-        private void UpdateListing()
+        private void UpdateNewListing()
         {
             if (NewListing != null)
             {
@@ -99,6 +92,13 @@ namespace landerist_library.Scrape
             }
             if (Page.Website.AchievedMaxNumberOfPages())
             {
+                return;
+            }
+
+            var redirectUrl = Downloader.GetRedirectUrl();
+            if (!string.IsNullOrEmpty(redirectUrl))
+            {
+                new Indexer(Page).Insert(redirectUrl);
                 return;
             }
             if (Page.ContainsMetaRobotsNoFollow())
@@ -120,20 +120,6 @@ namespace landerist_library.Scrape
                 return;
             }
             new HyperlinksIndexer(Page).Insert();
-        }
-
-        private void RedirectIfError()
-        {
-            if (Page.HttpStatusCode == null)
-            {
-                return;
-            }
-
-            var redirectUrl = Downloader.GetRedirectUrl();
-            if (redirectUrl != null)
-            {
-                new Indexer(Page).Insert(redirectUrl);
-            }
         }
     }
 }

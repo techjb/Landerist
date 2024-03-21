@@ -25,18 +25,11 @@ namespace landerist_library.Database
                 latitude.ToString(CultureInfo.InvariantCulture) + ")";
 
             string query =
-                "IF  EXISTS " +
-                "   (SELECT 1 " +
-                "   FROM " + COUNTRY_SPAIN + " " +
-                "   WHERE [geography].STIntersects(geography::STGeomFromText('" + point + "', 4326)) = 1) " +
-                "BEGIN " +
-                "   SELECT 'true' " +
-                "END ELSE " +
-                "BEGIN " +
-                "   SELECT 'false' " +
-                "END ";
-
-            return new DataBase().QueryBool(query);
+                "SELECT 1 " +
+                "FROM " + COUNTRY_SPAIN + " " +
+                "WHERE [geography].STIntersects(geography::STGeomFromText('" + point + "', 4326)) = 1";
+                
+            return new DataBase().QueryExists(query);
         }
     }
 }

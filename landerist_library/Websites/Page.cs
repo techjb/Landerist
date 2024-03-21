@@ -343,19 +343,15 @@ namespace landerist_library.Websites
             {
                 return false;
             }
-
+        
             string query =
-                "IF EXISTS (" +
-                "   SELECT 1 " +
-                "   FROM " + Pages.TABLE_PAGES + " " +
-                "   WHERE [HOST] = @Host AND " +
-                "   [UriHash] <> @UriHash AND " +
-                "   [ResponseBodyTextHash] = @ResponseBodyTextHash) " +
-                "SELECT 'true' " +
-                "ELSE " +
-                "SELECT 'false' ";
+                "SELECT 1 " +
+                "FROM " + Pages.TABLE_PAGES + " " +
+                "WHERE [HOST] = @Host AND " +
+                "[UriHash] <> @UriHash AND " +
+                "[ResponseBodyTextHash] = @ResponseBodyTextHash";
 
-            return new DataBase().QueryBool(query, new Dictionary<string, object?> {
+            return new DataBase().QueryExists(query, new Dictionary<string, object?> {
                 {"Host", Host},
                 {"UriHash", UriHash },
                 {"ResponseBodyTextHash", ResponseBodyTextHash },
