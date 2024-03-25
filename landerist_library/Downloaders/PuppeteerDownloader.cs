@@ -31,7 +31,8 @@ namespace landerist_library.Downloaders
 
         private static readonly LaunchOptions launchOptions = new()
         {
-            Headless = true, // if false, need to comment await browserPage.SetRequestInterceptionAsync(true);            
+            Headless = true, // if false, maybe need to comment await browserPage.SetRequestInterceptionAsync(true);            
+            //Headless = false,
             Devtools = false,
             IgnoreHTTPSErrors = true,
             Args = [
@@ -73,18 +74,12 @@ namespace landerist_library.Downloaders
             // redirect example:
             //var page = new Websites.Page("https://www.realestate.bnpparibas.es/es/soluciones-medida/soluciones-para-inversores");
 
-            var text = new PuppeteerDownloader().GetText(page);
-            if (text != null)
-            {
-                Console.WriteLine(text);
-                Logs.Log.WriteLogInfo("PuppeterTest", text);
-            }
-            else
-            {
-                Console.WriteLine("Text is null");
-                Logs.Log.WriteLogInfo("PuppeterTest", "Text is null");
-            }
 
+            Logs.Log.WriteLogInfo("PuppeterTest", "Starting test");
+            var text = new PuppeteerDownloader().GetText(page);
+
+            Console.WriteLine(text);
+            Logs.Log.WriteLogInfo("PuppeterTest", "Result: " + text);
         }
 
         public string? GetText(Websites.Page page)
@@ -106,8 +101,19 @@ namespace landerist_library.Downloaders
             }
             return null;
         }
+        
+        public static void InstallChrome()
+        {
+            Console.WriteLine("Installing Chrome ..");
+            Logs.Log.WriteLogInfo("service", "Installing Chrome ..");
 
-        public static async Task<bool> DownloadBrowserAsync()
+            bool sucess = Task.Run(async () => await DownloadBrowserAsync()).Result;
+
+            Console.WriteLine("Success: " + sucess);
+            Logs.Log.WriteLogInfo("service", "Success: " + sucess);
+        }
+
+        private static async Task<bool> DownloadBrowserAsync()
         {
             try
             {

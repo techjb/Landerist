@@ -401,6 +401,7 @@ namespace landerist_library.Websites
 
         public static void UpdateRobotsTxt()
         {
+            //Logs.Log.WriteLogInfo("service", "Updating Robots.txt");
             var websites = GetNeedToUpdateRobotsTxt();
             if (websites.Count.Equals(0))
             {
@@ -434,6 +435,7 @@ namespace landerist_library.Websites
 
         public static void UpdateSitemaps()
         {
+            //Logs.Log.WriteLogInfo("service", "Updating Sitemaps");
             var websites = GetNeedToUpdateSitemaps();
             if (websites.Count.Equals(0))
             {
@@ -467,6 +469,7 @@ namespace landerist_library.Websites
 
         public static void UpdateIpAddress()
         {
+            //Logs.Log.WriteLogInfo("service", "Updating UpdateIpAddress");
             var websites = GetNeedToUpdateIpAddress();
             if (websites.Count.Equals(0))
             {

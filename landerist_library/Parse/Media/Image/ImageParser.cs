@@ -59,11 +59,11 @@ namespace landerist_library.Parse.Media.Image
             AddImages(imageNodes, "src");
         }
 
-        private void AddImagesA()
-        {
-            var imageNodes = MediaParser.HtmlDocument!.DocumentNode.SelectNodes("//a");
-            AddImages(imageNodes, "href");
-        }
+        //private void AddImagesA()
+        //{
+        //    var imageNodes = MediaParser.HtmlDocument!.DocumentNode.SelectNodes("//a");
+        //    AddImages(imageNodes, "href");
+        //}
 
         private void AddImages(HtmlNodeCollection? nodeCollection, string attributeValue)
         {

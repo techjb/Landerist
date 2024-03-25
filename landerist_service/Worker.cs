@@ -32,20 +32,11 @@ namespace landerist_service
             {
                 Log.WriteLogInfo("service", "Started. Version: " + Config.VERSION);
                 SetTimers();
-                //await InstallChrome();
+                //PuppeteerDownloader.InstallChrome();
+                //PuppeteerDownloader.DoTest();
                 await Task.Delay(Timeout.Infinite, stoppingToken);
             }
         }
-
-#pragma warning disable CA1822 // Mark members as static
-#pragma warning disable IDE0051 // Remove unused private members
-        private async Task InstallChrome()
-        {
-            await PuppeteerDownloader.DownloadBrowserAsync();
-            Log.WriteLogInfo("service", "Chrome Installed");
-        }
-#pragma warning restore CA1822 // Mark members as static
-#pragma warning restore IDE0051 // Remove unused private members
 
         private void SetTimers()
         {

@@ -6,7 +6,7 @@ namespace landerist_library.Parse.PageTypeParser
 {
     public class ListingSimilarity
     {
-        private static readonly HashSet<string> Tags = [];
+        //private static readonly HashSet<string> Tags = [];
         private static readonly List<string> TagsToRemove =
         [
             "//head",
@@ -102,24 +102,24 @@ namespace landerist_library.Parse.PageTypeParser
             return false;
         }
 
-        private static double JacardCompare(HtmlDocument htmlDocument1, HtmlDocument htmlDocument2)
-        {
-            HashSet<string> nodeSet1 = [];
-            HashSet<string> nodeSet2 = [];
+        //private static double JacardCompare(HtmlDocument htmlDocument1, HtmlDocument htmlDocument2)
+        //{
+        //    HashSet<string> nodeSet1 = [];
+        //    HashSet<string> nodeSet2 = [];
 
-            BuildNodeSet(htmlDocument1.DocumentNode, nodeSet1);
-            BuildNodeSet(htmlDocument2.DocumentNode, nodeSet2);
+        //    BuildNodeSet(htmlDocument1.DocumentNode, nodeSet1);
+        //    BuildNodeSet(htmlDocument2.DocumentNode, nodeSet2);
 
-            return JacardCompare(nodeSet1, nodeSet2);
-        }
+        //    return JacardCompare(nodeSet1, nodeSet2);
+        //}
 
-        private static double JacardCompare(HashSet<string> nodeSet1, HtmlDocument htmlDocument)
-        {
-            HashSet<string> nodeSet2 = [];
+        //private static double JacardCompare(HashSet<string> nodeSet1, HtmlDocument htmlDocument)
+        //{
+        //    HashSet<string> nodeSet2 = [];
 
-            BuildNodeSet(htmlDocument.DocumentNode, nodeSet2);
-            return JacardCompare(nodeSet1 , nodeSet2);
-        }
+        //    BuildNodeSet(htmlDocument.DocumentNode, nodeSet2);
+        //    return JacardCompare(nodeSet1 , nodeSet2);
+        //}
 
         private static double JacardCompare(HashSet<string> nodeSet1, HashSet<string> nodeSet2)
         {

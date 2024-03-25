@@ -35,7 +35,9 @@ namespace landerist_library.Scrape
         public void Start()
         {
             PageBlocker.Clean();
+            //Log.WriteLogInfo("service", "Scrapper. Seleccing pages");
             Pages = PageSelector.Select();
+            Log.WriteLogInfo("service", "Scrapper. Selected " + Pages.Count + " pages");
             Scrape();
         }
 
@@ -100,7 +102,7 @@ namespace landerist_library.Scrape
             {
                 return false;
             }
-            TotalCounter = BlockingCollection.Count;            
+            TotalCounter = BlockingCollection.Count;
             Scraped = 0;
             Remaining = TotalCounter;
             ThreadCounter = 0;

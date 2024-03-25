@@ -80,7 +80,6 @@ namespace landerist_console
             //var page = new Page("https://www.viviendasasturias.es/Venta-Piso-Oviedo-Montecerrao-590?idioma=es");
             //var page = new Page("https://www.viviendasasturias.es/Venta-Piso-Oviedo-Montecerrao-590");
 
-            
 
             #endregion
 
@@ -133,11 +132,6 @@ namespace landerist_console
 
             #region Scrapper
 
-            //new HttpClientDownloader().Get(uriPage);
-            //PuppeteerDownloader.DoTest();
-            //PuppeteerDownloader.KillChrome();
-            //Console.WriteLine(text);
-
             //new Scraper(false).ScrapeUnknowPageType(10000);
             //new Scraper().ScrapeMainPage(website);
             //new Scraper().ScrapeUnknowHttpStatusCode();
@@ -148,6 +142,16 @@ namespace landerist_console
             //new Scraper().ScrapeAllPages();            
             //Scraper.Scrape(page);            
             //new Scraper().Start();
+
+            #endregion
+
+            #region Downloaders
+
+            //new HttpClientDownloader().Get(uriPage);
+            //PuppeteerDownloader.DoTest();
+            //PuppeteerDownloader.InstallChrome();
+            //PuppeteerDownloader.KillChrome();
+            //Console.WriteLine(text);
 
             #endregion
 
@@ -227,18 +231,6 @@ namespace landerist_console
 
             #region Others
 
-            //Uri uri = new("https://aloasis.com/detalle.php?pk=1077&idioma=es&idioma=es&idioma=es&idioma=es&idioma=es&idioma=es&idioma=es");
-            //Uri uri = new("https://inmocolsol.es/valladolid/local-comercial-en-alquiler-372235");
-            //Uri uri = new("https://www.inmoastefi.com/property-details/?706695-inmueble-Casas%20o%20chalets-Venta-Mata-.html");
-            //Uri uri = new("https://www.pirineoscasa.com/buscador/?pic_pagina=1&pic_pagina=4");
-            //Console.WriteLine(uri);
-            //uri = Uris.CleanUri(uri);
-            //Console.WriteLine(uri);
-
-            //var phone = "";
-            //phone = Strings.Clean(phone);
-            //bool r = Validate.Phone(phone);
-            //Console.WriteLine(r);   
 
             #endregion
 
