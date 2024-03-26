@@ -84,7 +84,7 @@ namespace landerist_library.Parse.Location
             }
 
             // in this order.
-            if(src.Contains("!2d") && src.Contains("!3d"))
+            if (src.Contains("!2d") && src.Contains("!3d"))
             {
                 LatLngIframeGoogleMaps(src, "!2d", "!3d", false);
             }
@@ -104,14 +104,14 @@ namespace landerist_library.Parse.Location
                 var lat = src[(src.IndexOf(key2) + key2.Length)..];
                 lat = lat[..lat.IndexOf('!')];
 
-                if(inverted)
+                if (inverted)
                 {
                     AddLatLng(lat, lng, false);
                 }
                 else
                 {
                     AddLatLng(lng, lat, false);
-                }                
+                }
             }
             catch (Exception exception)
             {
@@ -171,23 +171,38 @@ namespace landerist_library.Parse.Location
             }
         }
 
-        private void AddLatLng(string latitude, string longitude, bool locationIsAccurate)
+        
+        private void AddLatLng(string latitude, string longitude, bool isAccurate)
         {
             if (double.TryParse(longitude, NumberStyles.Float, CultureInfo.InvariantCulture, out double lng) &&
                 double.TryParse(latitude, NumberStyles.Float, CultureInfo.InvariantCulture, out double lat))
             {
-                AddLatLng(lat, lng, locationIsAccurate);
+                AddLatLng(lat, lng, isAccurate);
             }
         }
-        private void AddLatLng(double latitude, double longitude, bool locationIsAccurate)
+        private void AddLatLng(double latitude, double longitude, bool isAccurate)
         {
             if (!CountriesParser.ContainsCountry(Page.Website.CountryCode, latitude, longitude))
             {
                 return;
             }
-            var tuple = Tuple.Create(latitude, longitude, locationIsAccurate);
+            var tuple = Tuple.Create(latitude, longitude, isAccurate);
             LatLngs.Add(tuple);
         }
+
+        private void AddLatLng(Tuple<double, double>? tuple, bool? isAccurate)
+        {
+            if (tuple == null)
+            {
+                return;
+            }
+            if (!isAccurate.HasValue)
+            {
+                isAccurate = false;
+            }
+            AddLatLng(tuple.Item1, tuple.Item2, (bool)isAccurate);
+        }
+
 
         private void AddressToLatLng()
         {
@@ -201,13 +216,8 @@ namespace landerist_library.Parse.Location
                 return;
             }
 
-            var tuple = GoogleMaps.AddressToLatLng.Parse(Listing.address, Page.Website.CountryCode);
-            if (tuple == null)
-            {
-                return;
-            }
-
-            AddLatLng(tuple.Item1, tuple.Item2, false);
+            var (latLng, isAccurate) = GoogleMaps.AddressToLatLng.Parse(Listing.address, Page.Website.CountryCode);
+            AddLatLng(latLng, isAccurate);
         }
 
         public void CatastralReferenceToLatLng()

@@ -79,6 +79,7 @@ namespace landerist_console
             //var page = new Page("https://casasypisosalicante.com/?id=16070639060&amp;idioma=ES");
             //var page = new Page("https://www.viviendasasturias.es/Venta-Piso-Oviedo-Montecerrao-590?idioma=es");
             //var page = new Page("https://www.viviendasasturias.es/Venta-Piso-Oviedo-Montecerrao-590");
+            //var page = new Page("https://www.suavisdomus.es/inmuebles/casa-en-morales-del-vino-en-solar-de-114m2/");
 
 
             #endregion
@@ -160,7 +161,7 @@ namespace landerist_console
 
             //landerist_library.Parse.Listing.ListingsParser.Start();
 
-            //var tuple1 = landerist_library.Parse.Location.GoogleMaps.AddressToLatLng.Parse("Alondra 8, las rozas de madrid", landerist_library.Websites.CountryCode.ES);
+            //var tuple1 = landerist_library.Parse.Location.GoogleMaps.AddressToLatLng.Parse("Av. Domingo Bueno, 126. O Porriño, 36.400 Pontevedra", CountryCode.ES);
             //Console.WriteLine(tuple1);
 
             //var tuple1 = landerist_library.Parse.Location.Goolzoom.CadastralRefToLatLng.Parse("9441515XM7094A0001FT");
