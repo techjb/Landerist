@@ -21,6 +21,8 @@ namespace landerist_library.Websites
 
         public DateTime? Updated { get; set; }
 
+        public DateTime? NextUpdate { get; set; }
+
         public short? HttpStatusCode { get; set; }
 
         public PageType? PageType { get; private set; }
@@ -43,8 +45,6 @@ namespace landerist_library.Websites
 
 
         public Website Website = new();
-
-
 
 
         private bool Disposed;
@@ -100,6 +100,7 @@ namespace landerist_library.Websites
             UriHash = dataRow["UriHash"].ToString()!;
             Inserted = (DateTime)dataRow["Inserted"];
             Updated = dataRow["Updated"] is DBNull ? null : (DateTime)dataRow["Updated"];
+            NextUpdate = dataRow["NextUpdate"] is DBNull ? null : (DateTime)dataRow["NextUpdate"];
             HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
             PageType = dataRow["PageType"] is DBNull ? null : (PageType)Enum.Parse(typeof(PageType), dataRow["PageType"].ToString()!);
             PageTypeCounter = dataRow["PageTypeCounter"] is DBNull ? null : (short)dataRow["PageTypeCounter"];
@@ -129,7 +130,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "INSERT INTO " + Pages.TABLE_PAGES + " " +
-                "VALUES(@Host, @Uri, @UriHash, @Inserted, NULL, NULL, NULL, NULL, NULL)";
+                "VALUES(@Host, @Uri, @UriHash, @Inserted, NULL, NULL, NULL, NULL, NULL, NULL)";
 
             bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
                 {"Host", Host },
@@ -147,10 +148,12 @@ namespace landerist_library.Websites
         public bool Update()
         {
             Updated = DateTime.Now;
+            SetNextUpdate();
 
             string query =
                 "UPDATE " + Pages.TABLE_PAGES + " SET " +
                 "[Updated] = @Updated, " +
+                "[NextUpdate] = @NextUpdate, " +
                 "[HttpStatusCode] = @HttpStatusCode, " +
                 "[PageType] = @PageType, " +
                 "[PageTypeCounter] = @PageTypeCounter, " +
@@ -160,10 +163,41 @@ namespace landerist_library.Websites
             return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"UriHash", UriHash },
                 {"Updated", Updated },
+                {"NextUpdate", NextUpdate },
                 {"HttpStatusCode", HttpStatusCode},
                 {"PageType", PageType?.ToString()},
                 {"PageTypeCounter", PageTypeCounter},
                 {"ResponseBodyTextHash", ResponseBodyTextHash},
+            });
+        }
+
+        public void SetNextUpdate()
+        {
+            if (PageType == null || Updated == null || PageTypeCounter == null)
+            {
+                NextUpdate = null;
+            }
+
+            var addDays = PageType switch
+            {
+                landerist_library.Websites.PageType.MainPage => 3,
+                landerist_library.Websites.PageType.MayBeListing => 1,
+                landerist_library.Websites.PageType.Listing => 7,
+                _ => (short)PageTypeCounter! * 5,
+            };
+            NextUpdate = ((DateTime)Updated!).AddDays(addDays);
+        }
+
+        public bool UpdateNextUpdate()
+        {
+            string query =
+               "UPDATE " + Pages.TABLE_PAGES + " SET " +
+               "[NextUpdate] = @NextUpdate " +
+               "WHERE [UriHash] = @UriHash";
+
+            return new DataBase().Query(query, new Dictionary<string, object?> {
+                {"UriHash", UriHash },
+                {"NextUpdate", NextUpdate },
             });
         }
 
@@ -343,7 +377,7 @@ namespace landerist_library.Websites
             {
                 return false;
             }
-        
+
             string query =
                 "SELECT 1 " +
                 "FROM " + Pages.TABLE_PAGES + " " +

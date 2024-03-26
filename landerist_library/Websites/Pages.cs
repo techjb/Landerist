@@ -43,27 +43,16 @@ namespace landerist_library.Websites
             });
 
             return GetPages(dataTable);
-        }
+        }        
 
-        public static List<Page> GetPages(PageType pageType, int daysLastUpdate, int? pageTypeCounterMultiplier = null)
+        public static List<Page> GetPagesNextUpdate()
         {
-            DateTime now = DateTime.Now;
-            DateTime updated = now.AddDays(-daysLastUpdate);
-
             string query =
                 QueryPages() +
-                "WHERE [PageType] = @PageType AND [Updated] < @Updated ";
-
-            if (pageTypeCounterMultiplier != null)
-            {
-                query += "AND [Updated] < DATEADD(DAY, -(PageTypeCounter * @PageTypeCounterMultiplier), @Now)";
-            }
+                "WHERE [NextUpdate] < @Now ";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"PageType", pageType.ToString() },
-                {"Updated", updated },
-                {"Now", now },
-                {"PageTypeCounterMultiplier", pageTypeCounterMultiplier }
+                {"Now", DateTime.Now },
             });
 
             return GetPages(dataTable);
@@ -357,7 +346,7 @@ namespace landerist_library.Websites
             int total = pages.Count;
             int updated = 0;
             int counter = 0;
-            
+
             foreach (var page in pages)
             {
                 Console.WriteLine(counter++ + "/" + total);
@@ -370,12 +359,37 @@ namespace landerist_library.Websites
                         updated++;
                         if (ES_Listings.Update(listing))
                         {
-                            Console.WriteLine("UPDATED: " +updated++);
+                            Console.WriteLine("UPDATED: " + updated++);
                         }
                     }
                 }
             }
             Console.WriteLine(updated + "/" + total);
+        }
+
+        public static void UpdateNextUpdate()
+        {
+            var pages = GetPages();
+            int total = pages.Count;
+            int updated = 0;
+            int counter = 0;
+            int errors = 0;
+
+            Parallel.ForEach(pages, page =>
+            {
+                Interlocked.Increment(ref counter);
+                page.SetNextUpdate();
+                if (page.UpdateNextUpdate())
+                {
+                    Interlocked.Increment(ref updated);
+                }
+                else
+                {
+                    Interlocked.Increment(ref errors);
+                }
+                Console.WriteLine(counter + "/" + total + " updated: " + updated + " errors: " + errors);
+            });
+            Console.WriteLine(counter + "/" + total + " updated: " + updated + " errors: " + errors);
         }
 
     }

@@ -265,7 +265,7 @@ namespace landerist_library.Downloaders
             return RedirectUrl;
         }
 
-        public static void KillChromeProcesses()
+        public static void KillChrome()
         {
             Process[] processes = Process.GetProcessesByName("chrome");
             foreach (var process in processes)

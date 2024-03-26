@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using landerist_library.Logs;
 using landerist_library.Configuration;
+using landerist_library.Downloaders;
 
 namespace landerist_library.Scrape
 {
@@ -35,9 +36,8 @@ namespace landerist_library.Scrape
         public void Start()
         {
             PageBlocker.Clean();
-            //Log.WriteLogInfo("service", "Scrapper. Seleccing pages");
             Pages = PageSelector.Select();
-            Log.WriteLogInfo("service", "Scrapper. Selected " + Pages.Count + " pages");
+            //Log.WriteLogInfo("service", "Scrapper. Selected " + Pages.Count + " pages");
             Scrape();
         }
 
@@ -128,6 +128,10 @@ namespace landerist_library.Scrape
                 });
 
             Log.WriteLogInfo("scraper", "Updated " + Scraped + " pages");
+            if (Config.IsConfigurationProduction())
+            {
+                PuppeteerDownloader.KillChrome();
+            }
             return true;
         }
 

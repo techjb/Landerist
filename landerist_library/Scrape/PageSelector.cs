@@ -19,24 +19,7 @@ namespace landerist_library.Websites
             Console.WriteLine("Selecting pages ..");
             
             AddUnknowPageType();
-            AddErrorPages(PageType.DownloadError);
-            AddErrorPages(PageType.IncorrectLanguage);
-            AddErrorPages(PageType.BlockedByRobotsTxt);
-            AddErrorPages(PageType.RobotsTxtDisallow);
-            AddPages(PageType.MainPage, 3);
-            AddErrorPages(PageType.NotIndexable);
-            AddErrorPages(PageType.NotCanonical);
-            AddErrorPages(PageType.ResponseBodyIsError);
-            AddErrorPages(PageType.ResponseBodyTooLarge);
-            AddErrorPages(PageType.ResponseBodyTooShort);
-            AddErrorPages(PageType.ResponseBodyRepeatedInHost);
-            AddErrorPages(PageType.ResponseBodyTooManyTokens);
-            AddErrorPages(PageType.HtmlNotSimilarToListing);
-            AddPages(PageType.MayBeListing, 1);
-            AddPages(PageType.Listing, 7);            
-            AddErrorPages(PageType.NotListingByParser);
-            AddErrorPages(PageType.ListingButNotParsed);
-            AddErrorPages(PageType.NotListingByLastSegment);
+            AddNextUpdate();         
         }
 
         private static void AddUnknowPageType()
@@ -45,14 +28,9 @@ namespace landerist_library.Websites
             Pages.AddRange(pages);
         }
 
-        private static void AddErrorPages(PageType pagesType)
+        private static void AddNextUpdate()
         {
-            AddPages(pagesType, 3, 5);
-        }
-
-        private static void AddPages(PageType pageType, int lastUpdate, int? pageTypeCounterMultiplier = null)
-        {
-            var pages = landerist_library.Websites.Pages.GetPages(pageType, lastUpdate, pageTypeCounterMultiplier);
+            var pages = landerist_library.Websites.Pages.GetPagesNextUpdate();
             Pages.AddRange(pages);
         }
 
