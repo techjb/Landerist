@@ -4,7 +4,7 @@
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "1.77";
+        public static readonly string VERSION = "1.78";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
@@ -12,11 +12,11 @@
 
         public static readonly bool WORDS_ENABLED = false;
 
-        public static readonly int MAX_PAGES_PER_WEBSITE = 100;
-
-        public static readonly int MAX_PAGES_PER_SCRAPE = 1000;
+        public static readonly int MAX_PAGES_PER_WEBSITE = 120;
 
         public static readonly int MIN_PAGES_PER_SCRAPE = 20;
+
+        public static readonly int MAX_PAGES_PER_SCRAPE = 1000;        
 
         public static readonly int MAX_PAGES_PER_HOSTS_PER_SCRAPE = 5;
 
