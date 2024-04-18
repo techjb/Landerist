@@ -133,6 +133,7 @@ namespace landerist_console
             //Pages.DeleteListingsResponseBodyRepeated();            
             //Pages.UpdateInvalidCadastastralReferences();
             //Pages.UpdateNextUpdate();
+            //Pages.RemoveResponseBodyTextHash(PageType.Listing);
 
             #endregion
 

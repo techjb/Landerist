@@ -43,7 +43,7 @@ namespace landerist_library.Websites
             });
 
             return GetPages(dataTable);
-        }        
+        }
 
         public static List<Page> GetPagesNextUpdate()
         {
@@ -392,5 +392,16 @@ namespace landerist_library.Websites
             Console.WriteLine(counter + "/" + total + " updated: " + updated + " errors: " + errors);
         }
 
+        public static bool RemoveResponseBodyTextHash(PageType pageType)
+        {
+            string query =
+                "UPDATE" + TABLE_PAGES + " " +
+                "SET [ResponseBodyTextHash] = NULL " +
+                "WHERE [PageType] = @PageType";
+
+            return new DataBase().Query(query, new Dictionary<string, object?> {
+                {"PageType", pageType.ToString() }
+            });
+        }
     }
 }
