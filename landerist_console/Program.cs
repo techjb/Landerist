@@ -80,6 +80,7 @@ namespace landerist_console
             //var page = new Page("https://www.viviendasasturias.es/Venta-Piso-Oviedo-Montecerrao-590?idioma=es");
             //var page = new Page("https://www.viviendasasturias.es/Venta-Piso-Oviedo-Montecerrao-590");
             //var page = new Page("https://www.suavisdomus.es/inmuebles/casa-en-morales-del-vino-en-solar-de-114m2/");
+            //var page = new Page("https://www.grupopineda.es/inmueble/8292821");
 
 
             #endregion
@@ -142,8 +143,10 @@ namespace landerist_console
             //new Scraper().Scrape(website);
             //new Scraper().ScrapeUnknowPageType(website);
             //new Scraper().ScrapeAllPages();            
-            //Scraper.Scrape(page);            
+            //new Scraper().ScrapeResponseBodyRepeatedInListings();
             //new Scraper().Start();
+            //Scraper.Scrape(page); 
+
 
             #endregion
 

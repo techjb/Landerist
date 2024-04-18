@@ -54,6 +54,10 @@ namespace landerist_library.Parse.PageTypeParser
             {
                 return (PageType.ResponseBodyRepeatedInHost, null);
             }
+            if (page.ReponseBodyTextRepeatedInListings())
+            {
+                return (PageType.ResponseBodyRepeatedInListings, null);
+            }
             if (ParseListingRequest.TooManyTokens(page))
             {
                 return (PageType.ResponseBodyTooManyTokens, null);

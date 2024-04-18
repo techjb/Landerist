@@ -316,6 +316,12 @@ namespace landerist_library.Websites
             }
         }
 
+        public void SetResponseBodyTextHashToNull()
+        {
+            ResponseBodyTextHash = null;
+            ResponseBodyTextHasChanged = false;
+        }
+
         public void SetResponseBodyTextHash()
         {
             if (ResponseBodyText is null)
@@ -387,6 +393,27 @@ namespace landerist_library.Websites
 
             return new DataBase().QueryExists(query, new Dictionary<string, object?> {
                 {"Host", Host},
+                {"UriHash", UriHash },
+                {"ResponseBodyTextHash", ResponseBodyTextHash },
+            });
+        }
+
+        public bool ReponseBodyTextRepeatedInListings()
+        {
+            if (string.IsNullOrEmpty(ResponseBodyText))
+            {
+                return false;
+            }
+
+            string query =
+                "SELECT 1 " +
+                "FROM " + Pages.TABLE_PAGES + " " +
+                "WHERE [PageType] = @PageType AND " +
+                "[UriHash] <> @UriHash AND " +
+                "[ResponseBodyTextHash] = @ResponseBodyTextHash";
+
+            return new DataBase().QueryExists(query, new Dictionary<string, object?> {
+                {"PageType", landerist_library.Websites.PageType.Listing.ToString() },
                 {"UriHash", UriHash },
                 {"ResponseBodyTextHash", ResponseBodyTextHash },
             });

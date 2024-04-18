@@ -13,6 +13,7 @@
         ResponseBodyTooShort,
         ResponseBodyTooLarge,
         ResponseBodyRepeatedInHost,
+        ResponseBodyRepeatedInListings,
         ResponseBodyTooManyTokens,
         HtmlNotSimilarToListing,
         MayBeListing,

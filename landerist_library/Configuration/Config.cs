@@ -4,7 +4,7 @@
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "1.80";
+        public static readonly string VERSION = "1.81";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
