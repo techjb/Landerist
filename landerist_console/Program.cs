@@ -80,7 +80,10 @@ namespace landerist_console
             //var page = new Page("https://www.viviendasasturias.es/Venta-Piso-Oviedo-Montecerrao-590?idioma=es");
             //var page = new Page("https://www.viviendasasturias.es/Venta-Piso-Oviedo-Montecerrao-590");
             //var page = new Page("https://www.suavisdomus.es/inmuebles/casa-en-morales-del-vino-en-solar-de-114m2/");
-            //var page = new Page("https://www.grupopineda.es/inmueble/8292821");
+            //var page = new Page("https://baronybaron.com/property/c-san-pedro-cabezon-de-la-sal-179m2/");
+            //var page = new Page("https://empordaimmo.com/característica/persianas/"); // no listing
+            //var page = new Page("https://inmobiliariaalonsodiaz.com/inmueble/piso-en-venta-en-doctor-fleming-la-felguera-langreo/");
+            var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
 
 
             #endregion
@@ -145,7 +148,7 @@ namespace landerist_console
             //new Scraper().ScrapeAllPages();            
             //new Scraper().ScrapeResponseBodyRepeatedInListings();
             //new Scraper().Start();
-            //Scraper.Scrape(page); 
+            Scraper.Scrape(page); 
 
 
             #endregion
@@ -163,6 +166,7 @@ namespace landerist_console
             #region Parsers
 
             //landerist_library.Parse.Listing.ListingsParser.Start();
+            //landerist_library.Parse.Listing.ListingsParser.ParseListing(page);
 
             //var tuple1 = landerist_library.Parse.Location.GoogleMaps.AddressToLatLng.Parse("Av. Domingo Bueno, 126. O Porriño, 36.400 Pontevedra", CountryCode.ES);
             //Console.WriteLine(tuple1);
@@ -238,7 +242,6 @@ namespace landerist_console
 
 
             #endregion
-
 
         }
     }

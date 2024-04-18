@@ -507,8 +507,8 @@ namespace landerist_library.Parse.Listing.ChatGPT
         private double? GetPropertySize()
         {
             if (TamañoDelInmueble.HasValue &&
-                TamañoDelInmueble <= Config.MIN_PROPERTY_SIZE &&
-                TamañoDelInmueble >= Config.MAX_PROPERTY_SIZE)
+                TamañoDelInmueble >= Config.MIN_PROPERTY_SIZE &&
+                TamañoDelInmueble <= Config.MAX_PROPERTY_SIZE)
             {
                 return TamañoDelInmueble;
             }

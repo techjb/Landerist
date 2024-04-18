@@ -9,13 +9,13 @@ namespace landerist_library.Parse.Listing.ChatGPT
     {
 
         //https://platform.openai.com/docs/models/overview  
-        // gpt-3.5-turbo-0125: 16,385 
-        // gpt-4-1106-preview: 128,000
-        public static readonly int MAX_TOKENS = 16385;
-        //public static readonly string Model_GPT_4_1106_Preview = "gpt-4-1106-preview";
-        //public static readonly string Model_GPT_3_5_Turbo = "gpt-3.5-turbo-16k-0613";        
-        public static readonly string Model_GPT_3_5_Turbo = "gpt-3.5-turbo-0125";
-
+        public static readonly int MAX_CONTEXT_WINDOW = 
+            //16385; // gpt-3.5-turbo-0125
+            128000; // gpt-4-turbo        
+        
+        private static readonly string Model =
+            //"gpt-3.5-turbo-0125";
+             "gpt-4-turbo";
 
         private readonly OpenAIClient OpenAIClient = new(PrivateConfig.OPENAI_API_KEY);
         private readonly string SystemMessage = systemMessage;
@@ -39,10 +39,11 @@ namespace landerist_library.Parse.Listing.ChatGPT
                 new(Role.User, userInput),
             };
 
-            var model = Model_GPT_3_5_Turbo;
+            //var model = Model_GPT_3_5_Turbo;
+            //var model = Model_GPT_4_Turbo;
             var chatRequest = new ChatRequest(
                 messages: messages,
-                model: model,
+                model: Model,
                 temperature: 0,
                 tools: Tools,
                 toolChoice: ToolChoice,
@@ -70,7 +71,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             int userTokens = GPT3Tokenizer.Encode(userMessage).Count;
 
             int totalTokens = systemTokens + userTokens;
-            return totalTokens > MAX_TOKENS;
+            return totalTokens > MAX_CONTEXT_WINDOW;
         }
 
         public void ListModels()
