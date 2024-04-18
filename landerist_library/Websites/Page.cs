@@ -49,6 +49,10 @@ namespace landerist_library.Websites
 
         private bool Disposed;
 
+        public Page(Listing listing): this(listing.dataSourceUrl)
+        {
+
+        }
         public Page(string url) : this(new Uri(url))
         {
 
@@ -124,7 +128,6 @@ namespace landerist_library.Websites
             }
             return null;
         }
-
 
         public bool Insert()
         {

@@ -134,6 +134,7 @@ namespace landerist_console
             //Pages.UpdateInvalidCadastastralReferences();
             //Pages.UpdateNextUpdate();
             //Pages.RemoveResponseBodyTextHash(PageType.Listing);
+            //Pages.DeleteUnpublishedListings();
 
             #endregion
 

@@ -4,7 +4,7 @@
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "1.84";
+        public static readonly string VERSION = "1.85";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
@@ -106,6 +106,8 @@
         public const int MIN_PARKINGS = 0;
 
         public const int MAX_PARKINGS = 10000;
+
+        public const int DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS = 90;
 
         public static bool IsConfigurationProduction()
         {

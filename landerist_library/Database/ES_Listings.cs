@@ -1,5 +1,6 @@
 ﻿using landerist_library.Websites;
 using landerist_orels.ES;
+using System;
 using System.Data;
 
 namespace landerist_library.Database
@@ -190,6 +191,22 @@ namespace landerist_library.Database
             return GetListings(dataTable, loadMedia);
         }
 
+        public static SortedSet<Listing> GetUnpublishedListings(DateTime unlistingDate)
+        {
+            string query =
+                "SELECT * " +
+                "FROM " + TABLE_ES_LISTINGS + " " +
+                "WHERE [listingStatus] = @listingStatus AND " +
+                "[unlistingDate] < @unlistingDate";
+
+            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+                {"listingStatus", ListingStatus.unpublished.ToString() },
+                {"unlistingDate", unlistingDate }
+            });
+
+            return GetListings(dataTable, false);
+        }
+
         public static SortedSet<Listing> GetListings(bool loadMedia, DateTime dataSourceUpdate)
         {
             string query =
@@ -201,7 +218,7 @@ namespace landerist_library.Database
             return GetListings(dataTable, loadMedia);
         }
 
-        public static SortedSet<Listing> GetListings(DataTable dataTable, bool loadMedia)
+        private static SortedSet<Listing> GetListings(DataTable dataTable, bool loadMedia)
         {
             SortedSet<Listing> listings = new(new ListingComparer());
             foreach (DataRow dataRow in dataTable.Rows)
@@ -359,6 +376,7 @@ namespace landerist_library.Database
 
             return new DataBase().Query(query);
         }
+
 
         public static DataTable GetTrainingListings()
         {

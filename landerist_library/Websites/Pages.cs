@@ -2,6 +2,7 @@
 using landerist_library.Index;
 using landerist_library.Tools;
 using System.Data;
+using landerist_library.Configuration;
 
 namespace landerist_library.Websites
 {
@@ -402,6 +403,38 @@ namespace landerist_library.Websites
             return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"PageType", pageType.ToString() }
             });
+        }
+
+        public static void DeleteUnpublishedListings()
+        {
+            DateTime unlistingDate = DateTime.Now.AddDays(-Config.DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS);
+            var listings = ES_Listings.GetUnpublishedListings(unlistingDate);
+            if (listings.Equals(0))
+            {
+                return;
+            }
+            int total = listings.Count;
+            int processed = 0;
+            int deleted = 0;            
+            int errors = 0;
+            Parallel.ForEach(listings,
+                new ParallelOptions() { MaxDegreeOfParallelism = Environment.ProcessorCount - 1 },
+                listing =>
+            {
+                Interlocked.Increment(ref processed);
+                var page = new Page(listing);
+                if (page.DeleteListing())
+                {
+                    Interlocked.Increment(ref deleted);
+                }
+                else
+                {
+                    Interlocked.Increment(ref errors);
+                }
+                Console.WriteLine(processed + "/" + total + " Deleted: " + deleted);
+
+            });
+            Logs.Log.WriteLogInfo("DeleteUnpublishedListings", "Deleted: " + deleted + "/" + total + " Errors: " + errors);
         }
     }
 }

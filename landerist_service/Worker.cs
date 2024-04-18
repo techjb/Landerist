@@ -57,6 +57,7 @@ namespace landerist_service
         {
             try
             {
+                Pages.DeleteUnpublishedListings();
                 StatisticsSnapshot.TakeSnapshots();
                 FilesUpdater.UpdateFiles();                
                 Landerist_com.UpdateDownloadsAndStatistics();
