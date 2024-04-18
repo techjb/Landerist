@@ -18,10 +18,7 @@ namespace landerist_library.Parse.Media.Image
                     {
                         MaxDegreeOfParallelism = Environment.ProcessorCount - 1
                     },
-                    image =>
-                {
-                    DownloadImage(image);
-                });
+                    DownloadImage);
             }
             else
             {

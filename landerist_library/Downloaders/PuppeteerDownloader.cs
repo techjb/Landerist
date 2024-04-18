@@ -62,6 +62,38 @@ namespace landerist_library.Downloaders
             "maps.googleapis.com",
         ];
 
+      
+        public static void InstallChromeAndDoTest()
+        {
+            InstallChrome();
+            DoTest();
+        }
+
+        public static void InstallChrome()
+        {
+            Console.WriteLine("Installing Chrome ..");
+            Logs.Log.WriteLogInfo("service", "Installing Chrome ..");
+
+            bool sucess = Task.Run(DownloadBrowserAsync).Result;
+
+            Console.WriteLine("Success: " + sucess);
+            Logs.Log.WriteLogInfo("service", "Success: " + sucess);
+        }
+
+        private static async Task<bool> DownloadBrowserAsync()
+        {
+            try
+            {
+                using var browserFetcher = new BrowserFetcher();
+                await browserFetcher.DownloadAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public static void DoTest()
         {
             // working
@@ -101,31 +133,7 @@ namespace landerist_library.Downloaders
             }
             return null;
         }
-        
-        public static void InstallChrome()
-        {
-            Console.WriteLine("Installing Chrome ..");
-            Logs.Log.WriteLogInfo("service", "Installing Chrome ..");
 
-            bool sucess = Task.Run(async () => await DownloadBrowserAsync()).Result;
-
-            Console.WriteLine("Success: " + sucess);
-            Logs.Log.WriteLogInfo("service", "Success: " + sucess);
-        }
-
-        private static async Task<bool> DownloadBrowserAsync()
-        {
-            try
-            {
-                using var browserFetcher = new BrowserFetcher();
-                await browserFetcher.DownloadAsync();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
 
         public void SetResponseBodyAndStatusCode(Websites.Page page)
         {

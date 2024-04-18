@@ -10,12 +10,12 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
         //https://platform.openai.com/docs/models/overview  
         public static readonly int MAX_CONTEXT_WINDOW = 
-            //16385; // gpt-3.5-turbo-0125
-            128000; // gpt-4-turbo        
+            16385; // gpt-3.5-turbo-0125
+            //128000; // gpt-4-turbo        
         
         private static readonly string Model =
-            //"gpt-3.5-turbo-0125";
-             "gpt-4-turbo";
+            "gpt-3.5-turbo-0125";
+            //"gpt-4-turbo";
 
         private readonly OpenAIClient OpenAIClient = new(PrivateConfig.OPENAI_API_KEY);
         private readonly string SystemMessage = systemMessage;
@@ -39,8 +39,6 @@ namespace landerist_library.Parse.Listing.ChatGPT
                 new(Role.User, userInput),
             };
 
-            //var model = Model_GPT_3_5_Turbo;
-            //var model = Model_GPT_4_Turbo;
             var chatRequest = new ChatRequest(
                 messages: messages,
                 model: Model,

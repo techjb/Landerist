@@ -32,8 +32,7 @@ namespace landerist_service
             {
                 Log.WriteLogInfo("service", "Started. Version: " + Config.VERSION);
                 SetTimers();
-                //PuppeteerDownloader.InstallChrome();
-                //PuppeteerDownloader.DoTest();
+                //PuppeteerDownloader.InstallChromeAndDoTest();                
                 await Task.Delay(Timeout.Infinite, stoppingToken);
             }
         }

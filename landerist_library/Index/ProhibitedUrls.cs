@@ -121,7 +121,7 @@ namespace landerist_library.Index
                     continue;
                 }              
 
-                if (prohibitedContains.Any(item => directory.Contains(item)))
+                if (prohibitedContains.Any(directory.Contains))
                 {
                     return true;
                 }
@@ -195,7 +195,7 @@ namespace landerist_library.Index
                     continue;
                 }
 
-                bool isProhibited = prohibitedContains.Any(item => directory.Contains(item));
+                bool isProhibited = prohibitedContains.Any(directory.Contains);
                 if (!isProhibited)
                 {
                     dirs.Add(directory);

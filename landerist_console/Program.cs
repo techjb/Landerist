@@ -83,7 +83,7 @@ namespace landerist_console
             //var page = new Page("https://baronybaron.com/property/c-san-pedro-cabezon-de-la-sal-179m2/");
             //var page = new Page("https://empordaimmo.com/característica/persianas/"); // no listing
             //var page = new Page("https://inmobiliariaalonsodiaz.com/inmueble/piso-en-venta-en-doctor-fleming-la-felguera-langreo/");
-            var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
+            //var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
 
 
             #endregion
@@ -148,7 +148,7 @@ namespace landerist_console
             //new Scraper().ScrapeAllPages();            
             //new Scraper().ScrapeResponseBodyRepeatedInListings();
             //new Scraper().Start();
-            Scraper.Scrape(page); 
+            //Scraper.Scrape(page); 
 
 
             #endregion

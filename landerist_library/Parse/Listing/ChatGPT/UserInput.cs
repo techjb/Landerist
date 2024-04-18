@@ -44,7 +44,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
         public static string? Parse(Page page)
         {
-            //return page.ResponseBodyText;
+            return page.ResponseBodyText;
 
             try
             {
@@ -103,15 +103,15 @@ namespace landerist_library.Parse.Listing.ChatGPT
             return html.Trim();
         }
 
-        private static IEnumerable<string>? GetVisibleText(HtmlDocument htmlDocument)
-        {
-            var visibleNodes = htmlDocument.DocumentNode.DescendantsAndSelf()
-                .Where(n => n.NodeType == HtmlNodeType.Text)
-                   .Where(n => !string.IsNullOrWhiteSpace(n.InnerHtml))
-                   ;
+        //private static IEnumerable<string>? GetVisibleText(HtmlDocument htmlDocument)
+        //{
+        //    var visibleNodes = htmlDocument.DocumentNode.DescendantsAndSelf()
+        //        .Where(n => n.NodeType == HtmlNodeType.Text)
+        //           .Where(n => !string.IsNullOrWhiteSpace(n.InnerHtml))
+        //           ;
 
-            return visibleNodes.Select(n => n.InnerHtml.Trim());
-        }
+        //    return visibleNodes.Select(n => n.InnerHtml.Trim());
+        //}
 
         [GeneratedRegex(@"\s+")]
         private static partial Regex RegexSpace();

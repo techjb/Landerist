@@ -20,18 +20,18 @@ namespace landerist_library.Parse.Listing.ChatGPT
         //   "Response sólo con \"si\" o \"no\" en formato Json"
         //   ;
 
-        //public static readonly string SystemMessage =
-        //    "Tu tarea consiste en procesar el texto proporcionado por el usuario, identificando si corresponde a un anuncio inmobiliario. " +
-        //    "De ser así, deberás analizar meticulosamente el contenido para determinar que efectivamente se trata de un único anuncio y proceder a extraer los datos relevantes.  " +
-        //    "Estos deberán ser presentados en un formato estructurado JSON, asegurando una precisión exhaustiva en la identificación y extracción de los elementos clave. " +
-        //    "Es imperativo que mantengas un enfoque riguroso durante este proceso para ofrecer la respuesta más precisa y de la más alta calidad posible.";
-
-
         public static readonly string SystemMessage =
-            "Tu tarea consiste en procesar el código html proporcionado por el usuario, identificando si corresponde a un anuncio inmobiliario. " +
+            "Tu tarea consiste en procesar el texto proporcionado por el usuario, identificando si corresponde a un anuncio inmobiliario. " +
             "De ser así, deberás analizar meticulosamente el contenido para determinar que efectivamente se trata de un único anuncio y proceder a extraer los datos relevantes.  " +
             "Estos deberán ser presentados en un formato estructurado JSON, asegurando una precisión exhaustiva en la identificación y extracción de los elementos clave. " +
             "Es imperativo que mantengas un enfoque riguroso durante este proceso para ofrecer la respuesta más precisa y de la más alta calidad posible.";
+
+
+        //public static readonly string SystemMessage =
+        //    "Tu tarea consiste en procesar el código html proporcionado por el usuario, identificando si corresponde a un anuncio inmobiliario. " +
+        //    "De ser así, deberás analizar meticulosamente el contenido para determinar que efectivamente se trata de un único anuncio y proceder a extraer los datos relevantes.  " +
+        //    "Estos deberán ser presentados en un formato estructurado JSON, asegurando una precisión exhaustiva en la identificación y extracción de los elementos clave. " +
+        //    "Es imperativo que mantengas un enfoque riguroso durante este proceso para ofrecer la respuesta más precisa y de la más alta calidad posible.";
 
         private static readonly List<Tool> Tools = ParseListingTool.GetTools();
 
