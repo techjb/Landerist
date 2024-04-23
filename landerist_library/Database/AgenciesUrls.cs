@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Markup;
-
-namespace landerist_library.Database
+﻿namespace landerist_library.Database
 {
     public class AgenciesUrls
     {
@@ -15,7 +8,7 @@ namespace landerist_library.Database
         {
             string query =
                 "INSERT INTO " + TABLE_AGENCIES_URLS + " " +
-                "VALUES(@Url, @Province)";
+                "VALUES(@Url, @Province, NULL)";
 
             return new DataBase().Query(query, new Dictionary<string, object?>() {
                 {"Url", url },
@@ -34,6 +27,35 @@ namespace landerist_library.Database
             });
         }
 
+        public static HashSet<string> GetNotScrapped() {
+            string query =
+                "SELECT [Url] FROM " + TABLE_AGENCIES_URLS + " " +
+                "WHERE [AgencyUrl] IS NULL";
 
+            return new DataBase().QueryHashSet(query);
+        }
+
+
+        public static HashSet<string> GetEmpty()
+        {
+            string query =
+                "SELECT [Url] FROM " + TABLE_AGENCIES_URLS + " " +
+                "WHERE [AgencyUrl] = ''";
+
+            return new DataBase().QueryHashSet(query);
+        }
+
+        public static bool Update(string url, string? agencyUrl)
+        {
+            string query =
+                "UPDATE " + TABLE_AGENCIES_URLS + " " +
+                "SET [AgencyUrl] = @AgencyUrl " +
+                "WHERE [Url] = @Url";
+
+            return new DataBase().Query(query, new Dictionary<string, object?>() {
+                {"AgencyUrl", agencyUrl },
+                {"Url", url },
+            });
+        }
     }
 }
