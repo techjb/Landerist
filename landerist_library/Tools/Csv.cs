@@ -22,7 +22,6 @@ namespace landerist_library.Tools
             return dataTable;
         }
 
-        
         public static void Write(DataTable dataTable, string fileName, bool addHeaders)
         {
             using StreamWriter streamWriter = new(fileName);
@@ -53,9 +52,9 @@ namespace landerist_library.Tools
                     csvWriter.NextRecord();
                 }
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                Console.WriteLine("Error writting the file: " + ex.Message);
+                Console.WriteLine("Error writting the file: " + exception.Message);
             }
         }
 

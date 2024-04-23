@@ -45,6 +45,15 @@
             return new DataBase().QueryHashSet(query);
         }
 
+        public static HashSet<string> GetAgencies()
+        {
+            string query =
+                "SELECT [AgencyUrl] FROM " + TABLE_AGENCIES_URLS + " " +
+                "WHERE [AgencyUrl] <> '' AND [AgencyUrl] IS NOT NULL";
+
+            return new DataBase().QueryHashSet(query);
+        }
+
         public static bool Update(string url, string? agencyUrl)
         {
             string query =

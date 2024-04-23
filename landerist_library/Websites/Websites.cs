@@ -16,6 +16,12 @@ namespace landerist_library.Websites
             return GetWebsites(dataTable);
         }
 
+        public static HashSet<string> GetHosts()
+        {
+            string query = "SELECT [Host] FROM " + TABLE_WEBSITES;
+            return new DataBase().QueryHashSet(query);
+        }
+
         public static Dictionary<string, Website> GetDicionaryStatusCodeOk()
         {
             Dictionary<string, Website> dictionary = [];
