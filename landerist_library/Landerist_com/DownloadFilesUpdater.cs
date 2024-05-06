@@ -6,7 +6,7 @@ using landerist_orels.ES;
 
 namespace landerist_library.Landerist_com
 {
-    public class FilesUpdater : Landerist_com
+    public class DownloadFilesUpdater : Landerist_com
     {
         private static DateTime Yesterday;
         public static void UpdateFiles()

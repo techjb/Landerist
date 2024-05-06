@@ -43,7 +43,7 @@ namespace landerist_library.Landerist_com
         {
             var dataTable = StatisticsSnapshot.GetTop100Statistics(statisticsKey);
             List<string> values = [];
-            foreach (DataRow dataRow in dataTable.Rows)
+            foreach (DataRow dataRow in dataTable.Rows.Cast<DataRow>().Reverse())
             {
                 int counter = Convert.ToInt32(dataRow["Counter"]);
                 var date = ((DateTime)dataRow["Date"]).ToShortDateString();

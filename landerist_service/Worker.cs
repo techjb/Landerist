@@ -59,7 +59,7 @@ namespace landerist_service
             {
                 Pages.DeleteUnpublishedListings();
                 StatisticsSnapshot.TakeSnapshots();
-                FilesUpdater.UpdateFiles();                
+                DownloadFilesUpdater.UpdateFiles();                
                 Landerist_com.UpdateDownloadsAndStatistics();
                 Backup.Update();
             }

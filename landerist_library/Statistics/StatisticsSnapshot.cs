@@ -166,7 +166,7 @@ namespace landerist_library.Statistics
                 "SELECT TOP 100 [Date], [Counter] " +
                 "FROM " + TABLES_STATISTICS_SNAPSHOT + " " +
                 "WHERE [Key] = @Key " +                
-                "ORDER BY [Date] ASC";
+                "ORDER BY [Date] DESC";
 
             return new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 { "Key", statisticsKey.ToString() }

@@ -7,6 +7,7 @@ using landerist_library.Index;
 using landerist_library.Insert.GoogleCustomSearch;
 using landerist_library.Insert.GooglePlaces;
 using landerist_library.Insert.IdAgenciesScraper;
+using landerist_library.Landerist_com;
 using landerist_library.Logs;
 using landerist_library.Parse.Listing.ChatGPT;
 using landerist_library.Parse.Location;
@@ -246,8 +247,10 @@ namespace landerist_console
 
             #endregion
 
-            #region Others
+            #region 
 
+            //Landerist_com.UpdateDownloadsAndStatistics();
+            //StatisticsPage.Update();
 
             #endregion
 
