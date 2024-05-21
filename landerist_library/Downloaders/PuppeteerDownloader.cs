@@ -3,6 +3,9 @@ using PuppeteerSharp;
 using landerist_library.Configuration;
 using landerist_library.Websites;
 using System.Diagnostics;
+using Amazon.S3.Model.Internal.MarshallTransformations;
+using PuppeteerSharp.Media;
+using System.Runtime.CompilerServices;
 
 
 namespace landerist_library.Downloaders
@@ -17,17 +20,22 @@ namespace landerist_library.Downloaders
 
         private bool PuppeterLaunched = false;
 
-        private readonly HashSet<ResourceType> BlockResources =
-        [
-            ResourceType.Image,
-            ResourceType.ImageSet,
-            ResourceType.Img,
-            //ResourceType.StyleSheet,
-            ResourceType.Font,
-            ResourceType.Media,
-            //ResourceType.WebSocket,            
-            //ResourceType.Other
-        ];
+        private const bool BlockAllResources = true;
+
+        private static readonly HashSet<ResourceType> BlockResources = BlockAllResources ?
+            [
+                ResourceType.Image,
+                ResourceType.ImageSet,
+                ResourceType.Img,
+                ResourceType.Font,
+                ResourceType.Media,
+            ] :
+            [
+                ResourceType.Media,
+            ];
+
+        private static readonly string IDontCareAboutCookies = Config.CHROME_EXTENSIONS_DIRECTORY
+            + "IDontCareAboutCookies\\1.0.1_0\\";
 
         private static readonly LaunchOptions launchOptions = new()
         {
@@ -42,9 +50,11 @@ namespace landerist_library.Downloaders
                 "--window-position=0,0",
                 "--ignore-certificate-errors",
                 "--ignore-certificate-errors-spki-list",
+                
+                //"--disable-extensions-except=" + IDontCareAboutCookies,
+                //"--load-extension=" + IDontCareAboutCookies
             ],
         };
-
 
 
         private static readonly HashSet<string> BlockDomains =
@@ -62,7 +72,7 @@ namespace landerist_library.Downloaders
             "maps.googleapis.com",
         ];
 
-      
+
         public static void InstallChromeAndDoTest()
         {
             InstallChrome();
@@ -148,7 +158,7 @@ namespace landerist_library.Downloaders
         {
             try
             {
-                Html = Task.Run(async () => await GetAsync(page.Website.LanguageCode, page.Uri)).Result;
+                Html = Task.Run(async () => await GetAsync(page)).Result;
                 PuppeterLaunched = true;
             }
             catch (Exception exception)
@@ -158,7 +168,7 @@ namespace landerist_library.Downloaders
             return Html;
         }
 
-        private async Task<string?> GetAsync(LanguageCode languageCode, Uri uri)
+        private async Task<string?> GetAsync(Websites.Page page)
         {
             IBrowser? browser = null;
             IPage? browserPage = null;
@@ -166,13 +176,20 @@ namespace landerist_library.Downloaders
             try
             {
                 browser = await Puppeteer.LaunchAsync(launchOptions);
-                browserPage = await GetBroserPage(browser, languageCode, uri);
-                await browserPage.GoToAsync(uri.ToString(), WaitUntilNavigation.Networkidle0);
+
+                browserPage = await GetBroserPage(browser, page.Website.LanguageCode, page.Uri);
+                await browserPage.GoToAsync(page.Uri.ToString(), WaitUntilNavigation.Networkidle0);
+
+                if (Config.TAKE_SCREENSHOT)
+                {
+                    await TakeScreenshot(browserPage, page);
+                }
+
                 return await browserPage.GetContentAsync();
             }
-            catch
+            catch (Exception exception)
             {
-                
+
             }
             finally
             {
@@ -189,6 +206,24 @@ namespace landerist_library.Downloaders
             return null;
         }
 
+        private static async Task TakeScreenshot(IPage browserPage, Websites.Page page)
+        {
+            var type = ScreenshotType.Jpeg;
+            string file = Config.SCREENSHOTS_DIRECTORY + page.UriHash.ToString() + "." + type.ToString().ToLower();
+            var screenshotOptions = new ScreenshotOptions
+            {
+                Type = type,
+                FullPage = true,
+                OmitBackground = true,                
+            };
+            if (type.Equals(ScreenshotType.Jpeg))
+            {
+                screenshotOptions.Quality = 90;
+            }
+            await browserPage.ScreenshotAsync(file, screenshotOptions);
+        }
+
+
         private async Task<IPage> GetBroserPage(IBrowser browser, LanguageCode languageCode, Uri uri)
         {
             var browserPage = await browser.NewPageAsync();
@@ -201,7 +236,6 @@ namespace landerist_library.Downloaders
 
             await browserPage.SetRequestInterceptionAsync(true);
             browserPage.Request += async (sender, e) => await HandleRequestAsync(e, uri);
-
             browserPage.Response += (sender, e) => HandleResponseAsync(e, uri);
 
             return browserPage;

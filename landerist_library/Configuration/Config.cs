@@ -16,7 +16,7 @@
 
         public static readonly int MIN_PAGES_PER_SCRAPE = 20;
 
-        public static readonly int MAX_PAGES_PER_SCRAPE = 1000;        
+        public static readonly int MAX_PAGES_PER_SCRAPE = 1000;
 
         public static readonly int MAX_PAGES_PER_HOSTS_PER_SCRAPE = 5;
 
@@ -74,6 +74,9 @@
         public static string? LANDERIST_COM_OUTPUT { get; set; }
         public static string? LANDERIST_COM_TEMPLATES { get; set; }
         public static string? BACKUPS_DIRECTORY { get; set; }
+        public static string? SCREENSHOTS_DIRECTORY { get; set; }
+        public static string? CHROME_EXTENSIONS_DIRECTORY { get; set; }
+        public static bool TAKE_SCREENSHOT { get; set; }
 
         public static readonly int DAYS_TO_DELETE_BACKUP = 60;
 
@@ -108,6 +111,8 @@
         public const int MAX_PARKINGS = 10000;
 
         public const int DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS = 90;
+
+        
 
         public static bool IsConfigurationProduction()
         {
@@ -150,6 +155,17 @@
             BACKUPS_DIRECTORY = ConfigurationProduction ?
                 PrivateConfig.BACKUPS_DIRECTORY_PRODUCTION :
                 PrivateConfig.BACKUPS_DIRECTORY_LOCAL;
+
+            SCREENSHOTS_DIRECTORY = ConfigurationProduction ?
+                PrivateConfig.SCREENSHOTS_DIRECTORY_PRODUCTION :
+                PrivateConfig.SCREENSHOTS_DIRECTORY_LOCAL;
+
+            TAKE_SCREENSHOT = !ConfigurationProduction;
+
+            CHROME_EXTENSIONS_DIRECTORY = ConfigurationProduction?
+                PrivateConfig.CHROME_EXTENSIONS_DIRECTORY_PRODUCTION :
+                PrivateConfig.CHROME_EXTENSIONS_DIRECTORY_LOCAL;
+
 
             TIMERS_ENABLED = !ConfigurationProduction;
 
