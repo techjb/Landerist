@@ -11,11 +11,11 @@ namespace landerist_library.Parse.Listing.ChatGPT
         //https://platform.openai.com/docs/models/overview  
         public static readonly int MAX_CONTEXT_WINDOW = 
             16385; // gpt-3.5-turbo-0125
-            //128000; // gpt-4-turbo        
-        
+            //128000; // gpt-4o     
+
         private static readonly string Model =
             "gpt-3.5-turbo-0125";
-            //"gpt-4-turbo";
+            //"gpt-4o";
 
         private readonly OpenAIClient OpenAIClient = new(PrivateConfig.OPENAI_API_KEY);
         private readonly string SystemMessage = systemMessage;

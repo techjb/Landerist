@@ -6,7 +6,7 @@ using landerist_library.Configuration;
 
 namespace landerist_library.Parse.Listing.ChatGPT
 {
-    public class ParseListingResponse
+    public class ChatGPTResponse
     {
         public string? FechaDePublicación { get; set; } = null;
 

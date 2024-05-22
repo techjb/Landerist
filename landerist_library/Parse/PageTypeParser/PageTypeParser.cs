@@ -1,4 +1,5 @@
 ﻿using landerist_library.Parse.Listing.ChatGPT;
+using landerist_library.Parse.Listing.Gemini;
 using landerist_library.Websites;
 
 namespace landerist_library.Parse.PageTypeParser
@@ -58,7 +59,7 @@ namespace landerist_library.Parse.PageTypeParser
             {
                 return (PageType.ResponseBodyRepeatedInListings, null);
             }
-            if (ParseListingRequest.TooManyTokens(page))
+            if (ParseListingChatGPT.TooManyTokens(page))
             {
                 return (PageType.ResponseBodyTooManyTokens, null);
             }
@@ -66,7 +67,11 @@ namespace landerist_library.Parse.PageTypeParser
             {
                 return (PageType.HtmlNotSimilarToListing, null);
             }
-            return new ParseListingRequest().Parse(page);
+            if (page.Screenshot != null && page.Screenshot.Length > 0)
+            {
+                return new ParseListingGemini().Parse(page);
+            }
+            return new ParseListingChatGPT().Parse(page);
         }
     }
 }

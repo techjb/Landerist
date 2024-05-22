@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace landerist_library.Parse.Listing.ChatGPT
 {
-    public class ParseListingRequest : ChatGPTRequest
+    public class ParseListingChatGPT : ChatGPTRequest
     {
 
         //public static readonly string SystemMessage =
@@ -35,7 +35,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
         private static readonly List<Tool> Tools = ParseListingTool.GetTools();
 
-        public ParseListingRequest() : base(SystemMessage, Tools)
+        public ParseListingChatGPT() : base(SystemMessage, Tools)
         {
 
         }
@@ -100,7 +100,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             try
             {
                 string arguments = tool.Function.Arguments.ToString();
-                var parseListingResponse = JsonSerializer.Deserialize<ParseListingResponse>(arguments);
+                var parseListingResponse = JsonSerializer.Deserialize<ChatGPTResponse>(arguments);
                 if (parseListingResponse != null)
                 {
                     result.pageType = PageType.ListingButNotParsed;
