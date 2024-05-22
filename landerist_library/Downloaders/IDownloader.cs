@@ -2,11 +2,17 @@
 
 namespace landerist_library.Downloaders
 {
-    internal interface IDownloader
+    public interface IDownloader
     {
-        public void SetResponseBodyAndStatusCode(Page page);
+        public short? HttpStatusCode { get; set; }
 
-        public string? GetRedirectUrl();
+        public string? Content { get; set; }
+
+        public byte[]? Screenshot { get; set; }
+
+        public string? RedirectUrl { get; set; }
+
+        public void Download(Page page);
         
     }
 }

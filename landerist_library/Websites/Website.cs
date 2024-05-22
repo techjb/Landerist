@@ -4,14 +4,10 @@ using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Downloaders;
 using landerist_library.Index;
-using Newtonsoft.Json;
-using System.Collections.Generic;
 using System.Data;
 using System.Net;
 using System.Text;
 using landerist_library.Parse.PageTypeParser;
-using landerist_library.Export;
-using System.Diagnostics.Metrics;
 
 namespace landerist_library.Websites
 {
@@ -441,11 +437,11 @@ namespace landerist_library.Websites
             HttpClientDownloader httpClientDownloader = new();
             try
             {
-                var html = httpClientDownloader.GetAsync(LanguageCode, ListingExampleUri).Result;
-                if (html != null)
+                httpClientDownloader.GetAsync(LanguageCode, ListingExampleUri);
+                if (httpClientDownloader.Content != null)
                 {
                     var htmlDocument = new HtmlDocument();
-                    htmlDocument.LoadHtml(html);
+                    htmlDocument.LoadHtml(httpClientDownloader.Content);
                     ListingExampleNodeSet = ListingSimilarity.GetNodeSetSerialized(htmlDocument);
                     ListingExampleNodeSetUpdated = DateTime.Now;
                     return Update();

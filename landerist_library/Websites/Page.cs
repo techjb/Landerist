@@ -1,6 +1,7 @@
 ﻿using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Database;
+using landerist_library.Downloaders;
 using landerist_library.Index;
 using landerist_library.Tools;
 using landerist_orels.ES;
@@ -37,6 +38,8 @@ namespace landerist_library.Websites
 
         public bool ResponseBodyTextHasChanged { get; set; } = false;
 
+        public byte[]? Screenshot { get; set; }
+
 
         private HtmlDocument? HtmlDocument = null;
 
@@ -49,7 +52,7 @@ namespace landerist_library.Websites
 
         private bool Disposed;
 
-        public Page(Listing listing): this(listing.dataSourceUrl)
+        public Page(Listing listing) : this(listing.dataSourceUrl)
         {
 
         }
@@ -302,11 +305,12 @@ namespace landerist_library.Websites
             return string.IsNullOrEmpty(ResponseBody);
         }
 
-        public void SetResponseBodyAndStatusCode(string? responseBody, short? httpStatusCode)
+        public void SetDownloadedData(IDownloader downloader)
         {
-            ResponseBody = responseBody;
+            ResponseBody = downloader.Content;
             ResponseBodyText = null;
-            HttpStatusCode = httpStatusCode;
+            Screenshot = downloader.Screenshot;
+            HttpStatusCode = downloader.HttpStatusCode;
         }
 
         public void SetResponseBodyText()

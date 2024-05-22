@@ -22,7 +22,7 @@ namespace landerist_library.Scrape
 
         public bool Scrape()
         {
-            Downloader.SetResponseBodyAndStatusCode(Page);
+            Downloader.Download(Page);
             SetPageType();
             UpdateListing();            
             IndexPages();
@@ -95,7 +95,7 @@ namespace landerist_library.Scrape
                 return;
             }
 
-            var redirectUrl = Downloader.GetRedirectUrl();
+            var redirectUrl = Downloader.RedirectUrl;
             if (!string.IsNullOrEmpty(redirectUrl))
             {
                 new Indexer(Page).Insert(redirectUrl);

@@ -6,23 +6,24 @@ namespace landerist_library.Downloaders
 {
     public class HttpClientDownloader: IDownloader
     {
-        private short? HttpStatusCode = null;
-
-        private string? RedirectUrl = null;
+        public short? HttpStatusCode { get; set; } = null;
+        public string? Content { get; set; } = null;
+        public byte[]? Screenshot { get; set; } = null;
+        public string? RedirectUrl { get; set; } = null;
 
         private HttpResponseMessage? HttpResponseMessage;
 
-        public void SetResponseBodyAndStatusCode(Page page)
+        public void Download(Page page)
         {
-            var html = GetAsync(page.Website.LanguageCode, page.Uri).Result;
+            GetAsync(page.Website.LanguageCode, page.Uri);
             if (HttpResponseMessage != null)
             {
                 HttpStatusCode = (short)HttpResponseMessage.StatusCode;
             }
-            page.SetResponseBodyAndStatusCode(html, HttpStatusCode);
+            page.SetDownloadedData(this);
         }
 
-        public async Task<string?> GetAsync(LanguageCode languageCode, Uri uri)
+        public async void GetAsync(LanguageCode languageCode, Uri uri)
         {
             HttpClientHandler handler = new()
             {
@@ -46,13 +47,12 @@ namespace landerist_library.Downloaders
                 HttpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
                 Timers.Timer.SaveTimerDownloadPage(uri.ToString(), dateStart);
                 SetRedirectUrl();
-                return await HttpResponseMessage.Content.ReadAsStringAsync();
+                Content = await HttpResponseMessage.Content.ReadAsStringAsync();
             }
             catch// (Exception exception)
             {
                 //Logs.Log.WriteLogErrors("HttpClientDownloader GetAsync", page.Uri, exception);
             }
-            return null;
         }
 
         private static void SetAccepLanguage(HttpClient httpClient, LanguageCode languageCode)

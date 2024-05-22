@@ -4,7 +4,7 @@
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "1.88";
+        public static readonly string VERSION = "1.90";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
@@ -112,7 +112,7 @@
 
         public const int DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS = 90;
 
-        
+
 
         public static bool IsConfigurationProduction()
         {
@@ -162,7 +162,7 @@
 
             TAKE_SCREENSHOT = !ConfigurationProduction;
 
-            CHROME_EXTENSIONS_DIRECTORY = ConfigurationProduction?
+            CHROME_EXTENSIONS_DIRECTORY = ConfigurationProduction ?
                 PrivateConfig.CHROME_EXTENSIONS_DIRECTORY_PRODUCTION :
                 PrivateConfig.CHROME_EXTENSIONS_DIRECTORY_LOCAL;
 

@@ -3,57 +3,65 @@ using PuppeteerSharp;
 using landerist_library.Configuration;
 using landerist_library.Websites;
 using System.Diagnostics;
-using Amazon.S3.Model.Internal.MarshallTransformations;
-using PuppeteerSharp.Media;
-using System.Runtime.CompilerServices;
 
 
 namespace landerist_library.Downloaders
 {
     public class PuppeteerDownloader : IDownloader
     {
-        private short? HttpStatusCode = null;
-
-        private string? RedirectUrl = null;
-
-        private string? Html = null;
+        public short? HttpStatusCode { get; set; } = null;
+        public string? Content { get; set; } = null;
+        public byte[]? Screenshot { get; set; } = null;
+        public string? RedirectUrl { get; set; } = null;
 
         private bool PuppeterLaunched = false;
 
-        private const bool BlockAllResources = true;
+        private static readonly ScreenshotType ScreenshotType = ScreenshotType.Png;
 
-        private static readonly HashSet<ResourceType> BlockResources = BlockAllResources ?
-            [
-                ResourceType.Image,
-                ResourceType.ImageSet,
-                ResourceType.Img,
-                ResourceType.Font,
-                ResourceType.Media,
-            ] :
-            [
-                ResourceType.Media,
-            ];
+        private static readonly HashSet<ResourceType> BlockResources = Config.TAKE_SCREENSHOT ?
+        [
+            ResourceType.Font,
+            ResourceType.Media,
+        ] :
+        [
+            ResourceType.Image,
+            ResourceType.ImageSet,
+            ResourceType.Img,
+            ResourceType.Font,
+            ResourceType.Media,
+        ];
 
         private static readonly string IDontCareAboutCookies = Config.CHROME_EXTENSIONS_DIRECTORY
             + "IDontCareAboutCookies\\1.0.1_0\\";
 
-        private static readonly LaunchOptions launchOptions = new()
-        {
-            Headless = true, // if false, maybe need to comment await browserPage.SetRequestInterceptionAsync(true);            
-            //Headless = false,
-            Devtools = false,
-            IgnoreHTTPSErrors = true,
-            Args = [
+
+        private static readonly string[] LaunchOptionsArgs = Config.TAKE_SCREENSHOT ?
+            [
                 "--no-sandbox",
                 "--disable-setuid-sandbox",
                 "--disable-infobars",
                 "--window-position=0,0",
                 "--ignore-certificate-errors",
                 "--ignore-certificate-errors-spki-list",
-                
-                //"--disable-extensions-except=" + IDontCareAboutCookies,
-                //"--load-extension=" + IDontCareAboutCookies
-            ],
+                "--disable-extensions-except=" + IDontCareAboutCookies,
+                "--load-extension=" + IDontCareAboutCookies
+            ] :
+            [
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--disable-infobars",
+                "--window-position=0,0",
+                "--ignore-certificate-errors",
+                "--ignore-certificate-errors-spki-list",
+            ];
+
+        private static readonly LaunchOptions launchOptions = new()
+        {
+            //Headless = true, // if false, maybe need to comment await browserPage.SetRequestInterceptionAsync(true);            
+            Headless = Config.IsConfigurationProduction(),
+            Devtools = false,
+            IgnoreHTTPSErrors = true,
+            Args = LaunchOptionsArgs,
         };
 
 
@@ -94,7 +102,7 @@ namespace landerist_library.Downloaders
         {
             try
             {
-                using var browserFetcher = new BrowserFetcher();
+                BrowserFetcher browserFetcher = new();
                 await browserFetcher.DownloadAsync();
                 return true;
             }
@@ -107,18 +115,18 @@ namespace landerist_library.Downloaders
         public static void DoTest()
         {
             // working
-            var page = new Websites.Page("https://34mallorca.com/detalles-del-inmueble/carismatico-edificio-en-el-centro-de-palma/19675687");
+            Websites.Page page = new("https://34mallorca.com/detalles-del-inmueble/carismatico-edificio-en-el-centro-de-palma/19675687");
 
             // http - > https
             //var page = new Websites.Page("http://34mallorca.com/detalles-del-inmueble/carismatico-edificio-en-el-centro-de-palma/19675687");
             //var page = new Websites.Page("http://www.inmogyb.com/es/buscador/alquiler/es/buscador/alquiler/trastero");
 
-            // redirect example:
+            // redirect example: has to throw error
             //var page = new Websites.Page("https://www.realestate.bnpparibas.es/es/soluciones-medida/soluciones-para-inversores");
 
 
             Logs.Log.WriteLogInfo("PuppeterTest", "Starting test");
-            var text = new PuppeteerDownloader().GetText(page);
+            string? text = new PuppeteerDownloader().GetText(page);
 
             Console.WriteLine(text);
             Logs.Log.WriteLogInfo("PuppeterTest", "Result: " + text);
@@ -126,14 +134,13 @@ namespace landerist_library.Downloaders
 
         public string? GetText(Websites.Page page)
         {
-            //DownloadBrowserAsync().Result;
-            var html = GetResponseBody(page);
-            if (html != null)
+            SetContentAndScrenshot(page);
+            if (Content != null)
             {
                 HtmlDocument htmlDocument = new();
                 try
                 {
-                    htmlDocument.LoadHtml(html);
+                    htmlDocument.LoadHtml(Content);
                     return Tools.HtmlToText.GetText(htmlDocument);
                 }
                 catch (Exception exception)
@@ -145,31 +152,33 @@ namespace landerist_library.Downloaders
         }
 
 
-        public void SetResponseBodyAndStatusCode(Websites.Page page)
+        public void Download(Websites.Page page)
         {
-            var responseBody = GetResponseBody(page);
+            SetContentAndScrenshot(page);
             if (PuppeterLaunched)
             {
-                page.SetResponseBodyAndStatusCode(responseBody, HttpStatusCode);
+                page.SetDownloadedData(this);
             }
         }
 
-        public string? GetResponseBody(Websites.Page page)
+        public void SetContentAndScrenshot(Websites.Page page)
         {
             try
             {
-                Html = Task.Run(async () => await GetAsync(page)).Result;
+                (Content, Screenshot) = Task.Run(async () => await GetAsync(page)).Result;
                 PuppeterLaunched = true;
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("PuppeterDownloader GetResponseBody", exception);
+                Logs.Log.WriteLogErrors("PuppeterDownloader GetContent", exception);
             }
-            return Html;
         }
 
-        private async Task<string?> GetAsync(Websites.Page page)
+        private async Task<(string? content, byte[]? screenShot)> GetAsync(Websites.Page page)
         {
+            string? content = null;
+            byte[]? screenShot = null;
+
             IBrowser? browser = null;
             IPage? browserPage = null;
 
@@ -180,14 +189,10 @@ namespace landerist_library.Downloaders
                 browserPage = await GetBroserPage(browser, page.Website.LanguageCode, page.Uri);
                 await browserPage.GoToAsync(page.Uri.ToString(), WaitUntilNavigation.Networkidle0);
 
-                if (Config.TAKE_SCREENSHOT)
-                {
-                    await TakeScreenshot(browserPage, page);
-                }
-
-                return await browserPage.GetContentAsync();
+                content = await browserPage.GetContentAsync();
+                screenShot = await TakeScreenshot(browserPage, page);
             }
-            catch (Exception exception)
+            catch
             {
 
             }
@@ -203,30 +208,47 @@ namespace landerist_library.Downloaders
                     browser.Dispose();
                 }
             }
-            return null;
+            return (content, screenShot);
         }
 
-        private static async Task TakeScreenshot(IPage browserPage, Websites.Page page)
+        private static async Task<byte[]?> TakeScreenshot(IPage browserPage, Websites.Page page)
         {
-            var type = ScreenshotType.Jpeg;
-            string file = Config.SCREENSHOTS_DIRECTORY + page.UriHash.ToString() + "." + type.ToString().ToLower();
-            var screenshotOptions = new ScreenshotOptions
+            if (!Config.TAKE_SCREENSHOT)
             {
-                Type = type,
+                return null;
+            }
+
+            string file = Config.SCREENSHOTS_DIRECTORY + page.UriHash.ToString() + "." + ScreenshotType.ToString().ToLower();
+            ScreenshotOptions screenshotOptions = new()
+            {
+                Type = ScreenshotType,
                 FullPage = true,
-                OmitBackground = true,                
+                OmitBackground = true,
             };
-            if (type.Equals(ScreenshotType.Jpeg))
+            if (ScreenshotType.Equals(ScreenshotType.Jpeg))
             {
                 screenshotOptions.Quality = 90;
             }
-            await browserPage.ScreenshotAsync(file, screenshotOptions);
+            try
+            {
+                await browserPage.ScreenshotAsync(file, screenshotOptions);
+                return File.ReadAllBytes(file);
+            }
+            catch(Exception exception) 
+            {
+                Logs.Log.WriteLogErrors("PuppeteerDownloader TakeScreenshot", exception);
+            }
+            finally
+            {
+                File.Delete(file);
+            }
+            return null;
         }
 
 
         private async Task<IPage> GetBroserPage(IBrowser browser, LanguageCode languageCode, Uri uri)
         {
-            var browserPage = await browser.NewPageAsync();
+            IPage browserPage = await browser.NewPageAsync();
             if (Config.IsConfigurationProduction())
             {
                 browserPage.DefaultNavigationTimeout = Config.HTTPCLIENT_SECONDS_TIMEOUT * 1000;
@@ -258,7 +280,7 @@ namespace landerist_library.Downloaders
             }
         }
 
-        private async Task HandleRequestAsync(RequestEventArgs e, Uri uri)
+        private static async Task HandleRequestAsync(RequestEventArgs e, Uri uri)
         {
             if (BlockResources.Contains(e.Request.ResourceType))
             {
@@ -302,15 +324,10 @@ namespace landerist_library.Downloaders
             }
         }
 
-        public string? GetRedirectUrl()
-        {
-            return RedirectUrl;
-        }
-
         public static void KillChrome()
         {
             Process[] processes = Process.GetProcessesByName("chrome");
-            foreach (var process in processes)
+            foreach (Process process in processes)
             {
                 try
                 {
