@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace landerist_library.Parse.Listing.Gemini
+namespace landerist_library.Parse.Listing._Gemini
 {
     public class NotListingService : INotListingService
     {

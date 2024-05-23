@@ -559,6 +559,7 @@ namespace landerist_library.Websites
                 ResponseBody = null;
                 ResponseBodyText = null;
                 ResponseBodyTextHash = null;
+                Screenshot = null;
 
                 Website.Dispose();
             }

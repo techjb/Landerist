@@ -1,7 +1,7 @@
 ﻿using GenerativeAI;
 using System.ComponentModel;
 
-namespace landerist_library.Parse.Listing.Gemini
+namespace landerist_library.Parse.Listing._Gemini
 {
     [GenerativeAIFunctions]
     public interface IListingService
