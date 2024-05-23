@@ -22,11 +22,6 @@ namespace landerist_library.Parse.Listing.ChatGPT
         private readonly List<Tool>? Tools = tools;
         private readonly string? ToolChoice = "auto";
 
-        public ChatGPTRequest(string systemMessage, Tool tool) : this(systemMessage, [tool])
-        {
-            ToolChoice = tool.Function.Name;
-        }
-
         protected ChatResponse? GetResponse(string? userInput)
         {
             if (string.IsNullOrEmpty(userInput))

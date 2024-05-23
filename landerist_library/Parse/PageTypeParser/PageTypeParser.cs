@@ -67,7 +67,7 @@ namespace landerist_library.Parse.PageTypeParser
             {
                 return (PageType.HtmlNotSimilarToListing, null);
             }
-            if (page.Screenshot != null && page.Screenshot.Length > 0)
+            if (page.ContainsValidScreenshot())
             {
                 return new ParseListingGemini().Parse(page);
             }

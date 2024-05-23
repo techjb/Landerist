@@ -566,5 +566,13 @@ namespace landerist_library.Websites
             Disposed = true;
             GC.SuppressFinalize(this);
         }
+
+        public bool ContainsValidScreenshot()
+        {
+            return Screenshot != null &&
+                Screenshot.Length > 0 &&
+                Screenshot.Length < Config.MAX_SCREENSHOT_SIZE;
+            ;
+        }
     }
 }

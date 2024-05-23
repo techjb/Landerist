@@ -1,5 +1,4 @@
-﻿using GenerativeAI.Classes;
-using GenerativeAI.Models;
+﻿using GenerativeAI.Models;
 using GenerativeAI.Services;
 using GenerativeAI.Types;
 using landerist_library.Configuration;
@@ -9,9 +8,52 @@ namespace landerist_library.Parse.Listing.Gemini
 {
     public class ParseListingGemini
     {
-        private readonly string Prompt = "Dime si la siguiente imagen corresponde a un anuncio inmobiliario o no";
+        private static readonly string Prompt = 
+            "Dime si la siguiente imagen corresponde a un único anuncio inmobiliario o no";
 
-        private const string ModelName = "gemini-1.5-flash-latest";
+        //public static readonly string Prompt =
+        //  "Procesa la imagen proporcionada identificando si corresponde a un único anuncio inmobiliario. " +
+        //  "De ser así, deberás analizar meticulosamente el contenido para determinar que efectivamente se trata de un único anuncio y proceder a extraer los datos relevantes.  " +
+        //  "Estos deberán ser presentados en un formato estructurado JSON, asegurando una precisión exhaustiva en la identificación y extracción de los elementos clave. " +
+        //  "Es imperativo que mantengas un enfoque riguroso durante este proceso para ofrecer la respuesta más precisa y de la más alta calidad posible.";
+
+        private readonly ModelParams ModelParams = new()
+        {
+            Model = "gemini-1.5-pro-latest",
+            GenerationConfig = new GenerationConfig
+            {
+                Temperature = 0,                                
+            },                        
+            SafetySettings = 
+            [
+                new SafetySetting()
+                {
+                    Category = HarmCategory.HARM_CATEGORY_HARASSMENT,
+                    Threshold = HarmBlockThreshold.BLOCK_ONLY_HIGH
+                },
+                new SafetySetting()
+                {
+                    Category = HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                    Threshold = HarmBlockThreshold.BLOCK_ONLY_HIGH
+                },
+                new SafetySetting()
+                {
+                    Category = HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                    Threshold = HarmBlockThreshold.BLOCK_ONLY_HIGH
+                },
+                new SafetySetting()
+                {
+                    Category = HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                    Threshold = HarmBlockThreshold.BLOCK_ONLY_HIGH
+                },
+                //new SafetySetting() // throws error
+                //{
+                //    Category = HarmCategory.HARM_CATEGORY_UNSPECIFIED,
+                //    Threshold = HarmBlockThreshold.BLOCK_ONLY_HIGH
+                //},
+            ]
+        };
+
         public (PageType pageType, landerist_orels.ES.Listing? listing) Parse(Page page)
         {
             (PageType pageType, landerist_orels.ES.Listing? listing) result = (PageType.MayBeListing, null);
@@ -29,21 +71,34 @@ namespace landerist_library.Parse.Listing.Gemini
 
         private async Task<string?> Parse(byte[] screenshot)
         {
-            var modelParams = new ModelParams
+            try
             {
-                Model = ModelName,
-                GenerationConfig = new GenerationConfig
-                {
-                    Temperature = 0,                    
-                }                
-            };            
-
-            var model = new GenerativeModel(PrivateConfig.GEMINI_API_KEY, modelParams);
-
-            var textPart = new Part()
+                var parts = GetParts(screenshot);
+                var model = GetModel();
+                var result = await model.GenerateContentAsync(parts);                
+                var text = result.Text();
+                var function = result.GetFunction();
+                var candidates = result.Candidates;
+                return text;
+            }
+            catch (Exception ex)
             {
-                Text = Prompt
-            };            
+
+            }
+            return null;
+        }
+
+        private static Part[] GetParts(byte[] screenshot)
+        {
+            var listingService = new ListingService();
+
+            var textPart = new Part
+            {
+                Text = Prompt,
+                //FunctionResponse = listingService.
+            };
+            
+
 
             var imagePart = new Part()
             {
@@ -54,18 +109,19 @@ namespace landerist_library.Parse.Listing.Gemini
                 }
             };
 
-            var parts = new[] { textPart, imagePart };
+            return [textPart, imagePart];
+        }
 
-            try
-            {
-                var result = await model.GenerateContentAsync(parts);
-                return result.Text();
-            }
-            catch (Exception ex)
-            {
+        private GenerativeModel GetModel()
+        {
+            var listingService = new ListingService();
+            var notListingService = new NotListingService();
+            var model = new GenerativeModel(PrivateConfig.GEMINI_API_KEY, ModelParams);
 
-            }
-            return null;
+            model.AddGlobalFunctions(listingService.AsGoogleFunctions(), listingService.AsGoogleCalls());
+            model.AddGlobalFunctions(notListingService.AsGoogleFunctions(), notListingService.AsGoogleCalls());            
+            
+            return model;
         }
 
         public static void Test()
