@@ -1,5 +1,5 @@
 ﻿using landerist_library.Parse.Listing.ChatGPT;
-using landerist_library.Parse.Listing.Gemini;
+using landerist_library.Parse.Listing.VertexAI;
 using landerist_library.Websites;
 
 namespace landerist_library.Parse.PageTypeParser
@@ -69,7 +69,7 @@ namespace landerist_library.Parse.PageTypeParser
             }
             if (page.ContainsValidScreenshot())
             {
-                return new ParseListingGemini().Parse(page);
+                return new ParseListingVertexAI().Parse(page);
             }
             return new ParseListingChatGPT().Parse(page);
         }

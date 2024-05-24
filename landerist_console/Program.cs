@@ -202,7 +202,7 @@ namespace landerist_console
 
             //new ChatGPTRequest().ListModels();
 
-            landerist_library.Parse.Listing.Gemini.ParseListingGemini.Test();
+            landerist_library.Parse.Listing.VertexAI.ParseListingVertexAI.Test();
 
             #endregion
 
