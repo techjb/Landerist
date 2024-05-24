@@ -4,14 +4,16 @@ using landerist_library.Configuration;
 using landerist_library.Parse.Listing.ChatGPT;
 using landerist_library.Websites;
 using static Google.Cloud.AIPlatform.V1.NearestNeighborQuery.Types;
+using static Google.Cloud.AIPlatform.V1.SafetySetting.Types;
+
 
 namespace landerist_library.Parse.Listing.VertexAI
 {
     public class ParseListingVertexAI
     {
         private static readonly string ModelName =
-                            //"gemini-1.5-flash-preview-0514";
-                            "gemini-1.5-pro-preview-0514";
+                            "gemini-1.5-flash-preview-0514";
+        //"gemini-1.5-pro-preview-0514";
 
         private static readonly string ProjectId = "landerist";
 
@@ -99,17 +101,42 @@ namespace landerist_library.Parse.Listing.VertexAI
                 {
                     Temperature = 0,
                 },
+                SafetySettings =
+                {
+                    new SafetySetting
+                    {
+                        Category = HarmCategory.HateSpeech,
+                        Threshold = HarmBlockThreshold.BlockOnlyHigh
+                    },
+                    new SafetySetting
+                    {
+                        Category = HarmCategory.DangerousContent,
+                        Threshold = HarmBlockThreshold.BlockOnlyHigh
+                    },
+                    new SafetySetting
+                    {
+                        Category = HarmCategory.Harassment,
+                        Threshold = HarmBlockThreshold.BlockOnlyHigh
+                    },
+                    new SafetySetting
+                    {
+                        Category = HarmCategory.SexuallyExplicit,
+                        Threshold = HarmBlockThreshold.BlockOnlyHigh
+                    },
+                },
                 Tools =
                 {
                     new Tool
                     {
                         FunctionDeclarations =
                         {
-                            IsListingFunctionDeclaration()
-                        },                        
+                            new FunctionDeclaration
+                            {
+                                Name = "resultado",
+                            }
+                        },
                     },
                 },
-                
 
                 SystemInstruction = new Content
                 {
@@ -128,20 +155,20 @@ namespace landerist_library.Parse.Listing.VertexAI
         {
             return new FunctionDeclaration
             {
-                Name = "resultado_de_la_consulta",
-                Description = "Trata el resultado de la consulta",
-                Parameters = new OpenApiSchema
-                {
-                    Type = Google.Cloud.AIPlatform.V1.Type.Object,
-                    Properties =
-                        {
-                            ["es_un_anuncio"] = new()
-                            {
-                                Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
-                                Description = "true si a imagen es un anuncio, false en caso contrario"
-                            },
-                        },
-                }
+                Name = "resultado",
+                //Description = "Trata el resultado de la consulta",
+                //Parameters = new OpenApiSchema
+                //{
+                //    Type = Google.Cloud.AIPlatform.V1.Type.Object,
+                //    Properties =
+                //        {
+                //            ["es_un_anuncio"] = new()
+                //            {
+                //                Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
+                //                Description = "true si a imagen es un anuncio, false en caso contrario"
+                //            },
+                //        },
+                //}
                 //Name = ParseListingTool.FunctionNameIsListing,
                 //Description = ParseListingTool.FunctionDescriptionIsListing,
 
