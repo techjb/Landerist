@@ -218,7 +218,6 @@ namespace landerist_library.Downloaders
                 return null;
             }
 
-            string file = Config.SCREENSHOTS_DIRECTORY + page.UriHash.ToString() + "." + ScreenshotType.ToString().ToLower();
             ScreenshotOptions screenshotOptions = new()
             {
                 Type = ScreenshotType,
@@ -231,17 +230,12 @@ namespace landerist_library.Downloaders
             }
             try
             {
-                await browserPage.ScreenshotAsync(file, screenshotOptions);
-                return File.ReadAllBytes(file);
+                return await browserPage.ScreenshotDataAsync(screenshotOptions);                
             }
             catch(Exception exception) 
             {
                 Logs.Log.WriteLogErrors("PuppeteerDownloader TakeScreenshot", exception);
-            }
-            finally
-            {
-                File.Delete(file);
-            }
+            }            
             return null;
         }
 

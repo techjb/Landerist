@@ -69,7 +69,7 @@ namespace landerist_library.Parse.PageTypeParser
             }
             if (page.ContainsValidScreenshot())
             {
-                return new ParseListingVertexAI().Parse(page);
+                return ParseListingVertexAI.Parse(page);
             }
             return new ParseListingChatGPT().Parse(page);
         }
