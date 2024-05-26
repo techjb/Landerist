@@ -91,15 +91,16 @@ namespace landerist_library.Parse.Listing.VertexAI
                                     Data = ByteString.CopyFrom(screenshot)
                                 }
                             },
-                            new Part {
-                                Text = "Captura de pantalla"
+                            new Part 
+                            {
+                                Text = "Captura de pantalla"                                                                
                             },
                         }
                     }
                 },
                 GenerationConfig = new GenerationConfig()
                 {
-                    Temperature = 0,
+                    Temperature = 0f,
                 },
                 SafetySettings =
                 {
@@ -130,10 +131,14 @@ namespace landerist_library.Parse.Listing.VertexAI
                     {
                         FunctionDeclarations =
                         {
-                            new FunctionDeclaration
-                            {
-                                Name = "resultado",
-                            }
+                            IsListingFunctionDeclaration()
+                        },
+                    },
+                    new Tool
+                    {
+                        FunctionDeclarations =
+                        {
+                            IsNotListingFunctionDeclaration()
                         },
                     },
                 },
@@ -155,40 +160,26 @@ namespace landerist_library.Parse.Listing.VertexAI
         {
             return new FunctionDeclaration
             {
-                Name = "resultado",
-                //Description = "Trata el resultado de la consulta",
-                //Parameters = new OpenApiSchema
-                //{
-                //    Type = Google.Cloud.AIPlatform.V1.Type.Object,
-                //    Properties =
-                //        {
-                //            ["es_un_anuncio"] = new()
-                //            {
-                //                Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
-                //                Description = "true si a imagen es un anuncio, false en caso contrario"
-                //            },
-                //        },
-                //}
-                //Name = ParseListingTool.FunctionNameIsListing,
-                //Description = ParseListingTool.FunctionDescriptionIsListing,
+                Name = ParseListingTool.FunctionNameIsListing,
+                Description = ParseListingTool.FunctionDescriptionIsListing,
 
-                //Parameters = new OpenApiSchema
-                //{
-                //    Type = Google.Cloud.AIPlatform.V1.Type.Object,
-                //    Properties =
-                //    {
-                //        ["es_un_anuncio"] = new()
-                //        {
-                //            Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
-                //            Description = "La imagen es un anuncio"
-                //        },                        
-                //    },
+                Parameters = new OpenApiSchema
+                {
+                    Type = Google.Cloud.AIPlatform.V1.Type.Object,
+                    Properties =
+                    {
+                        ["es_un_anuncio"] = new()
+                        {
+                            Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
+                            Description = "La imagen es un anuncio"
+                        },
+                    },
 
-                //}
+                }
             };
         }
 
-        private static FunctionDeclaration IsNotListingFuncionDeclaration()
+        private static FunctionDeclaration IsNotListingFunctionDeclaration()
         {
             return new FunctionDeclaration
             {
@@ -212,7 +203,8 @@ namespace landerist_library.Parse.Listing.VertexAI
 
         public static void Test()
         {
-            var d = TextInput().Result;
+            //var d = TextInput().Result;
+            var d = GenerateFunctionCall().Result;
         }
 
         private static async Task<string> TextInput()
@@ -243,18 +235,151 @@ namespace landerist_library.Parse.Listing.VertexAI
                 {
                     Temperature = 0,
                 },
-                SystemInstruction = new Content
-                {
-                    Role = "USER",
-                    Parts =
-                        {
-                            new Part { Text = SystemPrompt }
-                        }
-                }
+
+                //SystemInstruction = new Content
+                //{
+                //    Role = "USER",
+                //    Parts =
+                //        {
+                //            new Part { Text = SystemPrompt }
+                //        }
+                //}
 
             };
 
             GenerateContentResponse response = await predictionServiceClient.GenerateContentAsync(generateContentRequest);
+
+            string responseText = response.Candidates[0].Content.Parts[0].Text;
+            Console.WriteLine(responseText);
+
+            return responseText;
+        }
+
+        public static async Task<string> GenerateFunctionCall()
+        {
+            var predictionServiceClient = GetPredictionServiceClient();
+
+            // Define the user's prompt in a Content object that we can reuse in
+            // model calls
+            var userPromptContent = new Content
+            {
+                Role = "USER",
+                Parts =
+            {
+                new Part { Text = "What is the weather like in Boston?" }
+            }
+            };
+
+            // Specify a function declaration and parameters for an API request
+            var functionName = "get_current_weather";
+            var getCurrentWeatherFunc = new FunctionDeclaration
+            {
+                Name = functionName,
+                //Description = "Get the current weather in a given location",
+                //Parameters = new OpenApiSchema
+                //{
+                //    Type = Google.Cloud.AIPlatform.V1.Type.Object,
+                //    Properties =
+                //    {
+                //        ["location"] = new()
+                //        {
+                //            Type = Google.Cloud.AIPlatform.V1.Type.String,
+                //            Description = "Get the current weather in a given location"
+                //        },
+                //        ["unit"] = new()
+                //        {
+                //            Type = Google.Cloud.AIPlatform.V1.Type.String,
+                //            Description = "The unit of measurement for the temperature",
+                //            Enum = {"celsius", "fahrenheit"}
+                //        }
+                //    },
+                //    Required = { "location" }
+                //}
+            };
+
+            // Send the prompt and instruct the model to generate content using the tool that you just created
+            var generateContentRequest = new GenerateContentRequest
+            {
+                Model = $"projects/{ProjectId}/locations/{Location}/publishers/{Publisher}/models/{ModelName}",
+                GenerationConfig = new GenerationConfig
+                {
+                    Temperature = 0f
+                },
+                Contents =
+                {
+                    userPromptContent
+                },
+                Tools =
+                {
+                    new Tool
+                    {
+                        FunctionDeclarations = { getCurrentWeatherFunc }
+                    }
+                }
+            };
+
+            GenerateContentResponse response = await predictionServiceClient.GenerateContentAsync(generateContentRequest);
+
+            var functionCall = response.Candidates[0].Content.Parts[0].FunctionCall;
+            Console.WriteLine(functionCall);
+
+            string apiResponse = "";
+
+
+            // Check the function name that the model responded with, and make an API call to an external system
+            if (functionCall.Name == functionName)
+            {
+                // Extract the arguments to use in your API call
+                string locationCity = functionCall.Args.Fields["location"].StringValue;
+
+                // Here you can use your preferred method to make an API request to
+                // fetch the current weather
+
+                // In this example, we'll use synthetic data to simulate a response
+                // payload from an external API
+                apiResponse = @"{ ""location"": ""Boston, MA"",
+                    ""temperature"": 38, ""description"": ""Partly Cloudy""}";
+            }
+
+            // Return the API response to Gemini so it can generate a model response or request another function call
+            generateContentRequest = new GenerateContentRequest
+            {
+                Model = $"projects/{ProjectId}/locations/{Location}/publishers/{Publisher}/models/{ModelName}",
+                Contents =
+            {
+                userPromptContent, // User prompt
+                response.Candidates[0].Content, // Function call response,
+                new Content
+                {
+                    Parts =
+                    {
+                        new Part
+                        {
+                            FunctionResponse = new()
+                            {
+                                Name = functionName,
+                                Response = new()
+                                {
+                                    //Fields =
+                                    //{
+                                    //    { "content", new Value { StringValue = apiResponse } }
+                                    //}
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+                Tools =
+            {
+                new Tool
+                {
+                    FunctionDeclarations = { getCurrentWeatherFunc }
+                }
+            }
+            };
+
+            response = await predictionServiceClient.GenerateContentAsync(generateContentRequest);
 
             string responseText = response.Candidates[0].Content.Parts[0].Text;
             Console.WriteLine(responseText);
