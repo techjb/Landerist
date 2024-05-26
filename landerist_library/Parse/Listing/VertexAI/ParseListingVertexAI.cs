@@ -3,7 +3,6 @@ using Google.Protobuf;
 using landerist_library.Configuration;
 using landerist_library.Parse.Listing.ChatGPT;
 using landerist_library.Websites;
-using static Google.Cloud.AIPlatform.V1.NearestNeighborQuery.Types;
 using static Google.Cloud.AIPlatform.V1.SafetySetting.Types;
 
 
@@ -185,29 +184,29 @@ namespace landerist_library.Parse.Listing.VertexAI
             {
                 Name = ParseListingTool.FunctionNameIsNotListing,
                 Description = ParseListingTool.FunctionDescriptionIsNotListing,
-                //Parameters = new OpenApiSchema
-                //{
-                //    Type = Google.Cloud.AIPlatform.V1.Type.Object,
-                //    Properties =
-                //    {
-                //        ["no_es_un_anuncio"] = new()
-                //        {
-                //            Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
-                //            Description = "La imagen no es un anuncio"
-                //        },
-                //    },
+                Parameters = new OpenApiSchema
+                {
+                    Type = Google.Cloud.AIPlatform.V1.Type.Object,
+                    Properties =
+                    {
+                        ["no_es_un_anuncio"] = new()
+                        {
+                            Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
+                            Description = "La imagen no es un anuncio"
+                        },
+                    },
 
-                //}
+                }
             };
         }
 
         public static void Test()
         {
-            //var d = TextInput().Result;
-            var d = GenerateFunctionCall().Result;
+            //var d = SimpleInputTest().Result;
+            var d = FunctionCallTest().Result;
         }
 
-        private static async Task<string> TextInput()
+        private static async Task<string> SimpleInputTest()
         {
             var predictionServiceClient = new PredictionServiceClientBuilder
             {
@@ -235,16 +234,6 @@ namespace landerist_library.Parse.Listing.VertexAI
                 {
                     Temperature = 0,
                 },
-
-                //SystemInstruction = new Content
-                //{
-                //    Role = "USER",
-                //    Parts =
-                //        {
-                //            new Part { Text = SystemPrompt }
-                //        }
-                //}
-
             };
 
             GenerateContentResponse response = await predictionServiceClient.GenerateContentAsync(generateContentRequest);
@@ -255,7 +244,7 @@ namespace landerist_library.Parse.Listing.VertexAI
             return responseText;
         }
 
-        public static async Task<string> GenerateFunctionCall()
+        public static async Task<string> FunctionCallTest()
         {
             var predictionServiceClient = GetPredictionServiceClient();
 

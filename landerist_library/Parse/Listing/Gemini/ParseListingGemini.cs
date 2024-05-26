@@ -64,9 +64,7 @@ namespace landerist_library.Parse.Listing.Gemini
             }
 
             string? text = Parse(page.Screenshot).Result;
-
             Console.WriteLine(text);
-
             return result;
         }
 
