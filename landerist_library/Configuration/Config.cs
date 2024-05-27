@@ -4,7 +4,7 @@
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "1.90";
+        public static readonly string VERSION = "1.91";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
@@ -162,7 +162,8 @@
                 PrivateConfig.SCREENSHOTS_DIRECTORY_PRODUCTION :
                 PrivateConfig.SCREENSHOTS_DIRECTORY_LOCAL;
 
-            TAKE_SCREENSHOT = !ConfigurationProduction;
+            TAKE_SCREENSHOT = false;
+            //TAKE_SCREENSHOT = !ConfigurationProduction;
 
             CHROME_EXTENSIONS_DIRECTORY = ConfigurationProduction ?
                 PrivateConfig.CHROME_EXTENSIONS_DIRECTORY_PRODUCTION :

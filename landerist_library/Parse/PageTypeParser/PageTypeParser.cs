@@ -1,4 +1,5 @@
-﻿using landerist_library.Parse.Listing.ChatGPT;
+﻿using landerist_library.Parse.Listing;
+using landerist_library.Parse.Listing.ChatGPT;
 using landerist_library.Parse.Listing.VertexAI;
 using landerist_library.Websites;
 
@@ -59,7 +60,7 @@ namespace landerist_library.Parse.PageTypeParser
             {
                 return (PageType.ResponseBodyRepeatedInListings, null);
             }
-            if (ParseListingChatGPT.TooManyTokens(page))
+            if (ChatGPTRequest.TooManyTokens(page))
             {
                 return (PageType.ResponseBodyTooManyTokens, null);
             }
@@ -69,9 +70,14 @@ namespace landerist_library.Parse.PageTypeParser
             }
             if (page.ContainsValidScreenshot())
             {
-                return ParseListingVertexAI.Parse(page);
+                return ParseListingVertexAI.ParseScreenshot(page);
             }
-            return new ParseListingChatGPT().Parse(page);
+            
+            //if (!Configuration.Config.IsConfigurationProduction())
+            //{
+            //    return ParseListingVertexAI.ParseText(page);
+            //}
+            return ParseListing.ParseText(page);
         }
     }
 }

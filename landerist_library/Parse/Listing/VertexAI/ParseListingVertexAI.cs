@@ -12,7 +12,7 @@ namespace landerist_library.Parse.Listing.VertexAI
     {
         private static readonly string ModelName =
                             "gemini-1.5-flash-preview-0514";
-        //"gemini-1.5-pro-preview-0514";
+                            //"gemini-1.5-pro-preview-0514";
 
         private static readonly string ProjectId = "landerist";
 
@@ -26,7 +26,7 @@ namespace landerist_library.Parse.Listing.VertexAI
             "Tu tarea es determinar si la imagen es la página web de un único anuncio inmobiliario o no.";
 
 
-        public static (PageType pageType, landerist_orels.ES.Listing? listing) Parse(Page page)
+        public static (PageType pageType, landerist_orels.ES.Listing? listing) ParseScreenshot(Page page)
         {
             (PageType pageType, landerist_orels.ES.Listing? listing) result = (PageType.MayBeListing, null);
             if (page.Screenshot == null || page.Screenshot.Length == 0)
@@ -34,13 +34,13 @@ namespace landerist_library.Parse.Listing.VertexAI
                 return result;
             }
 
-            string? text = Parse(page.Screenshot).Result;
+            string? text = ParseScreenshot(page.Screenshot).Result;
             Console.WriteLine(text);
 
             return result;
         }
 
-        private static async Task<string?> Parse(byte[] screenshot)
+        private static async Task<string?> ParseScreenshot(byte[] screenshot)
         {
             try
             {
@@ -60,6 +60,19 @@ namespace landerist_library.Parse.Listing.VertexAI
             return null;
         }
 
+        public static (PageType pageType, landerist_orels.ES.Listing? listing) ParseText(Page page)
+        {
+            (PageType pageType, landerist_orels.ES.Listing? listing) result = (PageType.MayBeListing, null);
+            if (page.Screenshot == null || page.Screenshot.Length == 0)
+            {
+                return result;
+            }
+
+            string? text = ParseScreenshot(page.Screenshot).Result;
+            Console.WriteLine(text);
+
+            return result;
+        }
 
         private static PredictionServiceClient GetPredictionServiceClient()
         {
@@ -159,8 +172,8 @@ namespace landerist_library.Parse.Listing.VertexAI
         {
             return new FunctionDeclaration
             {
-                Name = ParseListingTool.FunctionNameIsListing,
-                Description = ParseListingTool.FunctionDescriptionIsListing,
+                Name = ChatGPTTools.FunctionNameIsListing,
+                Description = ChatGPTTools.FunctionDescriptionIsListing,
 
                 Parameters = new OpenApiSchema
                 {
@@ -182,8 +195,8 @@ namespace landerist_library.Parse.Listing.VertexAI
         {
             return new FunctionDeclaration
             {
-                Name = ParseListingTool.FunctionNameIsNotListing,
-                Description = ParseListingTool.FunctionDescriptionIsNotListing,
+                Name = ChatGPTTools.FunctionNameIsNotListing,
+                Description = ChatGPTTools.FunctionDescriptionIsNotListing,
                 Parameters = new OpenApiSchema
                 {
                     Type = Google.Cloud.AIPlatform.V1.Type.Object,

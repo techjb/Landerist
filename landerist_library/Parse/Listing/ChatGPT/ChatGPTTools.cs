@@ -3,7 +3,7 @@ using System.Text.Json.Nodes;
 
 namespace landerist_library.Parse.Listing.ChatGPT
 {
-    public class ParseListingTool : ChatGPTResponse
+    public class ChatGPTTools : ParseListingFunction
     {
         public const string FunctionNameIsListing = "si_es_un_anuncio";
         public static readonly string FunctionDescriptionIsListing = "El texto introducido corresponde a un único anuncio inmobiliario";

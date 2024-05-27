@@ -2,9 +2,9 @@
 using landerist_library.Websites;
 using System.Text.RegularExpressions;
 
-namespace landerist_library.Parse.Listing.ChatGPT
+namespace landerist_library.Parse.Listing
 {
-    public partial class UserInput
+    public partial class UserTextInput
     {
         private static readonly HashSet<string> TagsToRemove =
         [
@@ -42,7 +42,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             return string.Join(" | ", TagsToRemove.ToList());
         }
 
-        public static string? Parse(Page page)
+        public static string? GetText(Page page)
         {
             return page.ResponseBodyText;
 

@@ -4,9 +4,9 @@ using landerist_orels.ES;
 using System.Text.Json.Nodes;
 using landerist_library.Configuration;
 
-namespace landerist_library.Parse.Listing.ChatGPT
+namespace landerist_library.Parse.Listing
 {
-    public class ChatGPTResponse
+    public class ParseListingFunction
     {
         public string? FechaDePublicación { get; set; } = null;
 
@@ -229,7 +229,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             return
                 IsValidTipoDeOperacion() &&
                 IsValidTipoDeInmueble() &&
-                IsValidListingDate() && 
+                IsValidListingDate() &&
                 IsValidDescription()
                 ;
         }
