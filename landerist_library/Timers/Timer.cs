@@ -7,7 +7,10 @@ namespace landerist_library.Timers
     {
         private const string TABLE_TIMERS = "[TIMERS]";
 
+        public const string TimerKeyVertexAI = "vertexai";
+
         public const string TimerKeyChatGPT = "chatgpt";
+
         public const string TimerKeyDownloadPage = "downloadpage";
 
         public static void SaveTimer(string timerKey, DateTime dateStart)
@@ -55,6 +58,11 @@ namespace landerist_library.Timers
         public static void SaveTimerChatGPT(string source, DateTime dateStart)
         {
             SaveTimer(TimerKeyChatGPT, source, dateStart);
+        }
+
+        public static void SaveTimerVertexAI(string source, DateTime dateStart)
+        {
+            SaveTimer(TimerKeyVertexAI, source, dateStart);
         }
 
         public static void SaveTimerDownloadPage(string source, DateTime dateStart)

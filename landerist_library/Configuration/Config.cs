@@ -4,7 +4,7 @@
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "1.91";
+        public static readonly string VERSION = "1.92";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
@@ -32,7 +32,7 @@
 
         public static readonly int MIN_RESPONSEBODYTEXT_LENGTH = 50;
 
-        public static readonly int MAX_RESPONSEBODYTEXT_LENGTH = 10000;
+        public static readonly int MAX_RESPONSEBODYTEXT_LENGTH = 100000;
 
         public static readonly int MAX_PAGETYPE_COUNTER = 1000;
         public static bool SCRAPE_WITH_PARALELISM { get; set; }
@@ -114,9 +114,9 @@
 
         public const int DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS = 90;
 
-        public const bool PARSE_TEXT_WITH_FULL_HTML = false;
-        public static bool USE_VERTEX_AI_TO_PARSE_TEXT { get; set; }
+        public const bool PARSE_TEXT_WITH_FULL_HTML = true;
 
+        public const bool PARSE_TEXT_WITH_VERTEX_AI = true;
 
 
     public static bool IsConfigurationProduction()
@@ -176,8 +176,6 @@
             TIMERS_ENABLED = !ConfigurationProduction;
 
             SCRAPE_WITH_PARALELISM = ConfigurationProduction;
-
-            USE_VERTEX_AI_TO_PARSE_TEXT = !ConfigurationProduction;
         }
 
         private static void InitDatabase(bool configurationProduction)

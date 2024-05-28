@@ -3,7 +3,6 @@ using landerist_library.Configuration;
 using landerist_library.Websites;
 using OpenAI;
 using OpenAI.Chat;
-using System.Text.Json;
 
 namespace landerist_library.Parse.Listing.ChatGPT
 {
@@ -55,18 +54,19 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
             //https://github.com/dluc/openai-tools
             int systemTokens = GPT3Tokenizer.Encode(SystemPrompt).Count;
-            int userTokens = GPT3Tokenizer.Encode(page.ResponseBodyText).Count;
+            string? text = UserTextInput.GetText(page);
+            if(text == null)
+            {
+                return false;
+            }
+            int userTokens = GPT3Tokenizer.Encode(text).Count;
 
             int totalTokens = systemTokens + userTokens;
             return totalTokens > MAX_CONTEXT_WINDOW;
         }
 
-        public static ChatResponse? GetResponse(string? userInput)
+        public static ChatResponse? GetResponse(string userInput)
         {
-            if (string.IsNullOrEmpty(userInput))
-            {
-                return null;
-            }
             var messages = new List<Message>
             {
                 new(Role.System, SystemPrompt),
@@ -93,7 +93,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("ChatGPT_Request", exception);
+                Logs.Log.WriteLogErrors("ChatGPTRequest", exception);
             }
             return null;
         }

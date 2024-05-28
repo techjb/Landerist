@@ -1,11 +1,20 @@
 ﻿using landerist_library.Parse.Listing.ChatGPT;
 using landerist_library.Websites;
 using landerist_library.Parse.Listing.VertexAI;
+using landerist_library.Configuration;
 
 namespace landerist_library.Parse.Listing
 {
     public class ParseListing
     {
+        public static bool TooManyTokens(Page page)
+        {
+            if (Config.PARSE_TEXT_WITH_VERTEX_AI)
+            {
+                return VertexAIRequest.TooManyTokens(page);
+            }
+            return ChatGPTRequest.TooManyTokens(page);
+        }
         public static (PageType pageType, landerist_orels.ES.Listing? listing) ParseText(Page page)
         {
             var text = UserTextInput.GetText(page);
@@ -13,7 +22,7 @@ namespace landerist_library.Parse.Listing
             {
                 return (PageType.ResponseBodyTooShort, null);
             }
-            if (Configuration.Config.USE_VERTEX_AI_TO_PARSE_TEXT)
+            if (Config.PARSE_TEXT_WITH_VERTEX_AI)
             {
                 return ParseTextVertextAI(page, text);
             }
@@ -22,11 +31,10 @@ namespace landerist_library.Parse.Listing
 
         private static (PageType pageType, landerist_orels.ES.Listing? listing) ParseTextVertextAI(Page page, string text)
         {
-            (PageType pageType, landerist_orels.ES.Listing? listing) result = (PageType.MayBeListing, null);
-            var response = VertexAIRequest.GetResponse(text).Result;
+            var response = VertexAIRequest.GetResponse(text).Result;            
             if (response == null)
             {
-                return result;
+                return (PageType.MayBeListing, null);
             }
             var (functionName, arguments) = VertexAIRequest.GetFunctionNameAndArguments(response);
             return ParseText(page, functionName, arguments);

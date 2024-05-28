@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using landerist_library.Database;
-using static landerist_library.Statistics.StatisticsSnapshot;
 
 namespace landerist_library.Statistics
 {

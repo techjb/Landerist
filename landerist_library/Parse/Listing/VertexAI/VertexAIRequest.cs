@@ -1,7 +1,7 @@
-﻿using Google.Cloud.AIPlatform.V1;
+﻿using AI.Dev.OpenAI.GPT;
+using Google.Cloud.AIPlatform.V1;
 using Google.Protobuf;
 using landerist_library.Configuration;
-using landerist_library.Parse.Listing.ChatGPT;
 using landerist_library.Websites;
 using static Google.Cloud.AIPlatform.V1.SafetySetting.Types;
 
@@ -10,6 +10,9 @@ namespace landerist_library.Parse.Listing.VertexAI
 {
     public class VertexAIRequest
     {
+
+        public const int MAX_CONTEXT_WINDOW = 1000000;
+
         private static readonly string ModelName =
                             "gemini-1.5-flash-preview-0514";
                             //"gemini-1.5-pro-preview-0514";
@@ -26,17 +29,38 @@ namespace landerist_library.Parse.Listing.VertexAI
            "Asegúrate de tener una precisión exhaustiva en la identificación y extracción de los elementos clave. " +
            "Es imperativo que mantengas un enfoque riguroso durante este proceso para ofrecer la respuesta más precisa y de la más alta calidad posible.";
 
+        public static bool TooManyTokens(Page page)
+        {
+            if (page.ResponseBodyText == null)
+            {
+                return false;
+            }
+
+            //https://github.com/dluc/openai-tools
+            int systemTokens = GPT3Tokenizer.Encode(SystemPrompt).Count;
+            string? text = UserTextInput.GetText(page);
+            if (text == null)
+            {
+                return false;
+            }
+            int userTokens = GPT3Tokenizer.Encode(text).Count;
+            int totalTokens = systemTokens + userTokens;
+            return totalTokens > MAX_CONTEXT_WINDOW;
+        }
         public static async Task<GenerateContentResponse?> GetResponse(string text)
         {
             try
             {
                 var predictionServiceClient = GetPredictionServiceClient();
                 var generateContentRequest = GetGenerateContentRequest(text);
-                return await predictionServiceClient.GenerateContentAsync(generateContentRequest);
+                DateTime dateStart = DateTime.Now;
+                var response = await predictionServiceClient.GenerateContentAsync(generateContentRequest);
+                Timers.Timer.SaveTimerVertexAI("VertexAIRequest", dateStart);
+                return response;
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-
+                Logs.Log.WriteLogErrors("VertexAIRequest GetResponse", exception);
             }
             return null;
         }
@@ -74,17 +98,13 @@ namespace landerist_library.Parse.Listing.VertexAI
             {
                 var predictionServiceClient = GetPredictionServiceClient();
                 var generateContentRequest = GetGenerateContentRequest(screenshot);
-                
                 GenerateContentResponse response = await predictionServiceClient.GenerateContentAsync(generateContentRequest);
-
                 var functionCall = response.Candidates[0].Content.Parts[0].FunctionCall;
-                Console.WriteLine(functionCall);
-
                 return response.Candidates[0].Content.Parts[0].Text;
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-
+                Logs.Log.WriteLogErrors("VertexAIRequest ParseScreenshot", exception);
             }
             return null;
         }

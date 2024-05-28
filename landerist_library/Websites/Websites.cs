@@ -1,6 +1,4 @@
-﻿using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
-using Google.Apis.Util;
-using landerist_library.Database;
+﻿using landerist_library.Database;
 using System.Data;
 using landerist_library.Configuration;
 

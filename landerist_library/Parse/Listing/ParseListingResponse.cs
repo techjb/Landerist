@@ -10,11 +10,11 @@ namespace landerist_library.Parse.Listing
             (PageType pageType, landerist_orels.ES.Listing? listing) result = (PageType.MayBeListing, null);
             try
             {
-                var parseListingFunction = JsonSerializer.Deserialize<ParseListingTool>(arguments);
-                if (parseListingFunction != null)
+                var parseListingTool = JsonSerializer.Deserialize<ParseListingTool>(arguments);
+                if (parseListingTool != null)
                 {
                     result.pageType = PageType.ListingButNotParsed;
-                    result.listing = parseListingFunction.ToListing(page);
+                    result.listing = parseListingTool.ToListing(page);
                     if (result.listing != null)
                     {
                         result.pageType = PageType.Listing;

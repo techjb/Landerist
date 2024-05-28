@@ -10,11 +10,11 @@ namespace landerist_library.Parse.Listing
     {
         public const string FunctionNameIsListing = "si_es_un_anuncio";
 
-        public static readonly string FunctionDescriptionIsListing = "El texto introducido corresponde a un único anuncio inmobiliario";
+        public static readonly string FunctionDescriptionIsListing = "Sí es un único anuncio inmobiliario";
 
         public const string FunctionNameIsNotListing = "no_es_un_anuncio";
 
-        public static readonly string FunctionDescriptionIsNotListing = "El texto introducido no corresponde a un único anuncio inmobiliario";
+        public static readonly string FunctionDescriptionIsNotListing = "No es un único anuncio inmobiliario";
 
         public string? FechaDePublicación { get; set; } = null;
 

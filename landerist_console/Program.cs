@@ -71,21 +71,21 @@ namespace landerist_console
             #region Urls
 
             //var uri = new Uri("https://www.viviendasasturias.es/");
-            //var uri = new Uri("https://inmocolsol.es/valladolid/local-comercial-en-alquiler-372235");
-            //var page = new Page("http://34mallorca.com/detalles-del-inmueble/carismatico-edificio-en-el-centro-de-palma/19675687");
-            //var page = new Page("https://www.inverolid.es/propiedades/piso-en-alquiler-arroyo-de-la-encomienda/");
             //var page = new Page("https://raymarinmobiliaria.com/listing/piso-en-santiago-el-mayor-murcia/");
-            //var page = new Page("http://www.bbilbao.es/es/inmueble/alquiler/oficina/areatza/areatza/691?&return=portada");
-            //var page = new Page("https://inmobiliariaperelada.com/inmueble/34/casona-");            
-            //var page = new Page("https://casasypisosalicante.com/?id=16070639060&amp;idioma=ES");
+            //var page = new Page("https://www.bbilbao.es/inmueble/bureau-691");
             //var page = new Page("https://www.viviendasasturias.es/Venta-Piso-Oviedo-Montecerrao-590?idioma=es");
             //var page = new Page("https://www.viviendasasturias.es/Venta-Piso-Oviedo-Montecerrao-590");
             //var page = new Page("https://www.suavisdomus.es/inmuebles/casa-en-morales-del-vino-en-solar-de-114m2/");
             //var page = new Page("https://baronybaron.com/property/c-san-pedro-cabezon-de-la-sal-179m2/");
             //var page = new Page("https://empordaimmo.com/característica/persianas/"); // no listing
+            //var page = new Page("https://www.inmobiliariasomera.com/tag/ayuda/"); // no listing
+            //var page = new Page("https://parba.com/prestación-propiedad/aire-acondicionado/?view=grid"); // no listing
+            //var page = new Page("https://servicasainmo.com/feature/lavadora/"); // no listing
+            //var page = new Page("https://veovall.com/property/valladolid/"); // no listing
             //var page = new Page("https://inmobiliariaalonsodiaz.com/inmueble/piso-en-venta-en-doctor-fleming-la-felguera-langreo/");
-            var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
-
+            //var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
+            //var page = new Page("https://www.fincasaldaba.com/propiedad/adosado-llano-samper/foto-16-7-19-10-01-49-copy/");
+            //var page = new Page("https://www.everyprop.com/propiedad/op-31427-mansion-de-lujo-en-prado-largo-madrid/");
 
             #endregion
 
@@ -134,7 +134,7 @@ namespace landerist_console
             //Pages.DeleteListingsResponseBodyRepeated();            
             //Pages.UpdateInvalidCadastastralReferences();
             //Pages.UpdateNextUpdate();
-            //Pages.RemoveResponseBodyTextHash(PageType.Listing);
+            //Pages.RemoveResponseBodyTextHash(PageType.ResponseBodyTooLarge);
             //Pages.DeleteUnpublishedListings();
 
             #endregion
@@ -151,8 +151,7 @@ namespace landerist_console
             //new Scraper().ScrapeAllPages();            
             //new Scraper().ScrapeResponseBodyRepeatedInListings();
             //new Scraper().Start();
-            Scraper.Scrape(page); 
-
+            //Scraper.Scrape(page); 
 
             #endregion
 

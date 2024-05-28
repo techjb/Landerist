@@ -24,10 +24,10 @@ namespace landerist_library.Parse.Listing.VertexAI
 
             AddString(properties, nameof(FechaDePublicación), "fecha de publicación");
             AddEnum(properties, nameof(TipoDeOperación), "tipo de operación", TiposDeOperación);
-            AddEnum(properties, nameof(TipoDeInmueble), "tipo de inmueble", TiposDeInmueble);
+            AddEnum(properties, nameof(TipoDeInmueble), "tipología del inmueble", TiposDeInmueble);
             AddEnum(properties, nameof(SubtipoDeInmueble), "subtipo de inmueble", SubtiposDeInmueble);
             AddNumber(properties, nameof(PrecioDelAnuncio), "precio del anuncio");
-            AddString(properties, nameof(DescripciónDelAnuncio), "descripción del anuncio");
+            AddString(properties, nameof(DescripciónDelAnuncio), "texto con la descripción del anuncio");
             AddString(properties, nameof(ReferenciaDelAnuncio), "referencia del anuncio");
             AddString(properties, nameof(TeléfonoDeContacto), "teléfono de contacto");
             AddString(properties, nameof(EmailDeContacto), "email de contacto");
