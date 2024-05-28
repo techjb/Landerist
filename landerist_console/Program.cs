@@ -134,7 +134,7 @@ namespace landerist_console
             //Pages.DeleteListingsResponseBodyRepeated();            
             //Pages.UpdateInvalidCadastastralReferences();
             //Pages.UpdateNextUpdate();
-            //Pages.RemoveResponseBodyTextHash(PageType.ResponseBodyTooLarge);
+            //Pages.RemoveResponseBodyTextHash(PageType.Listing);
             //Pages.DeleteUnpublishedListings();
 
             #endregion
