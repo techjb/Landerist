@@ -1,21 +1,26 @@
-﻿using OpenAI;
+﻿using Google.Cloud.AIPlatform.V1;
+using Google.Protobuf.Collections;
 using System.Text.Json.Nodes;
 
-namespace landerist_library.Parse.Listing.ChatGPT
+namespace landerist_library.Parse.Listing.VertexAI
 {
-    public class ChatGPTTools : ParseListingTool
+    public class VertexAITools : ParseListingTool
     {
-        public static List<Tool> GetTools()
+        public static Tool GetTools()
         {
-            var functionIsListing = GetToolIsListing();
-            var functionIsNotListing = GetToolIsNotListing();
-
-            return [functionIsListing, functionIsNotListing];            
+            return new Tool
+            {
+                FunctionDeclarations =
+                {
+                    IsListingFunctionDeclaration(),
+                    IsNotListingFunctionDeclaration()
+                }
+            };
         }
 
-        private static Tool GetToolIsListing()
+        private static FunctionDeclaration IsListingFunctionDeclaration()
         {
-            var properties = new JsonObject();
+            MapField<string, OpenApiSchema> properties = [];
 
             AddString(properties, nameof(FechaDePublicación), "fecha de publicación");
             AddEnum(properties, nameof(TipoDeOperación), "tipo de operación", TiposDeOperación);
@@ -52,68 +57,81 @@ namespace landerist_library.Parse.Listing.ChatGPT
             AddBoolean(properties, nameof(PermiteMascotas), "permite mascotas");
             AddBoolean(properties, nameof(TieneSistemasDeSeguridad), "tiene sistemas de seguridad");
 
-            var parameters = new JsonObject()
+            return new FunctionDeclaration
             {
-                ["type"] = "object",
-                ["properties"] = properties,
-                ["required"] = new JsonArray { }
+                Name = FunctionNameIsListing,
+                Description = FunctionDescriptionIsListing,
+                Parameters = new OpenApiSchema
+                {
+                    Type = Google.Cloud.AIPlatform.V1.Type.Object,
+                    Properties = { properties },
+                    Required = { }
+                }
             };
-
-            return new Function(FunctionNameIsListing, FunctionDescriptionIsListing, parameters);
         }
 
-        private static Tool GetToolIsNotListing()
+        private static void AddString(MapField<string, OpenApiSchema> mapField, string name, string description)
         {
-            var properties = new JsonObject();
-            JsonArray NoEsUnAnuncio =
-            [
-                "NO_ES_UN_ANUNCIO"
-            ];
+            Add(mapField, name, Google.Cloud.AIPlatform.V1.Type.String, description);
+        }
 
-            AddEnum(properties, "NoEsUnAnuncio", "No es un anuncio", NoEsUnAnuncio);
-
-            var parameters = new JsonObject()
+        private static void AddEnum(MapField<string, OpenApiSchema> mapField, string name, string description, JsonArray jsonArray)
+        {
+            OpenApiSchema openApiSchema = new()
             {
-                ["type"] = "object",
-                ["properties"] = properties,
-                ["required"] = new JsonArray { }
+                Type = Google.Cloud.AIPlatform.V1.Type.String,
+                Description = description,
+                Enum =
+                {
+                    ToEnumList(jsonArray)
+                }
             };
-
-            return new Function(FunctionNameIsNotListing, FunctionDescriptionIsNotListing, parameters);
+            mapField.Add(name, openApiSchema);
         }
 
-        private static void AddString(JsonObject jsonObject, string name, string description)
+        private static void AddNumber(MapField<string, OpenApiSchema> mapField, string name, string description)
         {
-            Add(jsonObject, name, "string", description);
+            Add(mapField, name, Google.Cloud.AIPlatform.V1.Type.Number, description);
         }
 
-        private static void AddEnum(JsonObject jsonObject, string name, string description, JsonArray jsonArray)
+        private static void AddBoolean(MapField<string, OpenApiSchema> mapField, string name, string description)
         {
-            Add(jsonObject, name, "string", description, jsonArray);
+            Add(mapField, name, Google.Cloud.AIPlatform.V1.Type.Boolean, description);
         }
 
-        private static void AddNumber(JsonObject jsonObject, string name, string description)
+        private static void Add(MapField<string, OpenApiSchema> mapField, string name, Google.Cloud.AIPlatform.V1.Type type, string description)
         {
-            Add(jsonObject, name, "number", description);
-        }
-
-        private static void AddBoolean(JsonObject jsonObject, string name, string description)
-        {
-            Add(jsonObject, name, "boolean", description);
-        }
-
-        private static void Add(JsonObject jsonObject, string name, string type, string description, JsonArray? jsonArray = null)
-        {
-            var property = new JsonObject
+            OpenApiSchema openApiSchema = new()
             {
-                ["type"] = type,
-                ["description"] = description
+                Type = type,
+                Description = description,
             };
-            if (jsonArray != null)
+            mapField.Add(name, openApiSchema);
+        }
+
+        private static List<string> ToEnumList(JsonArray jsonArray)
+        {
+            var list = new List<string>();
+            foreach (var item in jsonArray)
             {
-                property.Add("enum", jsonArray);
+                if (item is null)
+                {
+                    continue;
+                }
+                var value = item.GetValue<string>();
+                list.Add(value);
             }
-            jsonObject.Add(name, property);
+            return list;
+        }
+
+
+        private static FunctionDeclaration IsNotListingFunctionDeclaration()
+        {
+            return new FunctionDeclaration
+            {
+                Name = FunctionNameIsNotListing,
+                Description = FunctionDescriptionIsNotListing,
+            };
         }
     }
 }

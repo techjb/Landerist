@@ -230,7 +230,7 @@ namespace landerist_library.Websites
                 "SELECT [Host] " +
                 "FROM " + TABLE_PAGES + " " +
                 "GROUP BY [Host] " +
-                "HAVING COUNT(*) > " + Configuration.Config.MAX_PAGES_PER_WEBSITE;
+                "HAVING COUNT(*) > " + Config.MAX_PAGES_PER_WEBSITE;
 
             DataTable dataTable = new DataBase().QueryTable(query);
             int total = dataTable.Rows.Count;
@@ -250,7 +250,7 @@ namespace landerist_library.Websites
                     {
                         return;
                     }
-                    if (pageCounter > Configuration.Config.MAX_PAGES_PER_WEBSITE)
+                    if (pageCounter > Config.MAX_PAGES_PER_WEBSITE)
                     {
                         page.Delete();
                     }

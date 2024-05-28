@@ -425,7 +425,7 @@ namespace landerist_library.Websites
 
         private static HashSet<Website> GetNeedToUpdateRobotsTxt()
         {
-            DateTime robotsTxtUpdated = DateTime.Now.AddDays(-Configuration.Config.DAYS_TO_UPDATE_ROBOTS_TXT);
+            DateTime robotsTxtUpdated = DateTime.Now.AddDays(-Config.DAYS_TO_UPDATE_ROBOTS_TXT);
 
             string query =
                 "SELECT * " +
@@ -459,7 +459,7 @@ namespace landerist_library.Websites
 
         private static HashSet<Website> GetNeedToUpdateSitemaps()
         {
-            DateTime sitemapUpdated = DateTime.Now.AddDays(-Configuration.Config.DAYS_TO_UPDATE_SITEMAP);
+            DateTime sitemapUpdated = DateTime.Now.AddDays(-Config.DAYS_TO_UPDATE_SITEMAP);
 
             string query =
                 "SELECT * " +
@@ -493,7 +493,7 @@ namespace landerist_library.Websites
 
         private static HashSet<Website> GetNeedToUpdateIpAddress()
         {
-            DateTime ipAddressUpdated = DateTime.Now.AddDays(-Configuration.Config.DAYS_TO_UPDATE_IP_ADDRESS);
+            DateTime ipAddressUpdated = DateTime.Now.AddDays(-Config.DAYS_TO_UPDATE_IP_ADDRESS);
 
             string query =
                 "SELECT * " +

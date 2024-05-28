@@ -44,18 +44,20 @@ namespace landerist_library.Parse.Listing
 
         public static string? GetText(Page page)
         {
-            return page.ResponseBodyText;
-
+            if (!Configuration.Config.PARSE_TEXT_WITH_FULL_HTML)
+            {
+                return page.ResponseBodyText;
+            }
             try
             {
                 var htmlDocument = page.GetHtmlDocument();
                 if (htmlDocument != null)
                 {
-                    return GetHtml(htmlDocument);                    
+                    return GetHtml(htmlDocument);
                 }
             }
             catch { }
-            return null;
+            return null;            
         }
 
         public static string? GetHtml(HtmlDocument htmlDocument)

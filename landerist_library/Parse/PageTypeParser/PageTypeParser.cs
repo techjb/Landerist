@@ -70,13 +70,8 @@ namespace landerist_library.Parse.PageTypeParser
             }
             if (page.ContainsValidScreenshot())
             {
-                return ParseListingVertexAI.ParseScreenshot(page);
+                return VertexAIRequest.ParseScreenshot(page);
             }
-            
-            //if (!Configuration.Config.IsConfigurationProduction())
-            //{
-            //    return ParseListingVertexAI.ParseText(page);
-            //}
             return ParseListing.ParseText(page);
         }
     }

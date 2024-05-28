@@ -6,8 +6,16 @@ using landerist_library.Configuration;
 
 namespace landerist_library.Parse.Listing
 {
-    public class ParseListingFunction
+    public class ParseListingTool
     {
+        public const string FunctionNameIsListing = "si_es_un_anuncio";
+
+        public static readonly string FunctionDescriptionIsListing = "El texto introducido corresponde a un único anuncio inmobiliario";
+
+        public const string FunctionNameIsNotListing = "no_es_un_anuncio";
+
+        public static readonly string FunctionDescriptionIsNotListing = "El texto introducido no corresponde a un único anuncio inmobiliario";
+
         public string? FechaDePublicación { get; set; } = null;
 
         public string? TipoDeOperación { get; set; } = null;

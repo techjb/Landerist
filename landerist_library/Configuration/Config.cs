@@ -114,9 +114,12 @@
 
         public const int DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS = 90;
 
+        public const bool PARSE_TEXT_WITH_FULL_HTML = false;
+        public static bool USE_VERTEX_AI_TO_PARSE_TEXT { get; set; }
 
 
-        public static bool IsConfigurationProduction()
+
+    public static bool IsConfigurationProduction()
         {
             return ConfigurationProduction;
         }
@@ -173,6 +176,8 @@
             TIMERS_ENABLED = !ConfigurationProduction;
 
             SCRAPE_WITH_PARALELISM = ConfigurationProduction;
+
+            USE_VERTEX_AI_TO_PARSE_TEXT = !ConfigurationProduction;
         }
 
         private static void InitDatabase(bool configurationProduction)

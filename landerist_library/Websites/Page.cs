@@ -572,8 +572,7 @@ namespace landerist_library.Websites
         {
             return Screenshot != null &&
                 Screenshot.Length > 0 &&
-                Screenshot.Length < Config.MAX_SCREENSHOT_SIZE;
-            ;
+                Screenshot.Length < Config.MAX_SCREENSHOT_SIZE;            
         }
     }
 }
