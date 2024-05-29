@@ -17,40 +17,40 @@ namespace landerist_library.Parse.Listing.ChatGPT
         {
             var properties = new JsonObject();
 
-            AddString(properties, nameof(FechaDePublicación), "fecha de publicación");
-            AddEnum(properties, nameof(TipoDeOperación), "tipo de operación", TiposDeOperación);
-            AddEnum(properties, nameof(TipoDeInmueble), "tipo de inmueble", TiposDeInmueble);
-            AddEnum(properties, nameof(SubtipoDeInmueble), "subtipo de inmueble", SubtiposDeInmueble);
-            AddNumber(properties, nameof(PrecioDelAnuncio), "precio del anuncio");
-            AddString(properties, nameof(DescripciónDelAnuncio), "descripción del anuncio");
-            AddString(properties, nameof(ReferenciaDelAnuncio), "referencia del anuncio");
-            AddString(properties, nameof(TeléfonoDeContacto), "teléfono de contacto");
-            AddString(properties, nameof(EmailDeContacto), "email de contacto");
-            AddString(properties, nameof(DirecciónDelInmueble), "dirección del inmueble");
-            AddString(properties, nameof(ReferenciaCatastral), "referencia catastral (14 o 20 caracteres)");
-            AddNumber(properties, nameof(TamañoDelInmueble), "metros cuadrados del inmueble");
-            AddNumber(properties, nameof(TamañoDeLaParcela), "metros cuadrados de la parcela");
-            AddNumber(properties, nameof(AñoDeConstrucción), "año de construcción del inmueble");
-            AddEnum(properties, nameof(EstadoDeLaConstrucción), "estado de la construcción", EstadosDeLaConstrucción);
-            AddNumber(properties, nameof(PlantasDelEdificio), "plantas del edificio");
-            AddString(properties, nameof(PlantaDelInmueble), "planta del inmueble");
-            AddNumber(properties, nameof(NúmeroDeDormitorios), "número de dormitorios");
-            AddNumber(properties, nameof(NúmeroDeBaños), "número de baños");
-            AddNumber(properties, nameof(NúmeroDeParkings), "número de parkings");
-            AddBoolean(properties, nameof(TieneTerraza), "tiene terraza");
-            AddBoolean(properties, nameof(TieneJardín), "tiene jardín");
-            AddBoolean(properties, nameof(TieneGaraje), "tiene garaje");
-            AddBoolean(properties, nameof(TieneParkingParaMoto), "tiene parking para moto");
-            AddBoolean(properties, nameof(TienePiscina), "tiene piscina");
-            AddBoolean(properties, nameof(TieneAscensor), "tiene ascensor");
-            AddBoolean(properties, nameof(TieneAccesoParaDiscapacitados), "tiene acceso para discapacitados");
-            AddBoolean(properties, nameof(TieneTrastero), "tiene trastero");
-            AddBoolean(properties, nameof(EstáAmueblado), "está amueblado");
-            AddBoolean(properties, nameof(NoEstáAmueblado), "no está amueblado");
-            AddBoolean(properties, nameof(TienCalefácción), "tiene calefacción");
-            AddBoolean(properties, nameof(TienAireAcondicionado), "tiene aire acondicionado");
-            AddBoolean(properties, nameof(PermiteMascotas), "permite mascotas");
-            AddBoolean(properties, nameof(TieneSistemasDeSeguridad), "tiene sistemas de seguridad");
+            AddString(properties, nameof(fecha_de_publicación));
+            AddEnum(properties, nameof(tipo_de_operación), TiposDeOperación);
+            AddEnum(properties, nameof(tipo_de_inmueble), TiposDeInmueble);
+            AddEnum(properties, nameof(subtipo_de_inmueble), SubtiposDeInmueble);
+            AddNumber(properties, nameof(precio_del_anuncio));
+            AddString(properties, nameof(descripción_del_anuncio));
+            AddString(properties, nameof(referencia_del_anuncio));
+            AddString(properties, nameof(teléfono_de_contacto));
+            AddString(properties, nameof(email_de_contacto));
+            AddString(properties, nameof(dirección_del_inmueble));
+            AddString(properties, nameof(referencia_catastral));
+            AddNumber(properties, nameof(tamaño_del_inmueble));
+            AddNumber(properties, nameof(tamaño_de_la_parcela));
+            AddNumber(properties, nameof(año_de_construcción));
+            AddEnum(properties, nameof(estado_de_la_construcción), EstadosDeLaConstrucción);
+            AddNumber(properties, nameof(plantas_del_edificio));
+            AddString(properties, nameof(plantas_del_inmueble));
+            AddNumber(properties, nameof(número_de_dormitorios));
+            AddNumber(properties, nameof(número_de_baños));
+            AddNumber(properties, nameof(número_de_parkings));
+            AddBoolean(properties, nameof(tiene_terraza));
+            AddBoolean(properties, nameof(tiene_jardín));
+            AddBoolean(properties, nameof(tiene_garaje));
+            AddBoolean(properties, nameof(tiene_parking_para_moto));
+            AddBoolean(properties, nameof(tiene_piscina));
+            AddBoolean(properties, nameof(tiene_ascensor));
+            AddBoolean(properties, nameof(tiene_acceso_para_discapacitados));
+            AddBoolean(properties, nameof(tiene_trastero));
+            AddBoolean(properties, nameof(está_amueblado));
+            AddBoolean(properties, nameof(no_está_amueblado));
+            AddBoolean(properties, nameof(tiene_calefacción));
+            AddBoolean(properties, nameof(tiene_aire_acondicionado));
+            AddBoolean(properties, nameof(permite_mascotas));
+            AddBoolean(properties, nameof(tiene_sistemas_de_seguridad));
 
             var parameters = new JsonObject()
             {
@@ -70,7 +70,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
                 "NO_ES_UN_ANUNCIO"
             ];
 
-            AddEnum(properties, "NoEsUnAnuncio", "No es un anuncio", NoEsUnAnuncio);
+            Add(properties, "no_es_un_anuncio", "string", "No es un anuncio", NoEsUnAnuncio);
 
             var parameters = new JsonObject()
             {
@@ -82,26 +82,31 @@ namespace landerist_library.Parse.Listing.ChatGPT
             return new Function(FunctionNameIsNotListing, FunctionDescriptionIsNotListing, parameters);
         }
 
-        private static void AddString(JsonObject jsonObject, string name, string description)
+        private static void AddString(JsonObject jsonObject, string name)
         {
-            Add(jsonObject, name, "string", description);
+            Add(jsonObject, name, "string");
         }
 
-        private static void AddEnum(JsonObject jsonObject, string name, string description, JsonArray jsonArray)
+        private static void AddEnum(JsonObject jsonObject, string name, JsonArray jsonArray)
         {
-            Add(jsonObject, name, "string", description, jsonArray);
+            Add(jsonObject, name, "string", jsonArray);
         }
 
-        private static void AddNumber(JsonObject jsonObject, string name, string description)
+        private static void AddNumber(JsonObject jsonObject, string name)
         {
-            Add(jsonObject, name, "number", description);
+            Add(jsonObject, name, "number");
         }
 
-        private static void AddBoolean(JsonObject jsonObject, string name, string description)
+        private static void AddBoolean(JsonObject jsonObject, string name)
         {
-            Add(jsonObject, name, "boolean", description);
+            Add(jsonObject, name, "boolean");
         }
 
+        private static void Add(JsonObject jsonObject, string name, string type, JsonArray? jsonArray = null)
+        {
+            var description = GetDescriptionAttribute(name);
+            Add(jsonObject, name, type, description, jsonArray);
+        }
         private static void Add(JsonObject jsonObject, string name, string type, string description, JsonArray? jsonArray = null)
         {
             var property = new JsonObject

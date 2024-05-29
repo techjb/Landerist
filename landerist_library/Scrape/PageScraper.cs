@@ -121,5 +121,10 @@ namespace landerist_library.Scrape
             }
             new HyperlinksIndexer(Page).Insert();
         }
+
+        public Listing? GetListing()
+        {
+            return NewListing;
+        }
     }
 }

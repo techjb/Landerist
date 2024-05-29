@@ -80,7 +80,7 @@ namespace landerist_library.Parse.Listing.Gemini
                 var candidates = result.Candidates;
                 return text;
             }
-            catch (Exception ex)
+            catch //(Exception ex)
             {
 
             }

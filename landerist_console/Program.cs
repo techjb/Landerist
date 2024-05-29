@@ -134,7 +134,8 @@ namespace landerist_console
             //Pages.DeleteListingsResponseBodyRepeated();            
             //Pages.UpdateInvalidCadastastralReferences();
             //Pages.UpdateNextUpdate();
-            //Pages.RemoveResponseBodyTextHash(PageType.Listing);
+            //Pages.RemoveResponseBodyTextHashToAll();
+            //Pages.RemoveResponseBodyTextHash(PageType.ListingButNotParsed);
             //Pages.DeleteUnpublishedListings();
 
             #endregion
@@ -152,6 +153,8 @@ namespace landerist_console
             //new Scraper().ScrapeResponseBodyRepeatedInListings();
             //new Scraper().Start();
             //Scraper.Scrape(page); 
+            //Scraper.DoTest();
+            
 
             #endregion
 

@@ -405,6 +405,15 @@ namespace landerist_library.Websites
             });
         }
 
+        public static bool RemoveResponseBodyTextHashToAll()
+        {
+            string query =
+                "UPDATE" + TABLE_PAGES + " " +
+                "SET [ResponseBodyTextHash] = NULL";
+
+            return new DataBase().Query(query);
+        }
+
         public static void DeleteUnpublishedListings()
         {
             DateTime unlistingDate = DateTime.Now.AddDays(-Config.DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS);

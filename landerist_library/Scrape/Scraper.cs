@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using landerist_library.Logs;
 using landerist_library.Configuration;
 using landerist_library.Downloaders;
+using landerist_orels.ES;
 
 namespace landerist_library.Scrape
 {
@@ -33,11 +34,22 @@ namespace landerist_library.Scrape
         private List<Page> Pages = [];
 
 
+        public static void DoTest()
+        {
+            Log.WriteLogInfo("service", "Starting test..");
+            var page = new Page("https://www.everyprop.com/propiedad/op-31427-mansion-de-lujo-en-prado-largo-madrid/");
+            var pageScraper = new PageScraper(page);
+            pageScraper.Scrape();
+            Log.WriteLogInfo("service", "PageType: " + page.PageType.ToString());
+            var listing = pageScraper.GetListing();
+            string json = new Schema(listing).Serialize();
+            Log.WriteLogInfo("service", "Listing: " + json);
+        }
+
         public void Start()
         {
             PageBlocker.Clean();
-            Pages = PageSelector.Select();
-            //Log.WriteLogInfo("service", "Scrapper. Selected " + Pages.Count + " pages");
+            Pages = PageSelector.Select();            
             Scrape();
         }
 

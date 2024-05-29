@@ -11,15 +11,15 @@ namespace landerist_library.Parse.Listing.VertexAI
     public class VertexAIRequest
     {
 
-        public const int MAX_CONTEXT_WINDOW = 1000000;
+        public const int MAX_CONTEXT_WINDOW = 128000;
 
         private static readonly string ModelName =
-                            "gemini-1.5-flash-preview-0514";
-                            //"gemini-1.5-pro-preview-0514";
+                            "gemini-1.5-flash";
+                            //"gemini-1.5-pro";
 
         private static readonly string ProjectId = "landerist";
 
-        private static readonly string Location = "us-central1";
+        private static readonly string Location = "europe-southwest1";
 
         private static readonly string Publisher = "google";
 
@@ -174,6 +174,12 @@ namespace landerist_library.Parse.Listing.VertexAI
 
         private static GenerateContentRequest GetGenerateContentRequest(Content? content)
         {
+            //TODO: Missing in the library
+            //ToolConfig = new ToolConfig()
+            //{
+            //    mode = ToolConfig.FunctionCallingConfig.Mode.ANY
+            //}
+
             return new GenerateContentRequest
             {
                 Model = $"projects/{ProjectId}/locations/{Location}/publishers/{Publisher}/models/{ModelName}",

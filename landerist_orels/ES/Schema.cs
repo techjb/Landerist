@@ -21,6 +21,15 @@ namespace landerist_orels.ES
 
         }
 
+        public Schema(Listing listing)
+        {
+            SortedSet<Listing> listings = new SortedSet<Listing>()
+            {
+                listing
+            };
+            this.listings = listings;
+        }
+
         public Schema(SortedSet<Listing> listings)
         {
             this.listings = listings;

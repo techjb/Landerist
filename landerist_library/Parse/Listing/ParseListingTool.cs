@@ -3,6 +3,7 @@ using landerist_library.Websites;
 using landerist_orels.ES;
 using System.Text.Json.Nodes;
 using landerist_library.Configuration;
+using System.Reflection;
 
 namespace landerist_library.Parse.Listing
 {
@@ -16,73 +17,107 @@ namespace landerist_library.Parse.Listing
 
         public static readonly string FunctionDescriptionIsNotListing = "No es un único anuncio inmobiliario";
 
-        public string? FechaDePublicación { get; set; } = null;
+        [Description("fecha de la publicación del anuncio")]
+        public string? fecha_de_publicación { get; set; } = null;
 
-        public string? TipoDeOperación { get; set; } = null;
+        [Description("tipo de operación inmobiliaria")]
+        public string? tipo_de_operación { get; set; } = null;
 
-        public string? TipoDeInmueble { get; set; } = null;
+        [Description("tipología del inmueble")]
+        public string? tipo_de_inmueble { get; set; } = null;
 
-        public string? SubtipoDeInmueble { get; set; } = null;
+        [Description("subtipo de inmueble")]
+        public string? subtipo_de_inmueble { get; set; } = null;
 
-        public decimal? PrecioDelAnuncio { get; set; } = null;
+        [Description("precio del anuncio en euros")]
+        public decimal? precio_del_anuncio { get; set; } = null;
 
-        public string? DescripciónDelAnuncio { get; set; } = null;
+        [Description("texto con la descripción detallada del anuncio")]
+        public string? descripción_del_anuncio { get; set; } = null;
 
-        public string? ReferenciaDelAnuncio { get; set; } = null;
+        [Description("código de referencia del anuncio")]
+        public string? referencia_del_anuncio { get; set; } = null;
 
-        public string? TeléfonoDeContacto { get; set; } = null;
+        [Description("número de teléfono de contacto")]
+        public string? teléfono_de_contacto { get; set; } = null;
 
-        public string? EmailDeContacto { get; set; } = null;
+        [Description("dirección de email de contacto")]
+        public string? email_de_contacto { get; set; } = null;
 
-        public string? DirecciónDelInmueble { get; set; } = null;
+        [Description("dirección en la que se encuentra el inmueble")]
+        public string? dirección_del_inmueble { get; set; } = null;
 
-        public string? ReferenciaCatastral { get; set; } = null;
+        [Description("referencia catastral del anuncio (14 o 20 caracteres)")]
+        public string? referencia_catastral { get; set; } = null;
 
-        public double? TamañoDelInmueble { get; set; } = null;
+        [Description("número de metros cuadrados del inmueble")]
+        public double? tamaño_del_inmueble { get; set; } = null;
 
-        public double? TamañoDeLaParcela { get; set; } = null;
+        [Description("número de metros cuadrados de la parcela")]
+        public double? tamaño_de_la_parcela { get; set; } = null;
 
-        public double? AñoDeConstrucción { get; set; } = null;
+        [Description("año de construcción del inmueble")]
+        public double? año_de_construcción { get; set; } = null;
 
-        public string? EstadoDeLaConstrucción { get; set; } = null;
+        [Description("estado de la construcción en el que se encuentra el inmueble")]
+        public string? estado_de_la_construcción { get; set; } = null;
 
-        public double? PlantasDelEdificio { get; set; } = null;
+        [Description("número de plantas del edificio")]
+        public double? plantas_del_edificio { get; set; } = null;
 
-        public string? PlantaDelInmueble { get; set; } = null;
+        [Description("número de planta en la que se ubica el inmueble")]
+        public string? plantas_del_inmueble { get; set; } = null;
 
-        public double? NúmeroDeDormitorios { get; set; } = null;
+        [Description("número de dormitorios")]
+        public double? número_de_dormitorios { get; set; } = null;
 
-        public double? NúmeroDeBaños { get; set; } = null;
+        [Description("número de baños")]
+        public double? número_de_baños { get; set; } = null;
 
-        public double? NúmeroDeParkings { get; set; } = null;
+        [Description("número de parkings")]
+        public double? número_de_parkings { get; set; } = null;
 
-        public bool? TieneTerraza { get; set; } = null;
+        [Description("tiene terraza")]
+        public bool? tiene_terraza { get; set; } = null;
 
-        public bool? TieneJardín { get; set; } = null;
+        [Description("tiene jardín")]
+        public bool? tiene_jardín { get; set; } = null;
 
-        public bool? TieneGaraje { get; set; } = null;
+        [Description("tiene garaje")]
+        public bool? tiene_garaje { get; set; } = null;
 
-        public bool? TieneParkingParaMoto { get; set; } = null;
+        [Description("tiene parking para moto")]
+        public bool? tiene_parking_para_moto { get; set; } = null;
 
-        public bool? TienePiscina { get; set; } = null;
+        [Description("tiene piscina")]
+        public bool? tiene_piscina { get; set; } = null;
 
-        public bool? TieneAscensor { get; set; } = null;
+        [Description("tiene ascensor")]
+        public bool? tiene_ascensor { get; set; } = null;
 
-        public bool? TieneAccesoParaDiscapacitados { get; set; } = null;
+        [Description("tiene acceso para discapacitados")]
+        public bool? tiene_acceso_para_discapacitados { get; set; } = null;
 
-        public bool? TieneTrastero { get; set; } = null;
+        [Description("tiene trastero")]
+        public bool? tiene_trastero { get; set; } = null;
 
-        public bool? EstáAmueblado { get; set; } = null;
+        [Description("está amueblado")]
+        public bool? está_amueblado { get; set; } = null;
 
-        public bool? NoEstáAmueblado { get; set; } = null;
+        [Description("no está amueblado")]
+        public bool? no_está_amueblado { get; set; } = null;
 
-        public bool? TienCalefácción { get; set; } = null;
+        [Description("tiene calefacción")]
+        public bool? tiene_calefacción { get; set; } = null;
 
-        public bool? TienAireAcondicionado { get; set; } = null;
+        [Description("tiene aire acondicionado")]
+        public bool? tiene_aire_acondicionado { get; set; } = null;
 
-        public bool? PermiteMascotas { get; set; } = null;
+        [Description("se permiten mascotas")]
+        public bool? permite_mascotas { get; set; } = null;
 
-        public bool? TieneSistemasDeSeguridad { get; set; } = null;
+        [Description("tiene sistemas de seguridad")]
+        public bool? tiene_sistemas_de_seguridad { get; set; } = null;
 
 
         protected const string OPERACION_VENTA = "venta";
@@ -214,20 +249,20 @@ namespace landerist_library.Parse.Listing
                 bedrooms = GetBedrooms(),
                 bathrooms = GetBathrooms(),
                 parkings = GetParkings(),
-                terrace = TieneTerraza,
-                garden = TieneJardín,
-                garage = TieneGaraje,
-                motorbikeGarage = TieneParkingParaMoto,
-                pool = TienePiscina,
-                lift = TieneAscensor,
-                disabledAccess = TieneAccesoParaDiscapacitados,
-                storageRoom = TieneTrastero,
-                furnished = EstáAmueblado,
-                nonFurnished = NoEstáAmueblado,
-                heating = TienCalefácción,
-                airConditioning = TienAireAcondicionado,
-                petsAllowed = PermiteMascotas,
-                securitySystems = TieneSistemasDeSeguridad,
+                terrace = tiene_terraza,
+                garden = tiene_jardín,
+                garage = tiene_garaje,
+                motorbikeGarage = tiene_parking_para_moto,
+                pool = tiene_piscina,
+                lift = tiene_ascensor,
+                disabledAccess = tiene_acceso_para_discapacitados,
+                storageRoom = tiene_trastero,
+                furnished = está_amueblado,
+                nonFurnished = no_está_amueblado,
+                heating = tiene_calefacción,
+                airConditioning = tiene_aire_acondicionado,
+                petsAllowed = permite_mascotas,
+                securitySystems = tiene_sistemas_de_seguridad,
             };
             return listing;
         }
@@ -244,18 +279,18 @@ namespace landerist_library.Parse.Listing
 
         private bool IsValidTipoDeOperacion()
         {
-            if (TipoDeOperación != null)
+            if (tipo_de_operación != null)
             {
-                return JsonArrayContains(TiposDeOperación, TipoDeOperación);
+                return JsonArrayContains(TiposDeOperación, tipo_de_operación);
             }
             return false;
         }
 
         private bool IsValidTipoDeInmueble()
         {
-            if (TipoDeInmueble != null)
+            if (tipo_de_inmueble != null)
             {
-                return JsonArrayContains(TiposDeInmueble, TipoDeInmueble);
+                return JsonArrayContains(TiposDeInmueble, tipo_de_inmueble);
             }
             return false;
         }
@@ -301,9 +336,9 @@ namespace landerist_library.Parse.Listing
 
         private DateTime GetListingDate()
         {
-            if (FechaDePublicación != null)
+            if (fecha_de_publicación != null)
             {
-                if (DateTime.TryParse(FechaDePublicación, out DateTime listingDate))
+                if (DateTime.TryParse(fecha_de_publicación, out DateTime listingDate))
                 {
                     return listingDate;
                 }
@@ -313,7 +348,7 @@ namespace landerist_library.Parse.Listing
 
         private Operation GetOperation()
         {
-            return TipoDeOperación switch
+            return tipo_de_operación switch
             {
                 OPERACION_VENTA => Operation.sell,
                 OPERACION_ALQUILER => Operation.rent,
@@ -323,7 +358,7 @@ namespace landerist_library.Parse.Listing
 
         private PropertyType GetPropertyType()
         {
-            return TipoDeInmueble switch
+            return tipo_de_inmueble switch
             {
                 TIPO_DE_INMUEBLE_VIVIENDA => PropertyType.home,
                 TIPO_DE_INMUEBLE_DORMITORIO => PropertyType.room,
@@ -340,7 +375,7 @@ namespace landerist_library.Parse.Listing
 
         private PropertySubtype? GetPropertySubtype()
         {
-            if (SubtipoDeInmueble != null)
+            if (subtipo_de_inmueble != null)
             {
                 PropertySubtype? propertySubtype = GetPropertySubtypeValue();
                 if (IsValidPropertySubtype(propertySubtype))
@@ -353,7 +388,7 @@ namespace landerist_library.Parse.Listing
 
         private PropertySubtype? GetPropertySubtypeValue()
         {
-            return SubtipoDeInmueble switch
+            return subtipo_de_inmueble switch
             {
                 SUBTIPO_DE_INMUEBLE_PISO => (PropertySubtype?)PropertySubtype.flat,
                 SUBTIPO_DE_INMUEBLE_APARTAMENTO => (PropertySubtype?)PropertySubtype.appartment,
@@ -416,9 +451,9 @@ namespace landerist_library.Parse.Listing
 
         private Price? GetPropertyPrice()
         {
-            if (PrecioDelAnuncio.HasValue)
+            if (precio_del_anuncio.HasValue)
             {
-                var price = (decimal)PrecioDelAnuncio;
+                var price = (decimal)precio_del_anuncio;
                 if (price > 0)
                 {
                     return new Price(price, Currency.EUR);
@@ -429,11 +464,11 @@ namespace landerist_library.Parse.Listing
 
         private string? GetDescription()
         {
-            if (string.IsNullOrEmpty(DescripciónDelAnuncio))
+            if (string.IsNullOrEmpty(descripción_del_anuncio))
             {
                 return null;
             }
-            return Strings.Clean(DescripciónDelAnuncio);
+            return Strings.Clean(descripción_del_anuncio);
         }
 
         private static string GetDataSourceName(Page page)
@@ -443,11 +478,11 @@ namespace landerist_library.Parse.Listing
 
         private string? GetDataSourceGuid()
         {
-            if (string.IsNullOrEmpty(ReferenciaDelAnuncio))
+            if (string.IsNullOrEmpty(referencia_del_anuncio))
             {
                 return null;
             }
-            return Strings.Clean(ReferenciaDelAnuncio);
+            return Strings.Clean(referencia_del_anuncio);
         }
 
         private static DateTime GetDataSourceUpdate()
@@ -462,81 +497,81 @@ namespace landerist_library.Parse.Listing
 
         private string? GetPhone()
         {
-            if (string.IsNullOrEmpty(TeléfonoDeContacto))
+            if (string.IsNullOrEmpty(teléfono_de_contacto))
             {
                 return null;
             }
-            TeléfonoDeContacto = Strings.Clean(TeléfonoDeContacto);
-            if (!Validate.Phone(TeléfonoDeContacto))
+            teléfono_de_contacto = Strings.Clean(teléfono_de_contacto);
+            if (!Validate.Phone(teléfono_de_contacto))
             {
                 return null;
             }
-            return TeléfonoDeContacto;
+            return teléfono_de_contacto;
         }
 
         private string? GetEmail()
         {
-            if (string.IsNullOrEmpty(EmailDeContacto))
+            if (string.IsNullOrEmpty(email_de_contacto))
             {
                 return null;
             }
-            EmailDeContacto = Strings.Clean(EmailDeContacto);
-            EmailDeContacto = Strings.RemoveSpaces(EmailDeContacto);
-            if (!Validate.Email(EmailDeContacto))
+            email_de_contacto = Strings.Clean(email_de_contacto);
+            email_de_contacto = Strings.RemoveSpaces(email_de_contacto);
+            if (!Validate.Email(email_de_contacto))
             {
                 return null;
             }
-            return EmailDeContacto;
+            return email_de_contacto;
         }
 
         private string? GetAddress()
         {
-            if (string.IsNullOrEmpty(DirecciónDelInmueble))
+            if (string.IsNullOrEmpty(dirección_del_inmueble))
             {
                 return null;
             }
-            return Strings.Clean(DirecciónDelInmueble);
+            return Strings.Clean(dirección_del_inmueble);
         }
 
         private string? GetCadastralReference()
         {
-            if (string.IsNullOrEmpty(ReferenciaCatastral))
+            if (string.IsNullOrEmpty(referencia_catastral))
             {
                 return null;
             }
-            ReferenciaCatastral = Strings.Clean(ReferenciaCatastral);
-            if (!Validate.CadastralReference(ReferenciaCatastral))
+            referencia_catastral = Strings.Clean(referencia_catastral);
+            if (!Validate.CadastralReference(referencia_catastral))
             {
                 return null;
             }
-            return ReferenciaCatastral;
+            return referencia_catastral;
         }
 
         private double? GetPropertySize()
         {
-            if (TamañoDelInmueble.HasValue &&
-                TamañoDelInmueble >= Config.MIN_PROPERTY_SIZE &&
-                TamañoDelInmueble <= Config.MAX_PROPERTY_SIZE)
+            if (tamaño_del_inmueble.HasValue &&
+                tamaño_del_inmueble >= Config.MIN_PROPERTY_SIZE &&
+                tamaño_del_inmueble <= Config.MAX_PROPERTY_SIZE)
             {
-                return TamañoDelInmueble;
+                return tamaño_del_inmueble;
             }
             return null;
         }
 
         private double? GetLandSize()
         {
-            if (TamañoDeLaParcela.HasValue &&
-                TamañoDeLaParcela >= Config.MIN_LAND_SIZE &&
-                TamañoDeLaParcela <= Config.MAX_LAND_SIZE)
+            if (tamaño_de_la_parcela.HasValue &&
+                tamaño_de_la_parcela >= Config.MIN_LAND_SIZE &&
+                tamaño_de_la_parcela <= Config.MAX_LAND_SIZE)
             {
-                return TamañoDeLaParcela;
+                return tamaño_de_la_parcela;
             }
             return null;
         }
 
         private int? GetConstrunctionYear()
         {
-            var constructionYear = (int?)AñoDeConstrucción;
+            var constructionYear = (int?)año_de_construcción;
             var maxConstructionYear = DateTime.Now.AddYears(Config.MAX_CONSTRUCTION_YEARS_FROM_NOW).Year;
 
             if (constructionYear.HasValue &&
@@ -550,11 +585,11 @@ namespace landerist_library.Parse.Listing
 
         private ConstructionStatus? GetConstructionStatus()
         {
-            if (string.IsNullOrEmpty(EstadoDeLaConstrucción))
+            if (string.IsNullOrEmpty(estado_de_la_construcción))
             {
                 return null;
             }
-            return EstadoDeLaConstrucción switch
+            return estado_de_la_construcción switch
             {
                 ESTADO_DE_LA_CONSTRUCCIÓN_OBRA_NUEVA => (ConstructionStatus?)ConstructionStatus.@new,
                 ESTADO_DE_LA_CONSTRUCCIÓN_BUENO => (ConstructionStatus?)ConstructionStatus.good,
@@ -566,7 +601,7 @@ namespace landerist_library.Parse.Listing
 
         private int? GetFloors()
         {
-            var floors = (int?)PlantasDelEdificio;
+            var floors = (int?)plantas_del_edificio;
             if (floors.HasValue &&
                 floors >= Config.MIN_FLOORS &&
                 floors <= Config.MAX_FLOORS)
@@ -578,16 +613,16 @@ namespace landerist_library.Parse.Listing
 
         private string? GetFloor()
         {
-            if (string.IsNullOrEmpty(PlantaDelInmueble))
+            if (string.IsNullOrEmpty(plantas_del_inmueble))
             {
                 return null;
             }
-            return Strings.Clean(PlantaDelInmueble);
+            return Strings.Clean(plantas_del_inmueble);
         }
 
         private int? GetBedrooms()
         {
-            var bedrooms = (int?)NúmeroDeDormitorios;
+            var bedrooms = (int?)número_de_dormitorios;
             if (bedrooms.HasValue &&
                 bedrooms >= Config.MIN_BEDROOMS &&
                 bedrooms <= Config.MAX_BEDROOMS)
@@ -599,7 +634,7 @@ namespace landerist_library.Parse.Listing
 
         private int? GetBathrooms()
         {
-            var bathrooms = (int?)NúmeroDeBaños;
+            var bathrooms = (int?)número_de_baños;
             if (bathrooms.HasValue &&
                 bathrooms >= Config.MIN_BATHROOMS &&
                 bathrooms <= Config.MAX_BATHROOMS)
@@ -611,7 +646,7 @@ namespace landerist_library.Parse.Listing
 
         private int? GetParkings()
         {
-            var parkings = (int?)NúmeroDeParkings;
+            var parkings = (int?)número_de_parkings;
             if (parkings.HasValue &&
                 parkings >= Config.MIN_PARKINGS &&
                 parkings <= Config.MAX_PARKINGS)
@@ -619,6 +654,20 @@ namespace landerist_library.Parse.Listing
                 return parkings;
             }
             return null;
+        }
+
+        protected static string GetDescriptionAttribute(string name)
+        {
+            PropertyInfo? propertyInfo = typeof(ParseListingTool).GetProperty(name);
+            if (propertyInfo != null)
+            {
+                var descriptionAttribute = (DescriptionAttribute?)Attribute.GetCustomAttribute(propertyInfo, typeof(DescriptionAttribute));
+                if (descriptionAttribute != null)
+                {
+                    return descriptionAttribute.Description;
+                }
+            }
+            return string.Empty;
         }
     }
 }

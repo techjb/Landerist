@@ -18,6 +18,10 @@ namespace landerist_library.Logs
             {
                 return;
             }
+            if (!Config.IsConfigurationProduction())
+            {
+                Console.WriteLine(text);
+            }
             if (Config.LOGS_ENABLED)
             {
                 WriteLogDB(logKey, source, text);

@@ -34,6 +34,7 @@ namespace landerist_service
 
                 SetTimers();
                 //PuppeteerDownloader.InstallChromeAndDoTest();                
+                //Scraper.DoTest();
 
                 await Task.Delay(Timeout.Infinite, stoppingToken);
             }

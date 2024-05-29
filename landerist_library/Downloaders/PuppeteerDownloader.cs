@@ -14,7 +14,7 @@ namespace landerist_library.Downloaders
         public byte[]? Screenshot { get; set; } = null;
         public string? RedirectUrl { get; set; } = null;
 
-        private bool PuppeterLaunched = false;
+        private bool BrowserLaunched = false;
 
         private static readonly ScreenshotType ScreenshotType = ScreenshotType.Png;
 
@@ -155,9 +155,13 @@ namespace landerist_library.Downloaders
         public void Download(Websites.Page page)
         {
             SetContentAndScrenshot(page);
-            if (PuppeterLaunched)
+            if (BrowserLaunched)
             {
                 page.SetDownloadedData(this);
+            }
+            else
+            {
+                Logs.Log.WriteLogErrors("PuppeterDownloader Download", "Unable to launch browser");
             }
         }
 
@@ -165,8 +169,7 @@ namespace landerist_library.Downloaders
         {
             try
             {
-                (Content, Screenshot) = Task.Run(async () => await GetAsync(page)).Result;
-                PuppeterLaunched = true;
+                (Content, Screenshot) = Task.Run(async () => await GetAsync(page)).Result;                
             }
             catch (Exception exception)
             {
@@ -185,6 +188,7 @@ namespace landerist_library.Downloaders
             try
             {
                 browser = await Puppeteer.LaunchAsync(launchOptions);
+                BrowserLaunched = true;
 
                 browserPage = await GetBroserPage(browser, page.Website.LanguageCode, page.Uri);
                 await browserPage.GoToAsync(page.Uri.ToString(), WaitUntilNavigation.Networkidle0);
