@@ -224,9 +224,9 @@ namespace landerist_library.Websites
                 }
                 return true;
             }
-            catch (Exception exception)
+            catch //(Exception exception)
             {
-                Logs.Log.WriteLogErrors("Website SetMainUriAndStatusCode", MainUri, exception);
+                //Logs.Log.WriteLogErrors("Website SetMainUriAndStatusCode", MainUri, exception);
             }
             return false;
         }
@@ -427,7 +427,22 @@ namespace landerist_library.Websites
             return UpdateListingExampleNodeSet();
         }
 
+        public void SetListingExampleUri(Uri uri)
+        {
+            ListingExampleUri = uri;
+            SetListingExampleNodeSet();
+        }
+
         public bool UpdateListingExampleNodeSet()
+        {
+            if (SetListingExampleNodeSet())
+            {
+                return Update();
+            }
+            return false;
+        }
+
+        private bool SetListingExampleNodeSet()
         {
             if (ListingExampleUri == null)
             {
@@ -444,7 +459,7 @@ namespace landerist_library.Websites
                     htmlDocument.LoadHtml(httpClientDownloader.Content);
                     ListingExampleNodeSet = ListingSimilarity.GetNodeSetSerialized(htmlDocument);
                     ListingExampleNodeSetUpdated = DateTime.Now;
-                    return Update();
+                    return true;
                 }
             }
             catch (Exception exception)

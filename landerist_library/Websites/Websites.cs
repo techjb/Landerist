@@ -16,7 +16,9 @@ namespace landerist_library.Websites
 
         public static HashSet<string> GetHosts()
         {
-            string query = "SELECT [Host] FROM " + TABLE_WEBSITES;
+            string query = 
+                "SELECT [Host] " +
+                "FROM " + TABLE_WEBSITES;
             return new DataBase().QueryHashSet(query);
         }
 

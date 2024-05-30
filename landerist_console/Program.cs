@@ -27,6 +27,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 
 
+
 namespace landerist_console
 {
     internal class Program
@@ -94,13 +95,7 @@ namespace landerist_console
             //var website = new Website(uri);
             //Websites.Delete(website); return;
             //Websites.Delete(uri); return;
-            //Websites.DeleteAll(); return;
-
-            //WebsitesInserter.DeleteAndInsert(uri);return;
-            //new WebsitesInserter(false).DeleteAndInsert(uri); return;
-            //new WebsitesInserter(false).InsertLinksAlternate(uri); return;
-            //new CsvInserter(true).InsertBancodedatos_es(); 
-            //new CsvInserter(true).InsertBasededatosempresas_net(); // 4985 urls
+            //Websites.DeleteAll(); return;            
 
             //Websites.SetHttpStatusCodesToNull();
             //Websites.InsertUpdateUrisFromNotOk();
@@ -154,7 +149,7 @@ namespace landerist_console
             //new Scraper().Start();
             //Scraper.Scrape(page); 
             //Scraper.DoTest();
-            
+
 
             #endregion
 
@@ -247,6 +242,15 @@ namespace landerist_console
             //InsertIdUrls.Start();
             //GetAgenciesUrls.Start();            
             //ExportAgenciesUrls.Start();
+
+            //new landerist_library.Insert.CsvInserter().InsertBancodedatos_es(); 
+            //new landerist_library.Insert.CsvInserter().InsertBasededatosempresas_net(); // 4985 urls
+            new landerist_library.Insert.CsvInserter().InsertIdAgencies();
+
+            //WebsitesInserter.DeleteAndInsert(uri);return;
+            //new WebsitesInserter(false).DeleteAndInsert(uri); return;
+            //new WebsitesInserter(false).InsertLinksAlternate(uri); return;            
+
 
             #endregion
 

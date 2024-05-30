@@ -1,31 +1,35 @@
-﻿using landerist_library.Logs;
+﻿using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
+using landerist_library.Logs;
 using landerist_library.Websites;
+using System.Data;
 
 
 namespace landerist_library.Insert
 {
     public class WebsitesInserter
     {
-        private readonly static HashSet<Uri> InsertedUris = [];
-
         private static int Inserted = 0;
         private static int ErrorsMainUri = 0;
         private static int ErrorsRobotsTxt = 0;
         private static int ErrorsIpAddress = 0;
         private static int ErrorsInsert = 0;
         private static int ErrorsException = 0;
-        private static int Skipped = 0;        
-        private static readonly object syncHashSet = new();
+        private static int Skipped = 0;
+        private static readonly object SyncHashSet = new();
 
-        public WebsitesInserter(bool initInsertedUris)
+        private readonly static HashSet<Uri> InsertedUris = [];
+
+        private readonly static HashSet<string> InsertedHosts = [];
+
+        public WebsitesInserter(bool initialize)
         {
-            if (initInsertedUris)
+            if (initialize)
             {
-                InitInsertedUris();
+                Init();
             }
         }
 
-        private static void InitInsertedUris()
+        private static void Init()
         {
             var urls = Websites.Websites.GetUrls();
             foreach (var url in urls)
@@ -34,6 +38,7 @@ namespace landerist_library.Insert
                 InsertedUris.Add(uri);
             }
         }
+
 
         public static void DeleteAndInsert(Uri uri)
         {
@@ -67,16 +72,19 @@ namespace landerist_library.Insert
             Insert(hashSet);
         }
 
-        private static void Insert(HashSet<Uri> uris)
+        public static void Insert(HashSet<Uri> uris, bool listingExamples = false)
         {
             int total = uris.Count;
+            int counter = 0;
             Parallel.ForEach(uris,
                 //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
                 uri =>
             {
-                InsertWebsite(uri);
+                var mainUri = GetMainUri(uri);
+                InsertWebsite(mainUri, listingExamples ? uri : null);
+                Interlocked.Increment(ref counter);
                 Console.WriteLine(
-                    "Total: " + total + " " +
+                    "Processed: " + counter + "/" + total + " " +
                     "Skipped: " + Skipped + " " +
                     "Inserted: " + Inserted + " " +
                     "ErrorsMainUri: " + ErrorsMainUri + " " +
@@ -87,11 +95,15 @@ namespace landerist_library.Insert
             });
         }
 
-        private static bool InsertWebsite(Uri uri)
+        private static bool InsertWebsite(Uri? mainUri, Uri? listinExampleUri = null)
         {
+            if (mainUri == null)
+            {
+                return false;
+            }
             try
             {
-                if (!CanInsert(uri))
+                if (!CanInsert(mainUri))
                 {
                     Interlocked.Increment(ref Skipped);
                     return false;
@@ -99,15 +111,19 @@ namespace landerist_library.Insert
 
                 Website website = new()
                 {
-                    MainUri = uri,
-                    Host = uri.Host,
+                    MainUri = mainUri,
+                    Host = mainUri.Host,
                 };
-                return InsertWebsite(website);                
+                if (listinExampleUri != null)
+                {
+                    website.SetListingExampleUri(listinExampleUri);
+                }
+                return InsertWebsite(website);
             }
             catch (Exception exception)
             {
                 Interlocked.Increment(ref ErrorsException);
-                Log.WriteLogErrors(uri, exception);
+                Log.WriteLogErrors(mainUri, exception);
             }
             return false;
         }
@@ -118,9 +134,19 @@ namespace landerist_library.Insert
             if (Insert(uri))
             {
                 Website website = new(listingExampleUri.Host);
-                return website.UpdateListingExample(listingExampleUri);                
+                return website.UpdateListingExample(listingExampleUri);
             }
             return false;
+        }
+
+        public static Uri? GetMainUri(Uri listingExampleUri)
+        {
+            string mainUriString = listingExampleUri.GetLeftPart(UriPartial.Authority);
+            if (Uri.TryCreate(mainUriString, UriKind.Absolute, out Uri? uri))
+            {
+                return uri;
+            }
+            return null;
         }
 
         public static bool CanInsert(Uri uri)
@@ -171,7 +197,7 @@ namespace landerist_library.Insert
             }
 
             Interlocked.Increment(ref Inserted);
-            lock (syncHashSet)
+            lock (SyncHashSet)
             {
                 InsertedUris.Add(website.MainUri);
             }

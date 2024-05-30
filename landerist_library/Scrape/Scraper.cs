@@ -33,7 +33,6 @@ namespace landerist_library.Scrape
 
         private List<Page> Pages = [];
 
-
         public static void DoTest()
         {
             Log.WriteLogInfo("service", "Starting test..");

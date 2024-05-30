@@ -5,9 +5,9 @@ using landerist_library.Configuration;
 
 namespace landerist_library.Insert
 {
-    public class CsvInserter(bool initInsertedUris) : WebsitesInserter(initInsertedUris)
+    public class CsvInserter() : WebsitesInserter(true)
     {
-        public static void InsertBancodedatos_es()
+        public void InsertBancodedatos_es()
         {
             string file = PrivateConfig.INSERT_DIRECTORY + @"bancodedatos.es\Excel\Pedido_completo.csv";
             DataTable dataTable = Csv.ToDataTable(file);
@@ -15,7 +15,7 @@ namespace landerist_library.Insert
             Insert(uris);
         }
 
-        public static void InsertBasededatosempresas_net()
+        public void InsertBasededatosempresas_net()
         {
             string file = PrivateConfig.INSERT_DIRECTORY + @"basededatosempresas.net\Inmobiliarias.csv";
             DataTable dataTable = Csv.ToDataTable(file);
@@ -23,9 +23,19 @@ namespace landerist_library.Insert
             Insert(uris);
         }
 
-        private static List<Uri> ToList(DataTable dataTable, string columnName)
+        public void InsertIdAgencies()
         {
-            List<Uri> uris = [];
+            string file = PrivateConfig.INSERT_DIRECTORY + @"IdAgenciesScraper\Entrega.csv";
+            DataTable dataTable = Csv.ToDataTable(file);
+            var uris = ToList(dataTable, "ListingExample");
+            Insert(uris, true);
+        }
+
+
+        private static HashSet<Uri> ToList(DataTable dataTable, string columnName)
+        {
+            Console.WriteLine("Parsing to list ..");
+            HashSet<Uri> uris = [];
             foreach (DataRow row in dataTable.Rows)
             {
                 string url = row[columnName].ToString() ?? string.Empty;
@@ -40,10 +50,7 @@ namespace landerist_library.Insert
                 try
                 {
                     Uri uri = new(url);
-                    if (!uris.Contains(uri))
-                    {
-                        uris.Add(uri);
-                    }
+                    uris.Add(uri);
                 }
                 catch { }
             }

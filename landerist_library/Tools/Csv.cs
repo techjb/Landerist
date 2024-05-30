@@ -9,6 +9,7 @@ namespace landerist_library.Tools
     {
         public static DataTable ToDataTable(string file)
         {
+            Console.WriteLine("Reading file " + file + " ..");
             using var streamReader = new StreamReader(file);
             var csvConfiguration = new CsvConfiguration(CultureInfo.CurrentCulture)
             {
