@@ -140,7 +140,7 @@ namespace landerist_library.Scrape
             MayBeListingCounter = 0;
             OtherPageType = 0;
 
-            PuppeteerDownloader.ReinstallChrome();            
+            PuppeteerDownloader.UpdateChrome();            
 
             var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
             var maxDegreeOfParallelism = Config.SCRAPE_WITH_PARALELISM ? Environment.ProcessorCount - 1 : 1;
