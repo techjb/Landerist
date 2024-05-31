@@ -106,16 +106,13 @@ namespace landerist_library.Downloaders
                 return false;
             }
         }
-
-        public static void KillChromeOnProduction()
-        {
-            if (Config.IsConfigurationProduction())
-            {
-                KillChrome();
-            }
-        }
+        
         public static void KillChrome()
         {
+            if (!Config.IsConfigurationProduction())
+            {
+                return;
+            }
             Process[] processes = Process.GetProcessesByName("chrome");
             foreach (Process process in processes)
             {

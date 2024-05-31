@@ -161,7 +161,7 @@ namespace landerist_library.Scrape
 
             Log.WriteLogInfo("scraper", "Updated " + Scraped + " pages");
             
-            PuppeteerDownloader.KillChromeOnProduction();
+            PuppeteerDownloader.KillChrome();
 
             return true;
         }
