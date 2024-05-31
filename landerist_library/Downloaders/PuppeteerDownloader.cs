@@ -89,9 +89,8 @@ namespace landerist_library.Downloaders
 
         public static void ReinstallChrome()
         {
-            Logs.Log.WriteLogInfo("service", "Installing Chrome ..");
             bool sucess = Task.Run(DownloadBrowserAsync).Result;
-            Logs.Log.WriteLogInfo("service", "Installing Chrome. Success: " + sucess);
+            Logs.Log.WriteLogInfo("service", "Reinstall Chrome. Success: " + sucess);
         }
 
         private static async Task<bool> DownloadBrowserAsync()

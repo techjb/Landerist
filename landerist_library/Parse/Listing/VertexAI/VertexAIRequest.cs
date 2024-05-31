@@ -174,11 +174,7 @@ namespace landerist_library.Parse.Listing.VertexAI
 
         private static GenerateContentRequest GetGenerateContentRequest(Content? content)
         {
-            //TODO: Missing in the library
-            //ToolConfig = new ToolConfig()
-            //{
-            //    mode = ToolConfig.FunctionCallingConfig.Mode.ANY
-            //}
+            
 
             return new GenerateContentRequest
             {
@@ -227,7 +223,12 @@ namespace landerist_library.Parse.Listing.VertexAI
                             Text = SystemPrompt
                         }
                     }
-                },                
+                },
+                //TODO: Missing in the library
+                //ToolConfig  = new ToolConfig()
+                //{
+                //    mode = ToolConfig.FunctionCallingConfig.Mode.ANY
+                //}
             };
         }
     }
