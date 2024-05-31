@@ -81,21 +81,17 @@ namespace landerist_library.Downloaders
         ];
 
 
-        public static void InstallChromeAndDoTest()
+        public static void ReinstallChromeAndDoTest()
         {
-            InstallChrome();
+            ReinstallChrome();
             DoTest();
         }
 
-        public static void InstallChrome()
+        public static void ReinstallChrome()
         {
-            Console.WriteLine("Installing Chrome ..");
             Logs.Log.WriteLogInfo("service", "Installing Chrome ..");
-
             bool sucess = Task.Run(DownloadBrowserAsync).Result;
-
-            Console.WriteLine("Success: " + sucess);
-            Logs.Log.WriteLogInfo("service", "Success: " + sucess);
+            Logs.Log.WriteLogInfo("service", "Installing Chrome. Success: " + sucess);
         }
 
         private static async Task<bool> DownloadBrowserAsync()
@@ -109,6 +105,29 @@ namespace landerist_library.Downloaders
             catch
             {
                 return false;
+            }
+        }
+
+        public static void KillChromeOnProduction()
+        {
+            if (Config.IsConfigurationProduction())
+            {
+                KillChrome();
+            }
+        }
+        public static void KillChrome()
+        {
+            Process[] processes = Process.GetProcessesByName("chrome");
+            foreach (Process process in processes)
+            {
+                try
+                {
+                    process.Kill();
+                }
+                catch (Exception exception)
+                {
+                    Logs.Log.WriteLogErrors("PuppeterDownloader", exception);
+                }
             }
         }
 
@@ -319,22 +338,6 @@ namespace landerist_library.Downloaders
             if (e.Response.Headers.TryGetValue("Location", out string? location))
             {
                 RedirectUrl = location;
-            }
-        }
-
-        public static void KillChrome()
-        {
-            Process[] processes = Process.GetProcessesByName("chrome");
-            foreach (Process process in processes)
-            {
-                try
-                {
-                    process.Kill();
-                }
-                catch (Exception exception)
-                {
-                    Logs.Log.WriteLogErrors("PuppeterDownloader", exception);
-                }
             }
         }
     }

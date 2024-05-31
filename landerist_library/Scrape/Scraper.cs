@@ -140,6 +140,8 @@ namespace landerist_library.Scrape
             MayBeListingCounter = 0;
             OtherPageType = 0;
 
+            PuppeteerDownloader.ReinstallChrome();            
+
             var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
             var maxDegreeOfParallelism = Config.SCRAPE_WITH_PARALELISM ? Environment.ProcessorCount - 1 : 1;
 
@@ -158,10 +160,9 @@ namespace landerist_library.Scrape
                 });
 
             Log.WriteLogInfo("scraper", "Updated " + Scraped + " pages");
-            if (Config.IsConfigurationProduction())
-            {
-                PuppeteerDownloader.KillChrome();
-            }
+            
+            PuppeteerDownloader.KillChromeOnProduction();
+
             return true;
         }
 

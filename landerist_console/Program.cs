@@ -156,7 +156,7 @@ namespace landerist_console
             #region Downloaders
 
             //new HttpClientDownloader().Get(uriPage);
-            //PuppeteerDownloader.InstallChrome();
+            //PuppeteerDownloader.ReinstallChrome();
             //PuppeteerDownloader.KillChrome();
             //PuppeteerDownloader.DoTest();            
 
@@ -221,12 +221,6 @@ namespace landerist_console
             //Backup.Update();
             #endregion
 
-            #region Statistics
-
-            //landerist_library.Statistics.StatisticsSnapshot.TakeSnapshots();
-
-            #endregion
-
             #region Listing Example
             //string url1 = "https://www.inmobiliaria-teval.com/inmueble/salou-apartamento-ln-23523-eva-2/";            
             //string url2 = "https://www.inmobiliaria-teval.com/inmueble/miami-playa-el-casalot-chalet-adosado/";
@@ -245,7 +239,7 @@ namespace landerist_console
 
             //new landerist_library.Insert.CsvInserter().InsertBancodedatos_es(); 
             //new landerist_library.Insert.CsvInserter().InsertBasededatosempresas_net(); // 4985 urls
-            new landerist_library.Insert.CsvInserter().InsertIdAgencies();
+            //new landerist_library.Insert.CsvInserter().InsertIdAgencies();
 
             //WebsitesInserter.DeleteAndInsert(uri);return;
             //new WebsitesInserter(false).DeleteAndInsert(uri); return;
@@ -256,6 +250,7 @@ namespace landerist_console
 
             #region landerist_com
 
+            //landerist_library.Statistics.StatisticsSnapshot.TakeSnapshots();
             //Landerist_com.UpdateDownloadsAndStatistics();
             //StatisticsPage.Update();
 
