@@ -183,10 +183,10 @@ namespace landerist_library.Scrape
             }
             if (IsBlocked(page))
             {
-                //if (!BlockingCollection.IsAddingCompleted)
-                //{
-                //    BlockingCollection.Add(page);
-                //}
+                if (!BlockingCollection.IsAddingCompleted)
+                {
+                    BlockingCollection.Add(page);
+                }
                 return;
             }
 
