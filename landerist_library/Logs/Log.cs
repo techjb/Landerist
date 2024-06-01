@@ -20,7 +20,7 @@ namespace landerist_library.Logs
             }
             if (!Config.IsConfigurationProduction())
             {
-                Console.WriteLine(text);
+                Console.WriteLine(source + " " + text);
             }
             if (Config.LOGS_ENABLED)
             {

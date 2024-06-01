@@ -36,7 +36,7 @@ namespace landerist_library.Scrape
         public static void DoTest()
         {
             Log.WriteLogInfo("service", "Starting test..");
-            var page = new Page("https://www.everyprop.com/propiedad/op-31427-mansion-de-lujo-en-prado-largo-madrid/");
+            var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
             var pageScraper = new PageScraper(page);
             pageScraper.Scrape();
             Log.WriteLogInfo("service", "PageType: " + page.PageType.ToString());

@@ -174,8 +174,6 @@ namespace landerist_library.Parse.Listing.VertexAI
 
         private static GenerateContentRequest GetGenerateContentRequest(Content? content)
         {
-            
-
             return new GenerateContentRequest
             {
                 Model = $"projects/{ProjectId}/locations/{Location}/publishers/{Publisher}/models/{ModelName}",
@@ -224,11 +222,13 @@ namespace landerist_library.Parse.Listing.VertexAI
                         }
                     }
                 },
-                //TODO: Missing in the library
-                //ToolConfig  = new ToolConfig()
-                //{
-                //    mode = ToolConfig.FunctionCallingConfig.Mode.ANY
-                //}
+                ToolConfig = new ToolConfig
+                {
+                    FunctionCallingConfig = new FunctionCallingConfig
+                    {
+                        Mode = FunctionCallingConfig.Types.Mode.Any,
+                    }
+                }
             };
         }
     }

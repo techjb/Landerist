@@ -605,6 +605,8 @@ namespace landerist_library.Websites
                 IpAddress = null;
                 Robots = null;
                 RobotsTxt = null;
+                ListingExampleUri = null;
+                ListingExampleNodeSet = null;
             }
 
             Disposed = true;
