@@ -11,7 +11,7 @@ namespace landerist_library.Parse.Media
     {
         public readonly Page Page;
 
-        public readonly SortedSet<landerist_orels.ES.Media> Media = new(new MediaComparer());
+        private readonly SortedSet<landerist_orels.ES.Media> Media = new(new MediaComparer());
 
         public HtmlDocument? HtmlDocument { get; set; }
 
@@ -19,6 +19,20 @@ namespace landerist_library.Parse.Media
         {
             Page = page;
             InitHtmlDocument();
+        }
+
+        public void Add(landerist_orels.ES.Media media)
+        {
+            if (media.url == null)
+            {
+                return;
+            }
+
+            if (media.url.Scheme != Uri.UriSchemeHttp && media.url.Scheme == Uri.UriSchemeHttps)
+            {
+                return;
+            }
+            Media.Add(media);
         }
 
         public void AddMedia(landerist_orels.ES.Listing listing)
@@ -52,7 +66,7 @@ namespace landerist_library.Parse.Media
 
             try
             {
-                nodesToRemove = [.. HtmlDocument.DocumentNode.SelectNodes(xPath)];                 
+                nodesToRemove = [.. HtmlDocument.DocumentNode.SelectNodes(xPath)];
             }
             catch
             {

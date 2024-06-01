@@ -53,7 +53,7 @@ namespace landerist_library.Parse.Media.Other
                 title = title,
             };
 
-            MediaParser.Media.Add(media);
+            MediaParser.Add(media);
         }
     }
 }

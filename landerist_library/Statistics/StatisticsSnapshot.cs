@@ -17,7 +17,7 @@ namespace landerist_library.Statistics
     }
 
     public class StatisticsSnapshot
-    {       
+    {
         private static readonly string TABLES_STATISTICS_SNAPSHOT = "[STATISTICS_SNAPSHOT]";
 
         public static void TakeSnapshots()
@@ -29,7 +29,7 @@ namespace landerist_library.Statistics
             SnapshotPages();
             SnapshotUpdatedPages();
             SnapshotEs_Listings();
-            SnapshotEs_Media();            
+            SnapshotEs_Media();
         }
 
         private static void SnapshotWebsites()
@@ -38,7 +38,7 @@ namespace landerist_library.Statistics
                 "SELECT COUNT(*) " +
                 "FROM " + Websites.Websites.TABLE_WEBSITES;
 
-            Insert(StatisticsKey.Websites, query);
+            InsertDaily(StatisticsKey.Websites, query);
         }
 
         private static void SnapshotUpdatedRobotsTxt()
@@ -48,7 +48,7 @@ namespace landerist_library.Statistics
                 "FROM " + Websites.Websites.TABLE_WEBSITES + " " +
                 "WHERE CONVERT(date, [RobotsTxtUpdated]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
 
-            Insert(StatisticsKey.UpdatedRobotsTxt, query);
+            InsertDaily(StatisticsKey.UpdatedRobotsTxt, query);
         }
 
         private static void SnapshotUpdatedSitemaps()
@@ -58,7 +58,7 @@ namespace landerist_library.Statistics
                 "FROM " + Websites.Websites.TABLE_WEBSITES + " " +
                 "WHERE CONVERT(date, [SitemapUpdated]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
 
-            Insert(StatisticsKey.UpdatedSitemaps, query);
+            InsertDaily(StatisticsKey.UpdatedSitemaps, query);
         }
 
         private static void SnapshotUpdatedIpAddress()
@@ -68,7 +68,7 @@ namespace landerist_library.Statistics
                 "FROM " + Websites.Websites.TABLE_WEBSITES + " " +
                 "WHERE CONVERT(date, [IpAddressUpdated]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
 
-            Insert(StatisticsKey.UpdatedIpAddress, query);
+            InsertDaily(StatisticsKey.UpdatedIpAddress, query);
         }
 
         private static void SnapshotPages()
@@ -77,7 +77,7 @@ namespace landerist_library.Statistics
                 "SELECT COUNT(*) " +
                 "FROM " + Websites.Pages.TABLE_PAGES;
 
-            Insert(StatisticsKey.Pages, query);
+            InsertDaily(StatisticsKey.Pages, query);
         }
 
         private static void SnapshotUpdatedPages()
@@ -87,7 +87,7 @@ namespace landerist_library.Statistics
                 "FROM " + Websites.Pages.TABLE_PAGES + " " +
                 "WHERE CONVERT(date, [Updated]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
 
-            Insert(StatisticsKey.UpdatedPages, query);
+            InsertDaily(StatisticsKey.UpdatedPages, query);
         }
 
         private static void SnapshotEs_Listings()
@@ -96,7 +96,7 @@ namespace landerist_library.Statistics
                 "SELECT COUNT(*) " +
                 "FROM " + ES_Listings.TABLE_ES_LISTINGS;
 
-            Insert(StatisticsKey.Listings, query);
+            InsertDaily(StatisticsKey.Listings, query);
         }
 
         private static void SnapshotEs_Media()
@@ -105,24 +105,24 @@ namespace landerist_library.Statistics
                 "SELECT COUNT(*) " +
                 "FROM " + ES_Media.TABLE_ES_MEDIA;
 
-            Insert(StatisticsKey.Media, query);
+            InsertDaily(StatisticsKey.Media, query);
         }
 
-        private static bool Insert(StatisticsKey statisticsKey, string queryCount)
+        private static bool InsertDaily(StatisticsKey statisticsKey, string queryInt)
         {
-            int counter = new DataBase().QueryInt(queryCount);
-            return Insert(statisticsKey, counter);
-        }
+            int counter = new DataBase().QueryInt(queryInt);
 
-        private static bool Insert(StatisticsKey statisticsKey, int counter)
-        {
             string query =
+                "DELETE FROM " + TABLES_STATISTICS_SNAPSHOT + " " +
+                "WHERE [key] = @Key AND CAST([Date] AS date) = CAST(@Date AS date) " +
                 "INSERT INTO " + TABLES_STATISTICS_SNAPSHOT + " " +
-                "VALUES(GETDATE(), @Key, @Counter ) ";
+                "VALUES(@Date, @Key, @Counter) ";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
-                    { "Key", statisticsKey.ToString() },
-                    { "Counter", counter }
+                { "Date", DateTime.Now},
+                { "Key", statisticsKey.ToString() },
+                { "Counter", counter },
+
                 });
         }
 
@@ -164,7 +164,7 @@ namespace landerist_library.Statistics
             string query =
                 "SELECT TOP 100 [Date], [Counter] " +
                 "FROM " + TABLES_STATISTICS_SNAPSHOT + " " +
-                "WHERE [Key] = @Key " +                
+                "WHERE [Key] = @Key " +
                 "ORDER BY [Date] DESC";
 
             return new DataBase().QueryTable(query, new Dictionary<string, object?> {

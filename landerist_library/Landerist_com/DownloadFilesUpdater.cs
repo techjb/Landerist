@@ -25,8 +25,8 @@ namespace landerist_library.Landerist_com
 
         private static void Listings()
         {
-            Console.WriteLine("Exporting Listings ..");
-            var listings = ES_Listings.GetListings(true);
+            Console.WriteLine("Reading Listings ..");
+            var listings = ES_Listings.GetListingsWithParalelism(true);
             if (!Update(listings, CountryCode.ES, ExportType.Listings))
             {
                 Log.WriteLogErrors("filesupdater", "Error updating Listings");
@@ -35,8 +35,8 @@ namespace landerist_library.Landerist_com
 
         private static void Updates()
         {
-            Console.WriteLine("Exporting Updates ..");
-            var listings = ES_Listings.GetListings(true, Yesterday);
+            Console.WriteLine("Reading Updates ..");
+            var listings = ES_Listings.GetListingsWithParalelism(true, Yesterday);
             if (!Update(listings, CountryCode.ES, ExportType.Updates))
             {
                 Log.WriteLogErrors("filesupdater", "Error updating Updates");

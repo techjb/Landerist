@@ -40,7 +40,7 @@ namespace landerist_library.Parse.Media.Image
             RemoveImages();
             foreach (var image in MediaImages)
             {
-                MediaParser.Media.Add(image);
+                MediaParser.Add(image);
             }
         }
 

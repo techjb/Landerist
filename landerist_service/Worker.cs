@@ -24,16 +24,14 @@ namespace landerist_service
         private const int OneDay = 24 * OneHour;
         private readonly Scraper Scraper = new();
 
-
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             Logger.LogInformation("ExecuteAsync");
             while (!stoppingToken.IsCancellationRequested)
             {
                 Log.WriteLogInfo("service", "Started. Version: " + Config.VERSION);
-
-                SetTimers();
-                //PuppeteerDownloader.ReinstallChromeAndDoTest();                
+                PuppeteerDownloader.UpdateChrome();
+                SetTimers();                
                 //Scraper.DoTest();
 
                 await Task.Delay(Timeout.Infinite, stoppingToken);
@@ -62,8 +60,8 @@ namespace landerist_service
             {
                 Pages.DeleteUnpublishedListings();
                 StatisticsSnapshot.TakeSnapshots();
-                DownloadFilesUpdater.UpdateFiles();                
-                Landerist_com.UpdateDownloadsAndStatistics();
+                DownloadFilesUpdater.UpdateFiles();
+                Landerist_com.UpdateDownloadsAndStatisticsPages();
                 Backup.Update();
             }
             catch (Exception exception)

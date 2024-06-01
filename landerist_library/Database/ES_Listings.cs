@@ -180,14 +180,14 @@ namespace landerist_library.Database
             return new DataBase().Query(query, queryParameters);
         }
 
-        public static SortedSet<Listing> GetListings(bool loadMedia = true)
+        public static SortedSet<Listing> GetListingsWithParalelism(bool loadMedia)
         {
             string query =
                 "SELECT * " +
                 "FROM " + TABLE_ES_LISTINGS;
 
             DataTable dataTable = new DataBase().QueryTable(query);
-            return GetListings(dataTable, loadMedia);
+            return GetListingsWithParalelism(dataTable, loadMedia);
         }
 
         public static SortedSet<Listing> GetUnpublishedListings(DateTime unlistingDate)
@@ -206,7 +206,7 @@ namespace landerist_library.Database
             return GetListings(dataTable, false);
         }
 
-        public static SortedSet<Listing> GetListings(bool loadMedia, DateTime dataSourceUpdate)
+        public static SortedSet<Listing> GetListingsWithParalelism(bool loadMedia, DateTime dataSourceUpdate)
         {
             string query =
                 "SELECT * " +
@@ -214,7 +214,7 @@ namespace landerist_library.Database
                 "WHERE CONVERT(date, [dataSourceUpdate]) = CONVERT(date, @DataSourceUpdate)";
 
             DataTable dataTable = new DataBase().QueryTable(query, "DataSourceUpdate", dataSourceUpdate);
-            return GetListings(dataTable, loadMedia);
+            return GetListingsWithParalelism(dataTable, loadMedia);
         }
 
         private static SortedSet<Listing> GetListings(DataTable dataTable, bool loadMedia)
@@ -225,6 +225,24 @@ namespace landerist_library.Database
                 var listing = GetListing(dataRow, loadMedia);
                 listings.Add(listing);
             }
+            return listings;
+        }
+
+        private static SortedSet<Listing> GetListingsWithParalelism(DataTable dataTable, bool loadMedia)
+        {
+            SortedSet<Listing> listings = new(new ListingComparer());
+            var sync = new object();
+            Parallel.ForEach(dataTable.AsEnumerable(), new ParallelOptions()
+            {
+                MaxDegreeOfParallelism = Environment.ProcessorCount - 1
+            }, dataRow =>
+            {
+                var listing = GetListing(dataRow, loadMedia);
+                lock (sync)
+                {
+                    listings.Add(listing);
+                }
+            });
             return listings;
         }
 
@@ -354,7 +372,7 @@ namespace landerist_library.Database
 
         public static bool Delete(Listing listing)
         {
-            return Delete(listing.guid);            
+            return Delete(listing.guid);
         }
 
         public static bool Delete(string guid)

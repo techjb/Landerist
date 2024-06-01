@@ -17,6 +17,7 @@ using landerist_library.Scrape;
 using landerist_library.Statistics;
 using landerist_library.Tools;
 using landerist_library.Websites;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Globalization;
 using System.Net;
@@ -251,9 +252,10 @@ namespace landerist_console
             #region landerist_com
 
             //landerist_library.Statistics.StatisticsSnapshot.TakeSnapshots();
-            //Landerist_com.UpdateDownloadsAndStatistics();
+            //DownloadFilesUpdater.UpdateFiles();
+            //Landerist_com.UpdateDownloadsAndStatisticsPages();
             //StatisticsPage.Update();
-
+            
             #endregion
 
         }

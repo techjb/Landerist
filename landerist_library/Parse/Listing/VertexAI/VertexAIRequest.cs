@@ -222,13 +222,14 @@ namespace landerist_library.Parse.Listing.VertexAI
                         }
                     }
                 },
-                ToolConfig = new ToolConfig
-                {
-                    FunctionCallingConfig = new FunctionCallingConfig
-                    {
-                        Mode = FunctionCallingConfig.Types.Mode.Any,
-                    }
-                }
+                // only supported in gemini 1.5 pro
+                //ToolConfig = new ToolConfig
+                //{
+                //    FunctionCallingConfig = new FunctionCallingConfig
+                //    {
+                //        Mode = FunctionCallingConfig.Types.Mode.Any,
+                //    }
+                //}
             };
         }
     }

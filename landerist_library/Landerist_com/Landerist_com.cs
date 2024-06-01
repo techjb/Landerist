@@ -48,7 +48,7 @@ namespace landerist_library.Landerist_com
             return prefix + "_" + datePart + "." + extension;
         }
 
-        public static void UpdateDownloadsAndStatistics()
+        public static void UpdateDownloadsAndStatisticsPages()
         {
             DownloadsPage.Update();
             StatisticsPage.Update();

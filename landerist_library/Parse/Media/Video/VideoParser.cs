@@ -52,7 +52,7 @@ namespace landerist_library.Parse.Media.Video
 
         public void AddVideo(string url)
         {
-            if (!Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out Uri? uri))
+            if (!Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
             {
                 return;
             }
@@ -65,7 +65,7 @@ namespace landerist_library.Parse.Media.Video
                 mediaType = MediaType.video,
                 url = uri
             };
-            MediaParser.Media.Add(media);
+            MediaParser.Add(media);
         }
 
         [GeneratedRegex(@"(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:embed\/|watch\?v=)|youtu\.be\/)([\w\d_-]+)")]

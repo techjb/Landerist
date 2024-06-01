@@ -140,8 +140,6 @@ namespace landerist_library.Scrape
             MayBeListingCounter = 0;
             OtherPageType = 0;
 
-            PuppeteerDownloader.UpdateChrome();            
-
             var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
             var maxDegreeOfParallelism = Config.SCRAPE_WITH_PARALELISM ? Environment.ProcessorCount - 1 : 1;
 
@@ -185,18 +183,17 @@ namespace landerist_library.Scrape
             }
             if (IsBlocked(page))
             {
-                if (!BlockingCollection.IsAddingCompleted)
-                {
-                    BlockingCollection.Add(page);
-                }
+                //if (!BlockingCollection.IsAddingCompleted)
+                //{
+                //    BlockingCollection.Add(page);
+                //}
+                return;
             }
-            else
-            {
-                Scrape(page);
-                page.Dispose();
-                Interlocked.Increment(ref Scraped);
-                Interlocked.Decrement(ref Remaining);
-            }
+
+            Scrape(page);
+            page.Dispose();
+            Interlocked.Increment(ref Scraped);
+            Interlocked.Decrement(ref Remaining);
         }
 
         private static void WriteConsole()
