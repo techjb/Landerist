@@ -316,11 +316,18 @@ namespace landerist_library.Websites
         public void SetResponseBodyText()
         {
             var htmlDocument = GetHtmlDocument();
-            if (htmlDocument != null)
+            if (htmlDocument == null)
             {
-                ResponseBodyText = HtmlToText.GetText(htmlDocument);
-                SetResponseBodyTextHash();
+                return;
             }
+            ResponseBodyText = HtmlToText.GetText(htmlDocument);           
+            if (ResponseBodyText is null)
+            {
+                return;
+            }
+            string hash = Strings.GetHash(ResponseBodyText);
+            ResponseBodyTextHasChanged = ResponseBodyTextHash == null || !hash.Equals(ResponseBodyTextHash);
+            ResponseBodyTextHash = hash;
         }
 
         public void SetResponseBodyTextHashToNull()
@@ -329,16 +336,6 @@ namespace landerist_library.Websites
             ResponseBodyTextHasChanged = false;
         }
 
-        public void SetResponseBodyTextHash()
-        {
-            if (ResponseBodyText is null)
-            {
-                return;
-            }
-            string responseBodyTextHash = Strings.GetHash(ResponseBodyText);
-            ResponseBodyTextHasChanged = ResponseBodyTextHash == null || !responseBodyTextHash.Equals(ResponseBodyTextHash);
-            ResponseBodyTextHash = responseBodyTextHash;
-        }
 
         public bool ResponseBodyTextHasNotChanged()
         {

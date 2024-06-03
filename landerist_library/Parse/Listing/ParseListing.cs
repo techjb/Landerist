@@ -9,11 +9,8 @@ namespace landerist_library.Parse.Listing
     {
         public static bool TooManyTokens(Page page)
         {
-            if (Config.PARSE_TEXT_WITH_VERTEX_AI)
-            {
-                return VertexAIRequest.TooManyTokens(page);
-            }
-            return ChatGPTRequest.TooManyTokens(page);
+            return VertexAIRequest.TooManyTokens(page);
+            //return ChatGPTRequest.TooManyTokens(page);
         }
         public static (PageType pageType, landerist_orels.ES.Listing? listing) ParseText(Page page)
         {
@@ -22,11 +19,8 @@ namespace landerist_library.Parse.Listing
             {
                 return (PageType.ResponseBodyTooShort, null);
             }
-            if (Config.PARSE_TEXT_WITH_VERTEX_AI)
-            {
-                return ParseTextVertextAI(page, text);
-            }
-            return ParseTextChatGPT(page, text);
+            return ParseTextVertextAI(page, text);
+            //return ParseTextChatGPT(page, text);
         }
 
         private static (PageType pageType, landerist_orels.ES.Listing? listing) ParseTextVertextAI(Page page, string text)

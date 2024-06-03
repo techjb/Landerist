@@ -89,7 +89,7 @@ namespace landerist_library.Parse.Listing.Gemini
 
         private static Part[] GetParts(byte[] screenshot)
         {
-            var listingService = new ListingService();
+            //var listingService = new ListingService();
 
             var textPart = new Part
             {

@@ -19,8 +19,6 @@ namespace landerist_library.Insert
 
         private readonly static HashSet<Uri> InsertedUris = [];
 
-        private readonly static HashSet<string> InsertedHosts = [];
-
         public WebsitesInserter(bool initialize)
         {
             if (initialize)

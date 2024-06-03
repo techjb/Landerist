@@ -239,7 +239,7 @@ namespace landerist_console
             //ExportAgenciesUrls.Start();
 
             //new landerist_library.Insert.CsvInserter().InsertBancodedatos_es(); 
-            //new landerist_library.Insert.CsvInserter().InsertBasededatosempresas_net(); // 4985 urls
+            //new landerist_library.Insert.CsvInserter().InsertBasededatosempresas_net();
             //new landerist_library.Insert.CsvInserter().InsertIdAgencies();
 
             //WebsitesInserter.DeleteAndInsert(uri);return;

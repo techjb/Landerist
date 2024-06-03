@@ -4,7 +4,7 @@
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "2.07";
+        public static readonly string VERSION = "2.09";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
@@ -115,8 +115,6 @@
         public const int DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS = 90;
 
         public const bool PARSE_TEXT_WITH_FULL_HTML = true;
-
-        public const bool PARSE_TEXT_WITH_VERTEX_AI = true;
 
 
     public static bool IsConfigurationProduction()

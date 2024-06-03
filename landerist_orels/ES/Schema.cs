@@ -7,6 +7,8 @@ namespace landerist_orels.ES
 {
     public class Schema
     {
+#pragma warning disable IDE1006
+
         [JsonProperty(Order = 1)]
         public string schemaUrl { get; set; } = "https://github.com/techjb/Open-Real-Estate-Listings-Schema/blob/master/ES/1.0.json";
 
@@ -16,6 +18,7 @@ namespace landerist_orels.ES
         [JsonProperty(Order = 3)]
         public SortedSet<Listing> listings = new SortedSet<Listing>(new ListingComparer());
 
+#pragma warning restore IDE1006
         public Schema()
         {
 

@@ -130,7 +130,6 @@ namespace landerist_library.Websites
                 "INNER JOIN " + Websites.TABLE_WEBSITES + " ON " + TABLE_PAGES + ".[Host] = " + Websites.TABLE_WEBSITES + ".[Host] ";
         }
 
-
         private static List<Page> GetPages(DataTable dataTable)
         {
             List<Page> pages = [];
@@ -184,7 +183,6 @@ namespace landerist_library.Websites
             page.Insert();
         }
 
-
         public static List<string> GetUris(bool isListing)
         {
             string query =
@@ -204,26 +202,7 @@ namespace landerist_library.Websites
                 "FROM " + TABLE_PAGES;
             return new DataBase().QueryListString(query);
         }
-
-        public static void UpdateResponseBodyTextHash()
-        {
-            var pages = GetPages();
-            var sync = new object();
-            int counter = 0;
-            int changed = 0;
-            Parallel.ForEach(pages, page =>
-            {
-                Console.WriteLine(counter + "/" + pages.Count + " Changed: " + changed);
-                page.SetResponseBodyTextHash();
-                if (page.ResponseBodyTextHasChanged)
-                {
-                    page.Update();
-                    Interlocked.Increment(ref changed);
-                }
-                Interlocked.Increment(ref counter);
-            });
-        }
-
+     
         public static void DeleteNumPagesExceded()
         {
             string query =

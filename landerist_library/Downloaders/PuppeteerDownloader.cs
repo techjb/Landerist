@@ -209,7 +209,7 @@ namespace landerist_library.Downloaders
                 await browserPage.GoToAsync(page.Uri.ToString(), WaitUntilNavigation.Networkidle0);
 
                 content = await browserPage.GetContentAsync();
-                screenShot = await TakeScreenshot(browserPage, page);
+                screenShot = await TakeScreenshot(browserPage);
             }
             catch
             {
@@ -230,7 +230,7 @@ namespace landerist_library.Downloaders
             return (content, screenShot);
         }
 
-        private static async Task<byte[]?> TakeScreenshot(IPage browserPage, Websites.Page page)
+        private static async Task<byte[]?> TakeScreenshot(IPage browserPage)
         {
             if (!Config.TAKE_SCREENSHOT)
             {
@@ -297,17 +297,17 @@ namespace landerist_library.Downloaders
         {
             if (BlockResources.Contains(e.Request.ResourceType))
             {
-                await e.Request.AbortAsync();
+                await AbortRequest(e);
                 return;
             }
             if (BlockDomains.Contains(uri.Host))
             {
-                await e.Request.AbortAsync();
+                await AbortRequest(e);
                 return;
             }
             if (e.Request.IsNavigationRequest && e.Request.RedirectChain.Length != 0)
             {
-                await e.Request.AbortAsync();
+                await AbortRequest(e);
                 return;
             }
 
@@ -318,6 +318,20 @@ namespace landerist_library.Downloaders
             //    //return;
             //}
             await e.Request.ContinueAsync();
+        }
+
+        private static async Task AbortRequest(RequestEventArgs e)
+        {
+            try
+            {
+                await e.Request.AbortAsync();
+            }
+            catch (Exception exception)
+            {
+                Logs.Log.WriteLogErrors("PuppeterDownloader AbortRequest", exception);
+            }
+            return;
+            
         }
 
         private void HandleResponseAsync(ResponseCreatedEventArgs e, Uri uri)

@@ -17,6 +17,9 @@ namespace landerist_library.Parse.Listing
 
         public static readonly string FunctionDescriptionIsNotListing = "No es un único anuncio inmobiliario";
 
+#pragma warning disable IDE1006
+
+
         [Description("fecha de la publicación del anuncio")]
         public string? fecha_de_publicación { get; set; } = null;
 
@@ -119,6 +122,7 @@ namespace landerist_library.Parse.Listing
         [Description("tiene sistemas de seguridad")]
         public bool? tiene_sistemas_de_seguridad { get; set; } = null;
 
+#pragma warning restore IDE1006
 
         protected const string OPERACION_VENTA = "venta";
 
