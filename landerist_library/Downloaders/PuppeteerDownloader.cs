@@ -295,43 +295,36 @@ namespace landerist_library.Downloaders
 
         private static async Task HandleRequestAsync(RequestEventArgs e, Uri uri)
         {
-            if (BlockResources.Contains(e.Request.ResourceType))
-            {
-                await AbortRequest(e);
-                return;
-            }
-            if (BlockDomains.Contains(uri.Host))
-            {
-                await AbortRequest(e);
-                return;
-            }
-            if (e.Request.IsNavigationRequest && e.Request.RedirectChain.Length != 0)
-            {
-                await AbortRequest(e);
-                return;
-            }
-
-            // problematic
-            //if (e.Request.IsNavigationRequest && e.Request.Url != uri.ToString())
-            //{
-            //    //await e.Request.AbortAsync();
-            //    //return;
-            //}
-            await e.Request.ContinueAsync();
-        }
-
-        private static async Task AbortRequest(RequestEventArgs e)
-        {
             try
             {
-                await e.Request.AbortAsync();
+                if (BlockResources.Contains(e.Request.ResourceType))
+                {
+                    await e.Request.AbortAsync();
+                    return;
+                }
+                if (BlockDomains.Contains(uri.Host))
+                {
+                    await e.Request.AbortAsync();
+                    return;
+                }
+                if (e.Request.IsNavigationRequest && e.Request.RedirectChain.Length != 0)
+                {
+                    await e.Request.AbortAsync();
+                    return;
+                }
+
+                // problematic
+                //if (e.Request.IsNavigationRequest && e.Request.Url != uri.ToString())
+                //{
+                //    //await e.Request.AbortAsync();
+                //    //return;
+                //}
+                await e.Request.ContinueAsync();
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("PuppeterDownloader AbortRequest", exception);
+                Logs.Log.WriteLogErrors("PuppeteerDownloader HandleRequestAsync", exception);
             }
-            return;
-
         }
 
         private void HandleResponseAsync(ResponseCreatedEventArgs e, Uri uri)
