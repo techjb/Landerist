@@ -470,11 +470,6 @@ namespace landerist_library.Websites
                 && uri1.Port == uri2.Port;
         }
 
-        private static string NormalizeUri(Uri uri)
-        {
-            return uri.AbsoluteUri.TrimEnd('/');
-        }
-
         public bool IncorrectLanguage()
         {
             var htmlDocument = GetHtmlDocument();
