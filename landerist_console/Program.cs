@@ -254,9 +254,8 @@ namespace landerist_console
             //DownloadFilesUpdater.UpdateFiles();
             //Landerist_com.UpdateDownloadsAndStatisticsPages();
             //StatisticsPage.Update();
-            
-            #endregion
 
-        }
+            #endregion
     }
+}
 }

@@ -27,12 +27,18 @@ namespace landerist_library.Parse.Listing
             "//textarea",
             //"//del",
             "//button",
-            //"//form[not(.//input[@id='__VIEWSTATE' or @id='__VIEWSTATEGENERATOR' or @id='__EVENTVALIDATION'])]",
+            //"//form",
             "//input",
             "//img",
             "//iframe",
-            //"//*[contains(@style, 'text-decoration: line-through')]",
-            //"//*[contains(@style, 'text-decoration:line-through')]"
+            "//audio",
+            "//video",
+            "//map",
+            "//area",
+            "//source",
+            "//embed",
+            "//object",
+            "//param",
         ];
 
         private static readonly string XpathTagsToRemove = InitXpathTagsToRemove();
