@@ -23,7 +23,7 @@ namespace landerist_library.Index
             {
                 return;
             }
-            
+
             var sitemap = new Sitemap(uri);
             InsertSitemap(sitemap);
         }
@@ -69,7 +69,7 @@ namespace landerist_library.Index
                     InsertUri(item.Location);
                 }
             }
-        }        
+        }
 
         private bool CannAddMoreSitemaps()
         {

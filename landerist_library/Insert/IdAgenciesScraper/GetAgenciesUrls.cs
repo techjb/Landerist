@@ -16,7 +16,7 @@ namespace landerist_library.Insert.IdAgenciesScraper
             int noErrors = 0;
             Parallel.ForEach(hashSet, new ParallelOptions()
             {
-                MaxDegreeOfParallelism = 45,                
+                MaxDegreeOfParallelism = 45,
             }, url =>
             {
                 var agencyUrl = GetAgencyUrl(url);
@@ -29,12 +29,12 @@ namespace landerist_library.Insert.IdAgenciesScraper
                     Interlocked.Increment(ref errors);
                 }
                 AgenciesUrls.Update(url, agencyUrl);
-                
+
                 Interlocked.Increment(ref counter);
                 var percentage = Math.Round((double)counter * 100 / total, 2);
                 Console.WriteLine(counter + "/" + total + " (" + percentage + "%) " +
                     "Errors: " + errors + " No errors: " + noErrors);
-            });            
+            });
         }
 
         private static string? GetAgencyUrl(string url)
@@ -57,7 +57,7 @@ namespace landerist_library.Insert.IdAgenciesScraper
                     {
                         agencyUrl = string.Empty;
                     }
-                }               
+                }
             }
             catch (Exception exeption)
             {

@@ -26,7 +26,7 @@ namespace landerist_library.Database
             string query =
                 "SELECT 1 " +
                 "FROM " + tableName + " " +
-                "WHERE UriHash = @UriHash";               
+                "WHERE UriHash = @UriHash";
 
             return new DataBase().QueryExists(query, new Dictionary<string, object?> {
                 {"UriHash", uriHash }

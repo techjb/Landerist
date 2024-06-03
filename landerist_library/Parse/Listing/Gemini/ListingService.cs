@@ -1,8 +1,8 @@
 ﻿namespace landerist_library.Parse.Listing.Gemini
 {
-    public class ListingService: IListingService
+    public class ListingService : IListingService
     {
-        public string EsUnAnuncio() 
+        public string EsUnAnuncio()
         {
             return "ES UN ANUNCIO";
         }

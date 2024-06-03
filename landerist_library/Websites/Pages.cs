@@ -1,8 +1,8 @@
-﻿using landerist_library.Database;
+﻿using landerist_library.Configuration;
+using landerist_library.Database;
 using landerist_library.Index;
 using landerist_library.Tools;
 using System.Data;
-using landerist_library.Configuration;
 
 namespace landerist_library.Websites
 {
@@ -202,7 +202,7 @@ namespace landerist_library.Websites
                 "FROM " + TABLE_PAGES;
             return new DataBase().QueryListString(query);
         }
-     
+
         public static void DeleteNumPagesExceded()
         {
             string query =
@@ -403,7 +403,7 @@ namespace landerist_library.Websites
             }
             int total = listings.Count;
             int processed = 0;
-            int deleted = 0;            
+            int deleted = 0;
             int errors = 0;
             Parallel.ForEach(listings,
                 new ParallelOptions() { MaxDegreeOfParallelism = Environment.ProcessorCount - 1 },

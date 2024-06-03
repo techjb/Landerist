@@ -28,7 +28,7 @@ namespace landerist_library.Database
                 "SELECT 1 " +
                 "FROM " + COUNTRY_SPAIN + " " +
                 "WHERE [geography].STIntersects(geography::STGeomFromText('" + point + "', 4326)) = 1";
-                
+
             return new DataBase().QueryExists(query);
         }
     }

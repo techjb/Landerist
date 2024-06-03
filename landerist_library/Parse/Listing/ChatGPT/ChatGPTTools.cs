@@ -10,7 +10,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             var functionIsListing = GetToolIsListing();
             var functionIsNotListing = GetToolIsNotListing();
 
-            return [functionIsListing, functionIsNotListing];            
+            return [functionIsListing, functionIsNotListing];
         }
 
         private static Tool GetToolIsListing()

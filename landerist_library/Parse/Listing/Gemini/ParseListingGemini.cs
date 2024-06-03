@@ -8,7 +8,7 @@ namespace landerist_library.Parse.Listing.Gemini
 {
     public class ParseListingGemini
     {
-        private static readonly string Prompt = 
+        private static readonly string Prompt =
             "Dime si la siguiente imagen corresponde a un único anuncio inmobiliario o no";
 
         //public static readonly string Prompt =
@@ -23,9 +23,9 @@ namespace landerist_library.Parse.Listing.Gemini
             Model = "gemini-1.5-flash-latest",
             GenerationConfig = new GenerationConfig
             {
-                Temperature = 0,                                
-            },                        
-            SafetySettings = 
+                Temperature = 0,
+            },
+            SafetySettings =
             [
                 new SafetySetting()
                 {
@@ -74,7 +74,7 @@ namespace landerist_library.Parse.Listing.Gemini
             {
                 var parts = GetParts(screenshot);
                 var model = GetModel();
-                var result = await model.GenerateContentAsync(parts);                
+                var result = await model.GenerateContentAsync(parts);
                 var text = result.Text();
                 var function = result.GetFunction();
                 var candidates = result.Candidates;
@@ -96,7 +96,7 @@ namespace landerist_library.Parse.Listing.Gemini
                 Text = Prompt,
                 //FunctionResponse = listingService.
             };
-            
+
 
 
             var imagePart = new Part()
@@ -118,8 +118,8 @@ namespace landerist_library.Parse.Listing.Gemini
             var model = new GenerativeModel(PrivateConfig.GEMINI_API_KEY, ModelParams);
 
             model.AddGlobalFunctions(listingService.AsGoogleFunctions(), listingService.AsGoogleCalls());
-            model.AddGlobalFunctions(notListingService.AsGoogleFunctions(), notListingService.AsGoogleCalls());            
-            
+            model.AddGlobalFunctions(notListingService.AsGoogleFunctions(), notListingService.AsGoogleCalls());
+
             return model;
         }
 

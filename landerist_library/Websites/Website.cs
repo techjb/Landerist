@@ -4,10 +4,10 @@ using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Downloaders;
 using landerist_library.Index;
+using landerist_library.Parse.PageTypeParser;
 using System.Data;
 using System.Net;
 using System.Text;
-using landerist_library.Parse.PageTypeParser;
 
 namespace landerist_library.Websites
 {
@@ -45,7 +45,7 @@ namespace landerist_library.Websites
         private int NumListings { get; set; } = 0;
 
         private Uri? ListingExampleUri { get; set; }
-        
+
         public string? ListingExampleNodeSet { get; set; }
 
         public DateTime? ListingExampleNodeSetUpdated { get; set; }
@@ -333,7 +333,7 @@ namespace landerist_library.Websites
             var pages = GetPages();
             foreach (var page in pages)
             {
-                if(page.DeleteListing())
+                if (page.DeleteListing())
                 {
                     counter++;
                 }
@@ -342,7 +342,7 @@ namespace landerist_library.Websites
             Console.WriteLine("Deleted " + counter + " listings");
         }
 
-        
+
 
         private bool DeleteWebsite()
         {
@@ -407,7 +407,7 @@ namespace landerist_library.Websites
 
         public bool UpdateListingExample(string url)
         {
-            if(Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
+            if (Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
             {
                 return UpdateListingExample(uri);
             }
@@ -420,7 +420,7 @@ namespace landerist_library.Websites
                 listingExampleUri.Equals(MainUri))
             {
                 return false;
-            }            
+            }
             ListingExampleUri = listingExampleUri;
             ListingExampleNodeSet = null;
             ListingExampleNodeSetUpdated = null;
@@ -499,7 +499,7 @@ namespace landerist_library.Websites
 
         public bool AchievedMaxNumberOfPages()
         {
-            return Config.IsConfigurationProduction() && 
+            return Config.IsConfigurationProduction() &&
                 NumPages >= Config.MAX_PAGES_PER_WEBSITE;
         }
 

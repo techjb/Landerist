@@ -1,6 +1,6 @@
-﻿using landerist_library.Database;
+﻿using landerist_library.Configuration;
+using landerist_library.Database;
 using System.Data;
-using landerist_library.Configuration;
 
 namespace landerist_library.Websites
 {
@@ -16,7 +16,7 @@ namespace landerist_library.Websites
 
         public static HashSet<string> GetHosts()
         {
-            string query = 
+            string query =
                 "SELECT [Host] " +
                 "FROM " + TABLE_WEBSITES;
             return new DataBase().QueryHashSet(query);
@@ -129,7 +129,7 @@ namespace landerist_library.Websites
             string query =
                 "SELECT 1 " +
                 "FROM " + TABLE_WEBSITES + " " +
-                "WHERE Host = @Host";                
+                "WHERE Host = @Host";
 
             return new DataBase().QueryExists(query, new Dictionary<string, object?> {
                 {"Host", host }
@@ -556,11 +556,11 @@ namespace landerist_library.Websites
                     continue;
                 }
                 if (!Uri.TryCreate(listingUrl, UriKind.Absolute, out Uri? listingExampleUri))
-                {                    
+                {
                     continue;
                 }
 
-                if (!host.Equals(listingExampleUri.Host) 
+                if (!host.Equals(listingExampleUri.Host)
                     || false // !remove
                     )
                 {
@@ -623,7 +623,7 @@ namespace landerist_library.Websites
             int errors = 0;
             Parallel.ForEach(websites, new ParallelOptions()
             {
-                MaxDegreeOfParallelism = Environment.ProcessorCount - 1                
+                MaxDegreeOfParallelism = Environment.ProcessorCount - 1
             },
                 website =>
             {

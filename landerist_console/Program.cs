@@ -151,7 +151,6 @@ namespace landerist_console
             //Scraper.Scrape(page); 
             //Scraper.DoTest();
 
-
             #endregion
 
             #region Downloaders

@@ -27,7 +27,8 @@
             });
         }
 
-        public static HashSet<string> GetNotScrapped() {
+        public static HashSet<string> GetNotScrapped()
+        {
             string query =
                 "SELECT [Url] FROM " + TABLE_AGENCIES_URLS + " " +
                 "WHERE [AgencyUrl] IS NULL";

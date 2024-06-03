@@ -17,10 +17,10 @@ namespace landerist_library.Export
                 return false;
             }
 
-            if(File.Exists(zipFile))
+            if (File.Exists(zipFile))
             {
                 File.Delete(zipFile);
-            }            
+            }
             try
             {
                 using FileStream zipFileStream = new(zipFile, FileMode.Create);

@@ -11,7 +11,7 @@ namespace landerist_library.Insert.IdAgenciesScraper
             var hosts = Websites.Websites.GetHosts();
             HashSet<string> uris = [];
             int errors = 0;
-            int alreadyInserted = 0; 
+            int alreadyInserted = 0;
             int total = urls.Count;
             foreach (var url in urls)
             {
@@ -28,7 +28,7 @@ namespace landerist_library.Insert.IdAgenciesScraper
                 }
                 uris.Add(uri.ToString());
             }
-            
+
             Console.WriteLine(
                 "Urls: " + total + " " +
                 "Errors: " + errors + " " +

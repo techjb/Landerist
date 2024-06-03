@@ -263,13 +263,10 @@ namespace landerist_library.Websites
 
         public HtmlDocument? GetHtmlDocument()
         {
-            if (HtmlDocument != null && OriginalOuterHtml != null)
+            if (HtmlDocument != null && OriginalOuterHtml != null &&
+                OriginalOuterHtml.Equals(HtmlDocument.DocumentNode.OuterHtml))
             {
-                string currentOuterHtml = HtmlDocument.DocumentNode.OuterHtml;
-                if (OriginalOuterHtml.Equals(currentOuterHtml))
-                {
-                    return HtmlDocument;
-                }
+                return HtmlDocument;
             }
             if (!string.IsNullOrEmpty(ResponseBody))
             {
@@ -320,7 +317,7 @@ namespace landerist_library.Websites
             {
                 return;
             }
-            ResponseBodyText = HtmlToText.GetText(htmlDocument);           
+            ResponseBodyText = HtmlToText.GetText(htmlDocument);
             if (ResponseBodyText is null)
             {
                 return;
@@ -569,7 +566,7 @@ namespace landerist_library.Websites
         {
             return Screenshot != null &&
                 Screenshot.Length > 0 &&
-                Screenshot.Length < Config.MAX_SCREENSHOT_SIZE;            
+                Screenshot.Length < Config.MAX_SCREENSHOT_SIZE;
         }
     }
 }

@@ -14,7 +14,7 @@ namespace landerist_library.Tools
             text = RemoveUrls(text);
             text = RemoveMultipleDots(text);
             text = RemoveMultipleComas(text);
-            text = RemoveMultipleSpaces(text);            
+            text = RemoveMultipleSpaces(text);
             return text.Trim();
         }
 
@@ -37,7 +37,7 @@ namespace landerist_library.Tools
         private static partial Regex RegexTabs();
         private static string TabsToSpaces(string text)
         {
-            text = text.Replace("\t", " ");            
+            text = text.Replace("\t", " ");
             return RegexTabs().Replace(text, " ");
         }
 

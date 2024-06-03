@@ -14,11 +14,11 @@ namespace landerist_library.Tools
             var csvConfiguration = new CsvConfiguration(CultureInfo.CurrentCulture)
             {
                 BadDataFound = null
-            };            
-            using var csvReader = new CsvReader(streamReader, csvConfiguration);            
+            };
+            using var csvReader = new CsvReader(streamReader, csvConfiguration);
             using var csvDataReader = new CsvDataReader(csvReader);
 
-            var dataTable = new DataTable();            
+            var dataTable = new DataTable();
             dataTable.Load(csvDataReader);
             return dataTable;
         }
@@ -30,7 +30,7 @@ namespace landerist_library.Tools
             {
                 NewLine = Environment.NewLine,
                 TrimOptions = TrimOptions.Trim,
-                ShouldQuote = (field) => true,              
+                ShouldQuote = (field) => true,
             };
 
             using CsvWriter csvWriter = new(streamWriter, csvConfiguration);
@@ -74,7 +74,7 @@ namespace landerist_library.Tools
             {
                 for (var i = 0; i < dataTable.Columns.Count; i++)
                 {
-                    var field = row[i];                    
+                    var field = row[i];
                     csvWriter.WriteField(field);
                 }
                 csvWriter.NextRecord();

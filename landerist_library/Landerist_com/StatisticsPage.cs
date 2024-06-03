@@ -25,7 +25,7 @@ namespace landerist_library.Landerist_com
                 UpdateTemplate(StatisticsKey.Listings);
                 UpdateTemplate(StatisticsKey.Websites);
                 UpdateTemplate(StatisticsKey.Pages);
-                UpdateTemplate(StatisticsKey.UpdatedPages);                
+                UpdateTemplate(StatisticsKey.UpdatedPages);
 
                 if (UploadStatisticsFile())
                 {
@@ -50,16 +50,16 @@ namespace landerist_library.Landerist_com
                 var json = "{\"date\": \"" + date + "\", \"count\": " + counter + "}";
                 values.Add(json);
             }
-            
+
             string templateKey = "/*" + statisticsKey.ToString() + "*/";
             string valuesString = string.Join(",", [.. values]);
-            StatisticsTemplate = StatisticsTemplate.Replace(templateKey, valuesString);            
+            StatisticsTemplate = StatisticsTemplate.Replace(templateKey, valuesString);
         }
 
         private static bool UploadStatisticsFile()
         {
             File.WriteAllText(StatisticsHtmlFile, StatisticsTemplate);
-            return new S3().UploadToWebsiteBucket(StatisticsHtmlFile, "index.html", "statistics");            
+            return new S3().UploadToWebsiteBucket(StatisticsHtmlFile, "index.html", "statistics");
         }
     }
 }

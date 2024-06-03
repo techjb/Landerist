@@ -74,7 +74,7 @@ namespace landerist_library.Parse.Listing.VertexAI
         {
             Add(mapField, name, Google.Cloud.AIPlatform.V1.Type.String);
         }
-        
+
         private static void AddEnum(MapField<string, OpenApiSchema> mapField, string name, JsonArray jsonArray)
         {
             OpenApiSchema openApiSchema = new()

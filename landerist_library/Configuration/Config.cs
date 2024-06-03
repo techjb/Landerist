@@ -4,7 +4,7 @@
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "2.09";
+        public static readonly string VERSION = "2.10";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
@@ -74,11 +74,11 @@
         public static string? LANDERIST_COM_OUTPUT { get; set; }
         public static string? LANDERIST_COM_TEMPLATES { get; set; }
         public static string? BACKUPS_DIRECTORY { get; set; }
-        public static string? SCREENSHOTS_DIRECTORY { get; set; }        
+        public static string? SCREENSHOTS_DIRECTORY { get; set; }
         public static bool TAKE_SCREENSHOT { get; set; }
 
         public const int MAX_SCREENSHOT_SIZE = 20 * 1024 * 1024; // 20 MB
-        public static string? CHROME_EXTENSIONS_DIRECTORY { get; set; }        
+        public static string? CHROME_EXTENSIONS_DIRECTORY { get; set; }
 
         public static readonly int DAYS_TO_DELETE_BACKUP = 60;
 
@@ -114,10 +114,8 @@
 
         public const int DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS = 90;
 
-        public const bool PARSE_TEXT_WITH_FULL_HTML = true;
 
-
-    public static bool IsConfigurationProduction()
+        public static bool IsConfigurationProduction()
         {
             return ConfigurationProduction;
         }

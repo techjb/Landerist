@@ -4,7 +4,7 @@ using System.Net.Http.Headers;
 
 namespace landerist_library.Downloaders
 {
-    public class HttpClientDownloader: IDownloader
+    public class HttpClientDownloader : IDownloader
     {
         public short? HttpStatusCode { get; set; } = null;
         public string? Content { get; set; } = null;

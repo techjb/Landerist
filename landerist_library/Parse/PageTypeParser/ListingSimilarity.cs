@@ -71,7 +71,7 @@ namespace landerist_library.Parse.PageTypeParser
         {
             return string.Join(" | ", TagsToRemove.ToList());
         }
-        
+
         public static bool HtmlNotSimilarToListing(Page page)
         {
             if (page.Website.ListingExampleNodeSet == null)
@@ -191,6 +191,6 @@ namespace landerist_library.Parse.PageTypeParser
             {
                 BuildNodeSet(child, nodeSet);
             }
-        }   
+        }
     }
 }

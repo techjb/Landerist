@@ -119,13 +119,13 @@ namespace landerist_library.Index
                 if (string.IsNullOrEmpty(directory))
                 {
                     continue;
-                }              
+                }
 
                 if (prohibitedContains.Any(directory.Contains))
                 {
                     return true;
                 }
-                
+
             }
             return false;
         }
@@ -137,7 +137,7 @@ namespace landerist_library.Index
                 LanguageCode.es => ProhibitedContains_ES,
                 _ => [],
             };
-        }       
+        }
 
         public static void FindNewProhibitedStartsWith()
         {
@@ -170,7 +170,7 @@ namespace landerist_library.Index
                     {
                         dictionary[directory] = 1;
                     }
-                }              
+                }
             }
             var sortedDict = from entry in dictionary orderby entry.Value descending select entry;
             dictionary = sortedDict.ToDictionary(x => x.Key, x => x.Value);
@@ -187,7 +187,7 @@ namespace landerist_library.Index
 
             var directories = absolutePath.Split('/');
 
-            List<string> dirs = [];            
+            List<string> dirs = [];
             foreach (var directory in directories)
             {
                 if (string.IsNullOrEmpty(directory))

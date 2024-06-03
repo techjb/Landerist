@@ -10,11 +10,11 @@ namespace landerist_library.Parse.Media.Video
 
         public void GetVideos()
         {
-            if(MediaParser.HtmlDocument == null)
+            if (MediaParser.HtmlDocument == null)
             {
                 return;
             }
-            
+
             HtmlNodeCollection linkNodes = MediaParser.HtmlDocument.DocumentNode.SelectNodes("//a[@href]");
             GetYoutubeVideos(linkNodes, "href");
 

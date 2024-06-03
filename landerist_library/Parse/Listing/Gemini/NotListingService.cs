@@ -2,7 +2,7 @@
 {
     public class NotListingService : INotListingService
     {
-        public string NoEsUnAnuncio() 
+        public string NoEsUnAnuncio()
         {
             return "NO ES UN ANUNCIO";
         }

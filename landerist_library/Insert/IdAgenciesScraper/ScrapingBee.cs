@@ -22,7 +22,7 @@ namespace landerist_library.Insert.AgenciesScraper
                 "&url=" + url +
                 "&render_js=false" +// true => 5 credits,  false => 1 credit.
                 "&premium_proxy=true"  // 10-25 credits
-                
+
                 //"&stealth_proxy=false"  // 75 credits
                 //"&block_resources=false"
                 ;

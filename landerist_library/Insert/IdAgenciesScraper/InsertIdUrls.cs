@@ -20,7 +20,7 @@ namespace landerist_library.Insert.IdAgenciesScraper
                 ScrapePage(1);
                 Insert();
             }
-        }        
+        }
 
         private static void Insert()
         {

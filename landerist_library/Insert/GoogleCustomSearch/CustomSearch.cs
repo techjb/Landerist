@@ -1,7 +1,7 @@
-﻿using landerist_library.Configuration;
-using Google.Apis.CustomSearchAPI.v1;
-using Google.Apis.Services;
+﻿using Google.Apis.CustomSearchAPI.v1;
 using Google.Apis.CustomSearchAPI.v1.Data;
+using Google.Apis.Services;
+using landerist_library.Configuration;
 
 namespace landerist_library.Insert.GoogleCustomSearch
 {
@@ -27,7 +27,7 @@ namespace landerist_library.Insert.GoogleCustomSearch
         {
             int total = municipalities.Count;
             int processed = 0;
-            foreach(var municipality in municipalities)
+            foreach (var municipality in municipalities)
             {
                 processed++;
                 Console.WriteLine(processed + "/" + total);
@@ -41,8 +41,8 @@ namespace landerist_library.Insert.GoogleCustomSearch
 
             var initializer = new BaseClientService.Initializer
             {
-                ApiKey = PrivateConfig.GOOGLE_CLOUD_LANDERIST_API_KEY,                
-            };            
+                ApiKey = PrivateConfig.GOOGLE_CLOUD_LANDERIST_API_KEY,
+            };
 
             int totalResultsObtained = 0;
             int startIndex = 1;
@@ -54,7 +54,7 @@ namespace landerist_library.Insert.GoogleCustomSearch
                 listRequest.Q = query;
                 listRequest.Start = startIndex;
                 listRequest.Cx = PrivateConfig.GOOGLE_SEARCH_ENGINE_ID;
-                listRequest.Gl = "es";                
+                listRequest.Gl = "es";
 
                 var items = ExecuteRequest(listRequest, ref totalResultsObtained);
                 startIndex += items;

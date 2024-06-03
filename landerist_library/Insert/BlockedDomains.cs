@@ -57,7 +57,7 @@
             "housage.es",
             "viveku.es",
             "blogspot.com",
-            "kyero.com",            
+            "kyero.com",
 
         ];
 

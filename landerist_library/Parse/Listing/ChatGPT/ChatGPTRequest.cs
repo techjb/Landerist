@@ -8,7 +8,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
 {
     public class ChatGPTRequest
     {
-        
+
         //public static readonly string SystemMessage =
         //   "Un anuncio completo de oferta inmobiliaria debe contener la siguiente información:\r\n\r\n" +
         //   "1. Tipo de propiedad (por ejemplo, casa, apartamento, terreno, etc.).\r\n" +
@@ -44,7 +44,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
 
         private static readonly OpenAIClient OpenAIClient = new(PrivateConfig.OPENAI_API_KEY);
         private static readonly string? ToolChoice = "auto";
-      
+
         public static bool TooManyTokens(Page page)
         {
             if (page.ResponseBodyText == null)
@@ -55,7 +55,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
             //https://github.com/dluc/openai-tools
             int systemTokens = GPT3Tokenizer.Encode(SystemPrompt).Count;
             string? text = UserTextInput.GetText(page);
-            if(text == null)
+            if (text == null)
             {
                 return false;
             }
@@ -102,7 +102,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
         {
             try
             {
-                return (chatResponse.FirstChoice.Message.ToolCalls[0].Function.Name, 
+                return (chatResponse.FirstChoice.Message.ToolCalls[0].Function.Name,
                     chatResponse.FirstChoice.Message.ToolCalls[0].Function.Arguments.ToString());
             }
             catch

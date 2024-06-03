@@ -1,7 +1,7 @@
 ﻿using HtmlAgilityPack;
-using PuppeteerSharp;
 using landerist_library.Configuration;
 using landerist_library.Websites;
+using PuppeteerSharp;
 using System.Diagnostics;
 
 
@@ -106,7 +106,7 @@ namespace landerist_library.Downloaders
                 return false;
             }
         }
-        
+
         public static void KillChrome()
         {
             if (!Config.IsConfigurationProduction())
@@ -184,7 +184,7 @@ namespace landerist_library.Downloaders
         {
             try
             {
-                (Content, Screenshot) = Task.Run(async () => await GetAsync(page)).Result;                
+                (Content, Screenshot) = Task.Run(async () => await GetAsync(page)).Result;
             }
             catch (Exception exception)
             {
@@ -249,12 +249,12 @@ namespace landerist_library.Downloaders
             }
             try
             {
-                return await browserPage.ScreenshotDataAsync(screenshotOptions);                
+                return await browserPage.ScreenshotDataAsync(screenshotOptions);
             }
-            catch(Exception exception) 
+            catch (Exception exception)
             {
                 Logs.Log.WriteLogErrors("PuppeteerDownloader TakeScreenshot", exception);
-            }            
+            }
             return null;
         }
 
@@ -331,7 +331,7 @@ namespace landerist_library.Downloaders
                 Logs.Log.WriteLogErrors("PuppeterDownloader AbortRequest", exception);
             }
             return;
-            
+
         }
 
         private void HandleResponseAsync(ResponseCreatedEventArgs e, Uri uri)

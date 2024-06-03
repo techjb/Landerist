@@ -44,10 +44,6 @@ namespace landerist_library.Parse.Listing
 
         public static string? GetText(Page page)
         {
-            if (!Configuration.Config.PARSE_TEXT_WITH_FULL_HTML)
-            {
-                return page.ResponseBodyText;
-            }
             try
             {
                 var htmlDocument = page.GetHtmlDocument();
@@ -57,7 +53,7 @@ namespace landerist_library.Parse.Listing
                 }
             }
             catch { }
-            return null;            
+            return null;
         }
 
         public static string? GetHtml(HtmlDocument htmlDocument)
@@ -67,7 +63,7 @@ namespace landerist_library.Parse.Listing
             {
                 RemoveNodes(htmlDocument, XpathTagsToRemove);
                 //RemoveAttributes(htmlDocument);
-                text = CleanHtml(htmlDocument);                
+                text = CleanHtml(htmlDocument);
                 return text;
             }
             catch { }

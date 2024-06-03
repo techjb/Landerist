@@ -17,9 +17,9 @@ namespace landerist_library.Websites
         private static void SelectPages()
         {
             Console.WriteLine("Selecting pages ..");
-            
+
             AddUnknowPageType();
-            AddNextUpdate();         
+            AddNextUpdate();
         }
 
         private static void AddUnknowPageType()

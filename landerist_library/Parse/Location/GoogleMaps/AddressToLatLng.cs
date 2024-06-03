@@ -26,9 +26,9 @@ namespace landerist_library.Parse.Location.GoogleMaps
     {
         public double? lat { get; set; }
         public double? lng { get; set; }
-    } 
+    }
 
-   
+
     public class AddressToLatLng
     {
         public static (Tuple<double, double>? latLng, bool? isAccurate) Parse(string address, CountryCode countryCode)
@@ -46,10 +46,10 @@ namespace landerist_library.Parse.Location.GoogleMaps
                 var response = client.GetAsync(requestUrl).Result;
                 response.EnsureSuccessStatusCode();
                 var content = response.Content.ReadAsStringAsync().Result;
-                if(content == null)
+                if (content == null)
                 {
                     return (null, null);
-                }                
+                }
                 GeocodeData? geocodeData = JsonConvert.DeserializeObject<GeocodeData>(content);
                 if (geocodeData == null || geocodeData.results == null)
                 {

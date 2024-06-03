@@ -24,7 +24,7 @@ namespace landerist_library.Scrape
         {
             Downloader.Download(Page);
             SetPageType();
-            UpdateListing();            
+            UpdateListing();
             IndexPages();
 
             return Page.Update();

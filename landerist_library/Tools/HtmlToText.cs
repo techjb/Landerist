@@ -286,10 +286,10 @@ namespace landerist_library.Tools
                 foreach (var node in nodesToRemove)
                 {
                     var text = node.InnerText.ToLower();
-                    if(TextEquals.Contains(text))
+                    if (TextEquals.Contains(text))
                     {
                         node.Remove();
-                    }                    
+                    }
                 }
             }
         }

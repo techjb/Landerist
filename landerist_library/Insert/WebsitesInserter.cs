@@ -1,7 +1,5 @@
-﻿using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
-using landerist_library.Logs;
+﻿using landerist_library.Logs;
 using landerist_library.Websites;
-using System.Data;
 
 
 namespace landerist_library.Insert

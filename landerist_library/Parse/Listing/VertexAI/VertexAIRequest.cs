@@ -15,7 +15,7 @@ namespace landerist_library.Parse.Listing.VertexAI
 
         private static readonly string ModelName =
                             "gemini-1.5-flash";
-                            //"gemini-1.5-pro";
+        //"gemini-1.5-pro";
 
         private static readonly string ProjectId = "landerist";
 
@@ -31,11 +31,6 @@ namespace landerist_library.Parse.Listing.VertexAI
 
         public static bool TooManyTokens(Page page)
         {
-            if (page.ResponseBodyText == null)
-            {
-                return false;
-            }
-
             //https://github.com/dluc/openai-tools
             int systemTokens = GPT3Tokenizer.Encode(SystemPrompt).Count;
             string? text = UserTextInput.GetText(page);
@@ -65,11 +60,11 @@ namespace landerist_library.Parse.Listing.VertexAI
             return null;
         }
 
-        public static (string?,string?) GetFunctionNameAndArguments(GenerateContentResponse response)
+        public static (string?, string?) GetFunctionNameAndArguments(GenerateContentResponse response)
         {
             try
             {
-                return (response.Candidates[0].Content.Parts[0].FunctionCall.Name, 
+                return (response.Candidates[0].Content.Parts[0].FunctionCall.Name,
                     response.Candidates[0].Content.Parts[0].FunctionCall.Args.ToString());
             }
             catch
@@ -183,7 +178,7 @@ namespace landerist_library.Parse.Listing.VertexAI
                 },
                 GenerationConfig = new GenerationConfig()
                 {
-                    Temperature = 0f,                    
+                    Temperature = 0f,
                 },
                 SafetySettings =
                 {
@@ -211,7 +206,7 @@ namespace landerist_library.Parse.Listing.VertexAI
                 Tools =
                 {
                     VertexAITools.GetTools()
-                },                
+                },
                 SystemInstruction = new Content
                 {
                     Parts =

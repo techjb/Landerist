@@ -1,9 +1,9 @@
-﻿using landerist_library.Websites;
-using System.Collections.Concurrent;
-using landerist_library.Logs;
-using landerist_library.Configuration;
+﻿using landerist_library.Configuration;
 using landerist_library.Downloaders;
+using landerist_library.Logs;
+using landerist_library.Websites;
 using landerist_orels.ES;
+using System.Collections.Concurrent;
 
 namespace landerist_library.Scrape
 {
@@ -48,7 +48,7 @@ namespace landerist_library.Scrape
         public void Start()
         {
             PageBlocker.Clean();
-            Pages = PageSelector.Select();            
+            Pages = PageSelector.Select();
             Scrape();
         }
 
@@ -142,7 +142,7 @@ namespace landerist_library.Scrape
 
             var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
             var maxDegreeOfParallelism = Config.SCRAPE_WITH_PARALELISM ? Environment.ProcessorCount - 1 : 1;
-            
+
             PuppeteerDownloader.KillChrome();
 
             Parallel.ForEach(

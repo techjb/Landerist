@@ -9,11 +9,11 @@ namespace landerist_library.Export
             try
             {
                 var schema = new Schema(listings);
-                string json = schema.Serialize();                
-                if(File.Exists(filePath))
+                string json = schema.Serialize();
+                if (File.Exists(filePath))
                 {
                     File.Delete(filePath);
-                }                
+                }
                 File.WriteAllText(filePath, json);
                 return true;
             }

@@ -171,7 +171,7 @@ namespace landerist_library.Parse.Location
             }
         }
 
-        
+
         private void AddLatLng(string latitude, string longitude, bool isAccurate)
         {
             if (double.TryParse(longitude, NumberStyles.Float, CultureInfo.InvariantCulture, out double lng) &&

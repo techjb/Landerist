@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using landerist_library.Configuration;
+using Newtonsoft.Json;
 using System.Text;
-using landerist_library.Configuration;
 
 namespace landerist_library.Insert.GooglePlaces
 {
@@ -45,7 +45,7 @@ namespace landerist_library.Insert.GooglePlaces
             {
 
             }
-            return null;            
+            return null;
         }
 
         private static void AddHosts(string? json)
@@ -65,11 +65,11 @@ namespace landerist_library.Insert.GooglePlaces
                         if (Uri.TryCreate(place.WebsiteUri, UriKind.Absolute, out Uri? uri))
                         {
                             Hosts.Add(uri.Host);
-                        }                        
+                        }
                     }
                 }
             }
-            catch{ }
+            catch { }
         }
 
         private static void Output()

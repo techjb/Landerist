@@ -17,7 +17,7 @@
         ResponseBodyTooManyTokens,
         HtmlNotSimilarToListing,
         MayBeListing,
-        Listing,        
+        Listing,
         NotListingByParser,
         ListingButNotParsed,
         NotListingByLastSegment,

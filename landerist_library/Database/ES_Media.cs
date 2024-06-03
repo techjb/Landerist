@@ -1,5 +1,4 @@
-﻿using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
-using landerist_orels.ES;
+﻿using landerist_orels.ES;
 using System.Data;
 
 namespace landerist_library.Database
@@ -89,11 +88,11 @@ namespace landerist_library.Database
         {
             MediaType? mediaType = dataRow["mediaType"] is DBNull ? null : (MediaType)Enum.Parse(typeof(MediaType), dataRow["mediaType"].ToString()!);
             var title = dataRow["title"] is DBNull ? null : (string)dataRow["title"];
-            if(!Uri.TryCreate((string)dataRow["url"], UriKind.Absolute, out Uri? uri))
+            if (!Uri.TryCreate((string)dataRow["url"], UriKind.Absolute, out Uri? uri))
             {
                 return null;
             }
-            
+
             return new Media()
             {
                 mediaType = mediaType,

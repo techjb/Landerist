@@ -63,7 +63,7 @@ namespace landerist_library.Export
         public static void ExportHostsMainUri()
         {
             var dataTable = Websites.Websites.GetDataTableHostMainUri();
-            string fileName = Config.EXPORT_DIRECTORY + "HostMainUri.csv";            
+            string fileName = Config.EXPORT_DIRECTORY + "HostMainUri.csv";
             Tools.Csv.Write(dataTable, fileName, true);
         }
     }
