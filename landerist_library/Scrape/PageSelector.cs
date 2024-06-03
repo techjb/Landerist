@@ -49,17 +49,17 @@ namespace landerist_library.Websites
             foreach (var page in Pages)
             {
                 var host = page.Website.Host;
-                if (!dictionary.TryGetValue(host, out int value))
-                {
-                    dictionary[host] = 1;
-                }
-                else
+                if (dictionary.TryGetValue(host, out int value))
                 {
                     if (value >= Config.MAX_PAGES_PER_HOSTS_PER_SCRAPE)
                     {
                         continue;
                     }
-                    dictionary[host] = value + 1;
+                    dictionary[host] = value + 1;                    
+                }
+                else
+                {
+                    dictionary[host] = 1;
                 }
                 pages.Add(page);
             }

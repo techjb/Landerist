@@ -130,12 +130,7 @@ namespace landerist_library.Parse.PageTypeParser
             "ca",
             "ru",
             "zh",
-            "es-es",
-            //"1",
-            //"2",
-            //"3",
-            //"4",
-            //"&",
+            "es-es",           
             "i-t-e-inspeccion-tecnica-de-edificios",
             "preguntas-frecuentes",
             "comercializados",
@@ -144,6 +139,7 @@ namespace landerist_library.Parse.PageTypeParser
             "terms_of_use",
             "garaje-trastero-en-",
             "properties",
+            "rss"
         };
 
         public static bool NotListingByLastSegment(Uri uri)

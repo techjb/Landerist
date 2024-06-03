@@ -5,7 +5,9 @@ using landerist_library.Downloaders;
 using landerist_library.Index;
 using landerist_library.Tools;
 using landerist_orels.ES;
+using System;
 using System.Data;
+using System.Drawing;
 
 namespace landerist_library.Websites
 {
@@ -452,9 +454,25 @@ namespace landerist_library.Websites
             var canonicalUri = GetCanonicalUri();
             if (canonicalUri != null)
             {
-                return !Uri.Equals(canonicalUri);
+                return !AreUrisEqual(Uri, canonicalUri);
             }
             return false;
+        }
+
+        public static bool AreUrisEqual(Uri uri1, Uri uri2)
+        {
+            string normalizedUri1 = uri1.ToString().TrimEnd('/');
+            string normalizedUri2 = uri2.ToString().TrimEnd('/');
+
+            return normalizedUri1.Equals(normalizedUri2, StringComparison.OrdinalIgnoreCase)
+                && uri1.Host.Equals(uri2.Host, StringComparison.OrdinalIgnoreCase)
+                && uri1.Scheme.Equals(uri2.Scheme, StringComparison.OrdinalIgnoreCase)
+                && uri1.Port == uri2.Port;
+        }
+
+        private static string NormalizeUri(Uri uri)
+        {
+            return uri.AbsoluteUri.TrimEnd('/');
         }
 
         public bool IncorrectLanguage()

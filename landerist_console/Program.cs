@@ -87,7 +87,7 @@ namespace landerist_console
             //var page = new Page("https://inmobiliariaalonsodiaz.com/inmueble/piso-en-venta-en-doctor-fleming-la-felguera-langreo/");
             //var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
             //var page = new Page("https://www.fincasaldaba.com/propiedad/adosado-llano-samper/foto-16-7-19-10-01-49-copy/");
-            //var page = new Page("https://www.everyprop.com/propiedad/op-31427-mansion-de-lujo-en-prado-largo-madrid/");
+            //var page = new Page("https://www.12casas.com/inmueble/E869/");
 
             #endregion
 
@@ -148,7 +148,7 @@ namespace landerist_console
             //new Scraper().ScrapeAllPages();            
             //new Scraper().ScrapeResponseBodyRepeatedInListings();
             //new Scraper().Start();
-            //Scraper.Scrape(page); 
+            //Scraper.Scrape(page);
             //Scraper.DoTest();
 
             #endregion
@@ -256,6 +256,6 @@ namespace landerist_console
             //StatisticsPage.Update();
 
             #endregion
+        }
     }
-}
 }
