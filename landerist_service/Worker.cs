@@ -98,6 +98,7 @@ namespace landerist_service
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
             Logger.LogInformation("StopAsync");
+            Scraper.Stop();
             PuppeteerDownloader.KillChrome();
             Log.WriteLogInfo("service", "Stopped. Version: " + Config.VERSION);
             Timer1?.Change(Timeout.Infinite, 0);

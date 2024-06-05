@@ -31,6 +31,9 @@ namespace landerist_library.Scrape
 
         private static BlockingCollection<Page> BlockingCollection = [];
 
+        private static readonly CancellationTokenSource CancellationTokenSource = new();
+        
+
         private List<Page> Pages = [];
 
         public static void DoTest()
@@ -50,6 +53,11 @@ namespace landerist_library.Scrape
             PageBlocker.Clean();
             Pages = PageSelector.Select();
             Scrape();
+        }
+
+        public void Stop()
+        {
+            CancellationTokenSource.Cancel();
         }
 
         public void ScrapeUnknowPageType(int? rows = null)
@@ -149,7 +157,8 @@ namespace landerist_library.Scrape
                 orderablePartitioner,
                 new ParallelOptions()
                 {
-                    MaxDegreeOfParallelism = maxDegreeOfParallelism
+                    MaxDegreeOfParallelism = maxDegreeOfParallelism,
+                    CancellationToken = CancellationTokenSource.Token
                 },
                 (page, state) =>
                 {
