@@ -4,7 +4,7 @@
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "2.12";
+        public static readonly string VERSION = "2.13";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
@@ -18,7 +18,7 @@
 
         public static readonly int MAX_PAGES_PER_SCRAPE = 1000;
 
-        public static readonly int MAX_PAGES_PER_HOSTS_PER_SCRAPE = 5;
+        public static readonly int MAX_PAGES_PER_HOSTS_PER_SCRAPE = 4;
 
         public static readonly int MAX_SITEMAPS_PER_WEBSITE = 10;
 
@@ -35,7 +35,6 @@
         public static readonly int MAX_RESPONSEBODYTEXT_LENGTH = 100000;
 
         public static readonly int MAX_PAGETYPE_COUNTER = 1000;
-        public static bool SCRAPE_WITH_PARALELISM { get; set; }
 
         public static readonly bool LOGS_ENABLED = true;
         public static bool TIMERS_ENABLED { get; set; }
@@ -170,8 +169,6 @@
 
 
             TIMERS_ENABLED = !ConfigurationProduction;
-
-            SCRAPE_WITH_PARALELISM = ConfigurationProduction;
         }
 
         private static void InitDatabase(bool configurationProduction)
