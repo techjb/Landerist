@@ -329,18 +329,25 @@ namespace landerist_library.Downloaders
 
         private void HandleResponseAsync(ResponseCreatedEventArgs e, Uri uri)
         {
-            if (!Uri.TryCreate(e.Response.Url, UriKind.RelativeOrAbsolute, out Uri? responseUri))
+            try
             {
-                return;
+                if (!Uri.TryCreate(e.Response.Url, UriKind.RelativeOrAbsolute, out Uri? responseUri))
+                {
+                    return;
+                }
+                if (!responseUri.Equals(uri))
+                {
+                    return;
+                }
+                HttpStatusCode = (short)e.Response.Status;
+                if (e.Response.Headers.TryGetValue("Location", out string? location))
+                {
+                    RedirectUrl = location;
+                }
             }
-            if (!responseUri.Equals(uri))
+            catch(Exception exception)
             {
-                return;
-            }
-            HttpStatusCode = (short)e.Response.Status;
-            if (e.Response.Headers.TryGetValue("Location", out string? location))
-            {
-                RedirectUrl = location;
+                Logs.Log.WriteLogErrors("PuppeteerDownloader HandleResponseAsync", exception);
             }
         }
     }

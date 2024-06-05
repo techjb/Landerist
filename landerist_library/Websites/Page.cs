@@ -153,6 +153,13 @@ namespace landerist_library.Websites
             return sucess;
         }
 
+
+        public bool Update(PageType? pageType)
+        {
+            SetPageType(pageType);
+            return Update();
+        }
+
         public bool Update()
         {
             Updated = DateTime.Now;
@@ -189,9 +196,9 @@ namespace landerist_library.Websites
             var addDays = PageType switch
             {
                 landerist_library.Websites.PageType.MainPage => 3,
-                landerist_library.Websites.PageType.MayBeListing => 1,
+                landerist_library.Websites.PageType.MayBeListing => 3,
                 landerist_library.Websites.PageType.Listing => 7,
-                _ => (short)PageTypeCounter! * 5,
+                _ => (short)PageTypeCounter! * 7,
             };
             NextUpdate = ((DateTime)Updated!).AddDays(addDays);
         }
@@ -207,12 +214,6 @@ namespace landerist_library.Websites
                 {"UriHash", UriHash },
                 {"NextUpdate", NextUpdate },
             });
-        }
-
-        public bool Update(PageType? pageType)
-        {
-            SetPageType(pageType);
-            return Update();
         }
 
         public bool Delete()
