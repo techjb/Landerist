@@ -10,15 +10,17 @@ using landerist_orels.ES;
 
 namespace landerist_library.Scrape
 {
-    public class PageScraper(Page page)
+    public class PageScraper(Scraper scraper, Page page)
     {
         private readonly Page Page = page;
 
         private Listing? NewListing;
 
-        private readonly PuppeteerDownloader Downloader = new();
+        //private readonly PuppeteerDownloader PuppeteerDownloader = new();
 
         private readonly PageType? OldPageType = page.PageType;
+
+        private readonly Downloader Downloader = scraper.DownloadersList.GetDownloader();
 
         public bool Scrape()
         {
@@ -29,6 +31,7 @@ namespace landerist_library.Scrape
 
             return Page.Update();
         }
+
         private void SetPageType()
         {
             (var newPageType, NewListing) = PageTypeParser.GetPageType(Page);
@@ -95,7 +98,7 @@ namespace landerist_library.Scrape
                 return;
             }
 
-            var redirectUrl = Downloader.RedirectUrl;
+            var redirectUrl = Downloader.GetRedirectUrl();
             if (!string.IsNullOrEmpty(redirectUrl))
             {
                 new Indexer(Page).Insert(redirectUrl);

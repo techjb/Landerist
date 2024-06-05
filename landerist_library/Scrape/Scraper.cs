@@ -5,6 +5,7 @@ using landerist_library.Websites;
 using landerist_orels.ES;
 using System.Collections.Concurrent;
 
+
 namespace landerist_library.Scrape
 {
     public class Scraper
@@ -32,20 +33,23 @@ namespace landerist_library.Scrape
         private static BlockingCollection<Page> BlockingCollection = [];
 
         private static readonly CancellationTokenSource CancellationTokenSource = new();
+
+        public DownloadersList DownloadersList = new();
         
 
         private List<Page> Pages = [];
 
-        public static void DoTest()
+        public void DoTest()
         {
             Log.WriteLogInfo("service", "Starting test..");
             var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
-            var pageScraper = new PageScraper(page);
+            var pageScraper = new PageScraper(this, page);
             pageScraper.Scrape();
             Log.WriteLogInfo("service", "PageType: " + page.PageType.ToString());
             var listing = pageScraper.GetListing();
             string json = new Schema(listing).Serialize();
             Log.WriteLogInfo("service", "Listing: " + json);
+            Stop();
         }
 
         public void Start()
@@ -58,6 +62,7 @@ namespace landerist_library.Scrape
         public void Stop()
         {
             CancellationTokenSource.Cancel();
+            DownloadersList.Dispose();
         }
 
         public void ScrapeUnknowPageType(int? rows = null)
@@ -96,7 +101,7 @@ namespace landerist_library.Scrape
             ScrapeUnknowHttpStatusCode();
         }
 
-        public static void ScrapeMainPage(Website website)
+        public void ScrapeMainPage(Website website)
         {
             var page = new Page(website);
             Scrape(page);
@@ -152,6 +157,7 @@ namespace landerist_library.Scrape
             var maxDegreeOfParallelism = Config.IsConfigurationProduction() ? Environment.ProcessorCount - 1 : 1;
 
             PuppeteerDownloader.KillChrome();
+            DownloadersList.LogDownloadersCounter();
 
             Parallel.ForEach(
                 orderablePartitioner,
@@ -168,7 +174,7 @@ namespace landerist_library.Scrape
                     EndThread();
                 });
 
-            Log.WriteLogInfo("scraper", "Updated " + Scraped + " pages");
+            Log.WriteLogInfo("scraper", "Updated " + Scraped + " pages.");            
 
             return true;
         }
@@ -178,7 +184,7 @@ namespace landerist_library.Scrape
             Interlocked.Increment(ref ThreadCounter);
         }
 
-        private static void ProcessThread(Page page)
+        private void ProcessThread(Page page)
         {
             if (!page.Website.IsAllowedByRobotsTxt(page.Uri))
             {
@@ -246,18 +252,18 @@ namespace landerist_library.Scrape
             hashSet.Clear();
         }
 
-        public static void Scrape(Uri uri)
+        public void Scrape(Uri uri)
         {
             var page = new Page(uri);
             Scrape(page);
         }
 
-        public static void Scrape(Page page)
+        public void Scrape(Page page)
         {
             AddToPageBlocker(page);
             try
             {
-                new PageScraper(page).Scrape();
+                new PageScraper(this, page).Scrape();
             }
             catch (Exception exception)
             {

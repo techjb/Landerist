@@ -14,8 +14,6 @@ namespace landerist_library.Downloaders
         public byte[]? Screenshot { get; set; } = null;
         public string? RedirectUrl { get; set; } = null;
 
-        private bool BrowserLaunched = false;
-
         private static readonly ScreenshotType ScreenshotType = ScreenshotType.Png;
 
         private static readonly HashSet<ResourceType> BlockResources = Config.TAKE_SCREENSHOT ?
@@ -80,6 +78,47 @@ namespace landerist_library.Downloaders
             "maps.googleapis.com",
         ];
 
+        private IBrowser? Browser = null;
+
+
+        public PuppeteerDownloader()
+        {
+            Browser = Task.Run(LaunchAsync).Result;
+        }
+
+        private static async Task<IBrowser?> LaunchAsync()
+        {
+            try
+            {
+                return await Puppeteer.LaunchAsync(launchOptions);
+            }
+            catch (Exception exception) 
+            {
+                Logs.Log.WriteLogErrors("PuppeteerDownloader LaunchAsync", exception);
+            }
+            return null;
+        }
+
+        public void CloseBrowser()
+        {
+            Task.Run(CloseBrowserAsync);
+        }
+
+        private async Task CloseBrowserAsync()
+        {
+            try
+            {
+                if (Browser != null)
+                {
+                    await Browser.CloseAsync();
+                    Browser.Dispose();
+                }
+            }
+            catch(Exception exception) 
+            {
+                Logs.Log.WriteLogErrors("PuppeteerDownloader CloseBrowserAsync", exception);
+            }
+        }
 
         public static void UpdateChromeAndDoTest()
         {
@@ -170,7 +209,7 @@ namespace landerist_library.Downloaders
         public void Download(Websites.Page page)
         {
             SetContentAndScrenshot(page);
-            if (BrowserLaunched)
+            if (Browser != null)
             {
                 page.SetDownloadedData(this);
             }
@@ -197,19 +236,20 @@ namespace landerist_library.Downloaders
             string? content = null;
             byte[]? screenShot = null;
 
-            IBrowser? browser = null;
+            //Browser = null;
             IPage? browserPage = null;
 
             try
             {
-                browser = await Puppeteer.LaunchAsync(launchOptions);
-                BrowserLaunched = true;
+                //Browser = await Puppeteer.LaunchAsync(launchOptions);                
+                if (Browser != null)
+                {
+                    browserPage = await GetBroserPage(Browser, page.Website.LanguageCode, page.Uri);
+                    await browserPage.GoToAsync(page.Uri.ToString(), WaitUntilNavigation.Networkidle0);
 
-                browserPage = await GetBroserPage(browser, page.Website.LanguageCode, page.Uri);
-                await browserPage.GoToAsync(page.Uri.ToString(), WaitUntilNavigation.Networkidle0);
-
-                content = await browserPage.GetContentAsync();
-                screenShot = await TakeScreenshot(browserPage);
+                    content = await browserPage.GetContentAsync();
+                    screenShot = await TakeScreenshot(browserPage);
+                }
             }
             catch
             {
@@ -220,15 +260,12 @@ namespace landerist_library.Downloaders
                 if (browserPage != null)
                 {
                     await browserPage.CloseAsync();
-                }
-                if (browser != null)
-                {
-                    await browser.CloseAsync();
-                    browser.Dispose();
-                }
+                }                
             }
             return (content, screenShot);
         }
+
+
 
         private static async Task<byte[]?> TakeScreenshot(IPage browserPage)
         {
@@ -345,7 +382,7 @@ namespace landerist_library.Downloaders
                     RedirectUrl = location;
                 }
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 Logs.Log.WriteLogErrors("PuppeteerDownloader HandleResponseAsync", exception);
             }

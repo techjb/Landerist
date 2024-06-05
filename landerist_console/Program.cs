@@ -149,7 +149,7 @@ namespace landerist_console
             //new Scraper().ScrapeResponseBodyRepeatedInListings();
             //new Scraper().Start();
             //Scraper.Scrape(page);
-            //Scraper.DoTest();
+            //new Scraper().DoTest();
 
             #endregion
 
