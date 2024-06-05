@@ -62,7 +62,7 @@ namespace landerist_library.Scrape
         public void Stop()
         {
             CancellationTokenSource.Cancel();
-            DownloadersList.Dispose();
+            DownloadersList.Clear();
         }
 
         public void ScrapeUnknowPageType(int? rows = null)
@@ -156,8 +156,7 @@ namespace landerist_library.Scrape
             var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
             var maxDegreeOfParallelism = Config.IsConfigurationProduction() ? Environment.ProcessorCount - 1 : 1;
 
-            PuppeteerDownloader.KillChrome();
-            DownloadersList.LogDownloadersCounter();
+            PuppeteerDownloader.KillChrome();            
 
             Parallel.ForEach(
                 orderablePartitioner,
@@ -174,6 +173,8 @@ namespace landerist_library.Scrape
                     EndThread();
                 });
 
+            DownloadersList.LogDownloadersCounter();
+            DownloadersList.Clear();
             Log.WriteLogInfo("scraper", "Updated " + Scraped + " pages.");            
 
             return true;

@@ -27,7 +27,7 @@ namespace landerist_library.Downloaders
             }
         }
 
-        public void Dispose()
+        public void Clear()
         {
             var maxDegreeOfParallelism = Config.IsConfigurationProduction() ? Environment.ProcessorCount - 1 : 1;
             Parallel.ForEach(List, new ParallelOptions()
