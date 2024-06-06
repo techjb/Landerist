@@ -156,7 +156,7 @@ namespace landerist_library.Scrape
             var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
             var maxDegreeOfParallelism = Config.IsConfigurationProduction() ? Environment.ProcessorCount - 1 : 1;
 
-            PuppeteerDownloader.KillChrome();            
+            DownloadersList.Clear();
 
             Parallel.ForEach(
                 orderablePartitioner,
@@ -172,11 +172,8 @@ namespace landerist_library.Scrape
                     WriteConsole();
                     EndThread();
                 });
-
-            DownloadersList.LogDownloadersCounter();
-            DownloadersList.Clear();
-            Log.WriteLogInfo("scraper", "Updated " + Scraped + " pages.");            
-
+            
+            Log.WriteLogInfo("scraper", "Updated " + Scraped + " pages.");
             return true;
         }
 

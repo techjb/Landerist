@@ -38,6 +38,7 @@ namespace landerist_library.Downloaders
                 downloader.CloseBrowser();
             });
             List.Clear();
+            PuppeteerDownloader.KillChrome();
         }
 
         public void LogDownloadersCounter()
