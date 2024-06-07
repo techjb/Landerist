@@ -173,7 +173,7 @@ namespace landerist_library.Scrape
                     EndThread();
                 });
             
-            Log.WriteLogInfo("scraper", "Updated " + Scraped + " pages.");
+            Log.WriteLogInfo("scraper", "Updated " + Scraped + " pages");
             return true;
         }
 

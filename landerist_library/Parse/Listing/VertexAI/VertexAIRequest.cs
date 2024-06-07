@@ -67,9 +67,9 @@ namespace landerist_library.Parse.Listing.VertexAI
                 return (response.Candidates[0].Content.Parts[0].FunctionCall.Name,
                     response.Candidates[0].Content.Parts[0].FunctionCall.Args.ToString());
             }
-            catch(Exception exception)
+            catch //(Exception exception)
             {
-                Logs.Log.WriteLogErrors("VertexAIRequest GetFunctionNameAndArguments", exception);
+                //Logs.Log.WriteLogErrors("VertexAIRequest GetFunctionNameAndArguments", exception);
             }
             return (null, null);
         }
