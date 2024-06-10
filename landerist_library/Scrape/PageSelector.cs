@@ -24,13 +24,13 @@ namespace landerist_library.Websites
 
         private static void AddUnknowPageType()
         {
-            var pages = landerist_library.Websites.Pages.GetUnknownPageType();
+            var pages = landerist_library.Websites.Pages.GetUnknownPageType(Config.MAX_PAGES_PER_SCRAPE);
             Pages.AddRange(pages);
         }
 
         private static void AddNextUpdate()
         {
-            var pages = landerist_library.Websites.Pages.GetPagesNextUpdate();
+            var pages = landerist_library.Websites.Pages.GetPagesNextUpdate(Config.MAX_PAGES_PER_SCRAPE);
             Pages.AddRange(pages);
         }
 
@@ -55,7 +55,7 @@ namespace landerist_library.Websites
                     {
                         continue;
                     }
-                    dictionary[host] = value + 1;                    
+                    dictionary[host] = value + 1;
                 }
                 else
                 {

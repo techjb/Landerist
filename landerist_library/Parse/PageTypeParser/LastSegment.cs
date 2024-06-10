@@ -130,7 +130,7 @@ namespace landerist_library.Parse.PageTypeParser
             "ca",
             "ru",
             "zh",
-            "es-es",           
+            "es-es",
             "i-t-e-inspeccion-tecnica-de-edificios",
             "preguntas-frecuentes",
             "comercializados",

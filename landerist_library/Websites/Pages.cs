@@ -46,11 +46,11 @@ namespace landerist_library.Websites
             return GetPages(dataTable);
         }
 
-        public static List<Page> GetPagesNextUpdate()
+        public static List<Page> GetPagesNextUpdate(int? rows = null)
         {
             string query =
-                QueryPages() +
-                "WHERE [NextUpdate] < @Now ";
+                QueryPages(rows) +
+                "WHERE [NextUpdate] < @Now";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"Now", DateTime.Now },
@@ -91,15 +91,9 @@ namespace landerist_library.Websites
 
         public static List<Page> GetUnknownPageType(int? rows = null)
         {
-            string orderBy = string.Empty;
-            if (rows != null)
-            {
-                orderBy = "ORDER BY NEWID()";
-            }
             string query =
                 QueryPages(rows) +
-                "WHERE [PageType] IS NULL " +
-                orderBy;
+                "WHERE [PageType] IS NULL";
 
             DataTable dataTable = new DataBase().QueryTable(query);
             return GetPages(dataTable);

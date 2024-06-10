@@ -17,6 +17,11 @@
             IsAvailable = true;
         }
 
+        public bool ContainsBrowser()
+        {
+            return PuppeteerDownloader.ContainsBrowser();
+        }
+
         public void Download(Websites.Page Page)
         {
             PuppeteerDownloader.Download(Page);

@@ -78,12 +78,17 @@ namespace landerist_library.Downloaders
             "maps.googleapis.com",
         ];
 
-        private IBrowser? Browser = null;
+        private readonly IBrowser? Browser = null;
 
 
         public PuppeteerDownloader()
         {
             Browser = Task.Run(LaunchAsync).Result;
+        }
+
+        public bool ContainsBrowser()
+        {
+            return Browser != null;
         }
 
         private static async Task<IBrowser?> LaunchAsync()
@@ -92,7 +97,7 @@ namespace landerist_library.Downloaders
             {
                 return await Puppeteer.LaunchAsync(launchOptions);
             }
-            catch (Exception exception) 
+            catch (Exception exception)
             {
                 Logs.Log.WriteLogErrors("PuppeteerDownloader LaunchAsync", exception);
             }
@@ -108,13 +113,13 @@ namespace landerist_library.Downloaders
         {
             try
             {
-                if (Browser != null)
+                if (ContainsBrowser())
                 {
-                    await Browser.CloseAsync();
+                    await Browser!.CloseAsync();
                     Browser.Dispose();
                 }
             }
-            catch(Exception exception) 
+            catch (Exception exception)
             {
                 Logs.Log.WriteLogErrors("PuppeteerDownloader CloseBrowserAsync", exception);
             }
@@ -209,7 +214,7 @@ namespace landerist_library.Downloaders
         public void Download(Websites.Page page)
         {
             SetContentAndScrenshot(page);
-            if (Browser != null)
+            if (ContainsBrowser())
             {
                 page.SetDownloadedData(this);
             }
@@ -242,9 +247,9 @@ namespace landerist_library.Downloaders
             try
             {
                 //Browser = await Puppeteer.LaunchAsync(launchOptions);                
-                if (Browser != null)
+                if (ContainsBrowser())
                 {
-                    browserPage = await GetBroserPage(Browser, page.Website.LanguageCode, page.Uri);
+                    browserPage = await GetBroserPage(Browser!, page.Website.LanguageCode, page.Uri);
                     await browserPage.GoToAsync(page.Uri.ToString(), WaitUntilNavigation.Networkidle0);
 
                     content = await browserPage.GetContentAsync();
@@ -260,7 +265,7 @@ namespace landerist_library.Downloaders
                 if (browserPage != null)
                 {
                     await browserPage.CloseAsync();
-                }                
+                }
             }
             return (content, screenShot);
         }

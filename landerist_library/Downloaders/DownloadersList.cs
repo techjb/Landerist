@@ -8,9 +8,9 @@ namespace landerist_library.Downloaders
 
         private readonly object Sync = new();
 
-        public Downloader GetDownloader()
+        public Downloader? GetDownloader()
         {
-            lock(Sync)
+            lock (Sync)
             {
                 foreach (Downloader downloader in List)
                 {
@@ -21,9 +21,13 @@ namespace landerist_library.Downloaders
                     }
                 }
                 Downloader newDownloader = new();
-                List.Add(newDownloader);
-                newDownloader.SetUnavailable();
-                return newDownloader;
+                if (newDownloader.ContainsBrowser())
+                {
+                    List.Add(newDownloader);
+                    newDownloader.SetUnavailable();
+                    return newDownloader;
+                }
+                return null;
             }
         }
 

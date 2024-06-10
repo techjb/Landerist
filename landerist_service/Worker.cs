@@ -1,11 +1,11 @@
-using landerist_library.Logs;
-using landerist_library.Statistics;
-using landerist_library.Scrape;
-using landerist_library.Database;
 using landerist_library.Configuration;
-using landerist_library.Websites;
-using landerist_library.Landerist_com;
+using landerist_library.Database;
 using landerist_library.Downloaders;
+using landerist_library.Landerist_com;
+using landerist_library.Logs;
+using landerist_library.Scrape;
+using landerist_library.Statistics;
+using landerist_library.Websites;
 
 namespace landerist_service
 {
@@ -31,7 +31,7 @@ namespace landerist_service
             {
                 Log.WriteLogInfo("service", "Started. Version: " + Config.VERSION);
                 PuppeteerDownloader.UpdateChrome();
-                SetTimers();                
+                SetTimers();
                 //Scraper.DoTest();
 
                 await Task.Delay(Timeout.Infinite, stoppingToken);
@@ -98,7 +98,7 @@ namespace landerist_service
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
             Logger.LogInformation("StopAsync");
-            Scraper.Stop();            
+            Scraper.Stop();
             Log.WriteLogInfo("service", "Stopped. Version: " + Config.VERSION);
             Timer1?.Change(Timeout.Infinite, 0);
             Timer2?.Change(Timeout.Infinite, 0);

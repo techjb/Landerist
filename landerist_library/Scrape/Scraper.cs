@@ -16,11 +16,7 @@ namespace landerist_library.Scrape
 
         private static int DownloadErrorCounter = 0;
 
-        private static int MayBeListingCounter = 0;
-
         private static int ListingCounter = 0;
-
-        private static int OtherPageType = 0;
 
         private static int TotalCounter = 0;
 
@@ -35,13 +31,14 @@ namespace landerist_library.Scrape
         private static readonly CancellationTokenSource CancellationTokenSource = new();
 
         public DownloadersList DownloadersList = new();
-        
+
 
         private List<Page> Pages = [];
 
         public void DoTest()
         {
             Log.WriteLogInfo("service", "Starting test..");
+            PuppeteerDownloader.UpdateChrome();
             var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
             var pageScraper = new PageScraper(this, page);
             pageScraper.Scrape();
@@ -150,8 +147,6 @@ namespace landerist_library.Scrape
             Remaining = TotalCounter;
             ThreadCounter = 0;
             DownloadErrorCounter = 0;
-            MayBeListingCounter = 0;
-            OtherPageType = 0;
 
             var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
             var maxDegreeOfParallelism = Config.IsConfigurationProduction() ? Environment.ProcessorCount - 1 : 1;
@@ -172,7 +167,7 @@ namespace landerist_library.Scrape
                     WriteConsole();
                     EndThread();
                 });
-            
+
             Log.WriteLogInfo("scraper", "Updated " + Scraped + " pages");
             return true;
         }
@@ -217,17 +212,13 @@ namespace landerist_library.Scrape
             }
             var scrappedPercentage = Math.Round((float)Scraped * 100 / TotalCounter, 0);
             var downloadErrorPercentage = Math.Round((float)DownloadErrorCounter * 100 / TotalCounter, 0);
-            var mayBeListingPercentage = Math.Round((float)MayBeListingCounter * 100 / Scraped, 0);
             var listingPercentage = Math.Round((float)ListingCounter * 100 / Scraped, 0);
-            var OtherPageTypePercentage = Math.Round((float)OtherPageType * 100 / Scraped, 0);
 
             Console.WriteLine(
                "Threads: " + ThreadCounter + " " +
                "Scraped: " + Scraped + "/" + TotalCounter + " (" + scrappedPercentage + "%) " +
                "Errors: " + DownloadErrorCounter + " (" + downloadErrorPercentage + "%) " +
-               "MayBeListing: " + MayBeListingCounter + " (" + mayBeListingPercentage + "%) " +
-               "Listing: " + ListingCounter + " (" + listingPercentage + "%) " +
-               "Others: " + OtherPageType + " (" + OtherPageTypePercentage + "%) "
+               "Listing: " + ListingCounter + " (" + listingPercentage + "%) "
                );
         }
 
@@ -292,19 +283,9 @@ namespace landerist_library.Scrape
                         Interlocked.Increment(ref DownloadErrorCounter);
                     }
                     break;
-                case PageType.MayBeListing:
-                    {
-                        Interlocked.Increment(ref MayBeListingCounter);
-                    }
-                    break;
                 case PageType.Listing:
                     {
                         Interlocked.Increment(ref ListingCounter);
-                    }
-                    break;
-                default:
-                    {
-                        Interlocked.Increment(ref OtherPageType);
                     }
                     break;
             }

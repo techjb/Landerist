@@ -16,14 +16,16 @@ namespace landerist_library.Scrape
 
         private Listing? NewListing;
 
-        //private readonly PuppeteerDownloader PuppeteerDownloader = new();
-
         private readonly PageType? OldPageType = page.PageType;
 
-        private readonly Downloader Downloader = scraper.DownloadersList.GetDownloader();
+        private readonly Downloader? Downloader = scraper.DownloadersList.GetDownloader();
 
         public bool Scrape()
         {
+            if (Downloader == null)
+            {
+                return false;
+            }
             Downloader.Download(Page);
             SetPageType();
             UpdateListing();

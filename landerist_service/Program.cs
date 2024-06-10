@@ -15,7 +15,7 @@ namespace landerist_service
                     services.AddHostedService<Worker>();
                 })
                 .UseWindowsService()
-                .Build();            
+                .Build();
 
             host.Run();
         }

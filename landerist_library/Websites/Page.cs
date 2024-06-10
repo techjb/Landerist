@@ -5,9 +5,7 @@ using landerist_library.Downloaders;
 using landerist_library.Index;
 using landerist_library.Tools;
 using landerist_orels.ES;
-using System;
 using System.Data;
-using System.Drawing;
 
 namespace landerist_library.Websites
 {
