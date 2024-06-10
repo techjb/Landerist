@@ -9,7 +9,7 @@ namespace landerist_library.Insert.IdAgenciesScraper
         public static void Start()
         {
             Console.WriteLine("Reading Id urls ..");
-            var hashSet = AgenciesUrls.GetNotScrapped();
+            var hashSet = IdAgenciesUrls.GetNotScrapped();
             int total = hashSet.Count;
             int counter = 0;
             int errors = 0;
@@ -28,7 +28,7 @@ namespace landerist_library.Insert.IdAgenciesScraper
                 {
                     Interlocked.Increment(ref errors);
                 }
-                AgenciesUrls.Update(url, agencyUrl);
+                IdAgenciesUrls.Update(url, agencyUrl);
 
                 Interlocked.Increment(ref counter);
                 var percentage = Math.Round((double)counter * 100 / total, 2);

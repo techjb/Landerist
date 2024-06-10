@@ -27,7 +27,7 @@ namespace landerist_library.Insert.IdAgenciesScraper
             Console.WriteLine("Inserting " + HashSetUrls.Count + " urls ..");
             foreach (var url in HashSetUrls)
             {
-                AgenciesUrls.Insert(url, CurrentProvince);
+                IdAgenciesUrls.Insert(url, CurrentProvince);
             }
         }
 

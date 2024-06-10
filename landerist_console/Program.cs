@@ -237,9 +237,9 @@ namespace landerist_console
             //GetAgenciesUrls.Start();            
             //ExportAgenciesUrls.Start();
 
-            //new landerist_library.Insert.CsvInserter().InsertBancodedatos_es(); 
-            //new landerist_library.Insert.CsvInserter().InsertBasededatosempresas_net();
-            //new landerist_library.Insert.CsvInserter().InsertIdAgencies();
+            //landerist_library.Insert.BancoDeDatos.InsertBancoDeDatos.Start();
+            //landerist_library.Insert.BaseDeDatosEmpresas.InsertBaseDeDatosEmpresas.Start();
+            //landerist_library.Insert.IdAgenciesScraper.InsertIdAgencies.Start();
 
             //WebsitesInserter.DeleteAndInsert(uri);return;
             //new WebsitesInserter(false).DeleteAndInsert(uri); return;

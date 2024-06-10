@@ -1,5 +1,6 @@
 ﻿using landerist_library.Logs;
 using landerist_library.Websites;
+using System.Data;
 
 
 namespace landerist_library.Insert
@@ -35,6 +36,32 @@ namespace landerist_library.Insert
             }
         }
 
+        protected static HashSet<Uri> ToList(DataTable dataTable, string columnName)
+        {
+            Console.WriteLine("Parsing to list ..");
+            HashSet<Uri> uris = [];
+            foreach (DataRow row in dataTable.Rows)
+            {
+                string url = row[columnName].ToString() ?? string.Empty;
+                if (url.Equals(string.Empty))
+                {
+                    continue;
+                }
+                if (!url.StartsWith("http://") && !url.StartsWith("https://"))
+                {
+                    url = "http://" + url;
+                }
+                try
+                {
+                    Uri uri = new(url);
+                    uris.Add(uri);
+                }
+                catch
+                {
+                }
+            }
+            return uris;
+        }
 
         public static void DeleteAndInsert(Uri uri)
         {

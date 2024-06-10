@@ -7,7 +7,7 @@ namespace landerist_library.Insert.IdAgenciesScraper
     {
         public static void Start()
         {
-            var urls = AgenciesUrls.GetAgencies();
+            var urls = IdAgenciesUrls.GetAgencies();
             var hosts = Websites.Websites.GetHosts();
             HashSet<string> uris = [];
             int errors = 0;
