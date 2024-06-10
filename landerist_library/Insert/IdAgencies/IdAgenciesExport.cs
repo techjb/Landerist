@@ -1,9 +1,9 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Database;
 
-namespace landerist_library.Insert.IdAgenciesScraper
+namespace landerist_library.Insert.IdAgencies
 {
-    public class ExportAgenciesUrls
+    public class IdAgenciesExport
     {
         public static void Start()
         {
@@ -35,7 +35,7 @@ namespace landerist_library.Insert.IdAgenciesScraper
                 "Already inserted: " + alreadyInserted + " " +
                 "Uris: " + uris.Count);
 
-            string fileName = PrivateConfig.INSERT_DIRECTORY + @"IdAgenciesScraper\Urls.csv";
+            string fileName = PrivateConfig.INSERT_DIRECTORY + @"IdAgencies\Urls.csv";
             Tools.Csv.Write(uris, fileName);
         }
     }

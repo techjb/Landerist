@@ -1,10 +1,10 @@
 ﻿using HtmlAgilityPack;
 using landerist_library.Database;
-using landerist_library.Insert.AgenciesScraper;
+using landerist_library.Tools;
 
-namespace landerist_library.Insert.IdAgenciesScraper
+namespace landerist_library.Insert.IdAgencies
 {
-    public class GetAgenciesUrls
+    public class IdAgenciesSetAgencyUrls
     {
         public static void Start()
         {

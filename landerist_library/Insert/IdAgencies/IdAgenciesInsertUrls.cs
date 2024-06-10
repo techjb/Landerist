@@ -2,9 +2,9 @@
 using Newtonsoft.Json;
 using System.Text;
 
-namespace landerist_library.Insert.IdAgenciesScraper
+namespace landerist_library.Insert.IdAgencies
 {
-    public class InsertIdUrls
+    public class IdAgenciesInsertUrls
     {
         private const string USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36";
         private const string COOKIE = "userUUID=61b18f3d-9e1d-4fb5-8af4-e73f73cc84ce; contacte40ecfdb-4f2d-4db9-8045-8c4ce7c532a7=\"{'maxNumberContactsAllow':10}\"; sende40ecfdb-4f2d-4db9-8045-8c4ce7c532a7=\"{}\"; didomi_token=eyJ1c2VyX2lkIjoiMThlZTVjMWMtZjllMy02ZDc1LTk1MWEtODAxZTM4YmZhZWU0IiwiY3JlYXRlZCI6IjIwMjQtMDQtMTZUMDc6MTQ6MjcuODcwWiIsInVwZGF0ZWQiOiIyMDI0LTA0LTE2VDA3OjE0OjI5LjIzNVoiLCJ2ZW5kb3JzIjp7ImVuYWJsZWQiOlsiZ29vZ2xlIiwiYzpsaW5rZWRpbi1tYXJrZXRpbmctc29sdXRpb25zIiwiYzptaXhwYW5lbCIsImM6YWJ0YXN0eS1MTGtFQ0NqOCIsImM6aG90amFyIiwiYzp5YW5kZXhtZXRyaWNzIiwiYzpiZWFtZXItSDd0cjdIaXgiLCJjOmFwcHNmbHllci1HVVZQTHBZWSIsImM6dGVhbGl1bWNvLURWRENkOFpQIiwiYzp0aWt0b2stS1pBVVFMWjkiLCJjOmdvb2dsZWFuYS00VFhuSmlnUiIsImM6aWRlYWxpc3RhLUx6dEJlcUUzIiwiYzppZGVhbGlzdGEtZmVSRWplMmMiLCJjOmNvbnRlbnRzcXVhcmUiLCJjOm1pY3Jvc29mdCJdfSwicHVycG9zZXMiOnsiZW5hYmxlZCI6WyJhbmFseXRpY3MtSHBCSnJySzciLCJnZW9sb2NhdGlvbl9kYXRhIiwiZGV2aWNlX2NoYXJhY3RlcmlzdGljcyJdfSwidmVyc2lvbiI6MiwiYWMiOiJDaEdBRUFGa0ZDSUEuQUFBQSJ9; euconsent-v2=CP9KXsAP9KXsAAHABBENAwEsAP_gAAAAAAAAF5wBgAIAAqABaAFsAUgC8wAAACkoAMAAQUJKQAYAAgoSQgAwABBQkdABgACChISADAAEFCQA.f_wAAAAAAAAA; smc=\"{}\"; utag_main__prevCompleteClickName=255-idealista/others > >; SESSION=b172e53e2c112233~d8279848-c683-4804-a965-05931418b6d5; utag_main__sn=3; utag_main__se=1%3Bexp-session; utag_main__ss=1%3Bexp-session; utag_main__st=1713784693963%3Bexp-session; utag_main_ses_id=1713782893963%3Bexp-session; utag_main__pn=1%3Bexp-session; datadome=tZ~hp2unhYisDCg2LBpGEZ~OkuEycfmfKKlQzLVdwXdwpwZ4ocUYcbvWwuG5skxs0bxhvcleBZuxJRmutpAvdXpJatfHTFTWY1JpO40NpbyOJnJtZm~6SQKYbPyThoqF";
@@ -33,11 +33,9 @@ namespace landerist_library.Insert.IdAgenciesScraper
 
         private static async void ScrapePage(int page = 1)
         {
-
             Console.WriteLine("Scrapping province: " + CurrentProvince + " page: " + page);
 
             var httpClient = new HttpClient();
-
             var location = "0-EU-ES-" + CurrentProvince.ToString().PadLeft(2, '0');
             var postData = new
             {

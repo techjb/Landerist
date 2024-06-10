@@ -5,7 +5,7 @@ using System.Data;
 
 namespace landerist_library.Insert.BaseDeDatosEmpresas
 {
-    public class InsertBaseDeDatosEmpresas() : WebsitesInserter(true)
+    public class BaseDeDatosEmpresasInsertWebsites() : WebsitesInserter(true)
     {
         public static void Start()
         {

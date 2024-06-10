@@ -6,7 +6,7 @@ using landerist_library.Export;
 using landerist_library.Index;
 using landerist_library.Insert.GoogleCustomSearch;
 using landerist_library.Insert.GooglePlaces;
-using landerist_library.Insert.IdAgenciesScraper;
+using landerist_library.Insert.IdAgencies;
 using landerist_library.Landerist_com;
 using landerist_library.Logs;
 using landerist_library.Parse.Listing.ChatGPT;
@@ -236,6 +236,9 @@ namespace landerist_console
             //InsertIdUrls.Start();
             //GetAgenciesUrls.Start();            
             //ExportAgenciesUrls.Start();
+
+            //landerist_library.Insert.FtAgencies.InsertFtUrls.GetProvincesList();
+            landerist_library.Insert.FtAgencies.FtAgenciesInsertUrls.Start();
 
             //landerist_library.Insert.BancoDeDatos.InsertBancoDeDatos.Start();
             //landerist_library.Insert.BaseDeDatosEmpresas.InsertBaseDeDatosEmpresas.Start();

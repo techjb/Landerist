@@ -4,7 +4,7 @@ using System.Data;
 
 namespace landerist_library.Insert.BancoDeDatos
 {
-    public class InsertBancoDeDatos() : WebsitesInserter(true)
+    public class BancoDeDatosInsertWebsites() : WebsitesInserter(true)
     {
         public static void Start()
         {

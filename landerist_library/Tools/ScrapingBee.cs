@@ -1,7 +1,7 @@
 ﻿using landerist_library.Configuration;
 using System.Web;
 
-namespace landerist_library.Insert.AgenciesScraper
+namespace landerist_library.Tools
 {
     public class ScrapingBee
     {
