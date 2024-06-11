@@ -4,7 +4,7 @@ using landerist_library.Tools;
 
 namespace landerist_library.Insert.IdAgencies
 {
-    public class IdAgenciesSetAgencyUrls
+    public class IdAgenciesSetAgenciesUrls
     {
         public static void Start()
         {

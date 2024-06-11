@@ -238,7 +238,9 @@ namespace landerist_console
             //ExportAgenciesUrls.Start();
 
             //landerist_library.Insert.FtAgencies.InsertFtUrls.GetProvincesList();
-            landerist_library.Insert.FtAgencies.FtAgenciesInsertUrls.Start();
+            //landerist_library.Insert.FtAgencies.FtAgenciesInsertUrls.Start();
+            //landerist_library.Insert.FtAgencies.FtAgenciesSetAgenciesUrls.Start();
+            //landerist_library.Insert.FtAgencies.FtAgenciesExport.Start();
 
             //landerist_library.Insert.BancoDeDatos.InsertBancoDeDatos.Start();
             //landerist_library.Insert.BaseDeDatosEmpresas.InsertBaseDeDatosEmpresas.Start();

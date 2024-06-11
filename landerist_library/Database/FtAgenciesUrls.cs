@@ -4,15 +4,14 @@
     {
         private const string TABLE_FT_AGENCIES_URLS = "[FT_AGENCIES_URLS]";
 
-        public static bool Insert(string url, string province)
+        public static bool Insert(string url)
         {
             string query =
                 "INSERT INTO " + TABLE_FT_AGENCIES_URLS + " " +
-                "VALUES(@Url, @Province, NULL)";
+                "VALUES(@Url, NULL)";
 
             return new DataBase().Query(query, new Dictionary<string, object?>() {
-                {"Url", url },
-                {"Province", province },
+                {"Url", url },                
             });
         }
 
