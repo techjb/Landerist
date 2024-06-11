@@ -5,7 +5,7 @@
         DownloadError,
         IncorrectLanguage,
         BlockedByRobotsTxt,
-        RobotsTxtDisallow,
+        CrawlDelayTooBig,
         MainPage,
         NotIndexable,
         NotCanonical,

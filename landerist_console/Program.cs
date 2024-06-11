@@ -88,6 +88,7 @@ namespace landerist_console
             //var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
             //var page = new Page("https://www.fincasaldaba.com/propiedad/adosado-llano-samper/foto-16-7-19-10-01-49-copy/");
             //var page = new Page("https://www.12casas.com/inmueble/E869/");
+            var page = new Page("https://www.mallorca-sothebysrealty.com/es/propiedades-exclusivas-en-zona-suroeste-mallorca/bendinat");
 
             #endregion
 
@@ -131,7 +132,7 @@ namespace landerist_console
             //Pages.UpdateInvalidCadastastralReferences();
             //Pages.UpdateNextUpdate();
             //Pages.RemoveResponseBodyTextHashToAll();
-            //Pages.RemoveResponseBodyTextHash(PageType.ListingButNotParsed);
+            //Pages.RemoveResponseBodyTextHash(PageType.NotListingByLastSegment);
             //Pages.DeleteUnpublishedListings();
 
             #endregion
@@ -148,7 +149,7 @@ namespace landerist_console
             //new Scraper().ScrapeAllPages();            
             //new Scraper().ScrapeResponseBodyRepeatedInListings();
             //new Scraper().Start();
-            //Scraper.Scrape(page);
+            //new Scraper().Scrape(page);
             //new Scraper().DoTest();
 
             #endregion

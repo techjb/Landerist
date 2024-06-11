@@ -186,7 +186,7 @@ namespace landerist_library.Scrape
             }
             if (page.Website.CrawlDelayTooBig())
             {
-                page.Update(PageType.RobotsTxtDisallow);
+                page.Update(PageType.CrawlDelayTooBig);
                 return;
             }
             if (IsBlocked(page))

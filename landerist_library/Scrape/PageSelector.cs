@@ -6,6 +6,8 @@ namespace landerist_library.Websites
     {
         private static List<Page> Pages = [];
 
+        private static readonly int SelectTopCounter = Config.MAX_PAGES_PER_SCRAPE * 2;
+
         public static List<Page> Select()
         {
             Pages.Clear();
@@ -24,13 +26,13 @@ namespace landerist_library.Websites
 
         private static void AddUnknowPageType()
         {
-            var pages = landerist_library.Websites.Pages.GetUnknownPageType(Config.MAX_PAGES_PER_SCRAPE);
+            var pages = landerist_library.Websites.Pages.GetUnknownPageType(SelectTopCounter);
             Pages.AddRange(pages);
         }
 
         private static void AddNextUpdate()
         {
-            var pages = landerist_library.Websites.Pages.GetPagesNextUpdate(Config.MAX_PAGES_PER_SCRAPE);
+            var pages = landerist_library.Websites.Pages.GetPagesNextUpdate(SelectTopCounter);
             Pages.AddRange(pages);
         }
 

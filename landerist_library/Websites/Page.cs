@@ -246,22 +246,7 @@ namespace landerist_library.Websites
             }
             return false;
         }
-
-
-        public bool CanScrape()
-        {
-            if (!Website.IsAllowedByRobotsTxt(Uri))
-            {
-                return false;
-            }
-            var crawlDelay = Website.CrawlDelay();
-            if (crawlDelay > Config.MAX_CRAW_DELAY_SECONDS)
-            {
-                return false;
-            }
-            return true;
-        }
-
+       
         public HtmlDocument? GetHtmlDocument()
         {
             if (HtmlDocument != null && OriginalOuterHtml != null &&
@@ -453,12 +438,12 @@ namespace landerist_library.Websites
             var canonicalUri = GetCanonicalUri();
             if (canonicalUri != null)
             {
-                return !AreUrisEqual(Uri, canonicalUri);
+                return !UrisAreEquals(Uri, canonicalUri);
             }
             return false;
         }
 
-        public static bool AreUrisEqual(Uri uri1, Uri uri2)
+        public static bool UrisAreEquals(Uri uri1, Uri uri2)
         {
             string normalizedUri1 = uri1.ToString().TrimEnd('/');
             string normalizedUri2 = uri2.ToString().TrimEnd('/');

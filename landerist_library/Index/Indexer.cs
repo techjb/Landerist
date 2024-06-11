@@ -9,8 +9,6 @@ namespace landerist_library.Index
 
         private readonly HashSet<Uri> Inserted = [];
 
-        //private static readonly string[] MultimediaExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".mp3", ".mp4", ".avi", ".mov", ".mkv", ".flv", ".ogg", ".webm"];
-
         private static readonly string[] WebPageExtensions = [".htm", ".html", ".xhtml", ".asp", ".aspx", ".php", ".jsp", ".cshtml", ".vbhtml", "razor"];
 
         public Indexer(Website website) : this(new Page(website))

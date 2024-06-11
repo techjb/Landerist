@@ -4,7 +4,7 @@
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "2.24";
+        public static readonly string VERSION = "2.26";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
@@ -43,7 +43,7 @@
 
         public static readonly int HTTPCLIENT_SECONDS_TIMEOUT = 10;
 
-        public static readonly int MAX_CRAW_DELAY_SECONDS = 120;
+        public static readonly int MAX_CRAW_DELAY_SECONDS = 60 * 60;
 
         public static readonly double MINIMUM_PERCENTAGE_TO_BE_SIMILAR_PAGE = 0.85;
 

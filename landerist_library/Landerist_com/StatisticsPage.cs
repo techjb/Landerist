@@ -22,10 +22,10 @@ namespace landerist_library.Landerist_com
             try
             {
                 StatisticsTemplate = File.ReadAllText(StatisticsTemplateHtmlFile);
-                UpdateTemplate(StatisticsKey.Listings);
-                UpdateTemplate(StatisticsKey.Websites);
-                UpdateTemplate(StatisticsKey.Pages);
-                UpdateTemplate(StatisticsKey.UpdatedPages);
+                UpdateTemplate(StatisticsKey.Listings, false);
+                UpdateTemplate(StatisticsKey.Websites, false);
+                UpdateTemplate(StatisticsKey.Pages, false);
+                UpdateTemplate(StatisticsKey.UpdatedPages, true);
 
                 if (UploadStatisticsFile())
                 {
@@ -39,15 +39,20 @@ namespace landerist_library.Landerist_com
             }
         }
 
-        private static void UpdateTemplate(StatisticsKey statisticsKey)
+        private static void UpdateTemplate(StatisticsKey statisticsKey, bool yesterday)
         {
             var dataTable = StatisticsSnapshot.GetTop100Statistics(statisticsKey);
             List<string> values = [];
             foreach (DataRow dataRow in dataTable.Rows.Cast<DataRow>().Reverse())
             {
                 int counter = Convert.ToInt32(dataRow["Counter"]);
-                var date = ((DateTime)dataRow["Date"]).ToShortDateString();
-                var json = "{\"date\": \"" + date + "\", \"count\": " + counter + "}";
+                var date = ((DateTime)dataRow["Date"]);
+                if (yesterday)
+                {
+                    date = date.AddDays(-1);
+                }
+
+                var json = "{\"date\": \"" + date.ToShortDateString() + "\", \"count\": " + counter + "}";
                 values.Add(json);
             }
 

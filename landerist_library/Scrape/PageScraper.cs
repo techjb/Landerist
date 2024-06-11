@@ -100,6 +100,10 @@ namespace landerist_library.Scrape
                 return;
             }
 
+            if (Downloader == null)
+            {
+                return;
+            }
             var redirectUrl = Downloader.GetRedirectUrl();
             if (!string.IsNullOrEmpty(redirectUrl))
             {
@@ -119,11 +123,7 @@ namespace landerist_library.Scrape
             {
                 new CanonicalIndexer(Page).Insert();
                 return;
-            }
-            if (Page.ContainsMetaRobotsNoIndex())
-            {
-                return;
-            }
+            }           
             new HyperlinksIndexer(Page).Insert();
         }
 
