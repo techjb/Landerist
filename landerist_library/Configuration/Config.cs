@@ -4,7 +4,7 @@
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "2.26";
+        public static readonly string VERSION = "2.29";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
@@ -12,7 +12,7 @@
 
         public static readonly bool WORDS_ENABLED = false;
 
-        public static readonly int MAX_PAGES_PER_WEBSITE = 300;
+        public static readonly int MAX_PAGES_PER_WEBSITE = 400;
 
         public static readonly int MIN_PAGES_PER_SCRAPE = 20;
 
@@ -20,15 +20,13 @@
 
         public static readonly int MAX_PAGES_PER_HOSTS_PER_SCRAPE = 4;
 
-        public static readonly int MAX_SITEMAPS_PER_WEBSITE = 10;
+        public static readonly int MAX_SITEMAPS_PER_WEBSITE = 20;
 
         public static readonly int DAYS_TO_UPDATE_ROBOTS_TXT = 3;
 
         public static readonly int DAYS_TO_UPDATE_SITEMAP = 3;
 
         public static readonly int DAYS_TO_UPDATE_IP_ADDRESS = 7;
-
-        //public static readonly int MAX_LISTINGS_PER_WEBSITE = 100;
 
         public static readonly int MIN_RESPONSEBODYTEXT_LENGTH = 50;
 

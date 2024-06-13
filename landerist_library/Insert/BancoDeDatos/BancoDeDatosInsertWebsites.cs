@@ -11,7 +11,7 @@ namespace landerist_library.Insert.BancoDeDatos
             string file = PrivateConfig.INSERT_DIRECTORY + @"bancodedatos.es\Excel\Pedido_completo.csv";
             DataTable dataTable = Csv.ToDataTable(file);
             var uris = ToList(dataTable, "SITIO WEB");
-            Insert(uris);
+            Insert(uris, false);
         }
     }
 }

@@ -86,9 +86,9 @@ namespace landerist_console
             //var page = new Page("https://veovall.com/property/valladolid/"); // no listing
             //var page = new Page("https://inmobiliariaalonsodiaz.com/inmueble/piso-en-venta-en-doctor-fleming-la-felguera-langreo/");
             //var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
-            //var page = new Page("https://www.fincasaldaba.com/propiedad/adosado-llano-samper/foto-16-7-19-10-01-49-copy/");
+            var page = new Page("https://www.fincasaldaba.com/propiedad/adosado-llano-samper/foto-16-7-19-10-01-49-copy/");
             //var page = new Page("https://www.12casas.com/inmueble/E869/");
-            var page = new Page("https://www.mallorca-sothebysrealty.com/es/propiedades-exclusivas-en-zona-suroeste-mallorca/bendinat");
+            //var page = new Page("https://sanmiguelinmobiliaria.com/caracteristicas/terraza/");
 
             #endregion
 
@@ -149,7 +149,7 @@ namespace landerist_console
             //new Scraper().ScrapeAllPages();            
             //new Scraper().ScrapeResponseBodyRepeatedInListings();
             //new Scraper().Start();
-            //new Scraper().Scrape(page);
+            new Scraper().Scrape(page);
             //new Scraper().DoTest();
 
             #endregion
@@ -242,10 +242,11 @@ namespace landerist_console
             //landerist_library.Insert.FtAgencies.FtAgenciesInsertUrls.Start();
             //landerist_library.Insert.FtAgencies.FtAgenciesSetAgenciesUrls.Start();
             //landerist_library.Insert.FtAgencies.FtAgenciesExport.Start();
+            //landerist_library.Insert.FtAgencies.FtAgenciesInsertWebsites.Start();
 
             //landerist_library.Insert.BancoDeDatos.InsertBancoDeDatos.Start();
             //landerist_library.Insert.BaseDeDatosEmpresas.InsertBaseDeDatosEmpresas.Start();
-            //landerist_library.Insert.IdAgenciesScraper.InsertIdAgencies.Start();
+            //landerist_library.Insert.IdAgencies.IdAgenciesInsertWebsites.Start();
 
             //WebsitesInserter.DeleteAndInsert(uri);return;
             //new WebsitesInserter(false).DeleteAndInsert(uri); return;

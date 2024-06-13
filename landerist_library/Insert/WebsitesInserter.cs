@@ -40,6 +40,8 @@ namespace landerist_library.Insert
         {
             Console.WriteLine("Parsing to list ..");
             HashSet<Uri> uris = [];
+            HashSet<string> hosts = [];
+            
             foreach (DataRow row in dataTable.Rows)
             {
                 string url = row[columnName].ToString() ?? string.Empty;
@@ -54,7 +56,10 @@ namespace landerist_library.Insert
                 try
                 {
                     Uri uri = new(url);
-                    uris.Add(uri);
+                    if (hosts.Add(uri.Host))
+                    {
+                        uris.Add(uri);
+                    }
                 }
                 catch
                 {
@@ -92,10 +97,10 @@ namespace landerist_library.Insert
         public static void Insert(List<Uri> uris)
         {
             HashSet<Uri> hashSet = new(uris);
-            Insert(hashSet);
+            Insert(hashSet, false);
         }
 
-        public static void Insert(HashSet<Uri> uris, bool listingExamples = false)
+        public static void Insert(HashSet<Uri> uris, bool listingExamples)
         {
             int total = uris.Count;
             int counter = 0;
@@ -103,7 +108,7 @@ namespace landerist_library.Insert
                 //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
                 uri =>
             {
-                var mainUri = GetMainUri(uri);
+                var mainUri = GetSuggestedMainUri(uri);                
                 InsertWebsite(mainUri, listingExamples ? uri : null);
                 Interlocked.Increment(ref counter);
                 Console.WriteLine(
@@ -116,6 +121,16 @@ namespace landerist_library.Insert
                     "ErrorsInsert: " + ErrorsInsert + " " +
                     "ErrorsException: " + ErrorsException + " ");
             });
+        }
+
+        public static Uri? GetSuggestedMainUri(Uri listingExampleUri)
+        {
+            string mainUriString = listingExampleUri.GetLeftPart(UriPartial.Authority);
+            if (Uri.TryCreate(mainUriString, UriKind.Absolute, out Uri? uri))
+            {
+                return uri;
+            }
+            return null;
         }
 
         private static bool InsertWebsite(Uri? mainUri, Uri? listinExampleUri = null)
@@ -160,17 +175,7 @@ namespace landerist_library.Insert
                 return website.UpdateListingExample(listingExampleUri);
             }
             return false;
-        }
-
-        public static Uri? GetMainUri(Uri listingExampleUri)
-        {
-            string mainUriString = listingExampleUri.GetLeftPart(UriPartial.Authority);
-            if (Uri.TryCreate(mainUriString, UriKind.Absolute, out Uri? uri))
-            {
-                return uri;
-            }
-            return null;
-        }
+        }      
 
         public static bool CanInsert(Uri uri)
         {
@@ -197,10 +202,10 @@ namespace landerist_library.Insert
             {
                 Interlocked.Increment(ref ErrorsMainUri);
                 return false;
-            }
+            }           
             if (!CanInsert(website.MainUri))
             {
-                Interlocked.Increment(ref Skipped);
+                Interlocked.Increment(ref Skipped);                
                 return false;
             }
             if (!website.SetRobotsTxt())

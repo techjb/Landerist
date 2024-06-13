@@ -51,7 +51,9 @@ namespace landerist_library.Scrape
                 return;
             }
 
-            if (OldPageType != null && OldPageType.Equals(PageType.Listing))
+            if (!Page.PageType.Equals(PageType.MayBeListing) &&
+                OldPageType != null &&
+                OldPageType.Equals(PageType.Listing))
             {
                 NewListing ??= Page.GetListing(false);
                 if (NewListing != null)
@@ -123,7 +125,7 @@ namespace landerist_library.Scrape
             {
                 new CanonicalIndexer(Page).Insert();
                 return;
-            }           
+            }
             new HyperlinksIndexer(Page).Insert();
         }
 

@@ -12,7 +12,7 @@ namespace landerist_library.Insert.BaseDeDatosEmpresas
             string file = PrivateConfig.INSERT_DIRECTORY + @"basededatosempresas.net\Inmobiliarias.csv";
             DataTable dataTable = Csv.ToDataTable(file);
             var uris = ToList(dataTable, "Website");
-            Insert(uris);
+            Insert(uris, false);
         }
     }
 }
