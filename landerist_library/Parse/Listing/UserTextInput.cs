@@ -41,6 +41,16 @@ namespace landerist_library.Parse.Listing
             "//param",
         ];
 
+        private static readonly HashSet<string> AttributesToRemove = 
+        [
+            "width",
+            "height",
+            "src",
+            "target",
+            "style",
+            "tabindex",
+        ];
+
         private static readonly string XpathTagsToRemove = InitXpathTagsToRemove();
 
         private static string InitXpathTagsToRemove()
@@ -68,7 +78,7 @@ namespace landerist_library.Parse.Listing
             try
             {
                 RemoveNodes(htmlDocument, XpathTagsToRemove);
-                //RemoveAttributes(htmlDocument);
+                RemoveAttributes(htmlDocument);
                 text = CleanHtml(htmlDocument);
                 return text;
             }
@@ -89,20 +99,36 @@ namespace landerist_library.Parse.Listing
             }
         }
 
-        //private static void RemoveAttributes(HtmlDocument htmlDocument)
-        //{
-        //    foreach (HtmlNode node in htmlDocument.DocumentNode.SelectNodes("//*"))
-        //    {
-        //        node.Attributes.RemoveAll();
-        //    }
-        //}
+        private static void RemoveAttributes(HtmlDocument htmlDocument)
+        {
+            foreach (HtmlNode node in htmlDocument.DocumentNode.Descendants())
+            {
+                if (!node.HasAttributes)
+                {
+                    continue;
+                }
+
+                var onAttributes = node.Attributes.Where(attr => attr.Name.StartsWith("on", StringComparison.OrdinalIgnoreCase)).ToList();
+                foreach (var attribute in onAttributes)
+                {
+                    node.Attributes.Remove(attribute);
+                }
+                foreach (var attribute in AttributesToRemove)
+                {
+                    if (node.Attributes[attribute] != null)
+                    {
+                        node.Attributes.Remove(attribute);
+                    }
+                }
+            }
+        }
 
         static string CleanHtml(HtmlDocument htmlDocument)
         {
             string html = htmlDocument.DocumentNode.OuterHtml;
             html = RegexSpace().Replace(html, " ");
-            html = Regex1().Replace(html, ">");
-            html = Regex2().Replace(html, "<");
+            //html = Regex1().Replace(html, ">");
+            //html = Regex2().Replace(html, "<");
 
             return html.Trim();
         }

@@ -13,9 +13,10 @@ namespace landerist_library.Parse.Listing.VertexAI
 
         public const int MAX_CONTEXT_WINDOW = 128000;
 
+
         private static readonly string ModelName =
-                            "gemini-1.5-flash-001";
-                            //"gemini-1.5-pro";
+                            //"gemini-1.5-flash";
+                            "gemini-1.5-pro";
 
         private static readonly string ProjectId = "landerist";
 
@@ -29,8 +30,8 @@ namespace landerist_library.Parse.Listing.VertexAI
         //   "Asegúrate de tener una precisión exhaustiva en la identificación y extracción de los elementos clave. " +
         //   "Es imperativo que mantengas un enfoque riguroso durante este proceso para ofrecer la respuesta más precisa y de la más alta calidad posible.";
         public static readonly string SystemPrompt =
-         "Tu tarea consiste en procesar el html proporcionado por el usuario, identificando si corresponde a una página web de un anuncio inmobiliario. " +
-         "De ser así, deberás analizar meticulosamente el contenido para determinar que efectivamente se trata de un único anuncio y proceder a extraer los datos relevantes.  " +
+         "Tu tarea consiste en analizar el texto html proporcionado por el usuario, identificando si corresponde a una página web de un anuncio inmobiliario. " +
+         "En caso de ser un anuncio inmobiliario deberás proceder a extraer los datos relevantes. " +
          "Asegúrate de tener una precisión exhaustiva en la identificación y extracción de los elementos clave. " +
          "Es imperativo que mantengas un enfoque riguroso durante este proceso para ofrecer la respuesta más precisa y de la más alta calidad posible.";
 
@@ -226,13 +227,13 @@ namespace landerist_library.Parse.Listing.VertexAI
                 },
                 // only supported in gemini 1.5 pro
                 //https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/function-calling#tool-config
-                //ToolConfig = new ToolConfig
-                //{
-                //    FunctionCallingConfig = new FunctionCallingConfig
-                //    {
-                //        Mode = FunctionCallingConfig.Types.Mode.Any,
-                //    }
-                //}
+                ToolConfig = new ToolConfig
+                {
+                    FunctionCallingConfig = new FunctionCallingConfig
+                    {
+                        Mode = FunctionCallingConfig.Types.Mode.Any,
+                    }
+                }
             };
         }
     }
