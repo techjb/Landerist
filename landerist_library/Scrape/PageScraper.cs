@@ -10,7 +10,7 @@ using landerist_orels.ES;
 
 namespace landerist_library.Scrape
 {
-    public class PageScraper(Scraper scraper, Page page)
+    public class PageScraper(Page page)
     {
         private readonly Page Page = page;
 
@@ -18,8 +18,12 @@ namespace landerist_library.Scrape
 
         private readonly PageType? OldPageType = page.PageType;
 
-        private readonly Downloader? Downloader = scraper.DownloadersList.GetDownloader();
+        private readonly Downloader? Downloader;
 
+        public PageScraper(Page page, Scraper scraper): this(page)
+        {
+            Downloader = scraper.DownloadersList.GetDownloader();
+        }
         public bool Scrape()
         {
             if (Downloader == null)

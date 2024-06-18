@@ -9,7 +9,9 @@ using landerist_library.Insert.GooglePlaces;
 using landerist_library.Insert.IdAgencies;
 using landerist_library.Landerist_com;
 using landerist_library.Logs;
+using landerist_library.Parse.Listing;
 using landerist_library.Parse.Listing.ChatGPT;
+using landerist_library.Parse.Listing.VertexAI;
 using landerist_library.Parse.Location;
 using landerist_library.Parse.Location.Delimitations;
 using landerist_library.Parse.PageTypeParser;
@@ -88,7 +90,7 @@ namespace landerist_console
             //var page = new Page("https://www.fincasaldaba.com/propiedad/adosado-llano-samper/foto-16-7-19-10-01-49-copy/");
             //var page = new Page("https://www.12casas.com/inmueble/E869/");
             //var page = new Page("https://sanmiguelinmobiliaria.com/caracteristicas/terraza/");
-            //var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
+            var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
 
             #endregion
 
@@ -148,7 +150,7 @@ namespace landerist_console
             //new Scraper().ScrapeUnknowPageType(website);
             //new Scraper().ScrapeAllPages();            
             //new Scraper().ScrapeResponseBodyRepeatedInListings();
-            //new Scraper().Start();
+            new Scraper().Start();
             //new Scraper().Scrape(page);
             //new Scraper().DoTest();
 
@@ -160,6 +162,14 @@ namespace landerist_console
             //PuppeteerDownloader.ReinstallChrome();
             //PuppeteerDownloader.KillChrome();
             //PuppeteerDownloader.DoTest();            
+
+            #endregion
+
+            #region Batch
+
+            //var text = "{  \"candidates\": [    {      \"content\": {        \"role\": \"model\",        \"parts\": [          {            \"functionCall\": {              \"name\": \"si_es_un_anuncio\",              \"args\": {\"tiene_ascensor\": true}            }          }        ]      },      \"finishReason\": \"STOP\",            \"citationMetadata\": {        \"citations\": [          {            \"startIndex\": 330,            \"endIndex\": 630,            \"title\": \"Your prompt\"          },          {            \"startIndex\": 889,            \"endIndex\": 1052,            \"uri\": \"https://es.wallapop.com/ninos-y-bebes/parque-de-madera\"          }        ]      }    }  ],  \"usageMetadata\": {    \"promptTokenCount\": 41704,    \"candidatesTokenCount\": 383,    \"totalTokenCount\": 42087  }}";
+            //var result = ParseListing.ParseTextVertextAIFromBatch(page, text);
+
 
             #endregion
 

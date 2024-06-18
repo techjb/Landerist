@@ -40,7 +40,7 @@ namespace landerist_library.Scrape
             Log.WriteLogInfo("service", "Starting test..");
             PuppeteerDownloader.UpdateChrome();
             var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
-            var pageScraper = new PageScraper(this, page);
+            var pageScraper = new PageScraper(page, this);
             pageScraper.Scrape();
             Log.WriteLogInfo("service", "PageType: " + page.PageType.ToString());
             var listing = pageScraper.GetListing();
@@ -252,7 +252,7 @@ namespace landerist_library.Scrape
             AddToPageBlocker(page);
             try
             {
-                new PageScraper(this, page).Scrape();
+                new PageScraper(page, this).Scrape();
             }
             catch (Exception exception)
             {

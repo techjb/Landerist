@@ -1,6 +1,7 @@
 ﻿using landerist_library.Parse.Listing.ChatGPT;
 using landerist_library.Parse.Listing.VertexAI;
 using landerist_library.Websites;
+using Google.Cloud.AIPlatform.V1;
 
 namespace landerist_library.Parse.Listing
 {
@@ -25,14 +26,25 @@ namespace landerist_library.Parse.Listing
         private static (PageType pageType, landerist_orels.ES.Listing? listing) ParseTextVertextAI(Page page, string text)
         {
             var response = VertexAIRequest.GetResponse(text).Result;
-            if (response == null)
+            Console.WriteLine("Parsing vertex ai..");
+            return ParseTextVertextAI(page, response);
+        }
+
+        public static (PageType pageType, landerist_orels.ES.Listing? listing) ParseTextVertextAIFromBatch(Page page, string text)
+        {
+            var response = VertexAIBatch.GetGenerateContentResponse(text);
+            return ParseTextVertextAI(page, response);
+        }
+
+        private static (PageType pageType, landerist_orels.ES.Listing? listing) ParseTextVertextAI(Page page, GenerateContentResponse? generateContentResponse)
+        {
+            if (generateContentResponse == null)
             {
                 return (PageType.MayBeListing, null);
             }
-            var (functionName, arguments) = VertexAIRequest.GetFunctionNameAndArguments(response);
+            var (functionName, arguments) = VertexAIRequest.GetFunctionNameAndArguments(generateContentResponse);
             return ParseText(page, functionName, arguments);
         }
-
 
         private static (PageType pageType, landerist_orels.ES.Listing? listing) ParseTextChatGPT(Page page, string text)
         {

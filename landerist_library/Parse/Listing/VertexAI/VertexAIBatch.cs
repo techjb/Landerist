@@ -1,5 +1,8 @@
 ﻿using Google.Cloud.AIPlatform.V1;
 using landerist_library.Configuration;
+using landerist_library.Export;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 
 namespace landerist_library.Parse.Listing.VertexAI
@@ -9,19 +12,37 @@ namespace landerist_library.Parse.Listing.VertexAI
 
         private static void BarchPredicionJob()
         {
-            CreateBatchPredictionJobRequest createBatchPredictionJobRequest = new()
+            var createBatchPredictionJobRequest = new CreateBatchPredictionJobRequest()
             {
-                BatchPredictionJob = new()
+                BatchPredictionJob =
                 {
-                    Name = "",
-                    DisplayName = "",
-                    Model = "",
+                    Name = "new-run",
+                    DisplayName = "NewRun",
+                    Model = "publishers/google/models/gemini-1.5-flash-001",
+                    InputConfig =
+                    {
+                        InstancesFormat = "bigquery",
+                        BigquerySource = {
+                            InputUri = "bq://myprivateproject.datasetname.GeminiBatchTable"
+                        }
+                    },
+                    OutputConfig =
+                    {
+                        PredictionsFormat = "bigquery",
+                        BigqueryDestination = {
+                            OutputUri = "bq://myprivateproject.datasetname.GeminiBatchTable"
+                        }
+                    }
+
                 },
                 Parent = $"projects/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PROJECTID}/locations/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}"
             };
 
             var jobServiceClient = GetJobServiceClient();
             var batchPredictionJob = jobServiceClient.CreateBatchPredictionJob(createBatchPredictionJobRequest);
+            var state = batchPredictionJob.State;           
+
+
         }
 
         private static JobServiceClient GetJobServiceClient()
@@ -31,6 +52,22 @@ namespace landerist_library.Parse.Listing.VertexAI
                 Endpoint = $"{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}-aiplatform.googleapis.com",
                 JsonCredentials = PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_CREDENTIAL,
             }.Build();
+        }
+
+        public static GenerateContentResponse? GetGenerateContentResponse(string text)
+        {
+            try
+            {
+                //return JsonConvert.DeserializeObject<GenerateContentResponse?>(text); // not working
+                var data = (JObject)JsonConvert.DeserializeObject(text);
+                var candidates = data["candidates"];                
+                return null;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+
         }
     }
 }

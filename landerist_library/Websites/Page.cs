@@ -193,10 +193,10 @@ namespace landerist_library.Websites
 
             var addDays = PageType switch
             {
-                landerist_library.Websites.PageType.MainPage => 3,
-                landerist_library.Websites.PageType.MayBeListing => 1,
-                landerist_library.Websites.PageType.Listing => 3,
-                _ => (short)PageTypeCounter! * 5,
+                landerist_library.Websites.PageType.MainPage => 7,
+                landerist_library.Websites.PageType.MayBeListing => 7,
+                landerist_library.Websites.PageType.Listing => 7,
+                _ => (short)PageTypeCounter! * 7,
             };
             NextUpdate = ((DateTime)Updated!).AddDays(addDays);
         }
