@@ -8,34 +8,20 @@ using static Google.Cloud.AIPlatform.V1.SafetySetting.Types;
 
 namespace landerist_library.Parse.Listing.VertexAI
 {
-    public class VertexAIRequest
+    public class VertexAIRequest : ParseListingRequest
     {
 
         public const int MAX_CONTEXT_WINDOW = 128000;
 
+        private const string GEMINI_FLASH = "gemini-1.5-flash";
+
+        private const string GEMINI_PRO = "gemini-1.5-pro";
 
         private static readonly string ModelName =
-                            //"gemini-1.5-flash";
-                            "gemini-1.5-pro";
+            GEMINI_FLASH;
+        //GEMINI_PRO;                            
 
-        private static readonly string ProjectId = "landerist";
-
-        private static readonly string Location = "europe-southwest1";
-
-        private static readonly string Publisher = "google";
-
-        //public static readonly string SystemPrompt =
-        //   "Tu tarea consiste en procesar el html proporcionado por el usuario, identificando si corresponde o no a una página web de un único anuncio de oferta inmobiliaria. " +
-        //   "De ser así, deberás analizar meticulosamente el contenido para determinar que efectivamente se trata de un único anuncio y proceder a extraer los datos relevantes. " +
-        //   "Asegúrate de tener una precisión exhaustiva en la identificación y extracción de los elementos clave. " +
-        //   "Es imperativo que mantengas un enfoque riguroso durante este proceso para ofrecer la respuesta más precisa y de la más alta calidad posible.";
-        public static readonly string SystemPrompt =
-         "Tu tarea consiste en analizar el texto html proporcionado por el usuario, identificando si corresponde a una página web de un anuncio inmobiliario. " +
-         "En caso de ser un anuncio inmobiliario deberás proceder a extraer los datos relevantes. " +
-         "Asegúrate de tener una precisión exhaustiva en la identificación y extracción de los elementos clave. " +
-         "Es imperativo que mantengas un enfoque riguroso durante este proceso para ofrecer la respuesta más precisa y de la más alta calidad posible.";
-
-
+        
         public static bool TooManyTokens(Page page)
         {
             //https://github.com/dluc/openai-tools
@@ -49,6 +35,7 @@ namespace landerist_library.Parse.Listing.VertexAI
             int totalTokens = systemTokens + userTokens;
             return totalTokens > MAX_CONTEXT_WINDOW;
         }
+
         public static async Task<GenerateContentResponse?> GetResponse(string text)
         {
             try
@@ -130,7 +117,7 @@ namespace landerist_library.Parse.Listing.VertexAI
         {
             return new PredictionServiceClientBuilder
             {
-                Endpoint = $"{Location}-aiplatform.googleapis.com",
+                Endpoint = $"{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}-aiplatform.googleapis.com",
                 JsonCredentials = PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_CREDENTIAL,
             }.Build();
         }
@@ -177,9 +164,9 @@ namespace landerist_library.Parse.Listing.VertexAI
 
         private static GenerateContentRequest GetGenerateContentRequest(Content? content)
         {
-            return new GenerateContentRequest
+            var generateContentRequest = new GenerateContentRequest
             {
-                Model = $"projects/{ProjectId}/locations/{Location}/publishers/{Publisher}/models/{ModelName}",
+                Model = $"projects/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PROJECTID}/locations/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}/publishers/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PUBLISHER}/models/{ModelName}",
                 Contents =
                 {
                     content
@@ -224,17 +211,23 @@ namespace landerist_library.Parse.Listing.VertexAI
                             Text = SystemPrompt
                         }
                     }
-                },
-                // only supported in gemini 1.5 pro
-                //https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/function-calling#tool-config
-                ToolConfig = new ToolConfig
+                }
+            };
+
+            // ToolConfig only supported in gemini 1.5 pro
+            //https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/function-calling#tool-config
+            if (ModelName.Equals(GEMINI_PRO))
+            {
+                generateContentRequest.ToolConfig = new ToolConfig
                 {
                     FunctionCallingConfig = new FunctionCallingConfig
                     {
                         Mode = FunctionCallingConfig.Types.Mode.Any,
                     }
-                }
-            };
+                };
+            }
+
+            return generateContentRequest;
         }
     }
 }

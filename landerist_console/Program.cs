@@ -85,10 +85,10 @@ namespace landerist_console
             //var page = new Page("https://servicasainmo.com/feature/lavadora/"); // no listing
             //var page = new Page("https://veovall.com/property/valladolid/"); // no listing
             //var page = new Page("https://inmobiliariaalonsodiaz.com/inmueble/piso-en-venta-en-doctor-fleming-la-felguera-langreo/");
-            //var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
             //var page = new Page("https://www.fincasaldaba.com/propiedad/adosado-llano-samper/foto-16-7-19-10-01-49-copy/");
             //var page = new Page("https://www.12casas.com/inmueble/E869/");
             //var page = new Page("https://sanmiguelinmobiliaria.com/caracteristicas/terraza/");
+            //var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
 
             #endregion
 

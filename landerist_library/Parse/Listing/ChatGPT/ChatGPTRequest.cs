@@ -6,9 +6,8 @@ using OpenAI.Chat;
 
 namespace landerist_library.Parse.Listing.ChatGPT
 {
-    public class ChatGPTRequest
+    public class ChatGPTRequest: ParseListingRequest
     {
-
         //public static readonly string SystemMessage =
         //   "Un anuncio completo de oferta inmobiliaria debe contener la siguiente información:\r\n\r\n" +
         //   "1. Tipo de propiedad (por ejemplo, casa, apartamento, terreno, etc.).\r\n" +
@@ -19,21 +18,8 @@ namespace landerist_library.Parse.Listing.ChatGPT
         //   "Asegúrate de identificar la presencia de cada uno de los puntos anteriores en el texto. " +
         //   "Si encuentras títulos de otros anuncios en el texto, ignóralos a menos que vengan acompañados de toda la información requerida.\r\n\r\n" +
         //   "Response sólo con \"si\" o \"no\" en formato Json"
-        //   ;
-
-        public static readonly string SystemPrompt =
-            "Tu tarea consiste en procesar el texto proporcionado por el usuario, identificando si corresponde a un anuncio inmobiliario. " +
-            "De ser así, deberás analizar meticulosamente el contenido para determinar que efectivamente se trata de un único anuncio y proceder a extraer los datos relevantes.  " +
-            "Estos deberán ser presentados en un formato estructurado JSON, asegurando una precisión exhaustiva en la identificación y extracción de los elementos clave. " +
-            "Es imperativo que mantengas un enfoque riguroso durante este proceso para ofrecer la respuesta más precisa y de la más alta calidad posible.";
-
-
-        //public static readonly string SystemMessage =
-        //    "Tu tarea consiste en procesar el código html proporcionado por el usuario, identificando si corresponde a un anuncio inmobiliario. " +
-        //    "De ser así, deberás analizar meticulosamente el contenido para determinar que efectivamente se trata de un único anuncio y proceder a extraer los datos relevantes.  " +
-        //    "Estos deberán ser presentados en un formato estructurado JSON, asegurando una precisión exhaustiva en la identificación y extracción de los elementos clave. " +
-        //    "Es imperativo que mantengas un enfoque riguroso durante este proceso para ofrecer la respuesta más precisa y de la más alta calidad posible.";
-
+        //   ;       
+      
         public static readonly int MAX_CONTEXT_WINDOW =
                  16385; // gpt-3.5-turbo-0125
                         //128000; // gpt-4o     
