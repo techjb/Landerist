@@ -4,11 +4,11 @@
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "2.32";
+        public static readonly string VERSION = "2.36";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
-        public static readonly bool INDEXER_ENABLED = true;
+        public static readonly bool INDEXER_ENABLED = false;
 
         public static readonly bool WORDS_ENABLED = false;
 
