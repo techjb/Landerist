@@ -80,7 +80,7 @@ namespace landerist_library.Parse.Listing.VertexAI
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("VertexAIRequest GetFunctionNameAndArguments", exception);
+                Logs.Log.WriteLogErrors("VertexAIRequest GetFunctionNameAndArguments", response.ToString(), exception);
             }
             return (null, null);
         }

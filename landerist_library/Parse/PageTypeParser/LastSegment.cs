@@ -122,7 +122,7 @@ namespace landerist_library.Parse.PageTypeParser
             "registro",
             "mapa-footer",
             "eres-propietario",
-            "otros-tipos",            
+            "otros-tipos",
             "i-t-e-inspeccion-tecnica-de-edificios",
             "preguntas-frecuentes",
             "comercializados",

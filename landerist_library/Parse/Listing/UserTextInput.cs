@@ -41,7 +41,7 @@ namespace landerist_library.Parse.Listing
             "//param",
         ];
 
-        private static readonly HashSet<string> AttributesToRemove = 
+        private static readonly HashSet<string> AttributesToRemove =
         [
             "width",
             "height",

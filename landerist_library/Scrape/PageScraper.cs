@@ -20,7 +20,7 @@ namespace landerist_library.Scrape
 
         private readonly Downloader? Downloader;
 
-        public PageScraper(Page page, Scraper scraper): this(page)
+        public PageScraper(Page page, Scraper scraper) : this(page)
         {
             Downloader = scraper.DownloadersList.GetDownloader();
         }

@@ -246,7 +246,7 @@ namespace landerist_library.Websites
             }
             return false;
         }
-       
+
         public HtmlDocument? GetHtmlDocument()
         {
             if (HtmlDocument != null && OriginalOuterHtml != null &&

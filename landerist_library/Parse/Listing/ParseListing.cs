@@ -1,7 +1,7 @@
-﻿using landerist_library.Parse.Listing.ChatGPT;
+﻿using Google.Cloud.AIPlatform.V1;
+using landerist_library.Parse.Listing.ChatGPT;
 using landerist_library.Parse.Listing.VertexAI;
 using landerist_library.Websites;
-using Google.Cloud.AIPlatform.V1;
 
 namespace landerist_library.Parse.Listing
 {

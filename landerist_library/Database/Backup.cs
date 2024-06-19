@@ -10,25 +10,26 @@ namespace landerist_library.Database
         public static void Update()
         {
             CreateNewBackup();
-            DeleteOldBackups();
+            DeleteRemoteOldBackups();
+            DeleteLocalFiles();
         }
 
         private static void CreateNewBackup()
         {
             bool sucess = false;
             string fileName = Config.DATABASE_NAME + DateTime.Now.ToString("yyyyMMdd") + ".bak";
-            if (SaveBackup(fileName))
+            string filePath = LocalBakAbsolutePath(fileName);
+
+            if (SaveBackup(filePath))
             {
-                sucess = UploadBackup(fileName);
+                sucess = UploadBackup(fileName, filePath);
             }
             Log.WriteLogInfo("backup", fileName + " Sucess: " + sucess.ToString());
         }
 
-        private static bool SaveBackup(string fileName)
+        private static bool SaveBackup(string filePath)
         {
-            Console.WriteLine("Creating backup " + fileName + " ..");
-
-            string filePath = LocalBakAbsolutePath(fileName);
+            Console.WriteLine("Creating backup " + filePath + " ..");
 
             string query =
                 "BACKUP DATABASE [" + Config.DATABASE_NAME + "] TO  " +
@@ -40,21 +41,17 @@ namespace landerist_library.Database
             return dataBase.Query(query);
         }
 
-        private static bool UploadBackup(string fileName)
+        private static bool UploadBackup(string fileName, string filePath)
         {
             Console.WriteLine("Uploading backup " + fileName + "..");
-
-            string filePath = LocalBakAbsolutePath(fileName);
-            string keyName = fileName;
-
             if (!File.Exists(filePath))
             {
                 return false;
             }
-            return new S3().UploadFile(filePath, keyName, PrivateConfig.AWS_S3_BACKUPS_BUCKET);
+            return new S3().UploadFile(filePath, fileName, PrivateConfig.AWS_S3_BACKUPS_BUCKET);
         }
 
-        private static async void DeleteOldBackups()
+        private static async void DeleteRemoteOldBackups()
         {
             Console.WriteLine("Deletings old backups ..");
             var S3Objects = await new S3().ListObjects(PrivateConfig.AWS_S3_BACKUPS_BUCKET);
@@ -78,6 +75,20 @@ namespace landerist_library.Database
         protected static string LocalBakAbsolutePath(string fileName)
         {
             return Config.BACKUPS_DIRECTORY + fileName;
+        }
+
+        private static void DeleteLocalFiles()
+        {
+            if (Config.BACKUPS_DIRECTORY is null)
+            {
+                return;
+            }
+
+            DirectoryInfo directoryInfo = new(Config.BACKUPS_DIRECTORY);
+            foreach (FileInfo fileInfo in directoryInfo.GetFiles())
+            {
+                fileInfo.Delete();
+            }
         }
     }
 }

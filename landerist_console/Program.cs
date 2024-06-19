@@ -91,7 +91,7 @@ namespace landerist_console
             //var page = new Page("https://www.12casas.com/inmueble/E869/");
             //var page = new Page("https://sanmiguelinmobiliaria.com/caracteristicas/terraza/");
             //var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
-            var page = new Page("https://www.terramagna.net/detallesdelinmueble/villa-en-venta-chayofa/21282480");
+            //var page = new Page("https://www.terramagna.net/detallesdelinmueble/villa-en-venta-chayofa/21282480");
 
             #endregion
 
@@ -152,7 +152,7 @@ namespace landerist_console
             //new Scraper().ScrapeAllPages();            
             //new Scraper().ScrapeResponseBodyRepeatedInListings();
             //new Scraper().Start();
-            new Scraper().Scrape(page);
+            //new Scraper().Scrape(page);
             //new Scraper().DoTest();
 
             #endregion

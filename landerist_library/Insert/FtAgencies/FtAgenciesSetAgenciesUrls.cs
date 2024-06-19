@@ -56,7 +56,7 @@ namespace landerist_library.Insert.FtAgencies
                 if (link.Count.Equals(1))
                 {
                     agencyUrl = link[0];
-                }                
+                }
             }
             catch (Exception exeption)
             {

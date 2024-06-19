@@ -5,7 +5,7 @@ using System.Data;
 
 namespace landerist_library.Insert.FtAgencies
 {
-    public class FtAgenciesInsertWebsites (): WebsitesInserter(true)
+    public class FtAgenciesInsertWebsites() : WebsitesInserter(true)
     {
         public static void Start()
         {

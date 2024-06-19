@@ -1,6 +1,5 @@
 ﻿using Google.Cloud.AIPlatform.V1;
 using landerist_library.Configuration;
-using landerist_library.Export;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -40,7 +39,7 @@ namespace landerist_library.Parse.Listing.VertexAI
 
             var jobServiceClient = GetJobServiceClient();
             var batchPredictionJob = jobServiceClient.CreateBatchPredictionJob(createBatchPredictionJobRequest);
-            var state = batchPredictionJob.State;           
+            var state = batchPredictionJob.State;
 
 
         }
@@ -60,7 +59,7 @@ namespace landerist_library.Parse.Listing.VertexAI
             {
                 //return JsonConvert.DeserializeObject<GenerateContentResponse?>(text); // not working
                 var data = (JObject)JsonConvert.DeserializeObject(text);
-                var candidates = data["candidates"];                
+                var candidates = data["candidates"];
                 return null;
             }
             catch (Exception e)

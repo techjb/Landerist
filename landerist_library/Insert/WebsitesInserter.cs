@@ -41,7 +41,7 @@ namespace landerist_library.Insert
             Console.WriteLine("Parsing to list ..");
             HashSet<Uri> uris = [];
             HashSet<string> hosts = [];
-            
+
             foreach (DataRow row in dataTable.Rows)
             {
                 string url = row[columnName].ToString() ?? string.Empty;
@@ -108,7 +108,7 @@ namespace landerist_library.Insert
                 //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
                 uri =>
             {
-                var mainUri = GetSuggestedMainUri(uri);                
+                var mainUri = GetSuggestedMainUri(uri);
                 InsertWebsite(mainUri, listingExamples ? uri : null);
                 Interlocked.Increment(ref counter);
                 Console.WriteLine(
@@ -175,7 +175,7 @@ namespace landerist_library.Insert
                 return website.UpdateListingExample(listingExampleUri);
             }
             return false;
-        }      
+        }
 
         public static bool CanInsert(Uri uri)
         {
@@ -202,10 +202,10 @@ namespace landerist_library.Insert
             {
                 Interlocked.Increment(ref ErrorsMainUri);
                 return false;
-            }           
+            }
             if (!CanInsert(website.MainUri))
             {
-                Interlocked.Increment(ref Skipped);                
+                Interlocked.Increment(ref Skipped);
                 return false;
             }
             if (!website.SetRobotsTxt())

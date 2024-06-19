@@ -11,7 +11,7 @@
                 "VALUES(@Url, NULL)";
 
             return new DataBase().Query(query, new Dictionary<string, object?>() {
-                {"Url", url },                
+                {"Url", url },
             });
         }
 

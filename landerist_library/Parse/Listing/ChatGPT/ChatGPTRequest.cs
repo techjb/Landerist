@@ -6,7 +6,7 @@ using OpenAI.Chat;
 
 namespace landerist_library.Parse.Listing.ChatGPT
 {
-    public class ChatGPTRequest: ParseListingRequest
+    public class ChatGPTRequest : ParseListingRequest
     {
         //public static readonly string SystemMessage =
         //   "Un anuncio completo de oferta inmobiliaria debe contener la siguiente información:\r\n\r\n" +
@@ -19,7 +19,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
         //   "Si encuentras títulos de otros anuncios en el texto, ignóralos a menos que vengan acompañados de toda la información requerida.\r\n\r\n" +
         //   "Response sólo con \"si\" o \"no\" en formato Json"
         //   ;       
-      
+
         public static readonly int MAX_CONTEXT_WINDOW =
                  16385; // gpt-3.5-turbo-0125
                         //128000; // gpt-4o     
