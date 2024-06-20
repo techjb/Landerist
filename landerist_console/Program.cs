@@ -92,6 +92,7 @@ namespace landerist_console
             //var page = new Page("https://sanmiguelinmobiliaria.com/caracteristicas/terraza/");
             //var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
             //var page = new Page("https://www.terramagna.net/detallesdelinmueble/villa-en-venta-chayofa/21282480");
+            //var page = new Page("https://vitalcasa.com/feature/double-glazing/"); // no listing
 
             #endregion
 

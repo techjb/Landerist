@@ -25,8 +25,7 @@ namespace landerist_library.Parse.Listing
 
         private static (PageType pageType, landerist_orels.ES.Listing? listing) ParseTextVertextAI(Page page, string text)
         {
-            var response = VertexAIRequest.GetResponse(text).Result;
-            Console.WriteLine("Parsing vertex ai..");
+            var response = VertexAIRequest.GetResponse(text).Result;            
             return ParseTextVertextAI(page, response);
         }
 
