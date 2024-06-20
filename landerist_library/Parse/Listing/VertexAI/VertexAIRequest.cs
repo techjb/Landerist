@@ -3,7 +3,6 @@ using Google.Cloud.AIPlatform.V1;
 using Google.Protobuf;
 using landerist_library.Configuration;
 using landerist_library.Websites;
-using System.Text.RegularExpressions;
 using static Google.Cloud.AIPlatform.V1.SafetySetting.Types;
 
 
@@ -57,89 +56,7 @@ namespace landerist_library.Parse.Listing.VertexAI
             return null;
         }
 
-        public static (string?, string?) GetFunctionNameAndArguments(GenerateContentResponse response)
-        {
-            try
-            {
-                if (response.Candidates != null &&
-                    response.Candidates[0].Content != null &&
-                    response.Candidates[0].Content.Parts != null)
-                {
-                    var part = response.Candidates[0].Content.Parts[0];
-                    if (part.FunctionCall == null)
-                    {
-                        return GetFunctionNameAndArgumentsWithText(response);
-                    }
-                    var name = part.FunctionCall.Name;
-                    var args = part.FunctionCall.Args;
-                    if (name != null && args != null)
-                    {
-                        return (name, args.ToString());
-                    }
-                }
-            }
-            catch (Exception exception)
-            {
-                Logs.Log.WriteLogErrors("VertexAIRequest GetFunctionNameAndArguments", response.ToString(), exception);
-            }
-            return (null, null);
-        }
-
-        private static (string?, string?) GetFunctionNameAndArgumentsWithText(GenerateContentResponse response)
-        {
-            try
-            {
-                var text = response.Candidates[0].Content.Parts[0].Text;
-                string searckKey = "print(default_api.";
-                if (!text.Contains(searckKey))
-                {
-                    return (null, null);
-                }
-                text = text[(text.IndexOf(searckKey) + searckKey.Length)..];
-                if (!text.Contains('('))
-                {
-                    return (null, null);
-                }
-                string functionName = text[..text.IndexOf('(')];
-                string args = text[(text.IndexOf('(') + 1)..];
-                args = args[..^6];
-                args = ConvertToJSON(args);
-                return (functionName, args);
-            }
-            catch (Exception exception)
-            {
-                Logs.Log.WriteLogErrors("VertexAIRequest GetFunctionNameAndArgumentsWithText", exception);
-            }
-
-            return (null, null);
-        }
-
-        private static string ConvertToJSON(string input)
-        {
-            string pattern = @"(\w+)=('.*?'|[^,]+)";
-            var matches = Regex.Matches(input, pattern);
-
-            var keyValuePairs = new List<string>();
-            foreach (Match match in matches.Cast<Match>())
-            {
-                string key = match.Groups[1].Value;
-                string value = match.Groups[2].Value;
-
-                if (value.StartsWith("'") && value.EndsWith("'"))
-                {
-                    value = $"\"{value.Trim('\'')}\"";
-                }
-                else if (bool.TryParse(value, out bool boolValue))
-                {
-                    value = boolValue.ToString().ToLower();
-                }
-
-                keyValuePairs.Add($"\"{key}\": {value}");
-            }
-
-            return "{" + string.Join(", ", keyValuePairs) + "}";
-        }
-
+       
         public static (PageType pageType, landerist_orels.ES.Listing? listing) ParseScreenshot(Page page)
         {
             (PageType pageType, landerist_orels.ES.Listing? listing) result = (PageType.MayBeListing, null);
@@ -245,7 +162,7 @@ namespace landerist_library.Parse.Listing.VertexAI
                 },
                 GenerationConfig = new GenerationConfig()
                 {
-                    Temperature = 0f,
+                    Temperature = 0f,                    
                 },
                 SafetySettings =
                 {

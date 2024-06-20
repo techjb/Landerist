@@ -41,7 +41,7 @@ namespace landerist_library.Parse.Listing
             {
                 return (PageType.MayBeListing, null);
             }
-            var (functionName, arguments) = VertexAIRequest.GetFunctionNameAndArguments(generateContentResponse);
+            var (functionName, arguments) = VertexAIResponse.GetFunctionNameAndArguments(generateContentResponse);
             return ParseText(page, functionName, arguments);
         }
 

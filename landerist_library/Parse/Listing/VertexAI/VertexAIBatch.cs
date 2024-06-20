@@ -62,7 +62,7 @@ namespace landerist_library.Parse.Listing.VertexAI
                 var candidates = data["candidates"];
                 return null;
             }
-            catch (Exception e)
+            catch //(Exception e)
             {
                 return null;
             }

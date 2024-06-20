@@ -1,4 +1,6 @@
-﻿using System.Security.Cryptography;
+﻿using Google.Cloud.AIPlatform.V1;
+using Newtonsoft.Json;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -96,5 +98,23 @@ namespace landerist_library.Tools
             return BitConverter.ToString(hash).Replace("-", "");
         }
 
+        public static string RemoveHTMLTags(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                return input;
+            }
+
+            return HtmlTagsRegex().Replace(input, string.Empty);            
+        }
+
+        [GeneratedRegex(@"<.*?>")]
+        private static partial Regex HtmlTagsRegex();
+
+
+        public static string SafeJson(string input)
+        {
+            return JsonConvert.SerializeObject(input);
+        }
     }
 }
