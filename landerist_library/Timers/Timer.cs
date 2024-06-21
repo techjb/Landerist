@@ -55,7 +55,7 @@ namespace landerist_library.Timers
 
         #region Save timer
 
-        public static void SaveTimerChatGPT(string source, DateTime dateStart)
+        public static void SaveTimerOpenAI(string source, DateTime dateStart)
         {
             SaveTimer(TimerKeyChatGPT, source, dateStart);
         }

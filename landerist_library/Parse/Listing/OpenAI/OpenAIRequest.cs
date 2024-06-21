@@ -4,9 +4,9 @@ using landerist_library.Websites;
 using OpenAI;
 using OpenAI.Chat;
 
-namespace landerist_library.Parse.Listing.ChatGPT
+namespace landerist_library.Parse.Listing.OpenAI
 {
-    public class ChatGPTRequest : ParseListingRequest
+    public class OpenAIRequest : ParseListingRequest
     {
         //public static readonly string SystemMessage =
         //   "Un anuncio completo de oferta inmobiliaria debe contener la siguiente información:\r\n\r\n" +
@@ -59,7 +59,7 @@ namespace landerist_library.Parse.Listing.ChatGPT
                 new(Role.User, userInput),
             };
 
-            var tools = ChatGPTTools.GetTools();
+            var tools = OpenAITools.GetTools();
 
             var chatRequest = new ChatRequest(
                 messages: messages,
@@ -74,12 +74,12 @@ namespace landerist_library.Parse.Listing.ChatGPT
             {
                 DateTime dateStart = DateTime.Now;
                 var response = Task.Run(async () => await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest)).Result;
-                Timers.Timer.SaveTimerChatGPT("ChatGPTRequest", dateStart);
+                Timers.Timer.SaveTimerOpenAI("OpenAIRequest", dateStart);
                 return response;
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("ChatGPTRequest", exception);
+                Logs.Log.WriteLogErrors("OpenAIRequest GetResponse", exception);
             }
             return null;
         }

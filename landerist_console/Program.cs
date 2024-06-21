@@ -10,7 +10,7 @@ using landerist_library.Insert.IdAgencies;
 using landerist_library.Landerist_com;
 using landerist_library.Logs;
 using landerist_library.Parse.Listing;
-using landerist_library.Parse.Listing.ChatGPT;
+using landerist_library.Parse.Listing.OpenAI;
 using landerist_library.Parse.Listing.VertexAI;
 using landerist_library.Parse.Location;
 using landerist_library.Parse.Location.Delimitations;

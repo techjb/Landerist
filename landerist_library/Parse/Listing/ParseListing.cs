@@ -1,5 +1,5 @@
 ﻿using Google.Cloud.AIPlatform.V1;
-using landerist_library.Parse.Listing.ChatGPT;
+using landerist_library.Parse.Listing.OpenAI;
 using landerist_library.Parse.Listing.VertexAI;
 using landerist_library.Websites;
 
@@ -47,13 +47,13 @@ namespace landerist_library.Parse.Listing
 
         private static (PageType pageType, landerist_orels.ES.Listing? listing) ParseTextChatGPT(Page page, string text)
         {
-            var response = ChatGPTRequest.GetResponse(text);
+            var response = OpenAIRequest.GetResponse(text);
             if (response == null)
             {
                 return (PageType.MayBeListing, null);
             }
 
-            var (functionName, arguments) = ChatGPTRequest.GetFunctionNameAndArguments(response);
+            var (functionName, arguments) = OpenAIRequest.GetFunctionNameAndArguments(response);
             return ParseText(page, functionName, arguments);
         }
 

@@ -1,9 +1,9 @@
 ﻿using OpenAI;
 using System.Text.Json.Nodes;
 
-namespace landerist_library.Parse.Listing.ChatGPT
+namespace landerist_library.Parse.Listing.OpenAI
 {
-    public class ChatGPTTools : ParseListingTool
+    public class OpenAITools : ParseListingTool
     {
         public static List<Tool> GetTools()
         {
