@@ -57,8 +57,8 @@ namespace landerist_library.Parse.Listing.VertexAI
                 }
                 args = args[..(args.IndexOf("))"))];
 
-                string json = ConvertToJSON(args);
-                return (functionName, args);
+                string argsJson = ConvertToJSON(args);
+                return (functionName, argsJson);
             }
             catch (Exception exception)
             {
