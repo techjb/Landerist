@@ -241,19 +241,17 @@ namespace landerist_library.Downloaders
             string? content = null;
             byte[]? screenShot = null;
 
-            //Browser = null;
             IPage? browserPage = null;
 
             try
             {
-                //Browser = await Puppeteer.LaunchAsync(launchOptions);                
                 if (ContainsBrowser())
                 {
                     browserPage = await GetBroserPage(Browser!, page.Website.LanguageCode, page.Uri);
                     await browserPage.GoToAsync(page.Uri.ToString(), WaitUntilNavigation.Networkidle0);
 
                     content = await browserPage.GetContentAsync();
-                    screenShot = await TakeScreenshot(browserPage);
+                    screenShot = await TakeScreenshot(browserPage, page);                    
                 }
             }
             catch
@@ -272,7 +270,7 @@ namespace landerist_library.Downloaders
 
 
 
-        private static async Task<byte[]?> TakeScreenshot(IPage browserPage)
+        private static async Task<byte[]?> TakeScreenshot(IPage browserPage, Websites.Page page)
         {
             if (!Config.TAKE_SCREENSHOT)
             {
@@ -291,7 +289,13 @@ namespace landerist_library.Downloaders
             }
             try
             {
-                return await browserPage.ScreenshotDataAsync(screenshotOptions);
+                var data =  await browserPage.ScreenshotDataAsync(screenshotOptions);
+                if(Config.SAVE_SCREENSHOT_FILE)
+                {
+                    string fileName = Config.SCREENSHOTS_DIRECTORY + page.UriHash + ".png";
+                    File.WriteAllBytes(fileName, data);
+                }
+                return data;
             }
             catch (Exception exception)
             {

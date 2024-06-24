@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <PackageReference Include="AI.Dev.OpenAI.GPT" Version="1.0.2" />
+    <PackageReference Include="Anthropic.SDK" Version="3.2.3" />
     <PackageReference Include="AWSSDK.CloudFront" Version="3.7.303.15" />
     <PackageReference Include="AWSSDK.Comprehend" Version="3.7.300.108" />
     <PackageReference Include="AWSSDK.S3" Version="3.7.309.7" />

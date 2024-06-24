@@ -33,22 +33,7 @@ namespace landerist_library.Parse.Listing.OpenAI
 
         public static bool TooManyTokens(Page page)
         {
-            if (page.ResponseBodyText == null)
-            {
-                return false;
-            }
-
-            //https://github.com/dluc/openai-tools
-            int systemTokens = GPT3Tokenizer.Encode(SystemPrompt).Count;
-            string? text = UserTextInput.GetText(page);
-            if (text == null)
-            {
-                return false;
-            }
-            int userTokens = GPT3Tokenizer.Encode(text).Count;
-
-            int totalTokens = systemTokens + userTokens;
-            return totalTokens > MAX_CONTEXT_WINDOW;
+            return TooManyTokens(page, MAX_CONTEXT_WINDOW);
         }
 
         public static ChatResponse? GetResponse(string userInput)
@@ -82,19 +67,6 @@ namespace landerist_library.Parse.Listing.OpenAI
                 Logs.Log.WriteLogErrors("OpenAIRequest GetResponse", exception);
             }
             return null;
-        }
-
-        public static (string?, string?) GetFunctionNameAndArguments(ChatResponse chatResponse)
-        {
-            try
-            {
-                return (chatResponse.FirstChoice.Message.ToolCalls[0].Function.Name,
-                    chatResponse.FirstChoice.Message.ToolCalls[0].Function.Arguments.ToString());
-            }
-            catch
-            {
-            }
-            return (null, null);
-        }
+        }    
     }
 }

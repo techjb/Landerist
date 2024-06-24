@@ -1,10 +1,12 @@
-﻿namespace landerist_library.Configuration
+﻿using landerist_library.Parse.Listing;
+
+namespace landerist_library.Configuration
 {
     public class Config
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "2.49";
+        public static readonly string VERSION = "2.51";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
@@ -73,6 +75,7 @@
         public static string? BACKUPS_DIRECTORY { get; set; }
         public static string? SCREENSHOTS_DIRECTORY { get; set; }
         public static bool TAKE_SCREENSHOT { get; set; }
+        public static bool SAVE_SCREENSHOT_FILE{ get; set; }
 
         public const int MAX_SCREENSHOT_SIZE = 20 * 1024 * 1024; // 20 MB
         public static string? CHROME_EXTENSIONS_DIRECTORY { get; set; }
@@ -111,6 +114,7 @@
 
         public const int DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS = 90;
 
+        public static readonly LLMProviders LLM_PROVIDER = LLMProviders.VertexAI;
 
         public static bool IsConfigurationProduction()
         {
@@ -160,6 +164,8 @@
 
             TAKE_SCREENSHOT = false;
             //TAKE_SCREENSHOT = !ConfigurationProduction;
+
+            SAVE_SCREENSHOT_FILE = !ConfigurationProduction;
 
             CHROME_EXTENSIONS_DIRECTORY = ConfigurationProduction ?
                 PrivateConfig.CHROME_EXTENSIONS_DIRECTORY_PRODUCTION :

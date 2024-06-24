@@ -559,7 +559,7 @@ namespace landerist_library.Websites
             GC.SuppressFinalize(this);
         }
 
-        public bool ContainsValidScreenshot()
+        public bool ContainsScreenshot()
         {
             return Screenshot != null &&
                 Screenshot.Length > 0 &&

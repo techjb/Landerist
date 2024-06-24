@@ -1,6 +1,6 @@
-﻿using AI.Dev.OpenAI.GPT;
-using Google.Cloud.AIPlatform.V1;
+﻿using Google.Cloud.AIPlatform.V1;
 using Google.Protobuf;
+using Google.Protobuf.Collections;
 using landerist_library.Configuration;
 using landerist_library.Websites;
 using static Google.Cloud.AIPlatform.V1.SafetySetting.Types;
@@ -26,24 +26,15 @@ namespace landerist_library.Parse.Listing.VertexAI
 
         public static bool TooManyTokens(Page page)
         {
-            //https://github.com/dluc/openai-tools
-            int systemTokens = GPT3Tokenizer.Encode(SystemPrompt).Count;
-            string? text = UserTextInput.GetText(page);
-            if (text == null)
-            {
-                return false;
-            }
-            int userTokens = GPT3Tokenizer.Encode(text).Count;
-            int totalTokens = systemTokens + userTokens;
-            return totalTokens > MAX_CONTEXT_WINDOW;
+            return TooManyTokens(page, MAX_CONTEXT_WINDOW);            
         }
 
-        public static async Task<GenerateContentResponse?> GetResponse(string text)
+        public static async Task<GenerateContentResponse?> GetResponse(Page page, string text)
         {
             try
             {
                 var predictionServiceClient = GetPredictionServiceClient();
-                var generateContentRequest = GetGenerateContentRequest(text);
+                var generateContentRequest = GetGenerateContentRequest(page, text);
                 DateTime dateStart = DateTime.Now;
                 var response = await predictionServiceClient.GenerateContentAsync(generateContentRequest);
                 Timers.Timer.SaveTimerVertexAI("VertexAIRequest", dateStart);
@@ -55,53 +46,7 @@ namespace landerist_library.Parse.Listing.VertexAI
             }
             return null;
         }
-
-       
-        public static (PageType pageType, landerist_orels.ES.Listing? listing) ParseScreenshot(Page page)
-        {
-            (PageType pageType, landerist_orels.ES.Listing? listing) result = (PageType.MayBeListing, null);
-            if (page.Screenshot == null || page.Screenshot.Length == 0)
-            {
-                return result;
-            }
-
-            string? text = ParseScreenshot(page.Screenshot).Result;
-            Console.WriteLine(text);
-
-            return result;
-        }
-
-        private static async Task<string?> ParseScreenshot(byte[] screenshot)
-        {
-            try
-            {
-                var predictionServiceClient = GetPredictionServiceClient();
-                var generateContentRequest = GetGenerateContentRequest(screenshot);
-                GenerateContentResponse response = await predictionServiceClient.GenerateContentAsync(generateContentRequest);
-                var functionCall = response.Candidates[0].Content.Parts[0].FunctionCall;
-                return response.Candidates[0].Content.Parts[0].Text;
-            }
-            catch (Exception exception)
-            {
-                Logs.Log.WriteLogErrors("VertexAIRequest ParseScreenshot", exception);
-            }
-            return null;
-        }
-
-        public static (PageType pageType, landerist_orels.ES.Listing? listing) ParseScreenShot(Page page)
-        {
-            (PageType pageType, landerist_orels.ES.Listing? listing) result = (PageType.MayBeListing, null);
-            if (page.Screenshot == null || page.Screenshot.Length == 0)
-            {
-                return result;
-            }
-
-            string? text = ParseScreenshot(page.Screenshot).Result;
-            Console.WriteLine(text);
-
-            return result;
-        }
-
+      
         private static PredictionServiceClient GetPredictionServiceClient()
         {
             return new PredictionServiceClientBuilder
@@ -111,58 +56,54 @@ namespace landerist_library.Parse.Listing.VertexAI
             }.Build();
         }
 
-        private static GenerateContentRequest GetGenerateContentRequest(string text)
+        private static RepeatedField<Part> GetParts(Page page, string text)
         {
-            var content = new Content
+            if (page.ContainsScreenshot())
             {
-                Role = "USER",
-                Parts =
-                    {
-                        new Part
-                        {
-                            Text = text
-                        }
-                    }
-            };
-            return GetGenerateContentRequest(content);
-        }
-
-        private static GenerateContentRequest GetGenerateContentRequest(byte[] screenshot)
-        {
-            var content = new Content
-            {
-                Role = "USER",
-                Parts =
-                    {
-                        new Part
+                return
+                [
+                    new Part
                         {
                             InlineData = new()
                             {
                                 MimeType = "image/png",
-                                Data = ByteString.CopyFrom(screenshot)
+                                Data = ByteString.CopyFrom(page.Screenshot)
                             }
                         },
                         new Part
                         {
                             Text = "Captura de pantalla"
                         },
+                ];
+            }
+            return
+                [
+                    new Part
+                    {
+                        Text = text
                     }
-            };
-            return GetGenerateContentRequest(content);
+                ];
         }
 
-        private static GenerateContentRequest GetGenerateContentRequest(Content? content)
+        private static GenerateContentRequest GetGenerateContentRequest(Page page, string text)
         {
             var generateContentRequest = new GenerateContentRequest
             {
                 Model = $"projects/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PROJECTID}/locations/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}/publishers/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PUBLISHER}/models/{ModelName}",
                 Contents =
                 {
-                    content
+                    new Content()
+                    {
+                        Role = "USER",
+                        Parts =
+                        {
+                            GetParts(page, text)
+                        }
+                    }
                 },
                 GenerationConfig = new GenerationConfig()
                 {
-                    Temperature = 0f,                    
+                    Temperature = 0f,
                 },
                 SafetySettings =
                 {

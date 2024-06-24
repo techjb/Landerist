@@ -11,20 +11,20 @@ namespace landerist_library.Parse.Listing
     {
         public const string FunctionNameIsListing = "si_es_un_anuncio";
 
-        public static readonly string FunctionDescriptionIsListing = "Sí es un único anuncio inmobiliario";
+        public static readonly string FunctionDescriptionIsListing = "La página web corresponde a un único anuncio inmobiliario";
 
         public const string FunctionNameIsNotListing = "no_es_un_anuncio";
 
-        public static readonly string FunctionDescriptionIsNotListing = "No es un único anuncio inmobiliario";
+        public static readonly string FunctionDescriptionIsNotListing = "La página web no corresponde a un único anuncio inmobiliario";
 
 #pragma warning disable IDE1006
 
 
         [Description("fecha de la publicación del anuncio")]
-        public string? fecha_de_publicación { get; set; } = null;
+        public string? fecha_de_publicacion { get; set; } = null;
 
         [Description("tipo de operación inmobiliaria")]
-        public string? tipo_de_operación { get; set; } = null;
+        public string? tipo_de_operacion { get; set; } = null;
 
         [Description("tipología del inmueble")]
         public string? tipo_de_inmueble { get; set; } = null;
@@ -36,34 +36,34 @@ namespace landerist_library.Parse.Listing
         public decimal? precio_del_anuncio { get; set; } = null;
 
         [Description("texto con la descripción detallada del anuncio")]
-        public string? descripción_del_anuncio { get; set; } = null;
+        public string? descripcion_del_anuncio { get; set; } = null;
 
         [Description("código de referencia del anuncio")]
         public string? referencia_del_anuncio { get; set; } = null;
 
         [Description("número de teléfono de contacto")]
-        public string? teléfono_de_contacto { get; set; } = null;
+        public string? telefono_de_contacto { get; set; } = null;
 
         [Description("dirección de email de contacto")]
         public string? email_de_contacto { get; set; } = null;
 
         [Description("dirección en la que se encuentra el inmueble")]
-        public string? dirección_del_inmueble { get; set; } = null;
+        public string? direccion_del_inmueble { get; set; } = null;
 
         [Description("referencia catastral del anuncio (14 o 20 caracteres)")]
         public string? referencia_catastral { get; set; } = null;
 
         [Description("número de metros cuadrados del inmueble")]
-        public double? tamaño_del_inmueble { get; set; } = null;
+        public double? tamanio_del_inmueble { get; set; } = null;
 
         [Description("número de metros cuadrados de la parcela")]
-        public double? tamaño_de_la_parcela { get; set; } = null;
+        public double? tamanio_de_la_parcela { get; set; } = null;
 
         [Description("año de construcción del inmueble")]
-        public double? año_de_construcción { get; set; } = null;
+        public double? anio_de_construccion { get; set; } = null;
 
         [Description("estado de la construcción en el que se encuentra el inmueble")]
-        public string? estado_de_la_construcción { get; set; } = null;
+        public string? estado_de_la_construccion { get; set; } = null;
 
         [Description("número de plantas del edificio")]
         public double? plantas_del_edificio { get; set; } = null;
@@ -72,19 +72,19 @@ namespace landerist_library.Parse.Listing
         public string? plantas_del_inmueble { get; set; } = null;
 
         [Description("número de dormitorios")]
-        public double? número_de_dormitorios { get; set; } = null;
+        public double? numero_de_dormitorios { get; set; } = null;
 
         [Description("número de baños")]
-        public double? número_de_baños { get; set; } = null;
+        public double? numero_de_banios { get; set; } = null;
 
         [Description("número de parkings")]
-        public double? número_de_parkings { get; set; } = null;
+        public double? numero_de_parkings { get; set; } = null;
 
         [Description("tiene terraza")]
         public bool? tiene_terraza { get; set; } = null;
 
         [Description("tiene jardín")]
-        public bool? tiene_jardín { get; set; } = null;
+        public bool? tiene_jardin { get; set; } = null;
 
         [Description("tiene garaje")]
         public bool? tiene_garaje { get; set; } = null;
@@ -105,13 +105,13 @@ namespace landerist_library.Parse.Listing
         public bool? tiene_trastero { get; set; } = null;
 
         [Description("está amueblado")]
-        public bool? está_amueblado { get; set; } = null;
+        public bool? esta_amueblado { get; set; } = null;
 
         [Description("no está amueblado")]
-        public bool? no_está_amueblado { get; set; } = null;
+        public bool? no_esta_amueblado { get; set; } = null;
 
         [Description("tiene calefacción")]
-        public bool? tiene_calefacción { get; set; } = null;
+        public bool? tiene_calefaccion { get; set; } = null;
 
         [Description("tiene aire acondicionado")]
         public bool? tiene_aire_acondicionado { get; set; } = null;
@@ -254,16 +254,16 @@ namespace landerist_library.Parse.Listing
                 bathrooms = GetBathrooms(),
                 parkings = GetParkings(),
                 terrace = tiene_terraza,
-                garden = tiene_jardín,
+                garden = tiene_jardin,
                 garage = tiene_garaje,
                 motorbikeGarage = tiene_parking_para_moto,
                 pool = tiene_piscina,
                 lift = tiene_ascensor,
                 disabledAccess = tiene_acceso_para_discapacitados,
                 storageRoom = tiene_trastero,
-                furnished = está_amueblado,
-                nonFurnished = no_está_amueblado,
-                heating = tiene_calefacción,
+                furnished = esta_amueblado,
+                nonFurnished = no_esta_amueblado,
+                heating = tiene_calefaccion,
                 airConditioning = tiene_aire_acondicionado,
                 petsAllowed = permite_mascotas,
                 securitySystems = tiene_sistemas_de_seguridad,
@@ -283,9 +283,9 @@ namespace landerist_library.Parse.Listing
 
         private bool IsValidTipoDeOperacion()
         {
-            if (tipo_de_operación != null)
+            if (tipo_de_operacion != null)
             {
-                return JsonArrayContains(TiposDeOperación, tipo_de_operación);
+                return JsonArrayContains(TiposDeOperación, tipo_de_operacion);
             }
             return false;
         }
@@ -340,9 +340,9 @@ namespace landerist_library.Parse.Listing
 
         private DateTime GetListingDate()
         {
-            if (fecha_de_publicación != null)
+            if (fecha_de_publicacion != null)
             {
-                if (DateTime.TryParse(fecha_de_publicación, out DateTime listingDate))
+                if (DateTime.TryParse(fecha_de_publicacion, out DateTime listingDate))
                 {
                     return listingDate;
                 }
@@ -352,7 +352,7 @@ namespace landerist_library.Parse.Listing
 
         private Operation GetOperation()
         {
-            return tipo_de_operación switch
+            return tipo_de_operacion switch
             {
                 OPERACION_VENTA => Operation.sell,
                 OPERACION_ALQUILER => Operation.rent,
@@ -468,11 +468,11 @@ namespace landerist_library.Parse.Listing
 
         private string? GetDescription()
         {
-            if (string.IsNullOrEmpty(descripción_del_anuncio))
+            if (string.IsNullOrEmpty(descripcion_del_anuncio))
             {
                 return null;
             }
-            return Strings.Clean(descripción_del_anuncio);
+            return Strings.Clean(descripcion_del_anuncio);
         }
 
         private static string GetDataSourceName(Page page)
@@ -501,16 +501,16 @@ namespace landerist_library.Parse.Listing
 
         private string? GetPhone()
         {
-            if (string.IsNullOrEmpty(teléfono_de_contacto))
+            if (string.IsNullOrEmpty(telefono_de_contacto))
             {
                 return null;
             }
-            teléfono_de_contacto = Strings.Clean(teléfono_de_contacto);
-            if (!Validate.Phone(teléfono_de_contacto))
+            telefono_de_contacto = Strings.Clean(telefono_de_contacto);
+            if (!Validate.Phone(telefono_de_contacto))
             {
                 return null;
             }
-            return teléfono_de_contacto;
+            return telefono_de_contacto;
         }
 
         private string? GetEmail()
@@ -530,11 +530,11 @@ namespace landerist_library.Parse.Listing
 
         private string? GetAddress()
         {
-            if (string.IsNullOrEmpty(dirección_del_inmueble))
+            if (string.IsNullOrEmpty(direccion_del_inmueble))
             {
                 return null;
             }
-            return Strings.Clean(dirección_del_inmueble);
+            return Strings.Clean(direccion_del_inmueble);
         }
 
         private string? GetCadastralReference()
@@ -553,29 +553,29 @@ namespace landerist_library.Parse.Listing
 
         private double? GetPropertySize()
         {
-            if (tamaño_del_inmueble.HasValue &&
-                tamaño_del_inmueble >= Config.MIN_PROPERTY_SIZE &&
-                tamaño_del_inmueble <= Config.MAX_PROPERTY_SIZE)
+            if (tamanio_del_inmueble.HasValue &&
+                tamanio_del_inmueble >= Config.MIN_PROPERTY_SIZE &&
+                tamanio_del_inmueble <= Config.MAX_PROPERTY_SIZE)
             {
-                return tamaño_del_inmueble;
+                return tamanio_del_inmueble;
             }
             return null;
         }
 
         private double? GetLandSize()
         {
-            if (tamaño_de_la_parcela.HasValue &&
-                tamaño_de_la_parcela >= Config.MIN_LAND_SIZE &&
-                tamaño_de_la_parcela <= Config.MAX_LAND_SIZE)
+            if (tamanio_de_la_parcela.HasValue &&
+                tamanio_de_la_parcela >= Config.MIN_LAND_SIZE &&
+                tamanio_de_la_parcela <= Config.MAX_LAND_SIZE)
             {
-                return tamaño_de_la_parcela;
+                return tamanio_de_la_parcela;
             }
             return null;
         }
 
         private int? GetConstrunctionYear()
         {
-            var constructionYear = (int?)año_de_construcción;
+            var constructionYear = (int?)anio_de_construccion;
             var maxConstructionYear = DateTime.Now.AddYears(Config.MAX_CONSTRUCTION_YEARS_FROM_NOW).Year;
 
             if (constructionYear.HasValue &&
@@ -589,11 +589,11 @@ namespace landerist_library.Parse.Listing
 
         private ConstructionStatus? GetConstructionStatus()
         {
-            if (string.IsNullOrEmpty(estado_de_la_construcción))
+            if (string.IsNullOrEmpty(estado_de_la_construccion))
             {
                 return null;
             }
-            return estado_de_la_construcción switch
+            return estado_de_la_construccion switch
             {
                 ESTADO_DE_LA_CONSTRUCCIÓN_OBRA_NUEVA => (ConstructionStatus?)ConstructionStatus.@new,
                 ESTADO_DE_LA_CONSTRUCCIÓN_BUENO => (ConstructionStatus?)ConstructionStatus.good,
@@ -626,7 +626,7 @@ namespace landerist_library.Parse.Listing
 
         private int? GetBedrooms()
         {
-            var bedrooms = (int?)número_de_dormitorios;
+            var bedrooms = (int?)numero_de_dormitorios;
             if (bedrooms.HasValue &&
                 bedrooms >= Config.MIN_BEDROOMS &&
                 bedrooms <= Config.MAX_BEDROOMS)
@@ -638,7 +638,7 @@ namespace landerist_library.Parse.Listing
 
         private int? GetBathrooms()
         {
-            var bathrooms = (int?)número_de_baños;
+            var bathrooms = (int?)numero_de_banios;
             if (bathrooms.HasValue &&
                 bathrooms >= Config.MIN_BATHROOMS &&
                 bathrooms <= Config.MAX_BATHROOMS)
@@ -650,7 +650,7 @@ namespace landerist_library.Parse.Listing
 
         private int? GetParkings()
         {
-            var parkings = (int?)número_de_parkings;
+            var parkings = (int?)numero_de_parkings;
             if (parkings.HasValue &&
                 parkings >= Config.MIN_PARKINGS &&
                 parkings <= Config.MAX_PARKINGS)

@@ -1,5 +1,4 @@
 ﻿using landerist_library.Parse.Listing;
-using landerist_library.Parse.Listing.VertexAI;
 using landerist_library.Websites;
 
 namespace landerist_library.Parse.PageTypeParser
@@ -66,12 +65,8 @@ namespace landerist_library.Parse.PageTypeParser
             if (ListingSimilarity.HtmlNotSimilarToListing(page))
             {
                 return (PageType.HtmlNotSimilarToListing, null);
-            }
-            if (page.ContainsValidScreenshot())
-            {
-                return VertexAIRequest.ParseScreenshot(page);
-            }
-            return ParseListing.ParseText(page);
+            }            
+            return ParseListing.Parse(page);
         }
     }
 }

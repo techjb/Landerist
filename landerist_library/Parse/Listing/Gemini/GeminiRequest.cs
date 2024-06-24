@@ -6,7 +6,7 @@ using landerist_library.Websites;
 
 namespace landerist_library.Parse.Listing.Gemini
 {
-    public class ParseListingGemini
+    public class GeminiRequest : ParseListingRequest
     {
         private static readonly string Prompt =
             "Dime si la siguiente imagen corresponde a un único anuncio inmobiliario o no";
@@ -16,6 +16,13 @@ namespace landerist_library.Parse.Listing.Gemini
         //  "De ser así, deberás analizar meticulosamente el contenido para determinar que efectivamente se trata de un único anuncio y proceder a extraer los datos relevantes.  " +
         //  "Estos deberán ser presentados en un formato estructurado JSON, asegurando una precisión exhaustiva en la identificación y extracción de los elementos clave. " +
         //  "Es imperativo que mantengas un enfoque riguroso durante este proceso para ofrecer la respuesta más precisa y de la más alta calidad posible.";
+        
+        public static readonly int MAX_CONTEXT_WINDOW = 128000;
+
+        public static bool TooManyTokens(Page page)
+        {
+            return TooManyTokens(page, MAX_CONTEXT_WINDOW);
+        }
 
         private readonly ModelParams ModelParams = new()
         {

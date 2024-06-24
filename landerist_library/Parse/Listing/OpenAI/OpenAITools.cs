@@ -15,51 +15,55 @@ namespace landerist_library.Parse.Listing.OpenAI
 
         private static Tool GetToolIsListing()
         {
+            var parameters = GetJsonObject();
+            return new Function(FunctionNameIsListing, FunctionDescriptionIsListing, parameters);
+        }
+
+        public static JsonObject GetJsonObject()
+        {
             var properties = new JsonObject();
 
-            AddString(properties, nameof(fecha_de_publicación));
-            AddEnum(properties, nameof(tipo_de_operación), TiposDeOperación);
+            AddString(properties, nameof(fecha_de_publicacion));
+            AddEnum(properties, nameof(tipo_de_operacion), TiposDeOperación);
             AddEnum(properties, nameof(tipo_de_inmueble), TiposDeInmueble);
             AddEnum(properties, nameof(subtipo_de_inmueble), SubtiposDeInmueble);
             AddNumber(properties, nameof(precio_del_anuncio));
-            AddString(properties, nameof(descripción_del_anuncio));
+            AddString(properties, nameof(descripcion_del_anuncio));
             AddString(properties, nameof(referencia_del_anuncio));
-            AddString(properties, nameof(teléfono_de_contacto));
+            AddString(properties, nameof(telefono_de_contacto));
             AddString(properties, nameof(email_de_contacto));
-            AddString(properties, nameof(dirección_del_inmueble));
+            AddString(properties, nameof(direccion_del_inmueble));
             AddString(properties, nameof(referencia_catastral));
-            AddNumber(properties, nameof(tamaño_del_inmueble));
-            AddNumber(properties, nameof(tamaño_de_la_parcela));
-            AddNumber(properties, nameof(año_de_construcción));
-            AddEnum(properties, nameof(estado_de_la_construcción), EstadosDeLaConstrucción);
+            AddNumber(properties, nameof(tamanio_del_inmueble));
+            AddNumber(properties, nameof(tamanio_de_la_parcela));
+            AddNumber(properties, nameof(anio_de_construccion));
+            AddEnum(properties, nameof(estado_de_la_construccion), EstadosDeLaConstrucción);
             AddNumber(properties, nameof(plantas_del_edificio));
             AddString(properties, nameof(plantas_del_inmueble));
-            AddNumber(properties, nameof(número_de_dormitorios));
-            AddNumber(properties, nameof(número_de_baños));
-            AddNumber(properties, nameof(número_de_parkings));
+            AddNumber(properties, nameof(numero_de_dormitorios));
+            AddNumber(properties, nameof(numero_de_banios));
+            AddNumber(properties, nameof(numero_de_parkings));
             AddBoolean(properties, nameof(tiene_terraza));
-            AddBoolean(properties, nameof(tiene_jardín));
+            AddBoolean(properties, nameof(tiene_jardin));
             AddBoolean(properties, nameof(tiene_garaje));
             AddBoolean(properties, nameof(tiene_parking_para_moto));
             AddBoolean(properties, nameof(tiene_piscina));
             AddBoolean(properties, nameof(tiene_ascensor));
             AddBoolean(properties, nameof(tiene_acceso_para_discapacitados));
             AddBoolean(properties, nameof(tiene_trastero));
-            AddBoolean(properties, nameof(está_amueblado));
-            AddBoolean(properties, nameof(no_está_amueblado));
-            AddBoolean(properties, nameof(tiene_calefacción));
+            AddBoolean(properties, nameof(esta_amueblado));
+            AddBoolean(properties, nameof(no_esta_amueblado));
+            AddBoolean(properties, nameof(tiene_calefaccion));
             AddBoolean(properties, nameof(tiene_aire_acondicionado));
             AddBoolean(properties, nameof(permite_mascotas));
             AddBoolean(properties, nameof(tiene_sistemas_de_seguridad));
 
-            var parameters = new JsonObject()
+            return new JsonObject()
             {
                 ["type"] = "object",
                 ["properties"] = properties,
                 ["required"] = new JsonArray { }
             };
-
-            return new Function(FunctionNameIsListing, FunctionDescriptionIsListing, parameters);
         }
 
         private static Tool GetToolIsNotListing()
@@ -70,7 +74,7 @@ namespace landerist_library.Parse.Listing.OpenAI
                 "NO_ES_UN_ANUNCIO"
             ];
 
-            Add(properties, "no_es_un_anuncio", "string", "No es un anuncio", NoEsUnAnuncio);
+            Add(properties, FunctionNameIsNotListing, "string", FunctionDescriptionIsNotListing, NoEsUnAnuncio);
 
             var parameters = new JsonObject()
             {
