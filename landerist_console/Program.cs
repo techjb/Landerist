@@ -272,6 +272,7 @@ namespace landerist_console
 
             //landerist_library.Statistics.StatisticsSnapshot.TakeSnapshots();
             //DownloadFilesUpdater.UpdateFiles();
+            //DownloadFilesUpdater.UpdateUpdates();
             //Landerist_com.UpdateDownloadsAndStatisticsPages();
             //StatisticsPage.Update();
 

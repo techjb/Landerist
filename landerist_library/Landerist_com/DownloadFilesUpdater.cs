@@ -14,8 +14,8 @@ namespace landerist_library.Landerist_com
             Yesterday = DateTime.Now.AddDays(-1);
             try
             {
-                Listings();
-                Updates();
+                UpdateListings();
+                UpdateUpdates();
             }
             catch (Exception exception)
             {
@@ -23,7 +23,7 @@ namespace landerist_library.Landerist_com
             }
         }
 
-        private static void Listings()
+        public static void UpdateListings()
         {
             Console.WriteLine("Reading Listings ..");
             var listings = ES_Listings.GetListingsWithParalelism(true);
@@ -33,7 +33,7 @@ namespace landerist_library.Landerist_com
             }
         }
 
-        private static void Updates()
+        public static void UpdateUpdates()
         {
             Console.WriteLine("Reading Updates ..");
             var listings = ES_Listings.GetListingsWithParalelism(true, Yesterday);
@@ -47,7 +47,7 @@ namespace landerist_library.Landerist_com
         {
             if (listings.Count.Equals(0))
             {
-                return false;
+                return true;
             }
 
             string fileNameZip = GetFileName(countryCode, exportType, "zip");
