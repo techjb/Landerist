@@ -52,7 +52,6 @@ namespace landerist_library.Parse.Listing.Anthropic
         {
             if (page.ContainsScreenshot())
             {
-                // todo: ensure that images are < 5MB
                 return new Message()
                 {
                     Role = RoleType.User,
@@ -62,7 +61,7 @@ namespace landerist_library.Parse.Listing.Anthropic
                         {
                             Source = new ImageSource()
                             {
-                                MediaType = "image/png",
+                                MediaType = "image/" + Config.SCREENSHOT_TYPE.ToString().ToLower(),
                                 Data = Convert.ToBase64String(page.Screenshot!)
                             }
                         }
@@ -71,6 +70,5 @@ namespace landerist_library.Parse.Listing.Anthropic
             }
             return new(RoleType.User, text);
         }
-
     }
 }

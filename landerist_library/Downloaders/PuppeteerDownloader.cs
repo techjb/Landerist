@@ -3,6 +3,9 @@ using landerist_library.Configuration;
 using landerist_library.Websites;
 using PuppeteerSharp;
 using System.Diagnostics;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.Drawing;
 
 
 namespace landerist_library.Downloaders
@@ -13,8 +16,6 @@ namespace landerist_library.Downloaders
         public string? Content { get; set; } = null;
         public byte[]? Screenshot { get; set; } = null;
         public string? RedirectUrl { get; set; } = null;
-
-        private static readonly ScreenshotType ScreenshotType = ScreenshotType.Png;
 
         private static readonly HashSet<ResourceType> BlockResources = Config.TAKE_SCREENSHOT ?
         [
@@ -33,24 +34,24 @@ namespace landerist_library.Downloaders
             + "IDontCareAboutCookies\\1.0.1_0\\";
 
 
-        private static readonly string[] LaunchOptionsArgs = Config.TAKE_SCREENSHOT ?
+        private static readonly string[] LaunchOptionsArgs =
             [
                 "--no-sandbox",
+                "--disable-notifications",
+                "--disable-infobars",
                 "--disable-setuid-sandbox",
                 "--disable-infobars",
+                "--disable-features=TranslateUI",
+                "--disable-features=ChromeLabs",
                 "--window-position=0,0",
                 "--ignore-certificate-errors",
                 "--ignore-certificate-errors-spki-list",
+            ];
+
+        private static readonly string[] LaunchOptionsScreenShot = 
+            [
                 "--disable-extensions-except=" + IDontCareAboutCookies,
                 "--load-extension=" + IDontCareAboutCookies
-            ] :
-            [
-                "--no-sandbox",
-                "--disable-setuid-sandbox",
-                "--disable-infobars",
-                "--window-position=0,0",
-                "--ignore-certificate-errors",
-                "--ignore-certificate-errors-spki-list",
             ];
 
         private static readonly LaunchOptions launchOptions = new()
@@ -59,7 +60,7 @@ namespace landerist_library.Downloaders
             Headless = Config.IsConfigurationProduction(),
             Devtools = false,
             IgnoreHTTPSErrors = true,
-            Args = LaunchOptionsArgs,
+            Args = Config.TAKE_SCREENSHOT ? [.. LaunchOptionsArgs, .. LaunchOptionsScreenShot] : LaunchOptionsArgs,
         };
 
 
@@ -279,23 +280,28 @@ namespace landerist_library.Downloaders
 
             ScreenshotOptions screenshotOptions = new()
             {
-                Type = ScreenshotType,
+                Type = Config.SCREENSHOT_TYPE,
                 FullPage = true,
                 OmitBackground = true,
             };
-            if (ScreenshotType.Equals(ScreenshotType.Jpeg))
+            if (Config.SCREENSHOT_TYPE.Equals(ScreenshotType.Jpeg))
             {
                 screenshotOptions.Quality = 90;
             }
             try
             {
                 var data = await browserPage.ScreenshotDataAsync(screenshotOptions);
-                if (Config.SAVE_SCREENSHOT_FILE)
+                if (data != null && CheckSizeInMB(data))
                 {
-                    string fileName = Config.SCREENSHOTS_DIRECTORY + page.UriHash + ".png";
-                    File.WriteAllBytes(fileName, data);
+                    data = ResizeImage(data);
+
+                    if (Config.SAVE_SCREENSHOT_FILE)
+                    {
+                        string fileName = Config.SCREENSHOTS_DIRECTORY + page.UriHash + "." + Config.SCREENSHOT_TYPE.ToString().ToLower();
+                        File.WriteAllBytes(fileName, data);
+                    }
+                    return data;
                 }
-                return data;
             }
             catch (Exception exception)
             {
@@ -304,6 +310,55 @@ namespace landerist_library.Downloaders
             return null;
         }
 
+        private static bool CheckSizeInMB(byte[] bytes)
+        {
+            return bytes.Length < Config.MAX_SCREENSHOT_SIZE_IN_MB;
+        }
+
+#pragma warning disable CA1416 // only supported in windows
+        public static byte[] ResizeImage(byte[] bytes)
+        {
+            using MemoryStream memoryStream = new(bytes);
+            using Image imagen = Image.FromStream(memoryStream);
+            int originalWidth = imagen.Width;
+            int originalHeight = imagen.Height;
+
+            if (originalWidth <= Config.MAX_SCREENSHOT_PIXELS_SIDE &&
+                originalHeight <= Config.MAX_SCREENSHOT_PIXELS_SIDE)
+            {
+                return bytes;
+            }
+
+            float heightWidthRatio = originalWidth / (float)originalHeight;
+            int newWidth, newHeight;
+
+            if (originalWidth > originalHeight)
+            {
+                newWidth = Config.MAX_SCREENSHOT_PIXELS_SIDE;
+                newHeight = (int)(Config.MAX_SCREENSHOT_PIXELS_SIDE / heightWidthRatio);
+            }
+            else
+            {
+                newHeight = Config.MAX_SCREENSHOT_PIXELS_SIDE;
+                newWidth = (int)(Config.MAX_SCREENSHOT_PIXELS_SIDE * heightWidthRatio);
+            }
+
+            using Bitmap resizedImage = new(newWidth, newHeight);
+            using (Graphics graphics = Graphics.FromImage(resizedImage))
+            {
+                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                graphics.DrawImage(imagen, 0, 0, newWidth, newHeight);
+            }
+
+            using MemoryStream resizedMemoryStream = new();
+            ImageFormat imageFormat = Config.SCREENSHOT_TYPE.Equals(ScreenshotType.Jpeg) ?
+                ImageFormat.Jpeg :
+                ImageFormat.Png;
+
+            resizedImage.Save(resizedMemoryStream, imageFormat);
+            return resizedMemoryStream.ToArray();
+        }
+#pragma warning restore CA1416
 
         private async Task<IPage> GetBroserPage(IBrowser browser, LanguageCode languageCode, Uri uri)
         {

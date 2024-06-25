@@ -1,4 +1,5 @@
 ﻿using landerist_library.Parse.Listing;
+using PuppeteerSharp;
 
 namespace landerist_library.Configuration
 {
@@ -6,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "2.51";
+        public static readonly string VERSION = "2.52";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
@@ -75,9 +76,13 @@ namespace landerist_library.Configuration
         public static string? BACKUPS_DIRECTORY { get; set; }
         public static string? SCREENSHOTS_DIRECTORY { get; set; }
         public static bool TAKE_SCREENSHOT { get; set; }
-        public static bool SAVE_SCREENSHOT_FILE{ get; set; }
+        public static bool SAVE_SCREENSHOT_FILE { get; set; }
 
-        public const int MAX_SCREENSHOT_SIZE = 20 * 1024 * 1024; // 20 MB
+        public const ScreenshotType SCREENSHOT_TYPE = ScreenshotType.Jpeg;
+
+        public const int MAX_SCREENSHOT_SIZE_IN_MB = 5 * 1024 * 1024; // 5 MB
+
+        public const int MAX_SCREENSHOT_PIXELS_SIDE = 8000;
         public static string? CHROME_EXTENSIONS_DIRECTORY { get; set; }
 
         public static readonly int DAYS_TO_DELETE_BACKUP = 60;
@@ -113,8 +118,7 @@ namespace landerist_library.Configuration
         public const int MAX_PARKINGS = 10000;
 
         public const int DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS = 90;
-
-        public static readonly LLMProviders LLM_PROVIDER = LLMProviders.VertexAI;
+        public static LLMProviders LLM_PROVIDER { get; set; }
 
         public static bool IsConfigurationProduction()
         {
@@ -173,6 +177,11 @@ namespace landerist_library.Configuration
 
 
             TIMERS_ENABLED = !ConfigurationProduction;
+
+            LLM_PROVIDER = !ConfigurationProduction ?
+                LLMProviders.Anthropic :
+                LLMProviders.VertexAI;
+
         }
 
         private static void InitDatabase(bool configurationProduction)

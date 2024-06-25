@@ -41,6 +41,7 @@ namespace landerist_library.Scrape
         private void SetPageType()
         {
             (var newPageType, NewListing) = PageTypeParser.GetPageType(Page);
+            //Console.WriteLine(newPageType);
             Page.SetPageType(newPageType);
         }
 
