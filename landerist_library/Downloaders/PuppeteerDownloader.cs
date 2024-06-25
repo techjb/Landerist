@@ -86,7 +86,7 @@ namespace landerist_library.Downloaders
             Browser = Task.Run(LaunchAsync).Result;
         }
 
-        public bool ContainsBrowser()
+        public bool BrowserInitialized()
         {
             return Browser != null;
         }
@@ -113,7 +113,7 @@ namespace landerist_library.Downloaders
         {
             try
             {
-                if (ContainsBrowser())
+                if (BrowserInitialized())
                 {
                     await Browser!.CloseAsync();
                     Browser.Dispose();
@@ -214,7 +214,7 @@ namespace landerist_library.Downloaders
         public void Download(Websites.Page page)
         {
             SetContentAndScrenshot(page);
-            if (ContainsBrowser())
+            if (BrowserInitialized())
             {
                 page.SetDownloadedData(this);
             }
@@ -245,13 +245,13 @@ namespace landerist_library.Downloaders
 
             try
             {
-                if (ContainsBrowser())
+                if (BrowserInitialized())
                 {
                     browserPage = await GetBroserPage(Browser!, page.Website.LanguageCode, page.Uri);
                     await browserPage.GoToAsync(page.Uri.ToString(), WaitUntilNavigation.Networkidle0);
 
                     content = await browserPage.GetContentAsync();
-                    screenShot = await TakeScreenshot(browserPage, page);                    
+                    screenShot = await TakeScreenshot(browserPage, page);
                 }
             }
             catch
@@ -289,8 +289,8 @@ namespace landerist_library.Downloaders
             }
             try
             {
-                var data =  await browserPage.ScreenshotDataAsync(screenshotOptions);
-                if(Config.SAVE_SCREENSHOT_FILE)
+                var data = await browserPage.ScreenshotDataAsync(screenshotOptions);
+                if (Config.SAVE_SCREENSHOT_FILE)
                 {
                     string fileName = Config.SCREENSHOTS_DIRECTORY + page.UriHash + ".png";
                     File.WriteAllBytes(fileName, data);
@@ -341,30 +341,19 @@ namespace landerist_library.Downloaders
 
         private static async Task HandleRequestAsync(RequestEventArgs e, Uri uri)
         {
+
             try
             {
-                if (BlockResources.Contains(e.Request.ResourceType))
-                {
-                    await e.Request.AbortAsync();
-                    return;
-                }
-                if (BlockDomains.Contains(uri.Host))
-                {
-                    await e.Request.AbortAsync();
-                    return;
-                }
-                if (e.Request.IsNavigationRequest && e.Request.RedirectChain.Length != 0)
+                if (BlockResources.Contains(e.Request.ResourceType) ||
+                    BlockDomains.Contains(uri.Host) ||
+                    e.Request.IsNavigationRequest && e.Request.RedirectChain.Length != 0
+                    //|| e.Request.IsNavigationRequest && e.Request.Url != uri.ToString()) // problematic
+                    )
                 {
                     await e.Request.AbortAsync();
                     return;
                 }
 
-                // problematic
-                //if (e.Request.IsNavigationRequest && e.Request.Url != uri.ToString())
-                //{
-                //    //await e.Request.AbortAsync();
-                //    //return;
-                //}
                 await e.Request.ContinueAsync();
             }
             catch (Exception exception)

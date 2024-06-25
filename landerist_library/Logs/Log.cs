@@ -84,7 +84,9 @@ namespace landerist_library.Logs
                 "Message: " + exception.Message + "\r\n" +
                 "Source: " + exception.Source + "\r\n" +
                 "StackTrace: " + exception.StackTrace + "\r\n" +
-                "TargetSite: " + exception.TargetSite + "\r\n";
+                "TargetSite: " + exception.TargetSite + "\r\n" +
+                "InnerException: " + exception.InnerException;
+                
         }
 
         #region Write Logs

@@ -19,7 +19,7 @@
 
         public bool ContainsBrowser()
         {
-            return PuppeteerDownloader.ContainsBrowser();
+            return PuppeteerDownloader.BrowserInitialized();
         }
 
         public void Download(Websites.Page Page)
