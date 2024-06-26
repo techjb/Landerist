@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "2.52";
+        public static readonly string VERSION = "2.53";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
@@ -78,9 +78,9 @@ namespace landerist_library.Configuration
         public static bool TAKE_SCREENSHOT { get; set; }
         public static bool SAVE_SCREENSHOT_FILE { get; set; }
 
-        public const ScreenshotType SCREENSHOT_TYPE = ScreenshotType.Jpeg;
+        public static readonly ScreenshotType SCREENSHOT_TYPE = ScreenshotType.Jpeg;
 
-        public const int MAX_SCREENSHOT_SIZE_IN_MB = 5 * 1024 * 1024; // 5 MB
+        public const int MAX_SCREENSHOT_SIZE = 5 * 1024 * 1024; // 5 MB                
 
         public const int MAX_SCREENSHOT_PIXELS_SIDE = 8000;
         public static string? CHROME_EXTENSIONS_DIRECTORY { get; set; }
@@ -166,8 +166,8 @@ namespace landerist_library.Configuration
                 PrivateConfig.SCREENSHOTS_DIRECTORY_PRODUCTION :
                 PrivateConfig.SCREENSHOTS_DIRECTORY_LOCAL;
 
-            TAKE_SCREENSHOT = false;
-            //TAKE_SCREENSHOT = !ConfigurationProduction;
+            //TAKE_SCREENSHOT = false;
+            TAKE_SCREENSHOT = !ConfigurationProduction;
 
             SAVE_SCREENSHOT_FILE = !ConfigurationProduction;
 

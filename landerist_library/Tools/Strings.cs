@@ -1,5 +1,4 @@
-﻿using Google.Cloud.AIPlatform.V1;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;

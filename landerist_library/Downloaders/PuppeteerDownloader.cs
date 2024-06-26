@@ -3,9 +3,6 @@ using landerist_library.Configuration;
 using landerist_library.Websites;
 using PuppeteerSharp;
 using System.Diagnostics;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using System.Drawing;
 
 
 namespace landerist_library.Downloaders
@@ -16,6 +13,9 @@ namespace landerist_library.Downloaders
         public string? Content { get; set; } = null;
         public byte[]? Screenshot { get; set; } = null;
         public string? RedirectUrl { get; set; } = null;
+
+        private const string ExpressionRemoveCookies =
+            @"document.querySelectorAll('[class*=""cookie"" i], [id*=""cookie"" i]').forEach(el => el.remove());";
 
         private static readonly HashSet<ResourceType> BlockResources = Config.TAKE_SCREENSHOT ?
         [
@@ -249,10 +249,13 @@ namespace landerist_library.Downloaders
                 if (BrowserInitialized())
                 {
                     browserPage = await GetBroserPage(Browser!, page.Website.LanguageCode, page.Uri);
-                    await browserPage.GoToAsync(page.Uri.ToString(), WaitUntilNavigation.Networkidle0);
-
-                    content = await browserPage.GetContentAsync();
-                    screenShot = await TakeScreenshot(browserPage, page);
+                    await browserPage.GoToAsync(page.Uri.ToString(), WaitUntilNavigation.Networkidle0);                    
+                    await browserPage.EvaluateExpressionAsync(ExpressionRemoveCookies);
+                    if(Config.TAKE_SCREENSHOT)
+                    {
+                        content = await browserPage.GetContentAsync();
+                    }                    
+                    screenShot = await PuppeteerScreenshot.TakeScreenshot(browserPage, page);
                 }
             }
             catch
@@ -269,97 +272,7 @@ namespace landerist_library.Downloaders
             return (content, screenShot);
         }
 
-
-
-        private static async Task<byte[]?> TakeScreenshot(IPage browserPage, Websites.Page page)
-        {
-            if (!Config.TAKE_SCREENSHOT)
-            {
-                return null;
-            }
-
-            ScreenshotOptions screenshotOptions = new()
-            {
-                Type = Config.SCREENSHOT_TYPE,
-                FullPage = true,
-                OmitBackground = true,
-            };
-            if (Config.SCREENSHOT_TYPE.Equals(ScreenshotType.Jpeg))
-            {
-                screenshotOptions.Quality = 90;
-            }
-            try
-            {
-                var data = await browserPage.ScreenshotDataAsync(screenshotOptions);
-                if (data != null && CheckSizeInMB(data))
-                {
-                    data = ResizeImage(data);
-
-                    if (Config.SAVE_SCREENSHOT_FILE)
-                    {
-                        string fileName = Config.SCREENSHOTS_DIRECTORY + page.UriHash + "." + Config.SCREENSHOT_TYPE.ToString().ToLower();
-                        File.WriteAllBytes(fileName, data);
-                    }
-                    return data;
-                }
-            }
-            catch (Exception exception)
-            {
-                Logs.Log.WriteLogErrors("PuppeteerDownloader TakeScreenshot", exception);
-            }
-            return null;
-        }
-
-        private static bool CheckSizeInMB(byte[] bytes)
-        {
-            return bytes.Length < Config.MAX_SCREENSHOT_SIZE_IN_MB;
-        }
-
-#pragma warning disable CA1416 // only supported in windows
-        public static byte[] ResizeImage(byte[] bytes)
-        {
-            using MemoryStream memoryStream = new(bytes);
-            using Image imagen = Image.FromStream(memoryStream);
-            int originalWidth = imagen.Width;
-            int originalHeight = imagen.Height;
-
-            if (originalWidth <= Config.MAX_SCREENSHOT_PIXELS_SIDE &&
-                originalHeight <= Config.MAX_SCREENSHOT_PIXELS_SIDE)
-            {
-                return bytes;
-            }
-
-            float heightWidthRatio = originalWidth / (float)originalHeight;
-            int newWidth, newHeight;
-
-            if (originalWidth > originalHeight)
-            {
-                newWidth = Config.MAX_SCREENSHOT_PIXELS_SIDE;
-                newHeight = (int)(Config.MAX_SCREENSHOT_PIXELS_SIDE / heightWidthRatio);
-            }
-            else
-            {
-                newHeight = Config.MAX_SCREENSHOT_PIXELS_SIDE;
-                newWidth = (int)(Config.MAX_SCREENSHOT_PIXELS_SIDE * heightWidthRatio);
-            }
-
-            using Bitmap resizedImage = new(newWidth, newHeight);
-            using (Graphics graphics = Graphics.FromImage(resizedImage))
-            {
-                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                graphics.DrawImage(imagen, 0, 0, newWidth, newHeight);
-            }
-
-            using MemoryStream resizedMemoryStream = new();
-            ImageFormat imageFormat = Config.SCREENSHOT_TYPE.Equals(ScreenshotType.Jpeg) ?
-                ImageFormat.Jpeg :
-                ImageFormat.Png;
-
-            resizedImage.Save(resizedMemoryStream, imageFormat);
-            return resizedMemoryStream.ToArray();
-        }
-#pragma warning restore CA1416
-
+        
         private async Task<IPage> GetBroserPage(IBrowser browser, LanguageCode languageCode, Uri uri)
         {
             IPage browserPage = await browser.NewPageAsync();

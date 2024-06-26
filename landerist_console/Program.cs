@@ -94,6 +94,7 @@ namespace landerist_console
             //var page = new Page("https://www.terramagna.net/detallesdelinmueble/villa-en-venta-chayofa/21282480");
             //var page = new Page("https://vitalcasa.com/feature/double-glazing/"); // no listing
             //var page = new Page("https://www.inmosegursalou.com/ad/99569031");
+            //var page = new Page("http://www.finquesniu.com/propiedades");
 
             #endregion
 

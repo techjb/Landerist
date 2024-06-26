@@ -1,5 +1,4 @@
-﻿using AI.Dev.OpenAI.GPT;
-using landerist_library.Configuration;
+﻿using landerist_library.Configuration;
 using landerist_library.Websites;
 using OpenAI;
 using OpenAI.Chat;
