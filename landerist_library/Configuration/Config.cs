@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "2.53";
+        public static readonly string VERSION = "2.56";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
@@ -166,8 +166,8 @@ namespace landerist_library.Configuration
                 PrivateConfig.SCREENSHOTS_DIRECTORY_PRODUCTION :
                 PrivateConfig.SCREENSHOTS_DIRECTORY_LOCAL;
 
-            //TAKE_SCREENSHOT = false;
-            TAKE_SCREENSHOT = !ConfigurationProduction;
+            TAKE_SCREENSHOT = false;
+            //TAKE_SCREENSHOT = !ConfigurationProduction;
 
             SAVE_SCREENSHOT_FILE = !ConfigurationProduction;
 

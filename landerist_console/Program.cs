@@ -154,7 +154,7 @@ namespace landerist_console
             //new Scraper().ScrapeUnknowPageType(website);
             //new Scraper().ScrapeAllPages();            
             //new Scraper().ScrapeResponseBodyRepeatedInListings();
-            //new Scraper().Start();
+            new Scraper().Start();
             //new Scraper().Scrape(page);
             //new Scraper().DoTest();
 

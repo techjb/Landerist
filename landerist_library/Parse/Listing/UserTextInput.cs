@@ -145,9 +145,9 @@ namespace landerist_library.Parse.Listing
 
         [GeneratedRegex(@"\s+")]
         private static partial Regex RegexSpace();
-        [GeneratedRegex(@"\s*>")]
-        private static partial Regex Regex1();
-        [GeneratedRegex(@"<\s*")]
-        private static partial Regex Regex2();
+        //[GeneratedRegex(@"\s*>")]
+        //private static partial Regex Regex1();
+        //[GeneratedRegex(@"<\s*")]
+        //private static partial Regex Regex2();
     }
 }

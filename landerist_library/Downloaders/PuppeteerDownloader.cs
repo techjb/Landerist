@@ -253,9 +253,10 @@ namespace landerist_library.Downloaders
                     await browserPage.EvaluateExpressionAsync(ExpressionRemoveCookies);
                     if(Config.TAKE_SCREENSHOT)
                     {
-                        content = await browserPage.GetContentAsync();
-                    }                    
-                    screenShot = await PuppeteerScreenshot.TakeScreenshot(browserPage, page);
+                        screenShot = await PuppeteerScreenshot.TakeScreenshot(browserPage, page);
+                    }
+                    content = await browserPage.GetContentAsync();
+
                 }
             }
             catch
