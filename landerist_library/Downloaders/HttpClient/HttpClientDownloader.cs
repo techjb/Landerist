@@ -2,7 +2,7 @@
 using landerist_library.Websites;
 using System.Net.Http.Headers;
 
-namespace landerist_library.Downloaders
+namespace landerist_library.Downloaders.HttpClient
 {
     public class HttpClientDownloader : IDownloader
     {
@@ -32,7 +32,7 @@ namespace landerist_library.Downloaders
                 //ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; }
             };
 
-            using var httpClient = new HttpClient(handler);
+            using var httpClient = new System.Net.Http.HttpClient(handler);
             httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
 
             SetAccepLanguage(httpClient, languageCode);
@@ -55,7 +55,7 @@ namespace landerist_library.Downloaders
             }
         }
 
-        private static void SetAccepLanguage(HttpClient httpClient, LanguageCode languageCode)
+        private static void SetAccepLanguage(System.Net.Http.HttpClient httpClient, LanguageCode languageCode)
         {
             switch (languageCode)
             {

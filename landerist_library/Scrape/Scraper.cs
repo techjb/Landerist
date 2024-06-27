@@ -1,5 +1,6 @@
 ﻿using landerist_library.Configuration;
-using landerist_library.Downloaders;
+using landerist_library.Downloaders.Multiple;
+using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Logs;
 using landerist_library.Websites;
 using landerist_orels.ES;
@@ -30,7 +31,7 @@ namespace landerist_library.Scrape
 
         private static readonly CancellationTokenSource CancellationTokenSource = new();
 
-        public DownloadersList DownloadersList = new();
+        public MultipleDownloader MultipleDownloader = new();
 
 
         private List<Page> Pages = [];
@@ -59,7 +60,7 @@ namespace landerist_library.Scrape
         public void Stop()
         {
             CancellationTokenSource.Cancel();
-            DownloadersList.Clear();
+            MultipleDownloader.Clear();
         }
 
         public void ScrapeUnknowPageType(int? rows = null)
@@ -151,7 +152,7 @@ namespace landerist_library.Scrape
             var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
             var maxDegreeOfParallelism = Config.IsConfigurationProduction() ? Environment.ProcessorCount - 1 : 1;
 
-            DownloadersList.Clear();
+            MultipleDownloader.Clear();
 
             Parallel.ForEach(
                 orderablePartitioner,

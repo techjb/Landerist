@@ -5,7 +5,7 @@ using System.Drawing.Imaging;
 using System.Drawing;
 using landerist_library.Logs;
 
-namespace landerist_library.Downloaders
+namespace landerist_library.Downloaders.Puppeteer
 {
     public class PuppeteerScreenshot
     {
@@ -22,11 +22,11 @@ namespace landerist_library.Downloaders
                 FullPage = true,
                 OmitBackground = true,
             };
-            if (Config.SCREENSHOT_TYPE.Equals(ScreenshotType.Jpeg) 
-               //|| Config.SCREENSHOT_TYPE.Equals(ScreenshotType.Webp) Not supported for webp. Screenshots have low quality.
+            if (Config.SCREENSHOT_TYPE.Equals(ScreenshotType.Jpeg)
+                //|| Config.SCREENSHOT_TYPE.Equals(ScreenshotType.Webp) Not supported for webp. Screenshots have low quality.
                 )
             {
-                screenshotOptions.Quality = 90;                
+                screenshotOptions.Quality = 90;
             }
             try
             {
@@ -113,10 +113,10 @@ namespace landerist_library.Downloaders
 
         static byte[] ResizeImageToMaxSize(byte[] bytes, Image image)
         {
-            if(bytes.Length < Config.MAX_SCREENSHOT_SIZE)
+            if (bytes.Length < Config.MAX_SCREENSHOT_SIZE)
             {
                 return bytes;
-            }            
+            }
 
             switch (Config.SCREENSHOT_TYPE)
             {

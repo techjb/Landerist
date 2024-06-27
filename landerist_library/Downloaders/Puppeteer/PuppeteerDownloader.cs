@@ -5,7 +5,7 @@ using PuppeteerSharp;
 using System.Diagnostics;
 
 
-namespace landerist_library.Downloaders
+namespace landerist_library.Downloaders.Puppeteer
 {
     public class PuppeteerDownloader : IDownloader
     {
@@ -48,7 +48,7 @@ namespace landerist_library.Downloaders
                 "--ignore-certificate-errors-spki-list",
             ];
 
-        private static readonly string[] LaunchOptionsScreenShot = 
+        private static readonly string[] LaunchOptionsScreenShot =
             [
                 "--disable-extensions-except=" + IDontCareAboutCookies,
                 "--load-extension=" + IDontCareAboutCookies
@@ -96,7 +96,7 @@ namespace landerist_library.Downloaders
         {
             try
             {
-                return await Puppeteer.LaunchAsync(launchOptions);
+                return await PuppeteerSharp.Puppeteer.LaunchAsync(launchOptions);
             }
             catch (Exception exception)
             {
@@ -249,9 +249,9 @@ namespace landerist_library.Downloaders
                 if (BrowserInitialized())
                 {
                     browserPage = await GetBroserPage(Browser!, page.Website.LanguageCode, page.Uri);
-                    await browserPage.GoToAsync(page.Uri.ToString(), WaitUntilNavigation.Networkidle0);                    
+                    await browserPage.GoToAsync(page.Uri.ToString(), WaitUntilNavigation.Networkidle0);
                     await browserPage.EvaluateExpressionAsync(ExpressionRemoveCookies);
-                    if(Config.TAKE_SCREENSHOT)
+                    if (Config.TAKE_SCREENSHOT)
                     {
                         screenShot = await PuppeteerScreenshot.TakeScreenshot(browserPage, page);
                     }
@@ -273,7 +273,7 @@ namespace landerist_library.Downloaders
             return (content, screenShot);
         }
 
-        
+
         private async Task<IPage> GetBroserPage(IBrowser browser, LanguageCode languageCode, Uri uri)
         {
             IPage browserPage = await browser.NewPageAsync();

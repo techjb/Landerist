@@ -1,31 +1,32 @@
 ﻿using landerist_library.Configuration;
+using landerist_library.Downloaders.Puppeteer;
 
-namespace landerist_library.Downloaders
+namespace landerist_library.Downloaders.Multiple
 {
-    public class DownloadersList
+    public class MultipleDownloader
     {
-        private readonly List<Downloader> List = [];
+        private readonly List<SingleDownloader> List = [];
 
         private readonly object Sync = new();
 
-        public Downloader? GetDownloader()
+        public SingleDownloader? GetDownloader()
         {
             lock (Sync)
             {
-                foreach (Downloader downloader in List)
+                foreach (SingleDownloader singleDownloader in List)
                 {
-                    if (downloader.IsAvailable)
+                    if (singleDownloader.IsAvailable)
                     {
-                        downloader.SetUnavailable();
-                        return downloader;
+                        singleDownloader.SetUnavailable();
+                        return singleDownloader;
                     }
                 }
-                Downloader newDownloader = new();
-                if (newDownloader.ContainsBrowser())
+                SingleDownloader newSingleDownloader = new();
+                if (newSingleDownloader.ContainsBrowser())
                 {
-                    List.Add(newDownloader);
-                    newDownloader.SetUnavailable();
-                    return newDownloader;
+                    List.Add(newSingleDownloader);
+                    newSingleDownloader.SetUnavailable();
+                    return newSingleDownloader;
                 }
                 return null;
             }
@@ -37,9 +38,9 @@ namespace landerist_library.Downloaders
             Parallel.ForEach(List, new ParallelOptions()
             {
                 MaxDegreeOfParallelism = maxDegreeOfParallelism,
-            }, downloader =>
+            }, singleDownloader =>
             {
-                downloader.CloseBrowser();
+                singleDownloader.CloseBrowser();
             });
             List.Clear();
             PuppeteerDownloader.KillChrome();

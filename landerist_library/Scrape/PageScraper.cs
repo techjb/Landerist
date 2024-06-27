@@ -1,12 +1,12 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Database;
-using landerist_library.Downloaders;
 using landerist_library.Index;
 using landerist_library.Parse.Location;
 using landerist_library.Parse.Media;
 using landerist_library.Parse.PageTypeParser;
 using landerist_library.Websites;
 using landerist_orels.ES;
+using landerist_library.Downloaders.Multiple;
 
 namespace landerist_library.Scrape
 {
@@ -18,11 +18,11 @@ namespace landerist_library.Scrape
 
         private readonly PageType? OldPageType = page.PageType;
 
-        private readonly Downloader? Downloader;
+        private readonly SingleDownloader? Downloader;
 
         public PageScraper(Page page, Scraper scraper) : this(page)
         {
-            Downloader = scraper.DownloadersList.GetDownloader();
+            Downloader = scraper.MultipleDownloader.GetDownloader();
         }
         public bool Scrape()
         {

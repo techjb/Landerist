@@ -1,6 +1,8 @@
-﻿namespace landerist_library.Downloaders
+﻿using landerist_library.Downloaders.Puppeteer;
+
+namespace landerist_library.Downloaders.Multiple
 {
-    public class Downloader
+    public class SingleDownloader
     {
         private readonly PuppeteerDownloader PuppeteerDownloader = new();
 
