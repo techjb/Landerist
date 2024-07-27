@@ -67,7 +67,7 @@ namespace landerist_console
 #pragma warning restore CA1416 // Validate platform compatibility
         }
 
-        private static void Run()
+        private static async void Run()
         {
             //Config.SetToProduction();
             Config.SetDatabaseToProduction();
@@ -224,16 +224,17 @@ namespace landerist_console
 
             #endregion
 
-            #region Export Backup 
+            #region Backup 
 
             //Csv.Export(true);
             //landerist_library.Export.Json.Export("es_listings_full.json", true);
             //landerist_library.Landerist_com.FilesUpdater.UpdateFiles();
             //new landerist_library.Landerist_com.DownloadsPage().Update();            
             //landerist_library.Landerist_com.StatisticsPage.Update();
-            //landerist_library.Landerist_com.Landerist_com.InvalidateCloudFront();
+            //landerist_library.Landerist_com.Landerist_com.InvalidateCloudFront();            
 
             //Backup.Update();
+            //Backup.DeleteRemoteOldBackups();
             #endregion
 
             #region Listing Example

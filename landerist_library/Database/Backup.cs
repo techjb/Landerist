@@ -51,10 +51,10 @@ namespace landerist_library.Database
             return new S3().UploadFile(filePath, fileName, PrivateConfig.AWS_S3_BACKUPS_BUCKET);
         }
 
-        private static async void DeleteRemoteOldBackups()
+        public static void DeleteRemoteOldBackups()
         {
             Console.WriteLine("Deletings old backups ..");
-            var S3Objects = await new S3().ListObjects(PrivateConfig.AWS_S3_BACKUPS_BUCKET);
+            var S3Objects = new S3().ListObjects(PrivateConfig.AWS_S3_BACKUPS_BUCKET).Result;
             List<string> toDelete = [];
             DateTime dateToDelete = DateTime.Now.AddDays(-Config.DAYS_TO_DELETE_BACKUP);
             foreach (var S3Object in S3Objects)
@@ -68,7 +68,7 @@ namespace landerist_library.Database
             {
                 return;
             }
-            var deletedObjects = await new S3().DeleteObjects(PrivateConfig.AWS_S3_BACKUPS_BUCKET, toDelete);
+            var deletedObjects = new S3().DeleteObjects(PrivateConfig.AWS_S3_BACKUPS_BUCKET, toDelete).Result;
             Log.WriteLogInfo("backup", "DeleteOldBackups Deleted: " + deletedObjects.Count);
         }
 
