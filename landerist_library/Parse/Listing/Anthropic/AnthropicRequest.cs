@@ -35,7 +35,7 @@ namespace landerist_library.Parse.Listing.Anthropic
                 MaxTokens = MAX_TOKENS,
             };
 
-            var tools = AnthropicTools.GetTools();
+            var tools = new AnthropicTools().GetTools();
             try
             {
                 return Task.Run(async () => await client.Messages.GetClaudeMessageAsync(parameters, tools)).Result;

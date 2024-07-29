@@ -177,13 +177,13 @@ namespace landerist_library.Parse.Listing
         protected const string ESTADO_DE_LA_CONSTRUCCIÓN_EN_RUINAS = "en_ruinas";
 
 
-        protected static readonly JsonArray TiposDeOperación =
+        protected readonly JsonArray TiposDeOperación =
         [
             OPERACION_VENTA,
             OPERACION_ALQUILER
         ];
 
-        protected static readonly JsonArray TiposDeInmueble =
+        protected readonly JsonArray TiposDeInmueble =
         [
             TIPO_DE_INMUEBLE_VIVIENDA,
             TIPO_DE_INMUEBLE_DORMITORIO,
@@ -196,7 +196,7 @@ namespace landerist_library.Parse.Listing
             TIPO_DE_INMUEBLE_EDIFICIO
         ];
 
-        protected static readonly JsonArray SubtiposDeInmueble =
+        protected readonly JsonArray SubtiposDeInmueble =
         [
             SUBTIPO_DE_INMUEBLE_PISO,
             SUBTIPO_DE_INMUEBLE_APARTAMENTO,
@@ -211,7 +211,7 @@ namespace landerist_library.Parse.Listing
             SUBTIPO_DE_INMUEBLE_PARCELA_NO_URBANIZABLE
         ];
 
-        protected static readonly JsonArray EstadosDeLaConstrucción =
+        protected readonly JsonArray EstadosDeLaConstrucción =
         [
             ESTADO_DE_LA_CONSTRUCCIÓN_OBRA_NUEVA,
             ESTADO_DE_LA_CONSTRUCCIÓN_BUENO,

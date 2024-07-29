@@ -130,7 +130,7 @@ namespace landerist_library.Parse.Listing.VertexAI
                 },
                 Tools =
                 {
-                    VertexAITools.GetTools()
+                    new VertexAITools().GetTools()
                 },
                 SystemInstruction = new Content
                 {

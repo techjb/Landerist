@@ -6,7 +6,7 @@ namespace landerist_library.Parse.Listing.VertexAI
 {
     public class VertexAITools : ParseListingTool
     {
-        public static Tool GetTools()
+        public Tool GetTools()
         {
             return new Tool
             {
@@ -18,7 +18,7 @@ namespace landerist_library.Parse.Listing.VertexAI
             };
         }
 
-        private static FunctionDeclaration IsListingFunctionDeclaration()
+        private FunctionDeclaration IsListingFunctionDeclaration()
         {
             MapField<string, OpenApiSchema> properties = [];
 

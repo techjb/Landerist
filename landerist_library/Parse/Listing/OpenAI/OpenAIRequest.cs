@@ -40,7 +40,7 @@ namespace landerist_library.Parse.Listing.OpenAI
                 new(Role.User, userInput),
             };
 
-            var tools = OpenAITools.GetTools();
+            var tools = new OpenAITools().GetTools();
 
             var chatRequest = new ChatRequest(
                 messages: messages,

@@ -10,7 +10,7 @@ namespace landerist_library.Parse.Listing.Anthropic
 {
     public class AnthropicTools : ParseListingTool
     {
-        public static List<Anthropic_SDK_Common.Tool> GetTools()
+        public List<Anthropic_SDK_Common.Tool> GetTools()
         {
             var functionIsListing = GetFunctionIsListing();
             var functionIsNotListing = GetFunctionIsNotListing();
@@ -31,7 +31,7 @@ namespace landerist_library.Parse.Listing.Anthropic
         }
 
 
-        public static Function GetFunctionIsListing()
+        public Function GetFunctionIsListing()
         {
             var inputschema = GetInputSchema();           
 
@@ -45,7 +45,7 @@ namespace landerist_library.Parse.Listing.Anthropic
             return new Function(FunctionNameIsListing, FunctionDescriptionIsListing, JsonNode.Parse(jsonString));
         }
 
-        public static InputSchema GetInputSchema()
+        public InputSchema GetInputSchema()
         {
             var properties = new Dictionary<string, Property>();
 
