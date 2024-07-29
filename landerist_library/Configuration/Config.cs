@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "2.59";
+        public static readonly string VERSION = "2.61";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
@@ -179,8 +179,8 @@ namespace landerist_library.Configuration
             TIMERS_ENABLED = !ConfigurationProduction;
 
             LLM_PROVIDER = !ConfigurationProduction ?
-                LLMProviders.Anthropic :
-                LLMProviders.VertexAI;
+                LLMProviders.OpenAI :
+                LLMProviders.OpenAI;
 
         }
 

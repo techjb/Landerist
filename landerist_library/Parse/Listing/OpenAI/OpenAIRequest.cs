@@ -19,16 +19,13 @@ namespace landerist_library.Parse.Listing.OpenAI
         //   "Response sólo con \"si\" o \"no\" en formato Json"
         //   ;       
 
-        public static readonly int MAX_CONTEXT_WINDOW =
-                 16385; // gpt-3.5-turbo-0125
-                        //128000; // gpt-4o     
+        public static readonly int MAX_CONTEXT_WINDOW = 128000;
 
-        public static readonly string ModelName =
-                "gpt-3.5-turbo-0125";
-        //"gpt-4o";
+        public static readonly string MODEL_NAME = "gpt-4o-mini";
 
         private static readonly OpenAIClient OpenAIClient = new(PrivateConfig.OPENAI_API_KEY);
-        private static readonly string? ToolChoice = "auto";
+
+        private static readonly string? TOOL_CHOICE = "required";
 
         public static bool TooManyTokens(Page page)
         {
@@ -47,10 +44,10 @@ namespace landerist_library.Parse.Listing.OpenAI
 
             var chatRequest = new ChatRequest(
                 messages: messages,
-                model: ModelName,
+                model: MODEL_NAME,
                 temperature: 0,
                 tools: tools,
-                toolChoice: ToolChoice,
+                toolChoice: TOOL_CHOICE,
                 responseFormat: ChatResponseFormat.Json
                 );
 
