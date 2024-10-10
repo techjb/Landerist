@@ -48,7 +48,7 @@ namespace landerist_library.Parse.Listing.OpenAI
                 temperature: 0,
                 tools: tools,
                 toolChoice: TOOL_CHOICE,
-                responseFormat: ChatResponseFormat.Json
+                responseFormat:  ChatResponseFormat.Json                
                 );
 
             try

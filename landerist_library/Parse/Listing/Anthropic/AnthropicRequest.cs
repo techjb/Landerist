@@ -24,21 +24,23 @@ namespace landerist_library.Parse.Listing.Anthropic
             var apiAutentication = new APIAuthentication(PrivateConfig.ANTHROPIC_API_KEY);
             var client = new AnthropicClient(apiAutentication);
             var message = GetMessage(page, text);
+            List<SystemMessage> systemMessages =[new SystemMessage(SystemPrompt)];
+            var tools = new AnthropicTools().GetTools();
 
             var parameters = new MessageParameters()
             {
                 Messages = [message],
                 Model = ANTHROPIC_MODEL,
                 Stream = false,
-                SystemMessage = SystemPrompt,
+                System = systemMessages,
                 Temperature = 0m,
                 MaxTokens = MAX_TOKENS,
+                Tools = tools
             };
 
-            var tools = new AnthropicTools().GetTools();
             try
             {
-                return Task.Run(async () => await client.Messages.GetClaudeMessageAsync(parameters, tools)).Result;
+                return Task.Run(async () => await client.Messages.GetClaudeMessageAsync(parameters)).Result;
             }
             catch (Exception exception)
             {

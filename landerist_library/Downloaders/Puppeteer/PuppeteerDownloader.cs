@@ -59,7 +59,7 @@ namespace landerist_library.Downloaders.Puppeteer
             //Headless = true, // if false, maybe need to comment await browserPage.SetRequestInterceptionAsync(true);            
             Headless = Config.IsConfigurationProduction(),
             Devtools = false,
-            IgnoreHTTPSErrors = true,
+            //IgnoreHTTPSErrors = true,            
             Args = Config.TAKE_SCREENSHOT ? [.. LaunchOptionsArgs, .. LaunchOptionsScreenShot] : LaunchOptionsArgs,
         };
 
@@ -249,6 +249,9 @@ namespace landerist_library.Downloaders.Puppeteer
                 if (BrowserInitialized())
                 {
                     browserPage = await GetBroserPage(Browser!, page.Website.LanguageCode, page.Uri);
+                    //await browserPage.SetExtraHttpHeadersAsync(new Dictionary<string, string> {
+                    //    { "ignoreHTTPSErrors", "true" }
+                    //});
                     await browserPage.GoToAsync(page.Uri.ToString(), WaitUntilNavigation.Networkidle0);
                     await browserPage.EvaluateExpressionAsync(ExpressionRemoveCookies);
                     if (Config.TAKE_SCREENSHOT)

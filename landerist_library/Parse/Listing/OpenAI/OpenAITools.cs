@@ -7,7 +7,7 @@ namespace landerist_library.Parse.Listing.OpenAI
     {
         public List<Tool> GetTools()
         {
-            var functionIsListing = GetToolIsListing();
+            var functionIsListing = GetToolIsListing();            
             var functionIsNotListing = GetToolIsNotListing();
 
             return [functionIsListing, functionIsNotListing];
