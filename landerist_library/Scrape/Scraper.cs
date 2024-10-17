@@ -182,12 +182,12 @@ namespace landerist_library.Scrape
         {
             if (!page.Website.IsAllowedByRobotsTxt(page.Uri))
             {
-                page.Update(PageType.BlockedByRobotsTxt);
+                page.Update(PageType.BlockedByRobotsTxt, true);
                 return;
             }
             if (page.Website.CrawlDelayTooBig())
             {
-                page.Update(PageType.CrawlDelayTooBig);
+                page.Update(PageType.CrawlDelayTooBig, true);
                 return;
             }
             if (IsBlocked(page))

@@ -136,7 +136,11 @@ namespace landerist_library.Downloaders.Puppeteer
             do
             {
                 using MemoryStream outputStream = new();
-                ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
+                ImageCodecInfo? jpgEncoder = GetEncoder(ImageFormat.Jpeg);
+                if (jpgEncoder == null)
+                {
+                    return [];
+                }
                 EncoderParameters encoderParams = new(1);
                 encoderParams.Param[0] = new EncoderParameter(Encoder.Quality, quality);
 
@@ -149,7 +153,7 @@ namespace landerist_library.Downloaders.Puppeteer
             return resizedBytes;
         }
 
-        static ImageCodecInfo GetEncoder(ImageFormat format)
+        static ImageCodecInfo? GetEncoder(ImageFormat format)
         {
             ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
             foreach (ImageCodecInfo codec in codecs)

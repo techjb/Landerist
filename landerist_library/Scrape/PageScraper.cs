@@ -31,19 +31,22 @@ namespace landerist_library.Scrape
                 return false;
             }
             Downloader.Download(Page);
-            SetPageType();
-            UpdateListing();
-            IndexPages();
 
-            return Page.Update();
-        }
-
-        private void SetPageType()
-        {
             (var newPageType, NewListing) = PageTypeParser.GetPageType(Page);
-            //Console.WriteLine(newPageType);
-            Page.SetPageType(newPageType);
+            bool bulkParsing = newPageType.Equals(PageType.BulkParsing);
+            if (bulkParsing)
+            {
+                page.SetWaitingAIParsing();
+            }
+            else
+            {
+                Page.SetPageType(newPageType);
+                UpdateListing();
+            }
+            IndexPages();
+            return Page.Update(!bulkParsing);
         }
+
 
         private void UpdateListing()
         {

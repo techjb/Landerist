@@ -6,6 +6,8 @@ using landerist_library.Index;
 using landerist_library.Tools;
 using landerist_orels.ES;
 using System.Data;
+using System.IO.Compression;
+using System.Text;
 
 namespace landerist_library.Websites
 {
@@ -30,11 +32,15 @@ namespace landerist_library.Websites
 
         public short? PageTypeCounter { get; private set; }
 
+        public bool? WaitingAIParsing { get; set; }
+
         private string? ResponseBody { get; set; }
 
         public string? ResponseBodyText { get; set; }
 
         public string? ResponseBodyTextHash { get; set; }
+
+        public byte[]? ResponseBodyZipped { get; private set; }
 
         public bool ResponseBodyTextHasChanged { get; set; } = false;
 
@@ -111,7 +117,9 @@ namespace landerist_library.Websites
             HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
             PageType = dataRow["PageType"] is DBNull ? null : (PageType)Enum.Parse(typeof(PageType), dataRow["PageType"].ToString()!);
             PageTypeCounter = dataRow["PageTypeCounter"] is DBNull ? null : (short)dataRow["PageTypeCounter"];
+            WaitingAIParsing = dataRow["WaitingAIParsing"] is DBNull ? null : (bool)dataRow["WaitingAIParsing"];
             ResponseBodyTextHash = dataRow["ResponseBodyTextHash"] is DBNull ? null : dataRow["ResponseBodyTextHash"].ToString();
+            ResponseBodyZipped = dataRow["ResponseBodyZipped"] is DBNull ? null : (byte[])dataRow["ResponseBodyZipped"];
         }
 
         public DataRow? GetDataRow()
@@ -136,7 +144,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "INSERT INTO " + Pages.TABLE_PAGES + " " +
-                "VALUES(@Host, @Uri, @UriHash, @Inserted, NULL, NULL, NULL, NULL, NULL, NULL)";
+                "VALUES(@Host, @Uri, @UriHash, @Inserted, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
 
             bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
                 {"Host", Host },
@@ -152,16 +160,19 @@ namespace landerist_library.Websites
         }
 
 
-        public bool Update(PageType? pageType)
+        public bool Update(PageType? pageType, bool setNextUpdate)
         {
             SetPageType(pageType);
-            return Update();
+            return Update(setNextUpdate);
         }
 
-        public bool Update()
+        public bool Update(bool setNextUpdate)
         {
             Updated = DateTime.Now;
-            SetNextUpdate();
+            if (setNextUpdate)
+            {                
+                SetNextUpdate();
+            }
 
             string query =
                 "UPDATE " + Pages.TABLE_PAGES + " SET " +
@@ -170,7 +181,9 @@ namespace landerist_library.Websites
                 "[HttpStatusCode] = @HttpStatusCode, " +
                 "[PageType] = @PageType, " +
                 "[PageTypeCounter] = @PageTypeCounter, " +
-                "[ResponseBodyTextHash] = @ResponseBodyTextHash " +
+                "[WaitingAIParsing] = @WaitingAIParsing, " +
+                "[ResponseBodyTextHash] = @ResponseBodyTextHash, " +
+                "[ResponseBodyZipped] = @ResponseBodyZipped " +
                 "WHERE [UriHash] = @UriHash";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
@@ -180,7 +193,9 @@ namespace landerist_library.Websites
                 {"HttpStatusCode", HttpStatusCode},
                 {"PageType", PageType?.ToString()},
                 {"PageTypeCounter", PageTypeCounter},
+                {"WaitingAIParsing", WaitingAIParsing},
                 {"ResponseBodyTextHash", ResponseBodyTextHash},
+                {"ResponseBodyZipped", ResponseBodyZipped},
             });
         }
 
@@ -195,7 +210,7 @@ namespace landerist_library.Websites
             {
                 landerist_library.Websites.PageType.MainPage => 7,
                 landerist_library.Websites.PageType.MayBeListing => 7,
-                landerist_library.Websites.PageType.Listing => 7,
+                landerist_library.Websites.PageType.Listing => 7,                
                 _ => (short)PageTypeCounter! * 7,
             };
             NextUpdate = ((DateTime)Updated!).AddDays(addDays);
@@ -550,6 +565,7 @@ namespace landerist_library.Websites
                 ResponseBody = null;
                 ResponseBodyText = null;
                 ResponseBodyTextHash = null;
+                ResponseBodyZipped = null;
                 Screenshot = null;
 
                 Website.Dispose();
@@ -564,6 +580,19 @@ namespace landerist_library.Websites
             return Screenshot != null &&
                 Screenshot.Length > 0 &&
                 Screenshot.Length < Config.MAX_SCREENSHOT_SIZE;
+        }
+
+        public void SetWaitingAIParsing()
+        {
+            WaitingAIParsing = true;
+            
+            byte[] byteArray = Encoding.UTF8.GetBytes(ResponseBody!);
+            using var memoryStream = new MemoryStream();
+            using (var gzipStream = new GZipStream(memoryStream, CompressionMode.Compress))
+            {
+                gzipStream.Write(byteArray, 0, byteArray.Length);
+            }
+            ResponseBodyZipped = memoryStream.ToArray();
         }
     }
 }

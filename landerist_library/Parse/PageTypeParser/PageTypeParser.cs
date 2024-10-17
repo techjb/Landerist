@@ -65,7 +65,7 @@ namespace landerist_library.Parse.PageTypeParser
             if (ListingSimilarity.HtmlNotSimilarToListing(page))
             {
                 return (PageType.HtmlNotSimilarToListing, null);
-            }            
+            }
             return ParseListing.Parse(page);
         }
     }

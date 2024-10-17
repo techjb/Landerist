@@ -50,7 +50,7 @@ namespace landerist_library.Websites
         {
             string query =
                 QueryPages(rows) +
-                "WHERE [NextUpdate] < @Now";
+                "WHERE [NextUpdate] < @Now AND [WaitingAIParsing] IS NULL";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"Now", DateTime.Now },
@@ -93,7 +93,7 @@ namespace landerist_library.Websites
         {
             string query =
                 QueryPages(rows) +
-                "WHERE [PageType] IS NULL";
+                "WHERE [PageType] IS NULL AND [WaitingAIParsing] IS NULL";
 
             DataTable dataTable = new DataBase().QueryTable(query);
             return GetPages(dataTable);

@@ -2,6 +2,7 @@
 using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Downloaders;
+using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Export;
 using landerist_library.Index;
 using landerist_library.Insert.GoogleCustomSearch;
@@ -67,7 +68,7 @@ namespace landerist_console
 #pragma warning restore CA1416 // Validate platform compatibility
         }
 
-        private static async void Run()
+        private static void Run()
         {
             //Config.SetToProduction();
             Config.SetDatabaseToProduction();
@@ -91,9 +92,9 @@ namespace landerist_console
             //var page = new Page("https://www.12casas.com/inmueble/E869/");
             //var page = new Page("https://sanmiguelinmobiliaria.com/caracteristicas/terraza/");
             //var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
-            //var page = new Page("https://www.terramagna.net/detallesdelinmueble/villa-en-venta-chayofa/21282480");
+            //var page = new Page("https://www.terramagna.net/detallesdelinmueble/villa-en-venta-chayofa/21282480"); // not canonical
             //var page = new Page("https://vitalcasa.com/feature/double-glazing/"); // no listing
-            //var page = new Page("https://www.inmosegursalou.com/ad/99569031");
+            //var page = new Page("https://www.inmosegursalou.com/ad/99569031"); // listing
             //var page = new Page("http://www.finquesniu.com/propiedades");
 
             #endregion
@@ -166,6 +167,7 @@ namespace landerist_console
             //PuppeteerDownloader.ReinstallChrome();
             //PuppeteerDownloader.KillChrome();
             //PuppeteerDownloader.DoTest();            
+            //PuppeteerDownloader.UpdateChrome();
 
             #endregion
 

@@ -40,6 +40,7 @@ namespace landerist_library.Parse.Listing.VertexAI
             var jobServiceClient = GetJobServiceClient();
             var batchPredictionJob = jobServiceClient.CreateBatchPredictionJob(createBatchPredictionJobRequest);
             var state = batchPredictionJob.State;
+            Console.WriteLine(state.ToString());
 
 
         }
@@ -58,15 +59,18 @@ namespace landerist_library.Parse.Listing.VertexAI
             try
             {
                 //return JsonConvert.DeserializeObject<GenerateContentResponse?>(text); // not working
-                var data = (JObject)JsonConvert.DeserializeObject(text);
-                var candidates = data["candidates"];
+                var data = (JObject?)JsonConvert.DeserializeObject(text);
+                if(data == null)
+                {
+                    return null;
+                }
+                var candidates = data["candidates"];                
                 return null;
             }
             catch //(Exception e)
             {
                 return null;
             }
-
         }
     }
 }

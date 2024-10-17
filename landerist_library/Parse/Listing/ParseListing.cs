@@ -54,6 +54,11 @@ namespace landerist_library.Parse.Listing
 
         private static (PageType pageType, landerist_orels.ES.Listing? listing) ParseOpenAI(Page page, string text)
         {
+            if (Config.BATCH_ENABLED)
+            {
+                return (PageType.BulkParsing, null);
+            }
+
             var response = OpenAIRequest.GetResponse(text);
             if (response == null)
             {

@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "2.67";
+        public static readonly string VERSION = "2.68";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
@@ -120,6 +120,8 @@ namespace landerist_library.Configuration
         public const int DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS = 90;
         public static LLMProviders LLM_PROVIDER { get; set; }
 
+        public static bool BATCH_ENABLED { get; set; }
+
         public static bool IsConfigurationProduction()
         {
             return ConfigurationProduction;
@@ -181,6 +183,8 @@ namespace landerist_library.Configuration
             LLM_PROVIDER = !ConfigurationProduction ?
                 LLMProviders.OpenAI :
                 LLMProviders.OpenAI;
+
+            BATCH_ENABLED = LLM_PROVIDER.Equals(LLMProviders.OpenAI);
 
         }
 
