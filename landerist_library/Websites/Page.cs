@@ -585,7 +585,17 @@ namespace landerist_library.Websites
         public void SetWaitingAIParsing()
         {
             WaitingAIParsing = true;
-            
+            SetResponseBodyZipped();
+        }
+
+        public void SetWaitingAIResponse()
+        {
+            WaitingAIParsing = false;
+            Update(false);
+        }
+
+        private void SetResponseBodyZipped()
+        {
             byte[] byteArray = Encoding.UTF8.GetBytes(ResponseBody!);
             using var memoryStream = new MemoryStream();
             using (var gzipStream = new GZipStream(memoryStream, CompressionMode.Compress))
@@ -593,6 +603,14 @@ namespace landerist_library.Websites
                 gzipStream.Write(byteArray, 0, byteArray.Length);
             }
             ResponseBodyZipped = memoryStream.ToArray();
+        }
+
+        public void SetResponseBodyUnzipped()
+        {
+            using var memoryStream = new MemoryStream(ResponseBodyZipped!);
+            using var gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress);
+            using var streamReader = new StreamReader(gzipStream);
+            ResponseBody = streamReader.ReadToEnd();
         }
     }
 }

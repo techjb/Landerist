@@ -199,24 +199,12 @@ namespace landerist_console
             //landerist_library.Parse.PageType.PageTypeParser.ResponseBodyValidToIsListing();
             //landerist_library.Parse.PageType.PageTypeParser.ResponseBodyValidToIsListing(page);            
 
-            //landerist_library.Parse.Listing.MLModel.TrainingData.TestData();
-            //landerist_library.Parse.Listing.MLModel.TrainingData.CreateIsListing();
-            //landerist_library.Parse.Listing.MLModel.TrainingData.CreateListings();
-            //landerist_library.Parse.Listing.MLModel.TrainingData.CreateIsListing(1000);
-            //landerist_library.Parse.Listing.MLModel.TrainingData.CreateUriResponseBodyText();
-            //landerist_library.Parse.Listing.MLModel.IsListingUrl.IsListingUrl.CreateCsv();
-            //landerist_library.Parse.Listing.MLModel.TrainingData.CreateIsListing();
-
-            //landerist_library.Parse.Listing.IsListingTest.TestFTTC.Start();
-            //landerist_library.Parse.Listing.IsListingTest.TestLMStudio.Start();
-
-            //new landerist_library.Parse.Listing.MLModel.TrainingTests.Danyalktk().Run();
-            //new landerist_library.Parse.Listing.MLModel.TrainingTests.AWSComprehend().Run();
-            //new landerist_library.Parse.Listing.MLModel.TrainingTests.GoogleCNL().Run();
-
             //new ChatGPTRequest().ListModels();
 
             //landerist_library.Parse.Listing.VertexAI.ParseListingVertexAI.Test();
+
+            //landerist_library.Parse.Listing.OpenAI.OpenAIBatch.Start();
+            landerist_library.Parse.Listing.OpenAI.OpenAIBatch.End();
 
             #endregion
 

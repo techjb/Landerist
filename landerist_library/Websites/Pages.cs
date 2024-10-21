@@ -418,5 +418,15 @@ namespace landerist_library.Websites
             });
             Logs.Log.WriteLogInfo("DeleteUnpublishedListings", "Deleted: " + deleted + "/" + total + " Errors: " + errors);
         }
+
+        public static List<Page> SelectWaitingAIParsing()
+        { 
+            string query =
+                QueryPages() +
+                "WHERE [WaitingAIParsing] = 1";
+
+            DataTable dataTable = new DataBase().QueryTable(query);
+            return GetPages(dataTable);
+        }
     }
 }

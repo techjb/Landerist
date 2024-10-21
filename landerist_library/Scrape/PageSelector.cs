@@ -1,6 +1,7 @@
 ﻿using landerist_library.Configuration;
+using landerist_library.Websites;
 
-namespace landerist_library.Websites
+namespace landerist_library.Scrape
 {
     public class PageSelector
     {
@@ -26,13 +27,13 @@ namespace landerist_library.Websites
 
         private static void AddUnknowPageType()
         {
-            var pages = landerist_library.Websites.Pages.GetUnknownPageType(SelectTopCounter);
+            var pages = Websites.Pages.GetUnknownPageType(SelectTopCounter);
             Pages.AddRange(pages);
         }
 
         private static void AddNextUpdate()
         {
-            var pages = landerist_library.Websites.Pages.GetPagesNextUpdate(SelectTopCounter);
+            var pages = Websites.Pages.GetPagesNextUpdate(SelectTopCounter);
             Pages.AddRange(pages);
         }
 

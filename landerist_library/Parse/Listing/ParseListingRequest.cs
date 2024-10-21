@@ -24,5 +24,10 @@ namespace landerist_library.Parse.Listing
             int totalTokens = systemTokens + userTokens;
             return totalTokens > maxContextWindow;
         }
+
+        public static string GetSystemPrompt()
+        {
+            return SystemPrompt;
+        }
     }
 }

@@ -32,9 +32,8 @@ namespace landerist_library.Scrape
             }
             Downloader.Download(Page);
 
-            (var newPageType, NewListing) = PageTypeParser.GetPageType(Page);
-            bool bulkParsing = newPageType.Equals(PageType.BulkParsing);
-            if (bulkParsing)
+            (var newPageType, NewListing, var waitingAIParsing) = PageTypeParser.GetPageType(Page);
+            if (waitingAIParsing)
             {
                 page.SetWaitingAIParsing();
             }
@@ -44,7 +43,7 @@ namespace landerist_library.Scrape
                 UpdateListing();
             }
             IndexPages();
-            return Page.Update(!bulkParsing);
+            return Page.Update(!waitingAIParsing);
         }
 
 

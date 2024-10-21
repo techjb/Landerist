@@ -33,51 +33,56 @@ namespace landerist_library.Parse.Listing
             return false;
         }
 
-        public static (PageType pageType, landerist_orels.ES.Listing? listing) Parse(Page page)
+        public static (PageType pageType, landerist_orels.ES.Listing? listing, bool waitingAIParsing) 
+            Parse(Page page)
         {
-            var text = UserTextInput.GetText(page);
-            if (!string.IsNullOrEmpty(text))
+            var userInput = UserTextInput.GetText(page);
+            if (!string.IsNullOrEmpty(userInput))
             {
                 switch (Config.LLM_PROVIDER)
                 {
-                    case LLMProviders.OpenAI: return ParseOpenAI(page, text);
-                    case LLMProviders.VertexAI: return ParseVertextAI(page, text);
+                    case LLMProviders.OpenAI: return ParseOpenAI(page, userInput);
+                    case LLMProviders.VertexAI: return ParseVertextAI(page, userInput);
                     //case ModelName.Gemini: return GeminiRequest.ParseTextGemini(page);
-                    case LLMProviders.Anthropic: return ParseAnthropic(page, text);                    
+                    case LLMProviders.Anthropic: return ParseAnthropic(page, userInput);                    
                     default:
                         break;
 
                 }
             }
-            return (PageType.ResponseBodyTooShort, null);
+            return (PageType.ResponseBodyTooShort, null, false);
         }
 
-        private static (PageType pageType, landerist_orels.ES.Listing? listing) ParseOpenAI(Page page, string text)
+        private static (PageType pageType, landerist_orels.ES.Listing? listing, bool waitingAIParsing) 
+            ParseOpenAI(Page page, string userInput)
         {
             if (Config.BATCH_ENABLED)
             {
-                return (PageType.BulkParsing, null);
+                return (PageType.MayBeListing, null, true);
             }
 
-            var response = OpenAIRequest.GetResponse(text);
+            var response = OpenAIRequest.GetResponse(userInput);
             if (response == null)
             {
-                return (PageType.MayBeListing, null);
+                return (PageType.MayBeListing, null, false);
             }
 
             var (functionName, arguments) = OpenAIResponse.GetFunctionNameAndArguments(response);
-            return ParseText(page, functionName, arguments);
+            var (pageType, listing) = ParseText(page, functionName, arguments);
+            return (pageType, listing, false);
         }
 
-        private static (PageType pageType, landerist_orels.ES.Listing? listing) ParseVertextAI(Page page, string text)
+        private static (PageType pageType, landerist_orels.ES.Listing? listing, bool waitingAIParsing) 
+            ParseVertextAI(Page page, string text)
         {
             var response = VertexAIRequest.GetResponse(page, text).Result;
-            return ParseTextVertextAI(page, response);
+            var (pageType, listing) = ParseTextVertextAI(page, response);
+            return (pageType, listing, false);
         }
 
-        public static (PageType pageType, landerist_orels.ES.Listing? listing) ParseTextVertextAIFromBatch(Page page, string text)
+        public static (PageType pageType, landerist_orels.ES.Listing? listing) ParseTextVertextAIFromBatch(Page page, string userInput)
         {
-            var response = VertexAIBatch.GetGenerateContentResponse(text);
+            var response = VertexAIBatch.GetGenerateContentResponse(userInput);
             return ParseTextVertextAI(page, response);
         }
 
@@ -92,16 +97,18 @@ namespace landerist_library.Parse.Listing
         }
 
        
-        private static (PageType pageType, landerist_orels.ES.Listing? listing) ParseAnthropic(Page page, string text)
+        private static (PageType pageType, landerist_orels.ES.Listing? listing, bool waitingAIParsing) 
+            ParseAnthropic(Page page, string text)
         {
             var response = AnthropicRequest.GetResponse(page, text);
             if (response == null)
             {
-                return (PageType.MayBeListing, null);
+                return (PageType.MayBeListing, null, false);
             }
 
             var (functionName, arguments) = AnthropicResponse.GetFunctionNameAndArguments(response);
-            return ParseText(page, functionName, arguments);
+            var (pageType, listing) = ParseText(page, functionName, arguments);
+            return (pageType, listing, false);
         }
 
         private static (PageType pageType, landerist_orels.ES.Listing? listing) ParseText(Page page, string? functionName, string? arguments)

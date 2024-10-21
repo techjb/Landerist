@@ -85,6 +85,8 @@ namespace landerist_library.Configuration
         public const int MAX_SCREENSHOT_PIXELS_SIDE = 8000;
         public static string? CHROME_EXTENSIONS_DIRECTORY { get; set; }
 
+        public static string? BATCH_DIRECTORY { get; set; }
+
         public static readonly int DAYS_TO_DELETE_BACKUP = 60;
 
         public const int MAX_YEARS_SINCE_PUBLISHED_LISTING = 5;
@@ -121,6 +123,13 @@ namespace landerist_library.Configuration
         public static LLMProviders LLM_PROVIDER { get; set; }
 
         public static bool BATCH_ENABLED { get; set; }
+
+        
+        public const int MAX_PAGES_PER_BATCH = 10000;
+
+        public const int MIN_PAGES_PER_BATCH = 1;
+
+        public static readonly int MAX_DEGREE_OF_PARALLELISM = Environment.ProcessorCount - 1;
 
         public static bool IsConfigurationProduction()
         {
@@ -185,6 +194,10 @@ namespace landerist_library.Configuration
                 LLMProviders.OpenAI;
 
             BATCH_ENABLED = LLM_PROVIDER.Equals(LLMProviders.OpenAI);
+
+            BATCH_DIRECTORY = ConfigurationProduction ?
+                PrivateConfig.BATCH_DIRECTORY_PRODUCTION :
+                PrivateConfig.BATCH_DIRECTORY_LOCAL;
 
         }
 
