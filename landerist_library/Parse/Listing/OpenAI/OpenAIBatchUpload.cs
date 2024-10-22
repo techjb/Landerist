@@ -10,7 +10,7 @@ using landerist_library.Database;
 
 namespace landerist_library.Parse.Listing.OpenAI
 {
-    public class OpenAIBatch
+    public class OpenAIBatchUpload
     {
         private static List<Page> Pages = [];
 
@@ -87,7 +87,7 @@ namespace landerist_library.Parse.Listing.OpenAI
         private static void InitFilePath()
         {
             FilePath = Config.BATCH_DIRECTORY +
-                "openai_batch_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".json";
+                "openai_batch_upload_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".json";
 
             File.Delete(FilePath);
         }
@@ -208,28 +208,9 @@ namespace landerist_library.Parse.Listing.OpenAI
             });
         }
 
-        public static void End()
-        {
-            var batchIds = PendingBatches.Select();
-            foreach(var batchId in batchIds)
-            {
-                BatchResponse = OpenAIClient.BatchEndpoint.RetrieveBatchAsync(batchId).Result;
-                if (BatchResponse.Status.Equals(BatchStatus.Completed))
-                {
-                    RetrieveBatchResponse();
-                }
-            }
-        }
 
-        static void RetrieveBatchResponse()
-        {
-            if(BatchResponse == null)
-            {
-                return;
-            }
-            var fileId = BatchResponse.OutputFileId;
-            var downloadedFilePath = OpenAIClient.FilesEndpoint.DownloadFileAsync(fileId, "path/to/your/save/directory").Result;
-        }
+
+        
     }
 
 }

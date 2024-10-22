@@ -35,7 +35,8 @@ namespace landerist_library.Database
         {
             string query =
                 "SELECT Id " +
-                "FROM " + PENDING_BATCHES;
+                "FROM " + PENDING_BATCHES + " " +
+                "ORDER BY [Created] ASC";
 
             return new DataBase().QueryListString(query);        
         }

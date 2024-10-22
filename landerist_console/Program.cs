@@ -203,8 +203,8 @@ namespace landerist_console
 
             //landerist_library.Parse.Listing.VertexAI.ParseListingVertexAI.Test();
 
-            //landerist_library.Parse.Listing.OpenAI.OpenAIBatch.Start();
-            landerist_library.Parse.Listing.OpenAI.OpenAIBatch.End();
+            //landerist_library.Parse.Listing.OpenAI.OpenAIBatchUpload.Start();
+            landerist_library.Parse.Listing.OpenAI.OpenAIBatchDownload.Start();
 
             #endregion
 
