@@ -40,7 +40,10 @@ namespace landerist_library.Parse.Listing.OpenAI
                     if (CreateBatch())
                     {
                         InsertBatchId();
-                        //SetWaitingAIResponse();
+                        if (Config.IsConfigurationProduction())
+                        {
+                            SetWaitingAIResponse();
+                        }                        
                     }
                 }
             }
@@ -67,8 +70,7 @@ namespace landerist_library.Parse.Listing.OpenAI
             var errors = 0;
             Parallel.ForEach(Pages, new ParallelOptions()
             {
-                //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
-                MaxDegreeOfParallelism = 1
+                MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM                
             }, page =>
             {
                 if (AddToBatch(page))

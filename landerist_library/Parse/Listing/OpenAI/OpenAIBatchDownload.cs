@@ -2,9 +2,7 @@
 using OpenAI.Batch;
 using OpenAI;
 using landerist_library.Configuration;
-using Google.Cloud.AIPlatform.V1;
 using System.Text.Json;
-using landerist_library.Export;
 
 
 namespace landerist_library.Parse.Listing.OpenAI
@@ -80,12 +78,7 @@ namespace landerist_library.Parse.Listing.OpenAI
 
         public static void ReadDownloadFileLine(string line)
         {
-            JsonSerializerOptions options = new()
-            {
-                PropertyNameCaseInsensitive = true
-            };
-
-            var batchResponse = JsonSerializer.Deserialize<BatchResponseJson?>(line, options);
+            var batchResponse = JsonSerializer.Deserialize<BatchResponseJson?>(line);
             if (batchResponse == null)
             {
                 return;
