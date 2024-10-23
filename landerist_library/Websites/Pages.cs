@@ -10,10 +10,27 @@ namespace landerist_library.Websites
     {
         public const string TABLE_PAGES = "[PAGES]";
 
+        public static Page? GetPage(string uriHash)
+        {
+            string query =
+                SelectQuery() +
+                "WHERE [UriHash] = @UriHash";
+
+            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+                {"UriHash", uriHash }
+            });
+
+            var pages = GetPages(dataTable);
+            if (pages.Count.Equals(1))
+            {
+                return pages[0];
+            }
+            return null;
+        }
         public static List<Page> GetPages()
         {
             Console.WriteLine("Reading all pages");
-            string query = QueryPages();
+            string query = SelectQuery();
 
             var dataTable = new DataBase().QueryTable(query);
             return GetPages(dataTable);
@@ -36,7 +53,7 @@ namespace landerist_library.Websites
         public static List<Page> GetPages(PageType pageType)
         {
             string query =
-                QueryPages() +
+                SelectQuery() +
                 "WHERE [PageType] = @PageType";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
@@ -49,7 +66,7 @@ namespace landerist_library.Websites
         public static List<Page> GetPagesNextUpdate(int? rows = null)
         {
             string query =
-                QueryPages(rows) +
+                SelectQuery(rows) +
                 "WHERE [NextUpdate] < @Now AND [WaitingAIParsing] IS NULL";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
@@ -92,7 +109,7 @@ namespace landerist_library.Websites
         public static List<Page> GetUnknownPageType(int? rows = null)
         {
             string query =
-                QueryPages(rows) +
+                SelectQuery(rows) +
                 "WHERE [PageType] IS NULL AND [WaitingAIParsing] IS NULL";
 
             DataTable dataTable = new DataBase().QueryTable(query);
@@ -103,14 +120,14 @@ namespace landerist_library.Websites
         public static List<Page> GetUnknowHttpStatusCode()
         {
             string query =
-                QueryPages() +
+                SelectQuery() +
                 "WHERE [HttpStatusCode] IS NULL";
 
             DataTable dataTable = new DataBase().QueryTable(query);
             return GetPages(dataTable);
         }
 
-        private static string QueryPages(int? rows = null)
+        private static string SelectQuery(int? rows = null)
         {
             string topRows = string.Empty;
             if (rows != null)
@@ -268,7 +285,7 @@ namespace landerist_library.Websites
         public static void DeleteListingsHttpStatusCodeError()
         {
             string query =
-               QueryPages() +
+               SelectQuery() +
                "WHERE [PageType] = 'Listing' and [HttpStatusCode] <> 200";
 
             DataTable dataTable = new DataBase().QueryTable(query);
@@ -279,7 +296,7 @@ namespace landerist_library.Websites
         public static void DeleteListingsResponseBodyRepeated()
         {
             string query =
-               QueryPages() +
+               SelectQuery() +
                "WHERE [PageType] = 'Listing' AND [ResponseBodyTextHash] IS NOT NULL";
 
             DataTable dataTable = new DataBase().QueryTable(query);
@@ -422,7 +439,7 @@ namespace landerist_library.Websites
         public static List<Page> SelectWaitingAIParsing()
         { 
             string query =
-                QueryPages() +
+                SelectQuery() +
                 "WHERE [WaitingAIParsing] = 1";
 
             DataTable dataTable = new DataBase().QueryTable(query);

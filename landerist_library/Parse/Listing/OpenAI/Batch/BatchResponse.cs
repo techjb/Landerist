@@ -1,13 +1,14 @@
-﻿using System;
+﻿using OpenAI.Chat;
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace landerist_library.Parse.Listing.OpenAI
+namespace landerist_library.Parse.Listing.OpenAI.Batch
 {
 #pragma warning disable CS8618
 
-    public class BatchResponseJson
+    public class BatchResponse
     {
         [JsonPropertyName("id")]
         public string Id { get; set; }
@@ -31,7 +32,8 @@ namespace landerist_library.Parse.Listing.OpenAI
         public string RequestId { get; set; }
 
         [JsonPropertyName("body")]
-        public BatchResponseBody Body { get; set; }
+       //public BatchResponseBody Body { get; set; }
+        public ChatResponse Body { get; set; }
     }
 
     public class BatchResponseBody

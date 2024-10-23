@@ -124,12 +124,12 @@ namespace landerist_library.Configuration
 
         public static bool BATCH_ENABLED { get; set; }
 
-        
+
         public const int MAX_PAGES_PER_BATCH = 10000;
 
         public const int MIN_PAGES_PER_BATCH = 1;
 
-        public static readonly int MAX_DEGREE_OF_PARALLELISM = Environment.ProcessorCount - 1;
+        public static int MAX_DEGREE_OF_PARALLELISM { get; set; }
 
         public static bool IsConfigurationProduction()
         {
@@ -198,6 +198,9 @@ namespace landerist_library.Configuration
             BATCH_DIRECTORY = ConfigurationProduction ?
                 PrivateConfig.BATCH_DIRECTORY_PRODUCTION :
                 PrivateConfig.BATCH_DIRECTORY_LOCAL;
+
+            MAX_DEGREE_OF_PARALLELISM = ConfigurationProduction ?
+                Environment.ProcessorCount - 1 : 1;
 
         }
 

@@ -11,7 +11,6 @@ using landerist_library.Insert.IdAgencies;
 using landerist_library.Landerist_com;
 using landerist_library.Logs;
 using landerist_library.Parse.Listing;
-using landerist_library.Parse.Listing.OpenAI;
 using landerist_library.Parse.Listing.VertexAI;
 using landerist_library.Parse.Location;
 using landerist_library.Parse.Location.Delimitations;
@@ -203,8 +202,9 @@ namespace landerist_console
 
             //landerist_library.Parse.Listing.VertexAI.ParseListingVertexAI.Test();
 
-            //landerist_library.Parse.Listing.OpenAI.OpenAIBatchUpload.Start();
-            landerist_library.Parse.Listing.OpenAI.OpenAIBatchDownload.Start();
+            //landerist_library.Parse.Listing.OpenAI.Batch.BatchUpload.Start();
+            //landerist_library.Parse.Listing.OpenAI.Batch.BatchDownload.Start();
+            
 
             #endregion
 

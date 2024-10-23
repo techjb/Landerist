@@ -5,12 +5,11 @@ using System.Text.Json;
 using OpenAI.Files;
 using OpenAI;
 using OpenAI.Batch;
-using System.Threading.Tasks;
 using landerist_library.Database;
 
-namespace landerist_library.Parse.Listing.OpenAI
+namespace landerist_library.Parse.Listing.OpenAI.Batch
 {
-    public class OpenAIBatchUpload
+    public class BatchUpload
     {
         private static List<Page> Pages = [];
 
@@ -27,7 +26,7 @@ namespace landerist_library.Parse.Listing.OpenAI
 
         private static readonly OpenAIClient OpenAIClient = new(PrivateConfig.OPENAI_API_KEY);
 
-        private static BatchResponse? BatchResponse;
+        private static global::OpenAI.Batch.BatchResponse? BatchResponse;
 
         public static void Start()
         {
@@ -39,15 +38,14 @@ namespace landerist_library.Parse.Listing.OpenAI
                 {
                     if (CreateBatch())
                     {
-                        InsertBatchId();
+                        InsertPendingBatch();
                         if (Config.IsConfigurationProduction())
                         {
                             SetWaitingAIResponse();
-                        }                        
+                        }
                     }
                 }
             }
-
         }
 
         private static void FilterMaxPagesPerBatch()
@@ -70,7 +68,7 @@ namespace landerist_library.Parse.Listing.OpenAI
             var errors = 0;
             Parallel.ForEach(Pages, new ParallelOptions()
             {
-                MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM                
+                MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
             }, page =>
             {
                 if (AddToBatch(page))
@@ -117,6 +115,8 @@ namespace landerist_library.Parse.Listing.OpenAI
                 return null;
             }
 
+            var tools = new OpenAITools().GetTools();
+
             var requestData = new RequestData
             {
                 custom_id = page.UriHash,
@@ -125,18 +125,25 @@ namespace landerist_library.Parse.Listing.OpenAI
                 body = new Body
                 {
                     model = OpenAIRequest.MODEL_NAME,
-                    messages =
-                [
-                    new BatchMessage
+                    temperature = OpenAIRequest.TEMPERATURE,
+                    tools = tools,
+                    tool_choice = OpenAIRequest.TOOL_CHOICE,
+                    response_format = new ResponseFormat
                     {
-                        role = "system",
-                        content = OpenAIRequest.GetSystemPrompt()
+                        type = "json_object"
                     },
-                    new BatchMessage {
-                        role = "user",
-                        content = userInput
-                    }
-                ],
+                    messages =
+                    [
+                        new BatchMessage
+                        {
+                            role = "system",
+                            content = ParseListingRequest.GetSystemPrompt()
+                        },
+                        new BatchMessage {
+                            role = "user",
+                            content = userInput
+                        }
+                    ],
                 }
             };
 
@@ -187,7 +194,7 @@ namespace landerist_library.Parse.Listing.OpenAI
             return true;
         }
 
-        static bool InsertBatchId()
+        static bool InsertPendingBatch()
         {
             if (BatchResponse == null)
             {
@@ -209,10 +216,5 @@ namespace landerist_library.Parse.Listing.OpenAI
                 page.SetWaitingAIResponse();
             });
         }
-
-
-
-        
     }
-
 }

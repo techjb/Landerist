@@ -582,7 +582,7 @@ namespace landerist_library.Websites
                 Screenshot.Length < Config.MAX_SCREENSHOT_SIZE;
         }
 
-        public void SetWaitingAIParsing()
+        public void SetWaitingAIRequest()
         {
             WaitingAIParsing = true;
             SetResponseBodyZipped();
@@ -592,6 +592,12 @@ namespace landerist_library.Websites
         {
             WaitingAIParsing = false;
             Update(false);
+        }
+
+        public void RemoveWaitingAI()
+        {
+            WaitingAIParsing = null;
+            ResponseBodyZipped = null;
         }
 
         private void SetResponseBodyZipped()

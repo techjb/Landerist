@@ -23,9 +23,11 @@ namespace landerist_library.Parse.Listing.OpenAI
 
         public static readonly string MODEL_NAME = "gpt-4o-mini";
 
+        public static readonly double TEMPERATURE = 0;
+
         private static readonly OpenAIClient OpenAIClient = new(PrivateConfig.OPENAI_API_KEY);
 
-        private static readonly string? TOOL_CHOICE = "required";
+        public static readonly string? TOOL_CHOICE = "required";        
 
         public static bool TooManyTokens(Page page)
         {
@@ -45,12 +47,12 @@ namespace landerist_library.Parse.Listing.OpenAI
             var chatRequest = new ChatRequest(
                 messages: messages,
                 model: MODEL_NAME,
-                temperature: 0,
+                temperature: TEMPERATURE,
                 tools: tools,
                 toolChoice: TOOL_CHOICE,
                 responseFormat:  ChatResponseFormat.Json                
                 );
-
+            
             try
             {
                 DateTime dateStart = DateTime.Now;

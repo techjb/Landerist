@@ -5,6 +5,7 @@ using landerist_library.Parse.Listing.OpenAI;
 using landerist_library.Parse.Listing.VertexAI;
 using landerist_library.Websites;
 using landerist_library.Configuration;
+using OpenAI.Chat;
 
 namespace landerist_library.Parse.Listing
 {
@@ -62,12 +63,18 @@ namespace landerist_library.Parse.Listing
             }
 
             var response = OpenAIRequest.GetResponse(userInput);
-            if (response == null)
+            return ParseOpenAI(page, response);
+            
+        }
+
+        public static (PageType pageType, landerist_orels.ES.Listing? listing, bool waitingAIParsing) ParseOpenAI(Page page, ChatResponse? chatResponse)
+        {
+            if (chatResponse == null)
             {
                 return (PageType.MayBeListing, null, false);
             }
 
-            var (functionName, arguments) = OpenAIResponse.GetFunctionNameAndArguments(response);
+            var (functionName, arguments) = OpenAIResponse.GetFunctionNameAndArguments(chatResponse);
             var (pageType, listing) = ParseText(page, functionName, arguments);
             return (pageType, listing, false);
         }
