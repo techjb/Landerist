@@ -32,6 +32,10 @@ namespace landerist_library.Scrape
             }
             Downloader.Download(Page);
             (var newPageType, var newListing, var waitingAIParsing) = PageTypeParser.GetPageType(Page);
+            if(!Config.IsConfigurationProduction())
+            {
+                Console.WriteLine("PageType: " + newPageType);
+            }
             bool sucess =  SetPageType(newPageType, newListing, waitingAIParsing);
             IndexPages();
             return sucess;
@@ -41,7 +45,7 @@ namespace landerist_library.Scrape
         {
             if (waitingAIParsing)
             {
-                Page.SetWaitingAIRequest();                
+                Page.SetWaitingAIRequest();
                 return Page.Update(false);
             }
             return SetPageType(newPageType, newListing);

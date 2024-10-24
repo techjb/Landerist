@@ -32,7 +32,7 @@ namespace landerist_library.Websites
 
         public short? PageTypeCounter { get; private set; }
 
-        public bool? WaitingAIParsing { get; set; }
+        public bool? WaitingAIParsing { get; private set; }
 
         private string? ResponseBody { get; set; }
 
@@ -183,11 +183,10 @@ namespace landerist_library.Websites
                 "[PageTypeCounter] = @PageTypeCounter, " +
                 "[WaitingAIParsing] = @WaitingAIParsing, " +
                 "[ResponseBodyTextHash] = @ResponseBodyTextHash, " +
-                "[ResponseBodyZipped] = @ResponseBodyZipped " +
+                "[ResponseBodyZipped] = CASE WHEN @ResponseBodyZipped IS NULL THEN NULL ELSE CONVERT(varbinary(max), @ResponseBodyZipped) END " +
                 "WHERE [UriHash] = @UriHash";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
-                {"UriHash", UriHash },
                 {"Updated", Updated },
                 {"NextUpdate", NextUpdate },
                 {"HttpStatusCode", HttpStatusCode},
@@ -196,6 +195,7 @@ namespace landerist_library.Websites
                 {"WaitingAIParsing", WaitingAIParsing},
                 {"ResponseBodyTextHash", ResponseBodyTextHash},
                 {"ResponseBodyZipped", ResponseBodyZipped},
+                {"UriHash", UriHash },
             });
         }
 
@@ -584,18 +584,19 @@ namespace landerist_library.Websites
 
         public void SetWaitingAIRequest()
         {
-            WaitingAIParsing = true;
             SetResponseBodyZipped();
+            WaitingAIParsing = true;            
         }
 
         public void SetWaitingAIResponse()
         {
-            WaitingAIParsing = false;
-            Update(false);
+            SetResponseBodyFromZipped();
+            WaitingAIParsing = false;            
         }
 
         public void RemoveWaitingAI()
         {
+            SetResponseBodyFromZipped();
             WaitingAIParsing = null;
             ResponseBodyZipped = null;
         }
@@ -611,7 +612,7 @@ namespace landerist_library.Websites
             ResponseBodyZipped = memoryStream.ToArray();
         }
 
-        public void SetResponseBodyUnzipped()
+        private void SetResponseBodyFromZipped()
         {
             using var memoryStream = new MemoryStream(ResponseBodyZipped!);
             using var gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress);

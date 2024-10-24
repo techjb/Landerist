@@ -133,6 +133,16 @@ namespace landerist_library.Database
 
         #region Queries
 
+        public static List<SqlParameter> ParseParameters(Dictionary<string, object?> parameters)
+        {
+            List<SqlParameter> list = [];
+            foreach (KeyValuePair<string, object?> item in parameters)
+            {
+                var parameter = new SqlParameter("@" + item.Key, item.Value ?? DBNull.Value);
+                list.Add(parameter);
+            }
+            return list;
+        }
         public bool Query(string query)
         {
             bool result = false;
@@ -176,6 +186,12 @@ namespace landerist_library.Database
             CloseConnection();
             return result;
         }
+
+        public bool Query(string query, List<SqlParameter> sqlParameters)
+        {
+            return Query(query, sqlParameters.ToArray());
+        }
+
 
         public bool Query(string query, SqlParameter[] sqlParameters)
         {

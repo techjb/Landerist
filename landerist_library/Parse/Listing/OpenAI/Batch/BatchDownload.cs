@@ -4,10 +4,10 @@ using OpenAI;
 using landerist_library.Configuration;
 using System.Text.Json;
 using landerist_library.Websites;
-using System;
-using OpenAI.Chat;
 using System.Text.Json.Serialization;
 using landerist_library.Scrape;
+using landerist_library.Logs;
+using System.Diagnostics.Metrics;
 
 
 namespace landerist_library.Parse.Listing.OpenAI.Batch
@@ -22,10 +22,12 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
 
         private static readonly JsonSerializerOptions JsonSerializerOptions = new()
         {
-            Converters = {
-                    new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false)
-                },
-            PropertyNameCaseInsensitive = true
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            Converters =
+            {
+                new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false)
+            },
+            ReferenceHandler = ReferenceHandler.IgnoreCycles
         };
 
         public static void Start()
@@ -54,12 +56,12 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
                 }
                 else
                 {
-                    Logs.Log.WriteLogErrors("BatchDownload ProcessBatchResponse", "Error downloading file in batchId: " + BatchResponse.Id);
+                    Log.WriteLogErrors("BatchDownload ProcessBatchResponse", "Error downloading file in batchId: " + BatchResponse.Id);
                 }
             }
             else
             {
-                Logs.Log.WriteLogErrors("BatchDownload ProcessBatchResponse", "Error retrieving batchId: " + BatchResponse.Id);
+                Log.WriteLogErrors("BatchDownload ProcessBatchResponse", "Error retrieving batchId: " + BatchResponse.Id);
             }
         }
 
@@ -77,7 +79,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("BatchDownload RetrieveBatchResponse", exception);
+                Log.WriteLogErrors("BatchDownload RetrieveBatchResponse", exception);
                 return false;
             }
         }
@@ -97,13 +99,17 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("BatchDownload ReadDownloadedFile", exception);
+                Log.WriteLogErrors("BatchDownload ReadDownloadedFile", exception);
                 return false;
             }
         }
 
         private static void ReadLines(string[] lines)
         {
+            int total = lines.Length;
+            int readed = 0;
+            int errors = 0;
+
             Parallel.ForEach(lines, new ParallelOptions()
             {
                 MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
@@ -112,16 +118,23 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             {
                 try
                 {
-                    if (!ReadLine(line))
+                    if (ReadLine(line))
                     {
-                        Logs.Log.WriteLogErrors("BatchDownload ReadLines. Error reading line: ", line);
+                        Interlocked.Increment(ref readed);
+                    }
+                    else
+                    {
+                        Interlocked.Increment(ref errors);
+                        Log.WriteLogErrors("BatchDownload ReadLines. Error reading line: ", line);
                     }
                 }
                 catch (Exception exception)
                 {
-                    Logs.Log.WriteLogErrors("BatchDownload ReadLines", exception);
+                    Log.WriteLogErrors("BatchDownload ReadLines", exception);
                 }
             });
+
+            Log.WriteLogInfo("OpenAIBatch", $"Download. Total lines: {total}, Readed: {readed}, Errors: {errors}");
         }
 
         public static bool ReadLine(string line)
@@ -141,15 +154,15 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             {
                 return false;
             }
-            
-            page.SetResponseBodyUnzipped();
-            if (Config.IsConfigurationProduction())
-            {
-                page.RemoveWaitingAI();
-            }
+
+            page.RemoveWaitingAI();
+
             var (pageType, listing, _) = ParseListing.ParseOpenAI(page, batchResponse.Response.Body);
-            PageScraper pageScraper = new(page);
-            return pageScraper.SetPageType(pageType, listing);
+            if (!Config.IsConfigurationProduction())
+            {
+                Console.WriteLine("Page: " + page.Uri + " PageType: " + pageType);
+            }
+            return new PageScraper(page).SetPageType(pageType, listing);
         }
 
         public static void DeleteFiles()

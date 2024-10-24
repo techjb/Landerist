@@ -32,6 +32,10 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
         {
             Pages = Websites.Pages.SelectWaitingAIParsing();
             FilterMaxPagesPerBatch();
+            if (Pages.Count < Config.MIN_PAGES_PER_BATCH)
+            {
+                return;
+            }
             if (CreateFile())
             {
                 if (UploadFile())
@@ -39,12 +43,21 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
                     if (CreateBatch())
                     {
                         InsertPendingBatch();
-                        if (Config.IsConfigurationProduction())
-                        {
-                            SetWaitingAIResponse();
-                        }
+                        SetWaitingAIResponse();
+                    }
+                    else
+                    {
+                        Log.WriteLogErrors("OpenAIBatch Start", "Error creating batch");
                     }
                 }
+                else
+                {
+                    Log.WriteLogErrors("OpenAIBatch Start", "Error uploading file");
+                }                
+            }
+            else
+            {
+                Log.WriteLogErrors("OpenAIBatch Start", "Error creating file");
             }
         }
 
@@ -58,10 +71,6 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
 
         private static bool CreateFile()
         {
-            if (Pages.Count < Config.MIN_PAGES_PER_BATCH)
-            {
-                return false;
-            }
             InitFilePath();
             var totalPages = Pages.Count;
             var counter = 0;
@@ -73,6 +82,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             {
                 if (AddToBatch(page))
                 {
+                    page.Update(false);
                     Interlocked.Increment(ref counter);
                 }
                 else
@@ -80,7 +90,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
                     Interlocked.Increment(ref errors);
                 }
             });
-            Log.WriteLogInfo("OpenAIBatch", $"Total pages: {totalPages}, Added to batch: {counter}, Errors: {errors}");
+            Log.WriteLogInfo("OpenAIBatch", $"Upload. Total pages: {totalPages}, Added to batch: {counter}, Errors: {errors}");
             return errors.Equals(0);
         }
 
@@ -96,7 +106,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
         {
             try
             {
-                page.SetResponseBodyUnzipped();
+                page.SetWaitingAIResponse();
                 var json = GetBatchJson(page);
                 return WriteJson(json);
             }

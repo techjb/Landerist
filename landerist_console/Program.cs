@@ -74,27 +74,25 @@ namespace landerist_console
 
             #region Urls
 
-            //var uri = new Uri("https://www.viviendasasturias.es/");
-            //var page = new Page("https://raymarinmobiliaria.com/listing/piso-en-santiago-el-mayor-murcia/");
-            //var page = new Page("https://www.bbilbao.es/inmueble/bureau-691");
-            //var page = new Page("https://www.viviendasasturias.es/Venta-Piso-Oviedo-Montecerrao-590?idioma=es");
-            //var page = new Page("https://www.viviendasasturias.es/Venta-Piso-Oviedo-Montecerrao-590");
-            //var page = new Page("https://www.suavisdomus.es/inmuebles/casa-en-morales-del-vino-en-solar-de-114m2/");
-            //var page = new Page("https://baronybaron.com/property/c-san-pedro-cabezon-de-la-sal-179m2/");
-            //var page = new Page("https://empordaimmo.com/característica/persianas/"); // no listing
+            //var uri = new Uri("https://www.viviendasasturias.es/");            
+
+            //var page = new Page("https://baronybaron.com/property/c-san-pedro-cabezon-de-la-sal-179m2/"); //listing
+            // var page = new Page("https://empordaimmo.com/característica/persianas/"); // no listing
             //var page = new Page("https://www.inmobiliariasomera.com/tag/ayuda/"); // no listing
             //var page = new Page("https://parba.com/prestación-propiedad/aire-acondicionado/?view=grid"); // no listing
             //var page = new Page("https://servicasainmo.com/feature/lavadora/"); // no listing
             //var page = new Page("https://veovall.com/property/valladolid/"); // no listing
-            //var page = new Page("https://inmobiliariaalonsodiaz.com/inmueble/piso-en-venta-en-doctor-fleming-la-felguera-langreo/");
+
             //var page = new Page("https://www.fincasaldaba.com/propiedad/adosado-llano-samper/foto-16-7-19-10-01-49-copy/");
-            //var page = new Page("https://www.12casas.com/inmueble/E869/");
+            //var page = new Page("https://www.12casas.com/inmueble/E869/"); 
             //var page = new Page("https://sanmiguelinmobiliaria.com/caracteristicas/terraza/");
-            //var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
             //var page = new Page("https://www.terramagna.net/detallesdelinmueble/villa-en-venta-chayofa/21282480"); // not canonical
             //var page = new Page("https://vitalcasa.com/feature/double-glazing/"); // no listing
             //var page = new Page("https://www.inmosegursalou.com/ad/99569031"); // listing
             //var page = new Page("http://www.finquesniu.com/propiedades");
+            //var page = new Page("https://www.mardenia-inmobiliaria.com/venta/casa-en-venta-en-sagra-638/");// listing
+            //var page = new Page("https://goldacreestates.com/realestate/top/026712-42136"); // listing
+            //var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/"); // listing
 
             #endregion
 
@@ -204,6 +202,8 @@ namespace landerist_console
 
             //landerist_library.Parse.Listing.OpenAI.Batch.BatchUpload.Start();
             //landerist_library.Parse.Listing.OpenAI.Batch.BatchDownload.Start();
+
+            
             
 
             #endregion
