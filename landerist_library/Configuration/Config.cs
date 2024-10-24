@@ -121,14 +121,10 @@ namespace landerist_library.Configuration
 
         public const int DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS = 90;
         public static LLMProviders LLM_PROVIDER { get; set; }
-
         public static bool BATCH_ENABLED { get; set; }
 
-
         public const int MAX_PAGES_PER_BATCH = 10000;
-
-        public const int MIN_PAGES_PER_BATCH = 1;
-
+        public static int MIN_PAGES_PER_BATCH { get; set; }
         public static int MAX_DEGREE_OF_PARALLELISM { get; set; }
 
         public static bool IsConfigurationProduction()
@@ -194,6 +190,8 @@ namespace landerist_library.Configuration
                 LLMProviders.OpenAI;
 
             BATCH_ENABLED = LLM_PROVIDER.Equals(LLMProviders.OpenAI);
+
+            MIN_PAGES_PER_BATCH = ConfigurationProduction ? 100 : 1;
 
             BATCH_DIRECTORY = ConfigurationProduction ?
                 PrivateConfig.BATCH_DIRECTORY_PRODUCTION :
