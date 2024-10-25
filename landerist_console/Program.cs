@@ -168,14 +168,6 @@ namespace landerist_console
 
             #endregion
 
-            #region Batch
-
-            //var text = "{  \"candidates\": [    {      \"content\": {        \"role\": \"model\",        \"parts\": [          {            \"functionCall\": {              \"name\": \"si_es_un_anuncio\",              \"args\": {\"tiene_ascensor\": true}            }          }        ]      },      \"finishReason\": \"STOP\",            \"citationMetadata\": {        \"citations\": [          {            \"startIndex\": 330,            \"endIndex\": 630,            \"title\": \"Your prompt\"          },          {            \"startIndex\": 889,            \"endIndex\": 1052,            \"uri\": \"https://es.wallapop.com/ninos-y-bebes/parque-de-madera\"          }        ]      }    }  ],  \"usageMetadata\": {    \"promptTokenCount\": 41704,    \"candidatesTokenCount\": 383,    \"totalTokenCount\": 42087  }}";
-            //var result = ParseListing.ParseTextVertextAIFromBatch(page, text);
-
-
-            #endregion
-
             #region Parse
 
             //landerist_library.Parse.Listing.ListingsParser.Start();
@@ -202,9 +194,6 @@ namespace landerist_console
 
             //landerist_library.Parse.Listing.OpenAI.Batch.BatchUpload.Start();
             //landerist_library.Parse.Listing.OpenAI.Batch.BatchDownload.Start();
-
-            
-            
 
             #endregion
 

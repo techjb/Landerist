@@ -45,7 +45,8 @@ namespace landerist_library.Scrape
         {
             if (waitingAIParsing)
             {
-                Page.SetWaitingAIRequest();
+                Page.SetResponseBodyZipped();
+                Page.SetWaitingAIParsingRequest();
                 return Page.Update(false);
             }
             return SetPageType(newPageType, newListing);

@@ -47,17 +47,17 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
                     }
                     else
                     {
-                        Log.WriteLogErrors("OpenAIBatch Start", "Error creating batch");
+                        Log.WriteLogErrors("BatchUpload Start", "Error creating batch");
                     }
                 }
                 else
                 {
-                    Log.WriteLogErrors("OpenAIBatch Start", "Error uploading file");
-                }                
+                    Log.WriteLogErrors("BatchUpload Start", "Error uploading file");
+                }
             }
             else
             {
-                Log.WriteLogErrors("OpenAIBatch Start", "Error creating file");
+                Log.WriteLogErrors("BatchUpload Start", "Error creating file");
             }
         }
 
@@ -82,7 +82,6 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             {
                 if (AddToBatch(page))
                 {
-                    page.Update(false);
                     Interlocked.Increment(ref counter);
                 }
                 else
@@ -90,7 +89,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
                     Interlocked.Increment(ref errors);
                 }
             });
-            Log.WriteLogInfo("OpenAIBatch", $"Upload. Total pages: {totalPages}, Added to batch: {counter}, Errors: {errors}");
+            Log.WriteLogInfo("BatchUpload", $"Total pages: {totalPages}, Added to batch: {counter}, Errors: {errors}");
             return errors.Equals(0);
         }
 
@@ -106,26 +105,24 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
         {
             try
             {
-                page.SetWaitingAIResponse();
-                var json = GetBatchJson(page);
+                var json = GetJson(page);
                 return WriteJson(json);
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors("OpenAIBatch AddToBatch", exception.Message);
+                Log.WriteLogErrors("BatchUpload AddToBatch", exception.Message);
             }
             return false;
         }
 
-        private static string? GetBatchJson(Page page)
+        private static string? GetJson(Page page)
         {
+            page.SetResponseBodyFromZipped();
             var userInput = UserTextInput.GetText(page);
             if (string.IsNullOrEmpty(userInput))
             {
                 return null;
             }
-
-            var tools = new OpenAITools().GetTools();
 
             var requestData = new RequestData
             {
@@ -136,7 +133,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
                 {
                     model = OpenAIRequest.MODEL_NAME,
                     temperature = OpenAIRequest.TEMPERATURE,
-                    tools = tools,
+                    tools = new OpenAITools().GetTools(),
                     tool_choice = OpenAIRequest.TOOL_CHOICE,
                     response_format = new ResponseFormat
                     {
@@ -185,7 +182,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors("OpenAIBatch UploadFile", exception.Message);
+                Log.WriteLogErrors("BatchUpload UploadFile", exception);
 
             }
             File.Delete(FilePath);
@@ -198,9 +195,17 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             {
                 return false;
             }
+            try
+            {
+                var batchRequest = new CreateBatchRequest(FileResponse.Id, Endpoint.ChatCompletions);
+                BatchResponse = OpenAIClient.BatchEndpoint.CreateBatchAsync(batchRequest).Result;
+            }
+            catch (Exception exception)
+            {
+                Log.WriteLogErrors("BatchUpload CreateBatch", exception);
+                return false;
+            }
 
-            var batchRequest = new CreateBatchRequest(FileResponse.Id, Endpoint.ChatCompletions);
-            BatchResponse = OpenAIClient.BatchEndpoint.CreateBatchAsync(batchRequest).Result;
             return true;
         }
 
@@ -223,7 +228,8 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
                 },
                 page =>
             {
-                page.SetWaitingAIResponse();
+                page.SetWaitingAIParsingResponse();
+                page.Update(false);
             });
         }
     }

@@ -43,7 +43,7 @@ namespace landerist_library.Insert.FtAgencies
         {
             Parallel.ForEach(Provinces, new ParallelOptions()
             {
-                MaxDegreeOfParallelism = 49
+                MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
             }, province =>
             {
                 ScrapePage(province, false, 1);

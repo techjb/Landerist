@@ -417,7 +417,10 @@ namespace landerist_library.Websites
             int deleted = 0;
             int errors = 0;
             Parallel.ForEach(listings,
-                new ParallelOptions() { MaxDegreeOfParallelism = Environment.ProcessorCount - 1 },
+                new ParallelOptions() 
+                { 
+                    MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM,
+                },
                 listing =>
             {
                 Interlocked.Increment(ref processed);

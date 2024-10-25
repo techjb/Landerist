@@ -1,4 +1,5 @@
-﻿using landerist_library.Logs;
+﻿using landerist_library.Configuration;
+using landerist_library.Logs;
 using landerist_library.Websites;
 using System.Data;
 
@@ -105,7 +106,7 @@ namespace landerist_library.Insert
             int total = uris.Count;
             int counter = 0;
             Parallel.ForEach(uris,
-                //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
+                new ParallelOptions() { MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM },
                 uri =>
             {
                 var mainUri = GetSuggestedMainUri(uri);

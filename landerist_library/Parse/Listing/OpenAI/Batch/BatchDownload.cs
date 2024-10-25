@@ -7,7 +7,6 @@ using landerist_library.Websites;
 using System.Text.Json.Serialization;
 using landerist_library.Scrape;
 using landerist_library.Logs;
-using System.Diagnostics.Metrics;
 
 
 namespace landerist_library.Parse.Listing.OpenAI.Batch
@@ -35,8 +34,20 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             var batchIds = PendingBatches.Select();
             foreach (var batchId in batchIds)
             {
+                ProcessBatch(batchId);
+            }
+        }
+
+        public static void ProcessBatch(string batchId)
+        {
+            try
+            {
                 BatchResponse = OpenAIClient.BatchEndpoint.RetrieveBatchAsync(batchId).Result;
                 ProcessBatchResponse();
+            }
+            catch (Exception exception)
+            {
+                Log.WriteLogErrors("BatchDownload ProcessBatch", "batchId: " + batchId, exception);
             }
         }
 
@@ -134,34 +145,37 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
                 }
             });
 
-            Log.WriteLogInfo("OpenAIBatch", $"Download. Total lines: {total}, Readed: {readed}, Errors: {errors}");
+            Log.WriteLogInfo("BatchDownload", $"Total lines: {total}, Readed: {readed}, Errors: {errors}");
         }
 
         public static bool ReadLine(string line)
         {
             var batchResponse = JsonSerializer.Deserialize<BatchResponse?>(line, JsonSerializerOptions);
 
-            if (batchResponse == null ||
-                batchResponse.Response == null ||
-                batchResponse.Response.Body == null ||
-                !batchResponse.Response.StatusCode.Equals(200))
+            if (batchResponse == null)
             {
+                Log.WriteLogErrors("BatchDownload ReadLine", "batchResponse is null. Line: " + line);    
+                return false;
+            }
+
+            if (!batchResponse.Response.StatusCode.Equals(200))
+            {
+                Log.WriteLogErrors("BatchDownload ReadLine", "Error StatusCode. CustomId: " + batchResponse.CustomId + " StatusCode: " + batchResponse.Response.StatusCode);
                 return false;
             }
 
             var page = Pages.GetPage(batchResponse.CustomId);
             if (page == null)
             {
+                Log.WriteLogErrors("BatchDownload ReadLine", "Page is null. CustomId: " + batchResponse.CustomId);
                 return false;
             }
 
-            page.RemoveWaitingAI();
+            page.SetResponseBodyFromZipped();
+            page.RemoveWaitingAIParsing();
+            page.RemoveResponseBodyZipped();
 
-            var (pageType, listing, _) = ParseListing.ParseOpenAI(page, batchResponse.Response.Body);
-            if (!Config.IsConfigurationProduction())
-            {
-                Console.WriteLine("Page: " + page.Uri + " PageType: " + pageType);
-            }
+            var (pageType, listing, _) = ParseListing.ParseOpenAI(page, batchResponse.Response.Body);                        
             return new PageScraper(page).SetPageType(pageType, listing);
         }
 

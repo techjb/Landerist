@@ -1,4 +1,5 @@
-﻿using NetTopologySuite.Features;
+﻿using landerist_library.Configuration;
+using NetTopologySuite.Features;
 using NetTopologySuite.IO;
 using Newtonsoft.Json;
 using System.Data;
@@ -28,7 +29,7 @@ namespace landerist_library.Parse.Location.Delimitations
             Parallel.ForEach(featureCollection.Cast<Feature>(),
                 new ParallelOptions()
                 {
-                    MaxDegreeOfParallelism = Environment.ProcessorCount - 1
+                    MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
                 },
                 feature =>
             {

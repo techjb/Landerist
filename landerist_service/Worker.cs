@@ -6,6 +6,7 @@ using landerist_library.Logs;
 using landerist_library.Scrape;
 using landerist_library.Statistics;
 using landerist_library.Websites;
+using landerist_library.Parse.Listing.OpenAI.Batch;
 
 namespace landerist_service
 {
@@ -80,6 +81,8 @@ namespace landerist_service
             RunningTimer2 = true;
             try
             {
+                BatchDownload.Start();
+                BatchUpload.Start();                
                 Websites.UpdateRobotsTxt();
                 Websites.UpdateSitemaps();
                 Websites.UpdateIpAddress();

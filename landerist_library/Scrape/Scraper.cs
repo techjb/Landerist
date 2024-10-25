@@ -150,7 +150,7 @@ namespace landerist_library.Scrape
             DownloadErrorCounter = 0;
 
             var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
-            var maxDegreeOfParallelism = Config.IsConfigurationProduction() ? Environment.ProcessorCount - 1 : 1;
+            
 
             MultipleDownloader.Clear();
 
@@ -158,7 +158,7 @@ namespace landerist_library.Scrape
                 orderablePartitioner,
                 new ParallelOptions()
                 {
-                    MaxDegreeOfParallelism = maxDegreeOfParallelism,
+                    MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM,
                     CancellationToken = CancellationTokenSource.Token
                 },
                 (page, state) =>

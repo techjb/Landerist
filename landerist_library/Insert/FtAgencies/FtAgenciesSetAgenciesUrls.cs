@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Tools;
 
@@ -16,8 +17,7 @@ namespace landerist_library.Insert.FtAgencies
             int noErrors = 0;
             Parallel.ForEach(hashSet, new ParallelOptions()
             {
-                MaxDegreeOfParallelism = 45,
-                //MaxDegreeOfParallelism = 1,
+                MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
             }, url =>
             {
                 var agencyUrl = GetAgencyUrl(url);

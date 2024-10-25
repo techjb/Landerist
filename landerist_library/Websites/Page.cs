@@ -208,10 +208,10 @@ namespace landerist_library.Websites
 
             var addDays = PageType switch
             {
-                landerist_library.Websites.PageType.MainPage => 7,
-                landerist_library.Websites.PageType.MayBeListing => 7,
-                landerist_library.Websites.PageType.Listing => 7,                
-                _ => (short)PageTypeCounter! * 7,
+                landerist_library.Websites.PageType.MainPage => 10,
+                landerist_library.Websites.PageType.MayBeListing => 10,
+                landerist_library.Websites.PageType.Listing => 10,                
+                _ => (short)PageTypeCounter! * 10,
             };
             NextUpdate = ((DateTime)Updated!).AddDays(addDays);
         }
@@ -582,26 +582,27 @@ namespace landerist_library.Websites
                 Screenshot.Length < Config.MAX_SCREENSHOT_SIZE;
         }
 
-        public void SetWaitingAIRequest()
+        public void SetWaitingAIParsingRequest()
         {
-            SetResponseBodyZipped();
             WaitingAIParsing = true;            
         }
 
-        public void SetWaitingAIResponse()
+        public void SetWaitingAIParsingResponse()
         {
-            SetResponseBodyFromZipped();
             WaitingAIParsing = false;            
         }
 
-        public void RemoveWaitingAI()
+        public void RemoveWaitingAIParsing()
         {
-            SetResponseBodyFromZipped();
-            WaitingAIParsing = null;
-            ResponseBodyZipped = null;
+            WaitingAIParsing = null;            
         }
 
-        private void SetResponseBodyZipped()
+        public void RemoveResponseBodyZipped()
+        {
+            ResponseBodyZipped = null;
+        }   
+
+        public void SetResponseBodyZipped()
         {
             byte[] byteArray = Encoding.UTF8.GetBytes(ResponseBody!);
             using var memoryStream = new MemoryStream();
@@ -612,7 +613,7 @@ namespace landerist_library.Websites
             ResponseBodyZipped = memoryStream.ToArray();
         }
 
-        private void SetResponseBodyFromZipped()
+        public void SetResponseBodyFromZipped()
         {
             using var memoryStream = new MemoryStream(ResponseBodyZipped!);
             using var gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress);
