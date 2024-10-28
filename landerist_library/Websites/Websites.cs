@@ -410,12 +410,13 @@ namespace landerist_library.Websites
 
         public static void UpdateRobotsTxt()
         {
-            //Logs.Log.WriteLogInfo("service", "Updating Robots.txt");
             var websites = GetNeedToUpdateRobotsTxt();
             if (websites.Count.Equals(0))
             {
                 return;
             }
+            
+            int counter = 0;
             Parallel.ForEach(websites, new ParallelOptions()
             {
                 MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
@@ -423,7 +424,10 @@ namespace landerist_library.Websites
             {
                 website.SetRobotsTxt();
                 website.Update();
+                Interlocked.Increment(ref counter); 
             });
+            
+            //Logs.Log.WriteLogInfo("service", "Updated Robots.txt " + counter + "/" + websites.Count);    
         }
 
         private static HashSet<Website> GetNeedToUpdateRobotsTxt()
@@ -444,12 +448,13 @@ namespace landerist_library.Websites
 
         public static void UpdateSitemaps()
         {
-            //Logs.Log.WriteLogInfo("service", "Updating Sitemaps");
             var websites = GetNeedToUpdateSitemaps();
             if (websites.Count.Equals(0))
             {
                 return;
             }
+            
+            int counter = 0;
             Parallel.ForEach(websites, new ParallelOptions()
             {
                 MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
@@ -457,7 +462,10 @@ namespace landerist_library.Websites
             {
                 website.SetSitemap();
                 website.Update();
+                Interlocked.Increment(ref counter);
             });
+            
+            //Logs.Log.WriteLogInfo("service", "Updated Sitemaps " + counter + "/" + websites.Count);
         }
 
         private static HashSet<Website> GetNeedToUpdateSitemaps()
@@ -478,12 +486,13 @@ namespace landerist_library.Websites
 
         public static void UpdateIpAddress()
         {
-            //Logs.Log.WriteLogInfo("service", "Updating UpdateIpAddress");
             var websites = GetNeedToUpdateIpAddress();
             if (websites.Count.Equals(0))
             {
                 return;
             }
+            
+            int counter = 0;
             Parallel.ForEach(websites, new ParallelOptions()
             {
                 MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
@@ -491,7 +500,10 @@ namespace landerist_library.Websites
             {
                 website.SetIpAddress();
                 website.Update();
+                Interlocked.Increment(ref counter);
             });
+
+            //Logs.Log.WriteLogInfo("service", "Updated IpAddress " + counter + "/" + websites.Count);
         }
 
         private static HashSet<Website> GetNeedToUpdateIpAddress()

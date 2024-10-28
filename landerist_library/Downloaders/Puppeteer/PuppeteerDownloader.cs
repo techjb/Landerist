@@ -167,7 +167,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 }
                 catch (Exception exception)
                 {
-                    Logs.Log.WriteLogErrors("PuppeterDownloader", exception);
+                    Logs.Log.WriteLogErrors("PuppeteerDownloader", exception);
                 }
             }
         }
@@ -185,11 +185,11 @@ namespace landerist_library.Downloaders.Puppeteer
             //var page = new Websites.Page("https://www.realestate.bnpparibas.es/es/soluciones-medida/soluciones-para-inversores");
 
 
-            Logs.Log.WriteLogInfo("PuppeterTest", "Starting test");
+            Logs.Log.WriteLogInfo("PuppeteerTest", "Starting test");
             string? text = new PuppeteerDownloader().GetText(page);
 
             Console.WriteLine(text);
-            Logs.Log.WriteLogInfo("PuppeterTest", "Result: " + text);
+            Logs.Log.WriteLogInfo("PuppeteerTest", "Result: " + text);
         }
 
         public string? GetText(Websites.Page page)
@@ -221,7 +221,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
             else
             {
-                Logs.Log.WriteLogErrors("PuppeterDownloader Download", "Unable to launch browser");
+                Logs.Log.WriteLogErrors("PuppeteerDownloader Download", "Unable to launch browser");
             }
         }
 
@@ -233,7 +233,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("PuppeterDownloader GetContent", exception);
+                Logs.Log.WriteLogErrors("PuppeteerDownloader GetContent", exception);
             }
         }
 

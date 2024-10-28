@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "2.69";
+        public static readonly string VERSION = "2.70";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
@@ -190,8 +190,9 @@ namespace landerist_library.Configuration
                 LLMProviders.OpenAI;
 
             BATCH_ENABLED = LLM_PROVIDER.Equals(LLMProviders.OpenAI);
+            //BATCH_ENABLED = false;
 
-            MIN_PAGES_PER_BATCH = ConfigurationProduction ? 100 : 1;
+            MIN_PAGES_PER_BATCH = ConfigurationProduction ? 200 : 1;
 
             BATCH_DIRECTORY = ConfigurationProduction ?
                 PrivateConfig.BATCH_DIRECTORY_PRODUCTION :

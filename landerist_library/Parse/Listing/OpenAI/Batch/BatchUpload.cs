@@ -73,7 +73,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
         {
             InitFilePath();
             var totalPages = Pages.Count;
-            var counter = 0;
+            var added = 0;
             var errors = 0;
             Parallel.ForEach(Pages, new ParallelOptions()
             {
@@ -82,21 +82,21 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             {
                 if (AddToBatch(page))
                 {
-                    Interlocked.Increment(ref counter);
+                    Interlocked.Increment(ref added);
                 }
                 else
                 {
                     Interlocked.Increment(ref errors);
                 }
             });
-            Log.WriteLogInfo("BatchUpload", $"Total pages: {totalPages}, Added to batch: {counter}, Errors: {errors}");
+            Log.WriteLogInfo("BatchUpload", $"{added}/{totalPages} Errors: {errors}");
             return errors.Equals(0);
         }
 
         private static void InitFilePath()
         {
             FilePath = Config.BATCH_DIRECTORY +
-                "openai_batch_upload_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".json";
+                "batch_" + DateTime.Now.ToString("yyyyMMddHHmmss") + "_input.json";
 
             File.Delete(FilePath);
         }

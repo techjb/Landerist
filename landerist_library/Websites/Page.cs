@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+﻿using GenerativeAI.Requests;
+using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Downloaders;
@@ -170,7 +171,7 @@ namespace landerist_library.Websites
         {
             Updated = DateTime.Now;
             if (setNextUpdate)
-            {                
+            {
                 SetNextUpdate();
             }
 
@@ -210,7 +211,7 @@ namespace landerist_library.Websites
             {
                 landerist_library.Websites.PageType.MainPage => 10,
                 landerist_library.Websites.PageType.MayBeListing => 10,
-                landerist_library.Websites.PageType.Listing => 10,                
+                landerist_library.Websites.PageType.Listing => 10,
                 _ => (short)PageTypeCounter! * 10,
             };
             NextUpdate = ((DateTime)Updated!).AddDays(addDays);
@@ -584,23 +585,23 @@ namespace landerist_library.Websites
 
         public void SetWaitingAIParsingRequest()
         {
-            WaitingAIParsing = true;            
+            WaitingAIParsing = true;
         }
 
         public void SetWaitingAIParsingResponse()
         {
-            WaitingAIParsing = false;            
+            WaitingAIParsing = false;
         }
 
         public void RemoveWaitingAIParsing()
         {
-            WaitingAIParsing = null;            
+            WaitingAIParsing = null;
         }
 
         public void RemoveResponseBodyZipped()
         {
             ResponseBodyZipped = null;
-        }   
+        }
 
         public void SetResponseBodyZipped()
         {
@@ -615,10 +616,20 @@ namespace landerist_library.Websites
 
         public void SetResponseBodyFromZipped()
         {
-            using var memoryStream = new MemoryStream(ResponseBodyZipped!);
-            using var gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress);
-            using var streamReader = new StreamReader(gzipStream);
-            ResponseBody = streamReader.ReadToEnd();
+            if (ResponseBodyZipped is null)
+            {
+                return;
+            }
+            try
+            {
+                using var memoryStream = new MemoryStream(ResponseBodyZipped);
+                using var gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress);
+                using var streamReader = new StreamReader(gzipStream);
+                ResponseBody = streamReader.ReadToEnd();
+            }
+            catch
+            {
+            }
         }
     }
 }

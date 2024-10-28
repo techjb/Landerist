@@ -7,7 +7,7 @@ namespace landerist_library.Parse.Listing
     {
         protected static readonly string SystemPrompt =
             "Tu tarea consiste en analizar el texto html proporcionado por el usuario, identificando si corresponde a una página web de un anuncio inmobiliario. " +
-            "En caso de ser un anuncio inmobiliario deberás proceder a extraer los datos relevantes en formato json. " +
+            "En caso de ser un anuncio inmobiliario deberás proceder a extraer los datos relevantes en formato json en el que, si alguna clave no tiene un valor disponible, se asigne null en su lugar. " +
             "Asegúrate de tener una precisión exhaustiva en la identificación y extracción de los elementos clave. " +
             "Es imperativo que mantengas un enfoque riguroso durante este proceso para ofrecer la respuesta más precisa y de la más alta calidad posible.";
 

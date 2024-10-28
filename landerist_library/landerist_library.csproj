@@ -24,10 +24,10 @@
 
   <ItemGroup>
     <PackageReference Include="AI.Dev.OpenAI.GPT" Version="1.0.2" />
-    <PackageReference Include="Anthropic.SDK" Version="4.1.1" />
-    <PackageReference Include="AWSSDK.CloudFront" Version="3.7.400.38" />
-    <PackageReference Include="AWSSDK.Comprehend" Version="3.7.400.38" />
-    <PackageReference Include="AWSSDK.S3" Version="3.7.405.2" />
+    <PackageReference Include="Anthropic.SDK" Version="4.2.0" />
+    <PackageReference Include="AWSSDK.CloudFront" Version="3.7.400.40" />
+    <PackageReference Include="AWSSDK.Comprehend" Version="3.7.400.40" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.405.4" />
     <PackageReference Include="Com.Bekijkhet.RobotsTxt" Version="1.0.0" />
     <PackageReference Include="CsvHelper" Version="33.0.1" />
     <PackageReference Include="Google.Apis.CustomSearchAPI.v1" Version="1.68.0.3520" />
@@ -35,7 +35,7 @@
     <PackageReference Include="Google.Cloud.Language.V1" Version="3.7.0" />
     <PackageReference Include="Google_GenerativeAI" Version="1.0.2" />
     <PackageReference Include="Gzip.TextClassifier" Version="1.0.1" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.68" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.70" />
     <PackageReference Include="Louw.SitemapParser" Version="0.0.2" />
     <PackageReference Include="NetTopologySuite" Version="2.5.0" />
     <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="4.0.0" />

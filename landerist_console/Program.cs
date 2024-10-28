@@ -93,6 +93,7 @@ namespace landerist_console
             //var page = new Page("https://www.mardenia-inmobiliaria.com/venta/casa-en-venta-en-sagra-638/");// listing
             //var page = new Page("https://goldacreestates.com/realestate/top/026712-42136"); // listing
             //var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/"); // listing
+            //var page = new Page("https://rusticaurbana.com/tipo-propiedad/vivienda-duplex/");
 
             #endregion
 
