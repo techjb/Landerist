@@ -5,7 +5,8 @@ using landerist_library.Websites;
 using System.Text.Json.Serialization;
 using landerist_library.Scrape;
 using landerist_library.Logs;
-using OpenAI.Files;
+using landerist_library.Database;
+using OpenAI.Batch;
 
 
 namespace landerist_library.Parse.Listing.OpenAI.Batch
@@ -13,8 +14,6 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
     public class BatchDownload
     {
         private static readonly OpenAIClient OpenAIClient = new(PrivateConfig.OPENAI_API_KEY);
-
-        private static string? DownloadedFilePath;
 
         private static readonly JsonSerializerOptions JsonSerializerOptions = new()
         {
@@ -28,116 +27,97 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
 
         public static void Start()
         {
-            var files = OpenAIClient.FilesEndpoint.ListFilesAsync().Result;
-            files = [.. files.OrderBy(file => file.CreatedAt)];
+            Download();
+            Delete();
+        }
 
-            foreach (var file in files)
+        public static void Download()
+        {
+            var batchIds = Batches.SelectNonDownloaded();
+            foreach (var batchId in batchIds)
             {
-                if (file.FileName.StartsWith("batch_") && file.FileName.EndsWith("_output.jsonl"))
+                var batchResponse = GetBatch(batchId);
+                if (batchResponse == null || !BatchIsCompleted(batchResponse))
                 {
-                    ProcessFile(file);
+                    continue;
                 }
+                Download(batchResponse);
             }
         }
 
-        public static void ProcessFile(FileResponse fileResponse)
-        {
-            if (!DownloadFile(fileResponse))
-            {
-                return;
-            }
-            if (!ReadDownloadedFile())
-            {
-                Log.WriteLogErrors("BatchDownload ProcessFile", "ReadDownloadedFile fileResponse.id: " + fileResponse.Id);
-                return;
-            }
-            DeleteFiles(fileResponse);
-        }
-
-
-        //public static void ProcessBatch(string batchId)
-        //{
-        //    try
-        //    {
-        //        BatchResponse = OpenAIClient.BatchEndpoint.RetrieveBatchAsync(batchId).Result;
-        //        ProcessBatchResponse();
-        //    }
-        //    catch (Exception exception)
-        //    {
-        //        Log.WriteLogErrors("BatchDownload ProcessBatch", "batchId: " + batchId, exception);
-        //    }
-        //}
-
-        //public static void ProcessBatchResponse()
-        //{
-        //    if (BatchResponse == null || !BatchResponse.Status.Equals(BatchStatus.Completed))
-        //    {
-        //        return;
-        //    }
-
-        //    if (DownloadOutputFileId())
-        //    {
-        //        if (!ReadDownloadedFile())
-        //        {
-        //            Log.WriteLogErrors("BatchDownload ProcessBatchResponse", "Error downloading file in batchId: " + BatchResponse.Id);
-        //        }
-        //        DeleteFiles();
-        //    }                        
-        //}
-
-        //public static bool DownloadOutputFileId()
-        //{
-        //    if (BatchResponse == null || BatchResponse.OutputFileId == null)
-        //    {
-        //        return false;
-        //    }
-        //    try
-        //    {
-        //        DownloadedFilePath = OpenAIClient.FilesEndpoint.DownloadFileAsync(BatchResponse.OutputFileId, Config.BATCH_DIRECTORY).Result;
-
-        //        return !string.IsNullOrEmpty(DownloadedFilePath);
-        //    }
-        //    catch (Exception exception)
-        //    {
-        //        Log.WriteLogErrors("BatchDownload RetrieveBatchResponse", exception);
-        //        return false;
-        //    }
-        //}
-
-        public static bool DownloadFile(FileResponse fileResponse)
+        private static BatchResponse? GetBatch(string batchId)
         {
             try
             {
-                DownloadedFilePath = OpenAIClient.FilesEndpoint.DownloadFileAsync(fileResponse.Id, Config.BATCH_DIRECTORY).Result;
+                return OpenAIClient.BatchEndpoint.RetrieveBatchAsync(batchId).Result;
 
-                return !string.IsNullOrEmpty(DownloadedFilePath);
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors("BatchDownload DownloadOutputFile", exception);
-                return false;
+                Log.WriteLogErrors("BatchDownload GetBatch", "batchId: " + batchId, exception);
+            }
+            return null;
+        }
+
+        private static void Download(BatchResponse batchResponse)
+        {
+            if (Download(batchResponse.OutputFileId) && Download(batchResponse.ErrorFileId))
+            {
+                Batches.UpdateToDownloaded(batchResponse.Id);
             }
         }
 
-        public static bool ReadDownloadedFile()
+        private static bool Download(string? fileId)
         {
-            if (string.IsNullOrEmpty(DownloadedFilePath))
+            if (string.IsNullOrEmpty(fileId))
+            {
+                return true;
+            }
+            var filePath = DownloadFile(fileId);
+            if (string.IsNullOrEmpty(filePath))
             {
                 return false;
             }
-            bool sucess = false;
-            try
-            {
-                var lines = File.ReadAllLines(DownloadedFilePath);
-                ReadLines(lines);
-                sucess = true;
-            }
-            catch (Exception exception)
-            {
-                Log.WriteLogErrors("BatchDownload ReadDownloadedFile", exception);                
-            }
-            File.Delete(DownloadedFilePath!);
+            bool sucess = ReadFile(filePath);
+            File.Delete(filePath);
             return sucess;
+        }
+
+        private static bool BatchIsCompleted(BatchResponse batchResponse)
+        {
+            return batchResponse.Status.Equals(BatchStatus.Completed);
+        }
+
+        private static string? DownloadFile(string? fileId)
+        {
+            if (string.IsNullOrEmpty(fileId))
+            {
+                return null;
+            }
+            try
+            {
+                return OpenAIClient.FilesEndpoint.DownloadFileAsync(fileId, Config.BATCH_DIRECTORY).Result;
+            }
+            catch (Exception exception)
+            {
+                Log.WriteLogErrors("BatchDownload DownloadFile", "fileId: " + fileId, exception);
+            }
+            return null;
+        }
+
+        private static bool ReadFile(string filePath)
+        {
+            try
+            {
+                var lines = File.ReadAllLines(filePath);
+                ReadLines(lines);
+                return true;
+            }
+            catch (Exception exception)
+            {
+                Log.WriteLogErrors("BatchDownload ReadFile", exception);
+                return false;
+            }
         }
 
         private static void ReadLines(string[] lines)
@@ -149,6 +129,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             Parallel.ForEach(lines, new ParallelOptions()
             {
                 MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
+
             }, line =>
             {
                 try
@@ -165,84 +146,86 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
                 }
                 catch (Exception exception)
                 {
-                    Interlocked.Increment(ref errors);
                     Log.WriteLogErrors("BatchDownload ReadLines", exception);
                 }
             });
 
-            Log.WriteLogInfo("BatchDownload", $"{readed}/{total} Errors: {errors}");
+            Log.WriteLogInfo("BatchDownload", $"{readed}/{total}, Errors: {errors}");
         }
 
-        public static bool ReadLine(string line)
+        private static bool ReadLine(string line)
         {
-            var batchResponse = JsonSerializer.Deserialize<BatchResponse?>(line, JsonSerializerOptions);
+            var batchResponseLine = JsonSerializer.Deserialize<BatchResponseLine?>(line, JsonSerializerOptions);
 
-            if (batchResponse == null)
+            if (batchResponseLine == null)
             {
                 Log.WriteLogErrors("BatchDownload ReadLine", "batchResponse is null. Line: " + line);
                 return false;
             }
 
-            if (!batchResponse.Response.StatusCode.Equals(200))
-            {
-                Log.WriteLogErrors("BatchDownload ReadLine", "Error StatusCode. CustomId: " + batchResponse.CustomId + " StatusCode: " + batchResponse.Response.StatusCode);
-                return false;
-            }
-
-            var page = Pages.GetPage(batchResponse.CustomId);
+            var page = Pages.GetPage(batchResponseLine.CustomId);
             if (page == null)
             {
-                Log.WriteLogErrors("BatchDownload ReadLine", "Page is null. CustomId: " + batchResponse.CustomId);
+                Log.WriteLogErrors("BatchDownload ReadLine", "Page is null. CustomId: " + batchResponseLine.CustomId);
                 return false;
             }
 
-            page.SetResponseBodyFromZipped();
+            if (!batchResponseLine.Response.StatusCode.Equals(200))
+            {
+                page.SetWaitingAIParsingRequest();
+                return page.Update(false);
+            }
+
             page.RemoveWaitingAIParsing();
+            page.SetResponseBodyFromZipped();
             page.RemoveResponseBodyZipped();
 
-            var (pageType, listing, _) = ParseListing.ParseOpenAI(page, batchResponse.Response.Body);
+            var (pageType, listing, _) = ParseListing.ParseOpenAI(page, batchResponseLine.Response.Body);
             return new PageScraper(page).SetPageType(pageType, listing);
         }
 
-        public static void DeleteFiles(FileResponse fileResponse)
+        public static void Delete()
         {
-            DeleteFile(fileResponse.Id);
-            
-            try
+            var batchIds = Batches.SelectDownloaded();
+            foreach (var batchId in batchIds)
             {
-                string batchId = fileResponse.FileName.Replace("_output.jsonl", "");
-                var batchResponse = OpenAIClient.BatchEndpoint.RetrieveBatchAsync(batchId).Result;
-                if (batchResponse != null)
+                var batchResponse = GetBatch(batchId);
+                if (batchResponse == null || !BatchIsCompleted(batchResponse))
                 {
-                    DeleteFile(batchResponse.InputFileId);
-                    DeleteFile(batchResponse.OutputFileId);                    
+                    continue;
                 }
-            }
-            catch (Exception exception)
-            {
-                Log.WriteLogErrors("BatchDownload DeleteFiles", exception);
+                Delete(batchResponse);
             }
         }
 
-        private static void DeleteFile(string fileId)
+        private static void Delete(BatchResponse batchResponse)
+        {
+            if (DeleteFiles(batchResponse))
+            {
+                Batches.Delete(batchResponse.Id);
+            }
+        }
+
+
+        public static bool DeleteFiles(BatchResponse batchResponse)
+        {
+            return 
+                DeleteFile(batchResponse.OutputFileId) && 
+                DeleteFile(batchResponse.InputFileId);
+        }
+
+        private static bool DeleteFile(string fileId)
         {
             try
             {
                 OpenAIClient.FilesEndpoint.DeleteFileAsync(fileId).Wait();
+                return true;
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors("BatchDownload DeleteFiles", "fileId: " + fileId, exception);
+                Log.WriteLogErrors("BatchDownload DeleteFile", exception);
+                return false;
             }
         }
-
-        //public static bool DeletePendingBatch()
-        //{
-        //    if (BatchResponse == null)
-        //    {
-        //        return false;
-        //    }
-        //    return PendingBatches.Delete(BatchResponse.Id);
-        //}
     }
 }

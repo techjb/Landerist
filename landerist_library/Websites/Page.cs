@@ -169,7 +169,6 @@ namespace landerist_library.Websites
 
         public bool Update(bool setNextUpdate)
         {
-            Updated = DateTime.Now;
             if (setNextUpdate)
             {
                 SetNextUpdate();
@@ -202,7 +201,9 @@ namespace landerist_library.Websites
 
         public void SetNextUpdate()
         {
-            if (PageType == null || Updated == null || PageTypeCounter == null)
+            Updated = DateTime.Now;
+
+            if (PageType == null || PageTypeCounter == null)
             {
                 NextUpdate = null;
             }
