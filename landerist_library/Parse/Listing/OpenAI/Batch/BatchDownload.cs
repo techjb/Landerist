@@ -209,13 +209,18 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
 
         public static bool DeleteFiles(BatchResponse batchResponse)
         {
-            return 
-                DeleteFile(batchResponse.OutputFileId) && 
-                DeleteFile(batchResponse.InputFileId);
+            return
+                DeleteFile(batchResponse.OutputFileId, true) &&
+                DeleteFile(batchResponse.InputFileId, true) &&
+                DeleteFile(batchResponse.ErrorFileId, true);
         }
 
-        private static bool DeleteFile(string fileId)
+        private static bool DeleteFile(string fileId, bool retry)
         {
+            if (string.IsNullOrEmpty(fileId))
+            {
+                return true;
+            }
             try
             {
                 OpenAIClient.FilesEndpoint.DeleteFileAsync(fileId).Wait();
@@ -224,8 +229,13 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             catch (Exception exception)
             {
                 Log.WriteLogErrors("BatchDownload DeleteFile", exception);
-                return false;
+                if (retry)
+                {
+                    Thread.Sleep(5000);
+                    return DeleteFile(fileId, false);
+                }                
             }
+            return false;
         }
     }
 }

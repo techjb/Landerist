@@ -53,7 +53,7 @@ namespace landerist_library.Parse.Media
         private void InitHtmlDocument()
         {
             HtmlDocument = Page.GetHtmlDocument();
-            if (HtmlDocument == null)
+            if (HtmlDocument == null || HtmlDocument.DocumentNode == null)
             {
                 return;
             }
