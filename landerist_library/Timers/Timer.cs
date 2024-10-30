@@ -13,11 +13,6 @@ namespace landerist_library.Timers
 
         public const string TimerKeyDownloadPage = "downloadpage";
 
-        public static void SaveTimer(string timerKey, DateTime dateStart)
-        {
-            SaveTimer(timerKey, string.Empty, dateStart);
-        }
-
         public static void SaveTimer(string timerKey, string source, DateTime dateStart)
         {
             if (!Config.TIMERS_ENABLED)
@@ -41,7 +36,7 @@ namespace landerist_library.Timers
                 });
         }
 
-        public static void DeleteLog(string timerKey)
+        public static void Delete(string timerKey)
         {
             string query =
                 "DELETE FROM " + TABLE_TIMERS + " " +
@@ -71,6 +66,6 @@ namespace landerist_library.Timers
         }
 
 
-        #endregion Write Logs
+        #endregion
     }
 }

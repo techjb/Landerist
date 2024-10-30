@@ -11,7 +11,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
 {
     public class BatchUpload
     {
-        private static readonly object Sync = new();
+        private static readonly object SyncWrite = new();
 
         private static readonly JsonSerializerOptions JsonSerializerOptions = new()
         {
@@ -28,7 +28,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             {
                 return;
             }
-            string? filePath = CreateFile(pages);
+            (var filePath, pages) = CreateFile(pages);
             if (string.IsNullOrEmpty(filePath))
             {
                 Log.WriteLogErrors("BatchUpload Start", "Error creating file");
@@ -41,7 +41,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             {
                 Log.WriteLogErrors("BatchUpload Start", "Error uploading file");
                 return;
-            }            
+            }
 
             var batchResponse = CreateBatch(fileResponse);
             if (batchResponse == null)
@@ -63,33 +63,42 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             return pages;
         }
 
-        private static string? CreateFile(List<Page> pages)
+        private static (string? filePath, List<Page> added) CreateFile(List<Page> pages)
         {
             var filePath = Config.BATCH_DIRECTORY + "batch_" + DateTime.Now.ToString("yyyyMMddHHmmss") + "_input.json";
             File.Delete(filePath);
 
-            var added = 0;
+            List<Page> added = [];
+            var sync = new object();
             var errors = 0;
+            var skipped = 0;
+
             Parallel.ForEach(pages, new ParallelOptions()
             {
                 MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
             }, page =>
             {
-                if (AddToBatch(page, filePath))
+                if (!CanWriteFile(filePath))
                 {
-                    Interlocked.Increment(ref added);
+                    Interlocked.Increment(ref skipped);
+                    return;
                 }
-                else
+                if (!AddToBatch(page, filePath))
                 {
                     Interlocked.Increment(ref errors);
+                    return;
+                }
+                lock (sync)
+                {
+                    added.Add(page);
                 }
             });
-            Log.WriteLogInfo("BatchUpload", $"{added}/{pages.Count} Errors: {errors}");
-            if (errors.Equals(0))
+            Log.WriteLogInfo("BatchUpload", $"{added.Count}/{pages.Count} Errors: {errors} Skipped: {skipped}");
+            if (!errors.Equals(0))
             {
-                return filePath;
+                filePath = null;
             }
-            return null;
+            return (filePath, added);
         }
 
         private static bool AddToBatch(Page page, string filePath)
@@ -104,6 +113,20 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
                 Log.WriteLogErrors("BatchUpload AddToBatch", exception.Message);
             }
             return false;
+        }
+
+        private static bool CanWriteFile(string filePath)
+        {
+            lock (SyncWrite)
+            {
+                if (!File.Exists(filePath))
+                {
+                    return true;
+                }
+                const long sizeInByes = Config.MAX_BATCH_FILE_SIZE_MB * 1024 * 1024;
+                FileInfo fileInfo = new(filePath);
+                return fileInfo.Length < sizeInByes;
+            }
         }
 
         private static string? GetJson(Page page)
@@ -154,7 +177,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             {
                 return false;
             }
-            lock (Sync)
+            lock (SyncWrite)
             {
                 File.AppendAllText(filePath, json + Environment.NewLine);
             }

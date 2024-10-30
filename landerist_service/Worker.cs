@@ -7,6 +7,9 @@ using landerist_library.Scrape;
 using landerist_library.Statistics;
 using landerist_library.Websites;
 using landerist_library.Parse.Listing.OpenAI.Batch;
+using Amazon.Comprehend.Model;
+using System.Diagnostics;
+
 
 namespace landerist_service
 {
@@ -81,11 +84,18 @@ namespace landerist_service
             RunningTimer2 = true;
             try
             {
+                Stopwatch stopwatch = new();
+                stopwatch.Start();
+
                 BatchDownload.Start();
-                BatchUpload.Start();                
+                BatchUpload.Start();
                 Websites.UpdateRobotsTxt();
                 Websites.UpdateSitemaps();
                 Websites.UpdateIpAddress();
+
+                stopwatch.Stop();
+
+                Log.WriteLogInfo("TimerCallback2", $"Non scrapping tasks: {stopwatch.ElapsedMilliseconds / 1000} seconds.");
                 Scraper.Start();
             }
             catch (Exception exception)
