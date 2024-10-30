@@ -155,7 +155,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
 
         private static bool ReadLine(string line)
         {
-            var batchResponseLine = JsonSerializer.Deserialize<BatchResponseLine?>(line, JsonSerializerOptions);
+            var batchResponseLine = JsonSerializer.Deserialize<BatchLineResponse?>(line, JsonSerializerOptions);
 
             if (batchResponseLine == null)
             {
@@ -172,6 +172,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
 
             if (!batchResponseLine.Response.StatusCode.Equals(200))
             {
+                Log.WriteLogErrors("BatchDownload ReadLine", "Not 200 StatusCode. CustomId: " + batchResponseLine.CustomId);
                 page.SetWaitingAIParsingRequest();
                 return page.Update(false);
             }

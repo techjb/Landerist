@@ -103,7 +103,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT * " +
-                "FROM " + Websites.TABLE_WEBSITES + " " +
+                "FROM " + Websites.WEBSITES + " " +
                 "WHERE [Host] = @Host";
 
             var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
@@ -139,7 +139,7 @@ namespace landerist_library.Websites
         public bool Insert()
         {
             string query =
-                "INSERT INTO " + Websites.TABLE_WEBSITES + " VALUES " +
+                "INSERT INTO " + Websites.WEBSITES + " VALUES " +
                 "(@MainUri, @Host, @LanguageCode, @CountryCode, @RobotsTxt, @RobotsTxtUpdated, " +
                 "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @NumPages, @NumListings, " +
                 "@ListingExampleUri, @ListingExampleNodeSet, @ListingExampleNodeSetUpdated)";
@@ -151,7 +151,7 @@ namespace landerist_library.Websites
         public bool Update()
         {
             string query =
-                "UPDATE " + Websites.TABLE_WEBSITES + " SET " +
+                "UPDATE " + Websites.WEBSITES + " SET " +
                 "[MainUri] = @MainUri, " +
                 "[LanguageCode] = @LanguageCode, " +
                 "[CountryCode] = @CountryCode, " +
@@ -347,7 +347,7 @@ namespace landerist_library.Websites
         private bool DeleteWebsite()
         {
             string query =
-               "DELETE FROM " + Websites.TABLE_WEBSITES + " " +
+               "DELETE FROM " + Websites.WEBSITES + " " +
                "WHERE [Host] = @Host";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
@@ -512,7 +512,7 @@ namespace landerist_library.Websites
 
             string query =
                 "SELECT [NumPages] " +
-                "FROM " + Websites.TABLE_WEBSITES + " " +
+                "FROM " + Websites.WEBSITES + " " +
                 "WHERE [Host] = @Host";
 
             NumPages = new DataBase().QueryInt(query, new Dictionary<string, object?> {
@@ -547,7 +547,7 @@ namespace landerist_library.Websites
         public bool UpdateNumPages()
         {
             string query =
-                "UPDATE " + Websites.TABLE_WEBSITES + " " +
+                "UPDATE " + Websites.WEBSITES + " " +
                 "SET [NumPages] = @NumPages " +
                 "WHERE [Host] = @Host";
 
@@ -587,7 +587,7 @@ namespace landerist_library.Websites
         public bool UpdateNumListings()
         {
             string query =
-                "UPDATE " + Websites.TABLE_WEBSITES + " " +
+                "UPDATE " + Websites.WEBSITES + " " +
                 "SET [NumListings] = @NumListings " +
                 "WHERE [Host] = @Host";
 

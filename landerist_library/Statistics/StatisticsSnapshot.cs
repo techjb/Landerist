@@ -36,7 +36,7 @@ namespace landerist_library.Statistics
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + Websites.Websites.TABLE_WEBSITES;
+                "FROM " + Websites.Websites.WEBSITES;
 
             InsertDaily(StatisticsKey.Websites, query);
         }
@@ -45,7 +45,7 @@ namespace landerist_library.Statistics
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + Websites.Websites.TABLE_WEBSITES + " " +
+                "FROM " + Websites.Websites.WEBSITES + " " +
                 "WHERE CONVERT(date, [RobotsTxtUpdated]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
 
             InsertDaily(StatisticsKey.UpdatedRobotsTxt, query);
@@ -55,7 +55,7 @@ namespace landerist_library.Statistics
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + Websites.Websites.TABLE_WEBSITES + " " +
+                "FROM " + Websites.Websites.WEBSITES + " " +
                 "WHERE CONVERT(date, [SitemapUpdated]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
 
             InsertDaily(StatisticsKey.UpdatedSitemaps, query);
@@ -65,7 +65,7 @@ namespace landerist_library.Statistics
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + Websites.Websites.TABLE_WEBSITES + " " +
+                "FROM " + Websites.Websites.WEBSITES + " " +
                 "WHERE CONVERT(date, [IpAddressUpdated]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
 
             InsertDaily(StatisticsKey.UpdatedIpAddress, query);

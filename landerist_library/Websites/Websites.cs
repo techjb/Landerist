@@ -6,7 +6,7 @@ namespace landerist_library.Websites
 {
     public class Websites
     {
-        public const string TABLE_WEBSITES = "[WEBSITES]";
+        public const string WEBSITES = "[WEBSITES]";
 
         public static HashSet<Website> GetAll()
         {
@@ -18,7 +18,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT [Host] " +
-                "FROM " + TABLE_WEBSITES;
+                "FROM " + WEBSITES;
             return new DataBase().QueryHashSet(query);
         }
 
@@ -55,7 +55,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT * " +
-                "FROM " + TABLE_WEBSITES;
+                "FROM " + WEBSITES;
             return new DataBase().QueryTable(query);
         }
 
@@ -63,7 +63,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT * " +
-                "FROM " + TABLE_WEBSITES + " " +
+                "FROM " + WEBSITES + " " +
                 "WHERE [ListingExampleNodeSet] is null";
             return new DataBase().QueryTable(query);
         }
@@ -72,7 +72,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT [Host], [MainUri] " +
-                "FROM " + TABLE_WEBSITES;
+                "FROM " + WEBSITES;
             return new DataBase().QueryTable(query);
         }
 
@@ -81,7 +81,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT * " +
-                "FROM " + TABLE_WEBSITES + " " +
+                "FROM " + WEBSITES + " " +
                 "WHERE [HttpStatusCode] = 200";
             return new DataBase().QueryTable(query);
         }
@@ -90,7 +90,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT * " +
-                "FROM " + TABLE_WEBSITES + " " +
+                "FROM " + WEBSITES + " " +
                 "WHERE [HttpStatusCode] <> 200 AND [HttpStatusCode] IS NOT NULL";
             return new DataBase().QueryTable(query);
         }
@@ -99,7 +99,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT * " +
-                "FROM " + TABLE_WEBSITES + " " +
+                "FROM " + WEBSITES + " " +
                 "WHERE [HttpStatusCode] IS NULL";
             return new DataBase().QueryTable(query);
         }
@@ -113,7 +113,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT TOP 1 * " +
-                "FROM " + TABLE_WEBSITES + " " +
+                "FROM " + WEBSITES + " " +
                 "WHERE Host = @Host";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
@@ -128,7 +128,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT 1 " +
-                "FROM " + TABLE_WEBSITES + " " +
+                "FROM " + WEBSITES + " " +
                 "WHERE Host = @Host";
 
             return new DataBase().QueryExists(query, new Dictionary<string, object?> {
@@ -151,7 +151,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT Uri " +
-                "FROM " + TABLE_WEBSITES;
+                "FROM " + WEBSITES;
             return new DataBase().QueryHashSet(query);
         }
 
@@ -354,7 +354,7 @@ namespace landerist_library.Websites
         private static bool Delete()
         {
             string query =
-             "DELETE FROM " + TABLE_WEBSITES;
+             "DELETE FROM " + WEBSITES;
 
             return new DataBase().Query(query);
         }
@@ -384,7 +384,7 @@ namespace landerist_library.Websites
         {
             int numPages = CalculateNumPages(website);
             string query =
-                "UPDATE " + TABLE_WEBSITES + " " +
+                "UPDATE " + WEBSITES + " " +
                 "SET [NumPages] = @NumPages " +
                 "WHERE [Host] = @Host";
 
@@ -436,7 +436,7 @@ namespace landerist_library.Websites
 
             string query =
                 "SELECT * " +
-                "FROM " + TABLE_WEBSITES + " " +
+                "FROM " + WEBSITES + " " +
                 "WHERE [RobotsTxtUpdated] < @RobotsTxtUpdated ";
 
             var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
@@ -474,7 +474,7 @@ namespace landerist_library.Websites
 
             string query =
                 "SELECT * " +
-                "FROM " + TABLE_WEBSITES + " " +
+                "FROM " + WEBSITES + " " +
                 "WHERE [SitemapUpdated] < @SitemapUpdated ";
 
             var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
@@ -512,7 +512,7 @@ namespace landerist_library.Websites
 
             string query =
                 "SELECT * " +
-                "FROM " + TABLE_WEBSITES + " " +
+                "FROM " + WEBSITES + " " +
                 "WHERE [IpAddressUpdated] < @IpAddressUpdated ";
 
             var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {

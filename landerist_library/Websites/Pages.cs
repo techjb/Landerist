@@ -136,9 +136,9 @@ namespace landerist_library.Websites
             }
 
             return
-                "SELECT " + topRows + TABLE_PAGES + ".*, " + Websites.TABLE_WEBSITES + ".* " +
+                "SELECT " + topRows + TABLE_PAGES + ".*, " + Websites.WEBSITES + ".* " +
                 "FROM " + TABLE_PAGES + " " +
-                "INNER JOIN " + Websites.TABLE_WEBSITES + " ON " + TABLE_PAGES + ".[Host] = " + Websites.TABLE_WEBSITES + ".[Host] ";
+                "INNER JOIN " + Websites.WEBSITES + " ON " + TABLE_PAGES + ".[Host] = " + Websites.WEBSITES + ".[Host] ";
         }
 
         private static List<Page> GetPages(DataTable dataTable)

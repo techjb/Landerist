@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "2.72";
+        public static readonly string VERSION = "2.74";
 
         public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
 
@@ -199,7 +199,7 @@ namespace landerist_library.Configuration
                 PrivateConfig.BATCH_DIRECTORY_LOCAL;
 
             MAX_DEGREE_OF_PARALLELISM = ConfigurationProduction ?
-                Environment.ProcessorCount - 1 : 1;
+                Environment.ProcessorCount - 2 : 1;
 
         }
 

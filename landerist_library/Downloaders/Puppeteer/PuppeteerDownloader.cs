@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+﻿using CsvHelper.Delegates;
+using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Websites;
 using PuppeteerSharp;
@@ -282,7 +283,7 @@ namespace landerist_library.Downloaders.Puppeteer
             IPage browserPage = await browser.NewPageAsync();
             if (Config.IsConfigurationProduction())
             {
-                browserPage.DefaultNavigationTimeout = Config.HTTPCLIENT_SECONDS_TIMEOUT * 1000;
+                browserPage.DefaultNavigationTimeout = GetTimeout();
             }
             SetAccepLanguage(browserPage, languageCode);
             await browserPage.SetUserAgentAsync(Config.USER_AGENT);
@@ -326,7 +327,15 @@ namespace landerist_library.Downloaders.Puppeteer
                     return;
                 }
 
-                await e.Request.ContinueAsync();
+                var continueTask = e.Request.ContinueAsync();
+                if (await Task.WhenAny(continueTask, Task.Delay(GetTimeout())) == continueTask)
+                {
+                    await continueTask; // Task completed within timeout.
+                }
+                else
+                {
+                    throw new TimeoutException();
+                }
             }
             catch (Exception exception)
             {
@@ -356,6 +365,11 @@ namespace landerist_library.Downloaders.Puppeteer
             {
                 Logs.Log.WriteLogErrors("PuppeteerDownloader HandleResponseAsync", exception);
             }
+        }
+
+        private static int GetTimeout()
+        {
+            return Config.HTTPCLIENT_SECONDS_TIMEOUT * 1000;
         }
     }
 }

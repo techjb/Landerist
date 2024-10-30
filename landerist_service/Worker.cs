@@ -30,7 +30,7 @@ namespace landerist_service
             Logger.LogInformation("ExecuteAsync");
             while (!stoppingToken.IsCancellationRequested)
             {
-                Log.WriteLogInfo("service", "Started. Version: " + Config.VERSION);
+                Log.WriteLogInfo("landerist_service", "Started. Version: " + Config.VERSION);
                 PuppeteerDownloader.UpdateChrome();
                 SetTimers();
                 //Scraper.DoTest();
@@ -102,7 +102,7 @@ namespace landerist_service
         {
             Logger.LogInformation("StopAsync");
             Scraper.Stop();
-            Log.WriteLogInfo("service", "Stopped. Version: " + Config.VERSION);
+            Log.WriteLogInfo("landerist_service", "Stopped. Version: " + Config.VERSION);
             Timer1?.Change(Timeout.Infinite, 0);
             Timer2?.Change(Timeout.Infinite, 0);
             await base.StopAsync(cancellationToken);
