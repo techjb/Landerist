@@ -13,17 +13,6 @@ namespace landerist_scraper
 
             var host = builder.Build();
             host.Run();
-            
-
-            //var host = Host.CreateDefaultBuilder(args)
-            //    .ConfigureServices((hostContext, services) =>
-            //    {
-            //        services.AddHostedService<Worker>();
-            //    })
-            //    .UseWindowsService()
-            //    .Build();
-
-            //host.Run();
         }
     }
 }
