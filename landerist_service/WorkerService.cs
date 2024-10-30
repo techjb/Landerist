@@ -7,15 +7,14 @@ using landerist_library.Scrape;
 using landerist_library.Statistics;
 using landerist_library.Websites;
 using landerist_library.Parse.Listing.OpenAI.Batch;
-using Amazon.Comprehend.Model;
 using System.Diagnostics;
 
 
 namespace landerist_service
 {
-    public class Worker(ILogger<Worker> logger) : BackgroundService
+    public class WorkerService(ILogger<WorkerService> logger) : BackgroundService
     {
-        private readonly ILogger<Worker> Logger = logger;
+        private readonly ILogger<WorkerService> Logger = logger;
 
         private Timer? Timer1;
         private Timer? Timer2;
@@ -70,7 +69,7 @@ namespace landerist_service
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors("Worker TimerCallback1", exception);
+                Log.WriteLogErrors("WorkerService TimerCallback1", exception);
             }
         }
 
@@ -100,7 +99,7 @@ namespace landerist_service
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors("Worker TimerCallback2", exception);
+                Log.WriteLogErrors("WorkerService TimerCallback2", exception);
             }
             finally
             {

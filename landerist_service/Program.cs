@@ -1,6 +1,5 @@
 using landerist_library.Configuration;
 
-
 namespace landerist_service
 {
     public class Program
@@ -12,7 +11,7 @@ namespace landerist_service
             var host = Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddHostedService<Worker>();
+                    services.AddHostedService<WorkerService>();
                 })
                 .UseWindowsService()
                 .Build();
