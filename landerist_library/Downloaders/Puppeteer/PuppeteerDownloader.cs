@@ -1,5 +1,4 @@
-﻿using CsvHelper.Delegates;
-using HtmlAgilityPack;
+﻿using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Websites;
 using PuppeteerSharp;
@@ -57,7 +56,7 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private static readonly LaunchOptions launchOptions = new()
         {
-            //Headless = true, // if false, maybe need to comment await browserPage.SetRequestInterceptionAsync(true);            
+            //Headless = true, // if false, maybe need to comment await browserPage.SetRequestInterceptionAsync(true);          
             Headless = Config.IsConfigurationProduction(),
             Devtools = false,
             //IgnoreHTTPSErrors = true,            
@@ -78,10 +77,53 @@ namespace landerist_library.Downloaders.Puppeteer
             "mads.amazon-adsystem.com",
             "ad.doubleclick.net",
             "maps.googleapis.com",
+            "ads.yahoo.com",
+            "ads.twitter.com",
+            "analytics.twitter.com",
+            "cdn.taboola.com",
+            "ads.pubmatic.com",
+            "adsymptotic.com",
+            "pixel.quantserve.com",
+            "googleads.g.doubleclick.net",
+            "adroll.com",
+            "media.net",
+            "scorecardresearch.com",
+            "ssl.google-analytics.com",
+            "tracking.kissmetrics.com",
+            "banners.adfox.ru",
+            "static.criteo.net",
+            "ib.adnxs.com",
+            "cdn.adsafeprotected.com",
+            "contextweb.com",
+            "onetag.io",
+            "rubiconproject.com",
+            "yieldmo.com",
+            "casalemedia.com",
+            "googlesyndication.com",
+            "adsafeprotected.com",
+            "moatads.com",
+            "criteo.com",
+            "openx.net",
+            "yahoo.com",
+            "cloudflareinsights.com",
+            "adlightning.com",
+            "advertising.com",
+            "zqtk.net",
+            "everesttech.net",
+            "demdex.net",
+            "gumgum.com",
+            "outbrain.com",
+            "bing.com",
+            "pippio.com"
         ];
 
         private readonly IBrowser? Browser = null;
 
+        private static readonly NavigationOptions NavigationOptions = new()
+        {
+            WaitUntil = [WaitUntilNavigation.Networkidle2],
+            Timeout = GetTimeout(),
+        };
 
         public PuppeteerDownloader()
         {
@@ -250,17 +292,13 @@ namespace landerist_library.Downloaders.Puppeteer
                 if (BrowserInitialized())
                 {
                     browserPage = await GetBroserPage(Browser!, page.Website.LanguageCode, page.Uri);
-                    //await browserPage.SetExtraHttpHeadersAsync(new Dictionary<string, string> {
-                    //    { "ignoreHTTPSErrors", "true" }
-                    //});
-                    await browserPage.GoToAsync(page.Uri.ToString(), WaitUntilNavigation.Networkidle0);
+                    await browserPage.GoToAsync(page.Uri.ToString(), NavigationOptions);
                     await browserPage.EvaluateExpressionAsync(ExpressionRemoveCookies);
                     if (Config.TAKE_SCREENSHOT)
                     {
                         screenShot = await PuppeteerScreenshot.TakeScreenshot(browserPage, page);
                     }
                     content = await browserPage.GetContentAsync();
-
                 }
             }
             catch
@@ -314,7 +352,6 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private static async Task HandleRequestAsync(RequestEventArgs e, Uri uri)
         {
-
             try
             {
                 if (BlockResources.Contains(e.Request.ResourceType) ||
@@ -327,15 +364,7 @@ namespace landerist_library.Downloaders.Puppeteer
                     return;
                 }
 
-                var continueTask = e.Request.ContinueAsync();
-                if (await Task.WhenAny(continueTask, Task.Delay(GetTimeout())) == continueTask)
-                {
-                    await continueTask; // Task completed within timeout.
-                }
-                else
-                {
-                    throw new TimeoutException();
-                }
+                await e.Request.ContinueAsync();
             }
             catch (Exception exception)
             {

@@ -83,18 +83,11 @@ namespace landerist_service
             RunningTimer2 = true;
             try
             {
-                Stopwatch stopwatch = new();
-                stopwatch.Start();
-
                 BatchDownload.Start();
                 BatchUpload.Start();
                 Websites.UpdateRobotsTxt();
                 Websites.UpdateSitemaps();
                 Websites.UpdateIpAddress();
-
-                stopwatch.Stop();
-
-                Log.WriteLogInfo("TimerCallback2", $"Non scrapping tasks: {stopwatch.ElapsedMilliseconds / 1000} seconds.");
                 Scraper.Start();
             }
             catch (Exception exception)
