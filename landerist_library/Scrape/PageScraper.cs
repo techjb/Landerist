@@ -31,11 +31,7 @@ namespace landerist_library.Scrape
                 return false;
             }
             Downloader.Download(Page);
-            (var newPageType, var newListing, var waitingAIParsing) = PageTypeParser.GetPageType(Page);
-            if(!Config.IsConfigurationProduction())
-            {
-                Console.WriteLine("PageType: " + newPageType);
-            }
+            (var newPageType, var newListing, var waitingAIParsing) = PageTypeParser.GetPageType(Page);            
             bool sucess =  SetPageType(newPageType, newListing, waitingAIParsing);
             IndexPages();
             return sucess;
@@ -88,7 +84,7 @@ namespace landerist_library.Scrape
 
         private void SetMedia()
         {
-            if (NewListing != null)
+            if (NewListing != null && Config.MEDIA_PARSER_ENABLED)
             {
                 MediaParser mediaParser = new(Page);
                 mediaParser.AddMedia(NewListing);

@@ -32,13 +32,14 @@ namespace landerist_library.Logs
         {
             string query =
                 "INSERT INTO " + TABLE_LOGS + " " +
-                "VALUES(GETDATE(), @LogKey, @Source, @Text)";
+                "VALUES(@Date, @LogKey, @Source, @Text)";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
-                    { "LogKey", logKey },
-                    { "Source", source },
-                    { "Text", text.Trim() }
-                });
+                { "Date", DateTime.Now},
+                { "LogKey", logKey },
+                { "Source", source },
+                { "Text", text.Trim() }
+            });
         }
 
         public static DataTable ReadLog(string logKey, int top = 200)
@@ -86,7 +87,7 @@ namespace landerist_library.Logs
                 "StackTrace: " + exception.StackTrace + "\r\n" +
                 "TargetSite: " + exception.TargetSite + "\r\n" +
                 "InnerException: " + exception.InnerException;
-                
+
         }
 
         #region Write Logs

@@ -7,11 +7,11 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "2.81";
-
-        public static readonly bool SET_LATLNG_LAUID_AND_MEDIA_TO_LISTING = true;
+        public static readonly string VERSION = "2.88";
 
         public static readonly bool INDEXER_ENABLED = true;
+
+        public static readonly bool MEDIA_PARSER_ENABLED = false;        
 
         public static readonly bool WORDS_ENABLED = false;
 
@@ -85,8 +85,6 @@ namespace landerist_library.Configuration
         public const int MAX_SCREENSHOT_PIXELS_SIDE = 8000;
         public static string? CHROME_EXTENSIONS_DIRECTORY { get; set; }
 
-        public static string? BATCH_DIRECTORY { get; set; }
-
         public static readonly int DAYS_TO_DELETE_BACKUP = 60;
 
         public const int MAX_YEARS_SINCE_PUBLISHED_LISTING = 5;
@@ -120,7 +118,8 @@ namespace landerist_library.Configuration
         public const int MAX_PARKINGS = 10000;
 
         public const int DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS = 90;
-        public static LLMProviders LLM_PROVIDER { get; set; }
+        public static LLMProviders LLM_PROVIDER { get; set; }             
+        public static string? BATCH_DIRECTORY { get; set; }
         public static bool BATCH_ENABLED { get; set; }
 
         public const int MAX_PAGES_PER_BATCH = 10000;
@@ -201,7 +200,7 @@ namespace landerist_library.Configuration
                 PrivateConfig.BATCH_DIRECTORY_LOCAL;
 
             MAX_DEGREE_OF_PARALLELISM = ConfigurationProduction ?
-                Environment.ProcessorCount - 2 : 1;
+                Environment.ProcessorCount -1 : 1;                
 
         }
 

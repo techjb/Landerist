@@ -36,6 +36,19 @@ namespace landerist_library.Scrape
 
         private List<Page> Pages = [];
 
+        public Scraper()
+        {
+
+        }
+
+        public static void FinalizeBlockingCollection()
+        {
+            if (ThreadCounter.Equals(0) && BlockingCollection.Count.Equals(0))
+            {
+                BlockingCollection.CompleteAdding();                
+            }
+        }
+
         public void DoTest()
         {
             Log.WriteLogInfo("service", "Starting test..");
@@ -150,9 +163,10 @@ namespace landerist_library.Scrape
             DownloadErrorCounter = 0;
 
             var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
-            
 
             MultipleDownloader.Clear();
+
+            Log.WriteLogInfo("scraper", $"Scraping {TotalCounter} pages");
 
             Parallel.ForEach(
                 orderablePartitioner,
@@ -169,7 +183,7 @@ namespace landerist_library.Scrape
                     EndThread();
                 });
 
-            Log.WriteLogInfo("scraper", "Updated " + Scraped + " pages");
+            Log.WriteLogInfo("scraper", $"Scraped {Scraped} pages");
             return true;
         }
 
@@ -227,18 +241,18 @@ namespace landerist_library.Scrape
         {
             Interlocked.Decrement(ref ThreadCounter);
 
-            if (ThreadCounter.Equals(0) && BlockingCollection.Count.Equals(0))
-            {
-                BlockingCollection.CompleteAdding();
-                Console.WriteLine("Finished");
-            }
+            //if (ThreadCounter.Equals(0) && BlockingCollection.Count.Equals(0))
+            //{
+            //    BlockingCollection.CompleteAdding();
+            //    Console.WriteLine("Finished");
+            //}
         }
 
         private void InitBlockingCollection()
         {
             HashSet<Page> hashSet = new(Pages, new PageComparer());
             Pages.Clear();
-            BlockingCollection = [.. hashSet];
+            BlockingCollection = [.. hashSet];            
             hashSet.Clear();
         }
 

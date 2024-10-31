@@ -18,7 +18,9 @@ namespace landerist_service
 
         private Timer? Timer1;
         private Timer? Timer2;
+        private Timer? Timer3;
         private bool RunningTimer2 = false;
+        private bool RunningTimer3 = false;
 
         private const int OneSecond = 1000;
         private const int TenSeconds = 10 * OneSecond;
@@ -55,6 +57,7 @@ namespace landerist_service
 
             Timer1 = new Timer(TimerCallback1!, null, dueTimeOneAM, OneDay);
             Timer2 = new Timer(TimerCallback2!, null, 0, TenSeconds);
+            Timer3 = new Timer(TimerCallback3!, null, 0, OneSecond);
         }
 
         private void TimerCallback1(object state)
@@ -100,6 +103,28 @@ namespace landerist_service
             }
         }
 
+        private void TimerCallback3(object state)
+        {
+            if (RunningTimer3)
+            {
+                return;
+            }
+
+            RunningTimer3 = true;
+            try
+            {
+                Scraper.FinalizeBlockingCollection();
+            }
+            catch (Exception exception)
+            {
+                Log.WriteLogErrors("WorkerService TimerCallback3", exception);
+            }
+            finally
+            {
+                RunningTimer3 = false;
+            }
+        }
+
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
             Logger.LogInformation("StopAsync");
@@ -107,6 +132,7 @@ namespace landerist_service
             Log.WriteLogInfo("landerist_service", "Stopped. Version: " + Config.VERSION);
             Timer1?.Change(Timeout.Infinite, 0);
             Timer2?.Change(Timeout.Infinite, 0);
+            Timer3?.Change(Timeout.Infinite, 0);
             await base.StopAsync(cancellationToken);
         }
     }
