@@ -1,4 +1,5 @@
-﻿using landerist_library.Configuration;
+﻿using Amazon.Comprehend.Model.Internal.MarshallTransformations;
+using landerist_library.Configuration;
 using landerist_library.Tools;
 using landerist_library.Websites;
 using landerist_orels.ES;
@@ -20,106 +21,187 @@ namespace landerist_library.Parse.Listing
 #pragma warning disable IDE1006
 
 
-        [Description("fecha de la publicación del anuncio")]
+        public const string FechaDePublicaciónDescription = "fecha de la publicación del anuncio";
+
+        [Description(FechaDePublicaciónDescription)]
         public string? fecha_de_publicacion { get; set; } = null;
 
-        [Description("tipo de operación inmobiliaria")]
+
+        public const string TipoDeOperaciónDescription = "tipo de operación inmobiliaria";
+
+        [Description(TipoDeOperaciónDescription)]
         public string? tipo_de_operacion { get; set; } = null;
 
-        [Description("tipología del inmueble")]
+        
+        public const string TipoDeInmuebleDescription = "tipología del inmueble";
+
+        [Description(TipoDeInmuebleDescription)]
         public string? tipo_de_inmueble { get; set; } = null;
 
-        [Description("subtipo de inmueble")]
+
+        public const string SubtipoDeInmuebleDescription = "subtipo de inmueble";
+
+        [Description(SubtipoDeInmuebleDescription)]
         public string? subtipo_de_inmueble { get; set; } = null;
 
-        [Description("precio del anuncio en euros")]
+        
+        public const string PrecioDelAnuncioDescription = "precio del anuncio en euros";
+
+        [Description(PrecioDelAnuncioDescription)]
         public decimal? precio_del_anuncio { get; set; } = null;
 
-        [Description("texto con la descripción detallada del anuncio")]
+        
+        public const string DescripciónDelAnuncioDescription = "texto con la descripción detallada del anuncio";
+
+        [Description(DescripciónDelAnuncioDescription)]
         public string? descripcion_del_anuncio { get; set; } = null;
 
-        [Description("código de referencia del anuncio")]
+
+        public const string ReferenciaDelAnuncioDescription = "código de referencia del anuncio";
+
+        [Description(ReferenciaDelAnuncioDescription)]
         public string? referencia_del_anuncio { get; set; } = null;
 
-        [Description("número de teléfono de contacto")]
+
+        public const string TeléfonoDeContactoDescription = "número de teléfono de contacto";
+
+        [Description(TeléfonoDeContactoDescription)]
         public string? telefono_de_contacto { get; set; } = null;
 
-        [Description("dirección de email de contacto")]
+        
+        public const string EmailDeContactoDescription = "dirección de email de contacto";
+
+        [Description(EmailDeContactoDescription)]
         public string? email_de_contacto { get; set; } = null;
 
-        [Description("dirección en la que se encuentra el inmueble")]
+        
+        public const string DirecciónDelInmuebleDescription = "dirección en la que se encuentra el inmueble";
+
+        [Description(DirecciónDelInmuebleDescription)]
         public string? direccion_del_inmueble { get; set; } = null;
 
-        [Description("referencia catastral del anuncio (14 o 20 caracteres)")]
+        public const string ReferenciaCatastralDescription = "referencia catastral del anuncio (14 o 20 caracteres)";
+
+        [Description(ReferenciaCatastralDescription)]
         public string? referencia_catastral { get; set; } = null;
 
-        [Description("número de metros cuadrados del inmueble")]
+        public const string TamañoDelInmuebleDescription = "número de metros cuadrados del inmueble";
+
+        [Description(TamañoDelInmuebleDescription)]
         public double? tamanio_del_inmueble { get; set; } = null;
 
-        [Description("número de metros cuadrados de la parcela")]
+
+        public const string TamañoDeLaParcelaDescription = "número de metros cuadrados de la parcela";
+
+        [Description(TamañoDeLaParcelaDescription)]
         public double? tamanio_de_la_parcela { get; set; } = null;
 
-        [Description("año de construcción del inmueble")]
+        
+        public const string AñoDeConstrucciónDescription = "año de construcción del inmueble";
+
+        [Description(AñoDeConstrucciónDescription)]
         public double? anio_de_construccion { get; set; } = null;
 
-        [Description("estado de la construcción en el que se encuentra el inmueble")]
+        
+        public const string EstadoDeLaConstrucciónDescription = "estado de la construcción en el que se encuentra el inmueble";
+
+        [Description(EstadoDeLaConstrucciónDescription)]
         public string? estado_de_la_construccion { get; set; } = null;
 
-        [Description("número de plantas del edificio")]
+        public const string PlantasDelEdificioDescription = "número de plantas del edificio";
+
+        [Description(PlantasDelEdificioDescription)]
         public double? plantas_del_edificio { get; set; } = null;
 
-        [Description("número de planta en la que se ubica el inmueble")]
-        public string? plantas_del_inmueble { get; set; } = null;
+        public const string PlantaDelInmuebleDescription = "número de planta en la que se ubica el inmueble";
 
-        [Description("número de dormitorios")]
+        [Description(PlantaDelInmuebleDescription)]
+        public string? planta_del_inmueble { get; set; } = null;
+
+        public const string NúmeroDeDormitoriosDescription = "número de dormitorios";
+
+        [Description(NúmeroDeDormitoriosDescription)]
         public double? numero_de_dormitorios { get; set; } = null;
 
-        [Description("número de baños")]
+        public const string NúmeroDeBañosDescription = "número de baños";
+
+        [Description(NúmeroDeBañosDescription)]
         public double? numero_de_banios { get; set; } = null;
 
-        [Description("número de parkings")]
+        public const string NúmeroDeParkingsDescription = "número de parkings";
+
+        [Description(NúmeroDeParkingsDescription)]
         public double? numero_de_parkings { get; set; } = null;
 
-        [Description("tiene terraza")]
+        public const string TieneTerrazaDescription = "tiene terraza";
+
+        [Description(TieneTerrazaDescription)]
         public bool? tiene_terraza { get; set; } = null;
 
-        [Description("tiene jardín")]
+        public const string TieneJardínDescription = "tiene jardín";
+
+        [Description(TieneJardínDescription)]
         public bool? tiene_jardin { get; set; } = null;
 
-        [Description("tiene garaje")]
+        public const string TieneGarajeDescription = "tiene garaje";
+
+        [Description(TieneGarajeDescription)]
         public bool? tiene_garaje { get; set; } = null;
 
-        [Description("tiene parking para moto")]
+        
+        public const string TieneParkingParaMotoDescription = "tiene parking para moto";
+
+        [Description(TieneParkingParaMotoDescription)]
         public bool? tiene_parking_para_moto { get; set; } = null;
 
-        [Description("tiene piscina")]
+        public const string TienePiscinaDescription = "tiene piscina";
+
+        [Description(TienePiscinaDescription)]
         public bool? tiene_piscina { get; set; } = null;
 
-        [Description("tiene ascensor")]
+        public const string TieneAscensorDescription = "tiene ascensor";
+
+        [Description(TieneAscensorDescription)]
         public bool? tiene_ascensor { get; set; } = null;
 
-        [Description("tiene acceso para discapacitados")]
+        public const string TieneAccesoParaDiscapacitadosDescription = "tiene acceso para discapacitados";
+
+        [Description(TieneAccesoParaDiscapacitadosDescription)]
         public bool? tiene_acceso_para_discapacitados { get; set; } = null;
 
-        [Description("tiene trastero")]
+        public const string TieneTrasteroDescription = "tiene trastero";
+
+        [Description(TieneTrasteroDescription)]
         public bool? tiene_trastero { get; set; } = null;
 
-        [Description("está amueblado")]
+        public const string EstaAmuebladoDescription = "está amueblado";
+
+        [Description(EstaAmuebladoDescription)]
         public bool? esta_amueblado { get; set; } = null;
 
-        [Description("no está amueblado")]
+        public const string NoEstaAmuebladoDescription = "no está amueblado";
+
+        [Description(NoEstaAmuebladoDescription)]
         public bool? no_esta_amueblado { get; set; } = null;
 
-        [Description("tiene calefacción")]
+        public const string TieneCalefacciónDescription = "tiene calefacción";
+
+        [Description(TieneCalefacciónDescription)]
         public bool? tiene_calefaccion { get; set; } = null;
 
-        [Description("tiene aire acondicionado")]
+        public const string TieneAireAcondicionadoDescription = "tiene aire acondicionado";
+
+        [Description(TieneAireAcondicionadoDescription)]
         public bool? tiene_aire_acondicionado { get; set; } = null;
 
-        [Description("se permiten mascotas")]
+        public const string PermiteMascotasDescription = "se permiten mascotas";
+
+        [Description(PermiteMascotasDescription)]
         public bool? permite_mascotas { get; set; } = null;
 
-        [Description("tiene sistemas de seguridad")]
+        public const string TieneSistemasDeSeguridadDescription = "tiene sistemas de seguridad";
+
+        [Description(TieneSistemasDeSeguridadDescription)]
         public bool? tiene_sistemas_de_seguridad { get; set; } = null;
 
 #pragma warning restore IDE1006
@@ -182,6 +264,7 @@ namespace landerist_library.Parse.Listing
             OPERACION_VENTA,
             OPERACION_ALQUILER
         ];
+        
 
         protected readonly JsonArray TiposDeInmueble =
         [
@@ -195,6 +278,7 @@ namespace landerist_library.Parse.Listing
             TIPO_DE_INMUEBLE_PARCELA,
             TIPO_DE_INMUEBLE_EDIFICIO
         ];
+        
 
         protected readonly JsonArray SubtiposDeInmueble =
         [
@@ -211,6 +295,7 @@ namespace landerist_library.Parse.Listing
             SUBTIPO_DE_INMUEBLE_PARCELA_NO_URBANIZABLE
         ];
 
+      
         protected readonly JsonArray EstadosDeLaConstrucción =
         [
             ESTADO_DE_LA_CONSTRUCCIÓN_OBRA_NUEVA,
@@ -617,11 +702,11 @@ namespace landerist_library.Parse.Listing
 
         private string? GetFloor()
         {
-            if (string.IsNullOrEmpty(plantas_del_inmueble))
+            if (string.IsNullOrEmpty(planta_del_inmueble))
             {
                 return null;
             }
-            return Strings.Clean(plantas_del_inmueble);
+            return Strings.Clean(planta_del_inmueble);
         }
 
         private int? GetBedrooms()
@@ -660,7 +745,7 @@ namespace landerist_library.Parse.Listing
             return null;
         }
 
-        protected static string GetDescriptionAttribute(string name)
+        public static string GetDescriptionAttribute(string name)
         {
             PropertyInfo? propertyInfo = typeof(ParseListingTool).GetProperty(name);
             if (propertyInfo != null)

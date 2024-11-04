@@ -38,7 +38,7 @@ namespace landerist_library.Parse.Listing.VertexAI
             AddInteger(properties, nameof(anio_de_construccion));
             AddEnum(properties, nameof(estado_de_la_construccion), EstadosDeLaConstrucción);
             AddInteger(properties, nameof(plantas_del_edificio));
-            AddString(properties, nameof(plantas_del_inmueble));
+            AddString(properties, nameof(planta_del_inmueble));
             AddInteger(properties, nameof(numero_de_dormitorios));
             AddInteger(properties, nameof(numero_de_banios));
             AddInteger(properties, nameof(numero_de_parkings));

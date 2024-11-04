@@ -191,7 +191,7 @@ namespace landerist_library.Configuration
                 LLMProviders.OpenAI;
 
             BATCH_ENABLED = LLM_PROVIDER.Equals(LLMProviders.OpenAI);
-            //BATCH_ENABLED = false;
+            BATCH_ENABLED = false;
 
             MIN_PAGES_PER_BATCH = ConfigurationProduction ? 200 : 1;
 

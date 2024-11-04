@@ -39,7 +39,7 @@ namespace landerist_library.Parse.Listing.OpenAI
             AddNumber(properties, nameof(anio_de_construccion));
             AddEnum(properties, nameof(estado_de_la_construccion), EstadosDeLaConstrucción);
             AddNumber(properties, nameof(plantas_del_edificio));
-            AddString(properties, nameof(plantas_del_inmueble));
+            AddString(properties, nameof(planta_del_inmueble));
             AddNumber(properties, nameof(numero_de_dormitorios));
             AddNumber(properties, nameof(numero_de_banios));
             AddNumber(properties, nameof(numero_de_parkings));

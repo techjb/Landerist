@@ -2,6 +2,8 @@
 using landerist_library.Websites;
 using OpenAI;
 using OpenAI.Chat;
+using OpenAI.Extensions;
+
 
 namespace landerist_library.Parse.Listing.OpenAI
 {
@@ -50,9 +52,9 @@ namespace landerist_library.Parse.Listing.OpenAI
                 temperature: TEMPERATURE,
                 tools: tools,
                 toolChoice: TOOL_CHOICE,
-                responseFormat:  ChatResponseFormat.Json                
+                responseFormat: ChatResponseFormat.Json
                 );
-            
+
             try
             {
                 DateTime dateStart = DateTime.Now;
@@ -65,6 +67,44 @@ namespace landerist_library.Parse.Listing.OpenAI
                 Logs.Log.WriteLogErrors("OpenAIRequest GetResponse", exception);
             }
             return null;
-        }    
+        }
+
+        public static OpenAIStructuredOutput? GetStructuredOutput(string userInput)
+        {
+            var messages = new List<Message>
+            {
+                new(Role.System, SystemPrompt),
+                new(Role.User, userInput),
+            };
+
+            var chatRequest = new ChatRequest(
+                messages: messages,
+                model: MODEL_NAME,
+                temperature: TEMPERATURE
+                );
+
+            try
+            {
+                DateTime dateStart = DateTime.Now;
+
+                Type myType = typeof(OpenAIStructuredOutput);
+                //JsonSchema schema = myType;
+                //var schema = myType.GenerateJsonSchema();
+                //var d = new JsonSchema(myType.Name, myType.GenerateJsonSchema());
+                //var reque = new ResponseFormatObject(type);
+
+                //chatRequest.ResponseFormatObject = new ResponseFormatObject(myType);
+
+                var (structuredOutput, chatResponse) = 
+                    Task.Run(async () => await OpenAIClient.ChatEndpoint.GetCompletionAsync<OpenAIStructuredOutput>(chatRequest)).Result;
+                Timers.Timer.SaveTimerOpenAI("OpenAIRequest", dateStart);
+                return structuredOutput;
+            }
+            catch (Exception exception)
+            {
+                Logs.Log.WriteLogErrors("OpenAIRequest GetResponse", exception);
+            }
+            return null;
+        }
     }
 }

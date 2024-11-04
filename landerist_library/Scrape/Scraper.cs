@@ -23,8 +23,6 @@ namespace landerist_library.Scrape
 
         private static int Scraped = 0;
 
-        private static int Remaining = 0;
-
         private static int ThreadCounter = 0;
 
         private static BlockingCollection<Page> BlockingCollection = [];
@@ -158,7 +156,6 @@ namespace landerist_library.Scrape
             }
             TotalCounter = BlockingCollection.Count;
             Scraped = 0;
-            Remaining = TotalCounter;
             ThreadCounter = 0;
             DownloadErrorCounter = 0;
 
@@ -166,7 +163,7 @@ namespace landerist_library.Scrape
 
             MultipleDownloader.Clear();
 
-            Log.WriteLogInfo("scraper", $"Scraping {TotalCounter} pages");
+            //Log.WriteLogInfo("scraper", $"Scraping {TotalCounter} pages");
 
             Parallel.ForEach(
                 orderablePartitioner,
@@ -215,8 +212,7 @@ namespace landerist_library.Scrape
 
             Scrape(page);
             page.Dispose();
-            Interlocked.Increment(ref Scraped);
-            Interlocked.Decrement(ref Remaining);
+            Interlocked.Increment(ref Scraped);            
         }
 
         private static void WriteConsole()
