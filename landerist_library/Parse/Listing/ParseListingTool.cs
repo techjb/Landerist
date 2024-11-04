@@ -1,5 +1,4 @@
-﻿using Amazon.Comprehend.Model.Internal.MarshallTransformations;
-using landerist_library.Configuration;
+﻿using landerist_library.Configuration;
 using landerist_library.Tools;
 using landerist_library.Websites;
 using landerist_orels.ES;

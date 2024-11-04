@@ -28,6 +28,7 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Threading;
 
 
 
@@ -36,6 +37,7 @@ namespace landerist_console
     internal class Program
     {
         private static DateTime DateStart;
+        //static readonly Scraper TheScraper = new();
 
         static void Main()
         {
@@ -92,7 +94,7 @@ namespace landerist_console
             //var page = new Page("http://www.finquesniu.com/propiedades");
             //var page = new Page("https://www.mardenia-inmobiliaria.com/venta/casa-en-venta-en-sagra-638/");// listing
             //var page = new Page("https://goldacreestates.com/realestate/top/026712-42136"); // listing
-            var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/"); // listing
+            //var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/"); // listing
             //var page = new Page("https://rusticaurbana.com/tipo-propiedad/vivienda-duplex/");
             //var page = new Page("https://www.puertalmar.com/product-page/piso-en-calle-cánovas-del-castillo-carolinas-alicante-3-hab-2-baños");
 
@@ -155,7 +157,10 @@ namespace landerist_console
             //new Scraper().ScrapeAllPages();            
             //new Scraper().ScrapeResponseBodyRepeatedInListings();
             //new Scraper().Start();
-            new Scraper().Scrape(page);
+            //var Timer3 = new Timer(TimerCallback3!, null, 0, 1000);
+            //TheScraper.Start();            
+            //Thread.Sleep(100000000);
+            //new Scraper().Scrape(page);
             //new Scraper().DoTest();
 
             #endregion

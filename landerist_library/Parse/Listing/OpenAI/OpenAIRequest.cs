@@ -2,7 +2,6 @@
 using landerist_library.Websites;
 using OpenAI;
 using OpenAI.Chat;
-using OpenAI.Extensions;
 
 
 namespace landerist_library.Parse.Listing.OpenAI
@@ -86,15 +85,6 @@ namespace landerist_library.Parse.Listing.OpenAI
             try
             {
                 DateTime dateStart = DateTime.Now;
-
-                Type myType = typeof(OpenAIStructuredOutput);
-                //JsonSchema schema = myType;
-                //var schema = myType.GenerateJsonSchema();
-                //var d = new JsonSchema(myType.Name, myType.GenerateJsonSchema());
-                //var reque = new ResponseFormatObject(type);
-
-                //chatRequest.ResponseFormatObject = new ResponseFormatObject(myType);
-
                 var (structuredOutput, chatResponse) = 
                     Task.Run(async () => await OpenAIClient.ChatEndpoint.GetCompletionAsync<OpenAIStructuredOutput>(chatRequest)).Result;
                 Timers.Timer.SaveTimerOpenAI("OpenAIRequest", dateStart);

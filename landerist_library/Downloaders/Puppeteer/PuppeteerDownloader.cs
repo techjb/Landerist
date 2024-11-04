@@ -366,9 +366,9 @@ namespace landerist_library.Downloaders.Puppeteer
 
                 await e.Request.ContinueAsync();
             }
-            catch (Exception exception)
+            catch //(Exception exception)
             {
-                Logs.Log.WriteLogErrors("PuppeteerDownloader HandleRequestAsync " + uri.ToString(), exception);
+                //Logs.Log.WriteLogErrors("PuppeteerDownloader HandleRequestAsync " + uri.ToString(), exception);
             }
         }
 

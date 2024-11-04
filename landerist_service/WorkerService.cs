@@ -7,7 +7,6 @@ using landerist_library.Scrape;
 using landerist_library.Statistics;
 using landerist_library.Websites;
 using landerist_library.Parse.Listing.OpenAI.Batch;
-using System.Diagnostics;
 
 
 namespace landerist_service

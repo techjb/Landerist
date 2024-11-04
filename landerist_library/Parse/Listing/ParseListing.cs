@@ -6,7 +6,6 @@ using landerist_library.Parse.Listing.VertexAI;
 using landerist_library.Websites;
 using landerist_library.Configuration;
 using OpenAI.Chat;
-using OpenCvSharp;
 
 namespace landerist_library.Parse.Listing
 {
@@ -43,8 +42,7 @@ namespace landerist_library.Parse.Listing
             {
                 switch (Config.LLM_PROVIDER)
                 {
-                    case LLMProviders.OpenAI: return ParseOpenAIStructured(page, userInput);
-                    //case LLMProviders.OpenAI: return ParseOpenAI(page, userInput);
+                    case LLMProviders.OpenAI: return ParseOpenAI(page, userInput);
                     case LLMProviders.VertexAI: return ParseVertextAI(page, userInput);
                     //case ModelName.Gemini: return GeminiRequest.ParseTextGemini(page);
                     case LLMProviders.Anthropic: return ParseAnthropic(page, userInput);                    
@@ -64,20 +62,14 @@ namespace landerist_library.Parse.Listing
                 return (PageType.MayBeListing, null, true);
             }
 
-            var response = OpenAIRequest.GetResponse(userInput);
-            return ParseOpenAI(page, response);
-        }
-
-        private static (PageType pageType, landerist_orels.ES.Listing? listing, bool waitingAIParsing)
-            ParseOpenAIStructured(Page page, string userInput)
-        {
-            if (Config.BATCH_ENABLED)
+            if (Config.OPENAI_STRUCTURED_OUTPUT)
             {
-                return (PageType.MayBeListing, null, true);
+                var structuredOutput = OpenAIRequest.GetStructuredOutput(userInput);
+                return ParseOpenAI(page, structuredOutput);
             }
 
-            var structuredOutput = OpenAIRequest.GetStructuredOutput(userInput);
-            return ParseOpenAI(page, structuredOutput);
+            var response = OpenAIRequest.GetResponse(userInput);
+            return ParseOpenAI(page, response);
         }
 
         public static (PageType pageType, landerist_orels.ES.Listing? listing, bool waitingAIParsing) ParseOpenAI(Page page, ChatResponse? chatResponse)
@@ -103,6 +95,7 @@ namespace landerist_library.Parse.Listing
             {
                 return (PageType.NotListingByParser, null, false);
             }
+            Console.WriteLine(page.PageType);   
             return (PageType.Listing, null, false);
         }
 

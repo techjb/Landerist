@@ -25,9 +25,9 @@ namespace landerist_library.Scrape
 
         private static int ThreadCounter = 0;
 
-        private static BlockingCollection<Page> BlockingCollection = [];
+        private BlockingCollection<Page> BlockingCollection = [];
 
-        private static readonly CancellationTokenSource CancellationTokenSource = new();
+        private readonly CancellationTokenSource CancellationTokenSource = new();
 
         public MultipleDownloader MultipleDownloader = new();
 
@@ -39,11 +39,11 @@ namespace landerist_library.Scrape
 
         }
 
-        public static void FinalizeBlockingCollection()
+        public void FinalizeBlockingCollection()
         {
-            if (ThreadCounter.Equals(0) && BlockingCollection.Count.Equals(0))
+            if (BlockingCollection.Count < Config.MIN_PAGES_PER_SCRAPE)
             {
-                BlockingCollection.CompleteAdding();                
+                BlockingCollection.CompleteAdding();
             }
         }
 
@@ -177,7 +177,7 @@ namespace landerist_library.Scrape
                     StartThread();
                     ProcessThread(page);
                     WriteConsole();
-                    EndThread();
+                    EndThread(state);
                 });
 
             Log.WriteLogInfo("scraper", $"Scraped {Scraped} pages");
@@ -206,13 +206,14 @@ namespace landerist_library.Scrape
                 if (!BlockingCollection.IsAddingCompleted)
                 {
                     BlockingCollection.Add(page);
+
                 }
                 return;
             }
 
             Scrape(page);
             page.Dispose();
-            Interlocked.Increment(ref Scraped);            
+            Interlocked.Increment(ref Scraped);
         }
 
         private static void WriteConsole()
@@ -233,22 +234,20 @@ namespace landerist_library.Scrape
                );
         }
 
-        private static void EndThread()
+        private void EndThread(ParallelLoopState parallelLoopState)
         {
             Interlocked.Decrement(ref ThreadCounter);
-
-            //if (ThreadCounter.Equals(0) && BlockingCollection.Count.Equals(0))
-            //{
-            //    BlockingCollection.CompleteAdding();
-            //    Console.WriteLine("Finished");
-            //}
+            if (BlockingCollection.IsAddingCompleted)
+            {
+                parallelLoopState.Stop();
+            }
         }
 
         private void InitBlockingCollection()
         {
             HashSet<Page> hashSet = new(Pages, new PageComparer());
             Pages.Clear();
-            BlockingCollection = [.. hashSet];            
+            BlockingCollection = [.. hashSet];
             hashSet.Clear();
         }
 
