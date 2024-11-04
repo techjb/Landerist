@@ -37,7 +37,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
 
             var fileResponse = UploadFile(filePath);
             File.Delete(filePath);
-            if (fileResponse == null)
+            if (fileResponse == null || string.IsNullOrEmpty(fileResponse.Id))
             {
                 Log.WriteLogErrors("BatchUpload Start", "Error uploading file");
                 return;
@@ -46,6 +46,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             var batchResponse = CreateBatch(fileResponse);
             if (batchResponse == null)
             {
+                OpenAIClient.FilesEndpoint.DeleteFileAsync(fileResponse.Id).Wait();
                 Log.WriteLogErrors("BatchUpload Start", "Error creating batch");
                 return;
             }

@@ -2,6 +2,9 @@
 using landerist_library.Websites;
 using OpenAI;
 using OpenAI.Chat;
+using static Google.Cloud.Language.V1.PartOfSpeech.Types;
+using System.Text.Json.Nodes;
+using System.Text.Json;
 
 
 namespace landerist_library.Parse.Listing.OpenAI
@@ -76,15 +79,19 @@ namespace landerist_library.Parse.Listing.OpenAI
                 new(Role.User, userInput),
             };
 
+            
             var chatRequest = new ChatRequest(
                 messages: messages,
                 model: MODEL_NAME,
                 temperature: TEMPERATURE
+                //responseFormat: ChatResponseFormat.JsonSchema,
+                //jsonSchema: new JsonSchema()
                 );
-
+            
             try
             {
                 DateTime dateStart = DateTime.Now;
+                
                 var (structuredOutput, chatResponse) = 
                     Task.Run(async () => await OpenAIClient.ChatEndpoint.GetCompletionAsync<OpenAIStructuredOutput>(chatRequest)).Result;
                 Timers.Timer.SaveTimerOpenAI("OpenAIRequest", dateStart);

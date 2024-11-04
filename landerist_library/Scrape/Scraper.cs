@@ -203,17 +203,29 @@ namespace landerist_library.Scrape
             }
             if (IsBlocked(page))
             {
-                if (!BlockingCollection.IsAddingCompleted)
-                {
-                    BlockingCollection.Add(page);
-
-                }
+                BlokedPage(page);
                 return;
             }
 
             Scrape(page);
             page.Dispose();
             Interlocked.Increment(ref Scraped);
+        }
+
+        private void BlokedPage(Page page)
+        {
+            if (BlockingCollection.IsAddingCompleted)
+            {
+                return;
+            }
+
+            try
+            {
+                BlockingCollection.Add(page);
+            }
+            catch
+            {
+            }
         }
 
         private static void WriteConsole()
@@ -246,8 +258,8 @@ namespace landerist_library.Scrape
         private void InitBlockingCollection()
         {
             HashSet<Page> hashSet = new(Pages, new PageComparer());
-            Pages.Clear();
             BlockingCollection = [.. hashSet];
+            Pages.Clear();
             hashSet.Clear();
         }
 
