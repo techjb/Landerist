@@ -29,7 +29,7 @@ namespace landerist_library.Parse.Listing.VertexAI
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("VertexAIRequest GetFunctionNameAndArguments", response.ToString(), exception);
+                Logs.Log.WriteError("VertexAIRequest GetFunctionNameAndArguments", response.ToString(), exception);
             }
             return (null, null);
         }
@@ -62,7 +62,7 @@ namespace landerist_library.Parse.Listing.VertexAI
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("VertexAIRequest GetFunctionNameAndArgumentsWithText", exception);
+                Logs.Log.WriteError("VertexAIRequest GetFunctionNameAndArgumentsWithText", exception);
             }
 
             return (null, null);

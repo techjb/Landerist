@@ -284,7 +284,7 @@ namespace landerist_library.Websites
                 }
                 catch (Exception exception)
                 {
-                    Logs.Log.WriteLogErrors("Page GetHtmlDocument", Uri, exception);
+                    Logs.Log.WriteError("Page GetHtmlDocument", Uri, exception);
                 }
             }
             return null;

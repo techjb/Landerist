@@ -33,7 +33,7 @@ namespace landerist_service
             Logger.LogInformation("ExecuteAsync");
             while (!stoppingToken.IsCancellationRequested)
             {
-                Log.WriteLogInfo("landerist_service", "Started. Version: " + Config.VERSION);
+                Log.WriteInfo("landerist_service", "Started. Version: " + Config.VERSION);
                 PuppeteerDownloader.UpdateChrome();
                 SetTimers();
                 //Scraper.DoTest();
@@ -71,7 +71,7 @@ namespace landerist_service
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors("WorkerService TimerCallback1", exception);
+                Log.WriteError("WorkerService TimerCallback1", exception);
             }
         }
 
@@ -94,7 +94,7 @@ namespace landerist_service
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors("WorkerService TimerCallback2", exception);
+                Log.WriteError("WorkerService TimerCallback2", exception);
             }
             finally
             {
@@ -116,7 +116,7 @@ namespace landerist_service
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors("WorkerService TimerCallback3", exception);
+                Log.WriteError("WorkerService TimerCallback3", exception);
             }
             finally
             {
@@ -128,7 +128,7 @@ namespace landerist_service
         {
             Logger.LogInformation("StopAsync");
             Scraper.Stop();
-            Log.WriteLogInfo("landerist_service", "Stopped. Version: " + Config.VERSION);
+            Log.WriteInfo("landerist_service", "Stopped. Version: " + Config.VERSION);
             Timer1?.Change(Timeout.Infinite, 0);
             Timer2?.Change(Timeout.Infinite, 0);
             Timer3?.Change(Timeout.Infinite, 0);

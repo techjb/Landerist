@@ -115,7 +115,7 @@ namespace landerist_library.Parse.Location
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("LatLngParser LatLngIframeGoogleMaps", src, exception);
+                Logs.Log.WriteError("LatLngParser LatLngIframeGoogleMaps", src, exception);
             }
         }
 

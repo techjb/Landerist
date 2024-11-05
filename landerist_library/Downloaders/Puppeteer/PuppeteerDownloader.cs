@@ -143,7 +143,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("PuppeteerDownloader LaunchAsync", exception);
+                Logs.Log.WriteError("PuppeteerDownloader LaunchAsync", exception);
             }
             return null;
         }
@@ -165,7 +165,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("PuppeteerDownloader CloseBrowserAsync", exception);
+                Logs.Log.WriteError("PuppeteerDownloader CloseBrowserAsync", exception);
             }
         }
 
@@ -178,7 +178,7 @@ namespace landerist_library.Downloaders.Puppeteer
         public static void UpdateChrome()
         {
             bool sucess = Task.Run(DownloadBrowserAsync).Result;
-            Logs.Log.WriteLogInfo("service", "Updating Chrome. Success: " + sucess);
+            Logs.Log.WriteInfo("service", "Updating Chrome. Success: " + sucess);
         }
 
         private static async Task<bool> DownloadBrowserAsync()
@@ -210,7 +210,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 }
                 catch (Exception exception)
                 {
-                    Logs.Log.WriteLogErrors("PuppeteerDownloader", exception);
+                    Logs.Log.WriteError("PuppeteerDownloader", exception);
                 }
             }
         }
@@ -228,11 +228,11 @@ namespace landerist_library.Downloaders.Puppeteer
             //var page = new Websites.Page("https://www.realestate.bnpparibas.es/es/soluciones-medida/soluciones-para-inversores");
 
 
-            Logs.Log.WriteLogInfo("PuppeteerTest", "Starting test");
+            Logs.Log.WriteInfo("PuppeteerTest", "Starting test");
             string? text = new PuppeteerDownloader().GetText(page);
 
             Console.WriteLine(text);
-            Logs.Log.WriteLogInfo("PuppeteerTest", "Result: " + text);
+            Logs.Log.WriteInfo("PuppeteerTest", "Result: " + text);
         }
 
         public string? GetText(Websites.Page page)
@@ -248,7 +248,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 }
                 catch (Exception exception)
                 {
-                    Logs.Log.WriteLogErrors("PuppeteerDownloader GetText", exception);
+                    Logs.Log.WriteError("PuppeteerDownloader GetText", exception);
                 }
             }
             return null;
@@ -264,7 +264,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
             else
             {
-                Logs.Log.WriteLogErrors("PuppeteerDownloader Download", "Unable to launch browser");
+                Logs.Log.WriteError("PuppeteerDownloader Download", "Unable to launch browser");
             }
         }
 
@@ -276,7 +276,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("PuppeteerDownloader GetContent", exception);
+                Logs.Log.WriteError("PuppeteerDownloader GetContent", exception);
             }
         }
 
@@ -392,7 +392,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("PuppeteerDownloader HandleResponseAsync", exception);
+                Logs.Log.WriteError("PuppeteerDownloader HandleResponseAsync", exception);
             }
         }
 

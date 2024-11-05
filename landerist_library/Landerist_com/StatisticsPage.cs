@@ -29,13 +29,13 @@ namespace landerist_library.Landerist_com
 
                 if (UploadStatisticsFile())
                 {
-                    Log.WriteLogInfo("StatisticsPage", "Updated");
+                    Log.WriteInfo("StatisticsPage", "Updated");
                 }
 
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors("StatisticsPage Update", exception);
+                Log.WriteError("StatisticsPage Update", exception);
             }
         }
 

@@ -2,9 +2,13 @@
 using landerist_library.Websites;
 using OpenAI;
 using OpenAI.Chat;
-using static Google.Cloud.Language.V1.PartOfSpeech.Types;
-using System.Text.Json.Nodes;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using Newtonsoft.Json.Schema;
+using Newtonsoft.Json.Schema.Generation;
+using Newtonsoft.Json;
+using System.Text.Json.Nodes;
+using System.Runtime.InteropServices;
 
 
 namespace landerist_library.Parse.Listing.OpenAI
@@ -25,20 +29,29 @@ namespace landerist_library.Parse.Listing.OpenAI
 
         public static readonly int MAX_CONTEXT_WINDOW = 128000;
 
-        public static readonly string MODEL_NAME = "gpt-4o-mini";
+        public static readonly string MODEL_NAME =
+            "gpt-4o-mini";
+            //"gpt-4o";
 
         public static readonly double TEMPERATURE = 0;
 
         private static readonly OpenAIClient OpenAIClient = new(PrivateConfig.OPENAI_API_KEY);
 
-        public static readonly string? TOOL_CHOICE = "required";        
+        public static readonly string? TOOL_CHOICE = "required";
+
+        private static JsonSerializerOptions JsonSerializerOptions { get; } = new JsonSerializerOptions
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            //Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false) },
+            ReferenceHandler = ReferenceHandler.IgnoreCycles
+        };
 
         public static bool TooManyTokens(Page page)
         {
             return TooManyTokens(page, MAX_CONTEXT_WINDOW);
         }
 
-        public static ChatResponse? GetResponse(string userInput)
+        public static ChatResponse? GetChatResponse(string userInput)
         {
             var messages = new List<Message>
             {
@@ -66,7 +79,7 @@ namespace landerist_library.Parse.Listing.OpenAI
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("OpenAIRequest GetResponse", exception);
+                Logs.Log.WriteError("OpenAIRequest GetResponse", exception);
             }
             return null;
         }
@@ -79,29 +92,97 @@ namespace landerist_library.Parse.Listing.OpenAI
                 new(Role.User, userInput),
             };
 
-            
+            var jsonSchema = GetOpenAIJsonSchema();
             var chatRequest = new ChatRequest(
                 messages: messages,
                 model: MODEL_NAME,
-                temperature: TEMPERATURE
-                //responseFormat: ChatResponseFormat.JsonSchema,
-                //jsonSchema: new JsonSchema()
+                temperature: TEMPERATURE,
+                responseFormat: ChatResponseFormat.JsonSchema,
+                jsonSchema: jsonSchema
                 );
-            
+
             try
             {
                 DateTime dateStart = DateTime.Now;
-                
-                var (structuredOutput, chatResponse) = 
-                    Task.Run(async () => await OpenAIClient.ChatEndpoint.GetCompletionAsync<OpenAIStructuredOutput>(chatRequest)).Result;
+
+                ChatResponse chatResponse = Task.Run(async () => await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest)).Result;
+                var structuredOutput = JsonConvert.DeserializeObject<OpenAIStructuredOutput>(chatResponse.FirstChoice);
+
                 Timers.Timer.SaveTimerOpenAI("OpenAIRequest", dateStart);
                 return structuredOutput;
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("OpenAIRequest GetResponse", exception);
+                Logs.Log.WriteError("OpenAIRequest GetResponse", exception);
             }
             return null;
+        }
+
+        private static global::OpenAI.JsonSchema GetOpenAIJsonSchema()
+        {
+            var schema = GetSchema();            
+            return new global::OpenAI.JsonSchema("OpenAIStructuredOutput", schema);
+        }
+
+        public static string GetSchema()
+        {
+            JSchemaGenerator generator = new()
+            {
+                DefaultRequired = Required.AllowNull,
+                GenerationProviders =
+                {
+                    new StringEnumGenerationProvider(),
+                }
+            };
+
+            JSchema jSChema = generator.Generate(typeof(OpenAIStructuredOutput));
+            SetAdditionalPropertiesFalse(jSChema);
+            return jSChema.ToString();
+        }
+
+        private static void SetAdditionalPropertiesFalse(JSchema schema)
+        {
+            if ((schema.Type & JSchemaType.Object) == JSchemaType.Object)
+            {
+                schema.AllowAdditionalProperties = false;
+            }
+
+            foreach (var propertySchema in schema.Properties.Values)
+            {
+                SetAdditionalPropertiesFalse(propertySchema);
+            }
+
+            if (schema.Items != null)
+            {
+                foreach (var itemSchema in schema.Items)
+                {
+                    SetAdditionalPropertiesFalse(itemSchema);
+                }
+            }
+
+            if (schema.AnyOf != null)
+            {
+                foreach (var subschema in schema.AnyOf)
+                {
+                    SetAdditionalPropertiesFalse(subschema);
+                }
+            }
+
+            if (schema.AllOf != null)
+            {
+                foreach (var subschema in schema.AllOf)
+                {
+                    SetAdditionalPropertiesFalse(subschema);
+                }
+            }
+
+            if (schema.OneOf != null)
+            {
+                foreach (var subschema in schema.OneOf)
+                {
+                    SetAdditionalPropertiesFalse(subschema);
+                }
+            }
         }
     }
 }

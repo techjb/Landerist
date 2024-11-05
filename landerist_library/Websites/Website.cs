@@ -385,7 +385,7 @@ namespace landerist_library.Websites
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("Website InsertPagesFromSiteMap", Host, exception);
+                Logs.Log.WriteError("Website InsertPagesFromSiteMap", Host, exception);
             }
         }
 

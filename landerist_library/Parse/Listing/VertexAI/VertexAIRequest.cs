@@ -42,7 +42,7 @@ namespace landerist_library.Parse.Listing.VertexAI
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("VertexAIRequest GetResponse", exception);
+                Logs.Log.WriteError("VertexAIRequest GetResponse", exception);
             }
             return null;
         }

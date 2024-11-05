@@ -81,7 +81,7 @@ namespace landerist_library.Landerist_com
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors("InvalidateCloudFront", exception);
+                Log.WriteError("InvalidateCloudFront", exception);
             }
             return false;
         }

@@ -22,7 +22,7 @@ namespace landerist_scraper
             Logger.LogInformation("ExecuteAsync");
             while (!stoppingToken.IsCancellationRequested)
             {
-                Log.WriteLogInfo("landerist_scraper", "Started. Version: " + Config.VERSION);
+                Log.WriteInfo("landerist_scraper", "Started. Version: " + Config.VERSION);
                 PuppeteerDownloader.UpdateChrome();
                 SetTimers();
                 //Scraper.DoTest();
@@ -50,7 +50,7 @@ namespace landerist_scraper
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors("WorkerScraper TimerScrape", exception);
+                Log.WriteError("WorkerScraper TimerScrape", exception);
             }
             finally
             {
@@ -62,7 +62,7 @@ namespace landerist_scraper
         {
             Logger.LogInformation("StopAsync");
             Scraper.Stop();
-            Log.WriteLogInfo("landerist_scraper", "Stopped. Version: " + Config.VERSION);
+            Log.WriteInfo("landerist_scraper", "Stopped. Version: " + Config.VERSION);
             Timer1?.Change(Timeout.Infinite, 0);
             await base.StopAsync(cancellationToken);
         }

@@ -6,6 +6,8 @@ using landerist_library.Parse.Listing.VertexAI;
 using landerist_library.Websites;
 using landerist_library.Configuration;
 using OpenAI.Chat;
+using landerist_orels.ES;
+using System.Security.AccessControl;
 
 namespace landerist_library.Parse.Listing
 {
@@ -57,46 +59,47 @@ namespace landerist_library.Parse.Listing
         private static (PageType pageType, landerist_orels.ES.Listing? listing, bool waitingAIParsing)
             ParseOpenAI(Page page, string userInput)
         {
+            PageType pageType = PageType.MayBeListing;
+            landerist_orels.ES.Listing? listing = null;
+
             if (Config.BATCH_ENABLED)
             {
-                return (PageType.MayBeListing, null, true);
+                return (pageType, listing, true);
             }
 
             if (Config.OPENAI_STRUCTURED_OUTPUT)
             {
                 var structuredOutput = OpenAIRequest.GetStructuredOutput(userInput);
-                return ParseOpenAI(page, structuredOutput);
+                (pageType, listing) = ParseOpenAI(page, structuredOutput);
             }
-
-            var response = OpenAIRequest.GetResponse(userInput);
-            return ParseOpenAI(page, response);
+            else
+            {
+                var response = OpenAIRequest.GetChatResponse(userInput);
+                (pageType, listing) = ParseOpenAI(page, response);
+            }
+            return (pageType, listing, false);
         }
 
-        public static (PageType pageType, landerist_orels.ES.Listing? listing, bool waitingAIParsing) ParseOpenAI(Page page, ChatResponse? chatResponse)
+        public static (PageType pageType, landerist_orels.ES.Listing? listing) ParseOpenAI(Page page, ChatResponse? chatResponse)
         {
             if (chatResponse == null)
             {
-                return (PageType.MayBeListing, null, false);
+                return (PageType.MayBeListing, null);
             }
 
             var (functionName, arguments) = OpenAIResponse.GetFunctionNameAndArguments(chatResponse);
             var (pageType, listing) = ParseText(page, functionName, arguments);
-            return (pageType, listing, false);
+            return (pageType, listing);
         }
 
-        public static (PageType pageType, landerist_orels.ES.Listing? listing, bool waitingAIParsing) ParseOpenAI(Page page, OpenAIStructuredOutput? structuredOutput)
+        public static (PageType pageType, landerist_orels.ES.Listing? listing) ParseOpenAI(Page page, OpenAIStructuredOutput? structuredOutput)
         {
             if (structuredOutput == null)
             {
-                return (PageType.MayBeListing, null, false);
+                return (PageType.MayBeListing, null);
             }
             
-            if (!structuredOutput.EsUnAnuncio)
-            {
-                return (PageType.NotListingByParser, null, false);
-            }
-            Console.WriteLine(page.PageType);   
-            return (PageType.Listing, null, false);
+            return structuredOutput.ParseListing(page);            
         }
 
         private static (PageType pageType, landerist_orels.ES.Listing? listing, bool waitingAIParsing) 

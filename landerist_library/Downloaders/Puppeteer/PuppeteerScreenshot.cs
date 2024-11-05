@@ -45,7 +45,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors("PuppeteerDownloader TakeScreenshot", exception);
+                Log.WriteError("PuppeteerDownloader TakeScreenshot", exception);
             }
             return null;
         }
@@ -63,7 +63,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors("PuppeteerScreenshot ResizeImage", exception);
+                Log.WriteError("PuppeteerScreenshot ResizeImage", exception);
             }
             return bytes;
         }

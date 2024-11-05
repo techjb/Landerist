@@ -44,7 +44,7 @@ namespace landerist_library.Parse.Listing.Anthropic
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("AntropicRequest GetResponse", exception);
+                Logs.Log.WriteError("AntropicRequest GetResponse", exception);
             }
 
             return null;

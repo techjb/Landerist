@@ -65,7 +65,7 @@ namespace landerist_library.Export
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors("S3 UploadFile", exception);
+                Log.WriteError("S3 UploadFile", exception);
             }
             transferUtitlity.Dispose();
             return success;
@@ -97,7 +97,7 @@ namespace landerist_library.Export
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors("S3 ListObjects", exception);
+                Log.WriteError("S3 ListObjects", exception);
             }
             return list;
         }
@@ -118,7 +118,7 @@ namespace landerist_library.Export
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors("S3 DeleteObjects", exception);
+                Log.WriteError("S3 DeleteObjects", exception);
             }
 
             return list;
@@ -136,7 +136,7 @@ namespace landerist_library.Export
             }
             catch (AmazonS3Exception e)
             {
-                Log.WriteLogErrors("S3 GetFileInfo", e);
+                Log.WriteError("S3 GetFileInfo", e);
             }
             return (null, null);
         }

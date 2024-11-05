@@ -90,13 +90,11 @@ namespace landerist_console
             //var page = new Page("https://sanmiguelinmobiliaria.com/caracteristicas/terraza/");
             //var page = new Page("https://www.terramagna.net/detallesdelinmueble/villa-en-venta-chayofa/21282480"); // not canonical
             //var page = new Page("https://vitalcasa.com/feature/double-glazing/"); // no listing
-            //var page = new Page("https://www.inmosegursalou.com/ad/99569031"); // listing
             //var page = new Page("http://www.finquesniu.com/propiedades");
-            //var page = new Page("https://www.mardenia-inmobiliaria.com/venta/casa-en-venta-en-sagra-638/");// listing
+            var page = new Page("https://www.mardenia-inmobiliaria.com/venta/casa-en-venta-en-sagra-638/");// listing
             //var page = new Page("https://goldacreestates.com/realestate/top/026712-42136"); // listing
-            //var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/"); // listing
-            //var page = new Page("https://rusticaurbana.com/tipo-propiedad/vivienda-duplex/");
-            //var page = new Page("https://www.puertalmar.com/product-page/piso-en-calle-cánovas-del-castillo-carolinas-alicante-3-hab-2-baños");
+            //var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/"); // listing            
+            
 
             #endregion
 
@@ -160,7 +158,7 @@ namespace landerist_console
             //var Timer3 = new Timer(TimerCallback3!, null, 0, 1000);
             //TheScraper.Start();            
             //Thread.Sleep(100000000);
-            //new Scraper().Scrape(page);
+            new Scraper().Scrape(page);
             //new Scraper().DoTest();
 
             #endregion
@@ -201,6 +199,8 @@ namespace landerist_console
 
             //landerist_library.Parse.Listing.OpenAI.Batch.BatchUpload.Start();
             //landerist_library.Parse.Listing.OpenAI.Batch.BatchDownload.Start();
+            //var schema = landerist_library.Parse.Listing.OpenAI.OpenAIRequest.GetSchema();
+            //Console.WriteLine(schema);
 
 
             #endregion

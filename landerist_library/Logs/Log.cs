@@ -12,7 +12,7 @@ namespace landerist_library.Logs
         public const string LogKeyInfo = "info";
         public const string LogKeyScrapper = "scrapper";
 
-        private static void WriteLog(string logKey, string source, string text)
+        private static void Write(string logKey, string source, string text)
         {
             if (text.Equals(string.Empty))
             {
@@ -24,11 +24,11 @@ namespace landerist_library.Logs
             }
             if (Config.LOGS_ENABLED)
             {
-                WriteLogDB(logKey, source, text);
+                WriteDB(logKey, source, text);
             }
         }
 
-        private static bool WriteLogDB(string logKey, string source, string text)
+        private static bool WriteDB(string logKey, string source, string text)
         {
             string query =
                 "INSERT INTO " + TABLE_LOGS + " " +
@@ -42,7 +42,7 @@ namespace landerist_library.Logs
             });
         }
 
-        public static DataTable ReadLog(string logKey, int top = 200)
+        public static DataTable Read(string logKey, int top = 200)
         {
             string query =
                 "SELECT TOP " + top + " * " +
@@ -55,7 +55,7 @@ namespace landerist_library.Logs
             });
         }
 
-        public static List<string> ReadLogKeys()
+        public static List<string> ReadKeys()
         {
             string query =
                 "SELECT DISTINCT LogKey " +
@@ -63,7 +63,7 @@ namespace landerist_library.Logs
             return new DataBase().QueryListString(query);
         }
 
-        public static void DeleteLog(string logKey)
+        public static void Delete(string logKey)
         {
             string query =
                 "DELETE FROM " + TABLE_LOGS + " " +
@@ -92,49 +92,49 @@ namespace landerist_library.Logs
 
         #region Write Logs
 
-        public static void WriteLogErrors(string source, string text)
+        public static void WriteError(string source, string text)
         {
-            WriteLog(LogKeyError, source, text);
+            Write(LogKeyError, source, text);
         }
 
-        public static void WriteLogErrors(string source, string text, Exception exception)
+        public static void WriteError(string source, string text, Exception exception)
         {
             string textError = GetText(text, exception);
-            WriteLogErrors(source, textError);
+            WriteError(source, textError);
         }
 
-        public static void WriteLogErrors(string source, Exception exception)
+        public static void WriteError(string source, Exception exception)
         {
             string textError = GetText(exception);
-            WriteLogErrors(source, textError);
+            WriteError(source, textError);
         }
 
-        public static void WriteLogErrors(string source, Uri uri, Exception exception)
+        public static void WriteError(string source, Uri uri, Exception exception)
         {
             source += " " + uri.ToString();
-            WriteLogErrors(source, exception);
+            WriteError(source, exception);
         }
 
-        public static void WriteLogErrors(Uri uri, Exception exception)
+        public static void WriteError(Uri uri, Exception exception)
         {
             string source = uri.ToString();
-            WriteLogErrors(source, exception);
+            WriteError(source, exception);
         }
 
-        public static void WriteLogInfo(string source, string text)
+        public static void WriteInfo(string source, string text)
         {
-            WriteLog(LogKeyInfo, source, text);
+            Write(LogKeyInfo, source, text);
         }
 
-        public static void WriteLogInfo(Exception exception)
+        public static void WriteInfo(Exception exception)
         {
-            WriteLogInfo(string.Empty, exception);
+            WriteInfo(string.Empty, exception);
         }
 
-        public static void WriteLogInfo(string source, Exception exception)
+        public static void WriteInfo(string source, Exception exception)
         {
             string textError = GetText(exception);
-            WriteLogInfo(source, textError);
+            WriteInfo(source, textError);
         }
 
         #endregion Write Logs

@@ -31,7 +31,6 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             (var filePath, pages) = CreateFile(pages);
             if (string.IsNullOrEmpty(filePath))
             {
-                Log.WriteLogErrors("BatchUpload Start", "Error creating file");
                 return;
             }
 
@@ -39,7 +38,6 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             File.Delete(filePath);
             if (fileResponse == null || string.IsNullOrEmpty(fileResponse.Id))
             {
-                Log.WriteLogErrors("BatchUpload Start", "Error uploading file");
                 return;
             }
 
@@ -47,7 +45,6 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             if (batchResponse == null)
             {
                 OpenAIClient.FilesEndpoint.DeleteFileAsync(fileResponse.Id).Wait();
-                Log.WriteLogErrors("BatchUpload Start", "Error creating batch");
                 return;
             }
 
@@ -94,10 +91,11 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
                     added.Add(page);
                 }
             });
-            Log.WriteLogInfo("BatchUpload", $"{added.Count}/{pages.Count} Errors: {errors} Skipped: {skipped}");
-            if (!errors.Equals(0))
+            Log.WriteInfo("BatchUpload", $"{added.Count}/{pages.Count} Errors: {errors} Skipped: {skipped}");
+            if (errors > 0)
             {
                 filePath = null;
+                Log.WriteError("BatchUpload CreateFile", "Error creating file. Errors: " + errors);
             }
             return (filePath, added);
         }
@@ -111,7 +109,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors("BatchUpload AddToBatch", exception.Message);
+                Log.WriteError("BatchUpload AddToBatch", exception.Message);
             }
             return false;
         }
@@ -194,7 +192,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors("BatchUpload UploadFile", exception);
+                Log.WriteError("BatchUpload UploadFile", exception);
             }
             return null;
         }
@@ -208,7 +206,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors("BatchUpload CreateBatch", exception);
+                Log.WriteError("BatchUpload CreateBatch", exception);
             }
 
             return null;

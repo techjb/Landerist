@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <Compile Remove="Downloaders\SeleniumDownloader.cs" />
+    <Compile Remove="Parse\Listing\OpenAI\OpenAIStructuredOutput__.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -39,6 +40,7 @@
     <PackageReference Include="Louw.SitemapParser" Version="0.0.2" />
     <PackageReference Include="NetTopologySuite" Version="2.5.0" />
     <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="4.0.0" />
+    <PackageReference Include="Newtonsoft.Json.Schema" Version="4.0.1" />
     <PackageReference Include="OpenAI-DotNet" Version="8.3.0" />
     <PackageReference Include="OpenCvSharp4" Version="4.10.0.20240616" />
     <PackageReference Include="OpenCvSharp4.Extensions" Version="4.10.0.20240616" />

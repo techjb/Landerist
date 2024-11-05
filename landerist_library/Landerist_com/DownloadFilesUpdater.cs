@@ -19,7 +19,7 @@ namespace landerist_library.Landerist_com
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors("UpdateFiles", exception);
+                Log.WriteError("UpdateFiles", exception);
             }
         }
 
@@ -29,7 +29,7 @@ namespace landerist_library.Landerist_com
             var listings = ES_Listings.GetListingsWithParalelism(true);
             if (!Update(listings, CountryCode.ES, ExportType.Listings))
             {
-                Log.WriteLogErrors("filesupdater", "Error updating Listings");
+                Log.WriteError("filesupdater", "Error updating Listings");
             }
         }
 
@@ -39,7 +39,7 @@ namespace landerist_library.Landerist_com
             var listings = ES_Listings.GetListingsWithParalelism(true, Yesterday);
             if (!Update(listings, CountryCode.ES, ExportType.Updates))
             {
-                Log.WriteLogErrors("filesupdater", "Error updating Updates");
+                Log.WriteError("filesupdater", "Error updating Updates");
             }
         }
 
@@ -74,7 +74,7 @@ namespace landerist_library.Landerist_com
                 return false;
             }
 
-            Log.WriteLogInfo("filesupdater", fileNameZip);
+            Log.WriteInfo("filesupdater", fileNameZip);
             return true;
         }
 

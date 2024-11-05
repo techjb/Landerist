@@ -96,7 +96,7 @@ namespace landerist_library.Parse.PageTypeParser
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("ListingSimilarity HtmlNotSimilarToListing", exception);
+                Logs.Log.WriteError("ListingSimilarity HtmlNotSimilarToListing", exception);
             }
 
             return false;

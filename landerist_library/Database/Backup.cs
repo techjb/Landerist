@@ -24,7 +24,7 @@ namespace landerist_library.Database
             {
                 sucess = UploadBackup(fileName, filePath);
             }
-            Log.WriteLogInfo("backup", fileName + " Sucess: " + sucess.ToString());
+            Log.WriteInfo("backup", fileName + " Sucess: " + sucess.ToString());
         }
 
         private static bool SaveBackup(string filePath)
@@ -69,7 +69,7 @@ namespace landerist_library.Database
                 return;
             }
             var deletedObjects = new S3().DeleteObjects(PrivateConfig.AWS_S3_BACKUPS_BUCKET, toDelete).Result;
-            Log.WriteLogInfo("backup", "DeleteOldBackups Deleted: " + deletedObjects.Count);
+            Log.WriteInfo("backup", "DeleteOldBackups Deleted: " + deletedObjects.Count);
         }
 
         protected static string LocalBakAbsolutePath(string fileName)

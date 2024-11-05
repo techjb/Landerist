@@ -19,7 +19,7 @@ namespace landerist_library.Export
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("Json ExportListings", exception);
+                Logs.Log.WriteError("Json ExportListings", exception);
             }
             return false;
         }

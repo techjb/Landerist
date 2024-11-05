@@ -436,7 +436,7 @@ namespace landerist_library.Websites
                 Console.WriteLine(processed + "/" + total + " Deleted: " + deleted);
 
             });
-            Logs.Log.WriteLogInfo("DeleteUnpublishedListings", "Deleted: " + deleted + "/" + total + " Errors: " + errors);
+            Logs.Log.WriteInfo("DeleteUnpublishedListings", "Deleted: " + deleted + "/" + total + " Errors: " + errors);
         }
 
         public static List<Page> SelectWaitingAIParsing()

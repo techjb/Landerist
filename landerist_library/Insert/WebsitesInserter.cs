@@ -162,7 +162,7 @@ namespace landerist_library.Insert
             catch (Exception exception)
             {
                 Interlocked.Increment(ref ErrorsException);
-                Log.WriteLogErrors(mainUri, exception);
+                Log.WriteError(mainUri, exception);
             }
             return false;
         }
@@ -239,7 +239,7 @@ namespace landerist_library.Insert
             catch (Exception exception)
             {
                 Interlocked.Increment(ref ErrorsException);
-                Log.WriteLogErrors(website.Host, exception);
+                Log.WriteError(website.Host, exception);
             }
             return true;
         }

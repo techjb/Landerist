@@ -49,15 +49,15 @@ namespace landerist_library.Scrape
 
         public void DoTest()
         {
-            Log.WriteLogInfo("service", "Starting test..");
+            Log.WriteInfo("service", "Starting test..");
             PuppeteerDownloader.UpdateChrome();
             var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
             var pageScraper = new PageScraper(page, this);
             pageScraper.Scrape();
-            Log.WriteLogInfo("service", "PageType: " + page.PageType.ToString());
+            Log.WriteInfo("service", "PageType: " + page.PageType.ToString());
             var listing = pageScraper.GetListing();
             string json = new Schema(listing).Serialize();
-            Log.WriteLogInfo("service", "Listing: " + json);
+            Log.WriteInfo("service", "Listing: " + json);
             Stop();
         }
 
@@ -180,7 +180,7 @@ namespace landerist_library.Scrape
                     EndThread(state);
                 });
 
-            Log.WriteLogInfo("scraper", $"Scraped {Scraped} pages");
+            Log.WriteInfo("scraper", $"Scraped {Scraped} pages");
             return true;
         }
 
@@ -278,7 +278,7 @@ namespace landerist_library.Scrape
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors("Scraper Scrape", page.Uri, exception);
+                Log.WriteError("Scraper Scrape", page.Uri, exception);
             }
             IncrementCounters(page);
         }

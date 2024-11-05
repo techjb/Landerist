@@ -1,4 +1,5 @@
 ﻿using landerist_library.Parse.Listing;
+using landerist_library.Parse.Listing.OpenAI;
 using PuppeteerSharp;
 
 namespace landerist_library.Configuration
@@ -7,7 +8,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "2.91";
+        public static readonly string VERSION = "2.92";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -177,7 +178,6 @@ namespace landerist_library.Configuration
                 PrivateConfig.SCREENSHOTS_DIRECTORY_LOCAL;
 
             TAKE_SCREENSHOT = false;
-            //TAKE_SCREENSHOT = !ConfigurationProduction;
 
             SAVE_SCREENSHOT_FILE = !ConfigurationProduction;
 
@@ -192,10 +192,10 @@ namespace landerist_library.Configuration
                 LLMProviders.OpenAI :
                 LLMProviders.OpenAI;
 
-            OPENAI_STRUCTURED_OUTPUT = false;
+            OPENAI_STRUCTURED_OUTPUT = !ConfigurationProduction;
+            //OPENAI_STRUCTURED_OUTPUT = false;
 
-            BATCH_ENABLED = LLM_PROVIDER.Equals(LLMProviders.OpenAI);
-            //BATCH_ENABLED = false;
+            BATCH_ENABLED = LLM_PROVIDER.Equals(LLMProviders.OpenAI) && ConfigurationProduction;            
 
             MIN_PAGES_PER_BATCH = ConfigurationProduction ? 200 : 1;
 

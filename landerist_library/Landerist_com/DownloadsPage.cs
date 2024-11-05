@@ -27,13 +27,13 @@ namespace landerist_library.Landerist_com
                 UpdateDownloadsTemplate(CountryCode.ES, ExportType.Updates);
                 if (UploadDownloadsFile())
                 {
-                    Log.WriteLogInfo("DownloadsPage", "Updated");
+                    Log.WriteInfo("DownloadsPage", "Updated");
                 }
 
             }
             catch (Exception exception)
             {
-                Log.WriteLogErrors("DownloadsPage Update", exception);
+                Log.WriteError("DownloadsPage Update", exception);
             }
         }
 

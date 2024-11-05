@@ -49,7 +49,7 @@ namespace landerist_library.Downloaders.Multiple
 
         public void LogDownloadersCounter()
         {
-            Logs.Log.WriteLogInfo("MultipleDownloader DownloadersCounter", List.Count.ToString());
+            Logs.Log.WriteInfo("MultipleDownloader DownloadersCounter", List.Count.ToString());
         }
     }
 }

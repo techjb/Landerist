@@ -41,7 +41,7 @@ namespace landerist_library.Export
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("Compress", exception);
+                Logs.Log.WriteError("Compress", exception);
             }
             return false;
         }

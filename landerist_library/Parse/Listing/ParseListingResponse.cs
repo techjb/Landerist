@@ -23,7 +23,7 @@ namespace landerist_library.Parse.Listing
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteLogErrors("ParseListingResponse ParseListing", page.Uri, exception);
+                Logs.Log.WriteError("ParseListingResponse ParseListing", page.Uri, exception);
             }
             return result;
         }
