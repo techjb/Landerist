@@ -7,7 +7,7 @@ namespace landerist_library.Parse.Listing.OpenAI
     {
         public List<Tool> GetTools()
         {
-            var functionIsListing = GetToolIsListing();            
+            var functionIsListing = GetToolIsListing();
             var functionIsNotListing = GetToolIsNotListing();
 
             return [functionIsListing, functionIsNotListing];
@@ -21,7 +21,7 @@ namespace landerist_library.Parse.Listing.OpenAI
 
         public JsonObject GetJsonObject()
         {
-            var properties = new JsonObject();            
+            var properties = new JsonObject();
 
             AddString(properties, nameof(fecha_de_publicacion));
             AddEnum(properties, nameof(tipo_de_operacion), TiposDeOperación);
@@ -121,7 +121,7 @@ namespace landerist_library.Parse.Listing.OpenAI
 
             if (jsonArray != null)
             {
-                property["enum"] =  jsonArray;
+                property["enum"] = jsonArray;
             }
             jsonObject.Add(name, property);
         }

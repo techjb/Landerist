@@ -26,7 +26,7 @@ namespace landerist_library.Parse.Listing.VertexAI
 
         public static bool TooManyTokens(Page page)
         {
-            return TooManyTokens(page, MAX_CONTEXT_WINDOW);            
+            return TooManyTokens(page, MAX_CONTEXT_WINDOW);
         }
 
         public static async Task<GenerateContentResponse?> GetResponse(Page page, string text)
@@ -46,7 +46,7 @@ namespace landerist_library.Parse.Listing.VertexAI
             }
             return null;
         }
-      
+
         private static PredictionServiceClient GetPredictionServiceClient()
         {
             return new PredictionServiceClientBuilder

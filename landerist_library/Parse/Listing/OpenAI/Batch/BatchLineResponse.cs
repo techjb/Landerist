@@ -29,7 +29,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
         public string RequestId { get; set; }
 
         [JsonPropertyName("body")]
-       //public BatchResponseBody Body { get; set; }
+        //public BatchResponseBody Body { get; set; }
         public ChatResponse Body { get; set; }
     }
 

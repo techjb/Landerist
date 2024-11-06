@@ -60,7 +60,7 @@
                 "UPDATE " + BATCHES + " " +
                 "SET [Downloaded] = @Downloaded " +
                 "WHERE [Id] = @Id";
-                
+
 
             return new DataBase().Query(query, new Dictionary<string, object?>()
             {

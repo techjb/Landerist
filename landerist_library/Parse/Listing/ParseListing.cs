@@ -1,13 +1,12 @@
 ﻿using Google.Cloud.AIPlatform.V1;
+using landerist_library.Configuration;
 using landerist_library.Parse.Listing.Anthropic;
 using landerist_library.Parse.Listing.Gemini;
 using landerist_library.Parse.Listing.OpenAI;
 using landerist_library.Parse.Listing.VertexAI;
 using landerist_library.Websites;
-using landerist_library.Configuration;
+using Newtonsoft.Json;
 using OpenAI.Chat;
-using landerist_orels.ES;
-using System.Security.AccessControl;
 
 namespace landerist_library.Parse.Listing
 {
@@ -27,7 +26,7 @@ namespace landerist_library.Parse.Listing
             switch (Config.LLM_PROVIDER)
             {
                 case LLMProviders.OpenAI: return OpenAIRequest.TooManyTokens(page);
-                case LLMProviders.VertexAI: return VertexAIRequest.TooManyTokens(page);                
+                case LLMProviders.VertexAI: return VertexAIRequest.TooManyTokens(page);
                 case LLMProviders.Gemini: return GeminiRequest.TooManyTokens(page);
                 case LLMProviders.Anthropic: return AnthropicRequest.TooManyTokens(page);
                 default:
@@ -36,7 +35,7 @@ namespace landerist_library.Parse.Listing
             return false;
         }
 
-        public static (PageType pageType, landerist_orels.ES.Listing? listing, bool waitingAIParsing) 
+        public static (PageType pageType, landerist_orels.ES.Listing? listing, bool waitingAIParsing)
             Parse(Page page)
         {
             var userInput = UserTextInput.GetText(page);
@@ -47,7 +46,7 @@ namespace landerist_library.Parse.Listing
                     case LLMProviders.OpenAI: return ParseOpenAI(page, userInput);
                     case LLMProviders.VertexAI: return ParseVertextAI(page, userInput);
                     //case ModelName.Gemini: return GeminiRequest.ParseTextGemini(page);
-                    case LLMProviders.Anthropic: return ParseAnthropic(page, userInput);                    
+                    case LLMProviders.Anthropic: return ParseAnthropic(page, userInput);
                     default:
                         break;
 
@@ -67,16 +66,8 @@ namespace landerist_library.Parse.Listing
                 return (pageType, listing, true);
             }
 
-            if (Config.OPENAI_STRUCTURED_OUTPUT)
-            {
-                var structuredOutput = OpenAIRequest.GetStructuredOutput(userInput);
-                (pageType, listing) = ParseOpenAI(page, structuredOutput);
-            }
-            else
-            {
-                var response = OpenAIRequest.GetChatResponse(userInput);
-                (pageType, listing) = ParseOpenAI(page, response);
-            }
+            var response = OpenAIRequest.GetChatResponse(userInput);
+            (pageType, listing) = ParseOpenAI(page, response);
             return (pageType, listing, false);
         }
 
@@ -86,23 +77,22 @@ namespace landerist_library.Parse.Listing
             {
                 return (PageType.MayBeListing, null);
             }
+            if (Config.STRUCTURED_OUTPUT)
+            {
+                var structuredOutput = JsonConvert.DeserializeObject<OpenAIStructuredOutput>(chatResponse.FirstChoice);
+                if (structuredOutput == null)
+                {
+                    return (PageType.MayBeListing, null);
+                }
+                return structuredOutput.ParseListing(page);
+            }
 
             var (functionName, arguments) = OpenAIResponse.GetFunctionNameAndArguments(chatResponse);
             var (pageType, listing) = ParseText(page, functionName, arguments);
             return (pageType, listing);
         }
 
-        public static (PageType pageType, landerist_orels.ES.Listing? listing) ParseOpenAI(Page page, OpenAIStructuredOutput? structuredOutput)
-        {
-            if (structuredOutput == null)
-            {
-                return (PageType.MayBeListing, null);
-            }
-            
-            return structuredOutput.ParseListing(page);            
-        }
-
-        private static (PageType pageType, landerist_orels.ES.Listing? listing, bool waitingAIParsing) 
+        private static (PageType pageType, landerist_orels.ES.Listing? listing, bool waitingAIParsing)
             ParseVertextAI(Page page, string text)
         {
             var response = VertexAIRequest.GetResponse(page, text).Result;
@@ -126,8 +116,8 @@ namespace landerist_library.Parse.Listing
             return ParseText(page, functionName, arguments);
         }
 
-       
-        private static (PageType pageType, landerist_orels.ES.Listing? listing, bool waitingAIParsing) 
+
+        private static (PageType pageType, landerist_orels.ES.Listing? listing, bool waitingAIParsing)
             ParseAnthropic(Page page, string text)
         {
             var response = AnthropicRequest.GetResponse(page, text);

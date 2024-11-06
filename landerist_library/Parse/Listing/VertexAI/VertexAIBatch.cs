@@ -60,11 +60,11 @@ namespace landerist_library.Parse.Listing.VertexAI
             {
                 //return JsonConvert.DeserializeObject<GenerateContentResponse?>(text); // not working
                 var data = (JObject?)JsonConvert.DeserializeObject(text);
-                if(data == null)
+                if (data == null)
                 {
                     return null;
                 }
-                var candidates = data["candidates"];                
+                var candidates = data["candidates"];
                 return null;
             }
             catch //(Exception e)

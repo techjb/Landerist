@@ -1,9 +1,9 @@
 ﻿using landerist_library.Configuration;
+using landerist_library.Logs;
 using PuppeteerSharp;
+using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.Drawing;
-using landerist_library.Logs;
 
 namespace landerist_library.Downloaders.Puppeteer
 {

@@ -417,8 +417,8 @@ namespace landerist_library.Websites
             int deleted = 0;
             int errors = 0;
             Parallel.ForEach(listings,
-                new ParallelOptions() 
-                { 
+                new ParallelOptions()
+                {
                     MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM,
                 },
                 listing =>
@@ -440,7 +440,7 @@ namespace landerist_library.Websites
         }
 
         public static List<Page> SelectWaitingAIParsing()
-        { 
+        {
             string query =
                 SelectQuery() +
                 "WHERE [WaitingAIParsing] = 1";

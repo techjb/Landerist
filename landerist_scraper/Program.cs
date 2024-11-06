@@ -9,7 +9,7 @@ namespace landerist_scraper
             Config.SetToProduction();
 
             var builder = Host.CreateApplicationBuilder(args);
-            builder.Services.AddHostedService<WorkerScraper>();            
+            builder.Services.AddHostedService<WorkerScraper>();
 
             var host = builder.Build();
             host.Run();

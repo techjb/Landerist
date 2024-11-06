@@ -1,12 +1,12 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Database;
+using landerist_library.Downloaders.Multiple;
 using landerist_library.Index;
 using landerist_library.Parse.Location;
 using landerist_library.Parse.Media;
 using landerist_library.Parse.PageTypeParser;
 using landerist_library.Websites;
 using landerist_orels.ES;
-using landerist_library.Downloaders.Multiple;
 
 namespace landerist_library.Scrape
 {
@@ -31,8 +31,8 @@ namespace landerist_library.Scrape
                 return false;
             }
             Downloader.Download(Page);
-            (var newPageType, var newListing, var waitingAIParsing) = PageTypeParser.GetPageType(Page);            
-            bool sucess =  SetPageType(newPageType, newListing, waitingAIParsing);
+            (var newPageType, var newListing, var waitingAIParsing) = PageTypeParser.GetPageType(Page);
+            bool sucess = SetPageType(newPageType, newListing, waitingAIParsing);
             IndexPages();
             return sucess;
         }

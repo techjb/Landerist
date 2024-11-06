@@ -8,7 +8,7 @@ namespace landerist_library.Parse.Listing.Anthropic
         {
             try
             {
-                var toolUse = messageResponse.Content.OfType<ToolUseContent>().First();                
+                var toolUse = messageResponse.Content.OfType<ToolUseContent>().First();
                 return (toolUse.Name, toolUse.Input.ToJsonString());
             }
             catch

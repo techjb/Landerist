@@ -1,11 +1,11 @@
 ﻿using landerist_library.Configuration;
-using landerist_library.Websites;
+using landerist_library.Database;
 using landerist_library.Logs;
-using System.Text.Json;
-using OpenAI.Files;
+using landerist_library.Websites;
 using OpenAI;
 using OpenAI.Batch;
-using landerist_library.Database;
+using OpenAI.Files;
+using System.Text.Json;
 
 namespace landerist_library.Parse.Listing.OpenAI.Batch
 {
@@ -137,37 +137,74 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
                 return null;
             }
 
-            var requestData = new RequestData
+            if (Config.STRUCTURED_OUTPUT)
+            {
+                StructuredRequestData structuredRequestData = new()
+                {
+                    custom_id = page.UriHash,
+                    method = "POST",
+                    url = "/v1/chat/completions",
+                    body = GetStructuredBody(userInput)
+                };
+
+                return JsonSerializer.Serialize(structuredRequestData, JsonSerializerOptions);
+            }
+
+            NonStructuredRequestData nonStructuredRequestData = new()
             {
                 custom_id = page.UriHash,
                 method = "POST",
                 url = "/v1/chat/completions",
-                body = new Body
-                {
-                    model = OpenAIRequest.MODEL_NAME,
-                    temperature = OpenAIRequest.TEMPERATURE,
-                    tools = new OpenAITools().GetTools(),
-                    tool_choice = OpenAIRequest.TOOL_CHOICE,
-                    response_format = new ResponseFormat
-                    {
-                        type = "json_object"
-                    },
-                    messages =
-                    [
-                        new BatchMessage
-                        {
-                            role = "system",
-                            content = ParseListingRequest.GetSystemPrompt()
-                        },
-                        new BatchMessage {
-                            role = "user",
-                            content = userInput
-                        }
-                    ],
-                }
+                body = GetNonStructuredBody(userInput)
             };
 
-            return JsonSerializer.Serialize(requestData, JsonSerializerOptions);
+            return JsonSerializer.Serialize(nonStructuredRequestData, JsonSerializerOptions);
+        }
+
+        private static NonStructuredBody GetNonStructuredBody(string userInput)
+        {
+            return new NonStructuredBody
+            {
+                model = OpenAIRequest.MODEL_NAME,
+                temperature = OpenAIRequest.TEMPERATURE,
+                messages = GetBatchMessages(userInput),
+                response_format = new NonStructuredResponseFormat
+                {
+                    type = "json_object"
+                },
+                tools = new OpenAITools().GetTools(),
+                tool_choice = OpenAIRequest.TOOL_CHOICE
+            };
+        }
+
+        private static StructuredBody GetStructuredBody(string userInput)
+        {
+            return new StructuredBody
+            {
+                model = OpenAIRequest.MODEL_NAME,
+                temperature = OpenAIRequest.TEMPERATURE,
+                messages = GetBatchMessages(userInput),
+                response_format = new StructuredResponseFormat
+                {
+                    type = "json_schema",
+                    json_schema = OpenAIRequest.GetOpenAIJsonSchema()
+                },
+            };
+        }
+
+        private static List<BatchMessage> GetBatchMessages(string userInput)
+        {
+            return [
+                    new BatchMessage
+                    {
+                        role = "system",
+                        content = ParseListingRequest.GetSystemPrompt()
+                    },
+                    new BatchMessage {
+                        role = "user",
+                        content = userInput
+                    }
+                ];
         }
 
         private static bool WriteJson(string? json, string filePath)
@@ -211,7 +248,6 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
 
             return null;
         }
-
 
         static void SetWaitingAIResponse(List<Page> pages)
         {

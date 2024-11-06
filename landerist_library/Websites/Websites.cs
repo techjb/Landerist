@@ -415,7 +415,7 @@ namespace landerist_library.Websites
             {
                 return;
             }
-            
+
             int counter = 0;
             Parallel.ForEach(websites, new ParallelOptions()
             {
@@ -424,9 +424,9 @@ namespace landerist_library.Websites
             {
                 website.SetRobotsTxt();
                 website.Update();
-                Interlocked.Increment(ref counter); 
+                Interlocked.Increment(ref counter);
             });
-            
+
             //Logs.Log.WriteLogInfo("service", "Updated Robots.txt " + counter + "/" + websites.Count);    
         }
 
@@ -453,7 +453,7 @@ namespace landerist_library.Websites
             {
                 return;
             }
-            
+
             int counter = 0;
             Parallel.ForEach(websites, new ParallelOptions()
             {
@@ -464,7 +464,7 @@ namespace landerist_library.Websites
                 website.Update();
                 Interlocked.Increment(ref counter);
             });
-            
+
             //Logs.Log.WriteLogInfo("service", "Updated Sitemaps " + counter + "/" + websites.Count);
         }
 
@@ -491,7 +491,7 @@ namespace landerist_library.Websites
             {
                 return;
             }
-            
+
             int counter = 0;
             Parallel.ForEach(websites, new ParallelOptions()
             {

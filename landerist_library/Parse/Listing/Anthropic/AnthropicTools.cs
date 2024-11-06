@@ -1,9 +1,9 @@
-﻿using Anthropic_SDK_Common =  Anthropic.SDK.Common;
-using Anthropic.SDK.Common;
+﻿using Anthropic.SDK.Common;
 using Anthropic.SDK.Messaging;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using Anthropic_SDK_Common = Anthropic.SDK.Common;
 
 
 namespace landerist_library.Parse.Listing.Anthropic
@@ -15,7 +15,7 @@ namespace landerist_library.Parse.Listing.Anthropic
             var functionIsListing = GetFunctionIsListing();
             var functionIsNotListing = GetFunctionIsNotListing();
 
-            return [functionIsListing, functionIsNotListing];            
+            return [functionIsListing, functionIsNotListing];
         }
 
         public static Function GetFunctionIsNotListing()
@@ -33,7 +33,7 @@ namespace landerist_library.Parse.Listing.Anthropic
 
         public Function GetFunctionIsListing()
         {
-            var inputschema = GetInputSchema();           
+            var inputschema = GetInputSchema();
 
             JsonSerializerOptions? jsonSerializerOptions = new()
             {
@@ -92,7 +92,7 @@ namespace landerist_library.Parse.Listing.Anthropic
             };
         }
 
-      
+
         private static void AddString(Dictionary<string, Property> properties, string name)
         {
             Add(properties, name, "string");

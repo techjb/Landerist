@@ -31,7 +31,7 @@ namespace landerist_library.Parse.Listing
         [Description(TipoDeOperaciónDescription)]
         public string? tipo_de_operacion { get; set; } = null;
 
-        
+
         public const string TipoDeInmuebleDescription = "tipología del inmueble";
 
         [Description(TipoDeInmuebleDescription)]
@@ -43,13 +43,13 @@ namespace landerist_library.Parse.Listing
         [Description(SubtipoDeInmuebleDescription)]
         public string? subtipo_de_inmueble { get; set; } = null;
 
-        
+
         public const string PrecioDelAnuncioDescription = "precio del anuncio en euros";
 
         [Description(PrecioDelAnuncioDescription)]
         public decimal? precio_del_anuncio { get; set; } = null;
 
-        
+
         public const string DescripciónDelAnuncioDescription = "texto con la descripción detallada del anuncio";
 
         [Description(DescripciónDelAnuncioDescription)]
@@ -67,13 +67,13 @@ namespace landerist_library.Parse.Listing
         [Description(TeléfonoDeContactoDescription)]
         public string? telefono_de_contacto { get; set; } = null;
 
-        
+
         public const string EmailDeContactoDescription = "dirección de email de contacto";
 
         [Description(EmailDeContactoDescription)]
         public string? email_de_contacto { get; set; } = null;
 
-        
+
         public const string DirecciónDelInmuebleDescription = "dirección en la que se encuentra el inmueble";
 
         [Description(DirecciónDelInmuebleDescription)]
@@ -95,13 +95,13 @@ namespace landerist_library.Parse.Listing
         [Description(TamañoDeLaParcelaDescription)]
         public double? tamanio_de_la_parcela { get; set; } = null;
 
-        
+
         public const string AñoDeConstrucciónDescription = "año de construcción del inmueble";
 
         [Description(AñoDeConstrucciónDescription)]
         public double? anio_de_construccion { get; set; } = null;
 
-        
+
         public const string EstadoDeLaConstrucciónDescription = "estado de la construcción en el que se encuentra el inmueble";
 
         [Description(EstadoDeLaConstrucciónDescription)]
@@ -147,7 +147,7 @@ namespace landerist_library.Parse.Listing
         [Description(TieneGarajeDescription)]
         public bool? tiene_garaje { get; set; } = null;
 
-        
+
         public const string TieneParkingParaMotoDescription = "tiene parking para moto";
 
         [Description(TieneParkingParaMotoDescription)]
@@ -263,7 +263,7 @@ namespace landerist_library.Parse.Listing
             OPERACION_VENTA,
             OPERACION_ALQUILER
         ];
-        
+
 
         protected readonly JsonArray TiposDeInmueble =
         [
@@ -277,7 +277,7 @@ namespace landerist_library.Parse.Listing
             TIPO_DE_INMUEBLE_PARCELA,
             TIPO_DE_INMUEBLE_EDIFICIO
         ];
-        
+
 
         protected readonly JsonArray SubtiposDeInmueble =
         [
@@ -294,7 +294,7 @@ namespace landerist_library.Parse.Listing
             SUBTIPO_DE_INMUEBLE_PARCELA_NO_URBANIZABLE
         ];
 
-      
+
         protected readonly JsonArray EstadosDeLaConstrucción =
         [
             ESTADO_DE_LA_CONSTRUCCIÓN_OBRA_NUEVA,

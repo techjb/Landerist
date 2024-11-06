@@ -14,7 +14,7 @@ namespace landerist_scraper
 
         private const int OneSecond = 1000;
         private const int TenSeconds = 10 * OneSecond;
-        
+
         private readonly Scraper Scraper = new();
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

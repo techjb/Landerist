@@ -1,14 +1,10 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Websites;
-using OpenAI;
-using OpenAI.Chat;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Schema;
 using Newtonsoft.Json.Schema.Generation;
-using Newtonsoft.Json;
-using System.Text.Json.Nodes;
-using System.Runtime.InteropServices;
+using OpenAI;
+using OpenAI.Chat;
 
 
 namespace landerist_library.Parse.Listing.OpenAI
@@ -31,20 +27,13 @@ namespace landerist_library.Parse.Listing.OpenAI
 
         public static readonly string MODEL_NAME =
             "gpt-4o-mini";
-            //"gpt-4o";
+        //"gpt-4o";
 
         public static readonly double TEMPERATURE = 0;
 
         private static readonly OpenAIClient OpenAIClient = new(PrivateConfig.OPENAI_API_KEY);
 
         public static readonly string? TOOL_CHOICE = "required";
-
-        private static JsonSerializerOptions JsonSerializerOptions { get; } = new JsonSerializerOptions
-        {
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            //Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false) },
-            ReferenceHandler = ReferenceHandler.IgnoreCycles
-        };
 
         public static bool TooManyTokens(Page page)
         {
@@ -59,16 +48,28 @@ namespace landerist_library.Parse.Listing.OpenAI
                 new(Role.User, userInput),
             };
 
-            var tools = new OpenAITools().GetTools();
-
-            var chatRequest = new ChatRequest(
-                messages: messages,
-                model: MODEL_NAME,
-                temperature: TEMPERATURE,
-                tools: tools,
-                toolChoice: TOOL_CHOICE,
-                responseFormat: ChatResponseFormat.Json
+            ChatRequest chatRequest;
+            if (Config.STRUCTURED_OUTPUT)
+            {
+                chatRequest = new ChatRequest(
+                    messages: messages,
+                    model: MODEL_NAME,
+                    temperature: TEMPERATURE,
+                    responseFormat: ChatResponseFormat.JsonSchema,
+                    jsonSchema: GetOpenAIJsonSchema()
+                    );
+            }
+            else
+            {
+                chatRequest = new ChatRequest(
+                    messages: messages,
+                    model: MODEL_NAME,
+                    temperature: TEMPERATURE,
+                    tools: new OpenAITools().GetTools(),
+                    toolChoice: TOOL_CHOICE,
+                    responseFormat: ChatResponseFormat.Json
                 );
+            }
 
             try
             {
@@ -79,48 +80,14 @@ namespace landerist_library.Parse.Listing.OpenAI
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteError("OpenAIRequest GetResponse", exception);
+                Logs.Log.WriteError("OpenAIRequest GetChatResponse", exception);
             }
             return null;
         }
 
-        public static OpenAIStructuredOutput? GetStructuredOutput(string userInput)
+        public static global::OpenAI.JsonSchema GetOpenAIJsonSchema()
         {
-            var messages = new List<Message>
-            {
-                new(Role.System, SystemPrompt),
-                new(Role.User, userInput),
-            };
-
-            var jsonSchema = GetOpenAIJsonSchema();
-            var chatRequest = new ChatRequest(
-                messages: messages,
-                model: MODEL_NAME,
-                temperature: TEMPERATURE,
-                responseFormat: ChatResponseFormat.JsonSchema,
-                jsonSchema: jsonSchema
-                );
-
-            try
-            {
-                DateTime dateStart = DateTime.Now;
-
-                ChatResponse chatResponse = Task.Run(async () => await OpenAIClient.ChatEndpoint.GetCompletionAsync(chatRequest)).Result;
-                var structuredOutput = JsonConvert.DeserializeObject<OpenAIStructuredOutput>(chatResponse.FirstChoice);
-
-                Timers.Timer.SaveTimerOpenAI("OpenAIRequest", dateStart);
-                return structuredOutput;
-            }
-            catch (Exception exception)
-            {
-                Logs.Log.WriteError("OpenAIRequest GetResponse", exception);
-            }
-            return null;
-        }
-
-        private static global::OpenAI.JsonSchema GetOpenAIJsonSchema()
-        {
-            var schema = GetSchema();            
+            var schema = GetSchema();
             return new global::OpenAI.JsonSchema("OpenAIStructuredOutput", schema);
         }
 

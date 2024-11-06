@@ -34,11 +34,11 @@ namespace landerist_library.Downloaders.Multiple
 
         public void Clear()
         {
-            
+
             Parallel.ForEach(List, new ParallelOptions()
             {
                 MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM,
-            }, 
+            },
             singleDownloader =>
             {
                 singleDownloader.CloseBrowser();

@@ -1,12 +1,12 @@
-﻿using OpenAI;
-using landerist_library.Configuration;
-using System.Text.Json;
-using landerist_library.Websites;
-using System.Text.Json.Serialization;
-using landerist_library.Scrape;
-using landerist_library.Logs;
+﻿using landerist_library.Configuration;
 using landerist_library.Database;
+using landerist_library.Logs;
+using landerist_library.Scrape;
+using landerist_library.Websites;
+using OpenAI;
 using OpenAI.Batch;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 
 namespace landerist_library.Parse.Listing.OpenAI.Batch

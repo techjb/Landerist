@@ -1,9 +1,9 @@
 ﻿
 using landerist_library.Configuration;
 using landerist_library.Websites;
+using landerist_orels.ES;
 using Newtonsoft.Json;
 using static landerist_library.Parse.Listing.OpenAI.Anuncio;
-using landerist_orels.ES;
 
 namespace landerist_library.Parse.Listing.OpenAI
 {
@@ -65,7 +65,7 @@ namespace landerist_library.Parse.Listing.OpenAI
                     bedrooms = GetBedrooms(),
                     bathrooms = GetBathrooms(),
                     parkings = GetParkings(),
-                    terrace = Anuncio.TieneTerraza, 
+                    terrace = Anuncio.TieneTerraza,
                     garden = Anuncio.TieneJardín,
                     garage = Anuncio.TieneGaraje,
                     motorbikeGarage = Anuncio.TieneParkingParaMoto,
@@ -162,11 +162,11 @@ namespace landerist_library.Parse.Listing.OpenAI
 
         private PropertySubtype? GetPropertySubtype()
         {
-            if(Anuncio!.SubtipoDeInmueble == null)
+            if (Anuncio!.SubtipoDeInmueble == null)
             {
                 return null;
             }
-            
+
             return Anuncio!.SubtipoDeInmueble switch
             {
                 SubtiposDeInmueble.piso => (PropertySubtype?)PropertySubtype.flat,
@@ -181,7 +181,7 @@ namespace landerist_library.Parse.Listing.OpenAI
                 SubtiposDeInmueble.parcela_urbanizable => (PropertySubtype?)PropertySubtype.buildable,
                 SubtiposDeInmueble.parcela_no_urbanizable => (PropertySubtype?)PropertySubtype.non_building,
                 _ => null,
-            };            
+            };
         }
 
         private Price? GetPropertyPrice()
@@ -315,7 +315,7 @@ namespace landerist_library.Parse.Listing.OpenAI
             {
                 return null;
             }
-           
+
             return Anuncio!.EstadoDeLaConstrucción switch
             {
                 EstadosDeLaConstrucción.obra_nueva => (ConstructionStatus?)ConstructionStatus.@new,

@@ -11,21 +11,34 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
         public string custom_id { get; set; }
         public string method { get; set; }
         public string url { get; set; }
-        public Body body { get; set; }
+    }
+    public class NonStructuredRequestData : RequestData
+    {
+        public NonStructuredBody body { get; set; }
+    }
+
+    public class StructuredRequestData : RequestData
+    {
+        public StructuredBody body { get; set; }
     }
 
     public class Body
     {
         public string model { get; set; }
         public List<BatchMessage> messages { get; set; }
-
         public double temperature { get; set; }
+    }
 
+    public class NonStructuredBody : Body
+    {
         public string? tool_choice { get; set; }
-
-        public ResponseFormat response_format { get; set; }
-
         public List<Tool> tools { get; set; }
+        public NonStructuredResponseFormat response_format { get; set; }
+    }
+
+    public class StructuredBody : Body
+    {
+        public StructuredResponseFormat response_format { get; set; }
     }
 
     public class BatchMessage
@@ -34,9 +47,16 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
         public string content { get; set; }
     }
 
-    public class ResponseFormat
+    public class NonStructuredResponseFormat
     {
         public string? type { get; set; }
+    }
+
+    public class StructuredResponseFormat
+    {
+        public string? type { get; set; }
+
+        public global::OpenAI.JsonSchema json_schema { get; set; }
     }
 
 

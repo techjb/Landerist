@@ -1,34 +1,4 @@
-﻿using HtmlAgilityPack;
-using landerist_library.Configuration;
-using landerist_library.Database;
-using landerist_library.Downloaders;
-using landerist_library.Downloaders.Puppeteer;
-using landerist_library.Export;
-using landerist_library.Index;
-using landerist_library.Insert.GoogleCustomSearch;
-using landerist_library.Insert.GooglePlaces;
-using landerist_library.Insert.IdAgencies;
-using landerist_library.Landerist_com;
-using landerist_library.Logs;
-using landerist_library.Parse.Listing;
-using landerist_library.Parse.Listing.VertexAI;
-using landerist_library.Parse.Location;
-using landerist_library.Parse.Location.Delimitations;
-using landerist_library.Parse.PageTypeParser;
-using landerist_library.Scrape;
-using landerist_library.Statistics;
-using landerist_library.Tools;
-using landerist_library.Websites;
-using System.Data.SqlClient;
-using System.Diagnostics;
-using System.Globalization;
-using System.Net;
-using System.Reflection;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Nodes;
-using System.Threading;
+﻿using landerist_library.Configuration;
 
 
 
@@ -91,10 +61,10 @@ namespace landerist_console
             //var page = new Page("https://www.terramagna.net/detallesdelinmueble/villa-en-venta-chayofa/21282480"); // not canonical
             //var page = new Page("https://vitalcasa.com/feature/double-glazing/"); // no listing
             //var page = new Page("http://www.finquesniu.com/propiedades");
-            var page = new Page("https://www.mardenia-inmobiliaria.com/venta/casa-en-venta-en-sagra-638/");// listing
+            //var page = new Page("https://www.mardenia-inmobiliaria.com/venta/casa-en-venta-en-sagra-638/");// listing
             //var page = new Page("https://goldacreestates.com/realestate/top/026712-42136"); // listing
             //var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/"); // listing            
-            
+
 
             #endregion
 
@@ -158,7 +128,7 @@ namespace landerist_console
             //var Timer3 = new Timer(TimerCallback3!, null, 0, 1000);
             //TheScraper.Start();            
             //Thread.Sleep(100000000);
-            new Scraper().Scrape(page);
+            //new Scraper().Scrape(page);
             //new Scraper().DoTest();
 
             #endregion

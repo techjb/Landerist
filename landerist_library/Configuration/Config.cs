@@ -1,5 +1,4 @@
 ﻿using landerist_library.Parse.Listing;
-using landerist_library.Parse.Listing.OpenAI;
 using PuppeteerSharp;
 
 namespace landerist_library.Configuration
@@ -8,17 +7,17 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "2.92";
+        public static readonly string VERSION = "2.94";
 
         public static readonly bool INDEXER_ENABLED = true;
 
-        public static readonly bool MEDIA_PARSER_ENABLED = false;        
+        public static readonly bool MEDIA_PARSER_ENABLED = false;
 
         public static readonly bool WORDS_ENABLED = false;
 
         public static readonly int MAX_PAGES_PER_WEBSITE = 400;
 
-        public static readonly int MIN_PAGES_PER_SCRAPE = 20;
+        public static readonly int MIN_PAGES_PER_SCRAPE = 40;
 
         public static readonly int MAX_PAGES_PER_SCRAPE = 2000;
 
@@ -119,9 +118,9 @@ namespace landerist_library.Configuration
         public const int MAX_PARKINGS = 10000;
 
         public const int DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS = 90;
-        public static LLMProviders LLM_PROVIDER { get; set; }             
+        public static LLMProviders LLM_PROVIDER { get; set; }
 
-        public static bool OPENAI_STRUCTURED_OUTPUT { get; set; }   
+        public static bool STRUCTURED_OUTPUT { get; set; }
         public static string? BATCH_DIRECTORY { get; set; }
         public static bool BATCH_ENABLED { get; set; }
 
@@ -154,6 +153,8 @@ namespace landerist_library.Configuration
         private static void Init(bool configurationProduction)
         {
             ConfigurationProduction = configurationProduction;
+
+            Newtonsoft.Json.Schema.License.RegisterLicense(PrivateConfig.NEWTONSOFT_LICENSE_KEY);
 
             InitDatabase(configurationProduction);
 
@@ -192,10 +193,9 @@ namespace landerist_library.Configuration
                 LLMProviders.OpenAI :
                 LLMProviders.OpenAI;
 
-            OPENAI_STRUCTURED_OUTPUT = !ConfigurationProduction;
-            //OPENAI_STRUCTURED_OUTPUT = false;
+            STRUCTURED_OUTPUT = true;
 
-            BATCH_ENABLED = LLM_PROVIDER.Equals(LLMProviders.OpenAI) && ConfigurationProduction;            
+            BATCH_ENABLED = LLM_PROVIDER.Equals(LLMProviders.OpenAI) && ConfigurationProduction;
 
             MIN_PAGES_PER_BATCH = ConfigurationProduction ? 200 : 1;
 
@@ -204,8 +204,7 @@ namespace landerist_library.Configuration
                 PrivateConfig.BATCH_DIRECTORY_LOCAL;
 
             MAX_DEGREE_OF_PARALLELISM = ConfigurationProduction ?
-                Environment.ProcessorCount -1 : 1;                
-
+                Environment.ProcessorCount - 1 : 1;
         }
 
         private static void InitDatabase(bool configurationProduction)

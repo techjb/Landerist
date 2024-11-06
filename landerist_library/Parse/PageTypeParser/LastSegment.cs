@@ -181,10 +181,10 @@ namespace landerist_library.Parse.PageTypeParser
             var sync = new object();
             int counter = 0;
             Parallel.ForEach(urls,
-              new ParallelOptions() 
-              { 
+              new ParallelOptions()
+              {
                   MaxDegreeOfParallelism = Configuration.Config.MAX_DEGREE_OF_PARALLELISM
-              },                
+              },
               url =>
               {
                   Interlocked.Increment(ref counter);

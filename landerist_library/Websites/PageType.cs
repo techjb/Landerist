@@ -16,7 +16,7 @@
         ResponseBodyRepeatedInListings,
         ResponseBodyTooManyTokens,
         HtmlNotSimilarToListing,
-        MayBeListing,        
+        MayBeListing,
         Listing,
         NotListingByParser,
         ListingButNotParsed,

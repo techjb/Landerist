@@ -104,7 +104,7 @@ namespace landerist_library.Tools
                 return input;
             }
 
-            return HtmlTagsRegex().Replace(input, string.Empty);            
+            return HtmlTagsRegex().Replace(input, string.Empty);
         }
 
         [GeneratedRegex(@"<.*?>")]
