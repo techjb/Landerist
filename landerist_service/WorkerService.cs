@@ -22,7 +22,7 @@ namespace landerist_service
         private bool RunningTimer3 = false;
 
         private const int OneSecond = 1000;
-        private const int TenSeconds = 10 * OneSecond;
+        private const int TwoSeconds = 2 * OneSecond;        
         private const int OneMinute = 60 * OneSecond;
         private const int OneHour = 60 * OneMinute;
         private const int OneDay = 24 * OneHour;
@@ -55,7 +55,7 @@ namespace landerist_service
             int dueTimeOneAM = (int)(twelveAM - nowTime).TotalMilliseconds;
 
             Timer1 = new Timer(TimerCallback1!, null, dueTimeOneAM, OneDay);
-            Timer2 = new Timer(TimerCallback2!, null, 0, TenSeconds);
+            Timer2 = new Timer(TimerCallback2!, null, 0, TwoSeconds);
             Timer3 = new Timer(TimerCallback3!, null, 0, OneSecond);
         }
 
