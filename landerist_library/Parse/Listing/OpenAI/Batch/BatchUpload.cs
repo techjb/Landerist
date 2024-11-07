@@ -51,6 +51,9 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
 
             SetWaitingAIResponse(pages);
             Batches.Insert(batchResponse.Id);
+            Log.WriteInfo("batch", $"Uploaded {pages.Count}");
+
+            Start();
         }
 
         private static List<Page> Filter(List<Page> pages)
@@ -94,8 +97,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
                     added.Add(page);
                 }
             });
-            //Log.WriteInfo("BatchUpload", $"{added.Count}/{pages.Count} Errors: {errors} Skipped: {skipped}");
-            Log.WriteInfo("BatchUpload", $"Added {added.Count}");
+            //Log.WriteInfo("BatchUpload", $"{added.Count}/{pages.Count} Errors: {errors} Skipped: {skipped}");            
             if (errors > 0)
             {
                 filePath = null;

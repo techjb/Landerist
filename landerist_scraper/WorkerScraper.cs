@@ -10,7 +10,9 @@ namespace landerist_scraper
         private readonly ILogger<WorkerScraper> Logger = logger;
 
         private Timer? Timer1;
+        private Timer? Timer2;
         private bool RunningScraper = false;
+        private bool RunningBlockingCollection = false;
 
         private const int OneSecond = 1000;
         private const int TenSeconds = 10 * OneSecond;
@@ -34,6 +36,7 @@ namespace landerist_scraper
         private void SetTimers()
         {
             Timer1 = new Timer(TimerScrape!, null, 0, TenSeconds);
+            Timer2 = new Timer(TimerBlockingCollecion!, null, 0, OneSecond);
         }
 
         private void TimerScrape(object state)
@@ -58,12 +61,36 @@ namespace landerist_scraper
             }
         }
 
+        private void TimerBlockingCollecion(object state)
+        {
+            if (RunningBlockingCollection)
+            {
+                return;
+            }
+
+            RunningBlockingCollection = true;
+            try
+            {
+                Scraper.FinalizeBlockingCollection();
+            }
+            catch (Exception exception)
+            {
+                Log.WriteError("WorkerScraper TimerBlockingCollecion", exception);
+            }
+            finally
+            {
+                RunningBlockingCollection = false;
+            }
+        }
+
+
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
             Logger.LogInformation("StopAsync");
             Scraper.Stop();
             Log.WriteInfo("landerist_scraper", "Stopped. Version: " + Config.VERSION);
             Timer1?.Change(Timeout.Infinite, 0);
+            Timer2?.Change(Timeout.Infinite, 0);
             await base.StopAsync(cancellationToken);
         }
     }

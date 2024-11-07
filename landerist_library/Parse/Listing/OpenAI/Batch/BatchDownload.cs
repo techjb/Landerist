@@ -147,7 +147,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             });
 
             //Log.WriteInfo("BatchDownload", $"{readed}/{total}, Errors: {errors}");
-            Log.WriteInfo("BatchDownload", $"Readed {readed}");
+            Log.WriteInfo("batch", $"Downloaded {readed}");
         }
 
         private static bool ReadLine(string line)
