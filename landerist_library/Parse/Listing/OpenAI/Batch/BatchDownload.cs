@@ -24,12 +24,6 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
 
         public static void Start()
         {
-            Download();
-            Delete();
-        }
-
-        public static void Download()
-        {
             var batchIds = Batches.SelectNonDownloaded();
             foreach (var batchId in batchIds)
             {
@@ -188,7 +182,14 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             return new PageScraper(page).SetPageType(pageType, listing);
         }
 
-        public static void Delete()
+        
+        public static void Clean()
+        {
+            DeleteDownloadedBatches();
+            RemoveBatchesFiles();
+        }
+
+        private static void DeleteDownloadedBatches()
         {
             var batchIds = Batches.SelectDownloaded();
             foreach (var batchId in batchIds)
@@ -201,6 +202,19 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
                 Delete(batchResponse);
             }
         }
+
+        private static void RemoveBatchesFiles()
+        {
+            if (Config.BATCH_DIRECTORY != null && Directory.Exists(Config.BATCH_DIRECTORY))
+            {
+                var files = Directory.GetFiles(Config.BATCH_DIRECTORY);
+                foreach (var file in files)
+                {
+                    File.Delete(file);
+                }
+            }
+        }
+
 
         private static void Delete(BatchResponse batchResponse)
         {

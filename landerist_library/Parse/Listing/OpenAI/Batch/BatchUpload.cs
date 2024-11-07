@@ -13,6 +13,8 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
     {
         private static readonly object SyncWrite = new();
 
+        const long MAX_FILE_SIZE_IN_BYTES = Config.MAX_BATCH_FILE_SIZE_MB * 1024 * 1024;
+
         private static readonly JsonSerializerOptions JsonSerializerOptions = new()
         {
             WriteIndented = false
@@ -35,7 +37,6 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             }
 
             var fileResponse = UploadFile(filePath);
-            File.Delete(filePath);
             if (fileResponse == null || string.IsNullOrEmpty(fileResponse.Id))
             {
                 return;
@@ -74,11 +75,13 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             Parallel.ForEach(pages, new ParallelOptions()
             {
                 MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
-            }, page =>
+            }, 
+            (page, state) =>
             {
                 if (!CanWriteFile(filePath))
                 {
                     Interlocked.Increment(ref skipped);
+                    state.Stop();
                     return;
                 }
                 if (!AddToBatch(page, filePath))
@@ -123,9 +126,9 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
                 {
                     return true;
                 }
-                const long sizeInByes = Config.MAX_BATCH_FILE_SIZE_MB * 1024 * 1024;
+
                 FileInfo fileInfo = new(filePath);
-                return fileInfo.Length < sizeInByes;
+                return fileInfo.Length < MAX_FILE_SIZE_IN_BYTES;
             }
         }
 

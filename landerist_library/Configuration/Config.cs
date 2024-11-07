@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "2.95";
+        public static readonly string VERSION = "2.97";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -129,7 +129,7 @@ namespace landerist_library.Configuration
         public const int MAX_PAGES_PER_BATCH = 10000;
         public static int MIN_PAGES_PER_BATCH { get; set; }
 
-        public const int MAX_BATCH_FILE_SIZE_MB = 95;
+        public const int MAX_BATCH_FILE_SIZE_MB = 90;
         public static int MAX_DEGREE_OF_PARALLELISM { get; set; }
 
         public static bool IsConfigurationProduction()

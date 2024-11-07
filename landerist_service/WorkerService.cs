@@ -85,8 +85,7 @@ namespace landerist_service
             RunningTimer2 = true;
             try
             {
-                BatchDownload.Start();
-                BatchUpload.Start();
+                BatchTasks.Start();
                 Websites.UpdateRobotsTxt();
                 Websites.UpdateSitemaps();
                 Websites.UpdateIpAddress();
