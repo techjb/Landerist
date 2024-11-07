@@ -1,5 +1,4 @@
 ﻿using landerist_library.Configuration;
-using landerist_library.Websites;
 
 
 
@@ -170,8 +169,7 @@ namespace landerist_console
 
             //landerist_library.Parse.Listing.OpenAI.Batch.BatchUpload.Start();
             //landerist_library.Parse.Listing.OpenAI.Batch.BatchDownload.Start();
-            //var schema = landerist_library.Parse.Listing.OpenAI.OpenAIRequest.GetSchema();
-            //Console.WriteLine(schema);
+            //landerist_library.Parse.Listing.OpenAI.Batch.BatchDownload.Test();
 
 
             #endregion

@@ -42,6 +42,11 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             }
         }
 
+        //public static void Test()
+        //{
+        //    var batch = GetBatch("batch_672c297160b081909856773d7211b236");
+        //}
+
         private static BatchResponse? GetBatch(string batchId)
         {
             try
@@ -147,7 +152,8 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
                 }
             });
 
-            Log.WriteInfo("BatchDownload", $"{readed}/{total}, Errors: {errors}");
+            //Log.WriteInfo("BatchDownload", $"{readed}/{total}, Errors: {errors}");
+            Log.WriteInfo("BatchDownload", $"Readed {readed}");
         }
 
         private static bool ReadLine(string line)

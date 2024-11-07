@@ -91,7 +91,8 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
                     added.Add(page);
                 }
             });
-            Log.WriteInfo("BatchUpload", $"{added.Count}/{pages.Count} Errors: {errors} Skipped: {skipped}");
+            //Log.WriteInfo("BatchUpload", $"{added.Count}/{pages.Count} Errors: {errors} Skipped: {skipped}");
+            Log.WriteInfo("BatchUpload", $"Added {added.Count}");
             if (errors > 0)
             {
                 filePath = null;

@@ -209,10 +209,10 @@ namespace landerist_library.Websites
 
             var addDays = PageType switch
             {
-                landerist_library.Websites.PageType.MainPage => 10,
-                landerist_library.Websites.PageType.MayBeListing => 10,
-                landerist_library.Websites.PageType.Listing => 10,
-                _ => (short)PageTypeCounter! * 10,
+                landerist_library.Websites.PageType.MainPage => Config.DEFAULT_DAYS_NEXT_UPDATE,
+                landerist_library.Websites.PageType.MayBeListing => Config.DEFAULT_DAYS_NEXT_UPDATE,
+                landerist_library.Websites.PageType.Listing => Config.DEFAULT_DAYS_NEXT_UPDATE,
+                _ => (short)PageTypeCounter! * Config.DEFAULT_DAYS_NEXT_UPDATE,
             };
             NextUpdate = ((DateTime)Updated!).AddDays(addDays);
         }

@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "2.94";
+        public static readonly string VERSION = "2.95";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -19,11 +19,11 @@ namespace landerist_library.Configuration
 
         public static readonly int MIN_PAGES_PER_SCRAPE = 40;
 
-        public static readonly int MAX_PAGES_PER_SCRAPE = 2000;
+        public static readonly int MAX_PAGES_PER_SCRAPE = 4000;
 
         public static readonly int MAX_PAGES_PER_HOSTS_PER_SCRAPE = 4;
 
-        public static readonly int MAX_SITEMAPS_PER_WEBSITE = 20;
+        public static readonly int MAX_SITEMAPS_PER_WEBSITE = 50;
 
         public static readonly int DAYS_TO_UPDATE_ROBOTS_TXT = 3;
 
@@ -36,6 +36,8 @@ namespace landerist_library.Configuration
         public static readonly int MAX_RESPONSEBODYTEXT_LENGTH = 100000;
 
         public static readonly int MAX_PAGETYPE_COUNTER = 1000;
+
+        public static readonly int DEFAULT_DAYS_NEXT_UPDATE = 7;
 
         public static readonly bool LOGS_ENABLED = true;
         public static bool TIMERS_ENABLED { get; set; }
@@ -197,7 +199,7 @@ namespace landerist_library.Configuration
 
             BATCH_ENABLED = LLM_PROVIDER.Equals(LLMProviders.OpenAI) && ConfigurationProduction;
 
-            MIN_PAGES_PER_BATCH = ConfigurationProduction ? 200 : 1;
+            MIN_PAGES_PER_BATCH = ConfigurationProduction ? 300 : 1;
 
             BATCH_DIRECTORY = ConfigurationProduction ?
                 PrivateConfig.BATCH_DIRECTORY_PRODUCTION :

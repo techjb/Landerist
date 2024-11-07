@@ -15,11 +15,11 @@
         ResponseBodyRepeatedInHost,
         ResponseBodyRepeatedInListings,
         ResponseBodyTooManyTokens,
-        HtmlNotSimilarToListing,
+        //HtmlNotSimilarToListing,
         MayBeListing,
         Listing,
         NotListingByParser,
         ListingButNotParsed,
-        NotListingByLastSegment,
+        //NotListingByLastSegment,
     };
 }

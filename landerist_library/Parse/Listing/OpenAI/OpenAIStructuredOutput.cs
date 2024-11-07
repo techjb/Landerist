@@ -29,7 +29,7 @@ namespace landerist_library.Parse.Listing.OpenAI
 
             if (Anuncio == null)
             {
-                return (PageType.MayBeListing, null);
+                return (PageType.ListingButNotParsed, null);
             }
             try
             {
@@ -87,7 +87,7 @@ namespace landerist_library.Parse.Listing.OpenAI
             {
                 Logs.Log.WriteError("OpenAIStructuredOutput ParseListing", page.Uri, exception);
             }
-            return (PageType.MayBeListing, null);
+            return (PageType.ListingButNotParsed, null);
         }
 
         private bool IsValidResponse()
