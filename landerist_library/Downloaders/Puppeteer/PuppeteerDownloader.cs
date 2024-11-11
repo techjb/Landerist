@@ -117,9 +117,7 @@ namespace landerist_library.Downloaders.Puppeteer
             "pippio.com"
         ];
 
-        private IBrowser? Browser;
-
-        private IPage? IPage;
+        private readonly IBrowser? Browser;        
 
         private static readonly NavigationOptions NavigationOptions = new()
         {
@@ -233,7 +231,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 }
 
             }
-            catch (Exception exception)
+            catch// (Exception exception)
             {
                 //Logs.Log.WriteError("PuppeteerDownloader CloseAllPagesExceptFirst", exception);
             }
