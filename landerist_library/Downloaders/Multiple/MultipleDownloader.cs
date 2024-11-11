@@ -36,7 +36,7 @@ namespace landerist_library.Downloaders.Multiple
         {
             Parallel.ForEach(List, new ParallelOptions()
             {
-                //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM,
+                MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
             },
             singleDownloader =>
             {

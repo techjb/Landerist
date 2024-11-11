@@ -302,11 +302,15 @@ namespace landerist_library.Downloaders.Puppeteer
                     taskGetAsync.Wait();
                     (Content, Screenshot) = taskGetAsync.Result;
                 }
+                else
+                {
+                    Logs.Log.WriteError("PuppeteerDownloader SetContentAndScrenshot", "Timeout");
+                }
                 CloseAllPagesExceptFirst();
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteError("PuppeteerDownloader GetContent", exception);
+                Logs.Log.WriteError("PuppeteerDownloader SetContentAndScrenshot", exception);
             }
         }
 
