@@ -121,7 +121,7 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private static readonly NavigationOptions NavigationOptions = new()
         {
-            WaitUntil = [WaitUntilNavigation.Networkidle2],
+            WaitUntil = [WaitUntilNavigation.Networkidle0],
             Timeout = GetTimeout(),
         };
 
@@ -292,6 +292,9 @@ namespace landerist_library.Downloaders.Puppeteer
 
         public void SetContentAndScrenshot(Websites.Page page)
         {
+            Content = null;
+            Screenshot = null;
+
             try
             {
                 var taskGetAsync = Task.Run(async () => await GetAsync(page));
@@ -302,10 +305,10 @@ namespace landerist_library.Downloaders.Puppeteer
                     taskGetAsync.Wait();
                     (Content, Screenshot) = taskGetAsync.Result;
                 }
-                else
-                {
-                    Logs.Log.WriteError("PuppeteerDownloader SetContentAndScrenshot", "Timeout");
-                }
+                //else
+                //{
+                //    Logs.Log.WriteError("PuppeteerDownloader SetContentAndScrenshot", "Timeout");
+                //}
                 CloseAllPagesExceptFirst();
             }
             catch (Exception exception)
