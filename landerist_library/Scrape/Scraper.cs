@@ -169,7 +169,7 @@ namespace landerist_library.Scrape
                 orderablePartitioner,
                 new ParallelOptions()
                 {
-                    MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM,
+                    MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
                     CancellationToken = CancellationTokenSource.Token
                 },
                 (page, state) =>

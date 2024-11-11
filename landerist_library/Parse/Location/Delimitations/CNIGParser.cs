@@ -29,7 +29,7 @@ namespace landerist_library.Parse.Location.Delimitations
             Parallel.ForEach(featureCollection.Cast<Feature>(),
                 new ParallelOptions()
                 {
-                    MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
+                    //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
                 },
                 feature =>
             {

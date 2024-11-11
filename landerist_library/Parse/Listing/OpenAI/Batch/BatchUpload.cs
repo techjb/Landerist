@@ -77,7 +77,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
 
             Parallel.ForEach(pages, new ParallelOptions()
             {
-                MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
+                //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
             }, 
             (page, state) =>
             {
@@ -260,7 +260,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             Parallel.ForEach(pages,
                 new ParallelOptions()
                 {
-                    MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
+                    //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
                 },
                 page =>
             {

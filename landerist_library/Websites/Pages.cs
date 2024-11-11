@@ -419,7 +419,7 @@ namespace landerist_library.Websites
             Parallel.ForEach(listings,
                 new ParallelOptions()
                 {
-                    MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM,
+                    //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM,
                 },
                 listing =>
             {

@@ -17,7 +17,7 @@ namespace landerist_library.Insert.FtAgencies
             int noErrors = 0;
             Parallel.ForEach(hashSet, new ParallelOptions()
             {
-                MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
+                //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
             }, url =>
             {
                 var agencyUrl = GetAgencyUrl(url);

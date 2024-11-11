@@ -234,7 +234,7 @@ namespace landerist_library.Database
             var sync = new object();
             Parallel.ForEach(dataTable.AsEnumerable(), new ParallelOptions()
             {
-                MaxDegreeOfParallelism = Configuration.Config.MAX_DEGREE_OF_PARALLELISM
+                //MaxDegreeOfParallelism = Configuration.Config.MAX_DEGREE_OF_PARALLELISM
             }, dataRow =>
             {
                 var listing = GetListing(dataRow, loadMedia);

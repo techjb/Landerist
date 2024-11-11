@@ -177,7 +177,7 @@ namespace landerist_library.Websites
             Parallel.ForEach(websites,
                 new ParallelOptions()
                 {
-                    MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM,
+                    //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM,
                 },
                 website =>
                 {
@@ -224,7 +224,9 @@ namespace landerist_library.Websites
             int errors = 0;
             var sync = new object();
             Parallel.ForEach(websites,
-                new ParallelOptions() { MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM },
+                new ParallelOptions() { 
+                    //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM 
+                },
                 website =>
             {
                 bool success = website.SetRobotsTxt();
@@ -264,7 +266,9 @@ namespace landerist_library.Websites
             int successed = 0;
             var sync = new object();
             Parallel.ForEach(websites,
-                new ParallelOptions() { MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM },
+                new ParallelOptions() { 
+                    //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM 
+                },
                 website =>
                 {
                     bool success = website.SetIpAddress();
@@ -419,7 +423,7 @@ namespace landerist_library.Websites
             int counter = 0;
             Parallel.ForEach(websites, new ParallelOptions()
             {
-                MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
+                //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
             }, website =>
             {
                 website.SetRobotsTxt();
@@ -457,7 +461,7 @@ namespace landerist_library.Websites
             int counter = 0;
             Parallel.ForEach(websites, new ParallelOptions()
             {
-                MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
+                //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
             }, website =>
             {
                 website.SetSitemap();
@@ -495,7 +499,7 @@ namespace landerist_library.Websites
             int counter = 0;
             Parallel.ForEach(websites, new ParallelOptions()
             {
-                MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
+                //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
             }, website =>
             {
                 website.SetIpAddress();
@@ -638,7 +642,7 @@ namespace landerist_library.Websites
             int errors = 0;
             Parallel.ForEach(websites, new ParallelOptions()
             {
-                MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
+                //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
             },
                 website =>
             {
@@ -667,7 +671,7 @@ namespace landerist_library.Websites
 
             Parallel.ForEach(websites, new ParallelOptions()
             {
-                MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
+                //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
             },
                 website =>
                 {

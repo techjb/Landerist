@@ -16,7 +16,7 @@ namespace landerist_library.Parse.Media.Image
                 Parallel.ForEach(ImageParser.UnknowIsValidImages,
                     new ParallelOptions()
                     {
-                        MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM,
+                        //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM,
                     },
                     DownloadImage);
             }

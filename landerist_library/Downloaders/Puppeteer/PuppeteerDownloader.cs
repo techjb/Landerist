@@ -117,7 +117,9 @@ namespace landerist_library.Downloaders.Puppeteer
             "pippio.com"
         ];
 
-        private readonly IBrowser? Browser = null;
+        private IBrowser? Browser;
+
+        private IPage? IPage;
 
         private static readonly NavigationOptions NavigationOptions = new()
         {
@@ -215,6 +217,28 @@ namespace landerist_library.Downloaders.Puppeteer
             }
         }
 
+        private void CloseAllPagesExceptFirst()
+        {
+            if (Browser == null)
+            {
+                return;
+            }
+            try
+            {
+                var pages = Task.Run(async () => await Browser.PagesAsync()).Result;
+                for (var i = 0; i < pages.Length - 1; i++)
+                {
+                    var page = pages[i];
+                    page.CloseAsync();
+                }
+
+            }
+            catch (Exception exception)
+            {
+                //Logs.Log.WriteError("PuppeteerDownloader CloseAllPagesExceptFirst", exception);
+            }
+        }
+
         public static void DoTest()
         {
             // working
@@ -272,7 +296,15 @@ namespace landerist_library.Downloaders.Puppeteer
         {
             try
             {
-                (Content, Screenshot) = Task.Run(async () => await GetAsync(page)).Result;
+                var taskGetAsync = Task.Run(async () => await GetAsync(page));
+                var taskDelay = Task.Delay(GetTimeout());                
+                var completedTask = Task.WhenAny(taskGetAsync, taskDelay).Result;
+                if (completedTask == taskGetAsync)
+                {
+                    taskGetAsync.Wait();
+                    (Content, Screenshot) = taskGetAsync.Result;
+                }
+                CloseAllPagesExceptFirst();
             }
             catch (Exception exception)
             {
@@ -285,13 +317,11 @@ namespace landerist_library.Downloaders.Puppeteer
             string? content = null;
             byte[]? screenShot = null;
 
-            IPage? browserPage = null;
-
             try
             {
                 if (BrowserInitialized())
                 {
-                    browserPage = await GetBroserPage(Browser!, page.Website.LanguageCode, page.Uri);
+                    var browserPage = await GetBroserPage(Browser!, page.Website.LanguageCode, page.Uri);
                     await browserPage.GoToAsync(page.Uri.ToString(), NavigationOptions);
                     await browserPage.EvaluateExpressionAsync(ExpressionRemoveCookies);
                     if (Config.TAKE_SCREENSHOT)
@@ -304,13 +334,6 @@ namespace landerist_library.Downloaders.Puppeteer
             catch
             {
 
-            }
-            finally
-            {
-                if (browserPage != null)
-                {
-                    await browserPage.CloseAsync();
-                }
             }
             return (content, screenShot);
         }

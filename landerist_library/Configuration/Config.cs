@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "2.99";
+        public static readonly string VERSION = "3.03";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -130,7 +130,7 @@ namespace landerist_library.Configuration
         public static int MIN_PAGES_PER_BATCH { get; set; }
 
         public const int MAX_BATCH_FILE_SIZE_MB = 90;
-        public static int MAX_DEGREE_OF_PARALLELISM { get; set; }
+        public static int MAX_DEGREE_OF_PARALLELISM_SCRAPER { get; set; }
 
         public static bool IsConfigurationProduction()
         {
@@ -205,7 +205,7 @@ namespace landerist_library.Configuration
                 PrivateConfig.BATCH_DIRECTORY_PRODUCTION :
                 PrivateConfig.BATCH_DIRECTORY_LOCAL;
 
-            MAX_DEGREE_OF_PARALLELISM = ConfigurationProduction ?
+            MAX_DEGREE_OF_PARALLELISM_SCRAPER = ConfigurationProduction ?
                 Environment.ProcessorCount - 1 : 1;
         }
 

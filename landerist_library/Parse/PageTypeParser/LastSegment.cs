@@ -183,7 +183,7 @@ namespace landerist_library.Parse.PageTypeParser
             Parallel.ForEach(urls,
               new ParallelOptions()
               {
-                  MaxDegreeOfParallelism = Configuration.Config.MAX_DEGREE_OF_PARALLELISM
+                  //MaxDegreeOfParallelism = Configuration.Config.MAX_DEGREE_OF_PARALLELISM
               },
               url =>
               {

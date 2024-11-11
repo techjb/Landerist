@@ -85,10 +85,10 @@ namespace landerist_service
             RunningTimer2 = true;
             try
             {
-                BatchTasks.Start();
                 Websites.UpdateRobotsTxt();
                 Websites.UpdateSitemaps();
                 Websites.UpdateIpAddress();
+                BatchTasks.Start();
                 Scraper.Start();
             }
             catch (Exception exception)

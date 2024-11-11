@@ -106,7 +106,9 @@ namespace landerist_library.Insert
             int total = uris.Count;
             int counter = 0;
             Parallel.ForEach(uris,
-                new ParallelOptions() { MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM },
+                new ParallelOptions() { 
+                    //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM 
+                },
                 uri =>
             {
                 var mainUri = GetSuggestedMainUri(uri);
