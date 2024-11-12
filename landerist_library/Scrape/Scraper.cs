@@ -41,7 +41,7 @@ namespace landerist_library.Scrape
 
         public void FinalizeBlockingCollection()
         {
-            if (BlockingCollection.Count < Config.MIN_PAGES_PER_SCRAPE)
+            if (BlockingCollection.Count < Config.MIN_PAGES_TO_FINALIZE_SCRAPE)
             {
                 BlockingCollection.CompleteAdding();
             }

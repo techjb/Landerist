@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "3.05";
+        public static readonly string VERSION = "3.07";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -15,13 +15,15 @@ namespace landerist_library.Configuration
 
         public static readonly bool WORDS_ENABLED = false;
 
-        public static readonly int MAX_PAGES_PER_WEBSITE = 400;
+        public static readonly int MAX_PAGES_PER_WEBSITE = 500;
 
-        public static readonly int MIN_PAGES_PER_SCRAPE = 40;
+        public static readonly int MIN_PAGES_PER_SCRAPE = 100;
 
-        public static readonly int MAX_PAGES_PER_SCRAPE = 4000;
+        public static readonly int MIN_PAGES_TO_FINALIZE_SCRAPE = 40;
 
-        public static readonly int MAX_PAGES_PER_HOSTS_PER_SCRAPE = 4;
+        public static readonly int MAX_PAGES_PER_SCRAPE = 5000;
+
+        public static readonly int MAX_PAGES_PER_HOSTS_PER_SCRAPE = 5;
 
         public static readonly int MAX_SITEMAPS_PER_WEBSITE = 50;
 
@@ -29,7 +31,7 @@ namespace landerist_library.Configuration
 
         public static readonly int DAYS_TO_UPDATE_SITEMAP = 3;
 
-        public static readonly int DAYS_TO_UPDATE_IP_ADDRESS = 7;
+        public static readonly int DAYS_TO_UPDATE_IP_ADDRESS = 3;
 
         public static readonly int MIN_RESPONSEBODYTEXT_LENGTH = 50;
 
@@ -37,7 +39,7 @@ namespace landerist_library.Configuration
 
         public static readonly int MAX_PAGETYPE_COUNTER = 1000;
 
-        public static readonly int DEFAULT_DAYS_NEXT_UPDATE = 7;
+        public static readonly int DEFAULT_DAYS_NEXT_UPDATE = 5;
 
         public static readonly bool LOGS_ENABLED = true;
         public static bool TIMERS_ENABLED { get; set; }
