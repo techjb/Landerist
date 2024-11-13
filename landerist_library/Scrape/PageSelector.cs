@@ -7,8 +7,6 @@ namespace landerist_library.Scrape
     {
         private static List<Page> Pages = [];
 
-        private static readonly int SelectTopCounter = Config.MAX_PAGES_PER_SCRAPE * 2;
-
         public static List<Page> Select()
         {
             Pages.Clear();
@@ -23,29 +21,43 @@ namespace landerist_library.Scrape
 
             AddUnknowPageType();
             AddNextUpdate();
+            AddPagesToFillScrape();
         }
 
         private static void AddUnknowPageType()
         {
-            var pages = Websites.Pages.GetUnknownPageType(SelectTopCounter);
+            var pages = Websites.Pages.GetUnknownPageType(Config.MAX_PAGES_PER_SCRAPE);
             Pages.AddRange(pages);
         }
 
         private static void AddNextUpdate()
         {
-            var pages = Websites.Pages.GetPagesNextUpdate(SelectTopCounter);
+            var pages = Websites.Pages.GetPagesNextUpdatePast(Config.MAX_PAGES_PER_SCRAPE);
+            Pages.AddRange(pages);
+        }
+
+        private static void AddPagesToFillScrape()
+        {
+            int pagesToFill = Config.MAX_PAGES_PER_SCRAPE - Pages.Count;
+            if (pagesToFill <= 0)
+            {
+                return;
+            }
+
+            var pages = Websites.Pages.GetPagesNextUpdateFuture(pagesToFill);            
+            pages = pages.Where(p => !Pages.Any(p2 => p2.UriHash == p.UriHash)).ToList();
             Pages.AddRange(pages);
         }
 
         private static void FilterPages()
         {
             Console.WriteLine("Filtering pages ..");
-            FilterMaxPagesPerHost();
+            FilterMaxPagesHostsPerScrape();
             FilterMaxTotalPages();
             FilterMinTotalPages();
         }
 
-        private static void FilterMaxPagesPerHost()
+        private static void FilterMaxPagesHostsPerScrape()
         {
             List<Page> pages = [];
             Dictionary<string, int> dictionary = [];

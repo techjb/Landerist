@@ -233,10 +233,10 @@ namespace landerist_library.Database
         public bool QueryExists(string querySelect1, IDictionary<string, object?>? parameters = null)
         {
             string query =
-                "IF EXISTS (" + querySelect1 + ") " +
-                "SELECT 'true' " +
-                "ELSE " +
-                "SELECT 'false' ";
+                "SELECT CASE " +
+                $"WHEN EXISTS ({querySelect1}) THEN CAST(1 AS BIT) " +
+                "ELSE CAST(0 AS BIT) " +
+                "END";
 
             return QueryBool(query, parameters);
         }

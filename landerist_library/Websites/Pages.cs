@@ -63,11 +63,25 @@ namespace landerist_library.Websites
             return GetPages(dataTable);
         }
 
-        public static List<Page> GetPagesNextUpdate(int? rows = null)
+        public static List<Page> GetPagesNextUpdatePast(int? rows = null)
         {
             string query =
                 SelectQuery(rows) +
                 "WHERE [NextUpdate] < @Now AND [WaitingAIParsing] IS NULL";
+
+            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+                {"Now", DateTime.Now },
+            });
+
+            return GetPages(dataTable);
+        }
+
+        public static List<Page> GetPagesNextUpdateFuture(int? rows = null)
+        {
+            string query =
+                SelectQuery(rows) +
+                "WHERE [NextUpdate] >= @Now AND [WaitingAIParsing] IS NULL " +
+                "ORDER BY [NextUpdate] ASC";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"Now", DateTime.Now },
