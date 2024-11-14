@@ -6,7 +6,7 @@
         {
             BatchDownload.Start();
             BatchDownload.Clean();
-            BatchUpload.Start();            
+            BatchUpload.Start();
         }
     }
 }

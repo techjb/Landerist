@@ -44,7 +44,7 @@ namespace landerist_library.Scrape
                 return;
             }
 
-            var pages = Websites.Pages.GetPagesNextUpdateFuture(pagesToFill);            
+            var pages = Websites.Pages.GetPagesNextUpdateFuture(pagesToFill);
             pages = pages.Where(p => !Pages.Any(p2 => p2.UriHash == p.UriHash)).ToList();
             Pages.AddRange(pages);
         }

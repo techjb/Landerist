@@ -181,7 +181,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             return new PageScraper(page).SetPageType(pageType, listing);
         }
 
-        
+
         public static void Clean()
         {
             DeleteDownloadedBatches();

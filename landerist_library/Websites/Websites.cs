@@ -224,7 +224,8 @@ namespace landerist_library.Websites
             int errors = 0;
             var sync = new object();
             Parallel.ForEach(websites,
-                new ParallelOptions() { 
+                new ParallelOptions()
+                {
                     //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM 
                 },
                 website =>
@@ -266,7 +267,8 @@ namespace landerist_library.Websites
             int successed = 0;
             var sync = new object();
             Parallel.ForEach(websites,
-                new ParallelOptions() { 
+                new ParallelOptions()
+                {
                     //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM 
                 },
                 website =>

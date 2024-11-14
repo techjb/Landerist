@@ -117,7 +117,7 @@ namespace landerist_library.Downloaders.Puppeteer
             "pippio.com"
         ];
 
-        private readonly IBrowser? Browser;        
+        private readonly IBrowser? Browser;
 
         private static readonly NavigationOptions NavigationOptions = new()
         {
@@ -298,7 +298,7 @@ namespace landerist_library.Downloaders.Puppeteer
             try
             {
                 var taskGetAsync = Task.Run(async () => await GetAsync(page));
-                var taskDelay = Task.Delay(GetTimeout());                
+                var taskDelay = Task.Delay(GetTimeout());
                 var completedTask = Task.WhenAny(taskGetAsync, taskDelay).Result;
                 if (completedTask == taskGetAsync)
                 {

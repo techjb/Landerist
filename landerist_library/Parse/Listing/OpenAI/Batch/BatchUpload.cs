@@ -78,7 +78,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             Parallel.ForEach(pages, new ParallelOptions()
             {
                 //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
-            }, 
+            },
             (page, state) =>
             {
                 if (!CanWriteFile(filePath))
