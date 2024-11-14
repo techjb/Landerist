@@ -1,12 +1,7 @@
 using landerist_library.Configuration;
-using landerist_library.Database;
 using landerist_library.Downloaders.Puppeteer;
-using landerist_library.Landerist_com;
 using landerist_library.Logs;
-using landerist_library.Parse.Listing.OpenAI.Batch;
-using landerist_library.Scrape;
-using landerist_library.Statistics;
-using landerist_library.Websites;
+using landerist_library.Tasks;
 
 
 namespace landerist_service
@@ -17,16 +12,15 @@ namespace landerist_service
 
         private Timer? Timer1;
         private Timer? Timer2;
-        private Timer? Timer3;
         private bool RunningTimer2 = false;
-        private bool RunningTimer3 = false;
 
         private const int OneSecond = 1000;
         private const int TenSeconds = 10 * OneSecond;
         private const int OneMinute = 60 * OneSecond;
         private const int OneHour = 60 * OneMinute;
         private const int OneDay = 24 * OneHour;
-        private readonly Scraper Scraper = new();
+
+        private readonly ServiceTasks ServiceTasks = new();
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -54,28 +48,23 @@ namespace landerist_service
 
             int dueTimeOneAM = (int)(twelveAM - nowTime).TotalMilliseconds;
 
-            Timer1 = new Timer(TimerCallback1!, null, dueTimeOneAM, OneDay);
-            Timer2 = new Timer(TimerCallback2!, null, 0, TenSeconds);
-            Timer3 = new Timer(TimerCallback3!, null, 0, OneSecond);
+            Timer1 = new Timer(DailyTasks!, null, dueTimeOneAM, OneDay);
+            Timer2 = new Timer(UpdateAndScrape!, null, 0, TenSeconds);            
         }
 
-        private void TimerCallback1(object state)
+        private void DailyTasks(object state)
         {
             try
             {
-                Pages.DeleteUnpublishedListings();
-                StatisticsSnapshot.TakeSnapshots();
-                DownloadFilesUpdater.UpdateFiles();
-                Landerist_com.UpdateDownloadsAndStatisticsPages();
-                Backup.Update();
+                ServiceTasks.DailyTask();                
             }
             catch (Exception exception)
             {
-                Log.WriteError("WorkerService TimerCallback1", exception);
+                Log.WriteError("WorkerService DailyTasks", exception);
             }
         }
 
-        private void TimerCallback2(object state)
+        private void UpdateAndScrape(object state)
         {
             if (RunningTimer2)
             {
@@ -85,52 +74,25 @@ namespace landerist_service
             RunningTimer2 = true;
             try
             {
-                Websites.UpdateRobotsTxt();
-                Websites.UpdateSitemaps();
-                Websites.UpdateIpAddress();
-                BatchTasks.Start();
-                Scraper.Start();
+                ServiceTasks.UpdateAndScrape();
             }
             catch (Exception exception)
             {
-                Log.WriteError("WorkerService TimerCallback2", exception);
+                Log.WriteError("WorkerService UpdateAndScrape", exception);
             }
             finally
             {
                 RunningTimer2 = false;
             }
-        }
-
-        private void TimerCallback3(object state)
-        {
-            if (RunningTimer3)
-            {
-                return;
-            }
-
-            RunningTimer3 = true;
-            try
-            {
-                Scraper.FinalizeBlockingCollection();
-            }
-            catch (Exception exception)
-            {
-                Log.WriteError("WorkerService TimerCallback3", exception);
-            }
-            finally
-            {
-                RunningTimer3 = false;
-            }
-        }
+        }       
 
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
             Logger.LogInformation("StopAsync");
-            Scraper.Stop();
+            ServiceTasks.Stop();
             Log.WriteInfo("landerist_service", "Stopped. Version: " + Config.VERSION);
             Timer1?.Change(Timeout.Infinite, 0);
-            Timer2?.Change(Timeout.Infinite, 0);
-            Timer3?.Change(Timeout.Infinite, 0);
+            Timer2?.Change(Timeout.Infinite, 0);            
             await base.StopAsync(cancellationToken);
         }
     }

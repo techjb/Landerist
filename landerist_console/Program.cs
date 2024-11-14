@@ -1,6 +1,7 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Scrape;
+using landerist_library.Tasks;
 using landerist_library.Websites;
 
 
@@ -247,6 +248,15 @@ namespace landerist_console
             //Console.WriteLine(h);
 
             #endregion
+
+            #region ServiceTasks
+
+            //ServiceTasks.DailyTask();
+            //new ServiceTasks().ScraperTasks();
+
+            #endregion
+
+
         }
     }
 }
