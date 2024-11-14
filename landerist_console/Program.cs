@@ -1,4 +1,7 @@
 ﻿using landerist_library.Configuration;
+using landerist_library.Scrape;
+using landerist_library.Tasks;
+using landerist_library.Websites;
 
 
 
@@ -248,10 +251,9 @@ namespace landerist_console
             #region ServiceTasks
 
             //ServiceTasks.DailyTask();
-            //new ServiceTasks().ScraperTasks();
+            //new ServiceTasks().UpdateAndScrape();
 
             #endregion
-
 
         }
     }

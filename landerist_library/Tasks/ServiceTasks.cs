@@ -18,7 +18,7 @@ namespace landerist_library.Tasks
         public ServiceTasks()
         {
             Scraper = new();
-            Timer = new Timer(BlockingCollection!, null, 0, OneSecond);
+            Timer = new Timer(BlockingCollection!, null, OneSecond, OneSecond);
         }
 
         private void BlockingCollection(object state)
