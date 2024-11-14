@@ -49,14 +49,14 @@ namespace landerist_service
             int dueTimeOneAM = (int)(twelveAM - nowTime).TotalMilliseconds;
 
             Timer1 = new Timer(DailyTasks!, null, dueTimeOneAM, OneDay);
-            Timer2 = new Timer(UpdateAndScrape!, null, 0, TenSeconds);            
+            Timer2 = new Timer(UpdateAndScrape!, null, 0, TenSeconds);
         }
 
         private void DailyTasks(object state)
         {
             try
             {
-                ServiceTasks.DailyTask();                
+                ServiceTasks.DailyTask();
             }
             catch (Exception exception)
             {
@@ -84,7 +84,7 @@ namespace landerist_service
             {
                 RunningTimer2 = false;
             }
-        }       
+        }
 
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
@@ -92,7 +92,7 @@ namespace landerist_service
             ServiceTasks.Stop();
             Log.WriteInfo("landerist_service", "Stopped. Version: " + Config.VERSION);
             Timer1?.Change(Timeout.Infinite, 0);
-            Timer2?.Change(Timeout.Infinite, 0);            
+            Timer2?.Change(Timeout.Infinite, 0);
             await base.StopAsync(cancellationToken);
         }
     }
