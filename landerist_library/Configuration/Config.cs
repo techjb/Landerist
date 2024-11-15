@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "3.26";
+        public static readonly string VERSION = "3.34";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -21,7 +21,7 @@ namespace landerist_library.Configuration
 
         public static readonly int MIN_PAGES_TO_FINALIZE_SCRAPE = 40;
 
-        public static readonly int MAX_PAGES_PER_SCRAPE = 1000;
+        public static readonly int MAX_PAGES_PER_SCRAPE = 500;
 
         public static readonly int MAX_PAGES_PER_HOSTS_PER_SCRAPE = 10;
 
@@ -42,6 +42,8 @@ namespace landerist_library.Configuration
         public static readonly int DEFAULT_DAYS_NEXT_UPDATE = 5;
 
         public static readonly bool LOGS_ENABLED = true;
+
+        public static readonly bool LOGS_IN_CONSOLE = true;
         public static bool TIMERS_ENABLED { get; set; }
 
         public static readonly string USER_AGENT = "Mozilla/5.0 (compatible; AcmeInc/1.0)";
@@ -209,7 +211,7 @@ namespace landerist_library.Configuration
                 PrivateConfig.BATCH_DIRECTORY_LOCAL;
 
             MAX_DEGREE_OF_PARALLELISM_SCRAPER = ConfigurationProduction ?
-                15 : 1;
+                10 : 1;
         }
 
         private static void InitDatabase(bool configurationProduction)

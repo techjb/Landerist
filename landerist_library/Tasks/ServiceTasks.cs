@@ -1,4 +1,6 @@
-﻿using landerist_library.Database;
+﻿using landerist_library.Configuration;
+using landerist_library.Database;
+using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Landerist_com;
 using landerist_library.Logs;
 using landerist_library.Parse.Listing.OpenAI.Batch;
@@ -11,24 +13,90 @@ namespace landerist_library.Tasks
     public class ServiceTasks
     {
         private readonly Scraper Scraper;
-        private bool RunningTimer = false;
-        private readonly Timer? Timer;
+        private Timer? Timer1;
+        private Timer? Timer2;
+        private Timer? Timer3;
+        
+        private bool RunningTimer2 = false;
+        private bool RunningTimer3 = false;
+
         private const int OneSecond = 1000;
+        private const int TenSeconds = 10 * OneSecond;
+        private const int OneMinute = 60 * OneSecond;
+        private const int OneHour = 60 * OneMinute;
+        private const int OneDay = 24 * OneHour;
 
         public ServiceTasks()
         {
-            Scraper = new();
-            Timer = new Timer(BlockingCollection!, null, OneSecond, OneSecond);
+            Scraper = new();            
         }
 
-        private void BlockingCollection(object state)
+        public void Start()
         {
-            if (RunningTimer)
+            PuppeteerDownloader.UpdateChrome();
+            SetTimers();
+        }
+
+        private void SetTimers()
+        {
+            DateTime nowTime = DateTime.Now;
+
+            DateTime twelveAM = new(nowTime.Year, nowTime.Month, nowTime.Day, 0, 0, 0);
+            if (nowTime > twelveAM)
+            {
+                twelveAM = twelveAM.AddDays(1);
+            }
+
+            int dueTimeOneAM = (int)(twelveAM - nowTime).TotalMilliseconds;
+
+            Timer1 = new Timer(DailyTasks!, null, dueTimeOneAM, OneDay);
+            Timer2 = new Timer(UpdateAndScrape!, null, 0, TenSeconds);
+            Timer3 = new Timer(BlockingCollection!, null, OneSecond, OneSecond);
+        }
+
+        private void DailyTasks(object state)
+        {
+            try
+            {
+                DailyTask();
+            }
+            catch (Exception exception)
+            {
+                Log.WriteError("ServiceTasks DailyTasks", exception);
+            }
+        }
+
+        private void UpdateAndScrape(object state)
+        {
+            if (RunningTimer2)
             {
                 return;
             }
 
-            RunningTimer = true;
+            RunningTimer2 = true;
+            try
+            {
+                Update();
+                Scrape();
+            }
+            catch (Exception exception)
+            {
+                Log.WriteError("ServiceTasks UpdateAndScrape", exception);
+            }
+            finally
+            {
+                RunningTimer2 = false;
+            }
+        }
+
+        private void BlockingCollection(object state)
+        {
+            if (RunningTimer3)
+            {
+                return;
+            }
+
+            RunningTimer3 = true;
             try
             {
                 Scraper.FinalizeBlockingCollection();
@@ -39,7 +107,7 @@ namespace landerist_library.Tasks
             }
             finally
             {
-                RunningTimer = false;
+                RunningTimer3 = false;
             }
         }
 
@@ -50,12 +118,6 @@ namespace landerist_library.Tasks
             DownloadFilesUpdater.UpdateFiles();
             Landerist_com.Landerist_com.UpdateDownloadsAndStatisticsPages();
             Backup.Update();
-        }
-
-        public void UpdateAndScrape()
-        {
-            Update();
-            Scrape();
         }
 
         public static void Update()
@@ -74,7 +136,9 @@ namespace landerist_library.Tasks
         public void Stop()
         {
             Scraper.Stop();
-            Timer?.Change(Timeout.Infinite, 0);
+            Timer1?.Change(Timeout.Infinite, 0);
+            Timer2?.Change(Timeout.Infinite, 0);
+            Timer3?.Change(Timeout.Infinite, 0);
         }
     }
 }

@@ -14,10 +14,6 @@ namespace landerist_library.Scrape
 
         private static readonly object SyncPageBlocker = new();
 
-        private static int DownloadErrorCounter = 0;
-
-        private static int ListingCounter = 0;
-
         private static int TotalCounter = 0;
 
         private static int Scraped = 0;
@@ -156,11 +152,11 @@ namespace landerist_library.Scrape
             }
             TotalCounter = BlockingCollection.Count;
             Scraped = 0;
-            ThreadCounter = 0;
-            DownloadErrorCounter = 0;
+            ThreadCounter = 0;            
 
             var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
 
+            Console.WriteLine("Scrapping " + TotalCounter + " pages ..");
             //MultipleDownloader.Clear();
 
             Parallel.ForEach(
@@ -178,7 +174,7 @@ namespace landerist_library.Scrape
                     EndThread(state);
                 });
 
-            Log.WriteInfo("scraper", $"Scraped {Scraped} pages");
+            Log.WriteInfo("scraper", $"Scraped {Scraped}/{TotalCounter} pages");
             return true;
         }
 
@@ -233,15 +229,10 @@ namespace landerist_library.Scrape
                 return;
             }
             var scrappedPercentage = Math.Round((float)Scraped * 100 / TotalCounter, 0);
-            var downloadErrorPercentage = Math.Round((float)DownloadErrorCounter * 100 / TotalCounter, 0);
-            var listingPercentage = Math.Round((float)ListingCounter * 100 / Scraped, 0);
 
             Console.WriteLine(
                "Threads: " + ThreadCounter + " " +
-               "Scraped: " + Scraped + "/" + TotalCounter + " (" + scrappedPercentage + "%) " +
-               "Errors: " + DownloadErrorCounter + " (" + downloadErrorPercentage + "%) " +
-               "Listing: " + ListingCounter + " (" + listingPercentage + "%) "
-               );
+               "Scraped: " + Scraped + "/" + TotalCounter + " (" + scrappedPercentage + "%) ");
         }
 
         private void EndThread(ParallelLoopState parallelLoopState)
@@ -277,8 +268,7 @@ namespace landerist_library.Scrape
             catch (Exception exception)
             {
                 Log.WriteError("Scraper Scrape", page.Uri, exception);
-            }
-            IncrementCounters(page);
+            }            
         }
 
         private static bool IsBlocked(Page page)
@@ -291,23 +281,6 @@ namespace landerist_library.Scrape
             lock (SyncPageBlocker)
             {
                 PageBlocker.Add(page.Website);
-            }
-        }
-
-        private static void IncrementCounters(Page page)
-        {
-            switch (page.PageType)
-            {
-                case PageType.DownloadError:
-                    {
-                        Interlocked.Increment(ref DownloadErrorCounter);
-                    }
-                    break;
-                case PageType.Listing:
-                    {
-                        Interlocked.Increment(ref ListingCounter);
-                    }
-                    break;
             }
         }
     }

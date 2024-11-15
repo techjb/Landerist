@@ -18,7 +18,7 @@ namespace landerist_library.Scrape
 
         private readonly PageType? OldPageType = page.PageType;
 
-        private readonly SingleDownloader SingleDownloader = new();
+        private SingleDownloader? SingleDownloader;
 
         //public PageScraper(Page page, Scraper scraper) : this(page)
         //{
@@ -27,6 +27,7 @@ namespace landerist_library.Scrape
 
         public bool Scrape()
         {
+            SingleDownloader = new();
             if (!SingleDownloader.IsAvailable())
             {
                 Logs.Log.WriteInfo("PageScraper Scrape", "Downloader not available");

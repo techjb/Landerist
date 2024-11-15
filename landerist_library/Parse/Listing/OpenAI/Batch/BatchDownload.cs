@@ -125,6 +125,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             Parallel.ForEach(lines, new ParallelOptions()
             {
                 //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
+                //MaxDegreeOfParallelism = 1
             }, line =>
             {
                 try

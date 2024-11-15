@@ -1,8 +1,11 @@
-﻿using landerist_library.Configuration;
+﻿using Amazon.Auth.AccessControlPolicy.ActionIdentifiers;
+using landerist_library.Configuration;
+using landerist_library.Logs;
 using landerist_library.Scrape;
 using landerist_library.Tasks;
 using landerist_library.Websites;
 using System.Runtime.InteropServices;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace landerist_console
 {
@@ -23,6 +26,8 @@ namespace landerist_console
             Console.Title = "Landerist Console";
             Start();
             Run();
+            Console.WriteLine("ReadLine to exit..");
+            Console.ReadLine(); 
             End();
         }
 
@@ -34,6 +39,9 @@ namespace landerist_console
             string textStarted =
                 $"STARTED at  {DateStart.ToShortDateString()}  {DateStart:hh\\:mm\\:ss} Version {Config.VERSION} \n";
             Console.WriteLine(textStarted);
+
+            Log.Delete();
+            Log.WriteInfo("landerist_console", "Started. Version: " + Config.VERSION);
         }
 
         private static bool ConsoleEventHandler(int eventType)
@@ -49,6 +57,7 @@ namespace landerist_console
         {
             ServiceTasks.Stop();
 
+            Log.WriteInfo("landerist_service", "Stopped. Version: " + Config.VERSION);
             DateTime dateFinished = DateTime.Now;
             string textFinished =
                 "FINISHED at " + dateFinished.ToShortDateString() + " " + dateFinished.ToString(@"hh\:mm\:ss") +
@@ -62,8 +71,8 @@ namespace landerist_console
 
         private static void Run()
         {
-            //Config.SetToProduction();            
-            Config.SetOnlyDatabaseToProduction();
+            Config.SetToProduction();
+            //Config.SetOnlyDatabaseToProduction();
 
             #region Urls
 
@@ -84,7 +93,7 @@ namespace landerist_console
             //var page = new Page("http://www.finquesniu.com/propiedades");
             //var page = new Page("https://www.mardenia-inmobiliaria.com/venta/casa-en-venta-en-sagra-638/");// listing
             //var page = new Page("https://goldacreestates.com/realestate/top/026712-42136"); // listing
-            var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/"); // listing            
+            //var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/"); // listing            
 
 
             #endregion
@@ -149,7 +158,7 @@ namespace landerist_console
             //var Timer3 = new Timer(TimerCallback3!, null, 0, 1000);
             //new Scraper().Start();            
             //Thread.Sleep(100000000);
-            Scraper.Scrape(page);
+            //Scraper.Scrape(page);
             //new Scraper().DoTest();
 
 
@@ -272,7 +281,8 @@ namespace landerist_console
             //ServiceTasks.DailyTask();
             //new ServiceTasks().UpdateAndScrape();
             //ServiceTasks.UpdateAndScrape();
-            //ServiceTasks.Scrape();            
+            //ServiceTasks.Scrape();
+            ServiceTasks.Start();
 
             #endregion
 

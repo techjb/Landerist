@@ -4,11 +4,12 @@ namespace landerist_library.Downloaders.Multiple
 {
     public class SingleDownloader
     {
-        private readonly PuppeteerDownloader PuppeteerDownloader = new();
+        private readonly PuppeteerDownloader PuppeteerDownloader;
         private bool Available;
 
         public SingleDownloader()
         {
+            PuppeteerDownloader = new();
             Available = PuppeteerDownloader.BrowserInitialized();
         }
 

@@ -57,8 +57,8 @@ namespace landerist_library.Downloaders.Puppeteer
         private static readonly LaunchOptions launchOptions = new()
         {
             //Headless = true, // if false, maybe need to comment await browserPage.SetRequestInterceptionAsync(true);          
-            Headless = Config.IsConfigurationProduction(),
-            //Headless = false,
+            //Headless = Config.IsConfigurationProduction(),
+            Headless = false,
             Devtools = false,
             //IgnoreHTTPSErrors = true,            
             Args = Config.TAKE_SCREENSHOT ? [.. LaunchOptionsArgs, .. LaunchOptionsScreenShot] : LaunchOptionsArgs,
@@ -151,18 +151,13 @@ namespace landerist_library.Downloaders.Puppeteer
 
         public void CloseBrowser()
         {
-            Task.Run(CloseBrowserAsync);
-        }
-
-        private async Task CloseBrowserAsync()
-        {
+            if (!BrowserInitialized())
+            {
+                return;
+            }
             try
             {
-                if (BrowserInitialized())
-                {
-                    await Browser!.CloseAsync();
-                    Browser.Dispose();
-                }
+                Browser!.CloseAsync();                
             }
             catch (Exception exception)
             {

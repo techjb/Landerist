@@ -18,8 +18,7 @@ namespace landerist_library.Scrape
 
         private static void SelectPages()
         {
-            Console.WriteLine("Selecting pages ..");
-
+            //Console.WriteLine("Selecting pages ..");
             AddUnknowPageType();
             AddNextUpdate();
             AddPagesToFillScrape();

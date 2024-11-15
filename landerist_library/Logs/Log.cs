@@ -18,9 +18,9 @@ namespace landerist_library.Logs
             {
                 return;
             }
-            if (!Config.IsConfigurationProduction())
+            if (Config.LOGS_IN_CONSOLE)
             {
-                Console.WriteLine(source + " " + text);
+                Console.WriteLine(source + "\t" + text);
             }
             if (Config.LOGS_ENABLED)
             {
@@ -138,6 +138,14 @@ namespace landerist_library.Logs
         }
 
         #endregion Write Logs
+
+        public static bool Delete()
+        {
+            string query =
+                "DELETE FROM " + TABLE_LOGS;
+
+            return new DataBase().Query(query);
+        }
 
         public static bool CleanTable()
         {
