@@ -18,19 +18,23 @@ namespace landerist_library.Scrape
 
         private readonly PageType? OldPageType = page.PageType;
 
-        private readonly SingleDownloader? Downloader;
+        private readonly SingleDownloader SingleDownloader = new();
 
-        public PageScraper(Page page, Scraper scraper) : this(page)
-        {
-            Downloader = scraper.MultipleDownloader.GetDownloader();
-        }
+        //public PageScraper(Page page, Scraper scraper) : this(page)
+        //{
+        //    Downloader = scraper.MultipleDownloader.GetDownloader();
+        //}
+
         public bool Scrape()
         {
-            if (Downloader == null)
+            if (!SingleDownloader.IsAvailable())
             {
+                Logs.Log.WriteInfo("PageScraper Scrape", "Downloader not available");
                 return false;
             }
-            Downloader.Download(Page);
+            SingleDownloader.Download(Page);
+            SingleDownloader.CloseBrowser();
+
             (var newPageType, var newListing, var waitingAIParsing) = PageTypeParser.GetPageType(Page);
             bool sucess = SetPageType(newPageType, newListing, waitingAIParsing);
             IndexPages();
@@ -119,11 +123,11 @@ namespace landerist_library.Scrape
                 return;
             }
 
-            if (Downloader == null)
+            if (SingleDownloader == null)
             {
                 return;
             }
-            var redirectUrl = Downloader.GetRedirectUrl();
+            var redirectUrl = SingleDownloader.GetRedirectUrl();
             if (!string.IsNullOrEmpty(redirectUrl))
             {
                 new Indexer(Page).Insert(redirectUrl);

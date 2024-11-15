@@ -57,7 +57,8 @@ namespace landerist_library.Downloaders.Puppeteer
         private static readonly LaunchOptions launchOptions = new()
         {
             //Headless = true, // if false, maybe need to comment await browserPage.SetRequestInterceptionAsync(true);          
-            Headless = Config.IsConfigurationProduction(),            
+            Headless = Config.IsConfigurationProduction(),
+            //Headless = false,
             Devtools = false,
             //IgnoreHTTPSErrors = true,            
             Args = Config.TAKE_SCREENSHOT ? [.. LaunchOptionsArgs, .. LaunchOptionsScreenShot] : LaunchOptionsArgs,
@@ -215,7 +216,29 @@ namespace landerist_library.Downloaders.Puppeteer
             }
         }
 
-        private void CloseAllPagesExceptFirst()
+        //private void CloseAllPagesExceptFirst()
+        //{
+        //    if (Browser == null)
+        //    {
+        //        return;
+        //    }
+        //    try
+        //    {
+        //        var pages = Task.Run(async () => await Browser.PagesAsync()).Result;
+        //        for (var i = 1; i < pages.Length; i++)
+        //        {
+        //            var page = pages[i];
+        //            page.CloseAsync();
+        //        }
+
+        //    }
+        //    catch// (Exception exception)
+        //    {
+        //        //Logs.Log.WriteError("PuppeteerDownloader CloseAllPagesExceptFirst", exception);
+        //    }
+        //}
+
+        private void CloseAllPages()
         {
             if (Browser == null)
             {
@@ -224,12 +247,11 @@ namespace landerist_library.Downloaders.Puppeteer
             try
             {
                 var pages = Task.Run(async () => await Browser.PagesAsync()).Result;
-                for (var i = 0; i < pages.Length - 1; i++)
+                for (var i = 0; i < pages.Length; i++)
                 {
                     var page = pages[i];
                     page.CloseAsync();
                 }
-
             }
             catch// (Exception exception)
             {
@@ -305,7 +327,8 @@ namespace landerist_library.Downloaders.Puppeteer
                     taskGetAsync.Wait();
                     (Content, Screenshot) = taskGetAsync.Result;
                 }
-                CloseAllPagesExceptFirst();
+                //CloseAllPagesExceptFirst();
+                CloseAllPages();
             }
             catch (Exception exception)
             {

@@ -54,10 +54,20 @@ namespace landerist_library.Tasks
 
         public void UpdateAndScrape()
         {
+            Update();
+            Scrape();
+        }
+
+        public static void Update()
+        {
             Websites.Websites.UpdateRobotsTxt();
             Websites.Websites.UpdateSitemaps();
             Websites.Websites.UpdateIpAddress();
             BatchTasks.Start();
+        }
+
+        public void Scrape()
+        {
             Scraper.Start();
         }
 

@@ -1,7 +1,4 @@
-﻿using landerist_library.Configuration;
-using landerist_library.Downloaders.Puppeteer;
-
-namespace landerist_library.Downloaders.Multiple
+﻿namespace landerist_library.Downloaders.Multiple
 {
     public class MultipleDownloader
     {
@@ -15,14 +12,14 @@ namespace landerist_library.Downloaders.Multiple
             {
                 foreach (SingleDownloader singleDownloader in List)
                 {
-                    if (singleDownloader.IsAvailable)
+                    if (singleDownloader.IsAvailable())
                     {
                         singleDownloader.SetUnavailable();
                         return singleDownloader;
                     }
                 }
                 SingleDownloader newSingleDownloader = new();
-                if (newSingleDownloader.ContainsBrowser())
+                if (newSingleDownloader.IsAvailable())
                 {
                     List.Add(newSingleDownloader);
                     newSingleDownloader.SetUnavailable();
@@ -36,14 +33,13 @@ namespace landerist_library.Downloaders.Multiple
         {
             Parallel.ForEach(List, new ParallelOptions()
             {
-                MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
+                //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
             },
             singleDownloader =>
             {
                 singleDownloader.CloseBrowser();
             });
             List.Clear();
-            PuppeteerDownloader.KillChrome();
         }
 
         public void LogDownloadersCounter()

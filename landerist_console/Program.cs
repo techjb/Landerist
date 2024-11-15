@@ -2,20 +2,25 @@
 using landerist_library.Scrape;
 using landerist_library.Tasks;
 using landerist_library.Websites;
-
-
+using System.Runtime.InteropServices;
 
 namespace landerist_console
 {
-    internal class Program
+    partial class Program
     {
         private static DateTime DateStart;
-        //static readonly Scraper TheScraper = new();
+        private static readonly ServiceTasks ServiceTasks = new();
+
+        private delegate bool ConsoleEventDelegate(int eventType);
+        private static readonly ConsoleEventDelegate Handler = new(ConsoleEventHandler);
+        [LibraryImport("kernel32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static partial bool SetConsoleCtrlHandler(ConsoleEventDelegate callback, [MarshalAs(UnmanagedType.Bool)] bool add);
+
 
         static void Main()
         {
             Console.Title = "Landerist Console";
-            Config.SetToLocal();
             Start();
             Run();
             End();
@@ -23,14 +28,27 @@ namespace landerist_console
 
         private static void Start()
         {
+            SetConsoleCtrlHandler(Handler, true);
+
             DateStart = DateTime.Now;
             string textStarted =
-                "STARTED at " + DateStart.ToShortDateString() + " " + DateStart.ToString(@"hh\:mm\:ss") + "\n";
+                $"STARTED at  {DateStart.ToShortDateString()}  {DateStart:hh\\:mm\\:ss} Version {Config.VERSION} \n";
             Console.WriteLine(textStarted);
+        }
+
+        private static bool ConsoleEventHandler(int eventType)
+        {
+            if (eventType == 2)
+            {
+                End();
+            }
+            return false;
         }
 
         private static void End()
         {
+            ServiceTasks.Stop();
+
             DateTime dateFinished = DateTime.Now;
             string textFinished =
                 "FINISHED at " + dateFinished.ToShortDateString() + " " + dateFinished.ToString(@"hh\:mm\:ss") +
@@ -44,8 +62,8 @@ namespace landerist_console
 
         private static void Run()
         {
-            //Config.SetToProduction();
-            Config.SetDatabaseToProduction();
+            //Config.SetToProduction();            
+            Config.SetOnlyDatabaseToProduction();
 
             #region Urls
 
@@ -66,7 +84,7 @@ namespace landerist_console
             //var page = new Page("http://www.finquesniu.com/propiedades");
             //var page = new Page("https://www.mardenia-inmobiliaria.com/venta/casa-en-venta-en-sagra-638/");// listing
             //var page = new Page("https://goldacreestates.com/realestate/top/026712-42136"); // listing
-            //var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/"); // listing            
+            var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/"); // listing            
 
 
             #endregion
@@ -131,8 +149,9 @@ namespace landerist_console
             //var Timer3 = new Timer(TimerCallback3!, null, 0, 1000);
             //new Scraper().Start();            
             //Thread.Sleep(100000000);
-            //new Scraper().Scrape(page);
+            Scraper.Scrape(page);
             //new Scraper().DoTest();
+
 
             #endregion
 
@@ -252,6 +271,8 @@ namespace landerist_console
 
             //ServiceTasks.DailyTask();
             //new ServiceTasks().UpdateAndScrape();
+            //ServiceTasks.UpdateAndScrape();
+            //ServiceTasks.Scrape();            
 
             #endregion
 

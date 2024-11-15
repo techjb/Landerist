@@ -5,27 +5,31 @@ namespace landerist_library.Downloaders.Multiple
     public class SingleDownloader
     {
         private readonly PuppeteerDownloader PuppeteerDownloader = new();
+        private bool Available;
 
-        public bool IsAvailable { get; private set; } = true;
-
+        public SingleDownloader()
+        {
+            Available = PuppeteerDownloader.BrowserInitialized();
+        }
 
         public void SetUnavailable()
         {
-            IsAvailable = false;
+            Available = false;
         }
 
         public void SetAvailable()
         {
-            IsAvailable = true;
+            Available = true;
         }
 
-        public bool ContainsBrowser()
+        public bool IsAvailable()
         {
-            return PuppeteerDownloader.BrowserInitialized();
+            return Available;
         }
 
         public void Download(Websites.Page Page)
         {
+            SetUnavailable();
             PuppeteerDownloader.Download(Page);
             SetAvailable();
         }

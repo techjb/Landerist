@@ -1,5 +1,4 @@
 ﻿using landerist_library.Configuration;
-using landerist_library.Downloaders.Multiple;
 using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Logs;
 using landerist_library.Websites;
@@ -29,7 +28,7 @@ namespace landerist_library.Scrape
 
         private readonly CancellationTokenSource CancellationTokenSource = new();
 
-        public MultipleDownloader MultipleDownloader = new();
+        //public MultipleDownloader MultipleDownloader = new();
 
 
         private List<Page> Pages = [];
@@ -52,7 +51,7 @@ namespace landerist_library.Scrape
             Log.WriteInfo("service", "Starting test..");
             PuppeteerDownloader.UpdateChrome();
             var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
-            var pageScraper = new PageScraper(page, this);
+            var pageScraper = new PageScraper(page);
             pageScraper.Scrape();
             Log.WriteInfo("service", "PageType: " + page.PageType.ToString());
             var listing = pageScraper.GetListing();
@@ -71,7 +70,8 @@ namespace landerist_library.Scrape
         public void Stop()
         {
             CancellationTokenSource.Cancel();
-            MultipleDownloader.Clear();
+            //MultipleDownloader.Clear();
+            PuppeteerDownloader.KillChrome();
         }
 
         public void ScrapeUnknowPageType(int? rows = null)
@@ -110,7 +110,7 @@ namespace landerist_library.Scrape
             ScrapeUnknowHttpStatusCode();
         }
 
-        public void ScrapeMainPage(Website website)
+        public static void ScrapeMainPage(Website website)
         {
             var page = new Page(website);
             Scrape(page);
@@ -161,9 +161,7 @@ namespace landerist_library.Scrape
 
             var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
 
-            MultipleDownloader.Clear();
-
-            //Log.WriteLogInfo("scraper", $"Scraping {TotalCounter} pages");
+            //MultipleDownloader.Clear();
 
             Parallel.ForEach(
                 orderablePartitioner,
@@ -263,18 +261,18 @@ namespace landerist_library.Scrape
             hashSet.Clear();
         }
 
-        public void Scrape(Uri uri)
+        public static void Scrape(Uri uri)
         {
             var page = new Page(uri);
             Scrape(page);
         }
 
-        public void Scrape(Page page)
+        public static void Scrape(Page page)
         {
             AddToPageBlocker(page);
             try
             {
-                new PageScraper(page, this).Scrape();
+                new PageScraper(page).Scrape();
             }
             catch (Exception exception)
             {
