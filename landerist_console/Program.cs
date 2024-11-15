@@ -272,7 +272,7 @@ namespace landerist_console
             //new ServiceTasks().UpdateAndScrape();
             //ServiceTasks.UpdateAndScrape();
             //ServiceTasks.Scrape();
-            //ServiceTasks.Start();
+            ServiceTasks.Start();
 
             #endregion
 
