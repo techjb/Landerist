@@ -34,12 +34,7 @@ namespace landerist_console
         private static void Start()
         {
             SetConsoleCtrlHandler(Handler, true);
-
             DateStart = DateTime.Now;
-            string textStarted =
-                $"STARTED at  {DateStart.ToShortDateString()}  {DateStart:hh\\:mm\\:ss} Version {Config.VERSION} \n";
-            Console.WriteLine(textStarted);
-
             Log.Delete();
             Log.WriteInfo("landerist_console", "Started. Version: " + Config.VERSION);
         }
@@ -56,13 +51,8 @@ namespace landerist_console
         private static void End()
         {
             ServiceTasks.Stop();
-
-            Log.WriteInfo("landerist_service", "Stopped. Version: " + Config.VERSION);
-            DateTime dateFinished = DateTime.Now;
-            string textFinished =
-                "FINISHED at " + dateFinished.ToShortDateString() + " " + dateFinished.ToString(@"hh\:mm\:ss") +
-                "\nDuration: " + (dateFinished - DateStart).ToString(@"dd\:hh\:mm\:ss\.fff") + ". ";
-            Console.WriteLine("\n" + textFinished);
+            var duration = (DateTime.Now - DateStart).ToString(@"dd\:hh\:mm\:ss\.fff");
+            Log.WriteInfo("landerist_service", "Stopped. Version: " + Config.VERSION + " Duration: " + duration);
 
 #pragma warning disable CA1416 // Validate platform compatibility
             Console.Beep(500, 500);
@@ -282,7 +272,7 @@ namespace landerist_console
             //new ServiceTasks().UpdateAndScrape();
             //ServiceTasks.UpdateAndScrape();
             //ServiceTasks.Scrape();
-            ServiceTasks.Start();
+            //ServiceTasks.Start();
 
             #endregion
 

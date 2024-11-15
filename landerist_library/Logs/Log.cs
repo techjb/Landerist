@@ -20,7 +20,8 @@ namespace landerist_library.Logs
             }
             if (Config.LOGS_IN_CONSOLE)
             {
-                Console.WriteLine(source + "\t" + text);
+                DateTime date = DateTime.Now;   
+                Console.WriteLine($"{ date:hh\\:mm\\:ss} {text}");
             }
             if (Config.LOGS_ENABLED)
             {
