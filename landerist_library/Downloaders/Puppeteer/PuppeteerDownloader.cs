@@ -157,7 +157,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
             try
             {
-                Browser!.CloseAsync();                
+                Browser!.CloseAsync();
             }
             catch (Exception exception)
             {
@@ -360,7 +360,16 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private async Task<IPage> GetBroserPage(IBrowser browser, LanguageCode languageCode, Uri uri)
         {
-            IPage browserPage = await browser.NewPageAsync();
+            IPage browserPage;
+            var pages = Task.Run(async () => await Browser!.PagesAsync()).Result;
+            if (pages.Length > 0)
+            {
+                browserPage = pages[0];
+            }
+            else
+            {
+                browserPage = await browser.NewPageAsync();
+            }
             if (Config.IsConfigurationProduction())
             {
                 browserPage.DefaultNavigationTimeout = GetTimeout();
@@ -440,7 +449,11 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private static int GetTimeout()
         {
-            return Config.HTTPCLIENT_SECONDS_TIMEOUT * 1000;
+            if (Config.IsConfigurationProduction())
+            {
+                return Config.HTTPCLIENT_SECONDS_TIMEOUT * 1000;
+            }
+            return 100000000;
         }
     }
 }

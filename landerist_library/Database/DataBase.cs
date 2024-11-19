@@ -1,6 +1,6 @@
 ﻿using landerist_library.Configuration;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Text;
 
 namespace landerist_library.Database
@@ -31,7 +31,8 @@ namespace landerist_library.Database
                 "Password=" + pw + ";" +
                 "Initial Catalog=" + databaseName + ";" +
                 "Connect Timeout=100000;" +
-                "Data Source=" + Config.DATASOURCE + ";")
+                "Data Source=" + Config.DATASOURCE + ";" +
+                "TrustServerCertificate=True;")
         {
 
         }

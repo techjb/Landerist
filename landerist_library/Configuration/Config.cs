@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "3.35";
+        public static readonly string VERSION = "3.39";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -48,7 +48,7 @@ namespace landerist_library.Configuration
 
         public static readonly string USER_AGENT = "Mozilla/5.0 (compatible; AcmeInc/1.0)";
 
-        public static readonly int HTTPCLIENT_SECONDS_TIMEOUT = 10;
+        public static readonly int HTTPCLIENT_SECONDS_TIMEOUT = 5;
 
         public static readonly int MAX_CRAW_DELAY_SECONDS = 60 * 60;
 
@@ -211,7 +211,7 @@ namespace landerist_library.Configuration
                 PrivateConfig.BATCH_DIRECTORY_LOCAL;
 
             MAX_DEGREE_OF_PARALLELISM_SCRAPER = ConfigurationProduction ?
-                10 : 1;
+                15 : 1;
         }
 
         private static void InitDatabase(bool configurationProduction)

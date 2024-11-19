@@ -20,11 +20,6 @@ namespace landerist_library.Scrape
 
         private SingleDownloader? SingleDownloader;
 
-        //public PageScraper(Page page, Scraper scraper) : this(page)
-        //{
-        //    Downloader = scraper.MultipleDownloader.GetDownloader();
-        //}
-
         public bool Scrape()
         {
             SingleDownloader = new();

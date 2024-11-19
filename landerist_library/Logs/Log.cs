@@ -20,13 +20,18 @@ namespace landerist_library.Logs
             }
             if (Config.LOGS_IN_CONSOLE)
             {
-                DateTime date = DateTime.Now;   
-                Console.WriteLine($"{ date:hh\\:mm\\:ss} {text}");
+                Console(text);
             }
             if (Config.LOGS_ENABLED)
             {
                 WriteDB(logKey, source, text);
             }
+        }
+
+        public static void Console(string text)
+        {
+            DateTime date = DateTime.Now;
+            System.Console.WriteLine($"{date:hh\\:mm\\:ss} {text}");
         }
 
         private static bool WriteDB(string logKey, string source, string text)

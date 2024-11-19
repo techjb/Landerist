@@ -13,7 +13,7 @@ namespace landerist_library.Insert.FtAgencies
         private static int Inserted = 0;
         private static int Errors = 0;
 
-        private static object Sync = new();
+        private static readonly object Sync = new();
 
         public static void GetProvincesList()
         {
