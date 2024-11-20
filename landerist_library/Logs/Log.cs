@@ -31,7 +31,7 @@ namespace landerist_library.Logs
         public static void Console(string text)
         {
             DateTime date = DateTime.Now;
-            System.Console.WriteLine($"{date:hh\\:mm\\:ss} {text}");
+            System.Console.WriteLine($"{date:HH\\:mm\\:ss} {text}");
         }
 
         private static bool WriteDB(string logKey, string source, string text)

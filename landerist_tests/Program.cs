@@ -84,7 +84,7 @@ namespace landerist_tests
             //var page = new Page("http://www.finquesniu.com/propiedades");
             //var page = new Page("https://www.mardenia-inmobiliaria.com/venta/casa-en-venta-en-sagra-638/");// listing
             //var page = new Page("https://goldacreestates.com/realestate/top/026712-42136"); // listing
-            var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/"); // listing            
+            //var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/"); // listing            
 
 
             #endregion
@@ -149,7 +149,7 @@ namespace landerist_tests
             //var Timer3 = new Timer(TimerCallback3!, null, 0, 1000);
             //new Scraper().Start();            
             //Thread.Sleep(100000000);
-            Scraper.Scrape(page);
+            //Scraper.Scrape(page);
             //new Scraper().DoTest();
 
 
@@ -192,6 +192,7 @@ namespace landerist_tests
             //landerist_library.Parse.Listing.OpenAI.Batch.BatchUpload.Start();
             //landerist_library.Parse.Listing.OpenAI.Batch.BatchDownload.Start();
             //landerist_library.Parse.Listing.OpenAI.Batch.BatchDownload.Test();
+            //landerist_library.Parse.Listing.OpenAI.Batch.BatchTasks.Start();
 
 
             #endregion

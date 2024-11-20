@@ -158,6 +158,7 @@ namespace landerist_library.Downloaders.Puppeteer
             try
             {
                 Browser!.CloseAsync();
+                Browser.Dispose();
             }
             catch (Exception exception)
             {
@@ -211,7 +212,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
         }
 
-        //private void CloseAllPagesExceptFirst()
+        //private void CloseAllPages()
         //{
         //    if (Browser == null)
         //    {
@@ -220,39 +221,17 @@ namespace landerist_library.Downloaders.Puppeteer
         //    try
         //    {
         //        var pages = Task.Run(async () => await Browser.PagesAsync()).Result;
-        //        for (var i = 1; i < pages.Length; i++)
+        //        for (var i = 0; i < pages.Length; i++)
         //        {
         //            var page = pages[i];
         //            page.CloseAsync();
         //        }
-
         //    }
         //    catch// (Exception exception)
         //    {
         //        //Logs.Log.WriteError("PuppeteerDownloader CloseAllPagesExceptFirst", exception);
         //    }
         //}
-
-        private void CloseAllPages()
-        {
-            if (Browser == null)
-            {
-                return;
-            }
-            try
-            {
-                var pages = Task.Run(async () => await Browser.PagesAsync()).Result;
-                for (var i = 0; i < pages.Length; i++)
-                {
-                    var page = pages[i];
-                    page.CloseAsync();
-                }
-            }
-            catch// (Exception exception)
-            {
-                //Logs.Log.WriteError("PuppeteerDownloader CloseAllPagesExceptFirst", exception);
-            }
-        }
 
         public static void DoTest()
         {
@@ -312,18 +291,22 @@ namespace landerist_library.Downloaders.Puppeteer
             Content = null;
             Screenshot = null;
 
+            var delay = GetTimeout();
+            if (delay.Equals(0))
+            {
+                delay = 10000000;
+            }
+
             try
             {
                 var taskGetAsync = Task.Run(async () => await GetAsync(page));
-                var taskDelay = Task.Delay(GetTimeout());
+                var taskDelay = Task.Delay(delay);
                 var completedTask = Task.WhenAny(taskGetAsync, taskDelay).Result;
                 if (completedTask == taskGetAsync)
                 {
                     taskGetAsync.Wait();
                     (Content, Screenshot) = taskGetAsync.Result;
                 }
-                //CloseAllPagesExceptFirst();
-                CloseAllPages();
             }
             catch (Exception exception)
             {
@@ -370,10 +353,9 @@ namespace landerist_library.Downloaders.Puppeteer
             {
                 browserPage = await browser.NewPageAsync();
             }
-            if (Config.IsConfigurationProduction())
-            {
-                browserPage.DefaultNavigationTimeout = GetTimeout();
-            }
+
+            browserPage.DefaultNavigationTimeout = GetTimeout();
+
             SetAccepLanguage(browserPage, languageCode);
             await browserPage.SetUserAgentAsync(Config.USER_AGENT);
 
@@ -453,7 +435,7 @@ namespace landerist_library.Downloaders.Puppeteer
             {
                 return Config.HTTPCLIENT_SECONDS_TIMEOUT * 1000;
             }
-            return 100000000;
+            return 0;
         }
     }
 }
