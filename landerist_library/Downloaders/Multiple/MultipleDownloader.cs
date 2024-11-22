@@ -10,10 +10,6 @@ namespace landerist_library.Downloaders.Multiple
 
         public SingleDownloader? GetDownloader()
         {
-            if (List.Count >= Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER)
-            {
-                return null;
-            }
             lock (Sync)
             {
                 foreach (SingleDownloader singleDownloader in List)
@@ -39,7 +35,7 @@ namespace landerist_library.Downloaders.Multiple
         {
             Parallel.ForEach(List, new ParallelOptions()
             {
-                MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
+                //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
             },
             singleDownloader =>
             {

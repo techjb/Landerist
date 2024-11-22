@@ -1,4 +1,5 @@
 ﻿using landerist_library.Configuration;
+using landerist_library.Downloaders.Multiple;
 using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Logs;
 using landerist_library.Websites;
@@ -24,7 +25,7 @@ namespace landerist_library.Scrape
 
         private readonly CancellationTokenSource CancellationTokenSource = new();
 
-        //public MultipleDownloader MultipleDownloader = new();
+        public MultipleDownloader MultipleDownloader = new();
 
 
         private List<Page> Pages = [];
@@ -59,6 +60,7 @@ namespace landerist_library.Scrape
         public void Start()
         {
             PageBlocker.Clean();
+            MultipleDownloader.Clear();
             Pages = PageSelector.Select();
             Scrape();
         }
@@ -66,7 +68,7 @@ namespace landerist_library.Scrape
         public void Stop()
         {
             CancellationTokenSource.Cancel();
-            //MultipleDownloader.Clear();
+            MultipleDownloader.Clear();
             PuppeteerDownloader.KillChrome();
         }
 
@@ -106,7 +108,7 @@ namespace landerist_library.Scrape
             ScrapeUnknowHttpStatusCode();
         }
 
-        public static void ScrapeMainPage(Website website)
+        public void ScrapeMainPage(Website website)
         {
             var page = new Page(website);
             Scrape(page);
@@ -154,10 +156,8 @@ namespace landerist_library.Scrape
             Scraped = 0;
             ThreadCounter = 0;            
 
-            var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
-
             Log.Console("Scrapping " + TotalCounter + " pages ..");
-            //MultipleDownloader.Clear();
+            var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
 
             Parallel.ForEach(
                 orderablePartitioner,
@@ -175,6 +175,7 @@ namespace landerist_library.Scrape
                 });
 
             Log.WriteInfo("scraper", $"Scraped {Scraped}/{TotalCounter} pages");
+            MultipleDownloader.Clear();
             return true;
         }
 
@@ -252,18 +253,18 @@ namespace landerist_library.Scrape
             hashSet.Clear();
         }
 
-        public static void Scrape(Uri uri)
+        public void Scrape(Uri uri)
         {
             var page = new Page(uri);
             Scrape(page);
         }
 
-        public static void Scrape(Page page)
+        public void Scrape(Page page)
         {
             AddToPageBlocker(page);
             try
             {
-                new PageScraper(page).Scrape();
+                new PageScraper(page, this).Scrape();
             }
             catch (Exception exception)
             {

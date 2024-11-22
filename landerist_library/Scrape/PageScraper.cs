@@ -20,21 +20,64 @@ namespace landerist_library.Scrape
 
         private SingleDownloader? SingleDownloader;
 
+        private readonly Scraper? Scraper;
+
+
+        public PageScraper(Page page, Scraper scraper) : this(page)
+        {
+            Scraper = scraper;
+        }
+
         public bool Scrape()
         {
-            SingleDownloader = new();
-            if (!SingleDownloader.IsAvailable())
+            if (!Download())
             {
-                Logs.Log.WriteInfo("PageScraper Scrape", "Downloader not available");
                 return false;
             }
-            SingleDownloader.Download(Page);
-            SingleDownloader.CloseBrowser();
 
             (var newPageType, var newListing, var waitingAIParsing) = PageTypeParser.GetPageType(Page);
             bool sucess = SetPageType(newPageType, newListing, waitingAIParsing);
             IndexPages();
             return sucess;
+        }
+
+
+        private bool Download()
+        {
+            if (Config.MULTIPLE_DOWNLOADERS_ENABLED)
+            {
+                return DownloadMultipleDownloaders();
+            }
+            return DownloadSingleDownloader();
+        }
+
+        private bool DownloadMultipleDownloaders()
+        {
+            if (Scraper is null)
+            {
+                return false;
+            }
+            SingleDownloader = Scraper.MultipleDownloader.GetDownloader();
+            if (SingleDownloader == null)
+            {
+                Logs.Log.WriteInfo("PageScraper DownloadMultipleDownloaders", "Downloader not available");
+                return false;
+            }
+            SingleDownloader.Download(Page);
+            return true;
+        }
+
+        private bool DownloadSingleDownloader()
+        {
+            SingleDownloader = new();
+            if (!SingleDownloader.IsAvailable())
+            {
+                Logs.Log.WriteInfo("PageScraper DownloadPageSingleDownloader", "Downloader not available");
+                return false;
+            }
+            SingleDownloader.Download(Page);
+            SingleDownloader.CloseBrowser();
+            return true;
         }
 
         public bool SetPageType(PageType? newPageType, Listing? newListing, bool waitingAIParsing)

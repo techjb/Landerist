@@ -120,6 +120,8 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private readonly IBrowser? Browser;
 
+        private IPage? BrowserPage;
+
         private static readonly NavigationOptions NavigationOptions = new()
         {
             WaitUntil = [WaitUntilNavigation.Networkidle0],
@@ -323,14 +325,14 @@ namespace landerist_library.Downloaders.Puppeteer
             {
                 if (BrowserInitialized())
                 {
-                    var browserPage = await GetBroserPage(Browser!, page.Website.LanguageCode, page.Uri);
-                    await browserPage.GoToAsync(page.Uri.ToString(), NavigationOptions);
-                    await browserPage.EvaluateExpressionAsync(ExpressionRemoveCookies);
+                    BrowserPage ??= await GetBroserPage(Browser!, page.Website.LanguageCode, page.Uri);
+                    await BrowserPage.GoToAsync(page.Uri.ToString(), NavigationOptions);
+                    await BrowserPage.EvaluateExpressionAsync(ExpressionRemoveCookies);
                     if (Config.TAKE_SCREENSHOT)
                     {
-                        screenShot = await PuppeteerScreenshot.TakeScreenshot(browserPage, page);
+                        screenShot = await PuppeteerScreenshot.TakeScreenshot(BrowserPage, page);
                     }
-                    content = await browserPage.GetContentAsync();
+                    content = await BrowserPage.GetContentAsync();
                 }
             }
             catch
