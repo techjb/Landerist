@@ -273,7 +273,7 @@ namespace landerist_tests
             //ServiceTasks.DailyTask();
             //new ServiceTasks().UpdateAndScrape();
             //ServiceTasks.UpdateAndScrape();
-            //ServiceTasks.Scrape();
+            ServiceTasks.Scrape();
             //ServiceTasks.Start();
 
             #endregion

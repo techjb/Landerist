@@ -8,29 +8,41 @@ namespace landerist_library.Scrape
 
         private readonly Dictionary<string, DateTime> HostBlocker = [];
 
-        private const int MinSecconds = 4;
+        private const int MinSecconds = 3;
 
-        private const int MaxSecconds = 7;
+        private const int MaxSecconds = 6;
 
-        public bool IsBlocked(Website website)
+        private static readonly List<(Page page, DateTime blockUntil)> Pages = [];
+
+        public bool IsBlocked(Page page)
         {
-            bool isIpBlocked = IsBlocked(IpBlocker, website.IpAddress);
-            if (isIpBlocked)
+            var date = GetDate(IpBlocker, page.Website.IpAddress);
+            if (date != null && date > DateTime.Now)
             {
+                Pages.Add((page, (DateTime)date));
                 return true;
             }
-            bool isHostBlocked = IsBlocked(HostBlocker, website.Host);
-            return isHostBlocked;
-        }
 
-        private static bool IsBlocked(Dictionary<string, DateTime> keyValuePairs, string? key)
-        {
-            if (key != null && keyValuePairs.TryGetValue(key, out DateTime value))
+            date = GetDate(HostBlocker, page.Website.Host);
+            if (date != null && date > DateTime.Now)
             {
-                var blockUntil = value;
-                return blockUntil > DateTime.Now;
+                Pages.Add((page, (DateTime)date));
+                return true;
             }
             return false;
+        }
+
+        public static List<Page> GetUnblockedPages()
+        {
+            var now = DateTime.Now;
+            var pages = Pages.Where(o => o.blockUntil < now).ToList();
+            Pages.RemoveAll(o => o.blockUntil < now);
+            return pages.Select(o => o.page).ToList();
+        }
+
+        private static DateTime? GetDate(Dictionary<string, DateTime> keyValuePairs, string? key)
+        {
+            return key != null && keyValuePairs.TryGetValue(key, out DateTime value) ? value : null;
         }
 
         public void Add(Website website)
@@ -58,6 +70,7 @@ namespace landerist_library.Scrape
 
         private static int RandomSecconds()
         {
+            //return 100;
             return new Random().Next(MinSecconds, MaxSecconds);
         }
 
@@ -78,6 +91,7 @@ namespace landerist_library.Scrape
         {
             Clean(IpBlocker);
             Clean(HostBlocker);
+            Pages.Clear();
         }
 
         private static void Clean(Dictionary<string, DateTime> keyValuePairs)

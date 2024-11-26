@@ -154,7 +154,7 @@ namespace landerist_library.Scrape
             }
             TotalCounter = BlockingCollection.Count;
             Scraped = 0;
-            ThreadCounter = 0;            
+            ThreadCounter = 0;
 
             Log.Console("Scrapping " + TotalCounter + " pages ..");
             var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
@@ -196,32 +196,15 @@ namespace landerist_library.Scrape
                 page.Update(PageType.CrawlDelayTooBig, true);
                 return;
             }
-            if (IsBlocked(page))
+            if (!PageBlocker.IsBlocked(page))
             {
-                BlokedPage(page);
-                return;
+                Scrape(page);
+                page.Dispose();
+                Interlocked.Increment(ref Scraped);
             }
-
-            Scrape(page);
-            page.Dispose();
-            Interlocked.Increment(ref Scraped);
+            AddUnblockedPages();
         }
 
-        private void BlokedPage(Page page)
-        {
-            if (BlockingCollection.IsAddingCompleted)
-            {
-                return;
-            }
-
-            try
-            {
-                BlockingCollection.Add(page);
-            }
-            catch
-            {
-            }
-        }
 
         private static void WriteConsole()
         {
@@ -269,12 +252,7 @@ namespace landerist_library.Scrape
             catch (Exception exception)
             {
                 Log.WriteError("Scraper Scrape", page.Uri, exception);
-            }            
-        }
-
-        private static bool IsBlocked(Page page)
-        {
-            return PageBlocker.IsBlocked(page.Website);
+            }
         }
 
         private static void AddToPageBlocker(Page page)
@@ -282,6 +260,24 @@ namespace landerist_library.Scrape
             lock (SyncPageBlocker)
             {
                 PageBlocker.Add(page.Website);
+            }
+        }
+
+        private void AddUnblockedPages()
+        {
+            if (BlockingCollection.IsAddingCompleted)
+            {
+                return;
+            }
+
+            var unblockedPages = PageBlocker.GetUnblockedPages();
+            if (unblockedPages.Count.Equals(0))
+            {
+                return;
+            }
+            lock (SyncPageBlocker)
+            {
+                unblockedPages.ForEach(page => BlockingCollection.Add(page));
             }
         }
     }
