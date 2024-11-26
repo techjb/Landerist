@@ -14,7 +14,6 @@ namespace landerist_library.Scrape
 
         private static readonly List<(Page page, DateTime blockUntil)> Pages = [];
 
-
         public bool IsBlocked(Page page)
         {
             if (page == null || page.Website == null)
@@ -34,7 +33,7 @@ namespace landerist_library.Scrape
 
         private static bool IsBlockedByIp(Dictionary<string, DateTime> blocker, string? key, DateTime now, Page page)
         {
-            if (key != null && blocker.TryGetValue(key, out DateTime blockUntil) && blockUntil > now)
+            if (!string.IsNullOrEmpty(key) && blocker.TryGetValue(key, out DateTime blockUntil) && blockUntil > now)
             {
                 Pages.Add((page, blockUntil));
                 return true;
@@ -56,20 +55,20 @@ namespace landerist_library.Scrape
 
         public void Add(Website website)
         {
-            var ipBlockUntil = CalculateBlockUntil();
+            var ipBlockUntil = CalculateIpBlockUntil();
             Add(IpBlocker, website.IpAddress, ipBlockUntil);
 
-            var hostBlockUntil = CalculateBlockUntil(website);
+            var hostBlockUntil = CalculateHostBlockUntil(website);
             Add(HostBlocker, website.Host, hostBlockUntil);
         }
 
-        private static DateTime CalculateBlockUntil()
+        private static DateTime CalculateIpBlockUntil()
         {
             int secconds = RandomSecconds();
             return DateTime.Now.AddSeconds(secconds);
         }
 
-        private static DateTime CalculateBlockUntil(Website website)
+        private static DateTime CalculateHostBlockUntil(Website website)
         {
             int randomSecconds = RandomSecconds();
             int crawDelay = website.CrawlDelay();
@@ -85,7 +84,7 @@ namespace landerist_library.Scrape
 
         private static void Add(Dictionary<string, DateTime> keyValuePairs, string? key, DateTime blockUntil)
         {
-            if (key == null || key.Trim().Equals(string.Empty))
+            if (string.IsNullOrEmpty(key))
             {
                 return;
             }

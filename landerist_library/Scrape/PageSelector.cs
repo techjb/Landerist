@@ -6,12 +6,14 @@ namespace landerist_library.Scrape
     public class PageSelector
     {
         private static readonly List<Page> Pages = [];
-        private static readonly Dictionary<string, int> Dictionary = [];
+        private static readonly Dictionary<string, int> DictionaryHosts = [];
+        private static readonly Dictionary<string, int> DictionaryIps = [];
 
         public static List<Page> Select()
         {
             Pages.Clear();
-            Dictionary.Clear();
+            DictionaryHosts.Clear();
+            DictionaryIps.Clear();
             SelectPages();
             return Pages;
         }
@@ -61,21 +63,42 @@ namespace landerist_library.Scrape
                 {
                     return;
                 }
-                var host = page.Website.Host;
-                if (Dictionary.TryGetValue(host, out int value))
+                AddPage(page);
+            }
+        }
+
+        private static void AddPage(Page page)
+        {
+            var host = page.Website.Host;
+            if (DictionaryHosts.TryGetValue(host, out int hostCounter))
+            {
+                if (hostCounter >= Config.MAX_PAGES_PER_HOSTS_PER_SCRAPE)
                 {
-                    if (value >= Config.MAX_PAGES_PER_HOSTS_PER_SCRAPE)
+                    return;
+                }
+                DictionaryHosts[host] = hostCounter + 1;
+            }
+            else
+            {
+                DictionaryHosts[host] = 1;
+            }
+            var ipAddress = page.Website.IpAddress;
+            if (!string.IsNullOrEmpty(ipAddress))
+            {
+                if (DictionaryIps.TryGetValue(ipAddress, out int ipCounter))
+                {
+                    if (ipCounter >= Config.MAX_PAGES_PER_IP_PER_SCRAPE)
                     {
-                        continue;
+                        return;
                     }
-                    Dictionary[host] = value + 1;
+                    DictionaryIps[ipAddress] = ipCounter + 1;
                 }
                 else
                 {
-                    Dictionary[host] = 1;
+                    DictionaryIps[ipAddress] = 1;
                 }
-                Pages.Add(page);
             }
+            Pages.Add(page);
         }
 
 
