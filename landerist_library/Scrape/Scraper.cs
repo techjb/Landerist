@@ -37,7 +37,7 @@ namespace landerist_library.Scrape
 
         public void FinalizeBlockingCollection()
         {
-            if (BlockingCollection.Count < Config.MIN_PAGES_TO_FINALIZE_SCRAPE)
+            if (BlockingCollection.Count < Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER)
             {
                 BlockingCollection.CompleteAdding();
             }
@@ -72,14 +72,14 @@ namespace landerist_library.Scrape
             PuppeteerDownloader.KillChrome();
         }
 
-        public void ScrapeUnknowPageType(int? rows = null)
+        public void ScrapeUnknowPageType()
         {
-            Pages = Websites.Pages.GetUnknownPageType(rows);
+            Pages = Websites.Pages.GetUnknownPageType();
             if (!Scrape())
             {
                 return;
             }
-            ScrapeUnknowPageType(rows);
+            ScrapeUnknowPageType();
         }
 
         public void ScrapeNonScrapped(Uri uri)
@@ -174,7 +174,11 @@ namespace landerist_library.Scrape
                     EndThread(state);
                 });
 
-            Log.WriteInfo("scraper", $"Scraped {Scraped}/{TotalCounter} pages");
+
+            int blocked = PageBlocker.CountBlockedPages();
+            Log.WriteInfo("scraper", 
+                $"Scraped {Scraped}/{TotalCounter}. Blocked {blocked}");
+
             MultipleDownloader.Clear();
             return true;
         }
@@ -196,13 +200,13 @@ namespace landerist_library.Scrape
                 page.Update(PageType.CrawlDelayTooBig, true);
                 return;
             }
-            if (!PageBlocker.IsBlocked(page))
+            if (PageBlocker.IsBlocked(page))
             {
-                Scrape(page);
-                page.Dispose();
-                Interlocked.Increment(ref Scraped);
+                return;
             }
-            AddUnblockedPages();
+            Scrape(page);
+            page.Dispose();
+            Interlocked.Increment(ref Scraped);
         }
 
 
@@ -221,6 +225,7 @@ namespace landerist_library.Scrape
 
         private void EndThread(ParallelLoopState parallelLoopState)
         {
+            AddUnblockedPages();
             Interlocked.Decrement(ref ThreadCounter);
             if (BlockingCollection.IsAddingCompleted)
             {
@@ -270,14 +275,14 @@ namespace landerist_library.Scrape
                 return;
             }
 
-            var unblockedPages = PageBlocker.GetUnblockedPages();
-            if (unblockedPages.Count.Equals(0))
+            var pages = PageBlocker.GetUnblockedPages();
+            if (pages.Count.Equals(0))
             {
                 return;
             }
             lock (SyncPageBlocker)
             {
-                unblockedPages.ForEach(page => BlockingCollection.Add(page));
+                pages.ForEach(page => BlockingCollection.Add(page));
             }
         }
     }

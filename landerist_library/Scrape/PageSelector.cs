@@ -7,7 +7,6 @@ namespace landerist_library.Scrape
     {
         private static readonly List<Page> Pages = [];
         private static readonly Dictionary<string, int> Dictionary = [];
-        private static readonly int SELECT_COUNTER = Config.MAX_PAGES_PER_SCRAPE * 2;
 
         public static List<Page> Select()
         {
@@ -27,25 +26,29 @@ namespace landerist_library.Scrape
 
         private static void AddUnknowPageType()
         {
-            var pages = Websites.Pages.GetUnknownPageType(SELECT_COUNTER);
+            var pages = Websites.Pages.GetUnknownPageType();
             AddPages(pages);
         }
 
         private static void AddNextUpdate()
         {
-            var pages = Websites.Pages.GetPagesNextUpdatePast(SELECT_COUNTER);
+            if (Pages.Count >= Config.MAX_PAGES_PER_SCRAPE)
+            {
+                return;
+            }
+            var pages = Websites.Pages.GetPagesNextUpdatePast();
             AddPages(pages);
         }
 
         private static void AddPagesToFillScrape()
         {
-            int pagesToFill = SELECT_COUNTER - Pages.Count;
+            int pagesToFill = Config.MAX_PAGES_PER_SCRAPE - Pages.Count;
             if (pagesToFill <= 0)
             {
                 return;
             }
 
-            var pages = Websites.Pages.GetPagesNextUpdateFuture(pagesToFill);
+            var pages = Websites.Pages.GetPagesNextUpdateFuture();
             pages = pages.Where(p1 => !Pages.Any(p2 => p2.UriHash == p1.UriHash)).ToList();
             AddPages(pages);
         }
@@ -75,7 +78,6 @@ namespace landerist_library.Scrape
             }
         }
 
-        
 
         private static void FilterMinPages()
         {

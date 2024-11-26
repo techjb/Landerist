@@ -42,6 +42,8 @@ namespace landerist_library.Downloaders.Puppeteer
             "--disable-setuid-sandbox",            
             "--disable-features=TranslateUI",
             "--disable-features=ChromeLabs",
+            "--disable-features=Translate",
+            "--disable-features=LensStandalone",
             "--window-position=0,0",
             "--ignore-certificate-errors",
             "--ignore-certificate-errors-spki-list",
@@ -62,8 +64,7 @@ namespace landerist_library.Downloaders.Puppeteer
           
             //"--disable-web-security",
             //"--disable-extensions",
-            //"--disable-plugins",
-            ////"--headless",
+            //"--disable-plugins",            
             //"--disable-breakpad",
             //"--disable-client-side-phishing-detection",
             //"--disable-sync",
@@ -152,6 +153,11 @@ namespace landerist_library.Downloaders.Puppeteer
             "outbrain.com",
             "bing.com",
             "pippio.com"
+        ];
+
+        private static readonly HashSet<string> BlockedExtensions =
+        [
+            ".exe", ".zip", ".rar", ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx",
         ];
 
         private readonly IBrowser? Browser;
@@ -364,7 +370,7 @@ namespace landerist_library.Downloaders.Puppeteer
                     }
                 }
             }
-            catch (Exception ex)
+            catch// (Exception ex)
             {
 
             }
@@ -424,8 +430,11 @@ namespace landerist_library.Downloaders.Puppeteer
         {
             try
             {
+                var url = e.Request.Url.ToLower();
+
                 if (BlockResources.Contains(e.Request.ResourceType) ||
                     BlockDomains.Contains(uri.Host) ||
+                    BlockedExtensions.Any(extension => url.EndsWith(extension)) ||
                     e.Request.IsNavigationRequest && e.Request.RedirectChain.Length != 0
                     //|| e.Request.IsNavigationRequest && e.Request.Url != uri.ToString()) // problematic
                     )

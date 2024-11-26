@@ -63,11 +63,13 @@ namespace landerist_library.Websites
             return GetPages(dataTable);
         }
 
-        public static List<Page> GetPagesNextUpdatePast(int? rows = null)
+        public static List<Page> GetPagesNextUpdatePast()
         {
             string query =
-                SelectQuery(rows) +
+                SelectQuery(true) +
                 "WHERE [NextUpdate] < @Now AND [WaitingAIParsing] IS NULL";
+            
+            query = AddRanquedPages(query);
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"Now", DateTime.Now },
@@ -76,12 +78,14 @@ namespace landerist_library.Websites
             return GetPages(dataTable);
         }
 
-        public static List<Page> GetPagesNextUpdateFuture(int? rows = null)
+        public static List<Page> GetPagesNextUpdateFuture()
         {
             string query =
-                SelectQuery(rows) +
+                SelectQuery(true) +
                 "WHERE [NextUpdate] >= @Now AND [WaitingAIParsing] IS NULL " +
                 "ORDER BY [NextUpdate] ASC";
+
+            query = AddRanquedPages(query);
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"Now", DateTime.Now },
@@ -120,12 +124,13 @@ namespace landerist_library.Websites
             return GetPages(website, dataTable);
         }
 
-        public static List<Page> GetUnknownPageType(int? rows = null)
+        public static List<Page> GetUnknownPageType()
         {
             string query =
-                SelectQuery(rows) +
+                SelectQuery(true) +
                 "WHERE [PageType] IS NULL AND [WaitingAIParsing] IS NULL";
 
+            query = AddRanquedPages(query);
             DataTable dataTable = new DataBase().QueryTable(query);
             return GetPages(dataTable);
         }
@@ -141,18 +146,52 @@ namespace landerist_library.Websites
             return GetPages(dataTable);
         }
 
-        private static string SelectQuery(int? rows = null)
+        private static string SelectQuery(bool addRowNumber = false)
         {
-            string topRows = string.Empty;
-            if (rows != null)
-            {
-                topRows = "TOP " + rows + " ";
-            }
+            string rowNumber = addRowNumber ? 
+                ", ROW_NUMBER() OVER (PARTITION BY [PAGES].[Host] ORDER BY [PAGES].[Host]) AS RowNum " : 
+                string.Empty;
 
             return
-                "SELECT " + topRows + TABLE_PAGES + ".*, " + Websites.WEBSITES + ".* " +
+                "SELECT " +
+                TABLE_PAGES + ".[Host], " +
+                TABLE_PAGES + ".[Uri], " +
+                TABLE_PAGES + ".[UriHash], " +
+                TABLE_PAGES + ".[Inserted], " +
+                TABLE_PAGES + ".[Updated], " +
+                TABLE_PAGES + ".[NextUpdate], " +
+                TABLE_PAGES + ".[HttpStatusCode], " +
+                TABLE_PAGES + ".[PageType], " +
+                TABLE_PAGES + ".[PageTypeCounter], " +
+                TABLE_PAGES + ".[WaitingAIParsing], " +
+                TABLE_PAGES + ".[ResponseBodyTextHash], " +
+                TABLE_PAGES + ".[ResponseBodyZipped], " +                
+                Websites.WEBSITES + ".[MainUri], " +
+                Websites.WEBSITES + ".[LanguageCode], " +
+                Websites.WEBSITES + ".[CountryCode], " +
+                Websites.WEBSITES + ".[RobotsTxt], " +
+                Websites.WEBSITES + ".[RobotsTxtUpdated], " +
+                Websites.WEBSITES + ".[SitemapUpdated], " +
+                Websites.WEBSITES + ".[IpAddress], " +
+                Websites.WEBSITES + ".[IpAddressUpdated], " +
+                Websites.WEBSITES + ".[NumPages], " +
+                Websites.WEBSITES + ".[NumListings], " +
+                Websites.WEBSITES + ".[ListingExampleUri], " +
+                Websites.WEBSITES + ".[ListingExampleNodeSet], " +
+                Websites.WEBSITES + ".[ListingExampleNodeSetUpdated] " +
+                rowNumber + 
                 "FROM " + TABLE_PAGES + " " +
-                "INNER JOIN " + Websites.WEBSITES + " ON " + TABLE_PAGES + ".[Host] = " + Websites.WEBSITES + ".[Host] ";
+                "INNER JOIN " + Websites.WEBSITES + 
+                " ON " + TABLE_PAGES + ".[Host] = " + Websites.WEBSITES + ".[Host] ";
+        }
+
+        private static string AddRanquedPages(string query)
+        {
+            return
+                "WITH RankedPages AS (" + query + ") " +
+                "SELECT TOP "+ Config.MAX_PAGES_PER_SCRAPE + " * " +
+                "FROM RankedPages AS T " +
+                "WHERE RowNum <= " + Config.MAX_PAGES_PER_HOSTS_PER_SCRAPE;
         }
 
         private static List<Page> GetPages(DataTable dataTable)

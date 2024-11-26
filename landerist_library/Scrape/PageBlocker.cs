@@ -14,35 +14,44 @@ namespace landerist_library.Scrape
 
         private static readonly List<(Page page, DateTime blockUntil)> Pages = [];
 
+
         public bool IsBlocked(Page page)
         {
-            var date = GetDate(IpBlocker, page.Website.IpAddress);
-            if (date != null && date > DateTime.Now)
+            if (page == null || page.Website == null)
             {
-                Pages.Add((page, (DateTime)date));
+                return false;
+            }
+
+            var now = DateTime.Now;
+            if (IsBlockedByIp(IpBlocker, page.Website.IpAddress, now, page) ||
+                IsBlockedByIp(HostBlocker, page.Website.Host, now, page))
+            {
                 return true;
             }
 
-            date = GetDate(HostBlocker, page.Website.Host);
-            if (date != null && date > DateTime.Now)
+            return false;
+        }
+
+        private static bool IsBlockedByIp(Dictionary<string, DateTime> blocker, string? key, DateTime now, Page page)
+        {
+            if (key != null && blocker.TryGetValue(key, out DateTime blockUntil) && blockUntil > now)
             {
-                Pages.Add((page, (DateTime)date));
+                Pages.Add((page, blockUntil));
                 return true;
             }
             return false;
         }
 
+
         public static List<Page> GetUnblockedPages()
         {
             var now = DateTime.Now;
-            var pages = Pages.Where(o => o.blockUntil < now).ToList();
-            Pages.RemoveAll(o => o.blockUntil < now);
-            return pages.Select(o => o.page).ToList();
-        }
-
-        private static DateTime? GetDate(Dictionary<string, DateTime> keyValuePairs, string? key)
-        {
-            return key != null && keyValuePairs.TryGetValue(key, out DateTime value) ? value : null;
+            var unblockedPages = Pages.Where(o => o.blockUntil < now).ToList();
+            if (unblockedPages.Count > 0)
+            {
+                Pages.RemoveAll(o => o.blockUntil < now);
+            }
+            return unblockedPages.Select(o => o.page).ToList();
         }
 
         public void Add(Website website)
@@ -106,9 +115,9 @@ namespace landerist_library.Scrape
             }
         }
 
-        public Tuple<int, int> Count()
+        public static int CountBlockedPages()
         {
-            return Tuple.Create(IpBlocker.Count, HostBlocker.Count);
+            return Pages.Count;
         }
     }
 }
