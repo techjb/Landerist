@@ -10,7 +10,7 @@ namespace landerist_library.Websites
             {
                 return false;
             }
-            return x.Uri.Equals(y.Uri);
+            return x.UriHash.Equals(y.UriHash);
         }
 
         public int GetHashCode([DisallowNull] Page obj)

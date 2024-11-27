@@ -235,7 +235,7 @@ namespace landerist_library.Scrape
 
         private void InitBlockingCollection()
         {
-            HashSet<Page> hashSet = new(Pages, new PageComparer());
+            HashSet<Page> hashSet = new(Pages, new PageComparer());            
             BlockingCollection = [.. hashSet];
             Pages.Clear();
             hashSet.Clear();

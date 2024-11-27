@@ -82,7 +82,7 @@ namespace landerist_library.Websites
             Website = website;
             Host = uri.Host;
             Uri = uri;
-            UriHash = Strings.GetHash(uri.ToString());
+            UriHash = Strings.GetHash(uri.ToString());            
             Inserted = DateTime.Now;
             Updated = DateTime.Now;
 
@@ -126,7 +126,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT * " +
-                "FROM " + Pages.TABLE_PAGES + " " +
+                "FROM " + Pages.PAGES + " " +
                 "WHERE [UriHash] = @UriHash";
 
             var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
@@ -143,7 +143,7 @@ namespace landerist_library.Websites
         public bool Insert()
         {
             string query =
-                "INSERT INTO " + Pages.TABLE_PAGES + " " +
+                "INSERT INTO " + Pages.PAGES + " " +
                 "VALUES(@Host, @Uri, @UriHash, @Inserted, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
 
             bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
@@ -174,7 +174,7 @@ namespace landerist_library.Websites
             }
 
             string query =
-                "UPDATE " + Pages.TABLE_PAGES + " SET " +
+                "UPDATE " + Pages.PAGES + " SET " +
                 "[Updated] = @Updated, " +
                 "[NextUpdate] = @NextUpdate, " +
                 "[HttpStatusCode] = @HttpStatusCode, " +
@@ -220,7 +220,7 @@ namespace landerist_library.Websites
         public bool UpdateNextUpdate()
         {
             string query =
-               "UPDATE " + Pages.TABLE_PAGES + " SET " +
+               "UPDATE " + Pages.PAGES + " SET " +
                "[NextUpdate] = @NextUpdate " +
                "WHERE [UriHash] = @UriHash";
 
@@ -233,7 +233,7 @@ namespace landerist_library.Websites
         public bool Delete()
         {
             string query =
-                "DELETE FROM " + Pages.TABLE_PAGES + " " +
+                "DELETE FROM " + Pages.PAGES + " " +
                 "WHERE [UriHash] = @UriHash";
 
             bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
@@ -389,7 +389,7 @@ namespace landerist_library.Websites
 
             string query =
                 "SELECT 1 " +
-                "FROM " + Pages.TABLE_PAGES + " " +
+                "FROM " + Pages.PAGES + " " +
                 "WHERE [HOST] = @Host AND " +
                 "[UriHash] <> @UriHash AND " +
                 "[ResponseBodyTextHash] = @ResponseBodyTextHash";
@@ -410,7 +410,7 @@ namespace landerist_library.Websites
 
             string query =
                 "SELECT 1 " +
-                "FROM " + Pages.TABLE_PAGES + " " +
+                "FROM " + Pages.PAGES + " " +
                 "WHERE [PageType] = @PageType AND " +
                 "[UriHash] <> @UriHash AND " +
                 "[ResponseBodyTextHash] = @ResponseBodyTextHash";

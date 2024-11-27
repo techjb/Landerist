@@ -399,7 +399,7 @@ namespace landerist_library.Database
         {
             string query =
                 "SELECT " +
-                Pages.TABLE_PAGES + ".[ResponseBodyText], " +
+                Pages.PAGES + ".[ResponseBodyText], " +
                 "[operation], " +
                 "[propertyType], " +
                 "[propertySubtype], " +
@@ -434,7 +434,7 @@ namespace landerist_library.Database
                 "[petsAllowed], " +
                 "[securitySystems] " +
                 "FROM " + TABLE_ES_LISTINGS + " " +
-                "INNER JOIN PAGES ON " + TABLE_ES_LISTINGS + ".[guid] = " + Pages.TABLE_PAGES + ".[UriHash] ";
+                "INNER JOIN PAGES ON " + TABLE_ES_LISTINGS + ".[guid] = " + Pages.PAGES + ".[UriHash] ";
 
             return new DataBase().QueryTable(query);
         }

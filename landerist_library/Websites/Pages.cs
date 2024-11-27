@@ -1,4 +1,5 @@
-﻿using landerist_library.Configuration;
+﻿using Google.Protobuf.Collections;
+using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Index;
 using landerist_library.Tools;
@@ -8,7 +9,7 @@ namespace landerist_library.Websites
 {
     public class Pages
     {
-        public const string TABLE_PAGES = "[PAGES]";
+        public const string PAGES = "[PAGES]";
 
         public static Page? GetPage(string uriHash)
         {
@@ -40,7 +41,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT * " +
-                "FROM " + TABLE_PAGES + " " +
+                "FROM " + PAGES + " " +
                 "WHERE [Host] = @Host";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
@@ -63,13 +64,30 @@ namespace landerist_library.Websites
             return GetPages(dataTable);
         }
 
-        public static List<Page> GetPagesNextUpdatePast()
+        public static List<Page> GetUnknownPageType()
         {
             string query =
-                SelectQuery(true) +
-                "WHERE [NextUpdate] < @Now AND [WaitingAIParsing] IS NULL";
-            
-            query = AddRanquedPages(query);
+                SelectQuery() +
+                "WHERE [PageType] IS NULL AND [WaitingAIParsing] IS NULL ";
+
+            DataTable dataTable = new DataBase().QueryTable(query);
+            return GetPages(dataTable);
+        }
+        public static List<Page> GetUnknownPageType(int topRows, List<string> hosts, List<string> ips)
+        {
+            string query =
+                SelectQuery(topRows) +
+                "WHERE [PageType] IS NULL AND " + GetWhereFilter(hosts, ips);
+
+            DataTable dataTable = new DataBase().QueryTable(query);
+            return GetPages(dataTable);
+        }
+
+        public static List<Page> GetPagesNextUpdatePast(int topRows, List<string> hosts, List<string> ips)
+        {
+            string query =
+                SelectQuery(topRows) +
+                "WHERE [NextUpdate] < @Now AND " + GetWhereFilter(hosts, ips);
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"Now", DateTime.Now },
@@ -78,14 +96,13 @@ namespace landerist_library.Websites
             return GetPages(dataTable);
         }
 
-        public static List<Page> GetPagesNextUpdateFuture()
+        public static List<Page> GetPagesNextUpdateFuture(int topRows, List<string> hosts, List<string> ips)
         {
             string query =
-                SelectQuery(true) +
-                "WHERE [NextUpdate] >= @Now AND [WaitingAIParsing] IS NULL " +
-                "ORDER BY [NextUpdate] ASC";
+                SelectQuery(topRows) +
+                "WHERE [NextUpdate] >= @Now AND " + GetWhereFilter(hosts, ips);
 
-            query = AddRanquedPages(query);
+            query += " ORDER BY [NextUpdate] ASC";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"Now", DateTime.Now },
@@ -98,7 +115,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT * " +
-                "FROM " + TABLE_PAGES + " " +
+                "FROM " + PAGES + " " +
                 "WHERE [Host] = @Host AND " +
                 "[Updated] IS NULL";
 
@@ -113,7 +130,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT * " +
-                "FROM " + TABLE_PAGES + " " +
+                "FROM " + PAGES + " " +
                 "WHERE [Host] = @Host AND " +
                 "[PageType] IS NULL";
 
@@ -124,16 +141,6 @@ namespace landerist_library.Websites
             return GetPages(website, dataTable);
         }
 
-        public static List<Page> GetUnknownPageType()
-        {
-            string query =
-                SelectQuery(true) +
-                "WHERE [PageType] IS NULL AND [WaitingAIParsing] IS NULL";
-
-            query = AddRanquedPages(query);
-            DataTable dataTable = new DataBase().QueryTable(query);
-            return GetPages(dataTable);
-        }
 
 
         public static List<Page> GetUnknowHttpStatusCode()
@@ -146,26 +153,23 @@ namespace landerist_library.Websites
             return GetPages(dataTable);
         }
 
-        private static string SelectQuery(bool addRowNumber = false)
+        private static string SelectQuery(int? topRows = null)
         {
-            string rowNumber = addRowNumber ? 
-                ", ROW_NUMBER() OVER (PARTITION BY [PAGES].[Host] ORDER BY [PAGES].[Host]) AS RowNum " : 
-                string.Empty;
-
+            string top = topRows != null ? "TOP " + topRows : "";
             return
-                "SELECT " +
-                TABLE_PAGES + ".[Host], " +
-                TABLE_PAGES + ".[Uri], " +
-                TABLE_PAGES + ".[UriHash], " +
-                TABLE_PAGES + ".[Inserted], " +
-                TABLE_PAGES + ".[Updated], " +
-                TABLE_PAGES + ".[NextUpdate], " +
-                TABLE_PAGES + ".[HttpStatusCode], " +
-                TABLE_PAGES + ".[PageType], " +
-                TABLE_PAGES + ".[PageTypeCounter], " +
-                TABLE_PAGES + ".[WaitingAIParsing], " +
-                TABLE_PAGES + ".[ResponseBodyTextHash], " +
-                TABLE_PAGES + ".[ResponseBodyZipped], " +                
+                "SELECT " + top + " " +
+                PAGES + ".[Host], " +
+                PAGES + ".[Uri], " +
+                PAGES + ".[UriHash], " +
+                PAGES + ".[Inserted], " +
+                PAGES + ".[Updated], " +
+                PAGES + ".[NextUpdate], " +
+                PAGES + ".[HttpStatusCode], " +
+                PAGES + ".[PageType], " +
+                PAGES + ".[PageTypeCounter], " +
+                PAGES + ".[WaitingAIParsing], " +
+                PAGES + ".[ResponseBodyTextHash], " +
+                PAGES + ".[ResponseBodyZipped], " +
                 Websites.WEBSITES + ".[MainUri], " +
                 Websites.WEBSITES + ".[LanguageCode], " +
                 Websites.WEBSITES + ".[CountryCode], " +
@@ -179,19 +183,16 @@ namespace landerist_library.Websites
                 Websites.WEBSITES + ".[ListingExampleUri], " +
                 Websites.WEBSITES + ".[ListingExampleNodeSet], " +
                 Websites.WEBSITES + ".[ListingExampleNodeSetUpdated] " +
-                rowNumber + 
-                "FROM " + TABLE_PAGES + " " +
-                "INNER JOIN " + Websites.WEBSITES + 
-                " ON " + TABLE_PAGES + ".[Host] = " + Websites.WEBSITES + ".[Host] ";
+                "FROM " + PAGES + " " +
+                "INNER JOIN " + Websites.WEBSITES +
+                " ON " + PAGES + ".[Host] = " + Websites.WEBSITES + ".[Host] ";
         }
-
-        private static string AddRanquedPages(string query)
+        private static string GetWhereFilter(List<string> hosts, List<string> ips)
         {
             return
-                "WITH RankedPages AS (" + query + ") " +
-                "SELECT TOP "+ Config.MAX_PAGES_PER_SCRAPE + " * " +
-                "FROM RankedPages AS T " +
-                "WHERE RowNum <= " + Config.MAX_PAGES_PER_HOSTS_PER_SCRAPE;
+                "[WaitingAIParsing] IS NULL " +
+                "AND " + Websites.WEBSITES + ".[Host] NOT IN ('" + string.Join("', '", [.. hosts]) + "') " +
+                "AND " + Websites.WEBSITES + ".[IpAddress] NOT IN ('" + string.Join("', '", [.. ips]) + "') ";
         }
 
         private static List<Page> GetPages(DataTable dataTable)
@@ -220,7 +221,7 @@ namespace landerist_library.Websites
         public static bool Delete(Website website)
         {
             string query =
-               "DELETE FROM " + TABLE_PAGES + " " +
+               "DELETE FROM " + PAGES + " " +
                "WHERE [Host] = @Host";
 
             bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
@@ -236,7 +237,7 @@ namespace landerist_library.Websites
         public static bool DeleteAll()
         {
             string query =
-               "DELETE FROM " + TABLE_PAGES;
+               "DELETE FROM " + PAGES;
 
             return new DataBase().Query(query);
         }
@@ -251,7 +252,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT [Uri] " +
-                "FROM " + TABLE_PAGES + " " +
+                "FROM " + PAGES + " " +
                 "WHERE IsListing = @IsListing";
             return new DataBase().QueryListString(query, new Dictionary<string, object?>()
             {
@@ -263,7 +264,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT [Uri] " +
-                "FROM " + TABLE_PAGES;
+                "FROM " + PAGES;
             return new DataBase().QueryListString(query);
         }
 
@@ -271,7 +272,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT [Host] " +
-                "FROM " + TABLE_PAGES + " " +
+                "FROM " + PAGES + " " +
                 "GROUP BY [Host] " +
                 "HAVING COUNT(*) > " + Config.MAX_PAGES_PER_WEBSITE;
 
@@ -311,7 +312,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT [Uri] " +
-                "FROM " + TABLE_PAGES;
+                "FROM " + PAGES;
 
             DataTable dataTable = new DataBase().QueryTable(query);
             int counter = 0;
@@ -439,7 +440,7 @@ namespace landerist_library.Websites
         public static bool RemoveResponseBodyTextHash(PageType pageType)
         {
             string query =
-                "UPDATE" + TABLE_PAGES + " " +
+                "UPDATE" + PAGES + " " +
                 "SET [ResponseBodyTextHash] = NULL " +
                 "WHERE [PageType] = @PageType";
 
@@ -451,7 +452,7 @@ namespace landerist_library.Websites
         public static bool RemoveResponseBodyTextHashToAll()
         {
             string query =
-                "UPDATE" + TABLE_PAGES + " " +
+                "UPDATE" + PAGES + " " +
                 "SET [ResponseBodyTextHash] = NULL";
 
             return new DataBase().Query(query);

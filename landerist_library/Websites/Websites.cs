@@ -405,7 +405,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + Pages.TABLE_PAGES + " " +
+                "FROM " + Pages.PAGES + " " +
                 "WHERE [Host] = @Host";
 
             return new DataBase().QueryInt(query, new Dictionary<string, object?>()

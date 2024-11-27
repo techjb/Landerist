@@ -1,4 +1,5 @@
 ﻿using landerist_library.Websites;
+using System.ComponentModel.DataAnnotations;
 
 namespace landerist_library.Scrape
 {
@@ -21,26 +22,30 @@ namespace landerist_library.Scrape
                 return false;
             }
 
-            var now = DateTime.Now;
-            if (IsBlockedByIp(IpBlocker, page.Website.IpAddress, now, page) ||
-                IsBlockedByIp(HostBlocker, page.Website.Host, now, page))
+            var blockedTimeHost = GetBlockedTime(HostBlocker, page.Website.Host);
+            var blockedTimeIp = GetBlockedTime(IpBlocker, page.Website.IpAddress);
+
+            var blockedTime = blockedTimeHost > blockedTimeIp ? blockedTimeHost : blockedTimeIp;
+            if (blockedTime > DateTime.Now)
             {
+                Pages.Add((page, blockedTime));
                 return true;
             }
-
             return false;
         }
 
-        private static bool IsBlockedByIp(Dictionary<string, DateTime> blocker, string? key, DateTime now, Page page)
+        private static DateTime GetBlockedTime(Dictionary<string, DateTime> blocker, string? key)
         {
-            if (!string.IsNullOrEmpty(key) && blocker.TryGetValue(key, out DateTime blockUntil) && blockUntil > now)
+            if (string.IsNullOrEmpty(key))
             {
-                Pages.Add((page, blockUntil));
-                return true;
+                return DateTime.MinValue;
             }
-            return false;
+            if (blocker.TryGetValue(key, out DateTime blockUntil))
+            {
+                return blockUntil;
+            }
+            return DateTime.MinValue;
         }
-
 
         public static List<Page> GetUnblockedPages()
         {

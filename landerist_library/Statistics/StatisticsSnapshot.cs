@@ -75,7 +75,7 @@ namespace landerist_library.Statistics
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + Websites.Pages.TABLE_PAGES;
+                "FROM " + Websites.Pages.PAGES;
 
             InsertDaily(StatisticsKey.Pages, query);
         }
@@ -84,7 +84,7 @@ namespace landerist_library.Statistics
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + Websites.Pages.TABLE_PAGES + " " +
+                "FROM " + Websites.Pages.PAGES + " " +
                 "WHERE CONVERT(date, [Updated]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
 
             InsertDaily(StatisticsKey.UpdatedPages, query);

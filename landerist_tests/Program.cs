@@ -67,8 +67,7 @@ namespace landerist_tests
 
             #region Urls
 
-            //var uri = new Uri("https://www.viviendasasturias.es/");            
-
+            //var uri = new Uri("https://www.viviendasasturias.es/");
             //var page = new Page("https://baronybaron.com/property/c-san-pedro-cabezon-de-la-sal-179m2/"); //listing
             // var page = new Page("https://empordaimmo.com/característica/persianas/"); // no listing
             //var page = new Page("https://www.inmobiliariasomera.com/tag/ayuda/"); // no listing
