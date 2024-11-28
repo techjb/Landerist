@@ -12,6 +12,7 @@ namespace landerist_library.Scrape
 
         public static List<Page> Select()
         {
+            Logs.Log.Console("Selecting pages");
             Init();
             SelectPages();
             return Pages;
@@ -38,6 +39,7 @@ namespace landerist_library.Scrape
             {
                 var (hosts, ips) = GetBlockedHostsAndIps();
                 var pages = Websites.Pages.GetUnknownPageType(TopRows, hosts, ips);
+                pages = RemoveDuplicates(pages);
                 if (pages.Count.Equals(0))
                 {
                     return;
@@ -52,6 +54,7 @@ namespace landerist_library.Scrape
             {
                 var (hosts, ips) = GetBlockedHostsAndIps();
                 var pages = Websites.Pages.GetPagesNextUpdatePast(TopRows, hosts, ips);
+                pages = RemoveDuplicates(pages);
                 if (pages.Count.Equals(0))
                 {
                     return;
@@ -62,15 +65,23 @@ namespace landerist_library.Scrape
 
         private static void AddPagesToFillScrape()
         {
-            if (ScrapperIsFull())
+            while (!ScrapperIsFull())
             {
-                return;
+                var (hosts, ips) = GetBlockedHostsAndIps();
+                var pages = Websites.Pages.GetPagesNextUpdateFuture(TopRows, hosts, ips);
+                pages = RemoveDuplicates(pages);
+                if (pages.Count.Equals(0))
+                {
+                    return;
+                }
+                AddPages(pages);
             }
-            
-            var (hosts, ips) = GetBlockedHostsAndIps();
-            var pages = Websites.Pages.GetPagesNextUpdateFuture(TopRows, hosts, ips);
-            pages = pages.Where(p1 => !Pages.Any(p2 => p2.UriHash == p1.UriHash)).ToList();
-            AddPages(pages);
+        }
+
+        private static List<Page> RemoveDuplicates(List<Page> pages)
+        {
+            var pageUriHashes = new HashSet<string>(Pages.Select(p => p.UriHash));
+            return pages.AsParallel().Where(p => !pageUriHashes.Contains(p.UriHash)).ToList();
         }
 
         private static void AddPages(List<Page> pages)

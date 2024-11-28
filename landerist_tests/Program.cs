@@ -85,6 +85,7 @@ namespace landerist_tests
             //var page = new Page("https://goldacreestates.com/realestate/top/026712-42136"); // listing
             //var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/"); // listing            
 
+            //var page = new Page("https://www.nerjasolproperty.com/es/apartamento-en-venta-en-torrox-costa/80124/s2");
 
             #endregion
 
@@ -148,7 +149,7 @@ namespace landerist_tests
             //var Timer3 = new Timer(TimerCallback3!, null, 0, 1000);
             //new Scraper().Start();            
             //Thread.Sleep(100000000);
-            //Scraper.Scrape(page);
+            //new Scraper().Scrape(page);
             //new Scraper().DoTest();
 
 

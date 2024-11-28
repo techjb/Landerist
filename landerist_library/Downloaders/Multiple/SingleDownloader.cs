@@ -1,4 +1,8 @@
-﻿using landerist_library.Downloaders.Puppeteer;
+﻿using Amazon.Auth.AccessControlPolicy;
+using Google.Cloud.AIPlatform.V1;
+using landerist_library.Downloaders.Puppeteer;
+using landerist_library.Scrape;
+using landerist_library.Websites;
 
 namespace landerist_library.Downloaders.Multiple
 {
@@ -6,10 +10,17 @@ namespace landerist_library.Downloaders.Multiple
     {
         private readonly PuppeteerDownloader PuppeteerDownloader;
         private bool Available;
+        public readonly List<Page> Scrapped = [];
+        public int Id = 0;
+
+        public SingleDownloader(int id) : this()
+        {
+            Id = id;
+        }
 
         public SingleDownloader()
         {
-            PuppeteerDownloader = new();
+            PuppeteerDownloader = new(this);
             Available = PuppeteerDownloader.BrowserInitialized();
         }
 
@@ -28,10 +39,16 @@ namespace landerist_library.Downloaders.Multiple
             return Available;
         }
 
-        public void Download(Websites.Page Page)
+        public void Download(Page Page)
         {
             SetUnavailable();
             PuppeteerDownloader.Download(Page);
+            Scrapped.Add(Page);
+            if (BrowserHasErrors())
+            {
+                //CloseBrowser();
+                return;
+            }
             SetAvailable();
         }
 
@@ -43,6 +60,12 @@ namespace landerist_library.Downloaders.Multiple
         public void CloseBrowser()
         {
             PuppeteerDownloader.CloseBrowser();
+            Scrapped.Clear();
+        }
+
+        public bool BrowserHasErrors()
+        {
+            return PuppeteerDownloader.BrowserWithErrors();
         }
     }
 }

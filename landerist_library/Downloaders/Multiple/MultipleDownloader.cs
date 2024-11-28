@@ -1,52 +1,92 @@
-﻿using landerist_library.Configuration;
-
-namespace landerist_library.Downloaders.Multiple
+﻿namespace landerist_library.Downloaders.Multiple
 {
     public class MultipleDownloader
     {
-        private readonly List<SingleDownloader> List = [];
+        private static readonly HashSet<SingleDownloader> Downloaders = [];
 
-        private readonly object Sync = new();
+        private static readonly object Sync = new();
 
-        public SingleDownloader? GetDownloader()
+        public static SingleDownloader? GetDownloader()
         {
             lock (Sync)
             {
-                foreach (SingleDownloader singleDownloader in List)
+                RemoveBrowserWithErrors();
+                var downloader = Downloaders.FirstOrDefault(o => o.IsAvailable() && !o.BrowserHasErrors());
+
+                if (downloader != null)
                 {
-                    if (singleDownloader.IsAvailable())
-                    {
-                        singleDownloader.SetUnavailable();
-                        return singleDownloader;
-                    }
+                    downloader.SetUnavailable();
+                    return downloader;
                 }
-                SingleDownloader newSingleDownloader = new();
+
+                int id = Downloaders.Count + 1;
+                SingleDownloader newSingleDownloader = new(id);
                 if (newSingleDownloader.IsAvailable())
                 {
-                    List.Add(newSingleDownloader);
                     newSingleDownloader.SetUnavailable();
+                    Downloaders.Add(newSingleDownloader);
                     return newSingleDownloader;
                 }
                 return null;
             }
         }
 
-        public void Clear()
+        private static void RemoveBrowserWithErrors()
         {
-            Parallel.ForEach(List, new ParallelOptions()
+            var downloaders = Downloaders.Where(singleDownloader => singleDownloader.BrowserHasErrors()).ToList();
+            if (downloaders.Count == 0)
             {
-                //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
+                return;
+            }
+
+            Logs.Log.Console("RemoveBrowserWithErrors: " + downloaders.Count + "/" + Downloaders.Count);
+            foreach (var singleDownloader in downloaders)
+            {
+                singleDownloader.CloseBrowser();
+            }
+            //Downloaders.RemoveWhere(singleDownloader => singleDownloader.BrowserHasErrors());
+        }
+
+        public static void Clear()
+        {
+            Parallel.ForEach(Downloaders, new ParallelOptions()
+            {
+
             },
             singleDownloader =>
             {
                 singleDownloader.CloseBrowser();
             });
-            List.Clear();
+            Downloaders.Clear();
         }
 
-        public void LogDownloadersCounter()
+        public static void LogDownloadersCounter()
         {
-            Logs.Log.WriteInfo("MultipleDownloader DownloadersCounter", List.Count.ToString());
+            Logs.Log.WriteInfo("MultipleDownloader DownloadersCounter", Downloaders.Count.ToString());
+        }
+
+        public static void PrintDownloadCounters()
+        {
+            if(Downloaders.Count.Equals(0))
+            {
+                return;
+            }
+            List<string> counters = [];
+            foreach (SingleDownloader singleDownloader in Downloaders)
+            {
+                int counter = singleDownloader.Scrapped.Count;
+                counters.Add(singleDownloader.Id + ":" + counter);
+            }
+            Logs.Log.Console("MultipleDownloaders: " + string.Join(" ", counters));
+        }
+
+        private static void PrintDownloadedPages(SingleDownloader singleDownloader)
+        {
+            var pages = singleDownloader.Scrapped;
+            foreach (var page in pages)
+            {
+                Logs.Log.Console(page.Uri.ToString());
+            }
         }
     }
 }

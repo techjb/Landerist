@@ -25,7 +25,7 @@ namespace landerist_library.Scrape
 
         private readonly CancellationTokenSource CancellationTokenSource = new();
 
-        public MultipleDownloader MultipleDownloader = new();
+        //public static readonly MultipleDownloader MultipleDownloader = new();
 
 
         private List<Page> Pages = [];
@@ -179,6 +179,8 @@ namespace landerist_library.Scrape
             Log.WriteInfo("scraper", 
                 $"Scraped {Scraped}/{TotalCounter}. Blocked {blocked}");
 
+            MultipleDownloader.PrintDownloadCounters();
+
             MultipleDownloader.Clear();
             return true;
         }
@@ -216,8 +218,8 @@ namespace landerist_library.Scrape
             {
                 return;
             }
-            var scrappedPercentage = Math.Round((float)Scraped * 100 / TotalCounter, 0);
 
+            var scrappedPercentage = Math.Round((float)Scraped * 100 / TotalCounter, 0);
             Console.WriteLine(
                "Threads: " + ThreadCounter + " " +
                "Scraped: " + Scraped + "/" + TotalCounter + " (" + scrappedPercentage + "%) ");

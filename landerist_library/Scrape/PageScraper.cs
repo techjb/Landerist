@@ -57,14 +57,14 @@ namespace landerist_library.Scrape
             {
                 return false;
             }
-            SingleDownloader = Scraper.MultipleDownloader.GetDownloader();
+            SingleDownloader = MultipleDownloader.GetDownloader();
             if (SingleDownloader == null)
             {
-                Logs.Log.WriteInfo("PageScraper DownloadMultipleDownloaders", "Downloader not available");
+                Logs.Log.WriteInfo("PageScraper DownloadMultipleDownloaders", "Downloader is null");
                 return false;
-            }
+            }            
             SingleDownloader.Download(Page);
-            return true;
+            return !SingleDownloader.BrowserHasErrors();
         }
 
         private bool DownloadSingleDownloader()

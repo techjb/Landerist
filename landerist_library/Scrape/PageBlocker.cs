@@ -1,5 +1,4 @@
 ﻿using landerist_library.Websites;
-using System.ComponentModel.DataAnnotations;
 
 namespace landerist_library.Scrape
 {
@@ -83,7 +82,6 @@ namespace landerist_library.Scrape
 
         private static int RandomSecconds()
         {
-            //return 100;
             return new Random().Next(MinSecconds, MaxSecconds);
         }
 

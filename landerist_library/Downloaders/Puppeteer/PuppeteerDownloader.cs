@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using landerist_library.Configuration;
+using landerist_library.Downloaders.Multiple;
 using landerist_library.Websites;
 using PuppeteerSharp;
 using System.Diagnostics;
@@ -39,7 +40,7 @@ namespace landerist_library.Downloaders.Puppeteer
             "--no-sandbox",
             "--disable-notifications",
             "--disable-infobars",
-            "--disable-setuid-sandbox",            
+            "--disable-setuid-sandbox",
             "--disable-features=TranslateUI",
             "--disable-features=ChromeLabs",
             "--disable-features=Translate",
@@ -157,8 +158,10 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private static readonly HashSet<string> BlockedExtensions =
         [
-            ".exe", ".zip", ".rar", ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx",
+            ".exe", ".zip", ".rar", ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".tmp"
         ];
+
+        private const string BrowserErrorMessage = "Object reference not set to an instance of an object.";
 
         private readonly IBrowser? Browser;
 
@@ -169,6 +172,15 @@ namespace landerist_library.Downloaders.Puppeteer
             WaitUntil = [WaitUntilNavigation.Networkidle0],
             Timeout = GetTimeout(),
         };
+
+        private readonly SingleDownloader? SingleDownloader;
+
+        private static bool NavigationError = false;
+
+        public PuppeteerDownloader(SingleDownloader singleDownloader) : this()
+        {
+            SingleDownloader = singleDownloader;
+        }
 
         public PuppeteerDownloader()
         {
@@ -183,6 +195,11 @@ namespace landerist_library.Downloaders.Puppeteer
         public bool PageInitialized()
         {
             return BrowserPage != null;
+        }
+
+        public bool BrowserWithErrors()
+        {
+            return NavigationError;
         }
 
         public bool BrowserPageInitialized()
@@ -311,12 +328,13 @@ namespace landerist_library.Downloaders.Puppeteer
             SetContentAndScrenshot(page);
             if (BrowserInitialized())
             {
-                page.SetDownloadedData(this);
+                if (!BrowserWithErrors())
+                {
+                    page.SetDownloadedData(this);
+                }
+                return;
             }
-            else
-            {
-                Logs.Log.WriteError("PuppeteerDownloader Download", "Unable to launch browser");
-            }
+            Logs.Log.WriteError("PuppeteerDownloader Download", "Unable to initialize browser");
         }
 
         public void SetContentAndScrenshot(Websites.Page page)
@@ -325,10 +343,6 @@ namespace landerist_library.Downloaders.Puppeteer
             Screenshot = null;
 
             var delay = GetTimeout();
-            //if (delay.Equals(0))
-            //{
-            //    delay = 10000000;
-            //}
 
             try
             {
@@ -337,13 +351,12 @@ namespace landerist_library.Downloaders.Puppeteer
                 var completedTask = Task.WhenAny(taskGetAsync, taskDelay).Result;
                 if (completedTask == taskGetAsync)
                 {
-                    taskGetAsync.Wait();
                     (Content, Screenshot) = taskGetAsync.Result;
                 }
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteError("PuppeteerDownloader SetContentAndScrenshot", exception);
+                Logs.Log.WriteError("PuppeteerDownloader SetContentAndScrenshot Exception", exception);
             }
         }
 
@@ -351,6 +364,7 @@ namespace landerist_library.Downloaders.Puppeteer
         {
             string? content = null;
             byte[]? screenShot = null;
+            NavigationError = false;
 
             try
             {
@@ -360,21 +374,38 @@ namespace landerist_library.Downloaders.Puppeteer
                     if (PageInitialized())
                     {
                         var url = page.Uri.ToString();
-                        await BrowserPage!.GoToAsync(url, NavigationOptions);
-                        await BrowserPage.EvaluateExpressionAsync(ExpressionRemoveCookies);
-                        if (Config.TAKE_SCREENSHOT)
+                        var response = await BrowserPage!.GoToAsync(url, NavigationOptions);
+                        if (response.Ok)
                         {
-                            screenShot = await PuppeteerScreenshot.TakeScreenshot(BrowserPage, page);
+                            await BrowserPage.EvaluateExpressionAsync(ExpressionRemoveCookies);
+                            if (Config.TAKE_SCREENSHOT)
+                            {
+                                screenShot = await PuppeteerScreenshot.TakeScreenshot(BrowserPage, page);
+                            }
+                            content = await BrowserPage.GetContentAsync();
                         }
-                        content = await BrowserPage.GetContentAsync();
-                    }
-                }
+                    }                    
+                }                
             }
-            catch// (Exception ex)
+            catch (PuppeteerException exception)
             {
-
+                NavigationError = true;
+                //Logs.Log.WriteError("PuppeteerDownloader GetAsync", exception);
+            }
+            catch (Exception exception)
+            {
+                //if (IsBrowserException(exception))
+                //{
+                //    NavigationError = true;
+                //}
+                //Logs.Log.WriteError("PuppeteerDownloader GetAsync", exception);
             }
             return (content, screenShot);
+        }
+
+        private static bool IsBrowserException(Exception exception)
+        {
+            return exception.Message.Trim().Equals(BrowserErrorMessage);
         }
 
 
@@ -434,7 +465,7 @@ namespace landerist_library.Downloaders.Puppeteer
 
                 if (BlockResources.Contains(e.Request.ResourceType) ||
                     BlockDomains.Contains(uri.Host) ||
-                    BlockedExtensions.Any(extension => url.EndsWith(extension)) ||
+                    BlockedExtensions.Any(url.EndsWith) ||
                     e.Request.IsNavigationRequest && e.Request.RedirectChain.Length != 0
                     //|| e.Request.IsNavigationRequest && e.Request.Url != uri.ToString()) // problematic
                     )
@@ -477,7 +508,7 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private static int GetTimeout()
         {
-            return Config.HTTPCLIENT_SECONDS_TIMEOUT * 1000;            
+            return Config.HTTPCLIENT_SECONDS_TIMEOUT * 1000;
         }
     }
 }
