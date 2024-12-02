@@ -28,11 +28,9 @@ namespace landerist_console
         {
             SetConsoleCtrlHandler(Handler, true);
             DateStart = DateTime.Now;
-            Config.SetToProduction();
+            Config.SetToProduction();            
             Log.Delete();
             Log.WriteInfo("landerist_console", "Started. Version: " + Config.VERSION);
-
-
         }
 
         private static bool ConsoleEventHandler(int eventType)

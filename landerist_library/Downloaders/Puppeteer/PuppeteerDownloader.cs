@@ -95,8 +95,8 @@ namespace landerist_library.Downloaders.Puppeteer
         private static readonly LaunchOptions launchOptions = new()
         {
             //Headless = true, // if false, maybe need to comment await browserPage.SetRequestInterceptionAsync(true);          
-            //Headless = Config.IsConfigurationProduction(),
-            Headless = false,
+            Headless = Config.IsConfigurationProduction(),
+            //Headless = false,
             Devtools = false,
             //IgnoreHTTPSErrors = true,            
             Args = Config.TAKE_SCREENSHOT ? [.. LaunchOptionsArgs, .. LaunchOptionsScreenShot] : LaunchOptionsArgs,
