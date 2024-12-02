@@ -3,6 +3,7 @@ using landerist_library.Configuration;
 using landerist_library.Downloaders.Multiple;
 using landerist_library.Websites;
 using PuppeteerSharp;
+using System;
 using System.Diagnostics;
 
 
@@ -161,26 +162,18 @@ namespace landerist_library.Downloaders.Puppeteer
             ".exe", ".zip", ".rar", ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".tmp"
         ];
 
-        private const string BrowserErrorMessage = "Object reference not set to an instance of an object.";
-
         private readonly IBrowser? Browser;
 
         private IPage? BrowserPage;
 
         private static readonly NavigationOptions NavigationOptions = new()
         {
-            WaitUntil = [WaitUntilNavigation.Networkidle0],
+            WaitUntil = [WaitUntilNavigation.Networkidle2],
             Timeout = GetTimeout(),
         };
 
-        private readonly SingleDownloader? SingleDownloader;
-
         private static bool NavigationError = false;
 
-        public PuppeteerDownloader(SingleDownloader singleDownloader) : this()
-        {
-            SingleDownloader = singleDownloader;
-        }
 
         public PuppeteerDownloader()
         {
@@ -197,7 +190,7 @@ namespace landerist_library.Downloaders.Puppeteer
             return BrowserPage != null;
         }
 
-        public bool BrowserWithErrors()
+        public static bool BrowserWithErrors()
         {
             return NavigationError;
         }
@@ -230,6 +223,24 @@ namespace landerist_library.Downloaders.Puppeteer
             {
                 Browser!.CloseAsync();
                 Browser.Dispose();
+            }
+            catch (Exception exception)
+            {
+                Logs.Log.WriteError("PuppeteerDownloader CloseBrowserAsync", exception);
+            }
+        }
+
+        public void ClosePage()
+        {
+            if (!PageInitialized())
+            {
+                return;
+            }
+            try
+            {
+                BrowserPage!.CloseAsync();
+                BrowserPage.Dispose();
+                BrowserPage = null;
             }
             catch (Exception exception)
             {
@@ -384,28 +395,20 @@ namespace landerist_library.Downloaders.Puppeteer
                             }
                             content = await BrowserPage.GetContentAsync();
                         }
-                    }                    
-                }                
+                    }
+                }
             }
             catch (PuppeteerException exception)
             {
                 NavigationError = true;
-                //Logs.Log.WriteError("PuppeteerDownloader GetAsync", exception);
+                Logs.Log.WriteError("PuppeteerDownloader GetAsync PuppeteerException", exception);
             }
             catch (Exception exception)
             {
-                //if (IsBrowserException(exception))
-                //{
-                //    NavigationError = true;
-                //}
-                //Logs.Log.WriteError("PuppeteerDownloader GetAsync", exception);
+                Logs.Log.WriteError("PuppeteerDownloader GetAsync Exception", exception);
             }
-            return (content, screenShot);
-        }
 
-        private static bool IsBrowserException(Exception exception)
-        {
-            return exception.Message.Trim().Equals(BrowserErrorMessage);
+            return (content, screenShot);
         }
 
 

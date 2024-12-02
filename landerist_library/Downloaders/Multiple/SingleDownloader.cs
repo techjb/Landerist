@@ -20,7 +20,7 @@ namespace landerist_library.Downloaders.Multiple
 
         public SingleDownloader()
         {
-            PuppeteerDownloader = new(this);
+            PuppeteerDownloader = new();
             Available = PuppeteerDownloader.BrowserInitialized();
         }
 
@@ -46,7 +46,7 @@ namespace landerist_library.Downloaders.Multiple
             Scrapped.Add(Page);
             if (BrowserHasErrors())
             {
-                //CloseBrowser();
+                CloseBrowser();
                 return;
             }
             SetAvailable();
@@ -59,11 +59,10 @@ namespace landerist_library.Downloaders.Multiple
 
         public void CloseBrowser()
         {
-            PuppeteerDownloader.CloseBrowser();
-            Scrapped.Clear();
+            PuppeteerDownloader.CloseBrowser();            
         }
 
-        public bool BrowserHasErrors()
+        public static bool BrowserHasErrors()
         {
             return PuppeteerDownloader.BrowserWithErrors();
         }

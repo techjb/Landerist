@@ -180,7 +180,6 @@ namespace landerist_library.Scrape
                 $"Scraped {Scraped}/{TotalCounter}. Blocked {blocked}");
 
             MultipleDownloader.PrintDownloadCounters();
-
             MultipleDownloader.Clear();
             return true;
         }

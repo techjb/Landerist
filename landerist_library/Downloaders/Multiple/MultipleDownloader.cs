@@ -10,9 +10,10 @@
         {
             lock (Sync)
             {
-                RemoveBrowserWithErrors();
-                var downloader = Downloaders.FirstOrDefault(o => o.IsAvailable() && !o.BrowserHasErrors());
+                //RemoveBrowserWithErrors();
+                //var downloader = Downloaders.FirstOrDefault(o => o.IsAvailable() && !o.BrowserHasErrors());
 
+                var downloader = Downloaders.FirstOrDefault(o => o.IsAvailable());
                 if (downloader != null)
                 {
                     downloader.SetUnavailable();
@@ -31,21 +32,21 @@
             }
         }
 
-        private static void RemoveBrowserWithErrors()
-        {
-            var downloaders = Downloaders.Where(singleDownloader => singleDownloader.BrowserHasErrors()).ToList();
-            if (downloaders.Count == 0)
-            {
-                return;
-            }
+        //private static void RemoveBrowserWithErrors()
+        //{
+        //    var downloaders = Downloaders.Where(singleDownloader => singleDownloader.BrowserHasErrors()).ToList();
+        //    if (downloaders.Count == 0)
+        //    {
+        //        return;
+        //    }
 
-            Logs.Log.Console("RemoveBrowserWithErrors: " + downloaders.Count + "/" + Downloaders.Count);
-            foreach (var singleDownloader in downloaders)
-            {
-                singleDownloader.CloseBrowser();
-            }
-            //Downloaders.RemoveWhere(singleDownloader => singleDownloader.BrowserHasErrors());
-        }
+        //    Logs.Log.Console("RemoveBrowserWithErrors: " + downloaders.Count + "/" + Downloaders.Count);
+        //    foreach (var singleDownloader in downloaders)
+        //    {
+        //        singleDownloader.CloseBrowser();
+        //    }
+        //    //Downloaders.RemoveWhere(singleDownloader => singleDownloader.BrowserHasErrors());
+        //}
 
         public static void Clear()
         {
@@ -67,26 +68,16 @@
 
         public static void PrintDownloadCounters()
         {
-            if(Downloaders.Count.Equals(0))
+            if (Downloaders.Count.Equals(0))
             {
                 return;
             }
             List<string> counters = [];
             foreach (SingleDownloader singleDownloader in Downloaders)
             {
-                int counter = singleDownloader.Scrapped.Count;
-                counters.Add(singleDownloader.Id + ":" + counter);
+                counters.Add(singleDownloader.Id + ":" + singleDownloader.Scrapped.Count);
             }
-            Logs.Log.Console("MultipleDownloaders: " + string.Join(" ", counters));
-        }
-
-        private static void PrintDownloadedPages(SingleDownloader singleDownloader)
-        {
-            var pages = singleDownloader.Scrapped;
-            foreach (var page in pages)
-            {
-                Logs.Log.Console(page.Uri.ToString());
-            }
+            Logs.Log.WriteInfo("MultipleDownloaders", string.Join(" ", counters));
         }
     }
 }
