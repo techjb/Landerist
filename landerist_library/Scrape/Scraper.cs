@@ -19,6 +19,10 @@ namespace landerist_library.Scrape
 
         private static int Scraped = 0;
 
+        private static int Sucsess = 0;
+
+        private static int Errors = 0;
+
         private static int ThreadCounter = 0;
 
         private BlockingCollection<Page> BlockingCollection = [];
@@ -154,6 +158,8 @@ namespace landerist_library.Scrape
             }
             TotalCounter = BlockingCollection.Count;
             Scraped = 0;
+            Sucsess = 0;
+            Errors = 0;
             ThreadCounter = 0;
 
             Log.Console("Scrapping " + TotalCounter + " pages ..");
@@ -176,8 +182,9 @@ namespace landerist_library.Scrape
 
 
             int blocked = PageBlocker.CountBlockedPages();
-            Log.WriteInfo("scraper", 
-                $"Scraped {Scraped}/{TotalCounter}. Blocked {blocked}");
+            Log.WriteInfo("scraper",
+                $"Scraped {Scraped}/{TotalCounter}. Blocked {blocked} Suceess: {Sucsess} Erros: {Errors}");
+
 
             MultipleDownloader.PrintDownloadCounters();
             MultipleDownloader.Clear();
@@ -236,7 +243,7 @@ namespace landerist_library.Scrape
 
         private void InitBlockingCollection()
         {
-            HashSet<Page> hashSet = new(Pages, new PageComparer());            
+            HashSet<Page> hashSet = new(Pages, new PageComparer());
             BlockingCollection = [.. hashSet];
             Pages.Clear();
             hashSet.Clear();
@@ -253,7 +260,15 @@ namespace landerist_library.Scrape
             AddToPageBlocker(page);
             try
             {
-                new PageScraper(page, this).Scrape();
+                var pageScraper = new PageScraper(page, this);
+                if (pageScraper.Scrape())
+                {
+                    Interlocked.Increment(ref Sucsess);
+                }
+                else
+                {
+                    Interlocked.Increment(ref Errors);
+                }
             }
             catch (Exception exception)
             {
@@ -276,14 +291,14 @@ namespace landerist_library.Scrape
                 return;
             }
 
-            var pages = PageBlocker.GetUnblockedPages();
-            if (pages.Count.Equals(0))
-            {
-                return;
-            }
             lock (SyncPageBlocker)
             {
-                pages.ForEach(page => BlockingCollection.Add(page));
+                var pages = PageBlocker.GetUnblockedPages();
+                if (pages.Count.Equals(0))
+                {
+                    return;
+                }
+                pages.ForEach(BlockingCollection.Add);
             }
         }
     }

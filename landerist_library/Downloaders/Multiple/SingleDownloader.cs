@@ -1,14 +1,17 @@
 ﻿using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Websites;
 
+
 namespace landerist_library.Downloaders.Multiple
 {
     public class SingleDownloader
     {
-        private readonly PuppeteerDownloader PuppeteerDownloader;
+        private readonly PuppeteerDownloader Downloader;
         private bool Available;
         private readonly List<Page> Scrapped = [];
         public int Id = 0;
+        public int ErrorsCounter = 0;
+        public int SucessCounter = 0;
 
         public SingleDownloader(int id) : this()
         {
@@ -17,8 +20,8 @@ namespace landerist_library.Downloaders.Multiple
 
         public SingleDownloader()
         {
-            PuppeteerDownloader = new();
-            Available = PuppeteerDownloader.BrowserInitialized();
+            Downloader = new(this);
+            Available = Downloader.BrowserInitialized();
         }
 
         public void SetUnavailable()
@@ -39,32 +42,42 @@ namespace landerist_library.Downloaders.Multiple
         public void Download(Page Page)
         {
             SetUnavailable();
-            PuppeteerDownloader.Download(Page);
-            Scrapped.Add(Page);
+            Downloader.Download(Page);
+            //if (BrowserHasErrors())
+            //{
+            //    CloseBrowser();
+            //    return;
+            //}
             if (BrowserHasErrors())
             {
-                CloseBrowser();
-                return;
+                ErrorsCounter++;
+                Downloader.ClosePage();
+                Task.Run(() => Task.Delay(500)).Wait();
             }
+            else
+            {
+                SucessCounter++;
+            }
+            Scrapped.Add(Page);
             SetAvailable();
         }
 
         public string? GetRedirectUrl()
         {
-            return PuppeteerDownloader.RedirectUrl;
+            return Downloader.RedirectUrl;
         }
 
         public void CloseBrowser()
         {
-            PuppeteerDownloader.CloseBrowser();            
+            Downloader.CloseBrowser();
         }
 
         public bool BrowserHasErrors()
         {
-            return PuppeteerDownloader.BrowserWithErrors();
+            return Downloader.BrowserWithErrors();
         }
 
-        public int Count()
+        public int ScrapedCount()
         {
             return Scrapped.Count;
         }

@@ -13,11 +13,16 @@
                 //RemoveBrowserWithErrors();
                 //var downloader = Downloaders.FirstOrDefault(o => o.IsAvailable() && !o.BrowserHasErrors());
 
-                var downloader = Downloaders.FirstOrDefault(o => o.IsAvailable());
-                if (downloader != null)
+                //var downloader = Downloaders.FirstOrDefault(o => o.IsAvailable());
+                //if (downloader != null)
+                //{
+                //    downloader.SetUnavailable();
+                //    return downloader;
+                //}
+                var availables = Downloaders.Where(o => o.IsAvailable()).ToList();
+                if (availables.Count != 0)
                 {
-                    downloader.SetUnavailable();
-                    return downloader;
+                    return  availables[new Random().Next(availables.Count)];                    
                 }
 
                 int id = Downloaders.Count + 1;
@@ -28,6 +33,8 @@
                     Downloaders.Add(newSingleDownloader);
                     return newSingleDownloader;
                 }
+
+                Logs.Log.WriteError("MultipleDownloader GetDownloader", "Downloader not found");
                 return null;
             }
         }
@@ -82,14 +89,17 @@
                 {
                     withErrors++;
                 }
-                var counter = singleDownloader.Count();
+                var counter = singleDownloader.ScrapedCount();
                 if (counter > maxDownloads)
                 {
                     maxDownloads = counter;
                 }
             }
+            //Logs.Log.WriteInfo("MultipleDownloaders",
+            //    $"Downloaders: {Downloaders.Count} WithErros: {withErrors} MaxDownloads: {maxDownloads}");
+
             Logs.Log.WriteInfo("MultipleDownloaders",
-                $"Downloaders: {Downloaders.Count} WithErros: {withErrors} MaxDownloads: {maxDownloads}");
+                $"Downloaders: {Downloaders.Count} MaxDownloads: {maxDownloads}");
         }
     }
 }

@@ -88,10 +88,10 @@ namespace landerist_library.Logs
         private static string GetText(Exception exception)
         {
             return
-                "Message: " + exception.Message + "\r\n" +
-                "Source: " + exception.Source + "\r\n" +
-                "StackTrace: " + exception.StackTrace + "\r\n" +
-                "TargetSite: " + exception.TargetSite + "\r\n" +
+                "Message: " + exception.Message + "\r\n\r\n" +
+                "Source: " + exception.Source + "\r\n\r\n" +
+                "StackTrace: " + exception.StackTrace + "\r\n\r\n" +
+                "TargetSite: " + exception.TargetSite + "\r\n\r\n" +
                 "InnerException: " + exception.InnerException;
 
         }

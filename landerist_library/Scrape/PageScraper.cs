@@ -58,9 +58,8 @@ namespace landerist_library.Scrape
                 return false;
             }
             SingleDownloader = MultipleDownloader.GetDownloader();
-            if (SingleDownloader == null)
+            if (SingleDownloader is null)
             {
-                Logs.Log.WriteInfo("PageScraper DownloadMultipleDownloaders", "Downloader is null");
                 return false;
             }            
             SingleDownloader.Download(Page);

@@ -54,7 +54,7 @@ namespace landerist_library.Downloaders.Puppeteer
             "--disable-background-timer-throttling",
             "--disable-renderer-backgrounding",
             "--incognito",
-            "--single-process",
+            //"--single-process",
             "--disable-dev-profile",
             "--aggressive-cache-discard",
             "--disable-cache",
@@ -63,6 +63,10 @@ namespace landerist_library.Downloaders.Puppeteer
             "--disable-gpu-shader-disk-cache",
             "--media-cache-size=0",
             "--disk-cache-size=0",
+            "--disable-gl-drawing-for-tests",
+            "--disable-offline-load-stale-cache",
+            "--disable-histograms",
+            "--disk-cache-dir=null",
           
             //"--disable-web-security",
             //"--disable-extensions",
@@ -71,15 +75,15 @@ namespace landerist_library.Downloaders.Puppeteer
             //"--disable-client-side-phishing-detection",
             //"--disable-sync",
             //"--disable-translate",
-            //"--no-experiments",
+            "--no-experiments",
             //"--disable-default-apps",
             //"--mute-audio",
-            //"--no-default-browser-check",
-            //"--disable-background-timer-throttling",
-            //"--disable-backgrounding-occluded-windows",
-            //"--disable-notifications",
-            //"--disable-background-networking",
-            //"--disable-component-update",
+            "--no-default-browser-check",
+            "--disable-background-timer-throttling",
+            "--disable-backgrounding-occluded-windows",
+            "--disable-notifications",
+            "--disable-background-networking",
+            "--disable-component-update",
             //"--disable-domain-reliability",
             //"--autoplay-policy=user-gesture-required",
             //"--disable-component-extensions-with-background-pages",
@@ -162,7 +166,7 @@ namespace landerist_library.Downloaders.Puppeteer
             ".exe", ".zip", ".rar", ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".tmp"
         ];
 
-        private readonly IBrowser? Browser;
+        private IBrowser? Browser;
 
         private IPage? BrowserPage;
 
@@ -172,12 +176,19 @@ namespace landerist_library.Downloaders.Puppeteer
             Timeout = GetTimeout(),
         };
 
-        private static bool NavigationError = false;
+        private bool NavigationError = false;
 
+        private readonly SingleDownloader? SingleDownloader;
+
+
+        public PuppeteerDownloader(SingleDownloader singleDownloader) : this()
+        {
+            SingleDownloader = singleDownloader;
+        }
 
         public PuppeteerDownloader()
         {
-            Browser = Task.Run(LaunchAsync).Result;
+            Browser = Task.Run(LaunchAsync).Result;            
         }
 
         public bool BrowserInitialized()
@@ -190,7 +201,8 @@ namespace landerist_library.Downloaders.Puppeteer
             return BrowserPage != null;
         }
 
-        public static bool BrowserWithErrors()
+
+        public bool BrowserWithErrors()
         {
             return NavigationError;
         }
@@ -200,7 +212,7 @@ namespace landerist_library.Downloaders.Puppeteer
             return BrowserInitialized() && PageInitialized();
         }
 
-        private static async Task<IBrowser?> LaunchAsync()
+        private async Task<IBrowser?> LaunchAsync()
         {
             try
             {
@@ -222,12 +234,13 @@ namespace landerist_library.Downloaders.Puppeteer
             try
             {
                 Browser!.CloseAsync();
-                Browser.Dispose();
+                Browser!.Dispose();                
             }
             catch (Exception exception)
             {
                 Logs.Log.WriteError("PuppeteerDownloader CloseBrowserAsync", exception);
             }
+            Browser = null;
         }
 
         public void ClosePage()
@@ -238,14 +251,14 @@ namespace landerist_library.Downloaders.Puppeteer
             }
             try
             {
-                BrowserPage!.CloseAsync();
-                BrowserPage.Dispose();
-                BrowserPage = null;
+                Task.Run(async () => await BrowserPage!.CloseAsync()).Wait();
+                BrowserPage!.Dispose();
             }
             catch (Exception exception)
             {
                 Logs.Log.WriteError("PuppeteerDownloader CloseBrowserAsync", exception);
-            }
+            }            
+            BrowserPage = null;
         }
 
         public static void UpdateChromeAndDoTest()
@@ -337,15 +350,13 @@ namespace landerist_library.Downloaders.Puppeteer
         public void Download(Websites.Page page)
         {
             SetContentAndScrenshot(page);
-            if (BrowserInitialized())
+            if (PageInitialized())
             {
                 if (!BrowserWithErrors())
                 {
                     page.SetDownloadedData(this);
                 }
-                return;
             }
-            Logs.Log.WriteError("PuppeteerDownloader Download", "Unable to initialize browser");
         }
 
         public void SetContentAndScrenshot(Websites.Page page)
@@ -364,11 +375,11 @@ namespace landerist_library.Downloaders.Puppeteer
                 {
                     (Content, Screenshot) = taskGetAsync.Result;
                 }
-            }
+            }            
             catch (Exception exception)
             {
                 Logs.Log.WriteError("PuppeteerDownloader SetContentAndScrenshot Exception", exception);
-            }
+            }            
         }
 
         private async Task<(string? content, byte[]? screenShot)> GetAsync(Websites.Page page)
@@ -381,9 +392,10 @@ namespace landerist_library.Downloaders.Puppeteer
             {
                 if (BrowserInitialized())
                 {
-                    await InitializePage(page.Website.LanguageCode, page.Uri);
+                    await InitializePage(page.Website.LanguageCode, page.Uri);                    
                     if (PageInitialized())
                     {
+                        
                         var url = page.Uri.ToString();
                         var response = await BrowserPage!.GoToAsync(url, NavigationOptions);
                         if (response.Ok)
@@ -394,21 +406,32 @@ namespace landerist_library.Downloaders.Puppeteer
                                 screenShot = await PuppeteerScreenshot.TakeScreenshot(BrowserPage, page);
                             }
                             content = await BrowserPage.GetContentAsync();
+                            return (content, screenShot);
                         }
                     }
                 }
             }
-            //catch (PuppeteerException exception)
-            //{
-            //    NavigationError = true;
-            //    Logs.Log.WriteError("PuppeteerDownloader GetAsync PuppeteerException", exception);
-            //}
-            catch //(Exception exception)
+            catch (NullReferenceException exception)
             {
-                NavigationError = true;
-                //Logs.Log.WriteError("PuppeteerDownloader GetAsync Exception", exception);
-            }
 
+            }
+            catch (TargetClosedException exception)
+            {
+                
+            }
+            catch (NavigationException exception)
+            {
+                
+            }
+            catch (PuppeteerException exception)
+            {
+                
+            }
+            catch (Exception exception)
+            {
+                Logs.Log.WriteError("PuppeterDownloader GetAsync Exception", exception.GetType().ToString());
+            }
+            NavigationError = true;
             return (content, screenShot);
         }
 
@@ -419,16 +442,29 @@ namespace landerist_library.Downloaders.Puppeteer
             {
                 return;
             }
-            var pages = Task.Run(async () => await Browser!.PagesAsync()).Result;
-            if (pages.Length > 0)
+            
+            try
             {
+                var pages = Task.Run(async () => await Browser!.PagesAsync()).Result;
+                if (pages.Length > 0)
+                {
 
-                BrowserPage = pages[0];
+                    BrowserPage = pages[0];
+                    //Logs.Log.WriteInfo(SingleDownloader!.Id.ToString(), "PageInitialized current-page pages" + pages.Length);
+                }
+                else
+                {
+                    BrowserPage = await Browser!.NewPageAsync();
+                    //Logs.Log.WriteInfo(SingleDownloader!.Id.ToString(), "PageInitialized new-page");
+                }
             }
-            else
+            catch (Exception exception)
             {
-                BrowserPage = await Browser!.NewPageAsync();
+                Logs.Log.WriteInfo("PageInitialized error", SingleDownloader!.Id.ToString() + " " + exception.Message);
+                //Logs.Log.WriteError( SingleDownloader!.Id +  " PuppeteerDownloader InitializePage", exception);
+                return;
             }
+
 
             BrowserPage.DefaultNavigationTimeout = GetTimeout();
 
@@ -441,10 +477,9 @@ namespace landerist_library.Downloaders.Puppeteer
             BrowserPage.Response += (sender, e) => HandleResponseAsync(e, uri);
             //await browserPage.Client.SendAsync("HeapProfiler.collectGarbage");
 
-
         }
 
-        private static void SetAccepLanguage(IPage browserPage, LanguageCode languageCode)
+        private void SetAccepLanguage(IPage browserPage, LanguageCode languageCode)
         {
             Dictionary<string, string> extraHeaders = [];
             switch (languageCode)
@@ -461,7 +496,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
         }
 
-        private static async Task HandleRequestAsync(RequestEventArgs e, Uri uri)
+        private async Task HandleRequestAsync(RequestEventArgs e, Uri uri)
         {
             try
             {
