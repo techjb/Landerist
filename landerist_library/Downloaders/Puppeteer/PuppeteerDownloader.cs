@@ -398,14 +398,15 @@ namespace landerist_library.Downloaders.Puppeteer
                     }
                 }
             }
-            catch (PuppeteerException exception)
+            //catch (PuppeteerException exception)
+            //{
+            //    NavigationError = true;
+            //    Logs.Log.WriteError("PuppeteerDownloader GetAsync PuppeteerException", exception);
+            //}
+            catch //(Exception exception)
             {
                 NavigationError = true;
-                Logs.Log.WriteError("PuppeteerDownloader GetAsync PuppeteerException", exception);
-            }
-            catch (Exception exception)
-            {
-                Logs.Log.WriteError("PuppeteerDownloader GetAsync Exception", exception);
+                //Logs.Log.WriteError("PuppeteerDownloader GetAsync Exception", exception);
             }
 
             return (content, screenShot);

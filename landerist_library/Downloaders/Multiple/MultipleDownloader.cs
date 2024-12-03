@@ -61,10 +61,10 @@
             Downloaders.Clear();
         }
 
-        public static void LogDownloadersCounter()
-        {
-            Logs.Log.WriteInfo("MultipleDownloader DownloadersCounter", Downloaders.Count.ToString());
-        }
+        //public static void LogDownloadersCounter()
+        //{
+        //    Logs.Log.WriteInfo("MultipleDownloader DownloadersCounter", Downloaders.Count.ToString());
+        //}
 
         public static void PrintDownloadCounters()
         {
@@ -72,12 +72,24 @@
             {
                 return;
             }
-            List<string> counters = [];
+
+            int withErrors = 0;
+            int maxDownloads = 0;
+
             foreach (SingleDownloader singleDownloader in Downloaders)
             {
-                counters.Add(singleDownloader.Id + ":" + singleDownloader.Scrapped.Count);
+                if (singleDownloader.BrowserHasErrors())
+                {
+                    withErrors++;
+                }
+                var counter = singleDownloader.Count();
+                if (counter > maxDownloads)
+                {
+                    maxDownloads = counter;
+                }
             }
-            Logs.Log.WriteInfo("MultipleDownloaders", string.Join(" ", counters));
+            Logs.Log.WriteInfo("MultipleDownloaders",
+                $"Downloaders: {Downloaders.Count} WithErros: {withErrors} MaxDownloads: {maxDownloads}");
         }
     }
 }

@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "3.66";
+        public static readonly string VERSION = "3.67";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -45,7 +45,7 @@ namespace landerist_library.Configuration
 
         public static readonly bool LOGS_ENABLED = true;
 
-        public static readonly bool LOGS_IN_CONSOLE = false;
+        public static readonly bool LOGS_IN_CONSOLE = true;
         public static bool TIMERS_ENABLED { get; set; }
 
         public static readonly string USER_AGENT = "Mozilla/5.0 (compatible; AcmeInc/1.0)";

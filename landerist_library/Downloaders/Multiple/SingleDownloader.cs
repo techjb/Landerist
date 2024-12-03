@@ -1,7 +1,4 @@
-﻿using Amazon.Auth.AccessControlPolicy;
-using Google.Cloud.AIPlatform.V1;
-using landerist_library.Downloaders.Puppeteer;
-using landerist_library.Scrape;
+﻿using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Websites;
 
 namespace landerist_library.Downloaders.Multiple
@@ -10,7 +7,7 @@ namespace landerist_library.Downloaders.Multiple
     {
         private readonly PuppeteerDownloader PuppeteerDownloader;
         private bool Available;
-        public readonly List<Page> Scrapped = [];
+        private readonly List<Page> Scrapped = [];
         public int Id = 0;
 
         public SingleDownloader(int id) : this()
@@ -62,9 +59,14 @@ namespace landerist_library.Downloaders.Multiple
             PuppeteerDownloader.CloseBrowser();            
         }
 
-        public static bool BrowserHasErrors()
+        public bool BrowserHasErrors()
         {
             return PuppeteerDownloader.BrowserWithErrors();
+        }
+
+        public int Count()
+        {
+            return Scrapped.Count;
         }
     }
 }
