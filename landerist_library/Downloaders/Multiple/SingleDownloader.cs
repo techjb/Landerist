@@ -6,12 +6,11 @@ namespace landerist_library.Downloaders.Multiple
 {
     public class SingleDownloader
     {
-        private readonly PuppeteerDownloader Downloader;
+        private PuppeteerDownloader Downloader;
         private bool Available;
         private readonly List<Page> Scrapped = [];
         public int Id = 0;
-        public int ErrorsCounter = 0;
-        public int SucessCounter = 0;
+        private int CrashCounter = 0;
 
         public SingleDownloader(int id) : this()
         {
@@ -19,6 +18,11 @@ namespace landerist_library.Downloaders.Multiple
         }
 
         public SingleDownloader()
+        {
+            StartBrowser();
+        }
+
+        private void StartBrowser()
         {
             Downloader = new(this);
             Available = Downloader.BrowserInitialized();
@@ -39,27 +43,20 @@ namespace landerist_library.Downloaders.Multiple
             return Available;
         }
 
-        public void Download(Page Page)
+        public bool Download(Page Page)
         {
             SetUnavailable();
             Downloader.Download(Page);
-            //if (BrowserHasErrors())
-            //{
-            //    CloseBrowser();
-            //    return;
-            //}
-            if (BrowserHasErrors())
-            {
-                ErrorsCounter++;
-                Downloader.ClosePage();
-                Task.Run(() => Task.Delay(500)).Wait();
-            }
-            else
-            {
-                SucessCounter++;
-            }
             Scrapped.Add(Page);
+            
+            if (BrowserHasChrashed())
+            {
+                CrashCounter++;
+                RestartBrowser();
+                return false;
+            }            
             SetAvailable();
+            return true;
         }
 
         public string? GetRedirectUrl()
@@ -72,14 +69,25 @@ namespace landerist_library.Downloaders.Multiple
             Downloader.CloseBrowser();
         }
 
-        public bool BrowserHasErrors()
+        public bool BrowserHasChrashed()
         {
-            return Downloader.BrowserWithErrors();
+            return Downloader.BrowserHasChrashed();
         }
 
-        public int ScrapedCount()
+        public void RestartBrowser()
+        {
+            CloseBrowser();
+            StartBrowser();
+        }
+
+        public int ScrapedCounter()
         {
             return Scrapped.Count;
+        }
+
+        public int CrashesCounter()
+        {
+            return CrashCounter;
         }
     }
 }

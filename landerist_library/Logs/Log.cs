@@ -17,11 +17,7 @@ namespace landerist_library.Logs
             if (text.Equals(string.Empty))
             {
                 return;
-            }
-            if (Config.LOGS_IN_CONSOLE)
-            {
-                Console(text);
-            }
+            }            
             if (Config.LOGS_ENABLED)
             {
                 WriteDB(logKey, source, text);
@@ -100,6 +96,10 @@ namespace landerist_library.Logs
 
         public static void WriteError(string source, string text)
         {
+            if (Config.ERRORS_LOGS_IN_CONSOLE)
+            {
+                Console(text);
+            }
             Write(LogKeyError, source, text);
         }
 
@@ -129,6 +129,10 @@ namespace landerist_library.Logs
 
         public static void WriteInfo(string source, string text)
         {
+            if (Config.INFO_LOGS_IN_CONSOLE)
+            {
+                Console(text);
+            }
             Write(LogKeyInfo, source, text);
         }
 

@@ -54,7 +54,6 @@ namespace landerist_library.Downloaders.Puppeteer
             "--disable-background-timer-throttling",
             "--disable-renderer-backgrounding",
             "--incognito",
-            //"--single-process",
             "--disable-dev-profile",
             "--aggressive-cache-discard",
             "--disable-cache",
@@ -67,23 +66,24 @@ namespace landerist_library.Downloaders.Puppeteer
             "--disable-offline-load-stale-cache",
             "--disable-histograms",
             "--disk-cache-dir=null",
-          
-            //"--disable-web-security",
-            //"--disable-extensions",
-            //"--disable-plugins",            
-            //"--disable-breakpad",
-            //"--disable-client-side-phishing-detection",
-            //"--disable-sync",
-            //"--disable-translate",
             "--no-experiments",
-            //"--disable-default-apps",
-            //"--mute-audio",
             "--no-default-browser-check",
             "--disable-background-timer-throttling",
             "--disable-backgrounding-occluded-windows",
             "--disable-notifications",
             "--disable-background-networking",
             "--disable-component-update",
+          
+            //"--single-process",
+            //"--disable-web-security",
+            //"--disable-extensions",
+            //"--disable-plugins",            
+            //"--disable-breakpad",
+            //"--disable-client-side-phishing-detection",
+            //"--disable-sync",
+            //"--disable-translate",            
+            //"--disable-default-apps",
+            //"--mute-audio",            
             //"--disable-domain-reliability",
             //"--autoplay-policy=user-gesture-required",
             //"--disable-component-extensions-with-background-pages",
@@ -176,7 +176,7 @@ namespace landerist_library.Downloaders.Puppeteer
             Timeout = GetTimeout(),
         };
 
-        private bool NavigationError = false;
+        private bool BrowserChrashed = false;
 
         private readonly SingleDownloader? SingleDownloader;
 
@@ -202,9 +202,9 @@ namespace landerist_library.Downloaders.Puppeteer
         }
 
 
-        public bool BrowserWithErrors()
+        public bool BrowserHasChrashed()
         {
-            return NavigationError;
+            return BrowserChrashed;
         }
 
         public bool BrowserPageInitialized()
@@ -350,12 +350,9 @@ namespace landerist_library.Downloaders.Puppeteer
         public void Download(Websites.Page page)
         {
             SetContentAndScrenshot(page);
-            if (PageInitialized())
+            if (PageInitialized() && !BrowserHasChrashed())
             {
-                if (!BrowserWithErrors())
-                {
-                    page.SetDownloadedData(this);
-                }
+                page.SetDownloadedData(this);
             }
         }
 
@@ -386,52 +383,56 @@ namespace landerist_library.Downloaders.Puppeteer
         {
             string? content = null;
             byte[]? screenShot = null;
-            NavigationError = false;
+            BrowserChrashed = false;
 
             try
             {
-                if (BrowserInitialized())
+                if (!BrowserInitialized())
                 {
-                    await InitializePage(page.Website.LanguageCode, page.Uri);                    
-                    if (PageInitialized())
+                    BrowserChrashed = true;
+                    return (content, screenShot);
+                }
+                await InitializePage(page.Website.LanguageCode, page.Uri);
+                if (!PageInitialized())
+                {
+                    BrowserChrashed = true;
+                    return (content, screenShot);
+                }
+
+                var response = await BrowserPage!.GoToAsync(page.Uri.ToString(), NavigationOptions);
+                if (response.Ok)
+                {
+                    await BrowserPage.EvaluateExpressionAsync(ExpressionRemoveCookies);
+                    if (Config.TAKE_SCREENSHOT)
                     {
-                        
-                        var url = page.Uri.ToString();
-                        var response = await BrowserPage!.GoToAsync(url, NavigationOptions);
-                        if (response.Ok)
-                        {
-                            await BrowserPage.EvaluateExpressionAsync(ExpressionRemoveCookies);
-                            if (Config.TAKE_SCREENSHOT)
-                            {
-                                screenShot = await PuppeteerScreenshot.TakeScreenshot(BrowserPage, page);
-                            }
-                            content = await BrowserPage.GetContentAsync();
-                            return (content, screenShot);
-                        }
+                        screenShot = await PuppeteerScreenshot.TakeScreenshot(BrowserPage, page);
                     }
+                    content = await BrowserPage.GetContentAsync();
+                    return (content, screenShot);
                 }
             }
-            catch (NullReferenceException exception)
-            {
-
-            }
-            catch (TargetClosedException exception)
-            {
-                
-            }
+            //catch (NullReferenceException exception)
+            //{
+            //    Logs.Log.WriteError("PuppeterDownloader GetAsync NullReferenceException", exception.Message);
+            //}
+            //catch (TargetClosedException exception)
+            //{
+            //    Logs.Log.WriteError("PuppeterDownloader GetAsync TargetClosedException", exception.Message);
+            //}
+            //catch (PuppeteerException exception)
+            //{
+            //    Logs.Log.WriteError("PuppeterDownloader GetAsync PuppeteerException", exception.Message);
+            //}
             catch (NavigationException exception)
             {
-                
-            }
-            catch (PuppeteerException exception)
-            {
-                
-            }
+                Logs.Log.WriteError("PuppeterDownloader GetAsync NavigationException", exception.Message);
+            }            
             catch (Exception exception)
             {
+                BrowserChrashed = true;
                 Logs.Log.WriteError("PuppeterDownloader GetAsync Exception", exception.GetType().ToString());
             }
-            NavigationError = true;
+            
             return (content, screenShot);
         }
 
@@ -448,14 +449,11 @@ namespace landerist_library.Downloaders.Puppeteer
                 var pages = Task.Run(async () => await Browser!.PagesAsync()).Result;
                 if (pages.Length > 0)
                 {
-
                     BrowserPage = pages[0];
-                    //Logs.Log.WriteInfo(SingleDownloader!.Id.ToString(), "PageInitialized current-page pages" + pages.Length);
                 }
                 else
                 {
                     BrowserPage = await Browser!.NewPageAsync();
-                    //Logs.Log.WriteInfo(SingleDownloader!.Id.ToString(), "PageInitialized new-page");
                 }
             }
             catch (Exception exception)

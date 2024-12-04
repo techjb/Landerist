@@ -19,9 +19,11 @@ namespace landerist_library.Scrape
 
         private static int Scraped = 0;
 
-        private static int Sucsess = 0;
+        private static int Success = 0;
 
-        private static int Errors = 0;
+        private static int Crashed = 0;
+
+        private static int DownloadErrors = 0;
 
         private static int ThreadCounter = 0;
 
@@ -158,8 +160,9 @@ namespace landerist_library.Scrape
             }
             TotalCounter = BlockingCollection.Count;
             Scraped = 0;
-            Sucsess = 0;
-            Errors = 0;
+            Success = 0;
+            Crashed = 0;
+            DownloadErrors = 0;
             ThreadCounter = 0;
 
             Log.Console("Scrapping " + TotalCounter + " pages ..");
@@ -180,17 +183,13 @@ namespace landerist_library.Scrape
                     EndThread(state);
                 });
 
-
-            int blocked = PageBlocker.CountBlockedPages();
-            Log.WriteInfo("scraper",
-                $"Scraped {Scraped}/{TotalCounter}. Blocked {blocked} Suceess: {Sucsess} Erros: {Errors}");
-
-
-            MultipleDownloader.PrintDownloadCounters();
+            LogResults();
+            MultipleDownloader.Print();
             MultipleDownloader.Clear();
             return true;
         }
 
+       
         private static void StartThread()
         {
             Interlocked.Increment(ref ThreadCounter);
@@ -231,6 +230,23 @@ namespace landerist_library.Scrape
                "Scraped: " + Scraped + "/" + TotalCounter + " (" + scrappedPercentage + "%) ");
         }
 
+        private static void LogResults()
+        {
+            int blocked = PageBlocker.CountBlockedPages();
+            var scrappedPercentage = Math.Round((float)Scraped * 100 / TotalCounter, 0);
+            var successPercentage = Math.Round((float)Success * 100 / Scraped, 0);
+            var crashedPercentage = Math.Round((float)Crashed * 100 / Scraped, 0);
+            var downloadErrorsPercentage = Math.Round((float)DownloadErrors * 100 / Success, 0);
+
+            Log.WriteInfo("scraper",
+                $"Scraped {Scraped}/{TotalCounter} ({scrappedPercentage}%). " +
+                $"Blocked {blocked}. " +
+                $"Success: {Success} ({successPercentage}%). " +
+                $"Crashed: {Crashed} ({crashedPercentage}%). " +
+                $"DownloadErrors: {DownloadErrors} ({downloadErrorsPercentage}%).");
+        }
+
+
         private void EndThread(ParallelLoopState parallelLoopState)
         {
             AddUnblockedPages();
@@ -258,21 +274,18 @@ namespace landerist_library.Scrape
         public void Scrape(Page page)
         {
             AddToPageBlocker(page);
-            try
+            var pageScraper = new PageScraper(page, this);
+            if (pageScraper.Scrape())
             {
-                var pageScraper = new PageScraper(page, this);
-                if (pageScraper.Scrape())
+                Interlocked.Increment(ref Success);
+                if (page.PageType == PageType.DownloadError)
                 {
-                    Interlocked.Increment(ref Sucsess);
-                }
-                else
-                {
-                    Interlocked.Increment(ref Errors);
+                    Interlocked.Increment(ref DownloadErrors);
                 }
             }
-            catch (Exception exception)
+            else
             {
-                Log.WriteError("Scraper Scrape", page.Uri, exception);
+                Interlocked.Increment(ref Crashed);
             }
         }
 

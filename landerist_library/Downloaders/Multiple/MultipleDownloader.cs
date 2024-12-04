@@ -11,18 +11,10 @@
             lock (Sync)
             {
                 //RemoveBrowserWithErrors();
-                //var downloader = Downloaders.FirstOrDefault(o => o.IsAvailable() && !o.BrowserHasErrors());
-
-                //var downloader = Downloaders.FirstOrDefault(o => o.IsAvailable());
-                //if (downloader != null)
-                //{
-                //    downloader.SetUnavailable();
-                //    return downloader;
-                //}
                 var availables = Downloaders.Where(o => o.IsAvailable()).ToList();
                 if (availables.Count != 0)
                 {
-                    return  availables[new Random().Next(availables.Count)];                    
+                    return availables[new Random().Next(availables.Count)];
                 }
 
                 int id = Downloaders.Count + 1;
@@ -73,33 +65,32 @@
         //    Logs.Log.WriteInfo("MultipleDownloader DownloadersCounter", Downloaders.Count.ToString());
         //}
 
-        public static void PrintDownloadCounters()
+        public static void Print()
         {
             if (Downloaders.Count.Equals(0))
             {
                 return;
             }
 
-            int withErrors = 0;
+            int maxCrashCounter = 0;
             int maxDownloads = 0;
 
             foreach (SingleDownloader singleDownloader in Downloaders)
             {
-                if (singleDownloader.BrowserHasErrors())
+                var crashCounter = singleDownloader.CrashesCounter();
+                if (crashCounter > maxCrashCounter)
                 {
-                    withErrors++;
+                    maxCrashCounter = crashCounter;
                 }
-                var counter = singleDownloader.ScrapedCount();
+                var counter = singleDownloader.ScrapedCounter();
                 if (counter > maxDownloads)
                 {
                     maxDownloads = counter;
                 }
             }
-            //Logs.Log.WriteInfo("MultipleDownloaders",
-            //    $"Downloaders: {Downloaders.Count} WithErros: {withErrors} MaxDownloads: {maxDownloads}");
 
             Logs.Log.WriteInfo("MultipleDownloaders",
-                $"Downloaders: {Downloaders.Count} MaxDownloads: {maxDownloads}");
+                $"Downloaders: {Downloaders.Count} MaxDownloads: {maxDownloads} MaxCrashCounter: {maxCrashCounter}");
         }
     }
 }

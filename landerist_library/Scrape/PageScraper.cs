@@ -36,9 +36,9 @@ namespace landerist_library.Scrape
             }
 
             (var newPageType, var newListing, var waitingAIParsing) = PageTypeParser.GetPageType(Page);
-            bool sucess = SetPageType(newPageType, newListing, waitingAIParsing);
+            SetPageType(newPageType, newListing, waitingAIParsing);
             IndexPages();
-            return sucess;
+            return true;
         }
 
 
@@ -61,9 +61,8 @@ namespace landerist_library.Scrape
             if (SingleDownloader is null)
             {
                 return false;
-            }            
-            SingleDownloader.Download(Page);
-            return !SingleDownloader.BrowserHasErrors();
+            }
+            return SingleDownloader.Download(Page);
         }
 
         private bool DownloadSingleDownloader()
