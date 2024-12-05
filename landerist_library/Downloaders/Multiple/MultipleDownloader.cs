@@ -92,5 +92,35 @@
             Logs.Log.WriteInfo("MultipleDownloaders",
                 $"Downloaders: {Downloaders.Count} MaxDownloads: {maxDownloads} MaxCrashCounter: {maxCrashCounter}");
         }
+
+        public static int GetDownloadersCounter() => Downloaders.Count;
+
+        public static int GetMaxCrashCounter()
+        {
+            int maxCrashCounter = 0;
+            foreach (SingleDownloader singleDownloader in Downloaders)
+            {
+                var crashCounter = singleDownloader.CrashesCounter();
+                if (crashCounter > maxCrashCounter)
+                {
+                    maxCrashCounter = crashCounter;
+                }
+            }
+            return maxCrashCounter;
+        }
+
+        public static int GetMaxDownloads()
+        {
+            int maxDownloads = 0;
+            foreach (SingleDownloader singleDownloader in Downloaders)
+            {
+                var counter = singleDownloader.ScrapedCounter();
+                if (counter > maxDownloads)
+                {
+                    maxDownloads = counter;
+                }
+            }
+            return maxDownloads;
+        }
     }
 }
