@@ -19,11 +19,6 @@ namespace landerist_library.Downloaders.Multiple
 
         public SingleDownloader()
         {
-            StartBrowser();
-        }
-
-        private void StartBrowser()
-        {
             Downloader = new(this);
             Available = Downloader.BrowserInitialized();
         }
@@ -77,7 +72,8 @@ namespace landerist_library.Downloaders.Multiple
         public void RestartBrowser()
         {
             CloseBrowser();
-            StartBrowser();
+            Downloader = new(this);
+            Available = Downloader.BrowserInitialized();
         }
 
         public int ScrapedCounter()

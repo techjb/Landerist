@@ -249,9 +249,8 @@ namespace landerist_library.Scrape
                 $"Crashed: {Crashed} ({crashedPercentage}%) " +
                 $"DownloadErrors: {DownloadErrors} ({downloadErrorsPercentage}%) " +
                 $"Downloaders: {downloaders} " +
-                $"MaxDownloads: {maxDownloads}" +
-                $"MaxCrashes: {maxCrashes}" +
-                $"");
+                $"MaxDownloads: {maxDownloads} " +
+                $"MaxCrashes: {maxCrashes}");
         }
 
 
