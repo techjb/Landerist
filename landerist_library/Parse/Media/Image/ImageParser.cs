@@ -16,7 +16,7 @@ namespace landerist_library.Parse.Media.Image
 
         private const int MIN_IMAGE_SIZE = 256 * 256;
 
-        private readonly SortedSet<landerist_orels.ES.Media> MediaImages = new(new MediaComparer());
+        protected readonly SortedSet<landerist_orels.ES.Media> MediaImages = new(new MediaComparer());
 
         public readonly List<landerist_orels.ES.Media> MediaToRemove = [];
 
@@ -44,7 +44,7 @@ namespace landerist_library.Parse.Media.Image
             }
         }
 
-        private void AddImagesOpenGraph()
+        protected void AddImagesOpenGraph()
         {
             var imageNodes = MediaParser.HtmlDocument!.DocumentNode.SelectNodes("//meta[@property='og:image']");
             AddImages(imageNodes, "content");
@@ -96,7 +96,7 @@ namespace landerist_library.Parse.Media.Image
                 return;
             }
 
-            if (!IsValidImage(uri))
+            if (!IsValidImageUri(uri))
             {
                 return;
             }
@@ -113,7 +113,7 @@ namespace landerist_library.Parse.Media.Image
             MediaImages.Add(media);
         }
 
-        private static bool IsValidImage(Uri uri)
+        public static bool IsValidImageUri(Uri uri)
         {
             string? filename = Path.GetFileNameWithoutExtension(uri.LocalPath);
             if (string.IsNullOrEmpty(filename))

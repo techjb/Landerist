@@ -33,11 +33,21 @@ namespace landerist_library.Parse.Location.GoogleMaps
     {
         public static (Tuple<double, double>? latLng, bool? isAccurate) Parse(string address, CountryCode countryCode)
         {
+            if (Database.AddressLatLng.Select(address, GetRegion(countryCode)) is (double lat, double lng, bool isAccurate))
+            {
+                return (Tuple.Create(lat, lng), isAccurate);
+            }
+            return ParseInGoogle(address, countryCode);
+        }
+
+        private static (Tuple<double, double>? latLng, bool? isAccurate) ParseInGoogle(string address, CountryCode countryCode)
+        {
             string uriAdress = Uri.EscapeDataString(address);
+            var region = GetRegion(countryCode);
             string requestUrl =
                 "https://maps.googleapis.com/maps/api/geocode/json?" +
                 "address=" + uriAdress +
-                "&region=" + GetRegion(countryCode) +
+                "&region=" + region +
                 "&key=" + PrivateConfig.GOOGLE_CLOUD_LANDERIST_API_KEY;
 
             try
@@ -76,6 +86,8 @@ namespace landerist_library.Parse.Location.GoogleMaps
                     {
                         isAccurate = geometry.location_type.Equals("ROOFTOP");
                     }
+
+                    Database.AddressLatLng.Insert(address, region, lat, lng, isAccurate);
                     return (tuple, isAccurate);
                 }
             }

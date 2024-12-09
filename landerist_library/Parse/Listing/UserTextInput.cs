@@ -29,7 +29,7 @@ namespace landerist_library.Parse.Listing
             "//button",
             //"//form",
             "//input",
-            "//img",
+            //"//img",
             "//iframe",
             "//audio",
             "//video",
@@ -45,7 +45,7 @@ namespace landerist_library.Parse.Listing
         [
             "width",
             "height",
-            "src",
+            //"src",
             "target",
             "style",
             "tabindex",
@@ -65,7 +65,10 @@ namespace landerist_library.Parse.Listing
                 var htmlDocument = page.GetHtmlDocument();
                 if (htmlDocument != null)
                 {
-                    return GetHtml(htmlDocument);
+                    //return GetHtml(htmlDocument);
+                    return 
+                        "Url: " + page.Uri.ToString() + Environment.NewLine + " " +
+                        "Html: " +  GetHtml(htmlDocument);
                 }
             }
             catch { }

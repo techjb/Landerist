@@ -103,7 +103,7 @@ namespace landerist_library.Scrape
             if (Page.PageType.Equals(PageType.Listing))
             {
                 NewListing ??= Page.GetListing(true);
-                SetMedia();
+                //SetMedia();
                 SetLocation();
                 UpdateNewListing();
                 return;

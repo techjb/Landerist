@@ -4,6 +4,7 @@ using landerist_library.Parse.Media.Other;
 using landerist_library.Parse.Media.Video;
 using landerist_library.Websites;
 using landerist_orels.ES;
+using System.ComponentModel.DataAnnotations;
 
 namespace landerist_library.Parse.Media
 {
@@ -28,7 +29,7 @@ namespace landerist_library.Parse.Media
                 return;
             }
 
-            if (media.url.Scheme != Uri.UriSchemeHttp && media.url.Scheme == Uri.UriSchemeHttps)
+            if (media.url.Scheme != Uri.UriSchemeHttp && media.url.Scheme != Uri.UriSchemeHttps)
             {
                 return;
             }
@@ -47,6 +48,19 @@ namespace landerist_library.Parse.Media
             }
             new VideoParser(this).GetVideos();
             new OtherParser(this).GetOthers();
+            listing.SetMedia(Media);
+        }
+
+        public void AddMediaImages(landerist_orels.ES.Listing listing, string[]? list)
+        {
+            if (HtmlDocument == null  || list == null)
+            {
+                return;
+            }
+            if (!Page.ContainsMetaRobotsNoImageIndex())
+            {
+                new ImageParserUrls(this).AddImagesFromUrls(list);
+            }            
             listing.SetMedia(Media);
         }
 

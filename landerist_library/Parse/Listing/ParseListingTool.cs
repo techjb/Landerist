@@ -203,6 +203,12 @@ namespace landerist_library.Parse.Listing
         [Description(TieneSistemasDeSeguridadDescription)]
         public bool? tiene_sistemas_de_seguridad { get; set; } = null;
 
+
+        public const string UrlsDeImagenesDelAnuncio  = "urls de las imágenes del anuncio";
+        [Description(UrlsDeImagenesDelAnuncio)]
+        public string[]? urls_de_imagenes_del_anuncio { get; set; } = null;
+
+
 #pragma warning restore IDE1006
 
         protected const string OPERACION_VENTA = "venta";
