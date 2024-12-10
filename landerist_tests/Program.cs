@@ -213,7 +213,7 @@ namespace landerist_tests
             //landerist_library.Landerist_com.StatisticsPage.Update();
             //landerist_library.Landerist_com.Landerist_com.InvalidateCloudFront();            
 
-            //Backup.Update();
+            //landerist_library.Database.Backup.Update();
             //Backup.DeleteRemoteOldBackups();
             #endregion
 

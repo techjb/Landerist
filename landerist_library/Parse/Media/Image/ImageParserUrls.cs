@@ -4,7 +4,11 @@ namespace landerist_library.Parse.Media.Image
 {
     internal class ImageParserUrls(MediaParser mediaParser) : ImageParser(mediaParser)
     {
+        readonly Dictionary<string, string> SrcAlt = [];
+
         readonly Dictionary<string, string> SrcTitle = [];
+
+        
         public void AddImagesFromUrls(string[] list)
         {
             AddImagesOpenGraph();
@@ -18,24 +22,34 @@ namespace landerist_library.Parse.Media.Image
         private void AddImagesUrls(string[] list)
         {
             HashSet<string> hashSet = new(list);
-            InitSrcTitles();
+            InitDictionaries();
             foreach (var image in hashSet)
             {
                 AddImage(image);
             }
         }
 
-        private void InitSrcTitles()
+        private void InitDictionaries()
         {
             var imageNodes = MediaParser.HtmlDocument!.DocumentNode.SelectNodes("//img");
             foreach (var imageNode in imageNodes)
             {
-                var title = imageNode.GetAttributeValue("title", "");
                 var src = imageNode.GetAttributeValue("src", "");
-                if (!string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(src))
+                var alt = imageNode.GetAttributeValue("alt", "");
+                var title = imageNode.GetAttributeValue("title", "");                
+
+                if (string.IsNullOrEmpty(src))
+                {
+                    continue;
+                }
+                if (!string.IsNullOrEmpty(alt))
+                {
+                    SrcAlt.TryAdd(src, alt);
+                }
+                if (!string.IsNullOrEmpty(title))
                 {
                     SrcTitle.TryAdd(src, title);
-                }
+                }                
             }
         }
 
@@ -73,9 +87,13 @@ namespace landerist_library.Parse.Media.Image
 
         private string? GetTitle(string url)
         {
-            if (SrcTitle.TryGetValue(url, out string? value))
+            if (SrcAlt.TryGetValue(url, out string? alt))
             {
-                return value;
+                return alt;
+            }
+            if (SrcTitle.TryGetValue(url, out string? title))
+            {
+                return title;
             }
             return null;    
         }
