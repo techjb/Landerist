@@ -8,9 +8,9 @@ namespace landerist_library.Downloaders.Multiple
     {
         private PuppeteerDownloader Downloader;
         private bool Available;
-        private readonly List<Page> Scrapped = [];
         public int Id = 0;
-        private int CrashCounter = 0;
+        private int Chrashes = 0;
+        private int Scraped = 0;
 
         public SingleDownloader(int id) : this()
         {
@@ -42,11 +42,12 @@ namespace landerist_library.Downloaders.Multiple
         {
             SetUnavailable();
             Downloader.Download(Page);
-            Scrapped.Add(Page);
-            
+            Scraped++;
+
+
             if (BrowserHasChrashed())
             {
-                CrashCounter++;
+                Chrashes++;
                 RestartBrowser();
                 return false;
             }            
@@ -78,12 +79,12 @@ namespace landerist_library.Downloaders.Multiple
 
         public int ScrapedCounter()
         {
-            return Scrapped.Count;
+            return Scraped;
         }
 
         public int CrashesCounter()
         {
-            return CrashCounter;
+            return Chrashes;
         }
     }
 }

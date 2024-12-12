@@ -232,11 +232,11 @@ namespace landerist_library.Scrape
 
         private static void LogResults()
         {
-            var downloaders = MultipleDownloader.GetDownloadersCounter();
-            var maxDownloads = MultipleDownloader.GetMaxDownloads();
-            var maxCrashes = MultipleDownloader.GetMaxCrashCounter();
+            //var downloaders = MultipleDownloader.GetDownloadersCounter();
+            //var maxDownloads = MultipleDownloader.GetMaxDownloads();
+            //var maxCrashes = MultipleDownloader.GetMaxCrashCounter();
 
-            int blocked = PageBlocker.CountBlockedPages();
+            //int blocked = PageBlocker.CountBlockedPages();
             var scrappedPercentage = Math.Round((float)Scraped * 100 / TotalCounter, 0);
             var successPercentage = Math.Round((float)Success * 100 / Scraped, 0);
             var crashedPercentage = Math.Round((float)Crashed * 100 / Scraped, 0);
@@ -244,13 +244,14 @@ namespace landerist_library.Scrape
 
             Log.WriteInfo("scraper",
                 $"Scraped {Scraped}/{TotalCounter} ({scrappedPercentage}%) " +
-                $"Blocked {blocked} " +
+                //$"Blocked {blocked} " +
                 $"Success: {Success} ({successPercentage}%) " +
                 $"Crashed: {Crashed} ({crashedPercentage}%) " +
-                $"DownloadErrors: {DownloadErrors} ({downloadErrorsPercentage}%) " +
-                $"Downloaders: {downloaders} " +
-                $"MaxDownloads: {maxDownloads} " +
-                $"MaxCrashes: {maxCrashes}");
+                $"DownloadErrors: {DownloadErrors} ({downloadErrorsPercentage}%) "
+                //$"Downloaders: {downloaders} " +
+                //$"MaxDownloads: {maxDownloads} " +
+                //$"MaxCrashes: {maxCrashes}"
+                );
         }
 
 
