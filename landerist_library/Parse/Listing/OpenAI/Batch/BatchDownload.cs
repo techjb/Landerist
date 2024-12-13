@@ -106,8 +106,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             try
             {
                 var lines = File.ReadAllLines(filePath);
-                ReadLines(lines);
-                lines = [];
+                ReadLines(lines);                
                 return true;
             }
             catch (Exception exception)
@@ -180,7 +179,9 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             page.RemoveResponseBodyZipped();
 
             var (pageType, listing) = ParseListing.ParseOpenAI(page, batchResponseLine.Response.Body);
-            return new PageScraper(page).SetPageType(pageType, listing);
+            var sucess =  new PageScraper(page).SetPageType(pageType, listing);
+            page.Dispose();
+            return sucess;
         }
 
 
