@@ -496,11 +496,24 @@ namespace landerist_library.Websites
         public static List<Page> SelectWaitingAIParsing()
         {
             string query =
-                SelectQuery() +
+                SelectQuery(Config.MAX_PAGES_PER_BATCH) +
                 "WHERE [WaitingAIParsing] = 1";
 
             DataTable dataTable = new DataBase().QueryTable(query);
             return GetPages(dataTable);
+        }
+
+        public static void UpdateWaitingAIParsing(string uriHash, bool waitingAiParsing)
+        {
+            string query =
+                "UPDATE " + PAGES + " " +
+                "SET [WaitingAIParsing] = @WaitingAIParsing " +
+                "WHERE [UriHash] = @UriHash";
+
+            new DataBase().Query(query, new Dictionary<string, object?> {
+                {"WaitingAIParsing", waitingAiParsing },
+                {"UriHash", uriHash }
+            });
         }
     }
 }

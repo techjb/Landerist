@@ -1,11 +1,13 @@
-﻿namespace landerist_library.Parse.Listing.OpenAI.Batch
+﻿using landerist_library.Logs;
+
+namespace landerist_library.Parse.Listing.OpenAI.Batch
 {
     public class BatchTasks
     {
         public static void Start()
         {
             BatchDownload.Start();
-            BatchDownload.Clean();
+            BatchDownload.Clean();            
             BatchUpload.Start();
         }
     }

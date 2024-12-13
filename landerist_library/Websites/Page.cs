@@ -603,18 +603,32 @@ namespace landerist_library.Websites
             ResponseBodyZipped = null;
         }
 
-        public void SetResponseBodyZipped()
+        public void RemoveResponseBody()
         {
-            byte[] byteArray = Encoding.UTF8.GetBytes(ResponseBody!);
-            using var memoryStream = new MemoryStream();
-            using (var gzipStream = new GZipStream(memoryStream, CompressionMode.Compress))
-            {
-                gzipStream.Write(byteArray, 0, byteArray.Length);
-            }
-            ResponseBodyZipped = memoryStream.ToArray();
+            ResponseBody = null;
         }
 
-        public void SetResponseBodyFromZipped()
+        public bool SetResponseBodyZipped()
+        {
+            try
+            {
+                byte[] byteArray = Encoding.UTF8.GetBytes(ResponseBody!);
+                using var memoryStream = new MemoryStream();
+                using (var gzipStream = new GZipStream(memoryStream, CompressionMode.Compress))
+                {
+                    gzipStream.Write(byteArray, 0, byteArray.Length);
+                }
+                ResponseBodyZipped = memoryStream.ToArray();
+                return true;
+            }
+            catch (Exception exception)
+            {
+                Logs.Log.WriteError("Page SetResponseBodyZipped", exception);
+                return false;
+            }
+        }
+
+        public async void SetResponseBodyFromZipped()
         {
             if (ResponseBodyZipped is null)
             {
@@ -625,10 +639,11 @@ namespace landerist_library.Websites
                 using var memoryStream = new MemoryStream(ResponseBodyZipped);
                 using var gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress);
                 using var streamReader = new StreamReader(gzipStream);
-                ResponseBody = streamReader.ReadToEnd();
+                ResponseBody = await streamReader.ReadToEndAsync();
             }
-            catch
+            catch (Exception exception)
             {
+                Logs.Log.WriteError("Page SetResponseBodyFromZipped", exception);
             }
         }
     }

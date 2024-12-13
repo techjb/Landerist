@@ -25,15 +25,15 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
         public static void Start()
         {
             var batchIds = Batches.SelectNonDownloaded();
-            foreach (var batchId in batchIds)
+            Parallel.ForEach(batchIds, batchId =>
             {
                 var batchResponse = GetBatch(batchId);
                 if (batchResponse == null || !BatchIsCompleted(batchResponse))
                 {
-                    continue;
+                    return;
                 }
                 Download(batchResponse);
-            }
+            });
         }
 
         //public static void Test()
@@ -107,6 +107,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             {
                 var lines = File.ReadAllLines(filePath);
                 ReadLines(lines);
+                lines = [];
                 return true;
             }
             catch (Exception exception)
@@ -192,15 +193,15 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
         private static void DeleteDownloadedBatches()
         {
             var batchIds = Batches.SelectDownloaded();
-            foreach (var batchId in batchIds)
+            Parallel.ForEach(batchIds, batchId =>
             {
                 var batchResponse = GetBatch(batchId);
                 if (batchResponse == null || !BatchIsCompleted(batchResponse))
                 {
-                    continue;
+                    return;
                 }
                 Delete(batchResponse);
-            }
+            });            
         }
 
         private static void RemoveBatchesFiles()

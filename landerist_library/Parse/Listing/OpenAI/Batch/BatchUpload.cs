@@ -22,55 +22,64 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
 
         private static readonly OpenAIClient OpenAIClient = new(PrivateConfig.OPENAI_API_KEY);
 
+        private static List<Page> pages = [];
+
+        private static List<string> UriHashes = [];
+
+
         public static void Start()
         {
-            var pages = Pages.SelectWaitingAIParsing();
-            pages = Filter(pages);
+            Clear();
+            bool sucess = StartUpload();
+            if (pages.Count >= Config.MAX_PAGES_PER_BATCH && sucess)
+            {
+                Start();
+            }
+        }
+
+        private static bool StartUpload()
+        {
+            pages = Pages.SelectWaitingAIParsing();
             if (pages.Count < Config.MIN_PAGES_PER_BATCH)
             {
-                return;
+                return false;
             }
-            (var filePath, pages) = CreateFile(pages);
+            var filePath = CreateFile();
             if (string.IsNullOrEmpty(filePath))
             {
-                return;
+                return false;
             }
-
             var fileResponse = UploadFile(filePath);
             if (fileResponse == null || string.IsNullOrEmpty(fileResponse.Id))
             {
-                return;
+                return false;
             }
 
             var batchResponse = CreateBatch(fileResponse);
             if (batchResponse == null)
             {
                 OpenAIClient.FilesEndpoint.DeleteFileAsync(fileResponse.Id).Wait();
-                return;
+                return false;
             }
 
-            SetWaitingAIResponse(pages);
+            SetWaitingAIResponse();
             Batches.Insert(batchResponse.Id);
             Log.WriteInfo("batch", $"Uploaded {pages.Count}");
-
-            Start();
+            return true;
         }
 
-        private static List<Page> Filter(List<Page> pages)
+        private static void Clear()
         {
-            if (pages.Count > Config.MAX_PAGES_PER_BATCH)
-            {
-                pages = pages.Take(Config.MAX_PAGES_PER_BATCH).ToList();
-            }
-            return pages;
+            pages.Clear();
+            UriHashes.Clear();
         }
 
-        private static (string? filePath, List<Page> added) CreateFile(List<Page> pages)
+        private static string? CreateFile()
         {
             var filePath = Config.BATCH_DIRECTORY + "batch_" + DateTime.Now.ToString("yyyyMMddHHmmss") + "_input.json";
             File.Delete(filePath);
 
-            List<Page> added = [];
+            UriHashes = [];
             var sync = new object();
             var errors = 0;
             var skipped = 0;
@@ -78,32 +87,34 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             Parallel.ForEach(pages, new ParallelOptions()
             {
                 //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
+                //MaxDegreeOfParallelism = 1
             },
             (page, state) =>
             {
                 if (!CanWriteFile(filePath))
                 {
                     Interlocked.Increment(ref skipped);
-                    state.Stop();
-                    return;
+                    state.Stop();                    
                 }
-                if (!AddToBatch(page, filePath))
+                else if (!AddToBatch(page, filePath))
                 {
                     Interlocked.Increment(ref errors);
-                    return;
                 }
-                lock (sync)
+                else
                 {
-                    added.Add(page);
+                    lock (sync)
+                    {
+                        UriHashes.Add(page.UriHash);
+                    }
                 }
+                page.Dispose();
             });
-            //Log.WriteInfo("BatchUpload", $"{added.Count}/{pages.Count} Errors: {errors} Skipped: {skipped}");            
+
             if (errors > 0)
             {
-                filePath = null;
                 Log.WriteError("BatchUpload CreateFile", "Error creating file. Errors: " + errors);
             }
-            return (filePath, added);
+            return filePath;
         }
 
         private static bool AddToBatch(Page page, string filePath)
@@ -111,7 +122,17 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             try
             {
                 var json = GetJson(page);
-                return WriteJson(json, filePath);
+                if (string.IsNullOrEmpty(json))
+                {
+                    page.RemoveWaitingAIParsing();
+                    page.Update(false);
+                    return false;
+                }
+                lock (SyncWrite)
+                {
+                    File.AppendAllText(filePath, json + Environment.NewLine);
+                }
+                return true;
             }
             catch (Exception exception)
             {
@@ -138,8 +159,11 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
         {
             page.SetResponseBodyFromZipped();
             var userInput = UserTextInput.GetText(page);
+            page.RemoveResponseBody();
+
             if (string.IsNullOrEmpty(userInput))
             {
+                Log.WriteError("BatchUpload GetJson", "Error getting user input. Page: " + page.UriHash);
                 return null;
             }
 
@@ -213,19 +237,6 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
                 ];
         }
 
-        private static bool WriteJson(string? json, string filePath)
-        {
-            if (string.IsNullOrEmpty(json))
-            {
-                return false;
-            }
-            lock (SyncWrite)
-            {
-                File.AppendAllText(filePath, json + Environment.NewLine);
-            }
-            return true;
-        }
-
 
         static FileResponse? UploadFile(string filePath)
         {
@@ -255,17 +266,17 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             return null;
         }
 
-        static void SetWaitingAIResponse(List<Page> pages)
+        static void SetWaitingAIResponse()
         {
-            Parallel.ForEach(pages,
+            Parallel.ForEach(UriHashes,
                 new ParallelOptions()
                 {
                     //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
+                    //MaxDegreeOfParallelism = 1
                 },
-                page =>
+                uriHash =>
             {
-                page.SetWaitingAIParsingResponse();
-                page.Update(false);
+                Pages.UpdateWaitingAIParsing(uriHash, false);
             });
         }
     }

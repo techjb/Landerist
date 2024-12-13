@@ -102,6 +102,10 @@ namespace landerist_library.Scrape
         {
             Clean(IpBlocker);
             Clean(HostBlocker);
+            foreach(var page in Pages)
+            {
+                page.page.Dispose();
+            }
             Pages.Clear();
         }
 

@@ -431,6 +431,7 @@ namespace landerist_library.Websites
             {
                 website.SetRobotsTxt();
                 website.Update();
+                website.Dispose();
                 Interlocked.Increment(ref counter);
             });
 
@@ -470,6 +471,7 @@ namespace landerist_library.Websites
             {
                 website.SetSitemap();
                 website.Update();
+                website.Dispose();
                 Interlocked.Increment(ref counter);
             });
 
@@ -509,6 +511,7 @@ namespace landerist_library.Websites
             {
                 website.SetIpAddress();
                 website.Update();
+                website.Dispose();
                 Interlocked.Increment(ref counter);
             });
 

@@ -82,7 +82,10 @@ namespace landerist_library.Scrape
         {
             if (waitingAIParsing)
             {
-                Page.SetResponseBodyZipped();
+                if (!Page.SetResponseBodyZipped())
+                {
+                    return false;
+                }                
                 Page.SetWaitingAIParsingRequest();
                 return Page.Update(false);
             }

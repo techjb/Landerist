@@ -65,13 +65,15 @@ namespace landerist_library.Parse.Listing
                 var htmlDocument = page.GetHtmlDocument();
                 if (htmlDocument != null)
                 {
-                    //return GetHtml(htmlDocument);
                     return 
                         "Url: " + page.Uri.ToString() + Environment.NewLine + " " +
                         "Html: " +  GetHtml(htmlDocument);
                 }
             }
-            catch { }
+            catch (Exception exception)
+            { 
+
+            }
             return null;
         }
 
