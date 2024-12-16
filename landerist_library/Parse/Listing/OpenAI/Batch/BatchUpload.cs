@@ -35,6 +35,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             {
                 Start();
             }
+            Clear();
         }
 
         private static bool StartUpload()
@@ -56,12 +57,12 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             }
 
             var batchResponse = CreateBatch(fileResponse);
-            if (batchResponse == null)
+            if (batchResponse == null || string.IsNullOrEmpty(batchResponse.Id))
             {
                 OpenAIClient.FilesEndpoint.DeleteFileAsync(fileResponse.Id).Wait();
                 return false;
-            }
-
+            }            
+            
             SetWaitingAIResponse();
             Batches.Insert(batchResponse.Id);
             Log.WriteInfo("batch", $"Uploaded {pages.Count}");
@@ -70,6 +71,10 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
 
         private static void Clear()
         {
+            foreach(var page in pages)
+            {
+                page.Dispose();
+            }
             pages.Clear();
             UriHashes.Clear();
         }
