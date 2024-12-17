@@ -71,7 +71,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
 
         private static void Clear()
         {
-            Parallel.ForEach(pages, page => pages.Clear());
+            Parallel.ForEach(pages, page => page.Dispose());
             pages.Clear();
             UriHashes.Clear();
         }
