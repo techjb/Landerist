@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "3.77";
+        public static readonly string VERSION = "3.78";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -215,7 +215,7 @@ namespace landerist_library.Configuration
                 PrivateConfig.BATCH_DIRECTORY_LOCAL;
 
             MAX_DEGREE_OF_PARALLELISM_SCRAPER = ConfigurationProduction ?
-                20 : 1;
+                25 : 1;
         }
 
         private static void InitDatabase(bool configurationProduction)

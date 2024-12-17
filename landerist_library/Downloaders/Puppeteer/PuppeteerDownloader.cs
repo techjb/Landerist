@@ -426,15 +426,15 @@ namespace landerist_library.Downloaders.Puppeteer
             catch (NavigationException exception)
             {
                 var message = SingleDownloader!.Id.ToString() + " " + exception.Message; 
-                Logs.Log.WriteError("PuppeterDownloader GetAsync NavigationException", message);
+                //Logs.Log.WriteError("PuppeterDownloader GetAsync NavigationException", message);
             }            
             catch (Exception exception)
             {
                 BrowserChrashed = true;
                 var message = SingleDownloader!.Id.ToString() + " " + exception.GetType().ToString();
-                Logs.Log.WriteError("PuppeterDownloader GetAsync Exception", message);
+                //Logs.Log.WriteError("PuppeterDownloader GetAsync Exception", message);
             }
-            
+
             return (content, screenShot);
         }
 
