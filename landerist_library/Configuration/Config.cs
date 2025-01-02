@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "3.78";
+        public static readonly string VERSION = "3.80";
 
         public static readonly bool INDEXER_ENABLED = true;
 
