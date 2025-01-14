@@ -184,8 +184,8 @@ namespace landerist_library.Scrape
                 });
 
             LogResults();
-            //MultipleDownloader.Print();
-            Stop();
+            MultipleDownloader.Clear();
+            PuppeteerDownloader.KillChrome();
             return true;
         }
 

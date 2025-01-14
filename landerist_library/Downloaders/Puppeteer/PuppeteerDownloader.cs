@@ -188,7 +188,7 @@ namespace landerist_library.Downloaders.Puppeteer
 
         public PuppeteerDownloader()
         {
-            Browser = Task.Run(LaunchAsync).Result;            
+            Browser = Task.Run(LaunchAsync).Result;
         }
 
         public bool BrowserInitialized()
@@ -234,7 +234,7 @@ namespace landerist_library.Downloaders.Puppeteer
             try
             {
                 Browser!.CloseAsync();
-                Browser!.Dispose();                
+                Browser!.Dispose();
             }
             catch (Exception exception)
             {
@@ -257,7 +257,7 @@ namespace landerist_library.Downloaders.Puppeteer
             catch (Exception exception)
             {
                 Logs.Log.WriteError("PuppeteerDownloader CloseBrowserAsync", exception);
-            }            
+            }
             BrowserPage = null;
         }
 
@@ -372,11 +372,11 @@ namespace landerist_library.Downloaders.Puppeteer
                 {
                     (Content, Screenshot) = taskGetAsync.Result;
                 }
-            }            
+            }
             catch (Exception exception)
             {
                 Logs.Log.WriteError("PuppeteerDownloader SetContentAndScrenshot Exception", exception);
-            }            
+            }
         }
 
         private async Task<(string? content, byte[]? screenShot)> GetAsync(Websites.Page page)
@@ -425,9 +425,9 @@ namespace landerist_library.Downloaders.Puppeteer
             //}
             catch (NavigationException exception)
             {
-                var message = SingleDownloader!.Id.ToString() + " " + exception.Message; 
+                var message = SingleDownloader!.Id.ToString() + " " + exception.Message;
                 //Logs.Log.WriteError("PuppeterDownloader GetAsync NavigationException", message);
-            }            
+            }
             catch (Exception exception)
             {
                 BrowserChrashed = true;
@@ -445,7 +445,7 @@ namespace landerist_library.Downloaders.Puppeteer
             {
                 return;
             }
-            
+
             try
             {
                 var pages = Task.Run(async () => await Browser!.PagesAsync()).Result;
