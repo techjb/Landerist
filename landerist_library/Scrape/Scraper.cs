@@ -185,7 +185,7 @@ namespace landerist_library.Scrape
 
             LogResults();
             //MultipleDownloader.Print();
-            MultipleDownloader.Clear();
+            Stop();
             return true;
         }
 
