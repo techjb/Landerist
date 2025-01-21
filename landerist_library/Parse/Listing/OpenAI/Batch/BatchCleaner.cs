@@ -34,24 +34,24 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             });
         }
 
-        public static void DeleteAllRemoteFiles()
-        {
-            var batchIds = Batches.SelectAll();
-            if (batchIds.Count > 0)
-            {
-                return;
-            }
+        //public static void DeleteAllRemoteFiles()
+        //{
+        //    var batchIds = Batches.SelectAll();
+        //    if (batchIds.Count > 0)
+        //    {
+        //        return;
+        //    }
 
-            var files = ListFiles();
-            if (files is null)
-            {
-                return;
-            }
-            Parallel.ForEach(files, filesId =>
-            {
-                DeleteFile(filesId);
-            });
-        }
+        //    var files = ListFiles();
+        //    if (files is null)
+        //    {
+        //        return;
+        //    }
+        //    Parallel.ForEach(files, filesId =>
+        //    {
+        //        DeleteFile(filesId);
+        //    });
+        //}
 
         private static void DeleteLocalFiles()
         {
