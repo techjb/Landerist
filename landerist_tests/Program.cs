@@ -194,6 +194,7 @@ namespace landerist_tests
             //landerist_library.Parse.Listing.OpenAI.Batch.BatchDownload.Start();
             //landerist_library.Parse.Listing.OpenAI.Batch.BatchDownload.Test();
             //landerist_library.Parse.Listing.OpenAI.Batch.BatchTasks.Start();            
+            //landerist_library.Parse.Listing.OpenAI.Batch.BatchDownload.DeleteAllRemoteFiles();
 
 
             #endregion
@@ -274,8 +275,10 @@ namespace landerist_tests
             //ServiceTasks.DailyTask();
             //new ServiceTasks().UpdateAndScrape();
             //ServiceTasks.UpdateAndScrape();
+            //ServiceTasks.Update();
             //ServiceTasks.Scrape();
             //ServiceTasks.Start();
+
 
             #endregion
 

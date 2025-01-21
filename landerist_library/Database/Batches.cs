@@ -49,6 +49,17 @@
             });
         }
 
+        public static List<string> SelectAll()
+        {
+            string query =
+                "SELECT Id " +
+                "FROM " + BATCHES + " " +
+                "ORDER BY [Created] ASC";
+
+            return new DataBase().QueryListString(query, new Dictionary<string, object?>());
+        }
+
+
         public static bool UpdateToDownloaded(string id)
         {
             return Update(id, true);

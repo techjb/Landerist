@@ -16,7 +16,7 @@ namespace landerist_library.Tasks
         private Timer? Timer1;
         private Timer? Timer2;
         private Timer? Timer3;
-        
+
         private bool RunningTimer2 = false;
         private bool RunningTimer3 = false;
 
@@ -26,9 +26,11 @@ namespace landerist_library.Tasks
         private const int OneHour = 60 * OneMinute;
         private const int OneDay = 24 * OneHour;
 
+        private bool PerformDaylyTasks = false;
+
         public ServiceTasks()
         {
-            Scraper = new();            
+            Scraper = new();
         }
 
         public void Start()
@@ -56,14 +58,7 @@ namespace landerist_library.Tasks
 
         private void DailyTasks(object state)
         {
-            try
-            {
-                DailyTask();
-            }
-            catch (Exception exception)
-            {
-                Log.WriteError("ServiceTasks DailyTasks", exception);
-            }
+            PerformDaylyTasks = true;
         }
 
         private void UpdateAndScrape(object state)
@@ -76,6 +71,11 @@ namespace landerist_library.Tasks
             RunningTimer2 = true;
             try
             {
+                if (PerformDaylyTasks)
+                {
+                    DailyTask();
+                    PerformDaylyTasks = false;                    
+                }
                 Update();
                 Scrape();
             }
@@ -113,11 +113,19 @@ namespace landerist_library.Tasks
 
         public static void DailyTask()
         {
-            Pages.DeleteUnpublishedListings();
-            StatisticsSnapshot.TakeSnapshots();
-            DownloadFilesUpdater.UpdateFiles();
-            Landerist_com.Landerist_com.UpdateDownloadsAndStatisticsPages();
-            Backup.Update();
+            try
+            {
+                Pages.DeleteUnpublishedListings();
+                StatisticsSnapshot.TakeSnapshots();
+                DownloadFilesUpdater.UpdateFiles();
+                Landerist_com.Landerist_com.UpdateDownloadsAndStatisticsPages();
+                Backup.Update();
+            }
+            catch (Exception exception)
+            {
+                Log.WriteError("ServiceTasks DailyTask", exception);
+            }
+
         }
 
         public static void Update()

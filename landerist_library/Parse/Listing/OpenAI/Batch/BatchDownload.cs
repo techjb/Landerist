@@ -106,7 +106,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             try
             {
                 var lines = File.ReadAllLines(filePath);
-                ReadLines(lines);                
+                ReadLines(lines);
                 return true;
             }
             catch (Exception exception)
@@ -179,7 +179,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             page.RemoveResponseBodyZipped();
 
             var (pageType, listing) = ParseListing.ParseOpenAI(page, batchResponseLine.Response.Body);
-            var sucess =  new PageScraper(page).SetPageType(pageType, listing);
+            var sucess = new PageScraper(page).SetPageType(pageType, listing);
             page.Dispose();
             return sucess;
         }
@@ -187,11 +187,17 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
 
         public static void Clean()
         {
-            DeleteDownloadedBatches();
-            RemoveBatchesFiles();
+            DeleteRemoteFiles();
+            DeleteLocalFiles();
         }
 
-        private static void DeleteDownloadedBatches()
+        private static void DeleteRemoteFiles()
+        {
+            DeleteDownloadedRemoteFiles();
+            DeleteAllRemoteFiles();
+        }
+
+        private static void DeleteDownloadedRemoteFiles()
         {
             var batchIds = Batches.SelectDownloaded();
             Parallel.ForEach(batchIds, batchId =>
@@ -202,12 +208,31 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
                     return;
                 }
                 Delete(batchResponse);
-            });            
+            });
         }
 
-        private static void RemoveBatchesFiles()
+        public static void DeleteAllRemoteFiles()
         {
-            if (Config.BATCH_DIRECTORY != null && Directory.Exists(Config.BATCH_DIRECTORY))
+            var batchIds = Batches.SelectAll();
+            if (batchIds.Count > 0)
+            {
+                return;
+            }
+
+            var files = OpenAIClient.FilesEndpoint.ListFilesAsync().Result;
+            if (files is null)
+            {
+                return;
+            }
+            Parallel.ForEach(files, filesId =>
+            {
+                DeleteFile(filesId, true);
+            });
+        }
+
+        private static void DeleteLocalFiles()
+        {
+            if (Directory.Exists(Config.BATCH_DIRECTORY))
             {
                 var files = Directory.GetFiles(Config.BATCH_DIRECTORY);
                 foreach (var file in files)
