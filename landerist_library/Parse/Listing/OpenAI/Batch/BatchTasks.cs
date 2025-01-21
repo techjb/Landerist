@@ -7,7 +7,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
         public static void Start()
         {
             BatchDownload.Start();
-            BatchDownload.Clean();            
+            BatchCleaner.Start();            
             BatchUpload.Start();
         }
     }

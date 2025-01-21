@@ -2,14 +2,11 @@
 using landerist_library.Database;
 using landerist_library.Logs;
 using landerist_library.Websites;
-using OpenAI;
-using OpenAI.Batch;
-using OpenAI.Files;
 using System.Text.Json;
 
 namespace landerist_library.Parse.Listing.OpenAI.Batch
 {
-    public class BatchUpload
+    public class BatchUpload: BatchClient
     {
         private static readonly object SyncWrite = new();
 
@@ -19,8 +16,6 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
         {
             WriteIndented = false
         };
-
-        private static readonly OpenAIClient OpenAIClient = new(PrivateConfig.OPENAI_API_KEY);
 
         private static List<Page> pages = [];
 
@@ -59,7 +54,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             var batchResponse = CreateBatch(fileResponse);
             if (batchResponse == null || string.IsNullOrEmpty(batchResponse.Id))
             {
-                OpenAIClient.FilesEndpoint.DeleteFileAsync(fileResponse.Id).Wait();
+                //DeleteFile(fileResponse.Id);
                 return false;
             }            
             
@@ -237,35 +232,6 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
                         content = userInput
                     }
                 ];
-        }
-
-
-        static FileResponse? UploadFile(string filePath)
-        {
-            try
-            {
-                return OpenAIClient.FilesEndpoint.UploadFileAsync(filePath, FilePurpose.Batch).GetAwaiter().GetResult();
-            }
-            catch (Exception exception)
-            {
-                Log.WriteError("BatchUpload UploadFile", exception);
-            }
-            return null;
-        }
-
-        static BatchResponse? CreateBatch(FileResponse fileResponse)
-        {
-            try
-            {
-                var batchRequest = new CreateBatchRequest(fileResponse.Id, Endpoint.ChatCompletions);
-                return OpenAIClient.BatchEndpoint.CreateBatchAsync(batchRequest).Result;
-            }
-            catch (Exception exception)
-            {
-                Log.WriteError("BatchUpload CreateBatch", exception);
-            }
-
-            return null;
         }
 
         static void SetWaitingAIResponse()

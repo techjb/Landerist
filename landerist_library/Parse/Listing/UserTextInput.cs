@@ -70,7 +70,7 @@ namespace landerist_library.Parse.Listing
                         "Html: " +  GetHtml(htmlDocument);
                 }
             }
-            catch (Exception exception)
+            catch// (Exception exception)
             { 
 
             }
