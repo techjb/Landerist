@@ -195,6 +195,7 @@ namespace landerist_tests
             //landerist_library.Parse.Listing.OpenAI.Batch.BatchDownload.Test();
             //landerist_library.Parse.Listing.OpenAI.Batch.BatchTasks.Start();            
             //landerist_library.Parse.Listing.OpenAI.Batch.BatchCleaner.DeleteAllRemoteFiles();
+            //landerist_library.Parse.Listing.OpenAI.Batch.BatchClient.DeleteFile("dd");
 
 
             #endregion

@@ -1,25 +1,17 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Database;
-using OpenAI;
-using OpenAI.Batch;
 
 namespace landerist_library.Parse.Listing.OpenAI.Batch
 {
-    public class BatchCleaner: BatchClient
+    public class BatchCleaner : BatchClient
     {
         public static void Start()
         {
-            DeleteLocalBatches();
+            DeleteDownloadedBatches();
             DeleteLocalFiles();
         }
 
-        private static void DeleteRemoteFiles()
-        {
-            //DeleteLocalBatches();
-            //DeleteAllRemoteFiles();
-        }
-
-        private static void DeleteLocalBatches()
+        private static void DeleteDownloadedBatches()
         {
             var batchIds = Batches.SelectDownloaded();
             Parallel.ForEach(batchIds, batchId =>
@@ -29,29 +21,31 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
                 {
                     return;
                 }
-                //Delete(batchResponse);
-                Batches.Delete(batchResponse.Id);
+                if (DeleteFile(batchResponse.InputFileId) && DeleteFile(batchResponse.OutputFileId) && DeleteFile(batchResponse.ErrorFileId))
+                {
+                    Batches.Delete(batchResponse.Id);
+                }
             });
         }
 
-        //public static void DeleteAllRemoteFiles()
-        //{
-        //    var batchIds = Batches.SelectAll();
-        //    if (batchIds.Count > 0)
-        //    {
-        //        return;
-        //    }
+        public static void DeleteAllRemoteFiles()
+        {
+            var batchIds = Batches.SelectAll();
+            if (batchIds.Count > 0)
+            {
+                return;
+            }
 
-        //    var files = ListFiles();
-        //    if (files is null)
-        //    {
-        //        return;
-        //    }
-        //    Parallel.ForEach(files, filesId =>
-        //    {
-        //        DeleteFile(filesId);
-        //    });
-        //}
+            var files = ListFiles();
+            if (files is null)
+            {
+                return;
+            }
+            Parallel.ForEach(files, filesId =>
+            {
+                DeleteFile(filesId);
+            });
+        }
 
         private static void DeleteLocalFiles()
         {

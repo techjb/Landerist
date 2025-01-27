@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "3.86";
+        public static readonly string VERSION = "3.88";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -129,7 +129,6 @@ namespace landerist_library.Configuration
 
         public const int DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS = 90;
         public static LLMProviders LLM_PROVIDER { get; set; }
-
         public static bool STRUCTURED_OUTPUT { get; set; }
         public static string? BATCH_DIRECTORY { get; set; }
         public static bool BATCH_ENABLED { get; set; }
@@ -215,7 +214,7 @@ namespace landerist_library.Configuration
                 PrivateConfig.BATCH_DIRECTORY_LOCAL;
 
             MAX_DEGREE_OF_PARALLELISM_SCRAPER = ConfigurationProduction ?
-                Environment.ProcessorCount - 5 :
+                Environment.ProcessorCount - 6 :
                 1;
         }
 

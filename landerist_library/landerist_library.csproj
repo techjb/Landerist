@@ -25,10 +25,10 @@
 
   <ItemGroup>
     <PackageReference Include="AI.Dev.OpenAI.GPT" Version="1.0.2" />
-    <PackageReference Include="Anthropic.SDK" Version="4.4.3" />
-    <PackageReference Include="AWSSDK.CloudFront" Version="3.7.404.17" />
-    <PackageReference Include="AWSSDK.Comprehend" Version="3.7.400.82" />
-    <PackageReference Include="AWSSDK.S3" Version="3.7.412.2" />
+    <PackageReference Include="Anthropic.SDK" Version="4.4.4" />
+    <PackageReference Include="AWSSDK.CloudFront" Version="3.7.404.19" />
+    <PackageReference Include="AWSSDK.Comprehend" Version="3.7.400.84" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.412.4" />
     <PackageReference Include="Com.Bekijkhet.RobotsTxt" Version="1.0.0" />
     <PackageReference Include="CsvHelper" Version="33.0.1" />
     <PackageReference Include="Google.Apis.CustomSearchAPI.v1" Version="1.68.0.3520" />
@@ -38,11 +38,11 @@
     <PackageReference Include="Gzip.TextClassifier" Version="1.0.1" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.72" />
     <PackageReference Include="Louw.SitemapParser" Version="0.0.2" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.1" />
     <PackageReference Include="NetTopologySuite" Version="2.5.0" />
     <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="4.0.0" />
     <PackageReference Include="Newtonsoft.Json.Schema" Version="4.0.1" />
-    <PackageReference Include="OpenAI-DotNet" Version="8.4.2" />
+    <PackageReference Include="OpenAI-DotNet" Version="8.5.1" />
     <PackageReference Include="OpenCvSharp4" Version="4.10.0.20241108" />
     <PackageReference Include="OpenCvSharp4.Extensions" Version="4.10.0.20241108" />
     <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.10.0.20241108" />

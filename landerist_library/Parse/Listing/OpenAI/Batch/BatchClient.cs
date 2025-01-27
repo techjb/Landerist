@@ -10,20 +10,40 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
     {
         private static readonly OpenAIClient OpenAIClient = new(PrivateConfig.OPENAI_API_KEY);
 
-        protected static void DeleteFile(string fileId)
+        public static bool DeleteFile(string fileId)
         {
             if (string.IsNullOrEmpty(fileId))
             {
-                return;
+                return true;
+            }
+            if (!ExistsFile(fileId))
+            {
+                return true;
             }
             try
             {
                 OpenAIClient.FilesEndpoint.DeleteFileAsync(fileId);
+                return true;
             }
             catch (Exception exception)
             {
                 Log.WriteError("BatchClient DeleteFile", exception);
             }
+            return false;
+        }
+
+        protected static bool ExistsFile(string fileId)
+        {
+            try
+            {
+                FileResponse fileResponse = OpenAIClient.FilesEndpoint.GetFileInfoAsync(fileId).Result;
+                return true;
+            }
+            catch (Exception exception)
+            {
+                Log.WriteError("BatchClient ExistsFile", exception);
+            }
+            return false;
         }
 
         protected static BatchResponse? GetBatch(string batchId)

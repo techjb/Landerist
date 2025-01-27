@@ -53,6 +53,8 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             if (Download(batchResponse.OutputFileId) && Download(batchResponse.ErrorFileId))
             {
                 Batches.UpdateToDownloaded(batchResponse.Id);
+                //DeleteFile(batchResponse.OutputFileId);
+                //DeleteFile(batchResponse.ErrorFileId);
             }
         }
 
@@ -118,8 +120,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
                 }
             });
 
-            //Log.WriteInfo("BatchDownload", $"{readed}/{total}, Errors: {errors}");
-            Log.WriteInfo("batch", $"Downloaded {readed}");
+            Log.WriteInfo("batch", $"Downloaded {readed} Errors: " + errors);
         }
 
         private static bool ReadLine(string line)
