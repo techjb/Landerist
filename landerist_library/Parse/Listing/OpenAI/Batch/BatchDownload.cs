@@ -11,8 +11,8 @@ using System.Text.Json.Serialization;
 
 namespace landerist_library.Parse.Listing.OpenAI.Batch
 {
-    public class BatchDownload: BatchClient
-    {        
+    public class BatchDownload : BatchClient
+    {
 
         private static readonly JsonSerializerOptions JsonSerializerOptions = new()
         {
@@ -24,7 +24,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
         public static void Start()
         {
             var batchIds = Batches.SelectNonDownloaded();
-            Parallel.ForEach(batchIds,                 
+            Parallel.ForEach(batchIds,
                 //new ParallelOptions() { MaxDegreeOfParallelism = 1}, 
                 batchId =>
             {
@@ -47,7 +47,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
         //    var batch = GetBatch("batch_672c297160b081909856773d7211b236");
         //}
 
-        
+
         private static void Download(BatchResponse batchResponse)
         {
             if (Download(batchResponse.OutputFileId) && Download(batchResponse.ErrorFileId))
@@ -73,7 +73,7 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             File.Delete(filePath);
             return sucess;
         }
-       
+
 
         private static bool ReadFile(string filePath)
         {
@@ -111,7 +111,6 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
                     else
                     {
                         Interlocked.Increment(ref errors);
-                        Log.WriteError("BatchDownload ReadLines. Error reading line: ", line);
                     }
                 }
                 catch (Exception exception)
@@ -125,7 +124,17 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
 
         private static bool ReadLine(string line)
         {
-            var batchResponseLine = JsonSerializer.Deserialize<BatchLineResponse?>(line, JsonSerializerOptions);
+            BatchLineResponse? batchResponseLine;
+            try
+            {
+                batchResponseLine = JsonSerializer.Deserialize<BatchLineResponse?>(line, JsonSerializerOptions);
+            }
+            catch (Exception exception)
+            {
+                // todo: set page to WaitingAIParsing = 1
+                Log.WriteError("BatchDownload ReadLine Serialization", exception);
+                return false;
+            }
 
             if (batchResponseLine == null)
             {
@@ -151,10 +160,21 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
             page.SetResponseBodyFromZipped();
             page.RemoveResponseBodyZipped();
 
-            var (pageType, listing) = ParseListing.ParseOpenAI(page, batchResponseLine.Response.Body);
-            var sucess = new PageScraper(page).SetPageType(pageType, listing);
+            var sucess = false;
+            try
+            {
+                var (pageType, listing) = ParseListing.ParseOpenAI(page, batchResponseLine.Response.Body);
+                sucess = new PageScraper(page).SetPageType(pageType, listing);
+            }
+            catch (Exception exception)
+            {
+                Log.WriteError("BatchDownload ReadLine ParseListing", exception);
+            }
             page.Dispose();
             return sucess;
+
+
+
         }
     }
 }

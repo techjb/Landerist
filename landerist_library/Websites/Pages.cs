@@ -487,10 +487,10 @@ namespace landerist_library.Websites
                 {
                     Interlocked.Increment(ref errors);
                 }
-                Console.WriteLine(processed + "/" + total + " Deleted: " + deleted);
+                //Console.WriteLine(processed + "/" + total + " Deleted: " + deleted);
 
             });
-            Logs.Log.WriteInfo("DeleteUnpublishedListings", "Deleted: " + deleted + "/" + total + " Errors: " + errors);
+            Logs.Log.WriteInfo("DeleteUnpublishedListings", "Deleted: " + deleted + "/" + total + " listings. Errors: " + errors);
         }
 
         public static List<Page> SelectWaitingAIParsing()
