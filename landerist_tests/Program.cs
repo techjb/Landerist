@@ -263,10 +263,10 @@ namespace landerist_tests
             #endregion
 
             #region DataBase
-            //var d = CountrySpain.Contains(40.4199410000, - 3.6886920000); // true
+            //var d = landerist_library.Database.CountrySpain.Contains(40.4199410000, - 3.6886920000); // true
             //Console.WriteLine(d);
 
-            //var h = CountrySpain.Contains(-3.6886920000, 40.4199410000); // false
+            //var h = landerist_library.Database.CountrySpain.Contains(-3.6886920000, 40.4199410000); // false
             //Console.WriteLine(h);
 
             #endregion
