@@ -85,7 +85,7 @@ namespace landerist_library.Scrape
                 if (!Page.SetResponseBodyZipped())
                 {
                     return false;
-                }                
+                }
                 Page.SetWaitingAIParsingRequest();
                 return Page.Update(false);
             }
@@ -108,6 +108,7 @@ namespace landerist_library.Scrape
                 NewListing ??= Page.GetListing(true);
                 //SetMedia();
                 SetLocation();
+                SetLauId();
                 UpdateNewListing();
                 return;
             }
@@ -139,8 +140,15 @@ namespace landerist_library.Scrape
         {
             if (NewListing != null)
             {
-                LatLngParser latLngParser = new(Page, NewListing);
-                latLngParser.SetLatLng();
+                new LatLngParser(Page, NewListing).SetLatLng();
+            }
+        }
+
+        private void SetLauId()
+        {
+            if (NewListing != null)
+            {
+                new LauIdParser(Page, NewListing).SetLauId();
             }
         }
 

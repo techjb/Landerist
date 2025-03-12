@@ -180,14 +180,14 @@ namespace landerist_library.Database
             return new DataBase().Query(query, queryParameters);
         }
 
-        public static SortedSet<Listing> GetListingsWithParalelism(bool loadMedia)
+        public static SortedSet<Listing> GetAll(bool loadMedia)
         {
             string query =
                 "SELECT * " +
                 "FROM " + TABLE_ES_LISTINGS;
 
             DataTable dataTable = new DataBase().QueryTable(query);
-            return GetListingsWithParalelism(dataTable, loadMedia);
+            return GetAll(dataTable, loadMedia);
         }
 
         public static SortedSet<Listing> GetUnpublishedListings(DateTime unlistingDate)
@@ -203,10 +203,10 @@ namespace landerist_library.Database
                 {"unlistingDate", unlistingDate }
             });
 
-            return GetListings(dataTable, false);
+            return ParseListings(dataTable, false);
         }
 
-        public static SortedSet<Listing> GetListingsWithParalelism(bool loadMedia, DateTime dataSourceUpdate)
+        public static SortedSet<Listing> GetListings(bool loadMedia, DateTime dataSourceUpdate)
         {
             string query =
                 "SELECT * " +
@@ -214,10 +214,10 @@ namespace landerist_library.Database
                 "WHERE CONVERT(date, [dataSourceUpdate]) = CONVERT(date, @DataSourceUpdate)";
 
             DataTable dataTable = new DataBase().QueryTable(query, "DataSourceUpdate", dataSourceUpdate);
-            return GetListingsWithParalelism(dataTable, loadMedia);
+            return GetAll(dataTable, loadMedia);
         }
 
-        private static SortedSet<Listing> GetListings(DataTable dataTable, bool loadMedia)
+        private static SortedSet<Listing> ParseListings(DataTable dataTable, bool loadMedia)
         {
             SortedSet<Listing> listings = new(new ListingComparer());
             foreach (DataRow dataRow in dataTable.Rows)
@@ -228,7 +228,7 @@ namespace landerist_library.Database
             return listings;
         }
 
-        private static SortedSet<Listing> GetListingsWithParalelism(DataTable dataTable, bool loadMedia)
+        private static SortedSet<Listing> GetAll(DataTable dataTable, bool loadMedia)
         {
             SortedSet<Listing> listings = new(new ListingComparer());
             var sync = new object();
