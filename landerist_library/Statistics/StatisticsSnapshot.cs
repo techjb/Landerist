@@ -1,4 +1,5 @@
 ﻿using landerist_library.Database;
+using landerist_orels.ES;
 using System.Data;
 
 namespace landerist_library.Statistics
@@ -7,6 +8,8 @@ namespace landerist_library.Statistics
     {
         Listings,
         Media,
+        PublishedListings,
+        UnpublishedListings,
         Pages,
         Websites,
         UpdatedIpAddress,
@@ -28,8 +31,10 @@ namespace landerist_library.Statistics
             SnapshotUpdatedIpAddress();
             SnapshotPages();
             SnapshotUpdatedPages();
-            SnapshotEs_Listings();
-            SnapshotEs_Media();
+            SnapshotListings();
+            SnapshotPublishedListings();
+            SnapshotUnPublishedListings();
+            SnapshotMedia();
         }
 
         private static void SnapshotWebsites()
@@ -90,7 +95,7 @@ namespace landerist_library.Statistics
             InsertDaily(StatisticsKey.UpdatedPages, query);
         }
 
-        private static void SnapshotEs_Listings()
+        private static void SnapshotListings()
         {
             string query =
                 "SELECT COUNT(*) " +
@@ -99,7 +104,27 @@ namespace landerist_library.Statistics
             InsertDaily(StatisticsKey.Listings, query);
         }
 
-        private static void SnapshotEs_Media()
+        private static void SnapshotPublishedListings()
+        {
+            SnapshotListings(StatisticsKey.PublishedListings, ListingStatus.published);
+        }
+
+        private static void SnapshotUnPublishedListings()
+        {
+            SnapshotListings(StatisticsKey.UnpublishedListings, ListingStatus.unpublished);
+        }
+
+        private static void SnapshotListings(StatisticsKey statisticsKey, ListingStatus listingStatus)
+        {
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+                "WHERE [listingStatus] = '" + listingStatus.ToString() + "'";
+
+            InsertDaily(statisticsKey, query);
+        }
+
+        private static void SnapshotMedia()
         {
             string query =
                 "SELECT COUNT(*) " +

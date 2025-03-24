@@ -45,6 +45,7 @@ namespace landerist_library.Landerist_com
 
         private static bool Update(SortedSet<Listing> listings, CountryCode countryCode, ExportType exportType)
         {
+            Console.WriteLine("Updating " + exportType.ToString() + "..");
             if (listings.Count.Equals(0))
             {
                 return true;

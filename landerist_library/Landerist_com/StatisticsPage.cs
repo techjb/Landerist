@@ -23,6 +23,8 @@ namespace landerist_library.Landerist_com
             {
                 StatisticsTemplate = File.ReadAllText(StatisticsTemplateHtmlFile);
                 UpdateTemplate(StatisticsKey.Listings, false);
+                UpdateTemplate(StatisticsKey.PublishedListings, false);
+                UpdateTemplate(StatisticsKey.UnpublishedListings, false);
                 UpdateTemplate(StatisticsKey.Websites, false);
                 UpdateTemplate(StatisticsKey.Pages, false);
                 UpdateTemplate(StatisticsKey.UpdatedPages, true);

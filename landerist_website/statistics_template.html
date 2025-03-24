@@ -45,11 +45,15 @@
     <script>
 
         const valuesListings = [/*Listings*/];
+        const valuesPublishedListings = [/*PublishedListings*/];
+        const valuesUnpublishedListings = [/*UnpublishedListings*/];
         const valuesWebsites = [/*Websites*/];
         const valuesPages = [/*Pages*/];
         const valuesUpdatedPages = [/*UpdatedPages*/];
 
         CreateChart("ChartListings", "Listings", valuesListings);
+        CreateChart("ChartPublishedListings", "Published listings", valuesPublishedListings);
+        CreateChart("ChartUnpublishedListings", "Unpublished listings", valuesUnpublishedListings);
         CreateChart("ChartWebsites", "Websites", valuesWebsites);
         CreateChart("ChartPages", "Pages", valuesPages);
         CreateChart("ChartUpdatedPages", "Updated Pages", valuesUpdatedPages);

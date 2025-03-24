@@ -254,13 +254,14 @@ namespace landerist_tests
 
             #endregion
 
-            #region landerist_com
+            #region landerist.com
 
             //landerist_library.Statistics.StatisticsSnapshot.TakeSnapshots();
-            //DownloadFilesUpdater.UpdateFiles();
-            //DownloadFilesUpdater.UpdateUpdates();
-            //Landerist_com.UpdateDownloadsAndStatisticsPages();
-            //StatisticsPage.Update();
+            //landerist_library.Landerist_com.DownloadFilesUpdater.UpdateFiles();
+            //landerist_library.Landerist_com.DownloadFilesUpdater.UpdateUpdates();
+            //landerist_library.Landerist_com.Landerist_com.UpdateDownloadsAndStatisticsPages();
+            //landerist_library.Landerist_com.Landerist_com.UpdateDownloadsAndStatisticsPages();
+            //landerist_library.Landerist_com.StatisticsPage.Update();
 
             #endregion
 
