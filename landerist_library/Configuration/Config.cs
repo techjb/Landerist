@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "3.95";
+        public static readonly string VERSION = "3.96";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -200,7 +200,7 @@ namespace landerist_library.Configuration
             TIMERS_ENABLED = !ConfigurationProduction;
 
             LLM_PROVIDER = !ConfigurationProduction ?
-                LLMProviders.OpenAI :
+                LLMProviders.VertexAI:
                 LLMProviders.OpenAI;
 
             STRUCTURED_OUTPUT = true;

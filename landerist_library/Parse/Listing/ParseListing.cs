@@ -112,8 +112,8 @@ namespace landerist_library.Parse.Listing
             {
                 return (PageType.MayBeListing, null);
             }
-            var (functionName, arguments) = VertexAIResponse.GetFunctionNameAndArguments(generateContentResponse);
-            return ParseText(page, functionName, arguments);
+            OpenApiSchema? openApiSchema = VertexAIResponse.GetVertexAIStructuredOputput(generateContentResponse);            
+            return ParseText(page, openApiSchema);
         }
 
 
@@ -147,6 +147,25 @@ namespace landerist_library.Parse.Listing
                         }
                 }
             }
+            return (PageType.MayBeListing, null);
+        }
+
+        private static (PageType pageType, landerist_orels.ES.Listing? listing) ParseText(Page page, OpenApiSchema? openAIStructuredOutput)
+        {
+            //if (functionName != null && arguments != null)
+            //{
+            //    switch (functionName)
+            //    {
+            //        case ParseListingTool.FunctionNameIsNotListing:
+            //            {
+            //                return (PageType.NotListingByParser, null);
+            //            }
+            //        case ParseListingTool.FunctionNameIsListing:
+            //            {
+            //                return ParseListingResponse.ParseListing(page, arguments);
+            //            }
+            //    }
+            //}
             return (PageType.MayBeListing, null);
         }
     }

@@ -28,6 +28,7 @@ namespace landerist_library.Landerist_com
                 UpdateTemplate(StatisticsKey.Websites, false);
                 UpdateTemplate(StatisticsKey.Pages, false);
                 UpdateTemplate(StatisticsKey.UpdatedPages, true);
+                UpdateTemplate(StatisticsKey.NeedUpdate, true);
 
                 if (UploadStatisticsFile())
                 {

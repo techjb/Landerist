@@ -69,9 +69,8 @@ namespace landerist_tests
 
 
             // listing 
-            //var page = new Page("https://www.12casas.com/inmueble/E869/"); 
-            //var page = new Page("https://www.mardenia-inmobiliaria.com/venta/casa-en-venta-en-sagra-638/");
-            //var page = new Page("https://goldacreestates.com/realestate/top/026712-42136");
+            
+            var page = new Page("https://goldacreestates.com/realestate/top/026712-42136");
             //var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
             //var page = new Page("https://www.nerjasolproperty.com/es/apartamento-en-venta-en-torrox-costa/80124/s2");
             //var page = new Page("https://baronybaron.com/property/c-san-pedro-cabezon-de-la-sal-179m2/");
@@ -145,12 +144,9 @@ namespace landerist_tests
             //new Scraper().Scrape(website);
             //new Scraper().ScrapeUnknowPageType(website);
             //new Scraper().ScrapeAllPages();            
-            //new Scraper().ScrapeResponseBodyRepeatedInListings();
-            //new Scraper().Start();
-            //var Timer3 = new Timer(TimerCallback3!, null, 0, 1000);
-            //new Scraper().Start();            
-            //Thread.Sleep(100000000);
-            //new Scraper().Scrape(page);
+            //new Scraper().ScrapeResponseBodyRepeatedInListings();            
+            //new Scraper().Start();                        
+            new Scraper().Scrape(page);
             //new Scraper().DoTest();
 
 
@@ -159,7 +155,7 @@ namespace landerist_tests
             #region Downloaders
 
             //new HttpClientDownloader().Get(uriPage);
-            //PuppeteerDownloader.ReinstallChrome();
+            //PuppeteerDownloader.UpdateChrome();
             //PuppeteerDownloader.KillChrome();
             //PuppeteerDownloader.DoTest();            
             //PuppeteerDownloader.UpdateChrome();

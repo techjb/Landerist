@@ -50,13 +50,15 @@
         const valuesWebsites = [/*Websites*/];
         const valuesPages = [/*Pages*/];
         const valuesUpdatedPages = [/*UpdatedPages*/];
+        const valuesNeedUpdate = [/*NeedUpdate*/];
 
         CreateChart("ChartListings", "Listings", valuesListings);
         CreateChart("ChartPublishedListings", "Published listings", valuesPublishedListings);
         CreateChart("ChartUnpublishedListings", "Unpublished listings", valuesUnpublishedListings);
         CreateChart("ChartWebsites", "Websites", valuesWebsites);
         CreateChart("ChartPages", "Pages", valuesPages);
-        CreateChart("ChartUpdatedPages", "Updated Pages", valuesUpdatedPages);
+        CreateChart("ChartUpdatedPages", "Updated pages", valuesUpdatedPages);
+        CreateChart("ChartNeedUpdate", "Need update", valuesNeedUpdate);
 
         function CreateChart(id, title, values) {
             const dataListings = {

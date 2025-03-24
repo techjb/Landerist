@@ -14,6 +14,7 @@ namespace landerist_library.Statistics
         Websites,
         UpdatedIpAddress,
         UpdatedPages,
+        NeedUpdate,
         UpdatedWebsites,
         UpdatedRobotsTxt,
         UpdatedSitemaps
@@ -31,6 +32,7 @@ namespace landerist_library.Statistics
             SnapshotUpdatedIpAddress();
             SnapshotPages();
             SnapshotUpdatedPages();
+            SnapshotNeedUpdate();
             SnapshotListings();
             SnapshotPublishedListings();
             SnapshotUnPublishedListings();
@@ -93,6 +95,16 @@ namespace landerist_library.Statistics
                 "WHERE CONVERT(date, [Updated]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
 
             InsertDaily(StatisticsKey.UpdatedPages, query);
+        }
+
+        private static void SnapshotNeedUpdate()
+        {
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + Websites.Pages.PAGES + " " +
+                "WHERE [NextUpdate] < GETDATE()";
+
+            InsertDaily(StatisticsKey.NeedUpdate, query);
         }
 
         private static void SnapshotListings()

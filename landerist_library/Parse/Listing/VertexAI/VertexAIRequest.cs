@@ -13,13 +13,11 @@ namespace landerist_library.Parse.Listing.VertexAI
 
         public const int MAX_CONTEXT_WINDOW = 128000;
 
-        private const string GEMINI_FLASH = "gemini-1.5-flash";
+        private const string GEMINI_FLASH = "gemini-2.0-flash";
 
-        private const string GEMINI_PRO = "gemini-1.5-pro";
+        private const string GEMINI_PRO = "gemini-2.0-pro-exp-02-05";
 
-        private static readonly string ModelName =
-            GEMINI_FLASH;
-        //GEMINI_PRO;                            
+        private static readonly string ModelName = GEMINI_FLASH; //GEMINI_PRO;                            
 
         private static readonly HarmBlockThreshold HarmBlockThreshold = HarmBlockThreshold.BlockOnlyHigh;
 
@@ -104,6 +102,8 @@ namespace landerist_library.Parse.Listing.VertexAI
                 GenerationConfig = new GenerationConfig()
                 {
                     Temperature = 0f,
+                    ResponseMimeType = "application/json",
+                    ResponseSchema = VertexAIResponseSchema.Schema
                 },
                 SafetySettings =
                 {
@@ -127,11 +127,29 @@ namespace landerist_library.Parse.Listing.VertexAI
                         Category = HarmCategory.SexuallyExplicit,
                         Threshold = HarmBlockThreshold
                     },
+                    new SafetySetting
+                    {
+                        Category = HarmCategory.CivicIntegrity,
+                        Threshold = HarmBlockThreshold
+                    },
+                    new SafetySetting
+                    {
+                        Category = HarmCategory.Unspecified,
+                        Threshold = HarmBlockThreshold
+                    },
                 },
-                Tools =
-                {
-                    new VertexAITools().GetTools()
-                },
+                //Tools =
+                //{
+                //    new VertexAITools().GetTools()
+                //},
+                //ToolConfig = new ToolConfig
+                //{
+                //    FunctionCallingConfig = new FunctionCallingConfig
+                //    {
+                //        Mode = FunctionCallingConfig.Types.Mode.Any,
+                //    }
+                //},               
+               
                 SystemInstruction = new Content
                 {
                     Parts =
@@ -139,24 +157,10 @@ namespace landerist_library.Parse.Listing.VertexAI
                         new Part
                         {
                             Text = SystemPrompt
-                        }
+                        }                       
                     }
-                }
+                }                
             };
-
-            // ToolConfig only supported in gemini 1.5 pro
-            //https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/function-calling#tool-config
-            if (ModelName.Equals(GEMINI_PRO))
-            {
-                generateContentRequest.ToolConfig = new ToolConfig
-                {
-                    FunctionCallingConfig = new FunctionCallingConfig
-                    {
-                        Mode = FunctionCallingConfig.Types.Mode.Any,
-                    }
-                };
-            }
-
             return generateContentRequest;
         }
     }

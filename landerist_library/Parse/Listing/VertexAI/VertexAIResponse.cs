@@ -1,11 +1,41 @@
 ﻿using Google.Cloud.AIPlatform.V1;
+using landerist_library.Parse.Listing.OpenAI;
 using landerist_library.Tools;
+using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 
 namespace landerist_library.Parse.Listing.VertexAI
 {
     public class VertexAIResponse
     {
+
+        public static OpenApiSchema? GetVertexAIStructuredOputput(GenerateContentResponse response)
+        {
+            try
+            {
+                if (response.Candidates != null &&
+                    response.Candidates[0].Content != null &&
+                    response.Candidates[0].Content.Parts != null)
+                {
+                    var part = response.Candidates[0].Content.Parts[0];
+                    var settings = new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                        MissingMemberHandling = MissingMemberHandling.Ignore // Ignora propiedades no definidas en el modelo
+                    };
+
+                    var result = JsonConvert.DeserializeObject<OpenApiSchema>(part.Text, settings);
+                    return result;
+                }
+            }
+            catch (Exception exception)
+            {
+                Logs.Log.WriteError("VertexAIRequest GetFunctionNameAndArguments", response.ToString(), exception);
+            }
+            return null;
+        
+        }
+
         public static (string?, string?) GetFunctionNameAndArguments(GenerateContentResponse response)
         {
             try
