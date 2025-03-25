@@ -69,7 +69,7 @@ namespace landerist_tests
 
 
             // listing 
-            var page = new Page("https://goldacreestates.com/realestate/top/026712-42136");            
+            //var page = new Page("https://goldacreestates.com/realestate/top/026712-42136");            
             //var page = new Page("https://www.nerjasolproperty.com/es/apartamento-en-venta-en-torrox-costa/80124/s2");
             //var page = new Page("https://baronybaron.com/property/c-san-pedro-cabezon-de-la-sal-179m2/");
 
@@ -144,7 +144,7 @@ namespace landerist_tests
             //new Scraper().ScrapeAllPages();            
             //new Scraper().ScrapeResponseBodyRepeatedInListings();            
             //new Scraper().Start();                        
-            new Scraper().Scrape(page);
+            //new Scraper().Scrape(page);
             //new Scraper().DoTest();
 
 
