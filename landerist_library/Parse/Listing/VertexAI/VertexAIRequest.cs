@@ -85,6 +85,7 @@ namespace landerist_library.Parse.Listing.VertexAI
 
         private static GenerateContentRequest GetGenerateContentRequest(Page page, string text)
         {
+            var responseSchema = VertexAIResponseSchema.Schema;
             var generateContentRequest = new GenerateContentRequest
             {
                 Model = $"projects/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PROJECTID}/locations/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}/publishers/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PUBLISHER}/models/{ModelName}",
@@ -103,7 +104,7 @@ namespace landerist_library.Parse.Listing.VertexAI
                 {
                     Temperature = 0f,
                     ResponseMimeType = "application/json",
-                    ResponseSchema = VertexAIResponseSchema.Schema
+                    ResponseSchema = responseSchema
                 },
                 SafetySettings =
                 {
@@ -138,18 +139,6 @@ namespace landerist_library.Parse.Listing.VertexAI
                         Threshold = HarmBlockThreshold
                     },
                 },
-                //Tools =
-                //{
-                //    new VertexAITools().GetTools()
-                //},
-                //ToolConfig = new ToolConfig
-                //{
-                //    FunctionCallingConfig = new FunctionCallingConfig
-                //    {
-                //        Mode = FunctionCallingConfig.Types.Mode.Any,
-                //    }
-                //},               
-               
                 SystemInstruction = new Content
                 {
                     Parts =

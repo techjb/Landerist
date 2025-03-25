@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "3.96";
+        public static readonly string VERSION = "3.97";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -99,7 +99,7 @@ namespace landerist_library.Configuration
 
         public const int MAX_YEARS_SINCE_PUBLISHED_LISTING = 5;
 
-        public const int MIN_CONSTRUCTION_YEAR = 1980;
+        public const int MIN_CONSTRUCTION_YEAR = 1800;
 
         public const int MAX_CONSTRUCTION_YEARS_FROM_NOW = 5;
 
@@ -129,7 +129,6 @@ namespace landerist_library.Configuration
 
         public const int DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS = 90;
         public static LLMProviders LLM_PROVIDER { get; set; }
-        public static bool STRUCTURED_OUTPUT { get; set; }
         public static string? BATCH_DIRECTORY { get; set; }
         public static bool BATCH_ENABLED { get; set; }
 
@@ -203,7 +202,6 @@ namespace landerist_library.Configuration
                 LLMProviders.VertexAI:
                 LLMProviders.OpenAI;
 
-            STRUCTURED_OUTPUT = true;
 
             BATCH_ENABLED = LLM_PROVIDER.Equals(LLMProviders.OpenAI) && ConfigurationProduction;
 

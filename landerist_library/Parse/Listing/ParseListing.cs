@@ -77,43 +77,26 @@ namespace landerist_library.Parse.Listing
             {
                 return (PageType.MayBeListing, null);
             }
-            if (Config.STRUCTURED_OUTPUT)
-            {
-                var structuredOutput = JsonConvert.DeserializeObject<OpenAIStructuredOutput>(chatResponse.FirstChoice);
-                if (structuredOutput == null)
-                {
-                    return (PageType.MayBeListing, null);
-                }
-                return structuredOutput.ParseListing(page);
-            }
-
-            var (functionName, arguments) = OpenAIResponse.GetFunctionNameAndArguments(chatResponse);
-            var (pageType, listing) = ParseText(page, functionName, arguments);
-            return (pageType, listing);
+            return ParseResponse(page, chatResponse.FirstChoice);
         }
+
 
         private static (PageType pageType, landerist_orels.ES.Listing? listing, bool waitingAIParsing)
             ParseVertextAI(Page page, string text)
         {
-            var response = VertexAIRequest.GetResponse(page, text).Result;
-            var (pageType, listing) = ParseTextVertextAI(page, response);
+            var generateContentResponse = VertexAIRequest.GetResponse(page, text).Result;
+            var (pageType, listing) = ParseVertextAI(page, generateContentResponse);
             return (pageType, listing, false);
         }
 
-        public static (PageType pageType, landerist_orels.ES.Listing? listing) ParseTextVertextAIFromBatch(Page page, string userInput)
-        {
-            var response = VertexAIBatch.GetGenerateContentResponse(userInput);
-            return ParseTextVertextAI(page, response);
-        }
-
-        private static (PageType pageType, landerist_orels.ES.Listing? listing) ParseTextVertextAI(Page page, GenerateContentResponse? generateContentResponse)
+        private static (PageType pageType, landerist_orels.ES.Listing? listing) ParseVertextAI(Page page, GenerateContentResponse? generateContentResponse)
         {
             if (generateContentResponse == null)
             {
                 return (PageType.MayBeListing, null);
             }
-            OpenApiSchema? openApiSchema = VertexAIResponse.GetVertexAIStructuredOputput(generateContentResponse);            
-            return ParseText(page, openApiSchema);
+            string? responseText = VertexAIResponse.GetResponseText(generateContentResponse);
+            return ParseResponse(page, responseText);
         }
 
 
@@ -150,22 +133,24 @@ namespace landerist_library.Parse.Listing
             return (PageType.MayBeListing, null);
         }
 
-        private static (PageType pageType, landerist_orels.ES.Listing? listing) ParseText(Page page, OpenApiSchema? openAIStructuredOutput)
+        private static (PageType pageType, landerist_orels.ES.Listing? listing) ParseResponse(Page page, string? text)
         {
-            //if (functionName != null && arguments != null)
-            //{
-            //    switch (functionName)
-            //    {
-            //        case ParseListingTool.FunctionNameIsNotListing:
-            //            {
-            //                return (PageType.NotListingByParser, null);
-            //            }
-            //        case ParseListingTool.FunctionNameIsListing:
-            //            {
-            //                return ParseListingResponse.ParseListing(page, arguments);
-            //            }
-            //    }
-            //}
+            if (text is null)
+            {
+                return (PageType.MayBeListing, null);
+            }
+            try
+            {
+                var structuredOutput = JsonConvert.DeserializeObject<StructuredOutput>(text);
+                if (structuredOutput != null)
+                {
+                    return structuredOutput.ParseListing(page);
+                }
+            }
+            catch (Exception exception)
+            {
+                Logs.Log.WriteError("ParseListing ParseResponse", page.Uri, exception);
+            }
             return (PageType.MayBeListing, null);
         }
     }

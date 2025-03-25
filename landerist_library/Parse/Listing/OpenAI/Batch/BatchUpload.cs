@@ -164,28 +164,15 @@ namespace landerist_library.Parse.Listing.OpenAI.Batch
                 return null;
             }
 
-            if (Config.STRUCTURED_OUTPUT)
-            {
-                StructuredRequestData structuredRequestData = new()
-                {
-                    custom_id = page.UriHash,
-                    method = "POST",
-                    url = "/v1/chat/completions",
-                    body = GetStructuredBody(userInput)
-                };
-
-                return JsonSerializer.Serialize(structuredRequestData, JsonSerializerOptions);
-            }
-
-            NonStructuredRequestData nonStructuredRequestData = new()
+            StructuredRequestData structuredRequestData = new()
             {
                 custom_id = page.UriHash,
                 method = "POST",
                 url = "/v1/chat/completions",
-                body = GetNonStructuredBody(userInput)
+                body = GetStructuredBody(userInput)
             };
 
-            return JsonSerializer.Serialize(nonStructuredRequestData, JsonSerializerOptions);
+            return JsonSerializer.Serialize(structuredRequestData, JsonSerializerOptions);
         }
 
         private static NonStructuredBody GetNonStructuredBody(string userInput)

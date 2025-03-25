@@ -60,7 +60,7 @@ namespace landerist_library.Parse.Listing.VertexAI
             return new FunctionDeclaration
             {
                 Name = FunctionNameIsListing,
-                Description = FunctionDescriptionIsListing,
+                Description = FunctionNameIsListingDescription,
                 Parameters = new OpenApiSchema
                 {
                     Type = Google.Cloud.AIPlatform.V1.Type.Object,

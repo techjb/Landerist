@@ -16,7 +16,7 @@ namespace landerist_library.Parse.Listing.OpenAI
         private Tool GetToolIsListing()
         {
             var parameters = GetJsonObject();
-            return new Function(FunctionNameIsListing, FunctionDescriptionIsListing, parameters);
+            return new Function(FunctionNameIsListing, FunctionNameIsListingDescription, parameters);
         }
 
         public JsonObject GetJsonObject()

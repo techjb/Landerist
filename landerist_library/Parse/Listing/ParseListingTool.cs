@@ -9,18 +9,22 @@ namespace landerist_library.Parse.Listing
 {
     public class ParseListingTool
     {
-        public const string FunctionNameIsListing = "si_es_un_anuncio";
+        public const string FunctionNameIsListing = "es_un_anuncio";
 
-        public static readonly string FunctionDescriptionIsListing = "La página web corresponde a un único anuncio inmobiliario";
+        public const string FunctionNameIsListingDescription = "La página web corresponde a un único anuncio inmobiliario";
 
         public const string FunctionNameIsNotListing = "no_es_un_anuncio";
 
-        public static readonly string FunctionDescriptionIsNotListing = "La página web no corresponde a un único anuncio inmobiliario";
+        public const string FunctionDescriptionIsNotListing = "La página web no corresponde a un único anuncio inmobiliario";
+
+        public const string FunctionNameListing = "anuncio";
+
+        public const string FunctionNameListingDescription = "En caso de ser un anuncio, contiene la información del anuncio.";
 
 #pragma warning disable IDE1006
 
 
-        public const string FechaDePublicaciónDescription = "fecha de la publicación del anuncio";
+        public const string FechaDePublicaciónDescription = "fecha de la publicación del anuncio en ISO-8601 (YYYY-MM-DD)";
 
         [Description(FechaDePublicaciónDescription)]
         public string? fecha_de_publicacion { get; set; } = null;
@@ -50,7 +54,7 @@ namespace landerist_library.Parse.Listing
         public decimal? precio_del_anuncio { get; set; } = null;
 
 
-        public const string DescripciónDelAnuncioDescription = "texto con la descripción detallada del anuncio";
+        public const string DescripciónDelAnuncioDescription = "texto plano con la descripción detallada del anuncio";
 
         [Description(DescripciónDelAnuncioDescription)]
         public string? descripcion_del_anuncio { get; set; } = null;

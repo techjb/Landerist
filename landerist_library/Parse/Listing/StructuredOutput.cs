@@ -1,22 +1,22 @@
-﻿
-using landerist_library.Configuration;
+﻿using landerist_library.Configuration;
+using landerist_library.Parse.Listing.OpenAI;
 using landerist_library.Parse.Media;
 using landerist_library.Websites;
 using landerist_orels.ES;
 using Newtonsoft.Json;
 using static landerist_library.Parse.Listing.OpenAI.Anuncio;
 
-namespace landerist_library.Parse.Listing.OpenAI
+namespace landerist_library.Parse.Listing
 {
-    public class OpenAIStructuredOutput
+    public class StructuredOutput
     {
-        [JsonProperty("es_un_anuncio")]
-        [System.ComponentModel.Description("La página web corresponde a un único anuncio inmobiliario")]
+        [JsonProperty(ParseListingTool.FunctionNameIsListing)]
+        [System.ComponentModel.Description(ParseListingTool.FunctionNameIsListingDescription)]
         public bool EsUnAnuncio { get; private set; }
 
 
-        [JsonProperty("anuncio", Required = Required.AllowNull)]
-        [System.ComponentModel.Description("datos del anuncio, null en caso de no ser un anuncio")]
+        [JsonProperty(ParseListingTool.FunctionNameListing, Required = Required.AllowNull)]
+        [System.ComponentModel.Description(ParseListingTool.FunctionNameListingDescription)]
 
         public Anuncio? Anuncio { get; private set; }
 

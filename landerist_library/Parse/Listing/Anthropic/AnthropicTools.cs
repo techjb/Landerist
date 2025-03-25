@@ -42,7 +42,7 @@ namespace landerist_library.Parse.Listing.Anthropic
                 ReferenceHandler = ReferenceHandler.IgnoreCycles,
             };
             string jsonString = JsonSerializer.Serialize(inputschema, jsonSerializerOptions);
-            return new Function(FunctionNameIsListing, FunctionDescriptionIsListing, JsonNode.Parse(jsonString));
+            return new Function(FunctionNameIsListing, FunctionNameIsListingDescription, JsonNode.Parse(jsonString));
         }
 
         public InputSchema GetInputSchema()

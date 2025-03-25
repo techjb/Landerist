@@ -48,28 +48,13 @@ namespace landerist_library.Parse.Listing.OpenAI
                 new(Role.User, userInput),
             };
 
-            ChatRequest chatRequest;
-            if (Config.STRUCTURED_OUTPUT)
-            {
-                chatRequest = new ChatRequest(
-                    messages: messages,
-                    model: MODEL_NAME,
-                    temperature: TEMPERATURE,
-                    responseFormat: ChatResponseFormat.JsonSchema,
-                    jsonSchema: GetOpenAIJsonSchema()
-                    );
-            }
-            else
-            {
-                chatRequest = new ChatRequest(
-                    messages: messages,
-                    model: MODEL_NAME,
-                    temperature: TEMPERATURE,
-                    tools: new OpenAITools().GetTools(),
-                    toolChoice: TOOL_CHOICE,
-                    responseFormat: ChatResponseFormat.Json
-                );
-            }
+            ChatRequest chatRequest = new(
+                     messages: messages,
+                     model: MODEL_NAME,
+                     temperature: TEMPERATURE,
+                     responseFormat: ChatResponseFormat.JsonSchema,
+                     jsonSchema: GetOpenAIJsonSchema()
+                     );
 
             try
             {
@@ -102,7 +87,7 @@ namespace landerist_library.Parse.Listing.OpenAI
                 }
             };
 
-            JSchema jSChema = generator.Generate(typeof(OpenAIStructuredOutput));
+            JSchema jSChema = generator.Generate(typeof(StructuredOutput));
             SetAdditionalPropertiesFalse(jSChema);
             return jSChema.ToString();
         }
