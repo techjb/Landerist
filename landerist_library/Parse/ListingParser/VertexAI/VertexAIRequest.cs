@@ -13,11 +13,11 @@ namespace landerist_library.Parse.ListingParser.VertexAI
 
         public const int MAX_CONTEXT_WINDOW = 128000;
 
-        private const string GEMINI_FLASH = "gemini-2.0-flash";
+        private const string GEMINI_FLASH = "gemini-2.0-flash-001";
 
         private const string GEMINI_PRO = "gemini-2.0-pro-exp-02-05";
 
-        private static readonly string ModelName = GEMINI_FLASH; //GEMINI_PRO;                            
+        public static readonly string ModelName = GEMINI_FLASH; //GEMINI_PRO;                            
 
         private static readonly HarmBlockThreshold HarmBlockThreshold = HarmBlockThreshold.BlockOnlyHigh;
 

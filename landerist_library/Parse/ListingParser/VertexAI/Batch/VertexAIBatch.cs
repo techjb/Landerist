@@ -2,6 +2,7 @@
 using landerist_library.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Google.Protobuf.WellKnownTypes;
 
 
 namespace landerist_library.Parse.ListingParser.VertexAI.Batch
@@ -11,36 +12,55 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
 
         public static void Test()
         {
-            var createBatchPredictionJobRequest = new CreateBatchPredictionJobRequest()
+            var createBatchPredictionJobRequest = new CreateBatchPredictionJobRequest
             {
-                BatchPredictionJob =
+                BatchPredictionJob = new BatchPredictionJob()
                 {
                     Name = "new-run",
                     DisplayName = "New Run",
-                    Model = "publishers/google/models/gemini-1.5-flash-002",
-                    InputConfig =
+                    Model = "publishers/google/models/" + VertexAIRequest.ModelName,
+                    InputConfig = new BatchPredictionJob.Types.InputConfig()
                     {
                         InstancesFormat = "jsonl",
-                        GcsSource = {
+                        GcsSource = new GcsSource()
+                        {
                             Uris = { "gs://landerist-ia/test.jsonl" }
                         }
                     },
-                    OutputConfig =
+                    OutputConfig = new BatchPredictionJob.Types.OutputConfig()
                     {
-                        PredictionsFormat = "bigquery",
-                        BigqueryDestination = {
-                            OutputUri = "bq://myprivateproject.datasetname.GeminiBatchTable"
-                        }
-                    }
+                        PredictionsFormat = "jsonl",
+                        GcsDestination = new GcsDestination()
+                        {
+                            OutputUriPrefix = "gs://landerist-ia/output/",
+                        },
 
+                    },
                 },
-                Parent = $"projects/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PROJECTID}/locations/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}"
+                Parent = GetParent()
             };
 
             var jobServiceClient = GetJobServiceClient();
-            var batchPredictionJob = jobServiceClient.CreateBatchPredictionJob(createBatchPredictionJobRequest);
-            var state = batchPredictionJob.State;
-            Console.WriteLine(state.ToString());
+            var batchPredictionJob = jobServiceClient.CreateBatchPredictionJob(createBatchPredictionJobRequest);            
+            Console.WriteLine(batchPredictionJob.State);
+            Console.WriteLine(batchPredictionJob.DisplayName);
+            Console.WriteLine(batchPredictionJob.Name);
+            Console.WriteLine(batchPredictionJob.ModelVersionId);
+
+        }
+
+        public static void ListAllPredictionJobs()
+        {
+            var jobServiceClient = GetJobServiceClient();
+            var listBatchPredictionJobsRequest = new ListBatchPredictionJobsRequest
+            {
+                Parent = GetParent(),                
+            };
+            var listBatchPredictionJobsResponse = jobServiceClient.ListBatchPredictionJobs(listBatchPredictionJobsRequest);
+            foreach (var batchPredictionJob in listBatchPredictionJobsResponse)
+            {
+                Console.WriteLine(batchPredictionJob.DisplayName + " " + batchPredictionJob.State + " " + batchPredictionJob.BatchPredictionJobName.BatchPredictionJobId);
+            }
         }
 
         private static void BarchPredicionJob()
@@ -68,7 +88,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                     }
 
                 },
-                Parent = $"projects/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PROJECTID}/locations/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}"
+                Parent = GetParent()
             };
 
             var jobServiceClient = GetJobServiceClient();
@@ -79,6 +99,10 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
 
         }
 
+        private static string GetParent()
+        {
+            return $"projects/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PROJECTID}/locations/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}";
+        }
         private static JobServiceClient GetJobServiceClient()
         {
             return new JobServiceClientBuilder
