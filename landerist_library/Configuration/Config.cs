@@ -1,4 +1,4 @@
-﻿using landerist_library.Parse.Listing;
+﻿using landerist_library.Parse.ListingParser;
 using PuppeteerSharp;
 
 namespace landerist_library.Configuration
@@ -199,7 +199,8 @@ namespace landerist_library.Configuration
             TIMERS_ENABLED = !ConfigurationProduction;
 
             LLM_PROVIDER = !ConfigurationProduction ?
-                LLMProviders.VertexAI:
+                LLMProviders.VertexAI :
+                //LLMProviders.OpenAI :
                 LLMProviders.OpenAI;
 
 
@@ -212,7 +213,7 @@ namespace landerist_library.Configuration
                 PrivateConfig.BATCH_DIRECTORY_LOCAL;
 
             MAX_DEGREE_OF_PARALLELISM_SCRAPER = ConfigurationProduction ?
-                Environment.ProcessorCount - 6 :
+                Environment.ProcessorCount * 70 / 100 : // 70% of the processors
                 1;
         }
 

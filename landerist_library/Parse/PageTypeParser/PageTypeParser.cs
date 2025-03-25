@@ -1,4 +1,4 @@
-﻿using landerist_library.Parse.Listing;
+﻿using landerist_library.Parse.ListingParser;
 using landerist_library.Websites;
 
 namespace landerist_library.Parse.PageTypeParser

@@ -7,20 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Parse\Listing\IsListingTest\**" />
-    <Compile Remove="Parse\Listing\MLModel\**" />
-    <Compile Remove="Parse\Listing\_Gemini\**" />
-    <EmbeddedResource Remove="Parse\Listing\IsListingTest\**" />
-    <EmbeddedResource Remove="Parse\Listing\MLModel\**" />
-    <EmbeddedResource Remove="Parse\Listing\_Gemini\**" />
-    <None Remove="Parse\Listing\IsListingTest\**" />
-    <None Remove="Parse\Listing\MLModel\**" />
-    <None Remove="Parse\Listing\_Gemini\**" />
+    <Compile Remove="Parse\ListingParser\IsListingTest\**" />
+    <Compile Remove="Parse\ListingParser\MLModel\**" />
+    <Compile Remove="Parse\ListingParser\_Gemini\**" />
+    <EmbeddedResource Remove="Parse\ListingParser\IsListingTest\**" />
+    <EmbeddedResource Remove="Parse\ListingParser\MLModel\**" />
+    <EmbeddedResource Remove="Parse\ListingParser\_Gemini\**" />
+    <None Remove="Parse\ListingParser\IsListingTest\**" />
+    <None Remove="Parse\ListingParser\MLModel\**" />
+    <None Remove="Parse\ListingParser\_Gemini\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="Downloaders\SeleniumDownloader.cs" />
-    <Compile Remove="Parse\Listing\OpenAI\OpenAIStructuredOutput__.cs" />
+    <Compile Remove="Parse\ListingParser\OpenAI\OpenAIStructuredOutput__.cs" />
   </ItemGroup>
 
   <ItemGroup>

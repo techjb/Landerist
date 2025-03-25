@@ -36,7 +36,7 @@ namespace landerist_library.Parse.Media
             Media.Add(media);
         }
 
-        public void AddMedia(landerist_orels.ES.Listing listing)
+        public void AddMedia(Listing listing)
         {
             if (HtmlDocument == null)
             {
@@ -51,7 +51,7 @@ namespace landerist_library.Parse.Media
             listing.SetMedia(Media);
         }
 
-        public void AddMediaImages(landerist_orels.ES.Listing listing, string[]? list)
+        public void AddMediaImages(Listing listing, string[]? list)
         {
             if (HtmlDocument == null  || list == null)
             {

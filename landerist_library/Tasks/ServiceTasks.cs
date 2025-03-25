@@ -3,7 +3,7 @@ using landerist_library.Database;
 using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Landerist_com;
 using landerist_library.Logs;
-using landerist_library.Parse.Listing.OpenAI.Batch;
+using landerist_library.Parse.ListingParser.OpenAI.Batch;
 using landerist_library.Scrape;
 using landerist_library.Statistics;
 using landerist_library.Websites;

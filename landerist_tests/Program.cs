@@ -69,9 +69,7 @@ namespace landerist_tests
 
 
             // listing 
-            
-            var page = new Page("https://goldacreestates.com/realestate/top/026712-42136");
-            //var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
+            var page = new Page("https://goldacreestates.com/realestate/top/026712-42136");            
             //var page = new Page("https://www.nerjasolproperty.com/es/apartamento-en-venta-en-torrox-costa/80124/s2");
             //var page = new Page("https://baronybaron.com/property/c-san-pedro-cabezon-de-la-sal-179m2/");
 
@@ -183,6 +181,7 @@ namespace landerist_tests
             //landerist_library.Parse.PageType.PageTypeParser.ResponseBodyValidToIsListing(page);            
 
             //new ChatGPTRequest().ListModels();
+            //landerist_library.Parse.Location.LauIdParser.SetLauIdToAllListings();
 
             //landerist_library.Parse.Listing.VertexAI.ParseListingVertexAI.Test();
 
@@ -193,7 +192,7 @@ namespace landerist_tests
             //landerist_library.Parse.Listing.OpenAI.Batch.BatchCleaner.DeleteAllRemoteFiles();
             //landerist_library.Parse.Listing.OpenAI.Batch.BatchClient.DeleteFile("dd");
 
-            //landerist_library.Parse.Location.LauIdParser.SetLauIdToAllListings();
+
 
 
             #endregion
