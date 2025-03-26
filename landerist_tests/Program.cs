@@ -278,6 +278,8 @@ namespace landerist_tests
             //ServiceTasks.Update();
             //ServiceTasks.Scrape();
             //ServiceTasks.Start();
+            //BatchTasks.Start();
+            //BatchUpload.Start();
 
 
             #endregion

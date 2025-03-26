@@ -15,7 +15,7 @@ namespace landerist_library.Parse.ListingParser
         {
             //https://github.com/dluc/openai-tools
             int systemTokens = GPT3Tokenizer.Encode(SystemPrompt).Count;
-            string? text = UserInputText.GetText(page);
+            string? text = ParseListingUserInput.GetText(page);
             if (text == null)
             {
                 return false;

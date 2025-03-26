@@ -6,7 +6,7 @@ using OpenAI.Files;
 
 namespace landerist_library.Parse.ListingParser.OpenAI.Batch
 {
-    public class BatchClient
+    public class OpenAIBatchClient
     {
         private static readonly OpenAIClient OpenAIClient = new(PrivateConfig.OPENAI_API_KEY);
 
@@ -27,7 +27,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
             }
             catch (Exception exception)
             {
-                Log.WriteError("BatchClient DeleteFile", exception);
+                Log.WriteError("OpenAIBatchClient DeleteFile", exception);
             }
             return false;
         }
@@ -41,7 +41,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
             }
             catch (Exception exception)
             {
-                Log.WriteError("BatchClient ExistsFile", exception);
+                Log.WriteError("OpenAIBatchClient ExistsFile", exception);
             }
             return false;
         }
@@ -55,11 +55,20 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
             }
             catch (Exception exception)
             {
-                Log.WriteError("BatchClient GetBatch", exception);
+                Log.WriteError("OpenAIBatchClient GetBatch", exception);
             }
             return null;
         }
 
+        public static bool BatchIsCompleted(string bacthId)
+        {
+            var batch = GetBatch(bacthId);
+            if(batch != null)
+            {
+                return BatchIsCompleted(batch);
+            }
+            return false;
+        }
         protected static bool BatchIsCompleted(BatchResponse batchResponse)
         {
             return batchResponse.Status.Equals(BatchStatus.Completed);
@@ -77,7 +86,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
             }
             catch (Exception exception)
             {
-                Log.WriteError("BatchClient DownloadFile", exception);
+                Log.WriteError("OpenAIBatchClient DownloadFile", exception);
             }
             return null;
         }
@@ -90,34 +99,34 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
             }
             catch (Exception exception)
             {
-                Log.WriteError("BatchClient ListFiles", exception);
+                Log.WriteError("OpenAIBatchClient ListFiles", exception);
             }
             return null;
         }
 
-        protected static FileResponse? UploadFile(string filePath)
+        public static string? UploadFile(string filePath)
         {
             try
             {
-                return OpenAIClient.FilesEndpoint.UploadFileAsync(filePath, FilePurpose.Batch).GetAwaiter().GetResult();
+                return OpenAIClient.FilesEndpoint.UploadFileAsync(filePath, FilePurpose.Batch).GetAwaiter().GetResult().Id;
             }
             catch (Exception exception)
             {
-                Log.WriteError("BatchClient UploadFile", exception);
+                Log.WriteError("OpenAIBatchClient UploadFile", exception);
             }
             return null;
         }
 
-        protected static BatchResponse? CreateBatch(FileResponse fileResponse)
+        public static string? CreateBatch(string id)
         {
             try
             {
-                var batchRequest = new CreateBatchRequest(fileResponse.Id, Endpoint.ChatCompletions);
-                return OpenAIClient.BatchEndpoint.CreateBatchAsync(batchRequest).Result;
+                var batchRequest = new CreateBatchRequest(id, Endpoint.ChatCompletions);
+                return OpenAIClient.BatchEndpoint.CreateBatchAsync(batchRequest).Result.Id;
             }
             catch (Exception exception)
             {
-                Log.WriteError("BatchClient CreateBatch", exception);
+                Log.WriteError("OpenAIBatchClient CreateBatch", exception);
             }
             return null;
         }

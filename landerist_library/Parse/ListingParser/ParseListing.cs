@@ -40,7 +40,7 @@ namespace landerist_library.Parse.ListingParser
         public static (PageType pageType, Listing? listing, bool waitingAIParsing)
             Parse(Page page)
         {
-            var userInput = UserInputText.GetText(page);
+            var userInput = ParseListingUserInput.GetText(page);
             if (!string.IsNullOrEmpty(userInput))
             {
                 switch (Config.LLM_PROVIDER)

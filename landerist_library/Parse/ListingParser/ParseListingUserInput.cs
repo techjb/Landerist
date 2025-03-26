@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace landerist_library.Parse.ListingParser
 {
-    public partial class UserInputText
+    public partial class ParseListingUserInput
     {
         private static readonly HashSet<string> TagsToRemove =
         [

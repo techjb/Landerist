@@ -3,7 +3,7 @@ using landerist_library.Database;
 using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Landerist_com;
 using landerist_library.Logs;
-using landerist_library.Parse.ListingParser.OpenAI.Batch;
+using landerist_library.Parse.ListingParser;
 using landerist_library.Scrape;
 using landerist_library.Statistics;
 using landerist_library.Websites;
@@ -26,7 +26,7 @@ namespace landerist_library.Tasks
         private const int OneHour = 60 * OneMinute;
         private const int OneDay = 24 * OneHour;
 
-        private bool PerformDaylyTasks = false;
+        private bool PerformDailyTasks = false;
 
         public ServiceTasks()
         {
@@ -58,7 +58,7 @@ namespace landerist_library.Tasks
 
         private void DailyTasks(object state)
         {
-            PerformDaylyTasks = true;
+            PerformDailyTasks = true;
         }
 
         private void UpdateAndScrape(object state)
@@ -71,10 +71,10 @@ namespace landerist_library.Tasks
             RunningTimer2 = true;
             try
             {
-                if (PerformDaylyTasks)
+                if (PerformDailyTasks)
                 {
                     DailyTask();
-                    PerformDaylyTasks = false;                    
+                    PerformDailyTasks = false;                    
                 }
                 Update();
                 Scrape();

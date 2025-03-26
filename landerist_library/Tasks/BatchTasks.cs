@@ -1,6 +1,8 @@
-﻿using landerist_library.Logs;
+﻿using landerist_library.Configuration;
+using landerist_library.Parse.ListingParser;
+using landerist_library.Parse.ListingParser.OpenAI.Batch;
 
-namespace landerist_library.Parse.ListingParser.OpenAI.Batch
+namespace landerist_library.Tasks
 {
     public class BatchTasks
     {

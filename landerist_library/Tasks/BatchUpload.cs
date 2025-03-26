@@ -1,21 +1,18 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Logs;
+using landerist_library.Parse.ListingParser;
+using landerist_library.Parse.ListingParser.OpenAI.Batch;
+using landerist_library.Parse.ListingParser.VertexAI.Batch;
 using landerist_library.Websites;
-using System.Text.Json;
 
-namespace landerist_library.Parse.ListingParser.OpenAI.Batch
+namespace landerist_library.Tasks
 {
-    public class BatchUpload: BatchClient
+    public class BatchUpload
     {
         private static readonly object SyncWrite = new();
 
         const long MAX_FILE_SIZE_IN_BYTES = Config.MAX_BATCH_FILE_SIZE_MB * 1024 * 1024;
-
-        private static readonly JsonSerializerOptions JsonSerializerOptions = new()
-        {
-            WriteIndented = false
-        };
 
         private static List<Page> pages = [];
 
@@ -45,24 +42,52 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
             {
                 return false;
             }
-            var fileResponse = UploadFile(filePath);
-            if (fileResponse == null || string.IsNullOrEmpty(fileResponse.Id))
+            var fileId = UploadFile(filePath);
+            if (string.IsNullOrEmpty(fileId))
             {
                 return false;
             }
 
-            var batchResponse = CreateBatch(fileResponse);
-            if (batchResponse == null || string.IsNullOrEmpty(batchResponse.Id))
+            var batchId = CreateBatch(fileId);
+            if (string.IsNullOrEmpty(batchId))
             {
-                //DeleteFile(fileResponse.Id);
                 return false;
-            }            
-            
+            }
+
             SetWaitingAIResponse();
-            Batches.Insert(batchResponse.Id);
+            Batches.Insert(batchId);
             Log.WriteInfo("batch", $"Uploaded {pages.Count}");
             return true;
         }
+
+        private static string? UploadFile(string filePath)
+        {
+            switch (Config.LLM_PROVIDER)
+            {
+                case LLMProviders.OpenAI:
+                    return OpenAIBatchUpload.UploadFile(filePath);
+                case LLMProviders.VertexAI:
+                    //return VertexAIBatchClient.UploadFile(filePath);
+                    return null;
+                default:
+                    return null;
+            }
+        }
+
+        private static string? CreateBatch(string fileId)
+        {
+            switch (Config.LLM_PROVIDER)
+            {
+                case LLMProviders.OpenAI:
+                    return OpenAIBatchUpload.CreateBatch(fileId);
+                case LLMProviders.VertexAI:
+                    //return VertexAIBatchClient.CreateBatch(fileId);
+                    return null;
+                default:
+                    return null;
+            }
+        }
+
 
         private static void Clear()
         {
@@ -73,7 +98,10 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
 
         private static string? CreateFile()
         {
-            var filePath = Config.BATCH_DIRECTORY + "batch_" + DateTime.Now.ToString("yyyyMMddHHmmss") + "_input.json";
+            var filePath = Config.BATCH_DIRECTORY + "batch_" +
+                Config.LLM_PROVIDER.ToString().ToLower() + "_" +
+                DateTime.Now.ToString("yyyyMMddHHmmss") + "_input.json";
+
             File.Delete(filePath);
 
             UriHashes = [];
@@ -84,16 +112,16 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
             Parallel.ForEach(pages, new ParallelOptions()
             {
                 //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
-                //MaxDegreeOfParallelism = 1
+                MaxDegreeOfParallelism = 1
             },
             (page, state) =>
             {
                 if (!CanWriteFile(filePath))
                 {
                     Interlocked.Increment(ref skipped);
-                    state.Stop();                    
+                    state.Stop();
                 }
-                else if (!AddToBatch(page, filePath))
+                else if (!AddToFile(page, filePath))
                 {
                     Interlocked.Increment(ref errors);
                 }
@@ -114,7 +142,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
             return filePath;
         }
 
-        private static bool AddToBatch(Page page, string filePath)
+        private static bool AddToFile(Page page, string filePath)
         {
             try
             {
@@ -155,7 +183,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
         private static string? GetJson(Page page)
         {
             page.SetResponseBodyFromZipped();
-            var userInput = UserInputText.GetText(page);
+            var userInput = ParseListingUserInput.GetText(page);
             page.RemoveResponseBody();
 
             if (string.IsNullOrEmpty(userInput))
@@ -164,61 +192,16 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
                 return null;
             }
 
-            StructuredRequestData structuredRequestData = new()
+            switch (Config.LLM_PROVIDER)
             {
-                custom_id = page.UriHash,
-                method = "POST",
-                url = "/v1/chat/completions",
-                body = GetStructuredBody(userInput)
-            };
-
-            return JsonSerializer.Serialize(structuredRequestData, JsonSerializerOptions);
-        }
-
-        private static NonStructuredBody GetNonStructuredBody(string userInput)
-        {
-            return new NonStructuredBody
-            {
-                model = OpenAIRequest.MODEL_NAME,
-                temperature = OpenAIRequest.TEMPERATURE,
-                messages = GetBatchMessages(userInput),
-                response_format = new NonStructuredResponseFormat
-                {
-                    type = "json_object"
-                },
-                tools = new OpenAITools().GetTools(),
-                tool_choice = OpenAIRequest.TOOL_CHOICE
-            };
-        }
-
-        private static StructuredBody GetStructuredBody(string userInput)
-        {
-            return new StructuredBody
-            {
-                model = OpenAIRequest.MODEL_NAME,
-                temperature = OpenAIRequest.TEMPERATURE,
-                messages = GetBatchMessages(userInput),
-                response_format = new StructuredResponseFormat
-                {
-                    type = "json_schema",
-                    json_schema = OpenAIRequest.GetOpenAIJsonSchema()
-                },
-            };
-        }
-
-        private static List<BatchMessage> GetBatchMessages(string userInput)
-        {
-            return [
-                    new BatchMessage
-                    {
-                        role = "system",
-                        content = ParseListingRequest.GetSystemPrompt()
-                    },
-                    new BatchMessage {
-                        role = "user",
-                        content = userInput
-                    }
-                ];
+                case LLMProviders.OpenAI:
+                    return OpenAIBatchUpload.GetJson(page, userInput);
+                case LLMProviders.VertexAI:
+                    //return VertexAIBatchClient.GetJson(page, userInput);
+                    return null;
+                default:
+                    return null;
+            }
         }
 
         static void SetWaitingAIResponse()
