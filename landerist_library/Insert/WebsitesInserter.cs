@@ -96,7 +96,7 @@ namespace landerist_library.Insert
 
         public static void Insert(List<Uri> uris)
         {
-            HashSet<Uri> hashSet = new(uris);
+            HashSet<Uri> hashSet = [.. uris];
             Insert(hashSet, false);
         }
 

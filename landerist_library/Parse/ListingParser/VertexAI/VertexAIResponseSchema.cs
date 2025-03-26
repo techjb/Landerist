@@ -9,8 +9,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI
     public class VertexAIResponseSchema
     {
 
-
-        public readonly static OpenApiSchema Schema = new()
+        public readonly static OpenApiSchema ResponseSchema = new()
         {
             Type = Google.Cloud.AIPlatform.V1.Type.Object,
             Properties =

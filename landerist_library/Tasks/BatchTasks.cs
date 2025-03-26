@@ -1,6 +1,4 @@
-﻿using landerist_library.Configuration;
-using landerist_library.Parse.ListingParser;
-using landerist_library.Parse.ListingParser.OpenAI.Batch;
+﻿using landerist_library.Parse.ListingParser.OpenAI.Batch;
 
 namespace landerist_library.Tasks
 {

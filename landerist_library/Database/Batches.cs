@@ -1,15 +1,21 @@
-﻿namespace landerist_library.Database
+﻿using landerist_library.Configuration;
+using landerist_library.Parse.ListingParser;
+using System.Data;
+
+namespace landerist_library.Database
 {
     public class Batches
     {
         private const string BATCHES = "[BATCHES]";
+
         public static bool Insert(string id)
         {
             string query =
                 "INSERT INTO " + BATCHES + " " +
-                "VALUES (GETDATE(), @Id, 0)";
+                "VALUES (GETDATE(), @LLMProvider, @Id, 0)";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
+                {"LLMProvider", Config.LLM_PROVIDER.ToString() },
                 {"Id", id }
             });
         }
@@ -25,40 +31,61 @@
             });
         }
 
-        public static List<string> SelectNonDownloaded()
+        public static List<Batch> SelectNonDownloaded()
         {
             return Select(false);
         }
 
-        public static List<string> SelectDownloaded()
+        public static List<Batch> SelectDownloaded()
         {
             return Select(true);
         }
 
-        private static List<string> Select(bool downloaded)
+        private static List<Batch> Select(bool downloaded)
         {
             string query =
-                "SELECT Id " +
+                "SELECT * " +
                 "FROM " + BATCHES + " " +
                 "WHERE [Downloaded] = @Downloaded " +
                 "ORDER BY [Created] ASC";
 
-            return new DataBase().QueryListString(query, new Dictionary<string, object?>()
+            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>()
             {
                 {"Downloaded", downloaded }
             });
+            return Parse(dataTable);
         }
 
-        public static List<string> SelectAll()
+        private static List<Batch> Parse(DataTable dataTable)
+        {
+            List<Batch> batches = [];
+            foreach (DataRow dataRow in dataTable.Rows)
+            {
+                var batch = new Batch()
+                {
+                    Created = (DateTime)dataRow["Created"],
+                    LLMProvider = (LLMProvider)Enum.Parse(typeof(LLMProvider), (string)dataRow["LLMProvider"]),
+                    Id = (string)dataRow["Id"],
+                    Downloaded = (bool)dataRow["Downloaded"]
+                };
+                batches.Add(batch);
+            }
+            return batches;
+        }
+
+        public static List<string> SelectAll(LLMProvider lLMProvider)
         {
             string query =
                 "SELECT Id " +
                 "FROM " + BATCHES + " " +
+                "WHERE [LLMProvider] = @LLMProvider" +
                 "ORDER BY [Created] ASC";
 
-            return new DataBase().QueryListString(query, new Dictionary<string, object?>());
+            return new DataBase().QueryListString(query, new Dictionary<string, object?>()
+            {
+                { "LLMProvider", lLMProvider.ToString() }
+            });
         }
-
 
         public static bool UpdateToDownloaded(string id)
         {

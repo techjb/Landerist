@@ -18,35 +18,42 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
         };
         public static string? GetJson(Page page, string userInput)
         {
-            object structuredRequestData = "";
-            //StructuredRequestData structuredRequestData = new()
-            //{
-            //    custom_id = page.UriHash,
-            //    method = "POST",
-            //    url = "/v1/chat/completions",
-            //    body = new StructuredBody
-            //    {
-            //        model = OpenAIRequest.MODEL_NAME,
-            //        temperature = OpenAIRequest.TEMPERATURE,
-            //        messages =
-            //        [
-            //            new BatchMessage
-            //            {
-            //                role = "system",
-            //                content = ParseListingRequest.GetSystemPrompt()
-            //            },
-            //            new BatchMessage {
-            //                role = "user",
-            //                content = userInput
-            //            }
-            //        ],
-            //        response_format = new StructuredResponseFormat
-            //        {
-            //            type = "json_schema",
-            //            json_schema = OpenAIRequest.GetOpenAIJsonSchema()
-            //        },
-            //    }
-            //};
+            StructuredRequestData structuredRequestData = new()
+            {
+                request = new Request()
+                {
+                    contents =
+                    [
+                        new Content
+                        {
+                            role = "user",
+                            parts =
+                            [
+                                new Part
+                                {
+                                    text = userInput
+                                }
+                            ]
+                        }
+                    ],
+                    system_instruction = new SystemInstruction
+                    {
+                        parts =
+                        [
+                            new Part
+                            {
+                                text = ParseListingRequest.GetSystemPrompt()
+                            }
+                        ]
+                    },
+                    generation_config = new GenerationConfig
+                    {
+                        temperature = 0f,
+                        response_mime_type = "application/json",
+                        response_schema = new VertexAIBatchResponseSchema()
+                    }
+                }
+            };
 
             return JsonSerializer.Serialize(structuredRequestData, JsonSerializerOptions);
         }

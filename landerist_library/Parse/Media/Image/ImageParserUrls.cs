@@ -21,7 +21,7 @@ namespace landerist_library.Parse.Media.Image
 
         private void AddImagesUrls(string[] list)
         {
-            HashSet<string> hashSet = new(list);
+            HashSet<string> hashSet = [.. list];
             InitDictionaries();
             foreach (var image in hashSet)
             {

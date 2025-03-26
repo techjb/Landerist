@@ -108,7 +108,7 @@ namespace landerist_library.Export
             var deleteObjectsRequest = new DeleteObjectsRequest
             {
                 BucketName = bucketName,
-                Objects = new List<KeyVersion>(objectKeys.ConvertAll(k => new KeyVersion() { Key = k })),
+                Objects = [.. objectKeys.ConvertAll(k => new KeyVersion() { Key = k })],
                 Quiet = true
             };
             try

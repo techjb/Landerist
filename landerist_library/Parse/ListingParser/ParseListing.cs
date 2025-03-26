@@ -12,7 +12,7 @@ using OpenAI.Chat;
 
 namespace landerist_library.Parse.ListingParser
 {
-    public enum LLMProviders
+    public enum LLMProvider
     {
         OpenAI,
         Gemini,
@@ -27,9 +27,9 @@ namespace landerist_library.Parse.ListingParser
         {
             switch (Config.LLM_PROVIDER)
             {
-                case LLMProviders.OpenAI: return OpenAIRequest.TooManyTokens(page);
-                case LLMProviders.VertexAI: return VertexAIRequest.TooManyTokens(page);
-                case LLMProviders.Gemini: return GeminiRequest.TooManyTokens(page);
+                case LLMProvider.OpenAI: return OpenAIRequest.TooManyTokens(page);
+                case LLMProvider.VertexAI: return VertexAIRequest.TooManyTokens(page);
+                case LLMProvider.Gemini: return GeminiRequest.TooManyTokens(page);
                 //case LLMProviders.Anthropic: return AnthropicRequest.TooManyTokens(page);
                 default:
                     break;
@@ -45,8 +45,8 @@ namespace landerist_library.Parse.ListingParser
             {
                 switch (Config.LLM_PROVIDER)
                 {
-                    case LLMProviders.OpenAI: return ParseOpenAI(page, userInput);
-                    case LLMProviders.VertexAI: return ParseVertextAI(page, userInput);
+                    case LLMProvider.OpenAI: return ParseOpenAI(page, userInput);
+                    case LLMProvider.VertexAI: return ParseVertextAI(page, userInput);
                     //case ModelName.Gemini: return GeminiRequest.ParseTextGemini(page);
                     //case LLMProviders.Anthropic: return ParseAnthropic(page, userInput);
                     default:

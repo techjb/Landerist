@@ -48,7 +48,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
             {
                 return true;
             }
-            var filePath = OpenAIBatchClient.DownloadFile(fileId);
+            var filePath = DownloadFile(fileId);
             if (string.IsNullOrEmpty(filePath))
             {
                 return false;
@@ -108,10 +108,10 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
 
         private static bool ReadLine(string line)
         {
-            OpenAIBatchLineResponse? batchResponseLine;
+            OpenAIBatchResponse? batchResponseLine;
             try
             {
-                batchResponseLine = JsonSerializer.Deserialize<OpenAIBatchLineResponse?>(line, JsonSerializerOptions);
+                batchResponseLine = JsonSerializer.Deserialize<OpenAIBatchResponse?>(line, JsonSerializerOptions);
             }
             catch (Exception exception)
             {

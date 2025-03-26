@@ -52,40 +52,10 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                 Endpoint = $"{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}-aiplatform.googleapis.com",
                 JsonCredentials = PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_CREDENTIAL,
             }.Build();
-        }
+        }      
 
-        private static RepeatedField<Part> GetParts(Page page, string text)
+        public static GenerateContentRequest GetGenerateContentRequest(Page page, string text)
         {
-            if (page.ContainsScreenshot())
-            {
-                return
-                [
-                    new Part
-                        {
-                            InlineData = new()
-                            {
-                                MimeType = "image/png",
-                                Data = ByteString.CopyFrom(page.Screenshot)
-                            }
-                        },
-                        new Part
-                        {
-                            Text = "Captura de pantalla"
-                        },
-                ];
-            }
-            return
-                [
-                    new Part
-                    {
-                        Text = text
-                    }
-                ];
-        }
-
-        private static GenerateContentRequest GetGenerateContentRequest(Page page, string text)
-        {
-            var responseSchema = VertexAIResponseSchema.Schema;
             var generateContentRequest = new GenerateContentRequest
             {
                 Model = $"projects/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PROJECTID}/locations/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}/publishers/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PUBLISHER}/models/{ModelName}",
@@ -104,7 +74,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                 {
                     Temperature = 0f,
                     ResponseMimeType = "application/json",
-                    ResponseSchema = responseSchema
+                    ResponseSchema = VertexAIResponseSchema.ResponseSchema
                 },
                 SafetySettings =
                 {
@@ -150,7 +120,37 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                     }
                 }                
             };
+            
             return generateContentRequest;
+        }
+
+        private static RepeatedField<Part> GetParts(Page page, string text)
+        {
+            if (page.ContainsScreenshot())
+            {
+                return
+                [
+                    new Part
+                        {
+                            InlineData = new()
+                            {
+                                MimeType = "image/png",
+                                Data = ByteString.CopyFrom(page.Screenshot)
+                            }
+                        },
+                        new Part
+                        {
+                            Text = "Captura de pantalla"
+                        },
+                ];
+            }
+            return
+                [
+                    new Part
+                    {
+                        Text = text
+                    }
+                ];
         }
     }
 }

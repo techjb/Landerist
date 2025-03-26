@@ -19,8 +19,8 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
 
         public static void DeleteAllRemoteFiles()
         {
-            var batchIds = Batches.SelectAll();
-            if (batchIds.Count > 0)
+            var batches = Batches.SelectAll(LLMProvider.OpenAI);
+            if (batches.Count > 0)
             {
                 return;
             }

@@ -9,7 +9,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
     public class VertexAIBatch
     {
 
-        public static void Test()
+        public static void StartTest()
         {
             var createBatchPredictionJobRequest = new CreateBatchPredictionJobRequest
             {
@@ -23,7 +23,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                         InstancesFormat = "jsonl",
                         GcsSource = new GcsSource()
                         {
-                            Uris = { "gs://landerist-ia/test.jsonl" }
+                            Uris = { "gs://landerist-ia/test.json" }
                         }
                     },
                     OutputConfig = new BatchPredictionJob.Types.OutputConfig()
@@ -36,15 +36,13 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
 
                     },
                 },
+                
                 Parent = GetParent()
             };
 
             var jobServiceClient = GetJobServiceClient();
-            var batchPredictionJob = jobServiceClient.CreateBatchPredictionJob(createBatchPredictionJobRequest);            
-            Console.WriteLine(batchPredictionJob.State);
-            Console.WriteLine(batchPredictionJob.DisplayName);
-            Console.WriteLine(batchPredictionJob.Name);
-            Console.WriteLine(batchPredictionJob.ModelVersionId);
+            var batchPredictionJob = jobServiceClient.CreateBatchPredictionJob(createBatchPredictionJobRequest);                        
+            Console.WriteLine(batchPredictionJob.BatchPredictionJobName.BatchPredictionJobId);
 
         }
 

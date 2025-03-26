@@ -5,7 +5,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
 {
 #pragma warning disable CS8618
 
-    public class OpenAIBatchLineResponse
+    public class OpenAIBatchResponse
     {
         [JsonPropertyName("id")]
         public string Id { get; set; }

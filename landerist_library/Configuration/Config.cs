@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "3.97";
+        public static readonly string VERSION = "3.98";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -128,7 +128,7 @@ namespace landerist_library.Configuration
         public const int MAX_PARKINGS = 10000;
 
         public const int DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS = 90;
-        public static LLMProviders LLM_PROVIDER { get; set; }
+        public static LLMProvider LLM_PROVIDER { get; set; }
         public static string? BATCH_DIRECTORY { get; set; }
         public static bool BATCH_ENABLED { get; set; }
 
@@ -136,7 +136,9 @@ namespace landerist_library.Configuration
         public static int MIN_PAGES_PER_BATCH { get; set; }
 
         public const int MAX_BATCH_FILE_SIZE_MB = 90;
-        public static int MAX_DEGREE_OF_PARALLELISM_SCRAPER { get; set; }        
+        public static int MAX_DEGREE_OF_PARALLELISM_SCRAPER { get; set; }
+
+        public static ParallelOptions PARALLELOPTIONS1INLOCAL = new() { };
 
         public static bool IsConfigurationProduction()
         {
@@ -204,12 +206,12 @@ namespace landerist_library.Configuration
             TIMERS_ENABLED = !ConfigurationProduction;
 
             LLM_PROVIDER = !ConfigurationProduction ?
-                LLMProviders.VertexAI :
-                //LLMProviders.OpenAI :
-                LLMProviders.OpenAI;
+                LLMProvider.VertexAI :
+                //LLMProvider.OpenAI :
+                LLMProvider.OpenAI;
 
 
-            BATCH_ENABLED = LLM_PROVIDER.Equals(LLMProviders.OpenAI) && ConfigurationProduction;
+            BATCH_ENABLED = LLM_PROVIDER.Equals(LLMProvider.OpenAI) && ConfigurationProduction;
 
             MIN_PAGES_PER_BATCH = ConfigurationProduction ? 300 : 1;
 
@@ -220,7 +222,10 @@ namespace landerist_library.Configuration
             MAX_DEGREE_OF_PARALLELISM_SCRAPER = ConfigurationProduction ?
                 Environment.ProcessorCount * 70 / 100 : // 70% of the processors
                 1;
-            
+
+            PARALLELOPTIONS1INLOCAL = ConfigurationProduction ?
+                new() :
+                new ParallelOptions() { MaxDegreeOfParallelism = 1 };
         }
 
         private static void InitDatabase(bool configurationProduction)

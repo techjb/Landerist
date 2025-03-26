@@ -2,6 +2,7 @@
 using landerist_library.Configuration;
 using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Logs;
+using landerist_library.Parse.ListingParser.VertexAI.Batch;
 using landerist_library.Scrape;
 using landerist_library.Tasks;
 using landerist_library.Websites;
@@ -279,7 +280,9 @@ namespace landerist_tests
             //ServiceTasks.Scrape();
             //ServiceTasks.Start();
             //BatchTasks.Start();
-            //BatchUpload.Start();
+            BatchUpload.Start();
+            //VertexAIBatch.StartTest();
+            
 
 
             #endregion
