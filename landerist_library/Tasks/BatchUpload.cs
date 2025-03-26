@@ -60,6 +60,112 @@ namespace landerist_library.Tasks
             return true;
         }
 
+
+        private static string? CreateFile()
+        {
+            var filePath = Config.BATCH_DIRECTORY + "batch_" +
+                Config.LLM_PROVIDER.ToString().ToLower() + "_" +
+                DateTime.Now.ToString("yyyyMMddHHmmss") + "_input.json";
+
+            File.Delete(filePath);
+
+            UriHashes = [];
+            var sync = new object();
+            var errors = 0;
+            var skipped = 0;
+
+            Parallel.ForEach(pages,
+                new ParallelOptions() { MaxDegreeOfParallelism = 1 },
+                (page, state) =>
+            {
+                if (!CanWriteFile(filePath))
+                {
+                    Interlocked.Increment(ref skipped);
+                    state.Stop();
+                }
+                else if (!AddToFile(page, filePath))
+                {
+                    Interlocked.Increment(ref errors);
+                }
+                else
+                {
+                    lock (sync)
+                    {
+                        UriHashes.Add(page.UriHash);
+                    }
+                }
+                page.Dispose();
+            });
+
+            if (errors > 0)
+            {
+                Log.WriteError("BatchUpload CreateFile", "Error creating file. Errors: " + errors);
+            }
+            return filePath;
+        }
+
+        private static bool CanWriteFile(string filePath)
+        {
+            lock (SyncWrite)
+            {
+                if (!File.Exists(filePath))
+                {
+                    return true;
+                }
+
+                FileInfo fileInfo = new(filePath);
+                return fileInfo.Length < MAX_FILE_SIZE_IN_BYTES;
+            }
+        }
+
+        private static bool AddToFile(Page page, string filePath)
+        {
+            try
+            {
+                var json = GetJson(page);
+                if (string.IsNullOrEmpty(json))
+                {
+                    page.RemoveWaitingAIParsing();
+                    page.Update(false);
+                    return false;
+                }
+                lock (SyncWrite)
+                {
+                    File.AppendAllText(filePath, json + Environment.NewLine);
+                }
+                return true;
+            }
+            catch (Exception exception)
+            {
+                Log.WriteError("BatchUpload AddToBatch", exception.Message);
+            }
+            return false;
+        }
+
+
+        private static string? GetJson(Page page)
+        {
+            page.SetResponseBodyFromZipped();
+            var userInput = ParseListingUserInput.GetText(page);
+            page.RemoveResponseBody();
+
+            if (string.IsNullOrEmpty(userInput))
+            {
+                Log.WriteError("BatchUpload GetJson", "Error getting user input. Page: " + page.UriHash);
+                return null;
+            }
+
+            switch (Config.LLM_PROVIDER)
+            {
+                case LLMProviders.OpenAI:
+                    return OpenAIBatchUpload.GetJson(page, userInput);
+                case LLMProviders.VertexAI:
+                    return VertexAIBatchUpload.GetJson(page, userInput);
+                default:
+                    return null;
+            }
+        }
+
         private static string? UploadFile(string filePath)
         {
             switch (Config.LLM_PROVIDER)
@@ -96,122 +202,15 @@ namespace landerist_library.Tasks
             UriHashes.Clear();
         }
 
-        private static string? CreateFile()
-        {
-            var filePath = Config.BATCH_DIRECTORY + "batch_" +
-                Config.LLM_PROVIDER.ToString().ToLower() + "_" +
-                DateTime.Now.ToString("yyyyMMddHHmmss") + "_input.json";
-
-            File.Delete(filePath);
-
-            UriHashes = [];
-            var sync = new object();
-            var errors = 0;
-            var skipped = 0;
-
-            Parallel.ForEach(pages, new ParallelOptions()
-            {
-                //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
-                MaxDegreeOfParallelism = 1
-            },
-            (page, state) =>
-            {
-                if (!CanWriteFile(filePath))
-                {
-                    Interlocked.Increment(ref skipped);
-                    state.Stop();
-                }
-                else if (!AddToFile(page, filePath))
-                {
-                    Interlocked.Increment(ref errors);
-                }
-                else
-                {
-                    lock (sync)
-                    {
-                        UriHashes.Add(page.UriHash);
-                    }
-                }
-                page.Dispose();
-            });
-
-            if (errors > 0)
-            {
-                Log.WriteError("BatchUpload CreateFile", "Error creating file. Errors: " + errors);
-            }
-            return filePath;
-        }
-
-        private static bool AddToFile(Page page, string filePath)
-        {
-            try
-            {
-                var json = GetJson(page);
-                if (string.IsNullOrEmpty(json))
-                {
-                    page.RemoveWaitingAIParsing();
-                    page.Update(false);
-                    return false;
-                }
-                lock (SyncWrite)
-                {
-                    File.AppendAllText(filePath, json + Environment.NewLine);
-                }
-                return true;
-            }
-            catch (Exception exception)
-            {
-                Log.WriteError("BatchUpload AddToBatch", exception.Message);
-            }
-            return false;
-        }
-
-        private static bool CanWriteFile(string filePath)
-        {
-            lock (SyncWrite)
-            {
-                if (!File.Exists(filePath))
-                {
-                    return true;
-                }
-
-                FileInfo fileInfo = new(filePath);
-                return fileInfo.Length < MAX_FILE_SIZE_IN_BYTES;
-            }
-        }
-
-        private static string? GetJson(Page page)
-        {
-            page.SetResponseBodyFromZipped();
-            var userInput = ParseListingUserInput.GetText(page);
-            page.RemoveResponseBody();
-
-            if (string.IsNullOrEmpty(userInput))
-            {
-                Log.WriteError("BatchUpload GetJson", "Error getting user input. Page: " + page.UriHash);
-                return null;
-            }
-
-            switch (Config.LLM_PROVIDER)
-            {
-                case LLMProviders.OpenAI:
-                    return OpenAIBatchUpload.GetJson(page, userInput);
-                case LLMProviders.VertexAI:
-                    //return VertexAIBatchClient.GetJson(page, userInput);
-                    return null;
-                default:
-                    return null;
-            }
-        }
 
         static void SetWaitingAIResponse()
         {
+            if (Config.IsConfigurationLocal())
+            {
+                return;
+            }
             Parallel.ForEach(UriHashes,
-                new ParallelOptions()
-                {
-                    //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
-                    //MaxDegreeOfParallelism = 1
-                },
+                //new ParallelOptions(){MaxDegreeOfParallelism = 1},
                 uriHash =>
             {
                 Pages.UpdateWaitingAIParsing(uriHash, false);

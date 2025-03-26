@@ -136,11 +136,16 @@ namespace landerist_library.Configuration
         public static int MIN_PAGES_PER_BATCH { get; set; }
 
         public const int MAX_BATCH_FILE_SIZE_MB = 90;
-        public static int MAX_DEGREE_OF_PARALLELISM_SCRAPER { get; set; }
+        public static int MAX_DEGREE_OF_PARALLELISM_SCRAPER { get; set; }        
 
         public static bool IsConfigurationProduction()
         {
             return ConfigurationProduction;
+        }
+
+        public static bool IsConfigurationLocal()
+        {
+            return !ConfigurationProduction;
         }
 
         public static void SetToProduction()
@@ -215,6 +220,7 @@ namespace landerist_library.Configuration
             MAX_DEGREE_OF_PARALLELISM_SCRAPER = ConfigurationProduction ?
                 Environment.ProcessorCount * 70 / 100 : // 70% of the processors
                 1;
+            
         }
 
         private static void InitDatabase(bool configurationProduction)
