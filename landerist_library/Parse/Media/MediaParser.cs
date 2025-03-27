@@ -4,7 +4,6 @@ using landerist_library.Parse.Media.Other;
 using landerist_library.Parse.Media.Video;
 using landerist_library.Websites;
 using landerist_orels.ES;
-using System.ComponentModel.DataAnnotations;
 
 namespace landerist_library.Parse.Media
 {
@@ -53,14 +52,14 @@ namespace landerist_library.Parse.Media
 
         public void AddMediaImages(Listing listing, string[]? list)
         {
-            if (HtmlDocument == null  || list == null)
+            if (HtmlDocument == null || list == null)
             {
                 return;
             }
             if (!Page.ContainsMetaRobotsNoImageIndex())
             {
                 new ImageParserUrls(this).AddImagesFromUrls(list);
-            }            
+            }
             listing.SetMedia(Media);
         }
 

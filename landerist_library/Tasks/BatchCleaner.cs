@@ -15,11 +15,11 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
         {
             var batches = Batches.SelectDownloaded();
             Parallel.ForEach(batches, Config.PARALLELOPTIONS1INLOCAL, Delete);
-        }      
+        }
 
         private static void Delete(Database.Batch batch)
         {
-            switch(Config.LLM_PROVIDER)
+            switch (Config.LLM_PROVIDER)
             {
                 case LLMProvider.OpenAI:
                     OpenAIBatchCleaner.Delete(batch.Id);

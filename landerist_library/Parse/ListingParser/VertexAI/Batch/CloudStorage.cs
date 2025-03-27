@@ -1,5 +1,4 @@
-﻿using Amazon.Auth.AccessControlPolicy.ActionIdentifiers;
-using Google.Apis.Auth.OAuth2;
+﻿using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Storage.V1;
 using landerist_library.Configuration;
 
@@ -26,7 +25,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
 
         public static bool DownloadFile(string objectName, string localPath)
         {
-            var storageClient = GetStorageClient();            
+            var storageClient = GetStorageClient();
             try
             {
                 using var fileStream = File.OpenWrite(localPath);

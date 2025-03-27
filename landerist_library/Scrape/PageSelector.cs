@@ -35,7 +35,7 @@ namespace landerist_library.Scrape
 
         private static void AddUnknowPageType()
         {
-            while(!ScrapperIsFull())
+            while (!ScrapperIsFull())
             {
                 var (hosts, ips) = GetBlockedHostsAndIps();
                 var pages = Websites.Pages.GetUnknownPageType(TopRows, hosts, ips);
@@ -50,7 +50,7 @@ namespace landerist_library.Scrape
 
         private static void AddNextUpdate()
         {
-            while(!ScrapperIsFull())
+            while (!ScrapperIsFull())
             {
                 var (hosts, ips) = GetBlockedHostsAndIps();
                 var pages = Websites.Pages.GetPagesNextUpdatePast(TopRows, hosts, ips);
@@ -60,7 +60,7 @@ namespace landerist_library.Scrape
                     return;
                 }
                 AddPages(pages);
-            }            
+            }
         }
 
         private static void AddPagesToFillScrape()

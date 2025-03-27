@@ -42,7 +42,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI
             {
                 new StringEnumGenerationProvider(),
             }
-        };        
+        };
 
         public static bool TooManyTokens(Page page)
         {

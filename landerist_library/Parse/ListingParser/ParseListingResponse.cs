@@ -1,8 +1,4 @@
-﻿using landerist_library.Parse.ListingParser.StructuredOutputs;
-using landerist_library.Websites;
-using System.Text.Json;
-
-namespace landerist_library.Parse.ListingParser
+﻿namespace landerist_library.Parse.ListingParser
 {
     public class ParseListingResponse
     {

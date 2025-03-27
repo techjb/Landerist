@@ -17,7 +17,7 @@ namespace landerist_library.Logs
             if (text.Equals(string.Empty))
             {
                 return;
-            }            
+            }
             if (Config.LOGS_ENABLED)
             {
                 WriteDB(logKey, source, text);

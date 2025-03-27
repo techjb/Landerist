@@ -1,6 +1,5 @@
 ﻿using Google.Cloud.AIPlatform.V1;
 using landerist_library.Configuration;
-using landerist_library.Parse.ListingParser.Anthropic;
 using landerist_library.Parse.ListingParser.Gemini;
 using landerist_library.Parse.ListingParser.OpenAI;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
@@ -148,7 +147,7 @@ namespace landerist_library.Parse.ListingParser
                     MissingMemberHandling = MissingMemberHandling.Ignore,
                 };
 
-                var structuredOutput = JsonConvert.DeserializeObject<StructuredOutputEs>(text, settings);                
+                var structuredOutput = JsonConvert.DeserializeObject<StructuredOutputEs>(text, settings);
                 if (structuredOutput != null)
                 {
                     return new StructuredOutputEsParser(structuredOutput).Parse(page);

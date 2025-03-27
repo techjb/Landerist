@@ -24,7 +24,7 @@ namespace landerist_library.Tasks
             switch (batch.LLMProvider)
             {
                 case LLMProvider.OpenAI: OpenAIBatchDownload.BatchDownload(batch.Id); break;
-                case LLMProvider.VertexAI: BatchPredictions.BatchDownload(batch.Id); break;
+                case LLMProvider.VertexAI: VertexAIBatchDownload.BatchDownload(batch.Id); break;
                 //case LLMProviders.Anthropic: return AnthropicRequest.BatchIsComplete(batchId);
                 default: break;
             }

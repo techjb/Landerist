@@ -1,9 +1,7 @@
-﻿using landerist_library.Configuration;
-using landerist_library.Database;
+﻿using landerist_library.Database;
 using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Landerist_com;
 using landerist_library.Logs;
-using landerist_library.Parse.ListingParser;
 using landerist_library.Scrape;
 using landerist_library.Statistics;
 using landerist_library.Websites;
@@ -74,7 +72,7 @@ namespace landerist_library.Tasks
                 if (PerformDailyTasks)
                 {
                     DailyTask();
-                    PerformDailyTasks = false;                    
+                    PerformDailyTasks = false;
                 }
                 Update();
                 Scrape();

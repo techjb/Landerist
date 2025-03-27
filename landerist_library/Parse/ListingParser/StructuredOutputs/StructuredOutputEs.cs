@@ -11,7 +11,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
 
         [JsonProperty(StructuredOutputEsJson.FunctionNameListing, Required = Required.AllowNull)]
         [System.ComponentModel.Description(StructuredOutputEsJson.FunctionNameListingDescription)]
-        public StructuredOutputEsListing? Anuncio { get; private set; }        
+        public StructuredOutputEsListing? Anuncio { get; private set; }
     }
 
     public class StructuredOutputEsListing

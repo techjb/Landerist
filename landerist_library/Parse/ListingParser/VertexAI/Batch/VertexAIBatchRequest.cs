@@ -1,13 +1,10 @@
-﻿using Google.Cloud.AIPlatform.V1;
-using Newtonsoft.Json.Linq;
-
-namespace landerist_library.Parse.ListingParser.VertexAI.Batch
+﻿namespace landerist_library.Parse.ListingParser.VertexAI.Batch
 {
 
 #pragma warning disable CS8618
 #pragma warning disable IDE1006
 
-    
+
     public class VertexAIBatchRequest
     {
         public Request request { get; set; }
@@ -16,7 +13,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
     public class Request
     {
         public List<Content> contents { get; set; }
-        public SystemInstruction system_instruction { get; set; }        
+        public SystemInstruction system_instruction { get; set; }
 
         public GenerationConfig generation_config { get; set; }
 

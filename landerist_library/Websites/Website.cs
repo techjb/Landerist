@@ -337,7 +337,8 @@ namespace landerist_library.Websites
                 {
                     counter++;
                 }
-            };
+            }
+            ;
 
             Console.WriteLine("Deleted " + counter + " listings");
         }

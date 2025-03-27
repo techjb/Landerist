@@ -82,7 +82,7 @@ namespace landerist_library.Websites
             Website = website;
             Host = uri.Host;
             Uri = uri;
-            UriHash = Strings.GetHash(uri.ToString());            
+            UriHash = Strings.GetHash(uri.ToString());
             Inserted = DateTime.Now;
             Updated = DateTime.Now;
 

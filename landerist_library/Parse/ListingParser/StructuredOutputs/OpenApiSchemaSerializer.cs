@@ -24,7 +24,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             {
                 schemaJson["nullable"] = schema.Nullable;
             }
-            
+
             if (schema.Enum != null && schema.Enum.Count > 0)
             {
                 schemaJson["enum"] = schema.Enum;

@@ -63,7 +63,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
         public static bool BatchIsCompleted(string bacthId)
         {
             var batch = GetBatch(bacthId);
-            if(batch != null)
+            if (batch != null)
             {
                 return BatchIsCompleted(batch);
             }

@@ -8,7 +8,7 @@ namespace landerist_library.Parse.Media.Image
 
         readonly Dictionary<string, string> SrcTitle = [];
 
-        
+
         public void AddImagesFromUrls(string[] list)
         {
             AddImagesOpenGraph();
@@ -36,7 +36,7 @@ namespace landerist_library.Parse.Media.Image
             {
                 var src = imageNode.GetAttributeValue("src", "");
                 var alt = imageNode.GetAttributeValue("alt", "");
-                var title = imageNode.GetAttributeValue("title", "");                
+                var title = imageNode.GetAttributeValue("title", "");
 
                 if (string.IsNullOrEmpty(src))
                 {
@@ -49,7 +49,7 @@ namespace landerist_library.Parse.Media.Image
                 if (!string.IsNullOrEmpty(title))
                 {
                     SrcTitle.TryAdd(src, title);
-                }                
+                }
             }
         }
 
@@ -95,7 +95,7 @@ namespace landerist_library.Parse.Media.Image
             {
                 return title;
             }
-            return null;    
+            return null;
         }
     }
 }

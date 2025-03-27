@@ -1,11 +1,4 @@
-﻿using OpenCvSharp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace landerist_library.Database
+﻿namespace landerist_library.Database
 {
     public class AddressLatLng
     {
@@ -59,7 +52,7 @@ namespace landerist_library.Database
 
         public static bool Clean()
         {
-            string query = 
+            string query =
                 "DELETE FROM " + ADDRESS_LAT_LNG + " " +
                 "WHERE Date < DATEADD(YEAR, -2, GETDATE())";
 

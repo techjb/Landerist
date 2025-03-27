@@ -1,5 +1,4 @@
-﻿using Google.Protobuf.Collections;
-using landerist_library.Configuration;
+﻿using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Index;
 using landerist_library.Tools;
@@ -299,7 +298,8 @@ namespace landerist_library.Websites
                         page.Delete();
                     }
                 });
-            };
+            }
+            ;
         }
 
         public static void Delete(PageType pageType)

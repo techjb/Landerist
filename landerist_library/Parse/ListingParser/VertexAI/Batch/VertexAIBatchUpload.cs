@@ -1,6 +1,6 @@
-﻿using System.Text.Json;
+﻿using landerist_library.Parse.ListingParser.StructuredOutputs;
 using landerist_library.Websites;
-using landerist_library.Parse.ListingParser.StructuredOutputs;
+using System.Text.Json;
 
 namespace landerist_library.Parse.ListingParser.VertexAI.Batch
 {

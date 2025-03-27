@@ -3,7 +3,6 @@ using Google.Protobuf;
 using Google.Protobuf.Collections;
 using landerist_library.Configuration;
 using landerist_library.Websites;
-using System.Reflection.Emit;
 using static Google.Cloud.AIPlatform.V1.SafetySetting.Types;
 
 
@@ -53,13 +52,13 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                 Endpoint = $"{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}-aiplatform.googleapis.com",
                 JsonCredentials = PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_CREDENTIAL,
             }.Build();
-        }      
+        }
 
         public static GenerateContentRequest GetGenerateContentRequest(Page page, string text)
         {
             var generateContentRequest = new GenerateContentRequest
             {
-                Model = $"projects/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PROJECTID}/locations/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}/publishers/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PUBLISHER}/models/{ModelName}",                
+                Model = $"projects/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PROJECTID}/locations/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}/publishers/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PUBLISHER}/models/{ModelName}",
                 Contents =
                 {
                     new Content()
@@ -117,10 +116,10 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                         new Part
                         {
                             Text = SystemPrompt
-                        }                       
+                        }
                     }
                 },
-                Labels = 
+                Labels =
                 {
                     { "custom_id", page.UriHash }
                 }

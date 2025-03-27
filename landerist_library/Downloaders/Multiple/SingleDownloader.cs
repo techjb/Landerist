@@ -50,7 +50,7 @@ namespace landerist_library.Downloaders.Multiple
                 Chrashes++;
                 RestartBrowser();
                 return false;
-            }            
+            }
             SetAvailable();
             return true;
         }

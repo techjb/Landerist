@@ -1,8 +1,4 @@
-﻿using landerist_library.Configuration;
-using landerist_library.Tools;
-using landerist_library.Websites;
-using landerist_orels.ES;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text.Json.Nodes;
 
 namespace landerist_library.Parse.ListingParser.StructuredOutputs
@@ -208,7 +204,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public bool? tiene_sistemas_de_seguridad { get; set; } = null;
 
 
-        public const string UrlsDeImagenesDelAnuncio  = "urls de las imágenes del anuncio";
+        public const string UrlsDeImagenesDelAnuncio = "urls de las imágenes del anuncio";
         [Description(UrlsDeImagenesDelAnuncio)]
         public string[]? urls_de_imagenes_del_anuncio { get; set; } = null;
 

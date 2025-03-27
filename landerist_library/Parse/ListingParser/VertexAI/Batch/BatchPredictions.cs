@@ -1,6 +1,5 @@
 ﻿using Google.Cloud.AIPlatform.V1;
 using landerist_library.Configuration;
-using landerist_library.Database;
 
 
 namespace landerist_library.Parse.ListingParser.VertexAI.Batch

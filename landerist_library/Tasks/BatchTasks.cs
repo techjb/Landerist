@@ -7,7 +7,7 @@ namespace landerist_library.Tasks
         public static void Start()
         {
             BatchDownload.Start();
-            BatchCleaner.Start();            
+            BatchCleaner.Start();
             BatchUpload.Start();
         }
     }

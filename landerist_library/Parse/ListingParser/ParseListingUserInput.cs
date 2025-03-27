@@ -72,7 +72,7 @@ namespace landerist_library.Parse.ListingParser
                 }
             }
             catch// (Exception exception)
-            { 
+            {
 
             }
             return null;

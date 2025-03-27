@@ -180,7 +180,7 @@ namespace landerist_library.Tasks
                 case LLMProvider.OpenAI:
                     return OpenAIBatchClient.UploadFile(filePath);
                 case LLMProvider.VertexAI:
-                    return CloudStorage.UploadFile(filePath);                    
+                    return CloudStorage.UploadFile(filePath);
                 default:
                     return null;
             }
@@ -193,7 +193,7 @@ namespace landerist_library.Tasks
                 case LLMProvider.OpenAI:
                     return OpenAIBatchClient.CreateBatch(fileId);
                 case LLMProvider.VertexAI:
-                    return BatchPredictions.CreateBatch(fileId);                    
+                    return BatchPredictions.CreateBatch(fileId);
                 default:
                     return null;
             }

@@ -1,6 +1,4 @@
-﻿using landerist_library.Configuration;
-using landerist_library.Logs;
-using OpenAI;
+﻿using landerist_library.Logs;
 using OpenAI.Batch;
 using OpenAI.Files;
 
