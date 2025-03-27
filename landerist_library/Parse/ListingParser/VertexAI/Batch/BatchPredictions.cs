@@ -49,27 +49,6 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
             }
         }
 
-        //public static void BatchDownload(string batchId)
-        //{
-        //    var batchPredicionJob = GetBatchPredictionJob(batchId);
-        //    if (batchPredicionJob is null || !batchPredicionJob.State.Equals(JobState.Succeeded))
-        //    {
-        //        return;
-        //    }
-        //    string outputFilePath = Config.BATCH_DIRECTORY + batchPredicionJob.OutputConfig.GcsDestination.OutputUriPrefix.Split('/')[^1];
-        //    string objectName = batchPredicionJob.OutputInfo.GcsOutputDirectory.
-        //        Replace("gs://" + PrivateConfig.GOOGLE_CLOUD_BUCKET_NAME + "/", "") + "/predictions.jsonl";
-
-        //    File.Delete(outputFilePath);
-        //    if (!CloudStorage.DownloadFile(objectName, outputFilePath))
-        //    {
-        //        return;                
-        //    }
-
-        //    // read file.
-        //    //Batches.UpdateToDownloaded(batchId);
-        //}
-
         public static BatchPredictionJob? GetBatchPredictionJob(string name)
         {
             var jobServiceClient = GetJobServiceClient();

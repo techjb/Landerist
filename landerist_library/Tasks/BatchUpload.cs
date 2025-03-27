@@ -97,11 +97,7 @@ namespace landerist_library.Tasks
                         UriHashes.Add(page.UriHash);
                     }
                 }
-                page.Dispose();
-                //if (Config.IsConfigurationLocal())
-                //{
-                //    state.Stop();
-                //}
+                page.Dispose();               
             });
 
             if (errors > 0)

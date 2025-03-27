@@ -12,8 +12,6 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
         };
         public static string? GetJson(Page page, string userInput)
         {
-            var responseSchema = OpenApiSchemaSerializer.Serialize(VertexAIResponseSchema.ResponseSchema);
-
             VertexAIBatchRequest structuredRequestData = new()
             {
                 request = new Request()
@@ -46,7 +44,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                     {
                         temperature = 0f,
                         response_mime_type = "application/json",
-                        response_schema = responseSchema
+                        response_schema = OpenApiSchemaSerializer.Serialize(VertexAIResponseSchema.ResponseSchema)
                     },
                     labels = new Dictionary<string, string>()
                     {
