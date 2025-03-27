@@ -104,7 +104,7 @@ namespace landerist_library.Tasks
                     }
                 }
                 page.Dispose();
-                if (Config.IsConfigurationLocal())
+                if (Config.IsConfigurationLocal() && UriHashes.Count > 2)
                 {
                     state.Stop();
                 }

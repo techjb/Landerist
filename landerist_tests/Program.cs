@@ -280,9 +280,9 @@ namespace landerist_tests
             //ServiceTasks.Scrape();
             //ServiceTasks.Start();
             //BatchTasks.Start();
-            BatchUpload.Start();
+            //BatchUpload.Start();
             //VertexAIBatch.StartTest();
-            
+
 
 
             #endregion

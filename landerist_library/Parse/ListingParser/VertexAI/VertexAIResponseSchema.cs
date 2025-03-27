@@ -14,228 +14,228 @@ namespace landerist_library.Parse.ListingParser.VertexAI
             Type = Google.Cloud.AIPlatform.V1.Type.Object,
             Properties =
             {
-                [StructuredOutputEsParse.FunctionNameIsListing] = new()
+                [StructuredOutputEsJson.FunctionNameIsListing] = new()
                 {
                     Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
-                    Description = StructuredOutputEsParse.FunctionNameIsListingDescription,
+                    Description = StructuredOutputEsJson.FunctionNameIsListingDescription,
                 },
-                [StructuredOutputEsParse.FunctionNameListing]= new()
+                [StructuredOutputEsJson.FunctionNameListing]= new()
                 {
-                    Description =StructuredOutputEsParse.FunctionNameListingDescription,
+                    Description =StructuredOutputEsJson.FunctionNameListingDescription,
                     Type = Google.Cloud.AIPlatform.V1.Type.Object,
                     Nullable = true,
                     Properties =
                     {
-                        [nameof(StructuredOutputEsParse.fecha_de_publicacion)] = new()
+                        [nameof(StructuredOutputEsJson.fecha_de_publicacion)] = new()
                         {
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
                             Format = "date",
-                            Description = StructuredOutputEsParse.FechaDePublicaciónDescription,
+                            Description = StructuredOutputEsJson.FechaDePublicaciónDescription,
                         },
-                        [nameof(StructuredOutputEsParse.tipo_de_operacion)] = new()
+                        [nameof(StructuredOutputEsJson.tipo_de_operacion)] = new()
                         {
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
                             Enum = { GetEnumValues(typeof(TiposDeOperacion)) },
-                            Description = StructuredOutputEsParse.TipoDeOperaciónDescription,
+                            Description = StructuredOutputEsJson.TipoDeOperaciónDescription,
                         },
-                        [nameof(StructuredOutputEsParse.tipo_de_inmueble)] = new()
+                        [nameof(StructuredOutputEsJson.tipo_de_inmueble)] = new()
                         {
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
                             Enum = { GetEnumValues(typeof(TiposDeInmueble)) },
-                            Description = StructuredOutputEsParse.TipoDeInmuebleDescription,
+                            Description = StructuredOutputEsJson.TipoDeInmuebleDescription,
                         },
-                        [nameof(StructuredOutputEsParse.subtipo_de_inmueble)] = new()
+                        [nameof(StructuredOutputEsJson.subtipo_de_inmueble)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
                             Enum = { GetEnumValues(typeof(SubtiposDeInmueble)) },
-                            Description =  StructuredOutputEsParse.SubtipoDeInmuebleDescription,                            
+                            Description =  StructuredOutputEsJson.SubtipoDeInmuebleDescription,
                         },
-                        [nameof(StructuredOutputEsParse.precio_del_anuncio)] = new()
+                        [nameof(StructuredOutputEsJson.precio_del_anuncio)] = new()
                         {
                             Type = Google.Cloud.AIPlatform.V1.Type.Integer,
                             Format = "decimal",
-                            Description = StructuredOutputEsParse.PrecioDelAnuncioDescription,
+                            Description = StructuredOutputEsJson.PrecioDelAnuncioDescription,
                         },
-                        [nameof(StructuredOutputEsParse.descripcion_del_anuncio)] = new()
+                        [nameof(StructuredOutputEsJson.descripcion_del_anuncio)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
-                            Description = StructuredOutputEsParse.DescripciónDelAnuncioDescription,
+                            Description = StructuredOutputEsJson.DescripciónDelAnuncioDescription,
                         },
-                        [nameof(StructuredOutputEsParse.referencia_del_anuncio)] = new()
+                        [nameof(StructuredOutputEsJson.referencia_del_anuncio)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
-                            Description = StructuredOutputEsParse.ReferenciaDelAnuncioDescription,
+                            Description = StructuredOutputEsJson.ReferenciaDelAnuncioDescription,
                         },
-                        [nameof(StructuredOutputEsParse.telefono_de_contacto)] = new()
+                        [nameof(StructuredOutputEsJson.telefono_de_contacto)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
-                            Description = StructuredOutputEsParse.TeléfonoDeContactoDescription,
+                            Description = StructuredOutputEsJson.TeléfonoDeContactoDescription,
                         },
-                        [nameof(StructuredOutputEsParse.email_de_contacto)] = new()
+                        [nameof(StructuredOutputEsJson.email_de_contacto)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
                             Format = "email",
-                            Description = StructuredOutputEsParse.EmailDeContactoDescription,
+                            Description = StructuredOutputEsJson.EmailDeContactoDescription,
                         },
-                        [nameof(StructuredOutputEsParse.direccion_del_inmueble)] = new()
+                        [nameof(StructuredOutputEsJson.direccion_del_inmueble)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
-                            Description = StructuredOutputEsParse.DirecciónDelInmuebleDescription,
+                            Description = StructuredOutputEsJson.DirecciónDelInmuebleDescription,
                         },
-                        [nameof(StructuredOutputEsParse.referencia_catastral)] = new()
+                        [nameof(StructuredOutputEsJson.referencia_catastral)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
-                            Description = StructuredOutputEsParse.ReferenciaCatastralDescription,
+                            Description = StructuredOutputEsJson.ReferenciaCatastralDescription,
                         },
 
-                        [nameof(StructuredOutputEsParse.tamanio_del_inmueble)] = new()
+                        [nameof(StructuredOutputEsJson.tamanio_del_inmueble)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Integer,
-                            Description = StructuredOutputEsParse.TamañoDelInmuebleDescription,
+                            Description = StructuredOutputEsJson.TamañoDelInmuebleDescription,
                         },
 
-                        [nameof(StructuredOutputEsParse.tamanio_de_la_parcela)] = new()
+                        [nameof(StructuredOutputEsJson.tamanio_de_la_parcela)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Integer,
-                            Description = StructuredOutputEsParse.TamañoDeLaParcelaDescription,
+                            Description = StructuredOutputEsJson.TamañoDeLaParcelaDescription,
                         },
-                        [nameof(StructuredOutputEsParse.anio_de_construccion)] = new()
+                        [nameof(StructuredOutputEsJson.anio_de_construccion)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Integer,
-                            Description = StructuredOutputEsParse.AñoDeConstrucciónDescription,
+                            Description = StructuredOutputEsJson.AñoDeConstrucciónDescription,
                         },
-                        [nameof(StructuredOutputEsParse.estado_de_la_construccion)] = new()
+                        [nameof(StructuredOutputEsJson.estado_de_la_construccion)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
                             Enum =  { GetEnumValues(typeof(EstadosDeLaConstrucción)) },
-                            Description = StructuredOutputEsParse.EstadoDeLaConstrucciónDescription,
+                            Description = StructuredOutputEsJson.EstadoDeLaConstrucciónDescription,
                         },
-                        [nameof(StructuredOutputEsParse.plantas_del_edificio)] = new()
+                        [nameof(StructuredOutputEsJson.plantas_del_edificio)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Integer,
-                            Description = StructuredOutputEsParse.PlantasDelEdificioDescription,
+                            Description = StructuredOutputEsJson.PlantasDelEdificioDescription,
                         },
-                        [nameof(StructuredOutputEsParse.planta_del_inmueble)] = new()
+                        [nameof(StructuredOutputEsJson.planta_del_inmueble)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
-                            Description = StructuredOutputEsParse.PlantaDelInmuebleDescription,
+                            Description = StructuredOutputEsJson.PlantaDelInmuebleDescription,
                         },
-                        [nameof(StructuredOutputEsParse.numero_de_dormitorios)] = new()
+                        [nameof(StructuredOutputEsJson.numero_de_dormitorios)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Integer,
-                            Description = StructuredOutputEsParse.NúmeroDeDormitoriosDescription,
+                            Description = StructuredOutputEsJson.NúmeroDeDormitoriosDescription,
                         },
-                        [nameof(StructuredOutputEsParse.numero_de_banios)] = new()
+                        [nameof(StructuredOutputEsJson.numero_de_banios)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Integer,
-                            Description = StructuredOutputEsParse.NúmeroDeBañosDescription,
+                            Description = StructuredOutputEsJson.NúmeroDeBañosDescription,
                         },
-                        [nameof(StructuredOutputEsParse.numero_de_parkings)] = new()
+                        [nameof(StructuredOutputEsJson.numero_de_parkings)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Integer,
-                            Description =  StructuredOutputEsParse.NúmeroDeParkingsDescription,
+                            Description =  StructuredOutputEsJson.NúmeroDeParkingsDescription,
                         },
-                        [nameof(StructuredOutputEsParse.tiene_terraza)] = new()
+                        [nameof(StructuredOutputEsJson.tiene_terraza)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
-                            Description = StructuredOutputEsParse.TieneTerrazaDescription,
+                            Description = StructuredOutputEsJson.TieneTerrazaDescription,
                         },
-                        [nameof(StructuredOutputEsParse.tiene_jardin)] = new()
+                        [nameof(StructuredOutputEsJson.tiene_jardin)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
-                            Description = StructuredOutputEsParse.TieneJardínDescription,
+                            Description = StructuredOutputEsJson.TieneJardínDescription,
                         },
-                        [nameof(StructuredOutputEsParse.tiene_garaje)] = new()
+                        [nameof(StructuredOutputEsJson.tiene_garaje)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
-                            Description = StructuredOutputEsParse.TieneGarajeDescription,
+                            Description = StructuredOutputEsJson.TieneGarajeDescription,
                         },
-                        [nameof(StructuredOutputEsParse.tiene_parking_para_moto)] = new()
+                        [nameof(StructuredOutputEsJson.tiene_parking_para_moto)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
-                            Description = StructuredOutputEsParse.TieneParkingParaMotoDescription,
+                            Description = StructuredOutputEsJson.TieneParkingParaMotoDescription,
                         },
-                        [nameof(StructuredOutputEsParse.tiene_piscina)] = new()
+                        [nameof(StructuredOutputEsJson.tiene_piscina)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
-                            Description = StructuredOutputEsParse.TienePiscinaDescription,
+                            Description = StructuredOutputEsJson.TienePiscinaDescription,
                         },
-                        [nameof(StructuredOutputEsParse.tiene_ascensor)] = new()
+                        [nameof(StructuredOutputEsJson.tiene_ascensor)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
-                            Description = StructuredOutputEsParse.TieneAscensorDescription,
+                            Description = StructuredOutputEsJson.TieneAscensorDescription,
                         },
-                        [nameof(StructuredOutputEsParse.tiene_acceso_para_discapacitados)] = new()
+                        [nameof(StructuredOutputEsJson.tiene_acceso_para_discapacitados)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
-                            Description = StructuredOutputEsParse.TieneAccesoParaDiscapacitadosDescription,
+                            Description = StructuredOutputEsJson.TieneAccesoParaDiscapacitadosDescription,
                         },
-                        [nameof(StructuredOutputEsParse.tiene_trastero)] = new()
+                        [nameof(StructuredOutputEsJson.tiene_trastero)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
-                            Description = StructuredOutputEsParse.TieneTrasteroDescription,
+                            Description = StructuredOutputEsJson.TieneTrasteroDescription,
                         },
-                        [nameof(StructuredOutputEsParse.esta_amueblado)] = new()
+                        [nameof(StructuredOutputEsJson.esta_amueblado)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
-                            Description = StructuredOutputEsParse.EstaAmuebladoDescription,
+                            Description = StructuredOutputEsJson.EstaAmuebladoDescription,
                         },
-                        [nameof(StructuredOutputEsParse.no_esta_amueblado)] = new()
+                        [nameof(StructuredOutputEsJson.no_esta_amueblado)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
-                            Description = StructuredOutputEsParse.NoEstaAmuebladoDescription,
+                            Description = StructuredOutputEsJson.NoEstaAmuebladoDescription,
                         },
-                        [nameof(StructuredOutputEsParse.tiene_calefaccion)] = new()
+                        [nameof(StructuredOutputEsJson.tiene_calefaccion)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
-                            Description = StructuredOutputEsParse.TieneCalefacciónDescription,
+                            Description = StructuredOutputEsJson.TieneCalefacciónDescription,
                         },
-                        [nameof(StructuredOutputEsParse.tiene_aire_acondicionado)] = new()
+                        [nameof(StructuredOutputEsJson.tiene_aire_acondicionado)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
-                            Description = StructuredOutputEsParse.TieneAireAcondicionadoDescription,
+                            Description = StructuredOutputEsJson.TieneAireAcondicionadoDescription,
                         },
-                        [nameof(StructuredOutputEsParse.permite_mascotas)] = new()
+                        [nameof(StructuredOutputEsJson.permite_mascotas)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
-                            Description = StructuredOutputEsParse.PermiteMascotasDescription,
+                            Description = StructuredOutputEsJson.PermiteMascotasDescription,
                         },
-                        [nameof(StructuredOutputEsParse.tiene_sistemas_de_seguridad)] = new()
+                        [nameof(StructuredOutputEsJson.tiene_sistemas_de_seguridad)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
-                            Description = StructuredOutputEsParse.TieneSistemasDeSeguridadDescription,
+                            Description = StructuredOutputEsJson.TieneSistemasDeSeguridadDescription,
                         },
-                        [nameof(StructuredOutputEsParse.urls_de_imagenes_del_anuncio)] = new()
+                        [nameof(StructuredOutputEsJson.urls_de_imagenes_del_anuncio)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Array,
@@ -244,18 +244,18 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                                 Type = Google.Cloud.AIPlatform.V1.Type.String,
                                 Format = "uri"
                             },
-                            Description = StructuredOutputEsParse.UrlsDeImagenesDelAnuncio,
+                            Description = StructuredOutputEsJson.UrlsDeImagenesDelAnuncio,
                         }
                     },
                     Required = {
-                        nameof(StructuredOutputEsParse.fecha_de_publicacion),
-                        nameof(StructuredOutputEsParse.tipo_de_operacion),
-                        nameof(StructuredOutputEsParse.tipo_de_inmueble),
-                        nameof(StructuredOutputEsParse.precio_del_anuncio)
+                        nameof(StructuredOutputEsJson.fecha_de_publicacion),
+                        nameof(StructuredOutputEsJson.tipo_de_operacion),
+                        nameof(StructuredOutputEsJson.tipo_de_inmueble),
+                        nameof(StructuredOutputEsJson.precio_del_anuncio)
                     }
                 }
             },
-            Required = { StructuredOutputEsParse.FunctionNameIsListing }
+            Required = { StructuredOutputEsJson.FunctionNameIsListing }
         };
 
         public static RepeatedField<string> GetEnumValues(System.Type enumType)

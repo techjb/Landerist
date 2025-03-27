@@ -35,6 +35,14 @@ namespace landerist_library.Parse.ListingParser.OpenAI
         private static readonly OpenAIClient OpenAIClient = new(PrivateConfig.OPENAI_API_KEY);
 
         public static readonly string? TOOL_CHOICE = "required";
+        private static readonly JSchemaGenerator JSchemaGenerator = new()
+        {
+            DefaultRequired = Required.AllowNull,
+            GenerationProviders =
+            {
+                new StringEnumGenerationProvider(),
+            }
+        };        
 
         public static bool TooManyTokens(Page page)
         {
@@ -79,16 +87,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI
 
         public static string GetSchema()
         {
-            JSchemaGenerator generator = new()
-            {
-                DefaultRequired = Required.AllowNull,
-                GenerationProviders =
-                {
-                    new StringEnumGenerationProvider(),
-                }
-            };
-
-            JSchema jSChema = generator.Generate(typeof(StructuredOutputEs));
+            JSchema jSChema = JSchemaGenerator.Generate(typeof(StructuredOutputEs));
             SetAdditionalPropertiesFalse(jSChema);
             return jSChema.ToString();
         }

@@ -151,7 +151,7 @@ namespace landerist_library.Parse.ListingParser
                 var structuredOutput = JsonConvert.DeserializeObject<StructuredOutputEs>(text, settings);                
                 if (structuredOutput != null)
                 {
-                    return structuredOutput.ParseListing(page);
+                    return new StructuredOutputEsParser(structuredOutput).Parse(page);
                 }
             }
             catch (Exception exception)

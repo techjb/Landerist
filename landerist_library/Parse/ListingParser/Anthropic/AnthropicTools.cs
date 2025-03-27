@@ -9,11 +9,11 @@ using Anthropic_SDK_Common = Anthropic.SDK.Common;
 
 namespace landerist_library.Parse.ListingParser.Anthropic
 {
-    public class AnthropicTools : StructuredOutputEsParse
+    public class AnthropicTools : StructuredOutputEsJson
     {
         public List<Anthropic_SDK_Common.Tool> GetTools()
         {
-            var functionIsListing = GetFunctionIsListing();
+            var functionIsListing = GetFunctionIsListing(GetJsonSerializerOptions());
             var functionIsNotListing = GetFunctionIsNotListing();
 
             return [functionIsListing, functionIsNotListing];
@@ -31,17 +31,19 @@ namespace landerist_library.Parse.ListingParser.Anthropic
             return new Function(FunctionNameIsNotListing, FunctionDescriptionIsNotListing, parameters);
         }
 
-
-        public Function GetFunctionIsListing()
+        public JsonSerializerOptions GetJsonSerializerOptions()
         {
-            var inputschema = GetInputSchema();
-
-            JsonSerializerOptions? jsonSerializerOptions = new()
+            return new()
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 Converters = { new JsonStringEnumConverter() },
                 ReferenceHandler = ReferenceHandler.IgnoreCycles,
             };
+        }
+
+        public Function GetFunctionIsListing(JsonSerializerOptions jsonSerializerOptions)
+        {
+            var inputschema = GetInputSchema();
             string jsonString = JsonSerializer.Serialize(inputschema, jsonSerializerOptions);
             return new Function(FunctionNameIsListing, FunctionNameIsListingDescription, JsonNode.Parse(jsonString));
         }

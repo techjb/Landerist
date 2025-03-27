@@ -5,7 +5,7 @@ using System.Text.Json.Nodes;
 
 namespace landerist_library.Parse.ListingParser.VertexAI
 {
-    public class VertexAITools : StructuredOutputEsParse
+    public class VertexAITools : StructuredOutputEsJson
     {
         public Tool GetTools()
         {

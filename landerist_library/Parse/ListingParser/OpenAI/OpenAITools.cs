@@ -4,7 +4,7 @@ using System.Text.Json.Nodes;
 
 namespace landerist_library.Parse.ListingParser.OpenAI
 {
-    public class OpenAITools : StructuredOutputEsParse
+    public class OpenAITools : StructuredOutputEsJson
     {
         public List<Tool> GetTools()
         {

@@ -1,12 +1,6 @@
-﻿using landerist_library.Parse.ListingParser.OpenAI.Batch;
-using landerist_library.Parse.ListingParser.OpenAI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 using landerist_library.Websites;
+using landerist_library.Parse.ListingParser.StructuredOutputs;
 
 namespace landerist_library.Parse.ListingParser.VertexAI.Batch
 {
@@ -18,7 +12,9 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
         };
         public static string? GetJson(Page page, string userInput)
         {
-            StructuredRequestData structuredRequestData = new()
+            var responseSchema = OpenApiSchemaSerializer.Serialize(VertexAIResponseSchema.ResponseSchema);
+
+            VertexAIBatchRequest structuredRequestData = new()
             {
                 request = new Request()
                 {
@@ -50,7 +46,11 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                     {
                         temperature = 0f,
                         response_mime_type = "application/json",
-                        response_schema = new VertexAIBatchResponseSchema()
+                        response_schema = responseSchema
+                    },
+                    labels = new Dictionary<string, string>()
+                    {
+                        {"custom_id", page.UriHash}
                     }
                 }
             };

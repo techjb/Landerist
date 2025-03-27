@@ -1,11 +1,14 @@
-﻿namespace landerist_library.Parse.ListingParser.VertexAI.Batch
+﻿using Google.Cloud.AIPlatform.V1;
+using Newtonsoft.Json.Linq;
+
+namespace landerist_library.Parse.ListingParser.VertexAI.Batch
 {
 
 #pragma warning disable CS8618
 #pragma warning disable IDE1006
 
     
-    public class StructuredRequestData
+    public class VertexAIBatchRequest
     {
         public Request request { get; set; }
     }
@@ -16,6 +19,8 @@
         public SystemInstruction system_instruction { get; set; }        
 
         public GenerationConfig generation_config { get; set; }
+
+        public Dictionary<string, string> labels { get; set; }
     }
 
     public class SystemInstruction
@@ -27,6 +32,7 @@
     {
         public string text { get; set; }
     }
+
 
     public class Content
     {
@@ -40,7 +46,7 @@
 
         public string response_mime_type { get; set; }
 
-        public VertexAIBatchResponseSchema response_schema { get; set; }
+        public object response_schema { get; set; }
     }
 
 
