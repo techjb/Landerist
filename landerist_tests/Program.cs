@@ -281,12 +281,12 @@ namespace landerist_tests
             //ServiceTasks.Start();
             //BatchTasks.Start();
             //BatchUpload.Start();
-            //VertexAIBatch.StartTest();
-
-
+            BatchDownload.Start();
+            //BatchPredictions.ListAllPredictionJobs();
 
             #endregion
 
         }
     }
 }
+

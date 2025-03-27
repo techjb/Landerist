@@ -8,7 +8,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
 {
     public class VertexAIBatchClient
     {
-        private static readonly OpenAIClient OpenAIClient = new(PrivateConfig.OPENAI_API_KEY);
+        //private static readonly OpenAIClient OpenAIClient = new(PrivateConfig.OPENAI_API_KEY);
 
         public static bool DeleteFile(string fileId)
         {
@@ -22,7 +22,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
             }
             try
             {
-                OpenAIClient.FilesEndpoint.DeleteFileAsync(fileId);
+                //OpenAIClient.FilesEndpoint.DeleteFileAsync(fileId);
                 return true;
             }
             catch (Exception exception)
@@ -36,7 +36,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
         {
             try
             {
-                FileResponse fileResponse = OpenAIClient.FilesEndpoint.GetFileInfoAsync(fileId).Result;
+                //FileResponse fileResponse = OpenAIClient.FilesEndpoint.GetFileInfoAsync(fileId).Result;
                 return true;
             }
             catch (Exception exception)
@@ -50,7 +50,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
         {
             try
             {
-                return OpenAIClient.BatchEndpoint.RetrieveBatchAsync(batchId).Result;
+                //return OpenAIClient.BatchEndpoint.RetrieveBatchAsync(batchId).Result;
 
             }
             catch (Exception exception)
@@ -73,7 +73,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
             }
             try
             {
-                return OpenAIClient.FilesEndpoint.DownloadFileAsync(fileId, Config.BATCH_DIRECTORY).Result;
+                //return OpenAIClient.FilesEndpoint.DownloadFileAsync(fileId, Config.BATCH_DIRECTORY).Result;
             }
             catch (Exception exception)
             {
@@ -86,7 +86,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
         {
             try
             {
-                return [.. OpenAIClient.FilesEndpoint.ListFilesAsync().Result];
+                //return [.. OpenAIClient.FilesEndpoint.ListFilesAsync().Result];
             }
             catch (Exception exception)
             {
@@ -99,7 +99,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
         {
             try
             {
-                return OpenAIClient.FilesEndpoint.UploadFileAsync(filePath, FilePurpose.Batch).GetAwaiter().GetResult();
+                //return OpenAIClient.FilesEndpoint.UploadFileAsync(filePath, FilePurpose.Batch).GetAwaiter().GetResult();
             }
             catch (Exception exception)
             {
@@ -113,7 +113,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
             try
             {
                 var batchRequest = new CreateBatchRequest(fileResponse.Id, Endpoint.ChatCompletions);
-                return OpenAIClient.BatchEndpoint.CreateBatchAsync(batchRequest).Result;
+                //return OpenAIClient.BatchEndpoint.CreateBatchAsync(batchRequest).Result;
             }
             catch (Exception exception)
             {

@@ -7,11 +7,11 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
     {
         public static void Start()
         {
-            DeleteDownloadedBatches();
+            DeleteBatches();
             DeleteLocalFiles();
         }
 
-        private static void DeleteDownloadedBatches()
+        private static void DeleteBatches()
         {
             var batches = Batches.SelectDownloaded();
             Parallel.ForEach(batches, Config.PARALLELOPTIONS1INLOCAL, Delete);

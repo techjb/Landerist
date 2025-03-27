@@ -2,6 +2,7 @@
 using landerist_library.Database;
 using landerist_library.Parse.ListingParser;
 using landerist_library.Parse.ListingParser.OpenAI.Batch;
+using landerist_library.Parse.ListingParser.VertexAI.Batch;
 
 
 namespace landerist_library.Tasks
@@ -16,11 +17,14 @@ namespace landerist_library.Tasks
 
         private static void Download(Batch batch)
         {
+            if (Config.IsConfigurationLocal() && !batch.LLMProvider.Equals(Config.LLM_PROVIDER))
+            {
+                return;
+            }
             switch (batch.LLMProvider)
             {
                 case LLMProvider.OpenAI: OpenAIBatchDownload.BatchDownload(batch.Id); break;
-                //case LLMProviders.VertexAI: return VertexAIRequest.BatchIsComplete(batchId);
-
+                case LLMProvider.VertexAI: BatchPredictions.BatchDownload(batch.Id); break;
                 //case LLMProviders.Anthropic: return AnthropicRequest.BatchIsComplete(batchId);
                 default: break;
             }

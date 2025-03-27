@@ -33,12 +33,11 @@ namespace landerist_library.Tasks
         private static bool StartBatchUpload()
         {
             pages = Pages.SelectWaitingAIParsing();
-            if (pages.Count < Config.MIN_PAGES_PER_BATCH)
+            if (pages.Count < Config.MIN_PAGES_PER_BATCH && Config.IsConfigurationProduction())
             {
                 return false;
             }
             var filePath = CreateFile();
-            return true;
             if (string.IsNullOrEmpty(filePath))
             {
                 return false;
@@ -71,11 +70,6 @@ namespace landerist_library.Tasks
                 Config.LLM_PROVIDER.ToString().ToLower() + "_" +
                 DateTime.Now.ToString("yyyyMMddHHmmss") + "_input.json";
 
-            if (Config.IsConfigurationLocal())
-            {
-                filePath = Config.BATCH_DIRECTORY + "test.json";
-            }
-
             File.Delete(filePath);
 
             UriHashes = [];
@@ -104,10 +98,10 @@ namespace landerist_library.Tasks
                     }
                 }
                 page.Dispose();
-                if (Config.IsConfigurationLocal() && UriHashes.Count > 2)
-                {
-                    state.Stop();
-                }
+                //if (Config.IsConfigurationLocal())
+                //{
+                //    state.Stop();
+                //}
             });
 
             if (errors > 0)
@@ -184,10 +178,9 @@ namespace landerist_library.Tasks
             switch (Config.LLM_PROVIDER)
             {
                 case LLMProvider.OpenAI:
-                    return OpenAIBatchUpload.UploadFile(filePath);
+                    return OpenAIBatchClient.UploadFile(filePath);
                 case LLMProvider.VertexAI:
-                    //return VertexAIBatchClient.UploadFile(filePath);
-                    return null;
+                    return CloudStorage.UploadFile(filePath);                    
                 default:
                     return null;
             }
@@ -198,10 +191,9 @@ namespace landerist_library.Tasks
             switch (Config.LLM_PROVIDER)
             {
                 case LLMProvider.OpenAI:
-                    return OpenAIBatchUpload.CreateBatch(fileId);
+                    return OpenAIBatchClient.CreateBatch(fileId);
                 case LLMProvider.VertexAI:
-                    //return VertexAIBatchClient.CreateBatch(fileId);
-                    return null;
+                    return BatchPredictions.CreateBatch(fileId);                    
                 default:
                     return null;
             }
