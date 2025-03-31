@@ -1,5 +1,4 @@
 ﻿using landerist_library.Configuration;
-using landerist_library.Parse.ListingParser.Gemini;
 using landerist_library.Parse.ListingParser.OpenAI;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
 using landerist_library.Parse.ListingParser.VertexAI;
@@ -26,8 +25,6 @@ namespace landerist_library.Parse.ListingParser
             {
                 case LLMProvider.OpenAI: return OpenAIRequest.TooManyTokens(page);
                 case LLMProvider.VertexAI: return VertexAIRequest.TooManyTokens(page);
-                case LLMProvider.Gemini: return GeminiRequest.TooManyTokens(page);
-                //case LLMProviders.Anthropic: return AnthropicRequest.TooManyTokens(page);
                 default:
                     break;
             }
@@ -37,6 +34,11 @@ namespace landerist_library.Parse.ListingParser
         public static (PageType pageType, Listing? listing, bool waitingAIParsing)
             Parse(Page page)
         {
+            if (Config.BATCH_ENABLED)
+            {
+                return (PageType.MayBeListing, null, true);
+            }
+
             var userInput = ParseListingUserInput.GetText(page);
             if (!string.IsNullOrEmpty(userInput))
             {
@@ -44,8 +46,6 @@ namespace landerist_library.Parse.ListingParser
                 {
                     case LLMProvider.OpenAI: return ParseOpenAI(page, userInput);
                     case LLMProvider.VertexAI: return ParseVertextAI(page, userInput);
-                    //case ModelName.Gemini: return GeminiRequest.ParseTextGemini(page);
-                    //case LLMProviders.Anthropic: return ParseAnthropic(page, userInput);
                     default:
                         break;
 
@@ -57,20 +57,12 @@ namespace landerist_library.Parse.ListingParser
         private static (PageType pageType, Listing? listing, bool waitingAIParsing)
             ParseOpenAI(Page page, string userInput)
         {
-            PageType pageType = PageType.MayBeListing;
-            Listing? listing = null;
-
-            if (Config.BATCH_ENABLED)
-            {
-                return (pageType, listing, true);
-            }
-
             var response = OpenAIRequest.GetChatResponse(userInput);
             if (response == null || response.FirstChoice == null)
             {
-                return (pageType, listing, true);
+                return (PageType.MayBeListing, null, true);
             }            
-            (pageType, listing) = ParseResponse(page, response.FirstChoice);
+            var (pageType, listing) = ParseResponse(page, response.FirstChoice);
             return (pageType, listing, false);
         }
 
@@ -87,40 +79,6 @@ namespace landerist_library.Parse.ListingParser
             var (pageType, listing) = ParseResponse(page, responseText);
             return (pageType, listing, false);
         }
-
-
-        //private static (PageType pageType, Listing? listing, bool waitingAIParsing)
-        //    ParseAnthropic(Page page, string text)
-        //{
-        //    var response = AnthropicRequest.GetResponse(page, text);
-        //    if (response == null)
-        //    {
-        //        return (PageType.MayBeListing, null, false);
-        //    }
-
-        //    var (functionName, arguments) = AnthropicResponse.GetFunctionNameAndArguments(response);
-        //    var (pageType, listing) = ParseAnthropic(page, functionName, arguments);
-        //    return (pageType, listing, false);
-        //}
-
-        //private static (PageType pageType, Listing? listing) ParseAnthropic(Page page, string? functionName, string? arguments)
-        //{
-        //    if (functionName != null && arguments != null)
-        //    {
-        //        switch (functionName)
-        //        {
-        //            case StructuredOutputEsParse.FunctionNameIsNotListing:
-        //                {
-        //                    return (PageType.NotListingByParser, null);
-        //                }
-        //            case StructuredOutputEsParse.FunctionNameIsListing:
-        //                {
-        //                    return ParseListingResponse.ParseListing(page, arguments);
-        //                }
-        //        }
-        //    }
-        //    return (PageType.MayBeListing, null);
-        //}
 
         public static (PageType pageType, Listing? listing) ParseResponse(Page page, string? text)
         {
