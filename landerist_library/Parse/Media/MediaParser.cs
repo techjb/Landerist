@@ -96,10 +96,10 @@ namespace landerist_library.Parse.Media
 
         public static string GetTitle(HtmlNode imgNode)
         {
-            string title = imgNode.GetAttributeValue("alt", null);
+            string title = imgNode.GetAttributeValue("alt", "");
             if (string.IsNullOrEmpty(title))
             {
-                title = imgNode.GetAttributeValue("title", null);
+                title = imgNode.GetAttributeValue("title", "");                
             }
 
             return title;

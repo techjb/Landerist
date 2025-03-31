@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "3.98";
+        public static readonly string VERSION = "3.99";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -208,10 +208,11 @@ namespace landerist_library.Configuration
             LLM_PROVIDER = !ConfigurationProduction ?
                 LLMProvider.VertexAI :
                 //LLMProvider.OpenAI :
-                LLMProvider.OpenAI;
+                //LLMProvider.OpenAI;
+                LLMProvider.VertexAI;
 
 
-            BATCH_ENABLED = LLM_PROVIDER.Equals(LLMProvider.OpenAI) && ConfigurationProduction;
+            BATCH_ENABLED = true;
 
             MIN_PAGES_PER_BATCH = ConfigurationProduction ? 300 : 1;
 
@@ -220,7 +221,7 @@ namespace landerist_library.Configuration
                 PrivateConfig.BATCH_DIRECTORY_LOCAL;
 
             MAX_DEGREE_OF_PARALLELISM_SCRAPER = ConfigurationProduction ?
-                Environment.ProcessorCount * 70 / 100 : // 70% of the processors
+                Environment.ProcessorCount * 50 / 100 : // 50% of the processors
                 1;
 
             PARALLELOPTIONS1INLOCAL = ConfigurationProduction ?

@@ -1,20 +1,22 @@
 ﻿using landerist_library.Database;
+using OpenCvSharp.XImgProc;
 
 namespace landerist_library.Parse.ListingParser.OpenAI.Batch
 {
     public class OpenAIBatchCleaner : OpenAIBatchClient
     {
-        public static void Delete(string batchId)
+        public static bool Delete(string batchId)
         {
             var batchResponse = GetBatch(batchId);
             if (batchResponse == null || !BatchIsCompleted(batchResponse))
             {
-                return;
+                return false;
             }
             if (DeleteFile(batchResponse.InputFileId) && DeleteFile(batchResponse.OutputFileId) && DeleteFile(batchResponse.ErrorFileId))
             {
-                Batches.Delete(batchResponse.Id);
+                return true;
             }
+            return false;
         }
 
         public static void DeleteAllRemoteFiles()

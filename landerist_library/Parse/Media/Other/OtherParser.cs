@@ -27,7 +27,7 @@ namespace landerist_library.Parse.Media.Other
 
         private void GetOthers(HtmlNode htmlNode, string fileExtension)
         {
-            string attributeValue = htmlNode.GetAttributeValue("href", null);
+            string? attributeValue = htmlNode.GetAttributeValue("href", "");
             if (string.IsNullOrEmpty(attributeValue))
             {
                 return;

@@ -33,7 +33,7 @@ namespace landerist_library.Tasks
         private static bool StartBatchUpload()
         {
             pages = Pages.SelectWaitingAIParsing();
-            if (pages.Count < Config.MIN_PAGES_PER_BATCH && Config.IsConfigurationProduction())
+            if (pages.Count < Config.MIN_PAGES_PER_BATCH)
             {
                 return false;
             }

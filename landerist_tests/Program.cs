@@ -63,7 +63,6 @@ namespace landerist_tests
 
         private static void Run()
         {
-            //Config.SetToProduction();
             Config.SetOnlyDatabaseToProduction();
 
             #region Urls
@@ -281,8 +280,10 @@ namespace landerist_tests
             //ServiceTasks.Start();
             //BatchTasks.Start();
             //BatchUpload.Start();
-            BatchDownload.Start();
+            //BatchDownload.Start();
             //BatchPredictions.ListAllPredictionJobs();
+            //BatchDownload.ReadFileTest();
+            //VertexAIBatchCleaner.Clean();
 
             #endregion
 

@@ -67,18 +67,30 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
             }
         }
 
-        public static void ListAllPredictionJobs()
+        public static void Clean(DateTime dateTime)
         {
-            var jobServiceClient = GetJobServiceClient();
             var listBatchPredictionJobsRequest = new ListBatchPredictionJobsRequest
             {
                 Parent = GetParent(),
             };
-            var listBatchPredictionJobsResponse = jobServiceClient.ListBatchPredictionJobs(listBatchPredictionJobsRequest);
+            var listBatchPredictionJobsResponse = GetJobServiceClient().ListBatchPredictionJobs(listBatchPredictionJobsRequest);
             foreach (var batchPredictionJob in listBatchPredictionJobsResponse)
             {
-                Console.WriteLine(batchPredictionJob.Name);
+                if (batchPredictionJob.State.Equals(JobState.Succeeded) && batchPredictionJob.EndTime.ToDateTime() < dateTime)
+                {
+                    DeleteBatchPredictionJob(batchPredictionJob.Name);
+                }
             }
+        }
+
+        public static void DeleteBatchPredictionJob(string name)
+        {
+            var deleteBatchPredictionJobRequest = new DeleteBatchPredictionJobRequest
+            {
+                Name = name,
+            };
+
+            GetJobServiceClient().DeleteBatchPredictionJob(deleteBatchPredictionJobRequest);
         }
 
         private static string GetParent()

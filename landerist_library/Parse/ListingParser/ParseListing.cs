@@ -1,5 +1,4 @@
-﻿using Google.Cloud.AIPlatform.V1;
-using landerist_library.Configuration;
+﻿using landerist_library.Configuration;
 using landerist_library.Parse.ListingParser.Gemini;
 using landerist_library.Parse.ListingParser.OpenAI;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
@@ -7,7 +6,6 @@ using landerist_library.Parse.ListingParser.VertexAI;
 using landerist_library.Websites;
 using landerist_orels.ES;
 using Newtonsoft.Json;
-using OpenAI.Chat;
 
 namespace landerist_library.Parse.ListingParser
 {
@@ -68,17 +66,12 @@ namespace landerist_library.Parse.ListingParser
             }
 
             var response = OpenAIRequest.GetChatResponse(userInput);
-            (pageType, listing) = ParseOpenAI(page, response);
-            return (pageType, listing, false);
-        }
-
-        public static (PageType pageType, Listing? listing) ParseOpenAI(Page page, ChatResponse? chatResponse)
-        {
-            if (chatResponse == null)
+            if (response == null || response.FirstChoice == null)
             {
-                return (PageType.MayBeListing, null);
-            }
-            return ParseResponse(page, chatResponse.FirstChoice);
+                return (pageType, listing, true);
+            }            
+            (pageType, listing) = ParseResponse(page, response.FirstChoice);
+            return (pageType, listing, false);
         }
 
 
@@ -86,18 +79,13 @@ namespace landerist_library.Parse.ListingParser
             ParseVertextAI(Page page, string text)
         {
             var generateContentResponse = VertexAIRequest.GetResponse(page, text).Result;
-            var (pageType, listing) = ParseVertextAI(page, generateContentResponse);
-            return (pageType, listing, false);
-        }
-
-        private static (PageType pageType, Listing? listing) ParseVertextAI(Page page, GenerateContentResponse? generateContentResponse)
-        {
             if (generateContentResponse == null)
             {
-                return (PageType.MayBeListing, null);
+                return (PageType.MayBeListing, null, true);
             }
             string? responseText = VertexAIResponse.GetResponseText(generateContentResponse);
-            return ParseResponse(page, responseText);
+            var (pageType, listing) = ParseResponse(page, responseText);
+            return (pageType, listing, false);
         }
 
 
@@ -134,7 +122,7 @@ namespace landerist_library.Parse.ListingParser
         //    return (PageType.MayBeListing, null);
         //}
 
-        private static (PageType pageType, Listing? listing) ParseResponse(Page page, string? text)
+        public static (PageType pageType, Listing? listing) ParseResponse(Page page, string? text)
         {
             if (text is null)
             {

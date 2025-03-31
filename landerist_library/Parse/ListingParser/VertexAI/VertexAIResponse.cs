@@ -8,16 +8,32 @@ namespace landerist_library.Parse.ListingParser.VertexAI
         {
             try
             {
-                if (response.Candidates != null &&
-                    response.Candidates[0].Content != null &&
-                    response.Candidates[0].Content.Parts != null)
+                if (response.Candidates != null)
                 {
-                    return response.Candidates[0].Content.Parts[0].Text;
+                    var candidate = response.Candidates[0];
+                    return GetResponseText(candidate);
                 }
             }
             catch (Exception exception)
             {
                 Logs.Log.WriteError("VertexAIResponse GetResponseText", response.ToString(), exception);
+            }
+            return null;
+        }
+
+        public static string? GetResponseText(Candidate candidate)
+        {
+            try
+            {
+                if (candidate.Content != null &&
+                    candidate.Content.Parts != null)
+                {
+                    return candidate.Content.Parts[0].Text;
+                }
+            }
+            catch (Exception exception)
+            {
+                Logs.Log.WriteError("VertexAIResponse GetResponseText", candidate.ToString(), exception);
             }
             return null;
         }

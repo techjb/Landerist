@@ -1,6 +1,7 @@
 ﻿using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Storage.V1;
 using landerist_library.Configuration;
+using landerist_library.Logs;
 
 namespace landerist_library.Parse.ListingParser.VertexAI.Batch
 {
@@ -16,9 +17,9 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                 var dataObject = storageClient.UploadObject(PrivateConfig.GOOGLE_CLOUD_BUCKET_NAME, objectName, "text/html", fileStream);
                 return dataObject.Name;
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
-                Logs.Log.WriteError("CloudStorage UploadFile", e);
+                Log.WriteError("CloudStorage UploadFile", exception);
                 return null;
             }
         }
@@ -32,11 +33,31 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                 var dataObject = storageClient.DownloadObject(PrivateConfig.GOOGLE_CLOUD_BUCKET_NAME, objectName, fileStream);
                 return true;
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
-                Logs.Log.WriteError("CloudStorage DownloadFile", e);
+                Log.WriteError("CloudStorage DownloadFile", exception);
                 return false;
             }
+        }
+
+        public static void DeleteFiles(DateTime dateTime)
+        {
+            var storageClient = GetStorageClient();
+            var objects = storageClient.ListObjects(PrivateConfig.GOOGLE_CLOUD_BUCKET_NAME);
+            Parallel.ForEach(objects, Config.PARALLELOPTIONS1INLOCAL, obj =>
+            {
+                if (obj.TimeCreatedDateTimeOffset < dateTime)
+                {
+                    try
+                    {
+                        storageClient.DeleteObject(PrivateConfig.GOOGLE_CLOUD_BUCKET_NAME, obj.Name);
+                    }
+                    catch (Exception exception)
+                    {
+                        Log.WriteError("CloudStorage DeleteFiles", exception);
+                    }
+                }
+            });
         }
 
         private static StorageClient GetStorageClient()

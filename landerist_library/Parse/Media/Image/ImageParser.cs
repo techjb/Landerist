@@ -79,7 +79,7 @@ namespace landerist_library.Parse.Media.Image
 
         private void AddImage(HtmlNode imgNode, string name)
         {
-            string attributeValue = imgNode.GetAttributeValue(name, null);
+            string attributeValue = imgNode.GetAttributeValue(name, "");
             if (string.IsNullOrEmpty(attributeValue))
             {
                 return;

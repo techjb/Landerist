@@ -74,7 +74,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
             return batchResponse.Status.Equals(BatchStatus.Completed);
         }
 
-        protected static string? DownloadFile(string? fileId)
+        public static string? DownloadFile(string? fileId)
         {
             if (string.IsNullOrEmpty(fileId))
             {

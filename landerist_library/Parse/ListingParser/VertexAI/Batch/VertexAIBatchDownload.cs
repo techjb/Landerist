@@ -1,41 +1,107 @@
 ﻿using Google.Cloud.AIPlatform.V1;
 using landerist_library.Configuration;
+using System.Text.Json.Serialization;
+using System.Text.Json;
+using landerist_library.Websites;
+using landerist_library.Logs;
 
 namespace landerist_library.Parse.ListingParser.VertexAI.Batch
 {
     public class VertexAIBatchDownload
     {
-        public static void BatchDownload(string batchId)
+        private static readonly JsonSerializerOptions JsonSerializerOptions = new()
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false) },
+            ReferenceHandler = ReferenceHandler.IgnoreCycles
+        };
+
+
+        public static List<string>? GetFiles(string batchId)
         {
             try
             {
                 var batchPredictionJob = BatchPredictions.GetBatchPredictionJob(batchId);
-                if (batchPredictionJob is null || !batchPredictionJob.State.Equals(JobState.Succeeded))
+                if (batchPredictionJob != null && batchPredictionJob.State.Equals(JobState.Succeeded))
                 {
-                    return;
+                    string file = batchPredictionJob.OutputInfo.GcsOutputDirectory.
+                        Replace("gs://" + PrivateConfig.GOOGLE_CLOUD_BUCKET_NAME + "/", "") + "/predictions.jsonl";
+
+                    return [file];
                 }
-                DownloadFile(batchPredictionJob);
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
-                Logs.Log.WriteError("VertexAIBatchDownload BatchDownload", e);
+                Log.WriteError("VertexAIBatchDownload GetFiles", exception);
             }
+            return null;
         }
 
-        private static void DownloadFile(BatchPredictionJob batchPredictionJob)
+        public static string? DownloadFile(string file)
         {
-            string outputFilePath = Config.BATCH_DIRECTORY + batchPredictionJob.OutputConfig.GcsDestination.OutputUriPrefix.Split('/')[^1];
-            string objectName = batchPredictionJob.OutputInfo.GcsOutputDirectory.
-                Replace("gs://" + PrivateConfig.GOOGLE_CLOUD_BUCKET_NAME + "/", "") + "/predictions.jsonl";
-
+            string outputFilePath = Config.BATCH_DIRECTORY + file.Split("/")[1];
             File.Delete(outputFilePath);
-            if (!CloudStorage.DownloadFile(objectName, outputFilePath))
+            if (CloudStorage.DownloadFile(file, outputFilePath))
             {
-                return;
+                return outputFilePath;
             }
+            return null;
+        }
 
-            // read download file.
-            //Batches.UpdateToDownloaded(batchId);
+        public static (Page page, string? text)? ReadLine(string line)
+        {
+            VertexAIBatchResponse? vertexAIBatchResponse = null;
+            try
+            {
+                vertexAIBatchResponse = JsonSerializer.Deserialize<VertexAIBatchResponse>(line, JsonSerializerOptions);
+            }
+            catch (Exception exception)
+            {
+                Log.WriteError("VertexAIBatchDownload ReadLine", exception);
+            }
+            if (vertexAIBatchResponse is null)
+            {
+                Log.WriteError("VertextAIBatchDownload ReadLine", "vertexAIBatchResponse is null. Line: " + line);
+                return null;
+            }
+            Page? page = GetPage(vertexAIBatchResponse);
+            if (page == null)
+            {
+                Log.WriteError("VertextAIBatchDownload ReadLine", "page is null. Line: " + line);
+                return null;
+            }
+            string? text = GetText(vertexAIBatchResponse);
+            if (string.IsNullOrEmpty(text))
+            {
+                Log.WriteError("VertextAIBatchDownload ReadLine", "text is null. Line: " + line);
+            }
+            return (page, text);
+        }
+
+        private static string? GetText(VertexAIBatchResponse vertexAIBatchResponse)
+        {
+            if (vertexAIBatchResponse.Response.Candidates != null)
+            {
+                var content = vertexAIBatchResponse.Response.Candidates[0].Content;
+                if (content != null && content.Parts != null)
+                {
+                    return content.Parts[0].Text;
+                }
+            }
+            return null;
+        }
+
+        private static Page? GetPage(VertexAIBatchResponse vertexAIBatchResponse)
+        {
+            if (vertexAIBatchResponse.Request != null)
+            {
+                var labels = vertexAIBatchResponse.Request.labels;
+                if (labels.TryGetValue("custom_id", out string? label))
+                {
+                    return Pages.GetPage(label);
+                }
+            }
+            return null;
         }
     }
 }

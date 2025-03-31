@@ -1,5 +1,6 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Database;
+using landerist_library.Parse.ListingParser.VertexAI.Batch;
 
 namespace landerist_library.Parse.ListingParser.OpenAI.Batch
 {
@@ -8,6 +9,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
         public static void Start()
         {
             DeleteBatches();
+            VertexAIBatchCleaner.Clean();
             DeleteLocalFiles();
         }
 
@@ -19,13 +21,21 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
 
         private static void Delete(Database.Batch batch)
         {
+            bool sucess = false;
             switch (Config.LLM_PROVIDER)
             {
                 case LLMProvider.OpenAI:
-                    OpenAIBatchCleaner.Delete(batch.Id);
+                    sucess = OpenAIBatchCleaner.Delete(batch.Id);
+                    break;
+                case LLMProvider.VertexAI:
+                    sucess = true;
                     break;
                 default:
                     break;
+            }
+            if (sucess)
+            {
+                Batches.Delete(batch.Id);
             }
         }
 
