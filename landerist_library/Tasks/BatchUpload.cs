@@ -81,15 +81,11 @@ namespace landerist_library.Tasks
                 return false;
             }
 
+            Batches.Insert(batchId);
             SetWaitingAIResponse();
-            if (!Batches.Insert(batchId))
-            {
-                Log.WriteError("BatchUpload StartUpload", "Error inserting batch. BatchId: " + batchId);
-            }
-            Log.WriteInfo("batch", $"Uploaded {pages.Count}");
+            Log.WriteInfo("batch", $"Uploaded {UriHashes.Count}");
             return true;
         }
-
 
         private static string? CreateFile()
         {
