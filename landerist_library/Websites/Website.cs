@@ -2,7 +2,6 @@
 using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Database;
-using landerist_library.Downloaders.HttpClient;
 using landerist_library.Index;
 using landerist_library.Parse.PageTypeParser;
 using System.Data;
@@ -406,69 +405,69 @@ namespace landerist_library.Websites
             return null;
         }
 
-        public bool UpdateListingExample(string url)
-        {
-            if (Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
-            {
-                return UpdateListingExample(uri);
-            }
-            return false;
-        }
+        //public bool UpdateListingExample(string url)
+        //{
+        //    if (Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
+        //    {
+        //        return UpdateListingExample(uri);
+        //    }
+        //    return false;
+        //}
 
-        public bool UpdateListingExample(Uri listingExampleUri)
-        {
-            if (!listingExampleUri.Host.Equals(Host) ||
-                listingExampleUri.Equals(MainUri))
-            {
-                return false;
-            }
-            ListingExampleUri = listingExampleUri;
-            ListingExampleNodeSet = null;
-            ListingExampleNodeSetUpdated = null;
-            return UpdateListingExampleNodeSet();
-        }
+        //public bool UpdateListingExample(Uri listingExampleUri)
+        //{
+        //    if (!listingExampleUri.Host.Equals(Host) ||
+        //        listingExampleUri.Equals(MainUri))
+        //    {
+        //        return false;
+        //    }
+        //    ListingExampleUri = listingExampleUri;
+        //    ListingExampleNodeSet = null;
+        //    ListingExampleNodeSetUpdated = null;
+        //    return UpdateListingExampleNodeSet();
+        //}
 
-        public void SetListingExampleUri(Uri uri)
-        {
-            ListingExampleUri = uri;
-            SetListingExampleNodeSet();
-        }
+        //public void SetListingExampleUri(Uri uri)
+        //{
+        //    ListingExampleUri = uri;
+        //    SetListingExampleNodeSet();
+        //}
 
-        public bool UpdateListingExampleNodeSet()
-        {
-            if (SetListingExampleNodeSet())
-            {
-                return Update();
-            }
-            return false;
-        }
+        //public bool UpdateListingExampleNodeSet()
+        //{
+        //    if (SetListingExampleNodeSet())
+        //    {
+        //        return Update();
+        //    }
+        //    return false;
+        //}
 
-        private bool SetListingExampleNodeSet()
-        {
-            if (ListingExampleUri == null)
-            {
-                return false;
-            }
+        //private bool SetListingExampleNodeSet()
+        //{
+        //    if (ListingExampleUri == null)
+        //    {
+        //        return false;
+        //    }
 
-            HttpClientDownloader httpClientDownloader = new();
-            try
-            {
-                httpClientDownloader.GetAsync(LanguageCode, ListingExampleUri);
-                if (httpClientDownloader.Content != null)
-                {
-                    var htmlDocument = new HtmlDocument();
-                    htmlDocument.LoadHtml(httpClientDownloader.Content);
-                    ListingExampleNodeSet = ListingSimilarity.GetNodeSetSerialized(htmlDocument);
-                    ListingExampleNodeSetUpdated = DateTime.Now;
-                    return true;
-                }
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception.Message);
-            }
-            return false;
-        }
+        //    HttpClientDownloader httpClientDownloader = new();
+        //    try
+        //    {
+        //        httpClientDownloader.GetAsync(LanguageCode, ListingExampleUri);
+        //        if (httpClientDownloader.Content != null)
+        //        {
+        //            var htmlDocument = new HtmlDocument();
+        //            htmlDocument.LoadHtml(httpClientDownloader.Content);
+        //            ListingExampleNodeSet = ListingSimilarity.GetNodeSetSerialized(htmlDocument);
+        //            ListingExampleNodeSetUpdated = DateTime.Now;
+        //            return true;
+        //        }
+        //    }
+        //    catch (Exception exception)
+        //    {
+        //        Console.WriteLine(exception.Message);
+        //    }
+        //    return false;
+        //}
 
         public bool RemoveListingExample()
         {

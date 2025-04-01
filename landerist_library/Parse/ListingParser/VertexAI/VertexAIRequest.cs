@@ -12,15 +12,8 @@ namespace landerist_library.Parse.ListingParser.VertexAI
     {
 
         public const int MAX_CONTEXT_WINDOW = 128000;
-
-        private const string GEMINI_FLASH = "gemini-2.0-flash-001";
-
-        private const string GEMINI_PRO = "gemini-2.0-pro-exp-02-05";
-
-        public static readonly string ModelName = GEMINI_FLASH; //GEMINI_PRO;                            
-
-        //private static readonly HarmBlockThreshold HarmBlockThreshold = HarmBlockThreshold.BlockOnlyHigh;
-
+        
+        public static readonly string ModelName = "gemini-2.0-flash-lite-001";
 
         public static bool TooManyTokens(Page page)
         {
@@ -81,32 +74,32 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                     new SafetySetting
                     {
                         Category = HarmCategory.HateSpeech,
-                        Threshold = HarmBlockThreshold.BlockOnlyHigh
+                        Threshold = HarmBlockThreshold.Off
                     },
                     new SafetySetting
                     {
                         Category = HarmCategory.DangerousContent,
-                        Threshold = HarmBlockThreshold.BlockOnlyHigh
+                        Threshold = HarmBlockThreshold.Off
                     },
                     new SafetySetting
                     {
                         Category = HarmCategory.Harassment,
-                        Threshold = HarmBlockThreshold.BlockOnlyHigh
+                        Threshold = HarmBlockThreshold.Off
                     },
                     new SafetySetting
                     {
                         Category = HarmCategory.SexuallyExplicit,
-                        Threshold = HarmBlockThreshold.BlockOnlyHigh
+                        Threshold = HarmBlockThreshold.Off
                     },
                     new SafetySetting
                     {
                         Category = HarmCategory.CivicIntegrity,
-                        Threshold = HarmBlockThreshold.BlockOnlyHigh
+                        Threshold = HarmBlockThreshold.Off
                     },
                     new SafetySetting
                     {
                         Category = HarmCategory.Unspecified,
-                        Threshold = HarmBlockThreshold.BlockOnlyHigh
+                        Threshold = HarmBlockThreshold.Off
                     },
                 },
                 SystemInstruction = new Content

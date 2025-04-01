@@ -48,7 +48,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
             return null;
         }
 
-        public static (Page page, string? text)? ReadLine(string line)
+        public static (Page page, string? text)? ReadLine(string id, string line)
         {
             VertexAIBatchResponse? vertexAIBatchResponse = null;
             try
@@ -67,57 +67,47 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
             Page? page = GetPage(vertexAIBatchResponse);
             if (page == null)
             {
-                Log.WriteError("VertextAIBatchDownload ReadLine", "page is null");
+                Log.WriteError("VertextAIBatchDownload ReadLine", "page is null  Id: " + id);
                 return null;
             }
-            if (!IsValidResponse(vertexAIBatchResponse))
+            var candidate = GetCandidate(vertexAIBatchResponse);
+            if (candidate == null || !IsValidResponse(candidate))
             {
-                var finishReason = GetFinishReason(vertexAIBatchResponse);
-                Log.WriteError("VertextAIBatchDownload ReadLine", "response is not valid finishReason: " + finishReason ?? "");
+                var finishReason = candidate != null ? candidate.FinishReason : "";
+                Log.WriteError("VertextAIBatchDownload ReadLine", "response is not valid finishReason: " + finishReason + " Id: " + id);
                 return (page, null);
             }
-            string? text = GetText(vertexAIBatchResponse);
+            string? text = GetText(candidate);
             if (string.IsNullOrEmpty(text))
             {
-                Log.WriteError("VertextAIBatchDownload ReadLine", "text is null");
+                Log.WriteError("VertextAIBatchDownload ReadLine", "text is null  finishReason: " + candidate.FinishReason + "  Id: " + id);
             }
             return (page, text);
         }
 
-        private static bool IsValidResponse(VertexAIBatchResponse vertexAIBatchResponse)
-        {
-            var finishReason = GetFinishReason(vertexAIBatchResponse);
-            if (finishReason != null)
-            {
-                return finishReason.Equals("STOP");
-            }
-            return false;
-        }
-
-        private static string? GetFinishReason(VertexAIBatchResponse vertexAIBatchResponse)
+        private static VertexAIBatchResponseCandidate? GetCandidate(VertexAIBatchResponse vertexAIBatchResponse)
         {
             if (vertexAIBatchResponse.Response.Candidates != null)
             {
-                return vertexAIBatchResponse.Response.Candidates[0].FinishReason;
+                return vertexAIBatchResponse.Response.Candidates[0];
             }
             return null;
         }
-
-        private static string? GetText(VertexAIBatchResponse vertexAIBatchResponse)
+        private static bool IsValidResponse(VertexAIBatchResponseCandidate candidate)
         {
-            if (vertexAIBatchResponse.Response.Candidates != null)
+            if (candidate is null)
             {
-                var content = vertexAIBatchResponse.Response.Candidates[0].Content;
-                if (content != null && content.Parts != null)
-                {
-                    return content.Parts[0].Text;
-                }
-                else
-                {
-                    string finishReason = vertexAIBatchResponse.Response.Candidates[0].FinishReason;
-                    Log.WriteError("VertexAIBatchDownload GetText", "FinishReason: " + finishReason);
-                }
+                return false;
             }
+            return candidate.FinishReason.Equals("STOP");
+        }
+
+        private static string? GetText(VertexAIBatchResponseCandidate candidate)
+        {
+            if (candidate.Content != null && candidate.Content.Parts != null && candidate.Content.Parts.Count > 0)
+            {
+                return candidate.Content.Parts[0].Text;
+            }            
             return null;
         }
 

@@ -155,10 +155,10 @@ namespace landerist_library.Insert
                     MainUri = mainUri,
                     Host = mainUri.Host,
                 };
-                if (listinExampleUri != null)
-                {
-                    website.SetListingExampleUri(listinExampleUri);
-                }
+                //if (listinExampleUri != null)
+                //{
+                //    website.SetListingExampleUri(listinExampleUri);
+                //}
                 return InsertWebsite(website);
             }
             catch (Exception exception)
@@ -169,16 +169,16 @@ namespace landerist_library.Insert
             return false;
         }
 
-        public static bool InsertFromListingExampleUri(Uri listingExampleUri)
-        {
-            string uri = listingExampleUri.GetLeftPart(UriPartial.Authority);
-            if (Insert(uri))
-            {
-                Website website = new(listingExampleUri.Host);
-                return website.UpdateListingExample(listingExampleUri);
-            }
-            return false;
-        }
+        //public static bool InsertFromListingExampleUri(Uri listingExampleUri)
+        //{
+        //    string uri = listingExampleUri.GetLeftPart(UriPartial.Authority);
+        //    if (Insert(uri))
+        //    {
+        //        Website website = new(listingExampleUri.Host);
+        //        return website.UpdateListingExample(listingExampleUri);
+        //    }
+        //    return false;
+        //}
 
         public static bool CanInsert(Uri uri)
         {

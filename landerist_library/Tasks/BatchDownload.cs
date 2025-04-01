@@ -19,12 +19,12 @@ namespace landerist_library.Tasks
         }
 
 
-        public static void Test()
+        public static void DownloadVertexAI(string id)
         {
             Batch batch = new()
             {
                 LLMProvider = LLMProvider.VertexAI,
-                Id = "projects/942392546193/locations/europe-southwest1/batchPredictionJobs/3858938367819382784",
+                Id = id,
                 Created = DateTime.Now,
                 Downloaded = false,
             };
@@ -42,7 +42,7 @@ namespace landerist_library.Tasks
             {
                 return;
             }
-            if (!ReadFiles(batch.LLMProvider, filesPaths))
+            if (!ReadFiles(batch, filesPaths))
             {
                 return;
             }
@@ -88,11 +88,11 @@ namespace landerist_library.Tasks
             }
         }
 
-        private static bool ReadFiles(LLMProvider lLMProvider, List<string> filesPaths)
+        private static bool ReadFiles(Batch batch, List<string> filesPaths)
         {
             foreach (var filePath in filesPaths)
             {
-                if (!ReadFile(lLMProvider, filePath))
+                if (!ReadFile(batch, filePath))
                 {
                     return false;
                 }
@@ -101,19 +101,12 @@ namespace landerist_library.Tasks
             return true;
         }
 
-        public static void ReadFileTest()
-        {
-            string filePath = "E:\\Landerist\\Batch\\batch_vertexai_20250327165258_output.json";
-            var lines = File.ReadAllLines(filePath);
-            ReadLines(LLMProvider.VertexAI, lines);
-        }
-
-        private static bool ReadFile(LLMProvider lLMProvider, string filePath)
+        private static bool ReadFile(Batch batch, string filePath)
         {
             try
             {
                 var lines = File.ReadAllLines(filePath);
-                ReadLines(lLMProvider, lines);
+                ReadLines(batch, lines);
                 return true;
             }
             catch (Exception exception)
@@ -123,7 +116,7 @@ namespace landerist_library.Tasks
             }
         }
 
-        private static void ReadLines(LLMProvider lLMProvider, string[] lines)
+        private static void ReadLines(Batch batch, string[] lines)
         {
             int total = lines.Length;
             int readed = 0;
@@ -133,7 +126,7 @@ namespace landerist_library.Tasks
             {
                 try
                 {
-                    if (ReadLine(lLMProvider, line))
+                    if (ReadLine(batch, line))
                     {
                         Interlocked.Increment(ref readed);
                     }
@@ -152,13 +145,13 @@ namespace landerist_library.Tasks
             Log.WriteInfo("batch", $"Readed {readed} Errors: {errors} ({pertentage}%)");
         }
 
-        private static bool ReadLine(LLMProvider lLMProvider, string line)
+        private static bool ReadLine(Batch batch, string line)
         {
             (Page page, string? text)? result;
-            switch (lLMProvider)
+            switch (batch.LLMProvider)
             {
                 case LLMProvider.OpenAI: result = OpenAIBatchDownload.ReadLine(line); break;
-                case LLMProvider.VertexAI: result = VertexAIBatchDownload.ReadLine(line); break;
+                case LLMProvider.VertexAI: result = VertexAIBatchDownload.ReadLine(batch.Id, line); break;
                 default: return false;
             }
             if (result == null)

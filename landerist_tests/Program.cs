@@ -286,7 +286,7 @@ namespace landerist_tests
             //BatchDownload.Start();
             //BatchPredictions.ListAllPredictionJobs();
             //BatchDownload.ReadFileTest();
-            //BatchDownload.Test();
+            //BatchDownload.DownloadVertexAI("projects/942392546193/locations/europe-southwest1/batchPredictionJobs/391166654744100864");
             //VertexAIBatchCleaner.Clean();
             //OpenAIBatchCleaner.RemoveFiles();            
 
