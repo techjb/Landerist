@@ -3,7 +3,7 @@ using landerist_library.Websites;
 
 namespace landerist_library.Parse.ListingParser
 {
-    public class ParseListingRequest
+    public class ParseListingSystem
     {
         protected static readonly string SystemPrompt =
             "Tu tarea consiste en analizar la url y el código html proporcionado por el usuario, identificando si corresponde a una página web de un único anuncio inmobiliario. " +

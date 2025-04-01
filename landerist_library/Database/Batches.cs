@@ -1,4 +1,5 @@
-﻿using landerist_library.Configuration;
+﻿using Amazon.Comprehend.Model.Internal.MarshallTransformations;
+using landerist_library.Configuration;
 using landerist_library.Parse.ListingParser;
 using System.Data;
 
@@ -54,6 +55,20 @@ namespace landerist_library.Database
                 {"Downloaded", downloaded }
             });
             return Parse(dataTable);
+        }
+
+        public static Batch? Select(string id)
+        {
+            string query =
+                "SELECT TOP 1 * " +
+                "FROM " + BATCHES + " " +
+                "WHERE [Id] = @Id";
+            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>()
+            {
+                {"Id", id }
+            });
+            List<Batch> batches = Parse(dataTable);
+            return batches.Count > 0 ? batches[0] : null;
         }
 
         private static List<Batch> Parse(DataTable dataTable)

@@ -28,6 +28,10 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
     {
         [JsonPropertyName("content")]
         public VertexAIBatchResponseContent Content { get; set; }
+
+
+        [JsonPropertyName("finishReason")]
+        public string FinishReason { get; set; }
     }
 
     public class VertexAIBatchResponseContent

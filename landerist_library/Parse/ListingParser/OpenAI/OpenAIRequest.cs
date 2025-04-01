@@ -10,7 +10,7 @@ using OpenAI.Chat;
 
 namespace landerist_library.Parse.ListingParser.OpenAI
 {
-    public class OpenAIRequest : ParseListingRequest
+    public class OpenAIRequest : ParseListingSystem
     {
         //public static readonly string SystemMessage =
         //   "Un anuncio completo de oferta inmobiliaria debe contener la siguiente información:\r\n\r\n" +

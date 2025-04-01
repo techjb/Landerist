@@ -8,7 +8,7 @@ using static Google.Cloud.AIPlatform.V1.SafetySetting.Types;
 
 namespace landerist_library.Parse.ListingParser.VertexAI
 {
-    public class VertexAIRequest : ParseListingRequest
+    public class VertexAIRequest : ParseListingSystem
     {
 
         public const int MAX_CONTEXT_WINDOW = 128000;
@@ -19,7 +19,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI
 
         public static readonly string ModelName = GEMINI_FLASH; //GEMINI_PRO;                            
 
-        private static readonly HarmBlockThreshold HarmBlockThreshold = HarmBlockThreshold.BlockOnlyHigh;
+        //private static readonly HarmBlockThreshold HarmBlockThreshold = HarmBlockThreshold.BlockOnlyHigh;
 
 
         public static bool TooManyTokens(Page page)
@@ -81,32 +81,32 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                     new SafetySetting
                     {
                         Category = HarmCategory.HateSpeech,
-                        Threshold = HarmBlockThreshold
+                        Threshold = HarmBlockThreshold.BlockOnlyHigh
                     },
                     new SafetySetting
                     {
                         Category = HarmCategory.DangerousContent,
-                        Threshold = HarmBlockThreshold
+                        Threshold = HarmBlockThreshold.BlockOnlyHigh
                     },
                     new SafetySetting
                     {
                         Category = HarmCategory.Harassment,
-                        Threshold = HarmBlockThreshold
+                        Threshold = HarmBlockThreshold.BlockOnlyHigh
                     },
                     new SafetySetting
                     {
                         Category = HarmCategory.SexuallyExplicit,
-                        Threshold = HarmBlockThreshold
+                        Threshold = HarmBlockThreshold.BlockOnlyHigh
                     },
                     new SafetySetting
                     {
                         Category = HarmCategory.CivicIntegrity,
-                        Threshold = HarmBlockThreshold
+                        Threshold = HarmBlockThreshold.BlockOnlyHigh
                     },
                     new SafetySetting
                     {
                         Category = HarmCategory.Unspecified,
-                        Threshold = HarmBlockThreshold
+                        Threshold = HarmBlockThreshold.BlockOnlyHigh
                     },
                 },
                 SystemInstruction = new Content

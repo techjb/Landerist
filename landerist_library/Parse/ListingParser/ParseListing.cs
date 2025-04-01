@@ -11,14 +11,17 @@ namespace landerist_library.Parse.ListingParser
     public enum LLMProvider
     {
         OpenAI,
-        Gemini,
+        //Gemini,
         VertexAI,
-        Anthropic
+        //Anthropic
     }
 
     public class ParseListing
     {
-
+        private static readonly JsonSerializerSettings JsonSerializerSettings = new()
+        {
+            MissingMemberHandling = MissingMemberHandling.Ignore,
+        };
         public static bool TooManyTokens(Page page)
         {
             switch (Config.LLM_PROVIDER)
@@ -82,18 +85,13 @@ namespace landerist_library.Parse.ListingParser
 
         public static (PageType pageType, Listing? listing) ParseResponse(Page page, string? text)
         {
-            if (text is null)
+            if (string.IsNullOrEmpty(text))
             {
                 return (PageType.MayBeListing, null);
             }
             try
-            {
-                var settings = new JsonSerializerSettings
-                {
-                    MissingMemberHandling = MissingMemberHandling.Ignore,
-                };
-
-                var structuredOutput = JsonConvert.DeserializeObject<StructuredOutputEs>(text, settings);
+            {                
+                var structuredOutput = JsonConvert.DeserializeObject<StructuredOutputEs>(text, JsonSerializerSettings);
                 if (structuredOutput != null)
                 {
                     return new StructuredOutputEsParser(structuredOutput).Parse(page);

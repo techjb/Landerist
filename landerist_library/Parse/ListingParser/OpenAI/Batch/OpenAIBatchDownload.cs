@@ -1,7 +1,5 @@
 ﻿using landerist_library.Logs;
-using landerist_library.Scrape;
 using landerist_library.Websites;
-using OpenCvSharp;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -70,23 +68,6 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
             } 
 
             return (page, text);
-
-            //page.RemoveWaitingAIParsing();
-            //page.SetResponseBodyFromZipped();
-            //page.RemoveResponseBodyZipped();
-
-            //var sucess = false;
-            //try
-            //{
-            //    var (pageType, listing) = ParseListing.ParseResponse(page, batchResponseLine.Response.Body.FirstChoice);
-            //    sucess = new PageScraper(page).SetPageType(pageType, listing);
-            //}
-            //catch (Exception exception)
-            //{
-            //    Log.WriteError("OpenAIBatchDownload ReadLine ParseListing", exception);
-            //}
-            //page.Dispose();
-            //return sucess;
         }
     }
 }

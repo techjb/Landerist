@@ -6,7 +6,7 @@ using landerist_library.Websites;
 
 namespace landerist_library.Parse.ListingParser.Gemini
 {
-    public class GeminiRequest : ParseListingRequest
+    public class GeminiRequest : ParseListingSystem
     {
         private static readonly string Prompt =
             "Dime si la siguiente imagen corresponde a un único anuncio inmobiliario o no";

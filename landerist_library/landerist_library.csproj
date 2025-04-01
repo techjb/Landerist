@@ -26,13 +26,13 @@
   <ItemGroup>
     <PackageReference Include="AI.Dev.OpenAI.GPT" Version="1.0.2" />
     <PackageReference Include="Anthropic.SDK" Version="5.1.0" />
-    <PackageReference Include="AWSSDK.CloudFront" Version="3.7.404.58" />
-    <PackageReference Include="AWSSDK.Comprehend" Version="3.7.400.123" />
-    <PackageReference Include="AWSSDK.S3" Version="3.7.415.28" />
+    <PackageReference Include="AWSSDK.CloudFront" Version="3.7.404.59" />
+    <PackageReference Include="AWSSDK.Comprehend" Version="3.7.400.124" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.416" />
     <PackageReference Include="Com.Bekijkhet.RobotsTxt" Version="1.0.0" />
     <PackageReference Include="CsvHelper" Version="33.0.1" />
     <PackageReference Include="Google.Apis.CustomSearchAPI.v1" Version="1.68.0.3520" />
-    <PackageReference Include="Google.Cloud.AIPlatform.V1" Version="3.24.0" />
+    <PackageReference Include="Google.Cloud.AIPlatform.V1" Version="3.25.0" />
     <PackageReference Include="Google.Cloud.Language.V1" Version="3.7.0" />
     <PackageReference Include="Google.Cloud.Storage.V1" Version="4.11.0" />
     <PackageReference Include="Google_GenerativeAI" Version="1.0.2" />

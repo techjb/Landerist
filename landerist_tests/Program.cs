@@ -2,6 +2,9 @@
 using landerist_library.Configuration;
 using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Logs;
+using landerist_library.Parse.ListingParser.OpenAI.Batch;
+using landerist_library.Parse.ListingParser.StructuredOutputs;
+using landerist_library.Parse.ListingParser.VertexAI;
 using landerist_library.Parse.ListingParser.VertexAI.Batch;
 using landerist_library.Scrape;
 using landerist_library.Tasks;
@@ -283,7 +286,9 @@ namespace landerist_tests
             //BatchDownload.Start();
             //BatchPredictions.ListAllPredictionJobs();
             //BatchDownload.ReadFileTest();
+            //BatchDownload.Test();
             //VertexAIBatchCleaner.Clean();
+            //OpenAIBatchCleaner.RemoveFiles();            
 
             #endregion
 

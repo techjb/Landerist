@@ -6,7 +6,7 @@ using landerist_library.Websites;
 
 namespace landerist_library.Parse.ListingParser.Anthropic
 {
-    public class AnthropicRequest : ParseListingRequest
+    public class AnthropicRequest : ParseListingSystem
     {
         public const string ANTHROPIC_MODEL = AnthropicModels.Claude3Haiku;
 

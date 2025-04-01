@@ -61,21 +61,46 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
             }
             if (vertexAIBatchResponse is null)
             {
-                Log.WriteError("VertextAIBatchDownload ReadLine", "vertexAIBatchResponse is null. Line: " + line);
+                Log.WriteError("VertextAIBatchDownload ReadLine", "vertexAIBatchResponse is null");
                 return null;
             }
             Page? page = GetPage(vertexAIBatchResponse);
             if (page == null)
             {
-                Log.WriteError("VertextAIBatchDownload ReadLine", "page is null. Line: " + line);
+                Log.WriteError("VertextAIBatchDownload ReadLine", "page is null");
                 return null;
+            }
+            if (!IsValidResponse(vertexAIBatchResponse))
+            {
+                var finishReason = GetFinishReason(vertexAIBatchResponse);
+                Log.WriteError("VertextAIBatchDownload ReadLine", "response is not valid finishReason: " + finishReason ?? "");
+                return (page, null);
             }
             string? text = GetText(vertexAIBatchResponse);
             if (string.IsNullOrEmpty(text))
             {
-                Log.WriteError("VertextAIBatchDownload ReadLine", "text is null. Line: " + line);
+                Log.WriteError("VertextAIBatchDownload ReadLine", "text is null");
             }
             return (page, text);
+        }
+
+        private static bool IsValidResponse(VertexAIBatchResponse vertexAIBatchResponse)
+        {
+            var finishReason = GetFinishReason(vertexAIBatchResponse);
+            if (finishReason != null)
+            {
+                return finishReason.Equals("STOP");
+            }
+            return false;
+        }
+
+        private static string? GetFinishReason(VertexAIBatchResponse vertexAIBatchResponse)
+        {
+            if (vertexAIBatchResponse.Response.Candidates != null)
+            {
+                return vertexAIBatchResponse.Response.Candidates[0].FinishReason;
+            }
+            return null;
         }
 
         private static string? GetText(VertexAIBatchResponse vertexAIBatchResponse)
@@ -86,6 +111,11 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                 if (content != null && content.Parts != null)
                 {
                     return content.Parts[0].Text;
+                }
+                else
+                {
+                    string finishReason = vertexAIBatchResponse.Response.Candidates[0].FinishReason;
+                    Log.WriteError("VertexAIBatchDownload GetText", "FinishReason: " + finishReason);
                 }
             }
             return null;

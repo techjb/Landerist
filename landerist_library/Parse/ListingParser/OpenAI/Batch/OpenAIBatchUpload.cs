@@ -26,7 +26,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
                         new BatchMessage
                         {
                             role = "system",
-                            content = ParseListingRequest.GetSystemPrompt()
+                            content = ParseListingSystem.GetSystemPrompt()
                         },
                         new BatchMessage {
                             role = "user",

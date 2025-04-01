@@ -1,6 +1,8 @@
 ﻿using landerist_library.Parse.ListingParser.StructuredOutputs;
 using landerist_library.Websites;
 using System.Text.Json;
+using Google.Cloud.AIPlatform.V1;
+using static Google.Cloud.AIPlatform.V1.SafetySetting.Types;
 
 namespace landerist_library.Parse.ListingParser.VertexAI.Batch
 {
@@ -36,7 +38,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                         [
                             new Part
                             {
-                                text = ParseListingRequest.GetSystemPrompt()
+                                text = ParseListingSystem.GetSystemPrompt()
                             }
                         ]
                     },
@@ -46,6 +48,39 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                         response_mime_type = "application/json",
                         response_schema = OpenApiSchemaSerializer.Serialize(VertexAIResponseSchema.ResponseSchema)
                     },
+                    safety_settings =
+                    [
+                        new SafetySetting
+                        {
+                            category = (int)HarmCategory.HateSpeech,
+                            threshold = (int)HarmBlockThreshold.BlockOnlyHigh
+                        },
+                        new SafetySetting
+                        {
+                            category = (int)HarmCategory.DangerousContent,
+                            threshold = (int)HarmBlockThreshold.BlockOnlyHigh
+                        },
+                        new SafetySetting
+                        {
+                            category = (int)HarmCategory.Harassment,
+                            threshold = (int)HarmBlockThreshold.BlockOnlyHigh
+                        },
+                        new SafetySetting
+                        {
+                            category = (int)HarmCategory.SexuallyExplicit,
+                            threshold = (int)HarmBlockThreshold.BlockOnlyHigh
+                        },
+                        new SafetySetting
+                        {
+                            category = (int)HarmCategory.CivicIntegrity,
+                            threshold = (int)HarmBlockThreshold.BlockOnlyHigh
+                        },
+                        new SafetySetting
+                        {
+                            category = (int)HarmCategory.Unspecified,
+                            threshold = (int)HarmBlockThreshold.BlockOnlyHigh
+                        },
+                    ],
                     labels = new Dictionary<string, string>()
                     {
                         {"custom_id", page.UriHash}

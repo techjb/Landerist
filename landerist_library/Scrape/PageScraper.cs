@@ -89,15 +89,15 @@ namespace landerist_library.Scrape
                 Page.SetWaitingAIParsingRequest();
                 return Page.Update(false);
             }
-            return SetPageType(newPageType, newListing);
+            SetPageType(newPageType, newListing);
+            return Page.Update(true);
         }
 
-        public bool SetPageType(PageType? newPageType, Listing? newListing)
+        public void SetPageType(PageType? newPageType, Listing? newListing)
         {
             NewListing = newListing;
             Page.SetPageType(newPageType);
             UpdateListing();
-            return Page.Update(true);
         }
 
 

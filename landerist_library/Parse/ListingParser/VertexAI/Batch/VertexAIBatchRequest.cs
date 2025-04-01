@@ -13,9 +13,12 @@
     public class Request
     {
         public List<Content> contents { get; set; }
+
         public SystemInstruction system_instruction { get; set; }
 
         public GenerationConfig generation_config { get; set; }
+
+        public List<SafetySetting> safety_settings { get; set; }
 
         public Dictionary<string, string> labels { get; set; }
     }
@@ -28,6 +31,12 @@
     public class Part
     {
         public string text { get; set; }
+    }
+
+    public class SafetySetting
+    {
+        public int category { get; set; }
+        public int threshold { get; set; }
     }
 
 

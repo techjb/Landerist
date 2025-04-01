@@ -247,12 +247,12 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                             Description = StructuredOutputEsJson.UrlsDeImagenesDelAnuncio,
                         }
                     },
-                    Required = {
-                        nameof(StructuredOutputEsJson.fecha_de_publicacion),
-                        nameof(StructuredOutputEsJson.tipo_de_operacion),
-                        nameof(StructuredOutputEsJson.tipo_de_inmueble),
-                        nameof(StructuredOutputEsJson.precio_del_anuncio)
-                    }
+                    //Required = {
+                    //    nameof(StructuredOutputEsJson.fecha_de_publicacion),
+                    //    nameof(StructuredOutputEsJson.tipo_de_operacion),
+                    //    nameof(StructuredOutputEsJson.tipo_de_inmueble),
+                    //    nameof(StructuredOutputEsJson.precio_del_anuncio)
+                    //}
                 }
             },
             Required = { StructuredOutputEsJson.FunctionNameIsListing }

@@ -2,10 +2,9 @@
 {
     public class VertexAIBatchCleaner
     {
-        private static readonly int DaysToCleanFiles = Configuration.Config.IsConfigurationLocal() ? 1 : -7;
-        public static void Clean()
+        public static void RemoveFiles()
         {
-            DateTime dateTime = DateTime.Now.AddDays(DaysToCleanFiles);
+            DateTime dateTime = DateTime.Now.AddDays(Configuration.Config.DAYS_TO_REMOVE_BATCH_FILES);
             try
             {
                 BatchPredictions.Clean(dateTime);

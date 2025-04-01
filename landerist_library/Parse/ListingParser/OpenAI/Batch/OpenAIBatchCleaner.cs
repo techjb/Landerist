@@ -1,7 +1,4 @@
-﻿using landerist_library.Database;
-using OpenCvSharp.XImgProc;
-
-namespace landerist_library.Parse.ListingParser.OpenAI.Batch
+﻿namespace landerist_library.Parse.ListingParser.OpenAI.Batch
 {
     public class OpenAIBatchCleaner : OpenAIBatchClient
     {
@@ -19,22 +16,20 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
             return false;
         }
 
-        public static void DeleteAllRemoteFiles()
+        public static void RemoveFiles()
         {
-            var batches = Batches.SelectAll(LLMProvider.OpenAI);
-            if (batches.Count > 0)
-            {
-                return;
-            }
-
             var files = ListFiles();
-            if (files is null)
+            if (files is null || files.Count.Equals(0))
             {
                 return;
             }
-            Parallel.ForEach(files, filesId =>
+            DateTime dateTime = DateTime.Now.AddDays(Configuration.Config.DAYS_TO_REMOVE_BATCH_FILES);
+            Parallel.ForEach(files, Configuration.Config.PARALLELOPTIONS1INLOCAL, file =>
             {
-                DeleteFile(filesId);
+                if (file.CreatedAt < dateTime)
+                {
+                    DeleteFile(file);
+                }
             });
         }
     }

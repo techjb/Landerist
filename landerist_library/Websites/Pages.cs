@@ -496,7 +496,7 @@ namespace landerist_library.Websites
         public static List<Page> SelectWaitingAIParsing()
         {
             string query =
-                SelectQuery(Config.MAX_PAGES_PER_BATCH) +
+                SelectQuery(Config.MAX_PAGES_PER_BATCH_OPEN_AI) +
                 "WHERE [WaitingAIParsing] = 1";
 
             DataTable dataTable = new DataBase().QueryTable(query);

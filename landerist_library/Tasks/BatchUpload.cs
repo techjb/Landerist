@@ -12,18 +12,44 @@ namespace landerist_library.Tasks
     {
         private static readonly object SyncWrite = new();
 
-        const long MAX_FILE_SIZE_IN_BYTES = Config.MAX_BATCH_FILE_SIZE_MB * 1024 * 1024;
+        private static readonly long MaxFileSizeInBytes = SetMaxFileSize();
+
+        private static readonly int MaxPagesPerBatch = SetMaxPagesPerBatch();
 
         private static List<Page> pages = [];
 
         private static List<string> UriHashes = [];
+
+        private static long SetMaxFileSize()
+        {
+            switch (Config.LLM_PROVIDER)
+            {
+                case LLMProvider.OpenAI:
+                    return Config.MAX_BATCH_FILE_SIZE_OPEN_AI * 1024 * 1024;
+                case LLMProvider.VertexAI:
+                    return Config.MAX_BATCH_FILE_SIZE_VERTEX_AI * 1024 * 1024;
+            }
+            return 0;
+        }
+
+        private static int SetMaxPagesPerBatch()
+        {
+            switch (Config.LLM_PROVIDER)
+            {
+                case LLMProvider.OpenAI:
+                    return Config.MAX_PAGES_PER_BATCH_OPEN_AI;
+                case LLMProvider.VertexAI:
+                    return Config.MAX_PAGES_PER_BATCH_VERTEX_AI;
+            }
+            return 0;
+        }
 
 
         public static void Start()
         {
             Clear();
             bool sucess = StartBatchUpload();
-            if (pages.Count >= Config.MAX_PAGES_PER_BATCH && sucess)
+            if (pages.Count >= MaxPagesPerBatch && sucess)
             {
                 Start();
             }
@@ -33,6 +59,7 @@ namespace landerist_library.Tasks
         private static bool StartBatchUpload()
         {
             pages = Pages.SelectWaitingAIParsing();
+
             if (pages.Count < Config.MIN_PAGES_PER_BATCH)
             {
                 return false;
@@ -77,9 +104,7 @@ namespace landerist_library.Tasks
             var errors = 0;
             var skipped = 0;
 
-            Parallel.ForEach(pages,
-                Config.PARALLELOPTIONS1INLOCAL,
-                (page, state) =>
+            Parallel.ForEach(pages, Config.PARALLELOPTIONS1INLOCAL, (page, state) =>
             {
                 if (!CanWriteFile(filePath))
                 {
@@ -97,7 +122,7 @@ namespace landerist_library.Tasks
                         UriHashes.Add(page.UriHash);
                     }
                 }
-                page.Dispose();               
+                page.Dispose();
             });
 
             if (errors > 0)
@@ -117,7 +142,7 @@ namespace landerist_library.Tasks
                 }
 
                 FileInfo fileInfo = new(filePath);
-                return fileInfo.Length < MAX_FILE_SIZE_IN_BYTES;
+                return fileInfo.Length < MaxFileSizeInBytes;
             }
         }
 
@@ -195,7 +220,6 @@ namespace landerist_library.Tasks
             }
         }
 
-
         private static void Clear()
         {
             Parallel.ForEach(pages, page => page.Dispose());
@@ -210,9 +234,7 @@ namespace landerist_library.Tasks
             {
                 return;
             }
-            Parallel.ForEach(UriHashes,
-                //new ParallelOptions(){MaxDegreeOfParallelism = 1},
-                uriHash =>
+            Parallel.ForEach(UriHashes, Config.PARALLELOPTIONS1INLOCAL, uriHash =>
             {
                 Pages.UpdateWaitingAIParsing(uriHash, false);
             });

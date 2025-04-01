@@ -18,6 +18,18 @@ namespace landerist_library.Tasks
             Parallel.ForEach(batches, Config.PARALLELOPTIONS1INLOCAL, Download);
         }
 
+
+        public static void Test()
+        {
+            Batch batch = new()
+            {
+                LLMProvider = LLMProvider.VertexAI,
+                Id = "projects/942392546193/locations/europe-southwest1/batchPredictionJobs/3858938367819382784",
+                Created = DateTime.Now,
+                Downloaded = false,
+            };
+            Download(batch);
+        }
         private static void Download(Batch batch)
         {
             var files = GetFiles(batch);
@@ -136,7 +148,8 @@ namespace landerist_library.Tasks
                 }
             });
 
-            Log.WriteInfo("batch", $"Readed {readed} Errors: " + errors);
+            int pertentage = (errors * 100) / total;
+            Log.WriteInfo("batch", $"Readed {readed} Errors: {errors} ({pertentage}%)");
         }
 
         private static bool ReadLine(LLMProvider lLMProvider, string line)
@@ -154,27 +167,20 @@ namespace landerist_library.Tasks
             }
 
             var page = result.Value.page;
-            var text = result.Value.text;
-            if (string.IsNullOrEmpty(text))
+            var (pageType, listing) = ParseListing.ParseResponse(page, result.Value.text);
+            if (pageType.Equals(PageType.MayBeListing))
             {
                 page.SetWaitingAIParsingRequest();
-                return page.Update(false);
+                page.Update(false);
+                return false;
             }
 
             page.RemoveWaitingAIParsing();
             page.SetResponseBodyFromZipped();
             page.RemoveResponseBodyZipped();
 
-            var sucess = false;
-            try
-            {
-                var (pageType, listing) = ParseListing.ParseResponse(page, text);
-                sucess = new PageScraper(page).SetPageType(pageType, listing);
-            }
-            catch (Exception exception)
-            {
-                Log.WriteError("BatchDownload ReadLine ParseListing", exception);
-            }
+            new PageScraper(page).SetPageType(pageType, listing);
+            var sucess = page.Update(true);
             page.Dispose();
             return sucess;
         }

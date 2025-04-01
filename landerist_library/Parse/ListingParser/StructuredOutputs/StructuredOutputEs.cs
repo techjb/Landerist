@@ -4,12 +4,12 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
 {
     public class StructuredOutputEs
     {
-        [JsonProperty(StructuredOutputEsJson.FunctionNameIsListing)]
+        [JsonProperty(StructuredOutputEsJson.FunctionNameIsListing, Required = Required.Always)]
         [System.ComponentModel.Description(StructuredOutputEsJson.FunctionNameIsListingDescription)]
         public bool EsUnAnuncio { get; private set; }
 
 
-        [JsonProperty(StructuredOutputEsJson.FunctionNameListing, Required = Required.AllowNull)]
+        [JsonProperty(StructuredOutputEsJson.FunctionNameListing, Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.FunctionNameListingDescription)]
         public StructuredOutputEsListing? Anuncio { get; private set; }
     }
@@ -59,177 +59,177 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         };
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.fecha_de_publicacion), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.fecha_de_publicacion), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.FechaDePublicaciónDescription)]
         public string? FechaDePublicación { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.tipo_de_operacion), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.tipo_de_operacion), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.TipoDeOperaciónDescription)]
         public TiposDeOperacion? TipoDeOperación { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.tipo_de_inmueble), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.tipo_de_inmueble), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.TipoDeInmuebleDescription)]
         public TiposDeInmueble? TipoDeInmueble { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.subtipo_de_inmueble), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.subtipo_de_inmueble), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.SubtipoDeInmuebleDescription)]
         public SubtiposDeInmueble? SubtipoDeInmueble { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.precio_del_anuncio), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.precio_del_anuncio), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.PrecioDelAnuncioDescription)]
         public decimal? PrecioDelAnuncio { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.descripcion_del_anuncio), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.descripcion_del_anuncio), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.DescripciónDelAnuncioDescription)]
         public string? DescripciónDelAnuncio { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.referencia_del_anuncio), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.referencia_del_anuncio), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.ReferenciaDelAnuncioDescription)]
         public string? ReferenciaDelAnuncio { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.telefono_de_contacto), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.telefono_de_contacto), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.TeléfonoDeContactoDescription)]
         public string? TeléfonoDeContacto { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.email_de_contacto), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.email_de_contacto), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.EmailDeContactoDescription)]
         public string? EmailDeContacto { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.direccion_del_inmueble), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.direccion_del_inmueble), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.DirecciónDelInmuebleDescription)]
         public string? DirecciónDelInmueble { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.referencia_catastral), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.referencia_catastral), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.ReferenciaCatastralDescription)]
         public string? ReferenciaCatastral { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.tamanio_del_inmueble), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.tamanio_del_inmueble), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.TamañoDelInmuebleDescription)]
         public double? TamañoDelInmueble { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.tamanio_de_la_parcela), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.tamanio_de_la_parcela), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.TamañoDeLaParcelaDescription)]
         public double? TamañoDeLaParcela { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.anio_de_construccion), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.anio_de_construccion), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.AñoDeConstrucciónDescription)]
         public int? AñoDeConstrucción { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.estado_de_la_construccion), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.estado_de_la_construccion), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.EstadoDeLaConstrucciónDescription)]
         public EstadosDeLaConstrucción? EstadoDeLaConstrucción { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.plantas_del_edificio), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.plantas_del_edificio), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.PlantasDelEdificioDescription)]
         public int? PlantasDelEdificio { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.planta_del_inmueble), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.planta_del_inmueble), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.PlantaDelInmuebleDescription)]
         public string? PlantaDelInmueble { get; private set; }
 
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.numero_de_dormitorios), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.numero_de_dormitorios), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.NúmeroDeDormitoriosDescription)]
         public int? NúmeroDeDormitorios { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.numero_de_banios), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.numero_de_banios), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.NúmeroDeBañosDescription)]
         public int? NúmeroDeBaños { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.numero_de_parkings), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.numero_de_parkings), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.NúmeroDeParkingsDescription)]
         public int? NúmeroDeParkings { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.tiene_terraza), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.tiene_terraza), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.TieneTerrazaDescription)]
         public bool? TieneTerraza { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.tiene_jardin), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.tiene_jardin), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.TieneJardínDescription)]
         public bool? TieneJardín { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.tiene_garaje), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.tiene_garaje), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.TieneGarajeDescription)]
         public bool? TieneGaraje { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.tiene_parking_para_moto), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.tiene_parking_para_moto), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.TieneParkingParaMotoDescription)]
         public bool? TieneParkingParaMoto { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.tiene_piscina), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.tiene_piscina), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.TienePiscinaDescription)]
         public bool? TienePiscina { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.tiene_ascensor), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.tiene_ascensor), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.TieneAscensorDescription)]
         public bool? TieneAscensor { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.tiene_acceso_para_discapacitados), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.tiene_acceso_para_discapacitados), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.TieneAccesoParaDiscapacitadosDescription)]
         public bool? TieneAccesoParaDiscapacitados { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.tiene_trastero), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.tiene_trastero), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.TieneTrasteroDescription)]
         public bool? TieneTrastero { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.esta_amueblado), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.esta_amueblado), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.EstaAmuebladoDescription)]
         public bool? EstaAmueblado { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.no_esta_amueblado), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.no_esta_amueblado), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.NoEstaAmuebladoDescription)]
         public bool? NoEstaAmueblado { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.tiene_calefaccion), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.tiene_calefaccion), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.TieneCalefacciónDescription)]
         public bool? TieneCalefacción { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.tiene_aire_acondicionado), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.tiene_aire_acondicionado), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.TieneAireAcondicionadoDescription)]
         public bool? TieneAireAcondicionado { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.permite_mascotas), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.permite_mascotas), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.PermiteMascotasDescription)]
         public bool? PermiteMascotas { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.tiene_sistemas_de_seguridad), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.tiene_sistemas_de_seguridad), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.TieneSistemasDeSeguridadDescription)]
         public bool? TieneSistemasDeSeguridad { get; private set; }
 
-        [JsonProperty(nameof(StructuredOutputEsJson.urls_de_imagenes_del_anuncio), Required = Required.AllowNull)]
+        [JsonProperty(nameof(StructuredOutputEsJson.urls_de_imagenes_del_anuncio), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.UrlsDeImagenesDelAnuncio)]
         public string[]? ImagenesDelAnuncio { get; private set; }
 

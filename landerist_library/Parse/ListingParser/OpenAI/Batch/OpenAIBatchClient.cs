@@ -15,11 +15,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
             if (string.IsNullOrEmpty(fileId))
             {
                 return true;
-            }
-            if (!ExistsFile(fileId))
-            {
-                return true;
-            }
+            }            
             try
             {
                 OpenAIClient.FilesEndpoint.DeleteFileAsync(fileId);
