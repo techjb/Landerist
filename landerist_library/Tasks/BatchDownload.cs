@@ -147,13 +147,7 @@ namespace landerist_library.Tasks
 
         private static bool ReadLine(Batch batch, string line)
         {
-            (Page page, string? text)? result;
-            switch (batch.LLMProvider)
-            {
-                case LLMProvider.OpenAI: result = OpenAIBatchDownload.ReadLine(line); break;
-                case LLMProvider.VertexAI: result = VertexAIBatchDownload.ReadLine(batch.Id, line); break;
-                default: return false;
-            }
+            (Page page, string? text)? result = GetPageAndText(batch, line);            
             if (result == null)
             {
                 return false;
@@ -165,6 +159,7 @@ namespace landerist_library.Tasks
             {
                 page.SetWaitingAIParsingRequest();
                 page.Update(false);
+                page.Dispose();
                 return false;
             }
 
@@ -176,6 +171,16 @@ namespace landerist_library.Tasks
             var sucess = page.Update(true);
             page.Dispose();
             return sucess;
+        }
+
+        private static (Page page, string? text)? GetPageAndText(Batch batch, string line)
+        {
+            return batch.LLMProvider switch
+            {
+                LLMProvider.OpenAI => OpenAIBatchDownload.ReadLine(line),
+                LLMProvider.VertexAI => VertexAIBatchDownload.ReadLine(batch.Id, line),
+                _ => null,
+            };
         }
     }
 }
