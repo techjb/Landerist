@@ -2,8 +2,6 @@
 using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Landerist_com;
 using landerist_library.Logs;
-using landerist_library.Parse.ListingParser.OpenAI.Batch;
-using landerist_library.Parse.ListingParser.VertexAI.Batch;
 using landerist_library.Scrape;
 using landerist_library.Statistics;
 using landerist_library.Websites;
@@ -119,9 +117,7 @@ namespace landerist_library.Tasks
                 StatisticsSnapshot.TakeSnapshots();
                 DownloadFilesUpdater.UpdateFiles();
                 Landerist_com.Landerist_com.UpdateDownloadsAndStatisticsPages();
-                Backup.Update();
-                VertexAIBatchCleaner.RemoveFiles();
-                OpenAIBatchCleaner.RemoveFiles();
+                Backup.Update();                
             }
             catch (Exception exception)
             {
@@ -135,7 +131,7 @@ namespace landerist_library.Tasks
             Websites.Websites.UpdateRobotsTxt();
             Websites.Websites.UpdateSitemaps();
             Websites.Websites.UpdateIpAddress();
-            BatchTasks.Start();
+            BatchTasks.Start();            
         }
 
         public void Scrape()

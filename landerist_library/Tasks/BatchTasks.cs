@@ -1,4 +1,5 @@
 ﻿using landerist_library.Parse.ListingParser.OpenAI.Batch;
+using landerist_library.Parse.ListingParser.VertexAI.Batch;
 
 namespace landerist_library.Tasks
 {
@@ -8,7 +9,7 @@ namespace landerist_library.Tasks
         {
             BatchDownload.Start();
             BatchCleaner.Start();
-            BatchUpload.Start();
+            BatchUpload.Start();            
         }
     }
 }

@@ -197,6 +197,7 @@ namespace landerist_tests
 
             //landerist_library.Parse.ListingParser.VertexAI.Batch.VertexAIBatch.Test();
             //landerist_library.Parse.ListingParser.VertexAI.Batch.VertexAIBatch.ListAllPredictionJobs();
+            //VertexAIBatchCleaner.RemoveFiles();
 
 
             #endregion

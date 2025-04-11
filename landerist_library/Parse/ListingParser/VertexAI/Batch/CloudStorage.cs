@@ -44,20 +44,27 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
         {
             var storageClient = GetStorageClient();
             var objects = storageClient.ListObjects(PrivateConfig.GOOGLE_CLOUD_BUCKET_NAME);
-            Parallel.ForEach(objects, Config.PARALLELOPTIONS1INLOCAL, obj =>
+            int total = objects.Count();
+            int deleted = 0;
+            int toDelete = 0;
+            int errors = 0;             
+            foreach(var obj in objects)
             {
                 if (obj.TimeCreatedDateTimeOffset < dateTime)
                 {
+                    toDelete++;
                     try
                     {
                         storageClient.DeleteObject(PrivateConfig.GOOGLE_CLOUD_BUCKET_NAME, obj.Name);
+                        deleted++;
                     }
-                    catch (Exception exception)
+                    catch
                     {
-                        Log.WriteError("CloudStorage DeleteFiles", exception);
-                    }
+                        errors++;                        
+                    }                    
                 }
-            });
+            };
+            Log.WriteInfo("CloudStorage DeleteFiles", "Objects: " + total + " ToDelete: " + toDelete + " Deleted: " + deleted + " Errors: " + errors);
         }
 
         private static StorageClient GetStorageClient()

@@ -96,7 +96,7 @@ namespace landerist_library.Logs
 
         public static void WriteError(string source, string text)
         {
-            if (Config.ERRORS_LOGS_IN_CONSOLE)
+            if (Config.LOGS_ERRORS_IN_CONSOLE)
             {
                 Console(text);
             }
@@ -129,7 +129,7 @@ namespace landerist_library.Logs
 
         public static void WriteInfo(string source, string text)
         {
-            if (Config.INFO_LOGS_IN_CONSOLE)
+            if (Config.LOGS_INFO_IN_CONSOLE)
             {
                 Console(text);
             }

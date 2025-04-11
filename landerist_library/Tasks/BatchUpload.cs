@@ -44,7 +44,6 @@ namespace landerist_library.Tasks
             return 0;
         }
 
-
         public static void Start()
         {
             Clear();

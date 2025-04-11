@@ -1,5 +1,6 @@
 ﻿using Google.Cloud.AIPlatform.V1;
 using landerist_library.Configuration;
+using landerist_library.Logs;
 
 
 namespace landerist_library.Parse.ListingParser.VertexAI.Batch
@@ -74,23 +75,46 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                 Parent = GetParent(),
             };
             var listBatchPredictionJobsResponse = GetJobServiceClient().ListBatchPredictionJobs(listBatchPredictionJobsRequest);
+            var total = listBatchPredictionJobsResponse.Count();
+            var toDelete = 0;
+            int deleted = 0;
+            var jobServiceClient = GetJobServiceClient();
+            bool error = false;
             foreach (var batchPredictionJob in listBatchPredictionJobsResponse)
             {
                 if (batchPredictionJob.State.Equals(JobState.Succeeded) && batchPredictionJob.EndTime.ToDateTime() < dateTime)
                 {
-                    DeleteBatchPredictionJob(batchPredictionJob.Name);
+                    toDelete++;
+                    if (!error && DeleteBatchPredictionJob(jobServiceClient, batchPredictionJob.Name))
+                    {
+                        deleted++;
+                    }
+                    else
+                    {
+                        error = true;
+                    }
                 }
             }
+            Log.WriteInfo("BatchPredictions Clean", "Jobs: " + total + " ToDelete: " + toDelete + " Deleted: " + deleted);
         }
 
-        public static void DeleteBatchPredictionJob(string name)
+        public static bool DeleteBatchPredictionJob(JobServiceClient jobServiceClient, string name)
         {
             var deleteBatchPredictionJobRequest = new DeleteBatchPredictionJobRequest
             {
                 Name = name,
             };
 
-            GetJobServiceClient().DeleteBatchPredictionJob(deleteBatchPredictionJobRequest);
+            try
+            {
+                var operation = jobServiceClient.DeleteBatchPredictionJob(deleteBatchPredictionJobRequest);
+                operation.PollUntilCompleted();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private static string GetParent()

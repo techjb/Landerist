@@ -1,5 +1,6 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Database;
+using landerist_library.Parse.ListingParser.VertexAI.Batch;
 
 namespace landerist_library.Parse.ListingParser.OpenAI.Batch
 {
@@ -7,11 +8,14 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
     {
         public static void Start()
         {
-            DeleteDwonloadedBatches();            
+            DeleteDownloadedBatches();            
             DeleteLocalFiles();
+
+            VertexAIBatchCleaner.RemoveFiles();
+            OpenAIBatchCleaner.RemoveFiles();
         }
 
-        private static void DeleteDwonloadedBatches()
+        private static void DeleteDownloadedBatches()
         {
             var batches = Batches.SelectDownloaded();
             foreach(var batch in batches)
