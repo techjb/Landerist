@@ -76,7 +76,6 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
             };
             var listBatchPredictionJobsResponse = GetJobServiceClient().ListBatchPredictionJobs(listBatchPredictionJobsRequest);
             var total = listBatchPredictionJobsResponse.Count();
-            var toDelete = 0;
             int deleted = 0;
             var jobServiceClient = GetJobServiceClient();
             bool error = false;
@@ -84,7 +83,6 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
             {
                 if (batchPredictionJob.State.Equals(JobState.Succeeded) && batchPredictionJob.EndTime.ToDateTime() < dateTime)
                 {
-                    toDelete++;
                     if (!error && DeleteBatchPredictionJob(jobServiceClient, batchPredictionJob.Name))
                     {
                         deleted++;
@@ -95,7 +93,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                     }
                 }
             }
-            Log.WriteInfo("BatchPredictions Clean", "Jobs: " + total + " ToDelete: " + toDelete + " Deleted: " + deleted);
+            Log.WriteInfo("BatchPredictions Clean", "Jobs: " + total + " Deleted: " + deleted);
         }
 
         public static bool DeleteBatchPredictionJob(JobServiceClient jobServiceClient, string name)

@@ -188,7 +188,7 @@ namespace landerist_tests
 
             //landerist_library.Parse.Listing.VertexAI.ParseListingVertexAI.Test();
 
-            //landerist_library.Parse.Listing.OpenAI.Batch.BatchUpload.Start();
+            //landerist_library.Parse.ListingParser.Listing.OpenAI.Batch.BatchUpload.Start();
             //landerist_library.Parse.Listing.OpenAI.Batch.BatchDownload.Start();
             //landerist_library.Parse.Listing.OpenAI.Batch.BatchDownload.Test();
             //landerist_library.Parse.Listing.OpenAI.Batch.BatchTasks.Start();            

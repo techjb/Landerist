@@ -71,10 +71,14 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                 return null;
             }
             var candidate = GetCandidate(vertexAIBatchResponse);
-            if (candidate == null || !IsValidResponse(candidate))
+            if (candidate == null)
             {
-                //var finishReason = candidate != null ? candidate.FinishReason : "";
-                //Log.WriteError("VertextAIBatchDownload ReadLine", "response is not valid finishReason: " + finishReason + " Id: " + id);
+                Log.WriteError("VertextAIBatchDownload ReadLine", "candidate is null");
+                return (page, null);
+            }
+            if (!IsValidResponse(candidate))
+            {
+                Log.WriteError("VertextAIBatchDownload ReadLine", "Invalid response. FinishReason: " + candidate.FinishReason + ". Line: " + line);
                 return (page, null);
             }
             string? text = GetText(candidate);

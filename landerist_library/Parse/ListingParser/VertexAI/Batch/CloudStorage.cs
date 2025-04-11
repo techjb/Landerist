@@ -46,13 +46,11 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
             var objects = storageClient.ListObjects(PrivateConfig.GOOGLE_CLOUD_BUCKET_NAME);
             int total = objects.Count();
             int deleted = 0;
-            int toDelete = 0;
             int errors = 0;             
             foreach(var obj in objects)
             {
                 if (obj.TimeCreatedDateTimeOffset < dateTime)
                 {
-                    toDelete++;
                     try
                     {
                         storageClient.DeleteObject(PrivateConfig.GOOGLE_CLOUD_BUCKET_NAME, obj.Name);
@@ -64,7 +62,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                     }                    
                 }
             };
-            Log.WriteInfo("CloudStorage DeleteFiles", "Objects: " + total + " ToDelete: " + toDelete + " Deleted: " + deleted + " Errors: " + errors);
+            Log.WriteInfo("CloudStorage DeleteFiles", "Objects: " + total + " Deleted: " + deleted + " Errors: " + errors);
         }
 
         private static StorageClient GetStorageClient()

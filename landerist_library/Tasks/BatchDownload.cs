@@ -12,10 +12,6 @@ namespace landerist_library.Tasks
 {
     public class BatchDownload
     {
-        private static int ErrorResultNull = 0;
-        private static int ErrorParseListingResponse = 0;
-        private static int ErrroSetPageType = 0;
-
         public static void Start()
         {
             var batches = Batches.SelectNonDownloaded();
@@ -124,10 +120,7 @@ namespace landerist_library.Tasks
         {
             int total = lines.Length;
             int readed = 0;
-            int errors = 0;
-            ErrorResultNull = 0;
-            ErrorParseListingResponse = 0;
-            ErrroSetPageType = 0;
+            int errors = 0;            
 
             Parallel.ForEach(lines, Config.PARALLELOPTIONS1INLOCAL, line =>
             {
@@ -149,7 +142,7 @@ namespace landerist_library.Tasks
             });
 
             int pertentage = (errors * 100) / total;
-            Log.WriteInfo("batch", $"Readed {readed} Errors: {errors} ({pertentage}%) ErrorResultNull: {ErrorResultNull} ErrorParseListingResponse: {ErrorParseListingResponse} ErrroSetPageType: {ErrroSetPageType}");
+            Log.WriteInfo("batch", $"Readed {readed} Errors: {errors} ({pertentage}%)");
         }
 
         private static bool ReadLine(Batch batch, string line)
@@ -157,7 +150,6 @@ namespace landerist_library.Tasks
             (Page page, string? text)? result = GetPageAndText(batch, line);            
             if (result == null)
             {
-                Interlocked.Increment(ref ErrorResultNull);   
                 return false;
             }
 
@@ -165,7 +157,6 @@ namespace landerist_library.Tasks
             var (pageType, listing) = ParseListing.ParseResponse(page, result.Value.text);
             if (pageType.Equals(PageType.MayBeListing))
             {
-                Interlocked.Increment(ref ErrorParseListingResponse);
                 page.SetWaitingAIParsingRequest();
                 page.Update(false);
                 page.Dispose();
@@ -179,10 +170,6 @@ namespace landerist_library.Tasks
             new PageScraper(page).SetPageType(pageType, listing);
             var sucess = page.Update(true);
             page.Dispose();
-            if(!sucess)
-            {
-                Interlocked.Increment(ref ErrroSetPageType);
-            }            
             return sucess;
         }
 

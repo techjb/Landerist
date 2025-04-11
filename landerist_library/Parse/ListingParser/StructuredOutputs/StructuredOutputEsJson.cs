@@ -204,9 +204,11 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public bool? tiene_sistemas_de_seguridad { get; set; } = null;
 
 
-        public const string UrlsDeImagenesDelAnuncio = "urls de las imágenes del anuncio";
+        public const string UrlsDeImagenesDelAnuncio = "Diez urls de imágenes del anuncio";
         [Description(UrlsDeImagenesDelAnuncio)]
         public string[]? urls_de_imagenes_del_anuncio { get; set; } = null;
+
+        public const long MAX_URLS_DE_IMAGENES_DEL_ANUNCIO = 10;
 
 
 #pragma warning restore IDE1006

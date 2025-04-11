@@ -244,15 +244,10 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                                 Type = Google.Cloud.AIPlatform.V1.Type.String,
                                 Format = "uri"
                             },
+                            MaxItems = StructuredOutputEsJson.MAX_URLS_DE_IMAGENES_DEL_ANUNCIO,
                             Description = StructuredOutputEsJson.UrlsDeImagenesDelAnuncio,
                         }
                     },
-                    //Required = {
-                    //    nameof(StructuredOutputEsJson.fecha_de_publicacion),
-                    //    nameof(StructuredOutputEsJson.tipo_de_operacion),
-                    //    nameof(StructuredOutputEsJson.tipo_de_inmueble),
-                    //    nameof(StructuredOutputEsJson.precio_del_anuncio)
-                    //}
                 }
             },
             Required = { StructuredOutputEsJson.FunctionNameIsListing }

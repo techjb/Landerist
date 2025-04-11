@@ -87,6 +87,7 @@ namespace landerist_library.Parse.ListingParser
         {
             if (string.IsNullOrEmpty(text))
             {
+                //Logs.Log.WriteError("ParseListing ParseResponse", "Empty response");
                 return (PageType.MayBeListing, null);
             }
             try
@@ -96,10 +97,12 @@ namespace landerist_library.Parse.ListingParser
                 {
                     return new StructuredOutputEsParser(structuredOutput).Parse(page);
                 }
+                Logs.Log.WriteError("ParseListing ParseResponse", "StructuredOutput null");
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteError("ParseListing ParseResponse", page.Uri, exception);
+                //Logs.Log.WriteError("ParseListing ParseResponse", page.Uri, exception);
+                Logs.Log.WriteError("ParseListing ParseResponse", exception.Message);
             }
             return (PageType.MayBeListing, null);
         }
