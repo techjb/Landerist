@@ -1,5 +1,6 @@
 ﻿using landerist_library.Parse.ListingParser;
 using PuppeteerSharp;
+using System.Runtime.CompilerServices;
 
 namespace landerist_library.Configuration
 {
@@ -7,7 +8,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "4.11";
+        public static readonly string VERSION = "4.13";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -146,7 +147,7 @@ namespace landerist_library.Configuration
 
         public static ParallelOptions PARALLELOPTIONS1INLOCAL = new() { };
 
-        public static string MACHINE_NAME = Environment.MachineName;
+        public readonly static string MACHINE_NAME = Environment.MachineName;
 
         public static bool IsConfigurationProduction()
         {
@@ -156,6 +157,11 @@ namespace landerist_library.Configuration
         public static bool IsConfigurationLocal()
         {
             return !ConfigurationProduction;
+        }
+
+        public static bool IsPrincipalMachine()
+        {
+            return MACHINE_NAME.Equals(PrivateConfig.MACHINE_NAME_LANDERIST_ROBOT);
         }
 
         public static void SetToProduction()

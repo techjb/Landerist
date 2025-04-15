@@ -2,6 +2,7 @@
 using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Landerist_com;
 using landerist_library.Logs;
+using landerist_library.Parse.ListingParser.OpenAI.Batch;
 using landerist_library.Scrape;
 using landerist_library.Statistics;
 using landerist_library.Websites;
@@ -14,6 +15,8 @@ namespace landerist_library.Tasks
         private Timer? Timer1;
         private Timer? Timer2;
         private Timer? Timer3;
+        private Timer? Timer4;
+        private Timer? Timer5;
 
         private bool RunningTimer2 = false;
         private bool RunningTimer3 = false;
@@ -21,10 +24,15 @@ namespace landerist_library.Tasks
         private const int OneSecond = 1000;
         private const int TenSeconds = 10 * OneSecond;
         private const int OneMinute = 60 * OneSecond;
+        private const int TenMinutes = 10 * OneMinute;
         private const int OneHour = 60 * OneMinute;
         private const int OneDay = 24 * OneHour;
 
         private bool PerformDailyTasks = false;
+
+        private bool PerformTenMinutesTasks = false;
+
+        private bool PerformHourlyTasks = false;
 
         public ServiceTasks()
         {
@@ -39,19 +47,26 @@ namespace landerist_library.Tasks
 
         private void SetTimers()
         {
-            DateTime nowTime = DateTime.Now;
+            Timer1 = new Timer(Scrape!, null, 0, TenSeconds);
+            Timer2 = new Timer(BlockingCollection!, null, OneSecond, OneSecond);
 
-            DateTime twelveAM = new(nowTime.Year, nowTime.Month, nowTime.Day, 0, 0, 0);
-            if (nowTime > twelveAM)
+            if (Configuration.Config.IsPrincipalMachine())
+            {
+                Timer3 = new Timer(TenMinutesTasks!, null, OneSecond, TenMinutes);
+                Timer4 = new Timer(HourlyTasks!, null, OneSecond, OneHour);
+                Timer5 = new Timer(DailyTasks!, null, GetDueTime(), OneDay);
+            }
+        }
+
+        private static int GetDueTime()
+        {
+            DateTime now = DateTime.Now;
+            DateTime twelveAM = new(now.Year, now.Month, now.Day, 0, 0, 0);
+            if (now > twelveAM)
             {
                 twelveAM = twelveAM.AddDays(1);
             }
-
-            int dueTimeOneAM = (int)(twelveAM - nowTime).TotalMilliseconds;
-
-            Timer1 = new Timer(DailyTasks!, null, dueTimeOneAM, OneDay);
-            Timer2 = new Timer(UpdateAndScrape!, null, 0, TenSeconds);
-            Timer3 = new Timer(BlockingCollection!, null, OneSecond, OneSecond);
+            return (int)(twelveAM - now).TotalMilliseconds;
         }
 
         private void DailyTasks(object state)
@@ -59,7 +74,17 @@ namespace landerist_library.Tasks
             PerformDailyTasks = true;
         }
 
-        private void UpdateAndScrape(object state)
+        private void TenMinutesTasks(object state)
+        {
+            PerformTenMinutesTasks = true;
+        }
+
+        private void HourlyTasks(object state)
+        {
+            PerformHourlyTasks = true;
+        }
+
+        private void Scrape(object state)
         {
             if (RunningTimer2)
             {
@@ -69,12 +94,7 @@ namespace landerist_library.Tasks
             RunningTimer2 = true;
             try
             {
-                if (PerformDailyTasks)
-                {
-                    DailyTask();
-                    PerformDailyTasks = false;
-                }
-                Update();
+                PerformOtherTasks();
                 Scrape();
             }
             catch (Exception exception)
@@ -84,6 +104,22 @@ namespace landerist_library.Tasks
             finally
             {
                 RunningTimer2 = false;
+            }
+        }
+
+        private void PerformOtherTasks()
+        {
+            if (PerformTenMinutesTasks)
+            {
+                TenMinutesTasks();
+            }
+            if (PerformHourlyTasks)
+            {
+                HourlyTasks();
+            }
+            if (PerformDailyTasks)
+            {
+                DailyTask();
             }
         }
 
@@ -109,29 +145,38 @@ namespace landerist_library.Tasks
             }
         }
 
-        public static void DailyTask()
+        public void TenMinutesTasks()
         {
+            PerformTenMinutesTasks = false;
+            BatchDownload.Start();
+            BatchUpload.Start();
+        }
+
+        public void HourlyTasks()
+        {
+            PerformHourlyTasks = false;
+            Websites.Websites.UpdateRobotsTxt();
+            Websites.Websites.UpdateSitemaps();
+            Websites.Websites.UpdateIpAddress();
+            BatchCleaner.Start();
+            
+        }
+
+        public void DailyTask()
+        {
+            PerformDailyTasks = false;
             try
             {
                 Pages.DeleteUnpublishedListings();
                 StatisticsSnapshot.TakeSnapshots();
                 DownloadFilesUpdater.UpdateFiles();
                 Landerist_com.Landerist_com.UpdateDownloadsAndStatisticsPages();
-                Backup.Update();                
+                Backup.Update();
             }
             catch (Exception exception)
             {
                 Log.WriteError("ServiceTasks DailyTask", exception);
-            }
-
-        }
-
-        public static void Update()
-        {
-            Websites.Websites.UpdateRobotsTxt();
-            Websites.Websites.UpdateSitemaps();
-            Websites.Websites.UpdateIpAddress();
-            BatchTasks.Start();            
+            }            
         }
 
         public void Scrape()
@@ -145,6 +190,8 @@ namespace landerist_library.Tasks
             Timer1?.Change(Timeout.Infinite, 0);
             Timer2?.Change(Timeout.Infinite, 0);
             Timer3?.Change(Timeout.Infinite, 0);
+            Timer4?.Change(Timeout.Infinite, 0);
+            Timer5?.Change(Timeout.Infinite, 0);
         }
     }
 }
