@@ -52,8 +52,8 @@ namespace landerist_library.Tasks
 
             if (Configuration.Config.IsPrincipalMachine())
             {
-                Timer3 = new Timer(TenMinutesTasks!, null, OneSecond, TenMinutes);
-                Timer4 = new Timer(HourlyTasks!, null, OneSecond, OneHour);
+                Timer3 = new Timer(TenMinutesTasks!, null, TenMinutes, TenMinutes);
+                Timer4 = new Timer(HourlyTasks!, null, OneHour, OneHour);
                 Timer5 = new Timer(DailyTasks!, null, GetDueTime(), OneDay);
             }
         }
