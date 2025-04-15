@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "4.10";
+        public static readonly string VERSION = "4.11";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -145,6 +145,8 @@ namespace landerist_library.Configuration
         public static int MAX_DEGREE_OF_PARALLELISM_SCRAPER { get; set; }
 
         public static ParallelOptions PARALLELOPTIONS1INLOCAL = new() { };
+
+        public static string MACHINE_NAME = Environment.MachineName;
 
         public static bool IsConfigurationProduction()
         {

@@ -44,7 +44,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                     },
                     generation_config = new GenerationConfig
                     {
-                        temperature = 0f,
+                        temperature = VertexAIRequest.Temperature,
                         response_mime_type = "application/json",
                         response_schema = OpenApiSchemaSerializer.Serialize(VertexAIResponseSchema.ResponseSchema)
                     },

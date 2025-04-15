@@ -78,7 +78,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
             }
             if (!IsValidResponse(candidate))
             {
-                Log.WriteError("VertextAIBatchDownload ReadLine", "Invalid response. FinishReason: " + candidate.FinishReason + ". Line: " + line);
+                Log.WriteError("VertextAIBatchDownload ReadLine", "Invalid response. FinishReason: " + candidate.FinishReason);
                 return (page, null);
             }
             string? text = GetText(candidate);

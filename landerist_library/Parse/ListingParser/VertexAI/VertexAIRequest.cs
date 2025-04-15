@@ -15,6 +15,8 @@ namespace landerist_library.Parse.ListingParser.VertexAI
         
         public static readonly string ModelName = "gemini-2.0-flash-lite-001";
 
+        public const float Temperature = 0.1f;
+
         public static bool TooManyTokens(Page page)
         {
             return TooManyTokens(page, MAX_CONTEXT_WINDOW);
@@ -65,7 +67,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                 },
                 GenerationConfig = new GenerationConfig()
                 {
-                    Temperature = 0f,
+                    Temperature = Temperature,
                     ResponseMimeType = "application/json",
                     ResponseSchema = VertexAIResponseSchema.ResponseSchema
                 },

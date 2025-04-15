@@ -34,10 +34,11 @@ namespace landerist_library.Logs
         {
             string query =
                 "INSERT INTO " + TABLE_LOGS + " " +
-                "VALUES(@Date, @LogKey, @Source, @Text)";
+                "VALUES(@Date, @MachineName, @LogKey, @Source, @Text)";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
                 { "Date", DateTime.Now},
+                { "MachineName", Config.MACHINE_NAME},
                 { "LogKey", logKey },
                 { "Source", source },
                 { "Text", text.Trim() }
