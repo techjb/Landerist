@@ -95,7 +95,7 @@ namespace landerist_library.Tasks
             try
             {
                 PerformOtherTasks();
-                Scrape();
+                Scraper.Start();
             }
             catch (Exception exception)
             {
@@ -159,7 +159,6 @@ namespace landerist_library.Tasks
             Websites.Websites.UpdateSitemaps();
             Websites.Websites.UpdateIpAddress();
             BatchCleaner.Start();
-            
         }
 
         public void DailyTask()
@@ -176,12 +175,7 @@ namespace landerist_library.Tasks
             catch (Exception exception)
             {
                 Log.WriteError("ServiceTasks DailyTask", exception);
-            }            
-        }
-
-        public void Scrape()
-        {
-            Scraper.Start();
+            }
         }
 
         public void Stop()
