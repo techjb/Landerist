@@ -8,7 +8,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "4.13";
+        public static readonly string VERSION = "4.14";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -161,7 +161,7 @@ namespace landerist_library.Configuration
 
         public static bool IsPrincipalMachine()
         {
-            return MACHINE_NAME.Equals(PrivateConfig.MACHINE_NAME_LANDERIST_ROBOT);
+            return MACHINE_NAME.Equals(PrivateConfig.MACHINE_NAME_LANDERIST_01);
         }
 
         public static void SetToProduction()
