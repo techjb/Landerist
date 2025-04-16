@@ -7,6 +7,7 @@ using landerist_library.Parse.ListingParser.StructuredOutputs;
 using landerist_library.Parse.ListingParser.VertexAI;
 using landerist_library.Parse.ListingParser.VertexAI.Batch;
 using landerist_library.Scrape;
+using landerist_library.Statistics;
 using landerist_library.Tasks;
 using landerist_library.Websites;
 using System.Runtime.InteropServices;
@@ -262,6 +263,8 @@ namespace landerist_tests
             //landerist_library.Landerist_com.Landerist_com.UpdateDownloadsAndStatisticsPages();
             //landerist_library.Landerist_com.Landerist_com.UpdateDownloadsAndStatisticsPages();
             //landerist_library.Landerist_com.StatisticsPage.Update();
+            //landerist_library.Landerist_com.Landerist_com.InvalidateCloudFront();
+
 
             #endregion
 
@@ -291,7 +294,7 @@ namespace landerist_tests
             //VertexAIBatchCleaner.Clean();
             //OpenAIBatchCleaner.RemoveFiles();            
 
-            #endregion            
+            #endregion
 
         }
     }

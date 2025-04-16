@@ -47,7 +47,7 @@ namespace landerist_console
             ServiceTasks.Stop();
 
             var duration = (DateTime.Now - DateStart).ToString(@"dd\:hh\:mm\:ss\.fff");
-            Log.WriteInfo("landerist_service", "Stopped. Version: " + Config.VERSION + " Duration: " + duration);
+            Log.WriteInfo("landerist_console", "Stopped. Version: " + Config.VERSION + " Duration: " + duration);
         }
 
         private static void Run()

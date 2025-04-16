@@ -29,7 +29,7 @@ namespace landerist_library.Scrape
         {
             AddUnknowPageType();
             AddNextUpdate();
-            AddPagesToFillScrape();
+            //AddPagesToFillScrape();
             FilterMinPages();
         }
 
@@ -39,12 +39,10 @@ namespace landerist_library.Scrape
             {
                 var (hosts, ips) = GetBlockedHostsAndIps();
                 var pages = Websites.Pages.GetUnknownPageType(TopRows, hosts, ips);
-                pages = RemoveDuplicates(pages);
-                if (pages.Count.Equals(0))
+                if (!AddPages(pages))
                 {
                     return;
                 }
-                AddPages(pages);
             }
         }
 
@@ -54,12 +52,10 @@ namespace landerist_library.Scrape
             {
                 var (hosts, ips) = GetBlockedHostsAndIps();
                 var pages = Websites.Pages.GetPagesNextUpdatePast(TopRows, hosts, ips);
-                pages = RemoveDuplicates(pages);
-                if (pages.Count.Equals(0))
+                if (!AddPages(pages))
                 {
                     return;
                 }
-                AddPages(pages);
             }
         }
 
@@ -69,12 +65,10 @@ namespace landerist_library.Scrape
             {
                 var (hosts, ips) = GetBlockedHostsAndIps();
                 var pages = Websites.Pages.GetPagesNextUpdateFuture(TopRows, hosts, ips);
-                pages = RemoveDuplicates(pages);
-                if (pages.Count.Equals(0))
+                if (!AddPages(pages))
                 {
                     return;
                 }
-                AddPages(pages);
             }
         }
 
@@ -84,16 +78,22 @@ namespace landerist_library.Scrape
             return pages.AsParallel().Where(p => !pageUriHashes.Contains(p.UriHash)).ToList();
         }
 
-        private static void AddPages(List<Page> pages)
+        private static bool AddPages(List<Page> pages)
         {
+            pages = RemoveDuplicates(pages);
+            if (pages.Count.Equals(0))
+            {
+                return false;
+            }
             foreach (var page in pages)
             {
                 if (ScrapperIsFull())
                 {
-                    return;
+                    return false;
                 }
                 AddPage(page);
             }
+            return true;
         }
 
         private static void AddPage(Page page)

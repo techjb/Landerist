@@ -15,6 +15,7 @@ namespace landerist_library.Statistics
         UpdatedIpAddress,
         UpdatedPages,
         NeedUpdate,
+        UnknownPageType,
         UpdatedWebsites,
         UpdatedRobotsTxt,
         UpdatedSitemaps
@@ -33,6 +34,7 @@ namespace landerist_library.Statistics
             SnapshotPages();
             SnapshotUpdatedPages();
             SnapshotNeedUpdate();
+            SnapshotUnknownPageType();
             SnapshotListings();
             SnapshotPublishedListings();
             SnapshotUnPublishedListings();
@@ -105,6 +107,16 @@ namespace landerist_library.Statistics
                 "WHERE [NextUpdate] < GETDATE()";
 
             InsertDaily(StatisticsKey.NeedUpdate, query);
+        }
+
+        private static void SnapshotUnknownPageType()
+        {
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + Websites.Pages.PAGES + " " +
+                "WHERE [PageType] IS NULL";
+
+            InsertDaily(StatisticsKey.UnknownPageType, query);
         }
 
         private static void SnapshotListings()

@@ -8,7 +8,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "4.14";
+        public static readonly string VERSION = "4.15";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -237,7 +237,7 @@ namespace landerist_library.Configuration
             DAYS_TO_REMOVE_BATCH_FILES = -5;
 
             MAX_DEGREE_OF_PARALLELISM_SCRAPER = ConfigurationProduction ?
-                Environment.ProcessorCount * 80 / 100 : // % of the processors
+                Environment.ProcessorCount * 70 / 100 : // % of the processors
                 1;
 
             PARALLELOPTIONS1INLOCAL = ConfigurationProduction ?

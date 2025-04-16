@@ -51,6 +51,7 @@
         const valuesPages = [/*Pages*/];
         const valuesUpdatedPages = [/*UpdatedPages*/];
         const valuesNeedUpdate = [/*NeedUpdate*/];
+        const valuesUnknownPageType = [/*NewPages*/];
 
         CreateChart("ChartListings", "Listings", valuesListings);
         CreateChart("ChartPublishedListings", "Published listings", valuesPublishedListings);
@@ -59,6 +60,7 @@
         CreateChart("ChartPages", "Pages", valuesPages);
         CreateChart("ChartUpdatedPages", "Updated pages", valuesUpdatedPages);
         CreateChart("ChartNeedUpdate", "Need update", valuesNeedUpdate);
+        CreateChart("ChartUnknownPageType", "Unknown PageType", valuesUnknownPageType);
 
         function CreateChart(id, title, values) {
             const dataListings = {
