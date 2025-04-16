@@ -1,5 +1,6 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Websites;
+using System.Runtime.ConstrainedExecution;
 
 namespace landerist_library.Scrape
 {
@@ -29,7 +30,7 @@ namespace landerist_library.Scrape
         {
             AddUnknowPageType();
             AddNextUpdate();
-            //AddPagesToFillScrape();
+            AddPagesToFillScrape();
             FilterMinPages();
         }
 
@@ -85,25 +86,32 @@ namespace landerist_library.Scrape
             {
                 return false;
             }
+            var addedPages = 0;
             foreach (var page in pages)
             {
                 if (ScrapperIsFull())
                 {
+                    Console.WriteLine($"Added {addedPages}/{pages.Count} pages to scrape. Total: {Pages.Count}");
                     return false;
                 }
-                AddPage(page);
+                if (AddPage(page))
+                {
+                    addedPages++;
+                }
+                
             }
+            Console.WriteLine($"Added {addedPages}/{pages.Count} pages to scrape. Total: {Pages.Count}");
             return true;
         }
 
-        private static void AddPage(Page page)
+        private static bool AddPage(Page page)
         {
             var host = page.Website.Host;
             if (DictionaryHosts.TryGetValue(host, out int hostCounter))
             {
                 if (hostCounter >= Config.MAX_PAGES_PER_HOSTS_PER_SCRAPE)
                 {
-                    return;
+                    return false;
                 }
                 DictionaryHosts[host] = hostCounter + 1;
             }
@@ -118,7 +126,7 @@ namespace landerist_library.Scrape
                 {
                     if (ipCounter >= Config.MAX_PAGES_PER_IP_PER_SCRAPE)
                     {
-                        return;
+                        return false;
                     }
                     DictionaryIps[ipAddress] = ipCounter + 1;
                 }
@@ -128,6 +136,7 @@ namespace landerist_library.Scrape
                 }
             }
             Pages.Add(page);
+            return true;
         }
 
 
@@ -140,6 +149,7 @@ namespace landerist_library.Scrape
 
             if (Pages.Count < Config.MIN_PAGES_PER_SCRAPE)
             {
+                Console.WriteLine("Not enough pages to scrape. " + Pages.Count);
                 Pages.Clear();
             }
         }

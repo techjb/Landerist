@@ -150,6 +150,7 @@ namespace landerist_tests
             //new Scraper().Start();                        
             //new Scraper().Scrape(page);
             //new Scraper().DoTest();
+            landerist_library.Scrape.PageSelector.Select();
 
 
             #endregion
