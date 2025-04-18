@@ -10,7 +10,7 @@ namespace landerist_library.Scrape
         private static readonly List<Page> Pages = [];
         private static readonly Dictionary<string, int> DictionaryHosts = [];
         private static readonly Dictionary<string, int> DictionaryIps = [];
-        private static readonly int TopRows = Config.MAX_PAGES_PER_SCRAPE * 10;
+        //private static readonly int TopRows = Config.MAX_PAGES_PER_SCRAPE * 10;
 
         public static List<Page> Select()
         {
@@ -31,7 +31,7 @@ namespace landerist_library.Scrape
         {
             AddUnknowPageType();
             AddNextUpdate();
-            //AddPagesToFillScrape();
+            AddPagesToFillScrape();
             //FilterMinPages();
         }
 
@@ -60,7 +60,7 @@ namespace landerist_library.Scrape
         //    while (!ScrapperIsFull())
         //    {
         //        var (hosts, ips) = GetBlockedHostsAndIps();
-        //        var pages = Websites.Pages.GetPagesNextUpdate(TopRows, hosts, ips);
+        //        var pages = Websites.Pages.GetNextUpdate(TopRows, hosts, ips);
         //        if (!AddPages(pages))
         //        {
         //            return;
@@ -72,7 +72,7 @@ namespace landerist_library.Scrape
         {
             var topRows = GetTopRows();
             var (hosts, ips) = GetBlockedHostsAndIps();
-            var pages = Websites.Pages.GetPagesNextUpdate(topRows, hosts, ips);
+            var pages = Websites.Pages.GetNextUpdate(topRows, hosts, ips);
             AddPages(pages);
         }
 
@@ -81,17 +81,26 @@ namespace landerist_library.Scrape
             return Config.MAX_PAGES_PER_SCRAPE - Pages.Count;
         }
 
+        //private static void AddPagesToFillScrape()
+        //{
+        //    while (!ScrapperIsFull())
+        //    {
+        //        var (hosts, ips) = GetBlockedHostsAndIps();
+        //        var pages = Websites.Pages.GetNextUpdateFuture(TopRows, hosts, ips);
+        //        if (!AddPages(pages))
+        //        {
+        //            return;
+        //        }
+        //    }
+        //}
+
+
         private static void AddPagesToFillScrape()
         {
-            while (!ScrapperIsFull())
-            {
-                var (hosts, ips) = GetBlockedHostsAndIps();
-                var pages = Websites.Pages.GetPagesNextUpdateFuture(TopRows, hosts, ips);
-                if (!AddPages(pages))
-                {
-                    return;
-                }
-            }
+            var (hosts, ips) = GetBlockedHostsAndIps();
+            var topRows = GetTopRows();
+            var pages = Websites.Pages.GetNextUpdateFuture(topRows, hosts, ips);
+            AddPages(pages);
         }
 
         private static List<Page> RemoveDuplicates(List<Page> pages)

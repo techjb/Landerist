@@ -84,13 +84,8 @@ namespace landerist_library.Websites
         //    return GetPages(dataTable);
         //}
 
-        public static List<Page> GetUnknownPageType(int topRows)
-        {
-            string where = "P.[PageType] IS NULL";
-            return GetPages(topRows, where);
-        }
 
-        //public static List<Page> GetPagesNextUpdate(int topRows, List<string> hosts, List<string> ips)
+        //public static List<Page> GetNextUpdate(int topRows, List<string> hosts, List<string> ips)
         //{
         //    string query =
         //        SelectQuery(topRows) +
@@ -103,10 +98,22 @@ namespace landerist_library.Websites
         //    return GetPages(dataTable);
         //}
 
-        public static List<Page> GetPagesNextUpdate(int topRows, List<string> hosts, List<string> ips)
+        public static List<Page> GetUnknownPageType(int topRows)
+        {
+            string where = "P.[PageType] IS NULL";
+            return GetPages(topRows, where);
+        }
+
+        public static List<Page> GetNextUpdate(int topRows, List<string> hosts, List<string> ips)
         {
             string where = "P.[NextUpdate] < GETDATE() AND " + GetWhere(hosts, ips);
             return GetPages(topRows, where);            
+        }
+
+        public static List<Page> GetNextUpdateFuture(int topRows, List<string> hosts, List<string> ips)
+        {
+            string where = "P.[NextUpdate] >= GETDATE() AND " + GetWhere(hosts, ips);
+            return GetPages(topRows, where);
         }
 
         private static List<Page> GetPages(int topRows, string where)
@@ -149,26 +156,30 @@ namespace landerist_library.Websites
                 "FROM [RANKED_ROWS] " +
                 "WHERE " +
                 "   RN_HOST <= " + Config.MAX_PAGES_PER_HOSTS_PER_SCRAPE + " AND " +
-                "   RN_IP <= " + Config.MAX_PAGES_PER_IP_PER_SCRAPE;
+                "   RN_IP <= " + Config.MAX_PAGES_PER_IP_PER_SCRAPE + " " +
+                "ORDER BY [NextUpdate] ASC";
 
             DataTable dataTable = new DataBase().QueryTable(query);
             return GetPages(dataTable);
         }
 
-        public static List<Page> GetPagesNextUpdateFuture(int topRows, List<string> hosts, List<string> ips)
-        {
-            string query =
-                SelectQuery(topRows) +
-                "WHERE [NextUpdate] >= @Now AND " + GetWhere(hosts, ips);
 
-            query += " ORDER BY [NextUpdate] ASC";
+      
 
-            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"Now", DateTime.Now },
-            });
+        //public static List<Page> GetNextUpdateFuture(int topRows, List<string> hosts, List<string> ips)
+        //{
+        //    string query =
+        //        SelectQuery(topRows) +
+        //        "WHERE [NextUpdate] >= @Now AND " + GetWhere(hosts, ips);
 
-            return GetPages(dataTable);
-        }
+        //    query += " ORDER BY [NextUpdate] ASC";
+
+        //    DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+        //        {"Now", DateTime.Now },
+        //    });
+
+        //    return GetPages(dataTable);
+        //}
 
         public static List<Page> GetNonScrapedPages(Website website)
         {
