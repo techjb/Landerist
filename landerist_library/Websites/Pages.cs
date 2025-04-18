@@ -1,4 +1,5 @@
-﻿using landerist_library.Configuration;
+﻿using Google.Protobuf.Collections;
+using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Index;
 using landerist_library.Tools;
@@ -72,26 +73,85 @@ namespace landerist_library.Websites
             DataTable dataTable = new DataBase().QueryTable(query);
             return GetPages(dataTable);
         }
-        public static List<Page> GetUnknownPageType(int topRows, List<string> hosts, List<string> ips)
-        {
-            string query =
-                SelectQuery(topRows) +
-                "WHERE [PageType] IS NULL AND " + GetWhereFilter(hosts, ips);
 
-            DataTable dataTable = new DataBase().QueryTable(query);
-            return GetPages(dataTable);
+        //public static List<Page> GetUnknownPageType(int topRows, List<string> hosts, List<string> ips)
+        //{
+        //    string query =
+        //        SelectQuery(topRows) +
+        //        "WHERE [PageType] IS NULL AND " + GetWhere(hosts, ips);
+
+        //    DataTable dataTable = new DataBase().QueryTable(query);
+        //    return GetPages(dataTable);
+        //}
+
+        public static List<Page> GetUnknownPageType(int topRows)
+        {
+            string where = "P.[PageType] IS NULL";
+            return GetPages(topRows, where);
         }
 
-        public static List<Page> GetPagesNextUpdatePast(int topRows, List<string> hosts, List<string> ips)
+        //public static List<Page> GetPagesNextUpdate(int topRows, List<string> hosts, List<string> ips)
+        //{
+        //    string query =
+        //        SelectQuery(topRows) +
+        //        "WHERE [NextUpdate] < @Now AND " + GetWhere(hosts, ips);
+
+        //    DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+        //        {"Now", DateTime.Now },
+        //    });
+
+        //    return GetPages(dataTable);
+        //}
+
+        public static List<Page> GetPagesNextUpdate(int topRows, List<string> hosts, List<string> ips)
+        {
+            string where = "P.[NextUpdate] < GETDATE() AND " + GetWhere(hosts, ips);
+            return GetPages(topRows, where);            
+        }
+
+        private static List<Page> GetPages(int topRows, string where)
         {
             string query =
-                SelectQuery(topRows) +
-                "WHERE [NextUpdate] < @Now AND " + GetWhereFilter(hosts, ips);
+                "WITH [RANKED_ROWS] AS (" +
+                "   SELECT " +
+                        "P.[Host], " +
+                        "P.[Uri], " +
+                        "P.[UriHash], " +
+                        "P.[Inserted], " +
+                        "P.[Updated], " +
+                        "P.[NextUpdate], " +
+                        "P.[HttpStatusCode], " +
+                        "P.[PageType], " +
+                        "P.[PageTypeCounter], " +
+                        "P.[WaitingAIParsing], " +
+                        "P.[ResponseBodyTextHash], " +
+                        "P.[ResponseBodyZipped], " +
+                        "W.[MainUri], " +
+                        "W.[LanguageCode], " +
+                        "W.[CountryCode], " +
+                        "W.[RobotsTxt], " +
+                        "W.[RobotsTxtUpdated], " +
+                        "W.[SitemapUpdated], " +
+                        "W.[IpAddress], " +
+                        "W.[IpAddressUpdated], " +
+                        "W.[NumPages], " +
+                        "W.[NumListings], " +
+                        "W.[ListingExampleUri], " +
+                        "W.[ListingExampleNodeSet], " +
+                        "W.[ListingExampleNodeSetUpdated], " +
+                "       ROW_NUMBER() OVER(PARTITION BY P.[Host] ORDER BY P.[UriHash] ASC) AS RN_HOST, " +
+                "       ROW_NUMBER() OVER(PARTITION BY W.[IpAddress] ORDER BY W.[Host] ASC) AS RN_IP  " +
+                "   FROM " + PAGES + " AS P " +
+                "   INNER JOIN " + Websites.WEBSITES + " AS W ON P.[Host] = W.[Host] " +
+                "   WHERE " + where + " " +
+                ") " +
+                "SELECT TOP " + topRows + " * " +
+                "FROM [RANKED_ROWS] " +
+                "WHERE " +
+                "   RN_HOST <= " + Config.MAX_PAGES_PER_HOSTS_PER_SCRAPE + " AND " +
+                "   RN_IP <= " + Config.MAX_PAGES_PER_IP_PER_SCRAPE;
 
-            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"Now", DateTime.Now },
-            });
-
+            DataTable dataTable = new DataBase().QueryTable(query);
             return GetPages(dataTable);
         }
 
@@ -99,7 +159,7 @@ namespace landerist_library.Websites
         {
             string query =
                 SelectQuery(topRows) +
-                "WHERE [NextUpdate] >= @Now AND " + GetWhereFilter(hosts, ips);
+                "WHERE [NextUpdate] >= @Now AND " + GetWhere(hosts, ips);
 
             query += " ORDER BY [NextUpdate] ASC";
 
@@ -157,6 +217,15 @@ namespace landerist_library.Websites
             string top = topRows != null ? "TOP " + topRows : "";
             return
                 "SELECT " + top + " " +
+                SelectColumns() + " " +
+                "FROM " + PAGES + " " +
+                "INNER JOIN " + Websites.WEBSITES +
+                " ON " + PAGES + ".[Host] = " + Websites.WEBSITES + ".[Host] ";
+        }
+
+        private static string SelectColumns()
+        {
+            return
                 PAGES + ".[Host], " +
                 PAGES + ".[Uri], " +
                 PAGES + ".[UriHash], " +
@@ -181,17 +250,21 @@ namespace landerist_library.Websites
                 Websites.WEBSITES + ".[NumListings], " +
                 Websites.WEBSITES + ".[ListingExampleUri], " +
                 Websites.WEBSITES + ".[ListingExampleNodeSet], " +
-                Websites.WEBSITES + ".[ListingExampleNodeSetUpdated] " +
-                "FROM " + PAGES + " " +
-                "INNER JOIN " + Websites.WEBSITES +
-                " ON " + PAGES + ".[Host] = " + Websites.WEBSITES + ".[Host] ";
+                Websites.WEBSITES + ".[ListingExampleNodeSetUpdated] ";
         }
-        private static string GetWhereFilter(List<string> hosts, List<string> ips)
+
+        private static string GetWhere(List<string> hosts, List<string> ips)
         {
-            return
-                "[WaitingAIParsing] IS NULL " +
-                "AND " + Websites.WEBSITES + ".[Host] NOT IN ('" + string.Join("', '", [.. hosts]) + "') " +
-                "AND " + Websites.WEBSITES + ".[IpAddress] NOT IN ('" + string.Join("', '", [.. ips]) + "') ";
+            string where = "P.[WaitingAIParsing] IS NULL ";
+            if (hosts.Count > 0)
+            {
+                where += "AND W.[Host] NOT IN ('" + string.Join("', '", [.. hosts]) + "') ";
+            }
+            if (ips.Count > 0)
+            {
+                where += "AND W.[IpAddress] NOT IN ('" + string.Join("', '", [.. ips]) + "') ";
+            }
+            return where;
         }
 
         private static List<Page> GetPages(DataTable dataTable)
