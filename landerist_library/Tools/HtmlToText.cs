@@ -306,14 +306,18 @@ namespace landerist_library.Tools
 
         private static string CleanText(IEnumerable<string>? lines)
         {
-            List<string> cleanedLines = [];
+            List<string> cleanedLines = new();
             if (lines == null)
             {
                 return string.Empty;
             }
             foreach (var line in lines)
             {
-                string decodedLine = HtmlEntity.DeEntitize(line).Trim();
+                if (string.IsNullOrEmpty(line))
+                {
+                    continue;
+                }
+                string? decodedLine = HtmlEntity.DeEntitize(line)?.Trim();
                 if (string.IsNullOrEmpty(decodedLine))
                 {
                     continue;

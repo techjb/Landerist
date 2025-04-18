@@ -79,12 +79,17 @@ namespace landerist_library.Parse.Media
 
             try
             {
-                nodesToRemove = [.. HtmlDocument.DocumentNode.SelectNodes(xPath)];
+                var selectedNodes = HtmlDocument.DocumentNode.SelectNodes(xPath);
+                if (selectedNodes != null)
+                {
+                    nodesToRemove = [.. selectedNodes];
+                }
             }
             catch
             {
-
+                // Handle exceptions if necessary
             }
+
             if (nodesToRemove is not null)
             {
                 foreach (var node in nodesToRemove)

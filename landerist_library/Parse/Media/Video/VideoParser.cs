@@ -15,14 +15,14 @@ namespace landerist_library.Parse.Media.Video
                 return;
             }
 
-            HtmlNodeCollection linkNodes = MediaParser.HtmlDocument.DocumentNode.SelectNodes("//a[@href]");
+            HtmlNodeCollection? linkNodes = MediaParser.HtmlDocument.DocumentNode.SelectNodes("//a[@href]");
             GetYoutubeVideos(linkNodes, "href");
 
             linkNodes = MediaParser.HtmlDocument.DocumentNode.SelectNodes("//iframe[@src]");
             GetYoutubeVideos(linkNodes, "src");
         }
 
-        private void GetYoutubeVideos(HtmlNodeCollection linkNodes, string attributeName)
+        private void GetYoutubeVideos(HtmlNodeCollection? linkNodes, string attributeName)
         {
             if (linkNodes == null)
             {

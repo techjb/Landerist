@@ -23,8 +23,8 @@ namespace landerist_library.Insert.FtAgencies
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(html);
 
-            var links = htmlDocument.DocumentNode
-                .SelectNodes("//a[@href]")
+            var links = htmlDocument?.DocumentNode?
+                .SelectNodes("//a[@href]")?
                 .Select(a => a.GetAttributeValue("href", string.Empty))
                 .Where(href => href.StartsWith("/buscar-agencias-inmobiliarias/"))
                 .Select(href => href.Replace("/buscar-agencias-inmobiliarias/", ""))
@@ -33,6 +33,10 @@ namespace landerist_library.Insert.FtAgencies
                 .Distinct()
                 .ToList();
 
+            if (links == null)
+            {
+                return;
+            }
             foreach (var link in links)
             {
                 Console.Write("\"" + link + "\",");
@@ -95,13 +99,17 @@ namespace landerist_library.Insert.FtAgencies
 
         private static void AddAgenciesUrls(HtmlDocument htmlDocument)
         {
-            var agencies = htmlDocument.DocumentNode
-               .SelectNodes($"//a[contains(@class, 'cta-spain-link')]")
+            var agencies = htmlDocument?.DocumentNode?
+               .SelectNodes($"//a[contains(@class, 'cta-spain-link')]")?
                .Select(a => a.GetAttributeValue("href", string.Empty))
                .Where(href => !string.IsNullOrEmpty(href))
                .Distinct()
                .ToList();
 
+            if (agencies == null)
+            {
+                return;
+            }
             lock (Sync)
             {
                 foreach (var agencie in agencies)

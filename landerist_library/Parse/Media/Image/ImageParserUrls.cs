@@ -32,6 +32,10 @@ namespace landerist_library.Parse.Media.Image
         private void InitDictionaries()
         {
             var imageNodes = MediaParser.HtmlDocument!.DocumentNode.SelectNodes("//img");
+            if (imageNodes is null)
+            {
+                return;
+            }
             foreach (var imageNode in imageNodes)
             {
                 var src = imageNode.GetAttributeValue("src", "");

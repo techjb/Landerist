@@ -9,11 +9,11 @@ namespace landerist_library.Parse.Media.Other
 
         public void GetOthers()
         {
-            HtmlNodeCollection htmlNodeCollection = MediaParser.HtmlDocument!.DocumentNode.SelectNodes("//a[@href]");
+            HtmlNodeCollection? htmlNodeCollection = MediaParser.HtmlDocument!.DocumentNode.SelectNodes("//a[@href]");
             GetOthers(htmlNodeCollection, ".pdf");
         }
 
-        private void GetOthers(HtmlNodeCollection htmlNodeCollection, string fileExtension)
+        private void GetOthers(HtmlNodeCollection? htmlNodeCollection, string fileExtension)
         {
             if (htmlNodeCollection == null)
             {
