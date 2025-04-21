@@ -116,8 +116,7 @@ namespace landerist_library.Websites
             NextUpdate = dataRow["NextUpdate"] is DBNull ? null : (DateTime)dataRow["NextUpdate"];
             HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
             PageType = dataRow["PageType"] is DBNull ? null : (PageType)Enum.Parse(typeof(PageType), dataRow["PageType"].ToString()!);
-            PageTypeCounter = dataRow["PageTypeCounter"] is DBNull ? null : (short)dataRow["PageTypeCounter"];
-            var d = dataRow["WaitingStatus"].ToString();
+            PageTypeCounter = dataRow["PageTypeCounter"] is DBNull ? null : (short)dataRow["PageTypeCounter"];            
             WaitingStatus = dataRow["WaitingStatus"] is DBNull ? null : (WaitingStatus)Enum.Parse(typeof(WaitingStatus), dataRow["WaitingStatus"].ToString()!);
             ResponseBodyTextHash = dataRow["ResponseBodyTextHash"] is DBNull ? null : dataRow["ResponseBodyTextHash"].ToString();
             ResponseBodyZipped = dataRow["ResponseBodyZipped"] is DBNull ? null : (byte[])dataRow["ResponseBodyZipped"];
@@ -192,7 +191,7 @@ namespace landerist_library.Websites
                 {"HttpStatusCode", HttpStatusCode},
                 {"PageType", PageType?.ToString()},
                 {"PageTypeCounter", PageTypeCounter},
-                {"WaitingStatus", WaitingStatus.ToString()},
+                {"WaitingStatus", WaitingStatus?.ToString()},
                 {"ResponseBodyTextHash", ResponseBodyTextHash},
                 {"ResponseBodyZipped", ResponseBodyZipped},
                 {"UriHash", UriHash },
