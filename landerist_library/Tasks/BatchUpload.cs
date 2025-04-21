@@ -14,7 +14,7 @@ namespace landerist_library.Tasks
 
         private static readonly long MaxFileSizeInBytes = SetMaxFileSize();
 
-        private static readonly int MaxPagesPerBatch = SetMaxPagesPerBatch();
+        private static readonly int MaxPagesPerBatch = GetMaxPagesPerBatch();
 
         private static List<Page> pages = [];
 
@@ -32,7 +32,7 @@ namespace landerist_library.Tasks
             return 0;
         }
 
-        private static int SetMaxPagesPerBatch()
+        private static int GetMaxPagesPerBatch()
         {
             switch (Config.LLM_PROVIDER)
             {
@@ -57,7 +57,7 @@ namespace landerist_library.Tasks
 
         private static bool StartBatchUpload()
         {
-            pages = Pages.SelectWaitingAIParsing();
+            pages = Pages.SelectWaitingStatus(MaxPagesPerBatch, WaitingStatus.waiting_ai_request);
 
             if (pages.Count < Config.MIN_PAGES_PER_BATCH)
             {
@@ -81,7 +81,7 @@ namespace landerist_library.Tasks
             }
 
             Batches.Insert(batchId);
-            SetWaitingAIResponse();
+            SetWaitingStatusAIResponse();
             Log.WriteInfo("batch", $"Uploaded {UriHashes.Count}");
             return true;
         }
@@ -148,7 +148,7 @@ namespace landerist_library.Tasks
                 var json = GetJson(page);
                 if (string.IsNullOrEmpty(json))
                 {
-                    page.RemoveWaitingAIParsing();
+                    page.RemoveWaitingStatus();
                     page.Update(false);
                     return false;
                 }
@@ -223,7 +223,7 @@ namespace landerist_library.Tasks
         }
 
 
-        static void SetWaitingAIResponse()
+        static void SetWaitingStatusAIResponse()
         {
             if (Config.IsConfigurationLocal())
             {
@@ -231,7 +231,7 @@ namespace landerist_library.Tasks
             }
             Parallel.ForEach(UriHashes, Config.PARALLELOPTIONS1INLOCAL, uriHash =>
             {
-                Pages.UpdateWaitingAIParsing(uriHash, false);
+                Pages.UpdateWaitingStatus(uriHash, WaitingStatus.waiting_ai_response);
             });
         }
     }

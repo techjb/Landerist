@@ -157,13 +157,13 @@ namespace landerist_library.Tasks
             var (pageType, listing) = ParseListing.ParseResponse(page, result.Value.text);
             if (pageType.Equals(PageType.MayBeListing))
             {
-                page.SetWaitingAIParsingRequest();
+                page.SetWaitingStatusAIRequest();
                 page.Update(false);
                 page.Dispose();
                 return false;
             }
 
-            page.RemoveWaitingAIParsing();
+            page.RemoveWaitingStatus();
             page.SetResponseBodyFromZipped();
             page.RemoveResponseBodyZipped();
 

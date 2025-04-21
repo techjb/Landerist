@@ -34,7 +34,7 @@ namespace landerist_library.Parse.ListingParser
             return false;
         }
 
-        public static (PageType pageType, Listing? listing, bool waitingAIParsing)
+        public static (PageType pageType, Listing? listing, bool waitingAIRequest)
             Parse(Page page)
         {
             if (Config.BATCH_ENABLED)
@@ -57,7 +57,7 @@ namespace landerist_library.Parse.ListingParser
             return (PageType.ResponseBodyTooShort, null, false);
         }
 
-        private static (PageType pageType, Listing? listing, bool waitingAIParsing)
+        private static (PageType pageType, Listing? listing, bool waitingAIRequest)
             ParseOpenAI(Page page, string userInput)
         {
             var response = OpenAIRequest.GetChatResponse(userInput);
@@ -70,7 +70,7 @@ namespace landerist_library.Parse.ListingParser
         }
 
 
-        private static (PageType pageType, Listing? listing, bool waitingAIParsing)
+        private static (PageType pageType, Listing? listing, bool waitingAIRequest)
             ParseVertextAI(Page page, string text)
         {
             var generateContentResponse = VertexAIRequest.GetResponse(page, text).Result;

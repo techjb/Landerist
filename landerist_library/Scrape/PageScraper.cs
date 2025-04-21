@@ -35,8 +35,8 @@ namespace landerist_library.Scrape
                 return false;
             }
 
-            (var newPageType, var newListing, var waitingAIParsing) = PageTypeParser.GetPageType(Page);
-            SetPageType(newPageType, newListing, waitingAIParsing);
+            (var newPageType, var newListing, var waitingAIRequest) = PageTypeParser.GetPageType(Page);
+            SetPageType(newPageType, newListing, waitingAIRequest);
             IndexPages();
             return true;
         }
@@ -78,15 +78,15 @@ namespace landerist_library.Scrape
             return true;
         }
 
-        public bool SetPageType(PageType? newPageType, Listing? newListing, bool waitingAIParsing)
+        public bool SetPageType(PageType? newPageType, Listing? newListing, bool waitingAIRequest)
         {
-            if (waitingAIParsing)
+            if (waitingAIRequest)
             {
                 if (!Page.SetResponseBodyZipped())
                 {
                     return false;
                 }
-                Page.SetWaitingAIParsingRequest();
+                Page.SetWaitingStatusAIRequest();
                 return Page.Update(false);
             }
             SetPageType(newPageType, newListing);

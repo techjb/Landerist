@@ -1,5 +1,4 @@
-﻿using Google.Protobuf.Collections;
-using landerist_library.Configuration;
+﻿using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Index;
 using landerist_library.Tools;
@@ -68,35 +67,11 @@ namespace landerist_library.Websites
         {
             string query =
                 SelectQuery() +
-                "WHERE [PageType] IS NULL AND [WaitingAIParsing] IS NULL ";
+                "WHERE [PageType] IS NULL AND [WaitingStatus] IS NULL ";
 
             DataTable dataTable = new DataBase().QueryTable(query);
             return GetPages(dataTable);
         }
-
-        //public static List<Page> GetUnknownPageType(int topRows, List<string> hosts, List<string> ips)
-        //{
-        //    string query =
-        //        SelectQuery(topRows) +
-        //        "WHERE [PageType] IS NULL AND " + GetWhere(hosts, ips);
-
-        //    DataTable dataTable = new DataBase().QueryTable(query);
-        //    return GetPages(dataTable);
-        //}
-
-
-        //public static List<Page> GetNextUpdate(int topRows, List<string> hosts, List<string> ips)
-        //{
-        //    string query =
-        //        SelectQuery(topRows) +
-        //        "WHERE [NextUpdate] < @Now AND " + GetWhere(hosts, ips);
-
-        //    DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-        //        {"Now", DateTime.Now },
-        //    });
-
-        //    return GetPages(dataTable);
-        //}
 
         public static List<Page> GetUnknownPageType(int topRows)
         {
@@ -130,7 +105,7 @@ namespace landerist_library.Websites
                         "P.[HttpStatusCode], " +
                         "P.[PageType], " +
                         "P.[PageTypeCounter], " +
-                        "P.[WaitingAIParsing], " +
+                        "P.[WaitingStatus], " +
                         "P.[ResponseBodyTextHash], " +
                         "P.[ResponseBodyZipped], " +
                         "W.[MainUri], " +
@@ -162,24 +137,6 @@ namespace landerist_library.Websites
             DataTable dataTable = new DataBase().QueryTable(query);
             return GetPages(dataTable);
         }
-
-
-      
-
-        //public static List<Page> GetNextUpdateFuture(int topRows, List<string> hosts, List<string> ips)
-        //{
-        //    string query =
-        //        SelectQuery(topRows) +
-        //        "WHERE [NextUpdate] >= @Now AND " + GetWhere(hosts, ips);
-
-        //    query += " ORDER BY [NextUpdate] ASC";
-
-        //    DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-        //        {"Now", DateTime.Now },
-        //    });
-
-        //    return GetPages(dataTable);
-        //}
 
         public static List<Page> GetNonScrapedPages(Website website)
         {
@@ -246,7 +203,7 @@ namespace landerist_library.Websites
                 PAGES + ".[HttpStatusCode], " +
                 PAGES + ".[PageType], " +
                 PAGES + ".[PageTypeCounter], " +
-                PAGES + ".[WaitingAIParsing], " +
+                PAGES + ".[WaitingStatus], " +
                 PAGES + ".[ResponseBodyTextHash], " +
                 PAGES + ".[ResponseBodyZipped], " +
                 Websites.WEBSITES + ".[MainUri], " +
@@ -266,7 +223,7 @@ namespace landerist_library.Websites
 
         private static string GetWhere(List<string> hosts, List<string> ips)
         {
-            string where = "P.[WaitingAIParsing] IS NULL ";
+            string where = "P.[WaitingStatus] IS NULL ";
             if (hosts.Count > 0)
             {
                 where += "AND W.[Host] NOT IN ('" + string.Join("', '", [.. hosts]) + "') ";
@@ -577,25 +534,27 @@ namespace landerist_library.Websites
             Logs.Log.WriteInfo("DeleteUnpublishedListings", "Deleted: " + deleted + "/" + total + " listings. Errors: " + errors);
         }
 
-        public static List<Page> SelectWaitingAIParsing()
+        public static List<Page> SelectWaitingStatus(int topRows, WaitingStatus waitingStatus)
         {
             string query =
-                SelectQuery(Config.MAX_PAGES_PER_BATCH_OPEN_AI) +
-                "WHERE [WaitingAIParsing] = 1";
+                SelectQuery(topRows) +
+                "WHERE [WaitingStatus] = @WaitingStatus";
 
-            DataTable dataTable = new DataBase().QueryTable(query);
+            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+                {"WaitingStatus", waitingStatus.ToString() },                
+            });
             return GetPages(dataTable);
         }
 
-        public static void UpdateWaitingAIParsing(string uriHash, bool waitingAiParsing)
+        public static void UpdateWaitingStatus(string uriHash, WaitingStatus waitingStatus)
         {
             string query =
                 "UPDATE " + PAGES + " " +
-                "SET [WaitingAIParsing] = @WaitingAIParsing " +
+                "SET [WaitingStatus] = @WaitingStatus " +
                 "WHERE [UriHash] = @UriHash";
 
             new DataBase().Query(query, new Dictionary<string, object?> {
-                {"WaitingAIParsing", waitingAiParsing },
+                {"WaitingStatus", waitingStatus.ToString() },
                 {"UriHash", uriHash }
             });
         }

@@ -14,12 +14,17 @@
         ResponseBodyTooLarge,
         ResponseBodyRepeatedInHost,
         ResponseBodyRepeatedInListings,
-        ResponseBodyTooManyTokens,
-        //HtmlNotSimilarToListing,
+        ResponseBodyTooManyTokens,        
         MayBeListing,
         Listing,
         NotListingByParser,
         ListingButNotParsed,
-        //NotListingByLastSegment,
     };
+
+    public enum WaitingStatus
+    {
+        waiting_for_scrape,
+        waiting_ai_request,
+        waiting_ai_response,
+    }
 }

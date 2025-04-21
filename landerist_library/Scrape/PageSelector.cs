@@ -1,7 +1,5 @@
-﻿using Google.Protobuf.Collections;
-using landerist_library.Configuration;
+﻿using landerist_library.Configuration;
 using landerist_library.Websites;
-using System.Runtime.ConstrainedExecution;
 
 namespace landerist_library.Scrape
 {
@@ -10,7 +8,6 @@ namespace landerist_library.Scrape
         private static readonly List<Page> Pages = [];
         private static readonly Dictionary<string, int> DictionaryHosts = [];
         private static readonly Dictionary<string, int> DictionaryIps = [];
-        //private static readonly int TopRows = Config.MAX_PAGES_PER_SCRAPE * 10;
 
         public static List<Page> Select()
         {
@@ -35,38 +32,12 @@ namespace landerist_library.Scrape
             //FilterMinPages();
         }
 
-        //private static void AddUnknowPageType()
-        //{
-        //    while (!ScrapperIsFull())
-        //    {
-        //        var (hosts, ips) = GetBlockedHostsAndIps();
-        //        var pages = Websites.Pages.GetUnknownPageType(TopRows, hosts, ips);
-        //        if (!AddPages(pages))
-        //        {
-        //            return;
-        //        }
-        //    }
-        //}
-
         private static void AddUnknowPageType()
         {
             var topRows = GetTopRows();
             var pages = Websites.Pages.GetUnknownPageType(topRows);
             AddPages(pages);
         }
-
-        //private static void AddNextUpdate()
-        //{
-        //    while (!ScrapperIsFull())
-        //    {
-        //        var (hosts, ips) = GetBlockedHostsAndIps();
-        //        var pages = Websites.Pages.GetNextUpdate(TopRows, hosts, ips);
-        //        if (!AddPages(pages))
-        //        {
-        //            return;
-        //        }
-        //    }
-        //}
 
         private static void AddNextUpdate()
         {
@@ -80,20 +51,6 @@ namespace landerist_library.Scrape
         {
             return Config.MAX_PAGES_PER_SCRAPE - Pages.Count;
         }
-
-        //private static void AddPagesToFillScrape()
-        //{
-        //    while (!ScrapperIsFull())
-        //    {
-        //        var (hosts, ips) = GetBlockedHostsAndIps();
-        //        var pages = Websites.Pages.GetNextUpdateFuture(TopRows, hosts, ips);
-        //        if (!AddPages(pages))
-        //        {
-        //            return;
-        //        }
-        //    }
-        //}
-
 
         private static void AddPagesToFillScrape()
         {
@@ -121,16 +78,13 @@ namespace landerist_library.Scrape
             {
                 if (ScrapperIsFull())
                 {
-                    //Console.WriteLine($"Added {addedPages}/{pages.Count} pages to scrape. Total: {Pages.Count}");
                     return false;
                 }
                 if (AddPage(page))
                 {
                     addedPages++;
                 }
-
             }
-            //Console.WriteLine($"Added {addedPages}/{pages.Count} pages to scrape. Total: {Pages.Count}");
             return true;
         }
 
@@ -168,7 +122,6 @@ namespace landerist_library.Scrape
             Pages.Add(page);
             return true;
         }
-
 
         private static void FilterMinPages()
         {

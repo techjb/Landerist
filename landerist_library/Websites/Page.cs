@@ -32,7 +32,7 @@ namespace landerist_library.Websites
 
         public short? PageTypeCounter { get; private set; }
 
-        public bool? WaitingAIParsing { get; private set; }
+        public WaitingStatus? WaitingStatus { get; private set; }
 
         private string? ResponseBody { get; set; }
 
@@ -117,7 +117,8 @@ namespace landerist_library.Websites
             HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
             PageType = dataRow["PageType"] is DBNull ? null : (PageType)Enum.Parse(typeof(PageType), dataRow["PageType"].ToString()!);
             PageTypeCounter = dataRow["PageTypeCounter"] is DBNull ? null : (short)dataRow["PageTypeCounter"];
-            WaitingAIParsing = dataRow["WaitingAIParsing"] is DBNull ? null : (bool)dataRow["WaitingAIParsing"];
+            var d = dataRow["WaitingStatus"].ToString();
+            WaitingStatus = dataRow["WaitingStatus"] is DBNull ? null : (WaitingStatus)Enum.Parse(typeof(WaitingStatus), dataRow["WaitingStatus"].ToString()!);
             ResponseBodyTextHash = dataRow["ResponseBodyTextHash"] is DBNull ? null : dataRow["ResponseBodyTextHash"].ToString();
             ResponseBodyZipped = dataRow["ResponseBodyZipped"] is DBNull ? null : (byte[])dataRow["ResponseBodyZipped"];
         }
@@ -180,7 +181,7 @@ namespace landerist_library.Websites
                 "[HttpStatusCode] = @HttpStatusCode, " +
                 "[PageType] = @PageType, " +
                 "[PageTypeCounter] = @PageTypeCounter, " +
-                "[WaitingAIParsing] = @WaitingAIParsing, " +
+                "[WaitingStatus] = @WaitingStatus, " +
                 "[ResponseBodyTextHash] = @ResponseBodyTextHash, " +
                 "[ResponseBodyZipped] = CASE WHEN @ResponseBodyZipped IS NULL THEN NULL ELSE CONVERT(varbinary(max), @ResponseBodyZipped) END " +
                 "WHERE [UriHash] = @UriHash";
@@ -191,7 +192,7 @@ namespace landerist_library.Websites
                 {"HttpStatusCode", HttpStatusCode},
                 {"PageType", PageType?.ToString()},
                 {"PageTypeCounter", PageTypeCounter},
-                {"WaitingAIParsing", WaitingAIParsing},
+                {"WaitingStatus", WaitingStatus.ToString()},
                 {"ResponseBodyTextHash", ResponseBodyTextHash},
                 {"ResponseBodyZipped", ResponseBodyZipped},
                 {"UriHash", UriHash },
@@ -583,19 +584,24 @@ namespace landerist_library.Websites
                 Screenshot.Length < Config.MAX_SCREENSHOT_SIZE;
         }
 
-        public void SetWaitingAIParsingRequest()
+        public void SetWaitingStatusAIRequest()
         {
-            WaitingAIParsing = true;
+            SetWaitingStatus(landerist_library.Websites.WaitingStatus.waiting_ai_request);
         }
 
-        public void SetWaitingAIParsingResponse()
+        public void SetWaitingStatusAIResponse()
         {
-            WaitingAIParsing = false;
+            SetWaitingStatus(landerist_library.Websites.WaitingStatus.waiting_ai_response);
         }
 
-        public void RemoveWaitingAIParsing()
+        public void SetWaitingStatus(WaitingStatus waitingStatus)
         {
-            WaitingAIParsing = null;
+            WaitingStatus = waitingStatus;
+        }
+
+        public void RemoveWaitingStatus()
+        {
+            WaitingStatus = null;
         }
 
         public void RemoveResponseBodyZipped()

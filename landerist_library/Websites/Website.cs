@@ -1,9 +1,7 @@
 ﻿using Com.Bekijkhet.RobotsTxt;
-using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Index;
-using landerist_library.Parse.PageTypeParser;
 using System.Data;
 using System.Net;
 using System.Text;

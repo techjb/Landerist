@@ -5,7 +5,7 @@ namespace landerist_library.Parse.PageTypeParser
 {
     public class PageTypeParser
     {
-        public static (PageType? pageType, landerist_orels.ES.Listing? listing, bool waitingAIParsing)
+        public static (PageType? pageType, landerist_orels.ES.Listing? listing, bool waitingAIRequest)
             GetPageType(Page page)
         {
             if (page == null || page.ResponseBodyIsNullOrEmpty() || page.HttpStatusCode != 200)

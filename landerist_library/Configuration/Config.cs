@@ -1,6 +1,5 @@
 ﻿using landerist_library.Parse.ListingParser;
 using PuppeteerSharp;
-using System.Runtime.CompilerServices;
 
 namespace landerist_library.Configuration
 {
@@ -8,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "4.16";
+        public static readonly string VERSION = "4.17";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -24,7 +23,7 @@ namespace landerist_library.Configuration
 
         public static readonly int MAX_PAGES_PER_HOSTS_PER_SCRAPE = 5;
 
-        public static readonly int MAX_PAGES_PER_IP_PER_SCRAPE = 10;
+        public static readonly int MAX_PAGES_PER_IP_PER_SCRAPE = 5;
 
         public static readonly bool MULTIPLE_DOWNLOADERS_ENABLED = true;
 

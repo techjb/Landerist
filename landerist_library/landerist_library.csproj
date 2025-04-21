@@ -34,9 +34,9 @@
 
   <ItemGroup>
     <PackageReference Include="AI.Dev.OpenAI.GPT" Version="1.0.2" />
-    <PackageReference Include="AWSSDK.CloudFront" Version="3.7.404.71" />
-    <PackageReference Include="AWSSDK.Comprehend" Version="3.7.400.136" />
-    <PackageReference Include="AWSSDK.S3" Version="3.7.416.12" />
+    <PackageReference Include="AWSSDK.CloudFront" Version="3.7.404.72" />
+    <PackageReference Include="AWSSDK.Comprehend" Version="3.7.400.137" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.416.13" />
     <PackageReference Include="Com.Bekijkhet.RobotsTxt" Version="1.0.0" />
     <PackageReference Include="CsvHelper" Version="33.0.1" />
     <PackageReference Include="Google.Apis.CustomSearchAPI.v1" Version="1.68.0.3520" />
