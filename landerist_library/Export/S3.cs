@@ -93,7 +93,7 @@ namespace landerist_library.Export
                     list.AddRange(listObjectsV2Response.S3Objects);
                     listObjectsV2Request.ContinuationToken = listObjectsV2Response.NextContinuationToken;
                 }
-                while (listObjectsV2Response.IsTruncated);
+                while ((bool)listObjectsV2Response.IsTruncated!);
             }
             catch (Exception exception)
             {

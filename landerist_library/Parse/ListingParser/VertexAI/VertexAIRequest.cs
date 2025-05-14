@@ -93,11 +93,11 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                         Category = HarmCategory.SexuallyExplicit,
                         Threshold = HarmBlockThreshold.Off
                     },
-                    new SafetySetting
-                    {
-                        Category = HarmCategory.CivicIntegrity,
-                        Threshold = HarmBlockThreshold.Off
-                    },
+                    //new SafetySetting
+                    //{
+                    //    Category = HarmCategory.CivicIntegrity,
+                    //    Threshold = HarmBlockThreshold.Off
+                    //},
                     new SafetySetting
                     {
                         Category = HarmCategory.Unspecified,

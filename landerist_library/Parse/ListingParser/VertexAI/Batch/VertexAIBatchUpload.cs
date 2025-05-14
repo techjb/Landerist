@@ -70,11 +70,11 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                             category = (int)HarmCategory.SexuallyExplicit,
                             threshold = (int)HarmBlockThreshold.BlockOnlyHigh
                         },
-                        new SafetySetting
-                        {
-                            category = (int)HarmCategory.CivicIntegrity,
-                            threshold = (int)HarmBlockThreshold.BlockOnlyHigh
-                        },
+                        //new SafetySetting
+                        //{
+                        //    category = (int)HarmCategory.CivicIntegrity,
+                        //    threshold = (int)HarmBlockThreshold.BlockOnlyHigh
+                        //},
                         new SafetySetting
                         {
                             category = (int)HarmCategory.Unspecified,
