@@ -208,7 +208,7 @@ namespace landerist_library.Scrape
                 return;
             }
             var isBlocked = PageBlocker.IsBlocked(page);
-            if (!Config.PROXY_ENABLED && isBlocked)
+            if (isBlocked && !Config.PROXY_ENABLED)
             {
                 return;
             }
@@ -309,7 +309,7 @@ namespace landerist_library.Scrape
 
         private void AddUnblockedPages()
         {
-            if (BlockingCollection.IsAddingCompleted)
+            if (BlockingCollection.IsAddingCompleted || Config.PROXY_ENABLED)
             {
                 return;
             }

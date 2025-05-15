@@ -1,4 +1,5 @@
-﻿using landerist_library.Websites;
+﻿using landerist_library.Configuration;
+using landerist_library.Websites;
 
 namespace landerist_library.Scrape
 {
@@ -12,7 +13,7 @@ namespace landerist_library.Scrape
 
         private const int MaxSecconds = 6;
 
-        private static readonly List<(Page page, DateTime blockUntil)> Pages = [];
+        private static readonly List<(Page page, DateTime blockUntil)> BlockedPages = [];
 
         public bool IsBlocked(Page page)
         {
@@ -27,7 +28,7 @@ namespace landerist_library.Scrape
             var blockedTime = blockedTimeHost > blockedTimeIp ? blockedTimeHost : blockedTimeIp;
             if (blockedTime > DateTime.Now)
             {
-                Pages.Add((page, blockedTime));
+                BlockedPages.Add((page, blockedTime));
                 return true;
             }
             return false;
@@ -49,12 +50,12 @@ namespace landerist_library.Scrape
         public static List<Page> GetUnblockedPages()
         {
             var now = DateTime.Now;
-            var unblockedPages = Pages.Where(o => o.blockUntil < now).ToList();
+            var unblockedPages = BlockedPages.Where(o => o.blockUntil < DateTime.Now).ToList();
             if (unblockedPages.Count > 0)
             {
-                Pages.RemoveAll(o => o.blockUntil < now);
+                BlockedPages.RemoveAll(o => o.blockUntil < now);
             }
-            return unblockedPages.Select(o => o.page).ToList();
+            return [.. unblockedPages.Select(o => o.page)];
         }
 
         public void Add(Website website)
@@ -102,11 +103,11 @@ namespace landerist_library.Scrape
         {
             Clean(IpBlocker);
             Clean(HostBlocker);
-            foreach (var page in Pages)
+            foreach (var page in BlockedPages)
             {
                 page.page.Dispose();
             }
-            Pages.Clear();
+            BlockedPages.Clear();
         }
 
         private static void Clean(Dictionary<string, DateTime> keyValuePairs)
@@ -123,7 +124,7 @@ namespace landerist_library.Scrape
 
         public static int CountBlockedPages()
         {
-            return Pages.Count;
+            return BlockedPages.Count;
         }
     }
 }

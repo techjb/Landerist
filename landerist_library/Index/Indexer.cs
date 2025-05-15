@@ -18,7 +18,7 @@ namespace landerist_library.Index
 
         public void Insert(List<string?> urls)
         {
-            urls = urls.Distinct().ToList();
+            urls = [.. urls.Distinct()];
             foreach (var url in urls)
             {
                 if (url != null)

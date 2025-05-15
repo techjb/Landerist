@@ -10,7 +10,7 @@ namespace landerist_library.Index
 
         public void InsertSitemaps(List<Com.Bekijkhet.RobotsTxt.Sitemap> sitemaps)
         {
-            sitemaps = sitemaps.Take(Configuration.Config.MAX_SITEMAPS_PER_WEBSITE).ToList();
+            sitemaps = [.. sitemaps.Take(Configuration.Config.MAX_SITEMAPS_PER_WEBSITE)];
             foreach (var sitemap in sitemaps)
             {
                 InsertSitemap(sitemap.Url);
