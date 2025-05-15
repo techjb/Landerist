@@ -1,5 +1,6 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Downloaders.Puppeteer;
+using landerist_library.Landerist_com;
 using landerist_library.Logs;
 using landerist_library.Parse.ListingParser.OpenAI.Batch;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
@@ -148,7 +149,7 @@ namespace landerist_tests
             //new Scraper().ScrapeUnknowPageType(website);
             //new Scraper().ScrapeAllPages();            
             //new Scraper().ScrapeResponseBodyRepeatedInListings();            
-            //new Scraper().Start();                        
+            new Scraper().Start();                        
             //new Scraper().Scrape(page);
             //new Scraper().DoTest();
             //landerist_library.Scrape.PageSelector.Select();
@@ -260,8 +261,10 @@ namespace landerist_tests
             #region landerist.com
 
             //landerist_library.Statistics.StatisticsSnapshot.TakeSnapshots();
+            //DownloadFilesUpdater.UpdateFiles();
             //landerist_library.Landerist_com.DownloadFilesUpdater.UpdateFiles();
             //landerist_library.Landerist_com.DownloadFilesUpdater.UpdateUpdates();
+            //landerist_library.Landerist_com.Landerist_com.UpdateDownloads();
             //landerist_library.Landerist_com.Landerist_com.UpdateDownloadsAndStatisticsPages();
             //landerist_library.Landerist_com.Landerist_com.UpdateDownloadsAndStatisticsPages();
             //landerist_library.Landerist_com.StatisticsPage.Update();

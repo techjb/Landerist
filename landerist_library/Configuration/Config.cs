@@ -148,6 +148,8 @@ namespace landerist_library.Configuration
 
         public readonly static string MACHINE_NAME = Environment.MachineName;
 
+        public static bool PROXY_ENABLED = true;
+
         public static bool IsConfigurationProduction()
         {
             return ConfigurationProduction;

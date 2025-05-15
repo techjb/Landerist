@@ -41,9 +41,13 @@ namespace landerist_library.Scrape
 
         private static void AddNextUpdate()
         {
+            if (ScrapperIsFull())
+            {
+                return;
+            }
             var topRows = GetTopRows();
-            var (hosts, ips) = GetBlockedHostsAndIps();
-            var pages = Websites.Pages.GetNextUpdate(topRows, hosts, ips);
+            //var (hosts, ips) = GetBlockedHostsAndIps();
+            var pages = Websites.Pages.GetNextUpdate(topRows);
             AddPages(pages);
         }
 
@@ -54,9 +58,13 @@ namespace landerist_library.Scrape
 
         private static void AddPagesToFillScrape()
         {
-            var (hosts, ips) = GetBlockedHostsAndIps();
+            if (ScrapperIsFull())
+            {
+                return;
+            }
             var topRows = GetTopRows();
-            var pages = Websites.Pages.GetNextUpdateFuture(topRows, hosts, ips);
+            //var (hosts, ips) = GetBlockedHostsAndIps();
+            var pages = Websites.Pages.GetNextUpdateFuture(topRows);
             AddPages(pages);
         }
 
@@ -66,59 +74,50 @@ namespace landerist_library.Scrape
             return pages.AsParallel().Where(p => !pageUriHashes.Contains(p.UriHash)).ToList();
         }
 
-        private static bool AddPages(List<Page> pages)
+        private static void AddPages(List<Page> pages)
         {
             pages = RemoveDuplicates(pages);
-            if (pages.Count.Equals(0))
-            {
-                return false;
-            }
-            var addedPages = 0;
             foreach (var page in pages)
             {
                 if (ScrapperIsFull())
                 {
-                    return false;
+                    return;
                 }
-                if (AddPage(page))
-                {
-                    addedPages++;
-                }
+                AddPage(page);
             }
-            return true;
         }
 
         private static bool AddPage(Page page)
         {
-            var host = page.Website.Host;
-            if (DictionaryHosts.TryGetValue(host, out int hostCounter))
-            {
-                if (hostCounter >= Config.MAX_PAGES_PER_HOSTS_PER_SCRAPE)
-                {
-                    return false;
-                }
-                DictionaryHosts[host] = hostCounter + 1;
-            }
-            else
-            {
-                DictionaryHosts[host] = 1;
-            }
-            var ipAddress = page.Website.IpAddress;
-            if (!string.IsNullOrEmpty(ipAddress))
-            {
-                if (DictionaryIps.TryGetValue(ipAddress, out int ipCounter))
-                {
-                    if (ipCounter >= Config.MAX_PAGES_PER_IP_PER_SCRAPE)
-                    {
-                        return false;
-                    }
-                    DictionaryIps[ipAddress] = ipCounter + 1;
-                }
-                else
-                {
-                    DictionaryIps[ipAddress] = 1;
-                }
-            }
+            //var host = page.Website.Host;
+            //if (DictionaryHosts.TryGetValue(host, out int hostCounter))
+            //{
+            //    if (hostCounter >= Config.MAX_PAGES_PER_HOSTS_PER_SCRAPE)
+            //    {
+            //        return false;
+            //    }
+            //    DictionaryHosts[host] = hostCounter + 1;
+            //}
+            //else
+            //{
+            //    DictionaryHosts[host] = 1;
+            //}
+            //var ipAddress = page.Website.IpAddress;
+            //if (!string.IsNullOrEmpty(ipAddress))
+            //{
+            //    if (DictionaryIps.TryGetValue(ipAddress, out int ipCounter))
+            //    {
+            //        if (ipCounter >= Config.MAX_PAGES_PER_IP_PER_SCRAPE)
+            //        {
+            //            return false;
+            //        }
+            //        DictionaryIps[ipAddress] = ipCounter + 1;
+            //    }
+            //    else
+            //    {
+            //        DictionaryIps[ipAddress] = 1;
+            //    }
+            //}
             Pages.Add(page);
             return true;
         }

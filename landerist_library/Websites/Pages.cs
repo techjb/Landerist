@@ -77,61 +77,112 @@ namespace landerist_library.Websites
         {
             string where = "P.[PageType] IS NULL";
             return GetPages(topRows, where);
-        }
+        }       
 
-        public static List<Page> GetNextUpdate(int topRows, List<string> hosts, List<string> ips)
-        {
-            string where = "P.[NextUpdate] < GETDATE() AND " + GetWhere(hosts, ips);
-            return GetPages(topRows, where);            
-        }
 
-        public static List<Page> GetNextUpdateFuture(int topRows, List<string> hosts, List<string> ips)
+        //public static List<Page> GetNextUpdate(int topRows, List<string> hosts, List<string> ips)
+        //{
+        //    string where = "P.[NextUpdate] < GETDATE() AND " + GetWhere(hosts, ips);
+        //    return GetPages(topRows, where);            
+        //}
+
+        public static List<Page> GetNextUpdate(int topRows)
         {
-            string where = "P.[NextUpdate] >= GETDATE() AND " + GetWhere(hosts, ips);
+            string where = "P.[NextUpdate] < GETDATE()";
             return GetPages(topRows, where);
         }
 
+        //public static List<Page> GetNextUpdateFuture(int topRows, List<string> hosts, List<string> ips)
+        //{
+        //    string where = "P.[NextUpdate] >= GETDATE() AND " + GetWhere(hosts, ips);
+        //    return GetPages(topRows, where);
+        //}
+
+        public static List<Page> GetNextUpdateFuture(int topRows)
+        {
+            string where = "P.[NextUpdate] >= GETDATE()";
+            return GetPages(topRows, where);
+        }
+
+        //private static List<Page> GetPages(int topRows, string where)
+        //{
+        //    string query =
+        //        "WITH [RANKED_ROWS] AS (" +
+        //        "   SELECT " +
+        //                "P.[Host], " +
+        //                "P.[Uri], " +
+        //                "P.[UriHash], " +
+        //                "P.[Inserted], " +
+        //                "P.[Updated], " +
+        //                "P.[NextUpdate], " +
+        //                "P.[HttpStatusCode], " +
+        //                "P.[PageType], " +
+        //                "P.[PageTypeCounter], " +
+        //                "P.[WaitingStatus], " +
+        //                "P.[ResponseBodyTextHash], " +
+        //                "P.[ResponseBodyZipped], " +
+        //                "W.[MainUri], " +
+        //                "W.[LanguageCode], " +
+        //                "W.[CountryCode], " +
+        //                "W.[RobotsTxt], " +
+        //                "W.[RobotsTxtUpdated], " +
+        //                "W.[SitemapUpdated], " +
+        //                "W.[IpAddress], " +
+        //                "W.[IpAddressUpdated], " +
+        //                "W.[NumPages], " +
+        //                "W.[NumListings], " +
+        //                "W.[ListingExampleUri], " +
+        //                "W.[ListingExampleNodeSet], " +
+        //                "W.[ListingExampleNodeSetUpdated], " +
+        //        "       ROW_NUMBER() OVER(PARTITION BY P.[Host] ORDER BY P.[UriHash] ASC) AS RN_HOST, " +
+        //        "       ROW_NUMBER() OVER(PARTITION BY W.[IpAddress] ORDER BY W.[Host] ASC) AS RN_IP  " +
+        //        "   FROM " + PAGES + " AS P " +
+        //        "   INNER JOIN " + Websites.WEBSITES + " AS W ON P.[Host] = W.[Host] " +
+        //        "   WHERE " + where + " " +
+        //        ") " +
+        //        "SELECT TOP " + topRows + " * " +
+        //        "FROM [RANKED_ROWS] " +
+        //        "WHERE " +
+        //        "   RN_HOST <= " + Config.MAX_PAGES_PER_HOSTS_PER_SCRAPE + " AND " +
+        //        "   RN_IP <= " + Config.MAX_PAGES_PER_IP_PER_SCRAPE + " " +
+        //        "ORDER BY [NextUpdate] ASC";
+
+        //    DataTable dataTable = new DataBase().QueryTable(query);
+        //    return GetPages(dataTable);
+        //}
+
         private static List<Page> GetPages(int topRows, string where)
         {
-            string query =
-                "WITH [RANKED_ROWS] AS (" +
-                "   SELECT " +
-                        "P.[Host], " +
-                        "P.[Uri], " +
-                        "P.[UriHash], " +
-                        "P.[Inserted], " +
-                        "P.[Updated], " +
-                        "P.[NextUpdate], " +
-                        "P.[HttpStatusCode], " +
-                        "P.[PageType], " +
-                        "P.[PageTypeCounter], " +
-                        "P.[WaitingStatus], " +
-                        "P.[ResponseBodyTextHash], " +
-                        "P.[ResponseBodyZipped], " +
-                        "W.[MainUri], " +
-                        "W.[LanguageCode], " +
-                        "W.[CountryCode], " +
-                        "W.[RobotsTxt], " +
-                        "W.[RobotsTxtUpdated], " +
-                        "W.[SitemapUpdated], " +
-                        "W.[IpAddress], " +
-                        "W.[IpAddressUpdated], " +
-                        "W.[NumPages], " +
-                        "W.[NumListings], " +
-                        "W.[ListingExampleUri], " +
-                        "W.[ListingExampleNodeSet], " +
-                        "W.[ListingExampleNodeSetUpdated], " +
-                "       ROW_NUMBER() OVER(PARTITION BY P.[Host] ORDER BY P.[UriHash] ASC) AS RN_HOST, " +
-                "       ROW_NUMBER() OVER(PARTITION BY W.[IpAddress] ORDER BY W.[Host] ASC) AS RN_IP  " +
-                "   FROM " + PAGES + " AS P " +
-                "   INNER JOIN " + Websites.WEBSITES + " AS W ON P.[Host] = W.[Host] " +
-                "   WHERE " + where + " " +
-                ") " +
-                "SELECT TOP " + topRows + " * " +
-                "FROM [RANKED_ROWS] " +
-                "WHERE " +
-                "   RN_HOST <= " + Config.MAX_PAGES_PER_HOSTS_PER_SCRAPE + " AND " +
-                "   RN_IP <= " + Config.MAX_PAGES_PER_IP_PER_SCRAPE + " " +
+            string query =                
+                "SELECT TOP " + topRows + " " +
+                    "P.[Host], " +
+                    "P.[Uri], " +
+                    "P.[UriHash], " +
+                    "P.[Inserted], " +
+                    "P.[Updated], " +
+                    "P.[NextUpdate], " +
+                    "P.[HttpStatusCode], " +
+                    "P.[PageType], " +
+                    "P.[PageTypeCounter], " +
+                    "P.[WaitingStatus], " +
+                    "P.[ResponseBodyTextHash], " +
+                    "P.[ResponseBodyZipped], " +
+                    "W.[MainUri], " +
+                    "W.[LanguageCode], " +
+                    "W.[CountryCode], " +
+                    "W.[RobotsTxt], " +
+                    "W.[RobotsTxtUpdated], " +
+                    "W.[SitemapUpdated], " +
+                    "W.[IpAddress], " +
+                    "W.[IpAddressUpdated], " +
+                    "W.[NumPages], " +
+                    "W.[NumListings], " +
+                    "W.[ListingExampleUri], " +
+                    "W.[ListingExampleNodeSet], " +
+                    "W.[ListingExampleNodeSetUpdated] " +                
+                "FROM " + PAGES + " AS P " +
+                "INNER JOIN " + Websites.WEBSITES + " AS W ON P.[Host] = W.[Host] " +
+                "WHERE " + where + " " +              
                 "ORDER BY [NextUpdate] ASC";
 
             DataTable dataTable = new DataBase().QueryTable(query);
@@ -167,8 +218,6 @@ namespace landerist_library.Websites
 
             return GetPages(website, dataTable);
         }
-
-
 
         public static List<Page> GetUnknowHttpStatusCode()
         {

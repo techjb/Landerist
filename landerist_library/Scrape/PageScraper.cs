@@ -22,10 +22,13 @@ namespace landerist_library.Scrape
 
         private readonly Scraper? Scraper;
 
+        private readonly bool UseProxy = false;
 
-        public PageScraper(Page page, Scraper scraper) : this(page)
+
+        public PageScraper(Page page, Scraper scraper, bool useProxy) : this(page)
         {
             Scraper = scraper;
+            UseProxy = useProxy;
         }
 
         public bool Scrape()
@@ -57,7 +60,7 @@ namespace landerist_library.Scrape
             {
                 return false;
             }
-            SingleDownloader = MultipleDownloader.GetDownloader();
+            SingleDownloader = MultipleDownloader.GetDownloader(UseProxy);
             if (SingleDownloader is null)
             {
                 return false;
@@ -67,8 +70,8 @@ namespace landerist_library.Scrape
 
         private bool DownloadSingleDownloader()
         {
-            SingleDownloader = new();
-            if (!SingleDownloader.IsAvailable())
+            SingleDownloader = new(UseProxy);
+            if (!SingleDownloader.IsAvailable(UseProxy))
             {
                 Logs.Log.WriteInfo("PageScraper DownloadPageSingleDownloader", "Downloader not available");
                 return false;

@@ -114,11 +114,11 @@ namespace landerist_library.Scrape
             ScrapeUnknowHttpStatusCode();
         }
 
-        public void ScrapeMainPage(Website website)
-        {
-            var page = new Page(website);
-            Scrape(page);
-        }
+        //public void ScrapeMainPage(Website website)
+        //{
+        //    var page = new Page(website);
+        //    Scrape(page);
+        //}
 
         public void ScrapeResponseBodyRepeatedInListings()
         {
@@ -207,11 +207,13 @@ namespace landerist_library.Scrape
                 page.Update(PageType.CrawlDelayTooBig, true);
                 return;
             }
-            if (PageBlocker.IsBlocked(page))
+            var isBlocked = PageBlocker.IsBlocked(page);
+            if (!Config.PROXY_ENABLED && isBlocked)
             {
                 return;
             }
-            Scrape(page);
+            
+            Scrape(page, isBlocked);
             page.Dispose();
             Interlocked.Increment(ref Scraped);
         }
@@ -273,16 +275,16 @@ namespace landerist_library.Scrape
             hashSet.Clear();
         }
 
-        public void Scrape(Uri uri)
-        {
-            var page = new Page(uri);
-            Scrape(page);
-        }
+        //public void Scrape(Uri uri, bool useProxy)
+        //{
+        //    var page = new Page(uri);
+        //    Scrape(page, useProxy);
+        //}
 
-        public void Scrape(Page page)
+        public void Scrape(Page page, bool useProxy)
         {
             AddToPageBlocker(page);
-            var pageScraper = new PageScraper(page, this);
+            var pageScraper = new PageScraper(page, this, useProxy);
             if (pageScraper.Scrape())
             {
                 Interlocked.Increment(ref Success);

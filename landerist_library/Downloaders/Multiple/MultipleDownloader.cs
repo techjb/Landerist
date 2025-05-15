@@ -6,20 +6,19 @@
 
         private static readonly object Sync = new();
 
-        public static SingleDownloader? GetDownloader()
+        public static SingleDownloader? GetDownloader(bool useProxy)
         {
             lock (Sync)
             {
-                //RemoveBrowserWithErrors();
-                var availables = Downloaders.Where(o => o.IsAvailable()).ToList();
+                var availables = Downloaders.Where(o => o.IsAvailable(useProxy)).ToList();
                 if (availables.Count != 0)
                 {
                     return availables[new Random().Next(availables.Count)];
                 }
 
                 int id = Downloaders.Count + 1;
-                SingleDownloader newSingleDownloader = new(id);
-                if (newSingleDownloader.IsAvailable())
+                SingleDownloader newSingleDownloader = new(id, useProxy);
+                if (newSingleDownloader.IsAvailable(useProxy))
                 {
                     newSingleDownloader.SetUnavailable();
                     Downloaders.Add(newSingleDownloader);
@@ -31,24 +30,9 @@
             }
         }
 
-        //private static void RemoveBrowserWithErrors()
-        //{
-        //    var downloaders = Downloaders.Where(singleDownloader => singleDownloader.BrowserHasErrors()).ToList();
-        //    if (downloaders.Count == 0)
-        //    {
-        //        return;
-        //    }
-
-        //    Logs.Log.Console("RemoveBrowserWithErrors: " + downloaders.Count + "/" + Downloaders.Count);
-        //    foreach (var singleDownloader in downloaders)
-        //    {
-        //        singleDownloader.CloseBrowser();
-        //    }
-        //    //Downloaders.RemoveWhere(singleDownloader => singleDownloader.BrowserHasErrors());
-        //}
-
         public static void Clear()
         {
+            Print();
             Parallel.ForEach(Downloaders, new ParallelOptions()
             {
 
@@ -60,11 +44,6 @@
             Downloaders.Clear();
         }
 
-        //public static void LogDownloadersCounter()
-        //{
-        //    Logs.Log.WriteInfo("MultipleDownloader DownloadersCounter", Downloaders.Count.ToString());
-        //}
-
         public static void Print()
         {
             if (Downloaders.Count.Equals(0))
@@ -74,6 +53,7 @@
 
             int maxCrashCounter = 0;
             int maxDownloads = 0;
+            int withProxy = 0;
 
             foreach (SingleDownloader singleDownloader in Downloaders)
             {
@@ -87,10 +67,14 @@
                 {
                     maxDownloads = counter;
                 }
+                if (singleDownloader.GetUseProxy())
+                {
+                    withProxy++;
+                }
             }
 
             Logs.Log.WriteInfo("MultipleDownloaders",
-                $"Downloaders: {Downloaders.Count} MaxDownloads: {maxDownloads} MaxCrashCounter: {maxCrashCounter}");
+                $"Downloaders: {Downloaders.Count} WithProxy: {withProxy} MaxDownloads: {maxDownloads} MaxCrashCounter: {maxCrashCounter}");
         }
 
         public static int GetDownloadersCounter() => Downloaders.Count;

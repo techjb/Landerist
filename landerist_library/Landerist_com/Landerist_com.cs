@@ -48,6 +48,11 @@ namespace landerist_library.Landerist_com
             return prefix + "_" + datePart + "." + extension;
         }
 
+        public static void UpdateDownloads()
+        {
+            DownloadsPage.Update();
+            InvalidateCloudFront();
+        }
         public static void UpdateDownloadsAndStatisticsPages()
         {
             DownloadsPage.Update();

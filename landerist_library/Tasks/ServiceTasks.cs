@@ -61,7 +61,7 @@ namespace landerist_library.Tasks
         private static int GetDueTime()
         {
             DateTime now = DateTime.Now;
-            DateTime twelveAM = new(now.Year, now.Month, now.Day, 0, 0, 0);
+            DateTime twelveAM = new(now.Year, now.Month, now.Day, 0, 0, 10);
             if (now > twelveAM)
             {
                 twelveAM = twelveAM.AddDays(1);

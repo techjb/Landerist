@@ -11,14 +11,16 @@ namespace landerist_library.Downloaders.Multiple
         public int Id = 0;
         private int Chrashes = 0;
         private int Scraped = 0;
+        private readonly bool UseProxy = false;
 
-        public SingleDownloader(int id) : this()
+        public SingleDownloader(int id, bool useProxy) : this(useProxy)
         {
             Id = id;
         }
 
-        public SingleDownloader()
+        public SingleDownloader(bool useProxy)
         {
+            UseProxy = useProxy;
             Downloader = new(this);
             Available = Downloader.BrowserInitialized();
         }
@@ -33,9 +35,14 @@ namespace landerist_library.Downloaders.Multiple
             Available = true;
         }
 
-        public bool IsAvailable()
+        public bool IsAvailable(bool useProxy)
         {
-            return Available;
+            return Available && useProxy == UseProxy;
+        }
+
+        public bool GetUseProxy()
+        {
+            return UseProxy;
         }
 
         public bool Download(Page Page)

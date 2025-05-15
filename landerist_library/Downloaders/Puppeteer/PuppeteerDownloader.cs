@@ -86,22 +86,25 @@ namespace landerist_library.Downloaders.Puppeteer
             //"--disable-domain-reliability",
             //"--autoplay-policy=user-gesture-required",
             //"--disable-component-extensions-with-background-pages",
-
-
             ];
+
+        private static readonly string[] LaunchOptionsProxy =
+        [
+            "--proxy-server=" + PrivateConfig.BRIGTHDATA_HOST + ":" + PrivateConfig.BRIGTHDATA_PORT + ""
+        ];
 
         private static readonly string[] LaunchOptionsScreenShot =
-            [
-                "--disable-extensions-except=" + IDontCareAboutCookies,
-                "--load-extension=" + IDontCareAboutCookies
-            ];
+        [
+            "--disable-extensions-except=" + IDontCareAboutCookies,
+            "--load-extension=" + IDontCareAboutCookies
+        ];
 
         private static readonly LaunchOptions launchOptions = new()
         {
             //Headless = true, // if false, maybe need to comment await browserPage.SetRequestInterceptionAsync(true);          
             Headless = Config.IsConfigurationProduction(),
             //Headless = false,
-            Devtools = false,
+            Devtools = false,            
             //IgnoreHTTPSErrors = true,            
             Args = Config.TAKE_SCREENSHOT ? [.. LaunchOptionsArgs, .. LaunchOptionsScreenShot] : LaunchOptionsArgs,
         };
@@ -179,14 +182,21 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private readonly SingleDownloader? SingleDownloader;
 
+        private readonly bool UseProxy = false;
 
-        public PuppeteerDownloader(SingleDownloader singleDownloader) : this()
+
+        public PuppeteerDownloader(SingleDownloader singleDownloader) : this(singleDownloader.GetUseProxy())
         {
             SingleDownloader = singleDownloader;
         }
 
-        public PuppeteerDownloader()
+        public PuppeteerDownloader(bool useProxy)
         {
+            UseProxy = useProxy;
+            if (UseProxy)
+            {
+                launchOptions.Args = [.. launchOptions.Args, .. LaunchOptionsProxy];
+            }
             Browser = Task.Run(LaunchAsync).Result;
         }
 
@@ -309,7 +319,7 @@ namespace landerist_library.Downloaders.Puppeteer
         public static void DoTest()
         {
             // working
-            Websites.Page page = new("https://34mallorca.com/detalles-del-inmueble/carismatico-edificio-en-el-centro-de-palma/19675687");
+            Websites.Page page = new("https://remaxvetusta.es/inmueble/venta/casa/asturias/grandas-de-salime/3555_03851/");
 
             // http - > https
             //var page = new Websites.Page("http://34mallorca.com/detalles-del-inmueble/carismatico-edificio-en-el-centro-de-palma/19675687");
@@ -320,13 +330,13 @@ namespace landerist_library.Downloaders.Puppeteer
 
 
             Logs.Log.WriteInfo("PuppeteerTest", "Starting test");
-            string? text = new PuppeteerDownloader().GetText(page);
+            string? text = new PuppeteerDownloader(true).GetText(page);
 
             Console.WriteLine(text);
             Logs.Log.WriteInfo("PuppeteerTest", "Result: " + text);
         }
 
-        public string? GetText(Websites.Page page)
+        private string? GetText(Websites.Page page)
         {
             SetContentAndScrenshot(page);
             if (Content != null)
@@ -427,10 +437,10 @@ namespace landerist_library.Downloaders.Puppeteer
                 var message = SingleDownloader!.Id.ToString() + " " + exception.Message;
                 //Logs.Log.WriteError("PuppeterDownloader GetAsync NavigationException", message);
             }
-            catch (Exception exception)
+            catch //(Exception exception)
             {
                 BrowserChrashed = true;
-                var message = SingleDownloader!.Id.ToString() + " " + exception.GetType().ToString();
+                //var message = SingleDownloader!.Id.ToString() + " " + exception.GetType().ToString();
                 //Logs.Log.WriteError("PuppeterDownloader GetAsync Exception", message);
             }
 
@@ -460,22 +470,36 @@ namespace landerist_library.Downloaders.Puppeteer
             catch (Exception exception)
             {
                 Logs.Log.WriteInfo("PageInitialized error", SingleDownloader!.Id.ToString() + " " + exception.Message);
-                //Logs.Log.WriteError( SingleDownloader!.Id +  " PuppeteerDownloader InitializePage", exception);
                 return;
             }
 
 
+            AuthenticateIfProxy();
             BrowserPage.DefaultNavigationTimeout = GetTimeout();
 
             SetAccepLanguage(BrowserPage, languageCode);
             await BrowserPage.SetUserAgentAsync(Config.USER_AGENT);
             await BrowserPage.SetCacheEnabledAsync(false);
-
             await BrowserPage.SetRequestInterceptionAsync(true);
             BrowserPage.Request += async (sender, e) => await HandleRequestAsync(e, uri);
             BrowserPage.Response += (sender, e) => HandleResponseAsync(e, uri);
-            //await browserPage.Client.SendAsync("HeapProfiler.collectGarbage");
 
+        }
+
+        private async void AuthenticateIfProxy()
+        {
+            if (!UseProxy || BrowserPage == null)
+            {
+                return;
+            }
+            var session_id = new Random().Next().ToString(); 
+            var userName = PrivateConfig.BRIGTHDATA_USERNAME + "-session-" + session_id;
+            Credentials? credentials = new()
+            {
+                Username = userName,
+                Password = PrivateConfig.BRIGTHDATA_PASSWORD
+            };
+            await BrowserPage.AuthenticateAsync(credentials);
         }
 
         private void SetAccepLanguage(IPage browserPage, LanguageCode languageCode)
