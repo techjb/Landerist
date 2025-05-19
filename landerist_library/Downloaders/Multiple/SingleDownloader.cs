@@ -51,7 +51,6 @@ namespace landerist_library.Downloaders.Multiple
             Downloader.Download(Page);
             Scraped++;
 
-
             if (BrowserHasChrashed())
             {
                 Chrashes++;

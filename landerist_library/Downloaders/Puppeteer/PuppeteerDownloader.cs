@@ -230,11 +230,12 @@ namespace landerist_library.Downloaders.Puppeteer
             catch (Exception exception)
             {
                 Logs.Log.WriteError("PuppeteerDownloader LaunchAsync", exception);
+
             }
             return null;
         }
 
-        public void CloseBrowser()
+        public async void CloseBrowser()
         {
             if (!BrowserInitialized())
             {
@@ -242,8 +243,8 @@ namespace landerist_library.Downloaders.Puppeteer
             }
             try
             {
-                Browser!.CloseAsync();
-                Browser!.Dispose();
+                await Browser!.CloseAsync();
+                await Browser!.DisposeAsync();
             }
             catch (Exception exception)
             {
@@ -252,7 +253,7 @@ namespace landerist_library.Downloaders.Puppeteer
             Browser = null;
         }
 
-        public void ClosePage()
+        public async void ClosePage()
         {
             if (!PageInitialized())
             {
@@ -260,8 +261,8 @@ namespace landerist_library.Downloaders.Puppeteer
             }
             try
             {
-                Task.Run(async () => await BrowserPage!.CloseAsync()).Wait();
-                BrowserPage!.Dispose();
+                await BrowserPage!.CloseAsync();                
+                await BrowserPage!.DisposeAsync();
             }
             catch (Exception exception)
             {

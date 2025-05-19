@@ -54,8 +54,8 @@ namespace landerist_console
         {
             ServiceTasks.Start();
 
-            Console.WriteLine("ReadLine or Close to exit..");
-            Console.ReadLine();
+            //Console.WriteLine("ReadLine or Close to exit..");
+            //Console.ReadLine();
         }
     }
 }

@@ -25,14 +25,14 @@
                     return newSingleDownloader;
                 }
 
-                Logs.Log.WriteError("MultipleDownloader GetDownloader", "Downloader not found");
+                //Logs.Log.WriteError("MultipleDownloader GetDownloader", "Downloader not found");
                 return null;
             }
         }
 
         public static void Clear()
         {
-            Print();
+            //Print();
             Parallel.ForEach(Downloaders, new ParallelOptions()
             {
 
