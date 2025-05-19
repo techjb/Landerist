@@ -16,6 +16,10 @@ namespace landerist_library.Landerist_com
     public class Landerist_com
     {
 
+        protected static string GetFilePath(string subdirectory)
+        {
+            return Config.EXPORT_DIRECTORY + subdirectory;
+        }
         protected static string GetFilePath(string subdirectory, string fileName)
         {
             return Config.EXPORT_DIRECTORY + subdirectory + "\\" + fileName;

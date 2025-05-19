@@ -3,13 +3,14 @@ using landerist_library.Export;
 using landerist_library.Logs;
 using landerist_library.Websites;
 using landerist_orels.ES;
+using OpenAI;
 
 namespace landerist_library.Landerist_com
 {
     public class DownloadFilesUpdater : Landerist_com
     {
         private static DateTime Yesterday;
-        public static void UpdateFiles()
+        public static void UpdateListingsAndUpdates()
         {
             Yesterday = DateTime.Now.AddDays(-1);
             try
@@ -19,7 +20,7 @@ namespace landerist_library.Landerist_com
             }
             catch (Exception exception)
             {
-                Log.WriteError("UpdateFiles", exception);
+                Log.WriteError("UpdateListingsAndUpdates", exception);
             }
         }
 
@@ -53,10 +54,16 @@ namespace landerist_library.Landerist_com
 
             string fileNameZip = GetFileName(countryCode, exportType, "zip");
             string subdirectory = GetLocalSubdirectory(countryCode, exportType);
+            string filePath = GetFilePath(subdirectory);
             string filePathZip = GetFilePath(subdirectory, fileNameZip);
             string fileNameJson = GetFileName(countryCode, exportType, "json");
             string filePathJson = GetFilePath(subdirectory, fileNameJson);
             string subdirectoryInBucket = subdirectory.Replace("\\", "/");
+
+            if (!Directory.Exists(filePath))
+            {
+                Directory.CreateDirectory(filePath);
+            }
 
             if (!Json.ExportListings(listings, filePathJson))
             {

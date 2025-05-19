@@ -168,7 +168,7 @@ namespace landerist_library.Tasks
             {
                 Pages.DeleteUnpublishedListings();
                 StatisticsSnapshot.TakeSnapshots();
-                DownloadFilesUpdater.UpdateFiles();
+                DownloadFilesUpdater.UpdateListingsAndUpdates();
                 Landerist_com.Landerist_com.UpdateDownloadsAndStatisticsPages();
                 Backup.Update();
             }

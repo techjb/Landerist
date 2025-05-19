@@ -218,7 +218,7 @@ namespace landerist_tests
 
             //Csv.Export(true);
             //landerist_library.Export.Json.Export("es_listings_full.json", true);
-            //landerist_library.Landerist_com.FilesUpdater.UpdateFiles();
+            //landerist_library.Landerist_com.FilesUpdater.UpdateListingsAndUpdates();
             //new landerist_library.Landerist_com.DownloadsPage().Update();            
             //landerist_library.Landerist_com.StatisticsPage.Update();
             //landerist_library.Landerist_com.Landerist_com.InvalidateCloudFront();            
@@ -263,8 +263,8 @@ namespace landerist_tests
             #region landerist.com
 
             //landerist_library.Statistics.StatisticsSnapshot.TakeSnapshots();
-            //DownloadFilesUpdater.UpdateFiles();
-            //landerist_library.Landerist_com.DownloadFilesUpdater.UpdateFiles();
+            //DownloadFilesUpdater.UpdateListingsAndUpdates();
+            //landerist_library.Landerist_com.DownloadFilesUpdater.UpdateListingsAndUpdates();
             //landerist_library.Landerist_com.DownloadFilesUpdater.UpdateUpdates();
             //landerist_library.Landerist_com.Landerist_com.UpdateDownloads();
             //landerist_library.Landerist_com.Landerist_com.UpdateDownloadsAndStatisticsPages();
@@ -288,6 +288,7 @@ namespace landerist_tests
 
             //ServiceTasks.DailyTask();
             //new ServiceTasks().UpdateAndScrape();
+            DownloadFilesUpdater.UpdateListingsAndUpdates();
             //ServiceTasks.UpdateAndScrape();
             //ServiceTasks.Update();
             //ServiceTasks.Scrape();
