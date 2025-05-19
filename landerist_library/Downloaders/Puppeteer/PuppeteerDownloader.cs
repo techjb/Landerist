@@ -195,7 +195,7 @@ namespace landerist_library.Downloaders.Puppeteer
             UseProxy = useProxy;
             if (UseProxy)
             {
-                launchOptions.Args = [.. launchOptions.Args, .. LaunchOptionsProxy];
+                launchOptions.Args = [.. LaunchOptionsArgs, .. LaunchOptionsProxy];
             }
             Browser = Task.Run(LaunchAsync).Result;
         }
