@@ -69,6 +69,8 @@ namespace landerist_tests
         {
             Config.SetOnlyDatabaseToProduction();
 
+            Thread.Sleep(1000);
+
             #region Urls
 
 

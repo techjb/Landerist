@@ -31,9 +31,6 @@ namespace landerist_library.Scrape
 
         private readonly CancellationTokenSource CancellationTokenSource = new();
 
-        //public static readonly MultipleDownloader MultipleDownloader = new();
-
-
         private List<Page> Pages = [];
 
         public Scraper()

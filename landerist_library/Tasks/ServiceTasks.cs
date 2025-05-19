@@ -180,6 +180,7 @@ namespace landerist_library.Tasks
 
         public void Stop()
         {
+            Console.WriteLine("Stopping ServiceTasks ..");
             Scraper.Stop();
             Timer1?.Change(Timeout.Infinite, 0);
             Timer2?.Change(Timeout.Infinite, 0);

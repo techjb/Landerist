@@ -12,6 +12,7 @@ namespace landerist_console
 
         private delegate bool ConsoleEventDelegate(int eventType);
         private static readonly ConsoleEventDelegate Handler = new(ConsoleEventHandler);
+        private static ManualResetEvent ManualResetEvent = new (false);
         [LibraryImport("kernel32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static partial bool SetConsoleCtrlHandler(ConsoleEventDelegate callback, [MarshalAs(UnmanagedType.Bool)] bool add);
@@ -21,12 +22,20 @@ namespace landerist_console
             Console.Title = "Landerist Console";
             Start();
             Run();            
-            End();
+            //End();
         }
 
         private static void Start()
         {
             SetConsoleCtrlHandler(Handler, true);
+
+            Console.CancelKeyPress += (s, e) => {
+                ManualResetEvent.Set();
+                End();
+            };
+
+            Console.WriteLine("Press Ctrl+C to exit.");            
+
             DateStart = DateTime.Now;
             Config.SetToProduction();            
             Log.Delete();
@@ -40,21 +49,22 @@ namespace landerist_console
                 End();
             }
             return false;
-        }
-
-        private static void End()
-        {
-            ServiceTasks.Stop();
-
-            var duration = (DateTime.Now - DateStart).ToString(@"dd\:hh\:mm\:ss\.fff");
-            Log.WriteInfo("landerist_console", "Stopped. Version: " + Config.VERSION + " Duration: " + duration);
-        }
+        }     
 
         private static void Run()
         {
             ServiceTasks.Start();
+            ManualResetEvent.WaitOne();
+        }
 
-            //Console.WriteLine("ReadLine or Close to exit..");
+        private static void End()
+        {
+            Log.WriteInfo("landerist_console", "Stopping...");
+            ServiceTasks.Stop();
+
+            var duration = (DateTime.Now - DateStart).ToString(@"dd\:hh\:mm\:ss\.fff");
+            Log.WriteInfo("landerist_console", "Stopped. Version: " + Config.VERSION + " Duration: " + duration);
+
             //Console.ReadLine();
         }
     }
