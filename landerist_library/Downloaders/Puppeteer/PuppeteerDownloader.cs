@@ -3,7 +3,9 @@ using landerist_library.Configuration;
 using landerist_library.Downloaders.Multiple;
 using landerist_library.Websites;
 using PuppeteerSharp;
+using System;
 using System.Diagnostics;
+using System.Net;
 
 
 namespace landerist_library.Downloaders.Puppeteer
@@ -90,7 +92,7 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private static readonly string[] LaunchOptionsProxy =
         [
-            "--proxy-server=" + PrivateConfig.BRIGTHDATA_HOST + ":" + PrivateConfig.BRIGTHDATA_PORT + ""
+            "--proxy-server=" + PrivateConfig.BRIGTHDATA_HOST + ":" + PrivateConfig.BRIGTHDATA_PORT + ""            
         ];
 
         private static readonly string[] LaunchOptionsScreenShot =
@@ -106,7 +108,7 @@ namespace landerist_library.Downloaders.Puppeteer
             //Headless = false,
             Devtools = false,            
             //IgnoreHTTPSErrors = true,            
-            Args = Config.TAKE_SCREENSHOT ? [.. LaunchOptionsArgs, .. LaunchOptionsScreenShot] : LaunchOptionsArgs,
+            Args = Config.TAKE_SCREENSHOT ? [.. LaunchOptionsArgs, .. LaunchOptionsScreenShot] : LaunchOptionsArgs,            
         };
 
 
@@ -320,7 +322,7 @@ namespace landerist_library.Downloaders.Puppeteer
         public static void DoTest()
         {
             // working
-            Websites.Page page = new("https://remaxvetusta.es/inmueble/venta/casa/asturias/grandas-de-salime/3555_03851/");
+            Websites.Page page = new("https://www.nbinmobiliaria.es/ad/99269515");
 
             // http - > https
             //var page = new Websites.Page("http://34mallorca.com/detalles-del-inmueble/carismatico-edificio-en-el-centro-de-palma/19675687");
@@ -334,7 +336,9 @@ namespace landerist_library.Downloaders.Puppeteer
             string? text = new PuppeteerDownloader(true).GetText(page);
 
             Console.WriteLine(text);
-            Logs.Log.WriteInfo("PuppeteerTest", "Result: " + text);
+            Logs.Log.WriteInfo("PuppeteerTest", "Text: " + text);
+            
+            //Logs.Log.WriteInfo("PuppeteerTest", "HttpStatusCode: " + HttpStatusCode);
         }
 
         private string? GetText(Websites.Page page)
@@ -420,6 +424,14 @@ namespace landerist_library.Downloaders.Puppeteer
                     content = await BrowserPage.GetContentAsync();
                     return (content, screenShot);
                 }
+                else if (response.Status.Equals(System.Net.HttpStatusCode.ProxyAuthenticationRequired))
+                {
+                    throw new Exception();
+                }
+                //else
+                //{
+                //    LogHttpError(response);
+                //}
             }
             //catch (NullReferenceException exception)
             //{
@@ -493,8 +505,7 @@ namespace landerist_library.Downloaders.Puppeteer
             {
                 return;
             }
-            var session_id = new Random().Next().ToString(); 
-            var userName = PrivateConfig.BRIGTHDATA_USERNAME + "-session-" + session_id;
+            var userName = PrivateConfig.BRIGTHDATA_USERNAME + "-session-" + new Random().Next().ToString();
             Credentials? credentials = new()
             {
                 Username = userName,
@@ -530,7 +541,7 @@ namespace landerist_library.Downloaders.Puppeteer
                     BlockDomains.Contains(uri.Host) ||
                     BlockedExtensions.Any(url.EndsWith) ||
                     e.Request.IsNavigationRequest && e.Request.RedirectChain.Length != 0
-                    //|| e.Request.IsNavigationRequest && e.Request.Url != uri.ToString()) // problematic
+                    //|| response.Request.IsNavigationRequest && response.Request.Url != uri.ToString()) // problematic
                     )
                 {
                     await e.Request.AbortAsync();
@@ -557,7 +568,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 {
                     return;
                 }
-                HttpStatusCode = (short)e.Response.Status;
+                HttpStatusCode = (short)e.Response.Status;                
                 if (e.Response.Headers.TryGetValue("Location", out string? location))
                 {
                     RedirectUrl = location;
@@ -567,6 +578,19 @@ namespace landerist_library.Downloaders.Puppeteer
             {
                 Logs.Log.WriteError("PuppeteerDownloader HandleResponseAsync", exception);
             }
+        }
+
+        private static void LogHttpError(IResponse response)
+        {
+            //string error = $"▶ Status: {response.Status} ({response.StatusText}) ▶ Headers: ";
+            //foreach (var kv in response.Headers)
+            //{
+            //    error+= $" {kv.Key}: {kv.Value} ";
+            //}
+            //error += $" ▶ URL: {response.Url}";
+            string error = $"▶ Status: {response.Status} ({response.StatusText}) ▶ URL: {response.Url}";
+            
+            Logs.Log.WriteError("PuppeteerDownloader LogHttpError", error);
         }
 
         private static int GetTimeout()

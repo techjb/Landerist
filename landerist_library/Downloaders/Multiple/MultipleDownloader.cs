@@ -24,8 +24,7 @@
                     Downloaders.Add(newSingleDownloader);
                     return newSingleDownloader;
                 }
-
-                //Logs.Log.WriteError("MultipleDownloader GetDownloader", "Downloader not found");
+                Logs.Log.WriteError("MultipleDownloader GetDownloader", "Downloader not found");
                 return null;
             }
         }
