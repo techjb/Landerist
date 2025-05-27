@@ -423,15 +423,7 @@ namespace landerist_library.Downloaders.Puppeteer
                     }
                     content = await BrowserPage.GetContentAsync();
                     return (content, screenShot);
-                }
-                else if (response.Status.Equals(System.Net.HttpStatusCode.ProxyAuthenticationRequired))
-                {
-                    throw new Exception();
-                }
-                //else
-                //{
-                //    LogHttpError(response);
-                //}
+                }                
             }
             //catch (NullReferenceException exception)
             //{
@@ -482,12 +474,11 @@ namespace landerist_library.Downloaders.Puppeteer
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteInfo("PageInitialized error", SingleDownloader!.Id.ToString() + " " + exception.Message);
+                Logs.Log.WriteInfo("PuppeterDownloader InitializePage", exception.Message);
                 return;
             }
 
-
-            AuthenticateIfProxy();
+            await AuthenticateIfProxy();
             BrowserPage.DefaultNavigationTimeout = GetTimeout();
 
             SetAccepLanguage(BrowserPage, languageCode);
@@ -499,16 +490,15 @@ namespace landerist_library.Downloaders.Puppeteer
 
         }
 
-        private async void AuthenticateIfProxy()
+        private async Task AuthenticateIfProxy()
         {
             if (!UseProxy || BrowserPage == null)
             {
                 return;
-            }
-            var userName = PrivateConfig.BRIGTHDATA_USERNAME + "-session-" + new Random().Next().ToString();
-            Credentials? credentials = new()
+            }            
+            Credentials? credentials = new ()
             {
-                Username = userName,
+                Username = PrivateConfig.BRIGTHDATA_USERNAME + "-session-" + new Random().Next().ToString(),
                 Password = PrivateConfig.BRIGTHDATA_PASSWORD
             };
             await BrowserPage.AuthenticateAsync(credentials);
