@@ -32,6 +32,8 @@ namespace landerist_library.Websites
 
         public short? PageTypeCounter { get; private set; }
 
+        public string? LockedBy { get; set; }
+
         public WaitingStatus? WaitingStatus { get; private set; }
 
         private string? ResponseBody { get; set; }
@@ -116,7 +118,8 @@ namespace landerist_library.Websites
             NextUpdate = dataRow["NextUpdate"] is DBNull ? null : (DateTime)dataRow["NextUpdate"];
             HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
             PageType = dataRow["PageType"] is DBNull ? null : (PageType)Enum.Parse(typeof(PageType), dataRow["PageType"].ToString()!);
-            PageTypeCounter = dataRow["PageTypeCounter"] is DBNull ? null : (short)dataRow["PageTypeCounter"];            
+            PageTypeCounter = dataRow["PageTypeCounter"] is DBNull ? null : (short)dataRow["PageTypeCounter"];
+            LockedBy = dataRow["LockedBy"] is DBNull ? null : dataRow["LockedBy"].ToString();
             WaitingStatus = dataRow["WaitingStatus"] is DBNull ? null : (WaitingStatus)Enum.Parse(typeof(WaitingStatus), dataRow["WaitingStatus"].ToString()!);
             ResponseBodyTextHash = dataRow["ResponseBodyTextHash"] is DBNull ? null : dataRow["ResponseBodyTextHash"].ToString();
             ResponseBodyZipped = dataRow["ResponseBodyZipped"] is DBNull ? null : (byte[])dataRow["ResponseBodyZipped"];
@@ -144,7 +147,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "INSERT INTO " + Pages.PAGES + " " +
-                "VALUES(@Host, @Uri, @UriHash, @Inserted, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
+                "VALUES(@Host, @Uri, @UriHash, @Inserted, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
 
             bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
                 {"Host", Host },
@@ -180,6 +183,7 @@ namespace landerist_library.Websites
                 "[HttpStatusCode] = @HttpStatusCode, " +
                 "[PageType] = @PageType, " +
                 "[PageTypeCounter] = @PageTypeCounter, " +
+                "[LockedBy] = @LockedBy, " +
                 "[WaitingStatus] = @WaitingStatus, " +
                 "[ResponseBodyTextHash] = @ResponseBodyTextHash, " +
                 "[ResponseBodyZipped] = CASE WHEN @ResponseBodyZipped IS NULL THEN NULL ELSE CONVERT(varbinary(max), @ResponseBodyZipped) END " +
@@ -191,6 +195,7 @@ namespace landerist_library.Websites
                 {"HttpStatusCode", HttpStatusCode},
                 {"PageType", PageType?.ToString()},
                 {"PageTypeCounter", PageTypeCounter},
+                {"LockedBy", LockedBy?.ToString()},
                 {"WaitingStatus", WaitingStatus?.ToString()},
                 {"ResponseBodyTextHash", ResponseBodyTextHash},
                 {"ResponseBodyZipped", ResponseBodyZipped},

@@ -1,4 +1,5 @@
 ﻿using landerist_library.Configuration;
+using landerist_library.Database;
 using landerist_library.Downloaders.Multiple;
 using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Logs;
@@ -11,7 +12,7 @@ namespace landerist_library.Scrape
 {
     public class Scraper
     {
-        private static readonly PageBlocker PageBlocker = new();
+        //private static readonly PageBlocker PageBlocker = new();
 
         private static readonly object SyncPageBlocker = new();
 
@@ -62,7 +63,8 @@ namespace landerist_library.Scrape
 
         public void Start()
         {
-            PageBlocker.Clean();
+            //PageBlocker.Clean();
+            WebsitesBlocker.Clean();
             MultipleDownloader.Clear();
             Pages = PageSelector.Select();
             Scrape();
@@ -204,12 +206,12 @@ namespace landerist_library.Scrape
                 page.Update(PageType.CrawlDelayTooBig, true);
                 return;
             }
-            var isBlocked = PageBlocker.IsBlocked(page);
+            //var isBlocked = PageBlocker.IsBlocked(page);
+            var isBlocked = WebsitesBlocker.IsBlocked(page.Website);
             if (isBlocked && !Config.PROXY_ENABLED)
             {
                 return;
-            }
-            
+            }            
             Scrape(page, isBlocked);
             page.Dispose();
             Interlocked.Increment(ref Scraped);
@@ -256,7 +258,10 @@ namespace landerist_library.Scrape
 
         private void EndThread(ParallelLoopState parallelLoopState)
         {
-            AddUnblockedPages();
+            if(!Config.PROXY_ENABLED)
+            {
+                AddUnblockedPages();
+            }            
             Interlocked.Decrement(ref ThreadCounter);
             if (BlockingCollection.IsAddingCompleted)
             {
@@ -272,15 +277,10 @@ namespace landerist_library.Scrape
             hashSet.Clear();
         }
 
-        //public void Scrape(Uri uri, bool useProxy)
-        //{
-        //    var page = new Page(uri);
-        //    Scrape(page, useProxy);
-        //}
-
         public void Scrape(Page page, bool useProxy)
         {
-            AddToPageBlocker(page);
+            //AddToPageBlocker(page);
+            WebsitesBlocker.Block(page.Website);
             var pageScraper = new PageScraper(page, this, useProxy);
             if (pageScraper.Scrape())
             {
@@ -296,17 +296,17 @@ namespace landerist_library.Scrape
             }
         }
 
-        private static void AddToPageBlocker(Page page)
-        {
-            lock (SyncPageBlocker)
-            {
-                PageBlocker.Add(page.Website);
-            }
-        }
+        //private static void AddToPageBlocker(Page page)
+        //{
+        //    lock (SyncPageBlocker)
+        //    {
+        //        PageBlocker.Add(page.Website);
+        //    }
+        //}
 
         private void AddUnblockedPages()
         {
-            if (BlockingCollection.IsAddingCompleted || Config.PROXY_ENABLED)
+            if (BlockingCollection.IsAddingCompleted)
             {
                 return;
             }

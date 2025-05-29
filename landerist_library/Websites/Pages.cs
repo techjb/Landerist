@@ -77,7 +77,7 @@ namespace landerist_library.Websites
         {
             string where = "P.[PageType] IS NULL";
             return GetPages(topRows, where);
-        }       
+        }
 
 
         //public static List<Page> GetNextUpdate(int topRows, List<string> hosts, List<string> ips)
@@ -88,7 +88,7 @@ namespace landerist_library.Websites
 
         public static List<Page> GetNextUpdate(int topRows)
         {
-            string where = "P.[NextUpdate] < GETDATE()";
+            string where = "P.[NextUpdate] < GETDATE() ";
             return GetPages(topRows, where);
         }
 
@@ -104,47 +104,39 @@ namespace landerist_library.Websites
             return GetPages(topRows, where);
         }
 
+
         //private static List<Page> GetPages(int topRows, string where)
         //{
-        //    string query =
-        //        "WITH [RANKED_ROWS] AS (" +
-        //        "   SELECT " +
-        //                "P.[Host], " +
-        //                "P.[Uri], " +
-        //                "P.[UriHash], " +
-        //                "P.[Inserted], " +
-        //                "P.[Updated], " +
-        //                "P.[NextUpdate], " +
-        //                "P.[HttpStatusCode], " +
-        //                "P.[PageType], " +
-        //                "P.[PageTypeCounter], " +
-        //                "P.[WaitingStatus], " +
-        //                "P.[ResponseBodyTextHash], " +
-        //                "P.[ResponseBodyZipped], " +
-        //                "W.[MainUri], " +
-        //                "W.[LanguageCode], " +
-        //                "W.[CountryCode], " +
-        //                "W.[RobotsTxt], " +
-        //                "W.[RobotsTxtUpdated], " +
-        //                "W.[SitemapUpdated], " +
-        //                "W.[IpAddress], " +
-        //                "W.[IpAddressUpdated], " +
-        //                "W.[NumPages], " +
-        //                "W.[NumListings], " +
-        //                "W.[ListingExampleUri], " +
-        //                "W.[ListingExampleNodeSet], " +
-        //                "W.[ListingExampleNodeSetUpdated], " +
-        //        "       ROW_NUMBER() OVER(PARTITION BY P.[Host] ORDER BY P.[UriHash] ASC) AS RN_HOST, " +
-        //        "       ROW_NUMBER() OVER(PARTITION BY W.[IpAddress] ORDER BY W.[Host] ASC) AS RN_IP  " +
-        //        "   FROM " + PAGES + " AS P " +
-        //        "   INNER JOIN " + Websites.WEBSITES + " AS W ON P.[Host] = W.[Host] " +
-        //        "   WHERE " + where + " " +
-        //        ") " +
-        //        "SELECT TOP " + topRows + " * " +
-        //        "FROM [RANKED_ROWS] " +
-        //        "WHERE " +
-        //        "   RN_HOST <= " + Config.MAX_PAGES_PER_HOSTS_PER_SCRAPE + " AND " +
-        //        "   RN_IP <= " + Config.MAX_PAGES_PER_IP_PER_SCRAPE + " " +
+        //    string query =                
+        //        "SELECT TOP " + topRows + " " +
+        //            "P.[Host], " +
+        //            "P.[Uri], " +
+        //            "P.[UriHash], " +
+        //            "P.[Inserted], " +
+        //            "P.[Updated], " +
+        //            "P.[NextUpdate], " +
+        //            "P.[HttpStatusCode], " +
+        //            "P.[PageType], " +
+        //            "P.[PageTypeCounter], " +
+        //            "P.[WaitingStatus], " +
+        //            "P.[ResponseBodyTextHash], " +
+        //            "P.[ResponseBodyZipped], " +
+        //            "W.[MainUri], " +
+        //            "W.[LanguageCode], " +
+        //            "W.[CountryCode], " +
+        //            "W.[RobotsTxt], " +
+        //            "W.[RobotsTxtUpdated], " +
+        //            "W.[SitemapUpdated], " +
+        //            "W.[IpAddress], " +
+        //            "W.[IpAddressUpdated], " +
+        //            "W.[NumPages], " +
+        //            "W.[NumListings], " +
+        //            "W.[ListingExampleUri], " +
+        //            "W.[ListingExampleNodeSet], " +
+        //            "W.[ListingExampleNodeSetUpdated] " +                
+        //        "FROM " + PAGES + " AS P " +
+        //        "INNER JOIN " + Websites.WEBSITES + " AS W ON P.[Host] = W.[Host] " +
+        //        "WHERE " + where + " " +              
         //        "ORDER BY [NextUpdate] ASC";
 
         //    DataTable dataTable = new DataBase().QueryTable(query);
@@ -153,20 +145,30 @@ namespace landerist_library.Websites
 
         private static List<Page> GetPages(int topRows, string where)
         {
-            string query =                
-                "SELECT TOP " + topRows + " " +
-                    "P.[Host], " +
-                    "P.[Uri], " +
-                    "P.[UriHash], " +
-                    "P.[Inserted], " +
-                    "P.[Updated], " +
-                    "P.[NextUpdate], " +
-                    "P.[HttpStatusCode], " +
-                    "P.[PageType], " +
-                    "P.[PageTypeCounter], " +
-                    "P.[WaitingStatus], " +
-                    "P.[ResponseBodyTextHash], " +
-                    "P.[ResponseBodyZipped], " +
+            string query =
+                "WITH TopPages AS (" +
+                "   SELECT TOP " + topRows + " P.[UriHash] " +
+                "   FROM " + PAGES + " AS P " +
+                "   INNER JOIN " + Websites.WEBSITES + " AS W ON P.[Host] = W.[Host] " +
+                "   WHERE P.[LockedBy] IS NULL AND P.[WaitingStatus] IS NULL AND " + where + " " +
+                "   ORDER BY P.[NextUpdate] ASC" +
+                ") " +
+                "UPDATE P " +
+                "SET LockedBy = @LockedBy " +
+                "OUTPUT " +
+                    "INSERTED.[Host], " +
+                    "INSERTED.[Uri], " +
+                    "INSERTED.[UriHash], " +
+                    "INSERTED.[Inserted], " +
+                    "INSERTED.[Updated], " +
+                    "INSERTED.[NextUpdate], " +
+                    "INSERTED.[HttpStatusCode], " +
+                    "INSERTED.[PageType], " +
+                    "INSERTED.[PageTypeCounter], " +
+                    "INSERTED.[LockedBy], " +
+                    "INSERTED.[WaitingStatus], " +
+                    "INSERTED.[ResponseBodyTextHash], " +
+                    "INSERTED.[ResponseBodyZipped], " +
                     "W.[MainUri], " +
                     "W.[LanguageCode], " +
                     "W.[CountryCode], " +
@@ -179,15 +181,51 @@ namespace landerist_library.Websites
                     "W.[NumListings], " +
                     "W.[ListingExampleUri], " +
                     "W.[ListingExampleNodeSet], " +
-                    "W.[ListingExampleNodeSetUpdated] " +                
+                    "W.[ListingExampleNodeSetUpdated] " +
                 "FROM " + PAGES + " AS P " +
                 "INNER JOIN " + Websites.WEBSITES + " AS W ON P.[Host] = W.[Host] " +
-                "WHERE " + where + " " +              
-                "ORDER BY [NextUpdate] ASC";
+                "INNER JOIN TopPages AS TP ON P.[UriHash] = TP.[UriHash]";
 
-            DataTable dataTable = new DataBase().QueryTable(query);
+            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>(){
+                { "LockedBy", Config.IsConfigurationLocal()? null: Config.MACHINE_NAME}
+            });
             return GetPages(dataTable);
         }
+
+        //private static List<Page> GetPages(int topRows, string where)
+        //{
+        //    string query =
+        //        "DECLARE @LockedPages TABLE (" +
+        //        "   Host                NVARCHAR(200), " +
+        //        "   Uri                 NVARCHAR(MAX), " +
+        //        "   UriHash             CHAR(64), " +
+        //        "   Inserted            DATETIME, " +
+        //        "   Updated             DATETIME, " +
+        //        "   NextUpdate          DATETIME, " +
+        //        "   HttpStatusCode      SMALLINT, " +
+        //        "   PageType            VARCHAR(50), " +
+        //        "   PageTypeCounter     SMALLINT, " +
+        //        "   WaitingStatus       VARCHAR(50), " +
+        //        "   ResponseBodyTextHash CHAR(64), " +
+        //        "   ResponseBodyZipped  VARBINARY(MAX), " +
+        //        "   MainUri             NVARCHAR(MAX), " +
+        //        "   LanguageCode        NVARCHAR(10), " +
+        //        "   CountryCode         NVARCHAR(10), " +
+        //        "   RobotsTxt           NVARCHAR(MAX), " +
+        //        "   RobotsTxtUpdated    DATETIME, " +
+        //        "   SitemapUpdated      DATETIME, " +
+        //        "   IpAddress           VARCHAR(45), " +
+        //        "   IpAddressUpdated    DATETIME, " +
+        //        "   NumPages            INT,   " +
+        //        "   NumListings         INT,   " +
+        //        "   ListingExampleUri   NVARCHAR(MAX), " +
+        //        "   ListingExampleNodeSet NVARCHAR(MAX),   " +
+        //        "   ListingExampleNodeSetUpdated DATETIME); " +
+        //        "";
+
+        //    DataTable dataTable = new DataBase().QueryTable(query);
+        //    return GetPages(dataTable);
+        //}
 
         public static List<Page> GetNonScrapedPages(Website website)
         {
@@ -590,7 +628,7 @@ namespace landerist_library.Websites
                 "WHERE [WaitingStatus] = @WaitingStatus";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"WaitingStatus", waitingStatus.ToString() },                
+                {"WaitingStatus", waitingStatus.ToString() },
             });
             return GetPages(dataTable);
         }
@@ -605,6 +643,19 @@ namespace landerist_library.Websites
             new DataBase().Query(query, new Dictionary<string, object?> {
                 {"WaitingStatus", waitingStatus.ToString() },
                 {"UriHash", uriHash }
+            });
+        }
+
+        public static void CleanLockedBy()
+        {
+            string query =
+                "UPDATE " + PAGES + " " +
+                "SET [LockedBy] = NULL " +
+                "WHERE [LockedBy] = @LockedBy";
+
+            new DataBase().Query(query, new Dictionary<string, object?>()
+            {
+                { "LockedBy", Config.MACHINE_NAME }
             });
         }
     }

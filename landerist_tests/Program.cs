@@ -1,4 +1,5 @@
 ﻿using landerist_library.Configuration;
+using landerist_library.Database;
 using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Landerist_com;
 using landerist_library.Logs;
@@ -74,7 +75,7 @@ namespace landerist_tests
             #region Urls
 
 
-            //var page = new Page("https://archigestion.com/manuel-perez-lima-realiza-una-firma-de-libros-en-el-cc-martianez-por-el-apoyo-a-la-lectura/");
+            var page = new Page("https://archigestion.com/manuel-perez-lima-realiza-una-firma-de-libros-en-el-cc-martianez-por-el-apoyo-a-la-lectura/");
 
             // listing 
             //var page = new Page("https://goldacreestates.com/realestate/top/026712-42136");            
@@ -151,10 +152,12 @@ namespace landerist_tests
             //new Scraper().ScrapeUnknowPageType(website);
             //new Scraper().ScrapeAllPages();            
             //new Scraper().ScrapeResponseBodyRepeatedInListings();            
-            //new Scraper().Start();                        
+            new Scraper().Start();
             //new Scraper().Scrape(page);
             //new Scraper().DoTest();
             //landerist_library.Scrape.PageSelector.Select();
+            //Console.WriteLine("Block: " + WebsitesBlocker.Block(page.Website));
+            //Console.WriteLine("IsBlocked: " + WebsitesBlocker.IsBlocked(page.Website));
 
 
             #endregion

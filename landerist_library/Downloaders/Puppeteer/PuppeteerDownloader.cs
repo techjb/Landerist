@@ -487,7 +487,6 @@ namespace landerist_library.Downloaders.Puppeteer
             await BrowserPage.SetRequestInterceptionAsync(true);
             BrowserPage.Request += async (sender, e) => await HandleRequestAsync(e, uri);
             BrowserPage.Response += (sender, e) => HandleResponseAsync(e, uri);
-
         }
 
         private async Task AuthenticateIfProxy()
