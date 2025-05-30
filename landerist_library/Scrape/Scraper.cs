@@ -74,6 +74,7 @@ namespace landerist_library.Scrape
         {
             CancellationTokenSource.Cancel();
             MultipleDownloader.Clear();
+            Websites.Pages.CleanLockedBy();
             PuppeteerDownloader.KillChrome();
         }
 
@@ -211,7 +212,7 @@ namespace landerist_library.Scrape
             if (isBlocked && !Config.PROXY_ENABLED)
             {
                 return;
-            }            
+            }               
             Scrape(page, isBlocked);
             page.Dispose();
             Interlocked.Increment(ref Scraped);

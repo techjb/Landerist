@@ -23,11 +23,7 @@ namespace landerist_library.Parse.PageTypeParser
             if (page.NotCanonical())
             {
                 return (PageType.NotCanonical, null, false);
-            }
-            //if (LastSegment.NotListingByLastSegment(page.Uri))
-            //{
-            //    return (PageType.NotListingByLastSegment, null, false);
-            //}
+            }            
             if (page.IncorrectLanguage())
             {
                 return (PageType.IncorrectLanguage, null, false);

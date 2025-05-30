@@ -92,7 +92,7 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private static readonly string[] LaunchOptionsProxy =
         [
-            "--proxy-server=" + PrivateConfig.BRIGTHDATA_HOST + ":" + PrivateConfig.BRIGTHDATA_PORT + ""            
+            "--proxy-server=" + PrivateConfig.BRIGTHDATA_HOST + ":" + PrivateConfig.BRIGTHDATA_PORT + ""
         ];
 
         private static readonly string[] LaunchOptionsScreenShot =
@@ -101,14 +101,14 @@ namespace landerist_library.Downloaders.Puppeteer
             "--load-extension=" + IDontCareAboutCookies
         ];
 
-        private static readonly LaunchOptions launchOptions = new()
+        private readonly LaunchOptions launchOptions = new()
         {
             //Headless = true, // if false, maybe need to comment await browserPage.SetRequestInterceptionAsync(true);          
             Headless = Config.IsConfigurationProduction(),
             //Headless = false,
-            Devtools = false,            
+            Devtools = false,
             //IgnoreHTTPSErrors = true,            
-            Args = Config.TAKE_SCREENSHOT ? [.. LaunchOptionsArgs, .. LaunchOptionsScreenShot] : LaunchOptionsArgs,            
+            Args = Config.TAKE_SCREENSHOT ? [.. LaunchOptionsArgs, .. LaunchOptionsScreenShot] : LaunchOptionsArgs,
         };
 
 
@@ -186,6 +186,8 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private readonly bool UseProxy = false;
 
+        private readonly Credentials? ProxyCredentials;
+
 
         public PuppeteerDownloader(SingleDownloader singleDownloader) : this(singleDownloader.GetUseProxy())
         {
@@ -197,6 +199,13 @@ namespace landerist_library.Downloaders.Puppeteer
             UseProxy = useProxy;
             if (UseProxy)
             {
+                var sessionId = new Random().Next(1, 1000000);
+                ProxyCredentials = new Credentials
+                {
+                    Username = $"{PrivateConfig.BRIGTHDATA_USERNAME}-session-{sessionId}",
+                    //Username = $"{PrivateConfig.BRIGTHDATA_USERNAME}",
+                    Password = PrivateConfig.BRIGTHDATA_PASSWORD
+                };
                 launchOptions.Args = [.. LaunchOptionsArgs, .. LaunchOptionsProxy];
             }
             Browser = Task.Run(LaunchAsync).Result;
@@ -263,7 +272,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
             try
             {
-                await BrowserPage!.CloseAsync();                
+                await BrowserPage!.CloseAsync();
                 await BrowserPage!.DisposeAsync();
             }
             catch (Exception exception)
@@ -322,7 +331,8 @@ namespace landerist_library.Downloaders.Puppeteer
         public static void DoTest()
         {
             // working
-            Websites.Page page = new("https://www.nbinmobiliaria.es/ad/99269515");
+            //Websites.Page page = new("https://www.nbinmobiliaria.es/ad/99269515");
+            //Websites.Page page = new("http://www.finquesparellades.com/buscador/?Pagina=6");            
 
             // http - > https
             //var page = new Websites.Page("http://34mallorca.com/detalles-del-inmueble/carismatico-edificio-en-el-centro-de-palma/19675687");
@@ -332,13 +342,15 @@ namespace landerist_library.Downloaders.Puppeteer
             //var page = new Websites.Page("https://www.realestate.bnpparibas.es/es/soluciones-medida/soluciones-para-inversores");
 
 
-            Logs.Log.WriteInfo("PuppeteerTest", "Starting test");
-            string? text = new PuppeteerDownloader(true).GetText(page);
+            //Logs.Log.WriteInfo("PuppeteerTest", "Starting test");
+            //string? text = new PuppeteerDownloader(true).GetText(page);
 
-            Console.WriteLine(text);
-            Logs.Log.WriteInfo("PuppeteerTest", "Text: " + text);
-            
-            //Logs.Log.WriteInfo("PuppeteerTest", "HttpStatusCode: " + HttpStatusCode);
+            Websites.Page page1 = new("https://www.rualcasa.com/ficha/local-comercial/alicante/babel/1008/21300773/");
+            Websites.Page page2 = new("https://www.ilanrealty.com/es/barcelona/barcelona/alquilar-propiedad-verano-vacaciones-con-familia-amigos-como-en-casa-todo-incluido-bcn30699.html");
+            var puppeteerDownloader = new PuppeteerDownloader(true);
+            //Console.WriteLine(puppeteerDownloader.GetText(page1));
+            Console.WriteLine(puppeteerDownloader.GetText(page2));
+
         }
 
         private string? GetText(Websites.Page page)
@@ -374,8 +386,14 @@ namespace landerist_library.Downloaders.Puppeteer
         {
             Content = null;
             Screenshot = null;
+            HttpStatusCode = null;
+            RedirectUrl = null;
 
             var delay = GetTimeout();
+            if (Config.IsConfigurationLocal())
+            {
+                delay = 1000 * 1000;
+            }
 
             try
             {
@@ -423,7 +441,7 @@ namespace landerist_library.Downloaders.Puppeteer
                     }
                     content = await BrowserPage.GetContentAsync();
                     return (content, screenShot);
-                }                
+                }
             }
             //catch (NullReferenceException exception)
             //{
@@ -439,8 +457,14 @@ namespace landerist_library.Downloaders.Puppeteer
             //}
             catch (NavigationException exception)
             {
-                var message = SingleDownloader!.Id.ToString() + " " + exception.Message;
+                var message =
+                       $"HttpStatusCode: {HttpStatusCode} " +
+                       $"UseProxy: {UseProxy} " +
+                       //$"SingleDownloader Id:{SingleDownloader!.Id} " +
+                       //$"ScrapedCounter:{SingleDownloader!.ScrapedCounter()} " +
+                       $"Message: {exception.Message}";
                 //Logs.Log.WriteError("PuppeterDownloader GetAsync NavigationException", message);
+
             }
             catch //(Exception exception)
             {
@@ -477,10 +501,11 @@ namespace landerist_library.Downloaders.Puppeteer
                 Logs.Log.WriteInfo("PuppeterDownloader InitializePage", exception.Message);
                 return;
             }
-
-            await AuthenticateIfProxy();
+            if (UseProxy)
+            {
+                await BrowserPage.AuthenticateAsync(ProxyCredentials);
+            }
             BrowserPage.DefaultNavigationTimeout = GetTimeout();
-
             SetAccepLanguage(BrowserPage, languageCode);
             await BrowserPage.SetUserAgentAsync(Config.USER_AGENT);
             await BrowserPage.SetCacheEnabledAsync(false);
@@ -488,21 +513,6 @@ namespace landerist_library.Downloaders.Puppeteer
             BrowserPage.Request += async (sender, e) => await HandleRequestAsync(e, uri);
             BrowserPage.Response += (sender, e) => HandleResponseAsync(e, uri);
         }
-
-        private async Task AuthenticateIfProxy()
-        {
-            if (!UseProxy || BrowserPage == null)
-            {
-                return;
-            }            
-            Credentials? credentials = new ()
-            {
-                Username = PrivateConfig.BRIGTHDATA_USERNAME + "-session-" + new Random().Next().ToString(),
-                Password = PrivateConfig.BRIGTHDATA_PASSWORD
-            };
-            await BrowserPage.AuthenticateAsync(credentials);
-        }
-
         private void SetAccepLanguage(IPage browserPage, LanguageCode languageCode)
         {
             Dictionary<string, string> extraHeaders = [];
@@ -557,7 +567,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 {
                     return;
                 }
-                HttpStatusCode = (short)e.Response.Status;                
+                HttpStatusCode = (short)e.Response.Status;
                 if (e.Response.Headers.TryGetValue("Location", out string? location))
                 {
                     RedirectUrl = location;
@@ -578,7 +588,7 @@ namespace landerist_library.Downloaders.Puppeteer
             //}
             //error += $" ▶ URL: {response.Url}";
             string error = $"▶ Status: {response.Status} ({response.StatusText}) ▶ URL: {response.Url}";
-            
+
             Logs.Log.WriteError("PuppeteerDownloader LogHttpError", error);
         }
 

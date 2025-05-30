@@ -75,7 +75,8 @@ namespace landerist_tests
             #region Urls
 
 
-            var page = new Page("https://archigestion.com/manuel-perez-lima-realiza-una-firma-de-libros-en-el-cc-martianez-por-el-apoyo-a-la-lectura/");
+            //var page = new Page("https://archigestion.com/manuel-perez-lima-realiza-una-firma-de-libros-en-el-cc-martianez-por-el-apoyo-a-la-lectura/");
+            //var page = new Page("https://www.nicehousebyabagyan.com/house/4142004-flat-for-sale-in-lhospitalet-de-llobregat-of-54-m2-248990eur-BAI248/");
 
             // listing 
             //var page = new Page("https://goldacreestates.com/realestate/top/026712-42136");            
@@ -152,8 +153,8 @@ namespace landerist_tests
             //new Scraper().ScrapeUnknowPageType(website);
             //new Scraper().ScrapeAllPages();            
             //new Scraper().ScrapeResponseBodyRepeatedInListings();            
-            new Scraper().Start();
-            //new Scraper().Scrape(page);
+            //new Scraper().Start();
+            //new Scraper().Scrape(page, true);
             //new Scraper().DoTest();
             //landerist_library.Scrape.PageSelector.Select();
             //Console.WriteLine("Block: " + WebsitesBlocker.Block(page.Website));
@@ -167,7 +168,7 @@ namespace landerist_tests
             //new HttpClientDownloader().Get(uriPage);
             //PuppeteerDownloader.UpdateChrome();
             //PuppeteerDownloader.KillChrome();
-            //PuppeteerDownloader.DoTest();            
+            PuppeteerDownloader.DoTest();            
             //PuppeteerDownloader.UpdateChrome();
 
             #endregion

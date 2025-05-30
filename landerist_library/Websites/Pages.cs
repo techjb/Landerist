@@ -290,7 +290,8 @@ namespace landerist_library.Websites
                 PAGES + ".[HttpStatusCode], " +
                 PAGES + ".[PageType], " +
                 PAGES + ".[PageTypeCounter], " +
-                PAGES + ".[WaitingStatus], " +
+                PAGES + ".[LockedBy], " +
+                PAGES + ".[WaitingStatus], " +                
                 PAGES + ".[ResponseBodyTextHash], " +
                 PAGES + ".[ResponseBodyZipped], " +
                 Websites.WEBSITES + ".[MainUri], " +
