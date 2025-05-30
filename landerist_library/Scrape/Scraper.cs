@@ -259,10 +259,10 @@ namespace landerist_library.Scrape
 
         private void EndThread(ParallelLoopState parallelLoopState)
         {
-            if(!Config.PROXY_ENABLED)
-            {
-                AddUnblockedPages();
-            }            
+            //if(!Config.PROXY_ENABLED)
+            //{
+            //    AddUnblockedPages();
+            //}            
             Interlocked.Decrement(ref ThreadCounter);
             if (BlockingCollection.IsAddingCompleted)
             {
@@ -305,22 +305,22 @@ namespace landerist_library.Scrape
         //    }
         //}
 
-        private void AddUnblockedPages()
-        {
-            if (BlockingCollection.IsAddingCompleted)
-            {
-                return;
-            }
+        //private void AddUnblockedPages()
+        //{
+        //    if (BlockingCollection.IsAddingCompleted)
+        //    {
+        //        return;
+        //    }
 
-            lock (SyncPageBlocker)
-            {
-                var pages = PageBlocker.GetUnblockedPages();
-                if (pages.Count.Equals(0))
-                {
-                    return;
-                }
-                pages.ForEach(BlockingCollection.Add);
-            }
-        }
+        //    lock (SyncPageBlocker)
+        //    {
+        //        var pages = PageBlocker.GetUnblockedPages();
+        //        if (pages.Count.Equals(0))
+        //        {
+        //            return;
+        //        }
+        //        pages.ForEach(BlockingCollection.Add);
+        //    }
+        //}
     }
 }

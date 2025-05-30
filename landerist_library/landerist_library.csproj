@@ -30,17 +30,18 @@
   <ItemGroup>
     <Compile Remove="Downloaders\SeleniumDownloader.cs" />
     <Compile Remove="Parse\ListingParser\OpenAI\OpenAIStructuredOutput__.cs" />
+    <Compile Remove="Scrape\PageBlocker.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AI.Dev.OpenAI.GPT" Version="1.0.2" />
     <PackageReference Include="AWSSDK.CloudFront" Version="4.0.0.5" />
     <PackageReference Include="AWSSDK.Comprehend" Version="4.0.0.4" />
-    <PackageReference Include="AWSSDK.S3" Version="4.0.0.7" />
+    <PackageReference Include="AWSSDK.S3" Version="4.0.1" />
     <PackageReference Include="Com.Bekijkhet.RobotsTxt" Version="1.0.0" />
     <PackageReference Include="CsvHelper" Version="33.0.1" />
     <PackageReference Include="Google.Apis.CustomSearchAPI.v1" Version="1.68.0.3520" />
-    <PackageReference Include="Google.Cloud.AIPlatform.V1" Version="3.31.0" />
+    <PackageReference Include="Google.Cloud.AIPlatform.V1" Version="3.32.0" />
     <PackageReference Include="Google.Cloud.Language.V1" Version="3.7.0" />
     <PackageReference Include="Google.Cloud.Storage.V1" Version="4.13.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.12.1" />

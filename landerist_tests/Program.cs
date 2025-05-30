@@ -168,7 +168,7 @@ namespace landerist_tests
             //new HttpClientDownloader().Get(uriPage);
             //PuppeteerDownloader.UpdateChrome();
             //PuppeteerDownloader.KillChrome();
-            PuppeteerDownloader.DoTest();            
+            //PuppeteerDownloader.DoTest();            
             //PuppeteerDownloader.UpdateChrome();
 
             #endregion
