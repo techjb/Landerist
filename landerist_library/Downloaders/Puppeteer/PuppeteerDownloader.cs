@@ -345,10 +345,10 @@ namespace landerist_library.Downloaders.Puppeteer
             //Logs.Log.WriteInfo("PuppeteerTest", "Starting test");
             //string? text = new PuppeteerDownloader(true).GetText(page);
 
-            Websites.Page page1 = new("https://www.rualcasa.com/ficha/local-comercial/alicante/babel/1008/21300773/");
+            Websites.Page page1 = new("https://www.rualcasa.com/ficha/local-comercial/alicante/babel/1008/21300773/es/");
             Websites.Page page2 = new("https://www.ilanrealty.com/es/barcelona/barcelona/alquilar-propiedad-verano-vacaciones-con-familia-amigos-como-en-casa-todo-incluido-bcn30699.html");
             var puppeteerDownloader = new PuppeteerDownloader(true);
-            //Console.WriteLine(puppeteerDownloader.GetText(page1));
+            Console.WriteLine(puppeteerDownloader.GetText(page1));
             Console.WriteLine(puppeteerDownloader.GetText(page2));
 
         }
@@ -430,7 +430,10 @@ namespace landerist_library.Downloaders.Puppeteer
                     BrowserChrashed = true;
                     return (content, screenShot);
                 }
-
+                if (UseProxy)
+                {
+                    await BrowserPage!.AuthenticateAsync(ProxyCredentials);
+                }
                 var response = await BrowserPage!.GoToAsync(page.Uri.ToString(), NavigationOptions);
                 if (response.Ok)
                 {
@@ -501,10 +504,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 Logs.Log.WriteInfo("PuppeterDownloader InitializePage", exception.Message);
                 return;
             }
-            if (UseProxy)
-            {
-                await BrowserPage.AuthenticateAsync(ProxyCredentials);
-            }
+           
             BrowserPage.DefaultNavigationTimeout = GetTimeout();
             SetAccepLanguage(BrowserPage, languageCode);
             await BrowserPage.SetUserAgentAsync(Config.USER_AGENT);
@@ -513,6 +513,8 @@ namespace landerist_library.Downloaders.Puppeteer
             BrowserPage.Request += async (sender, e) => await HandleRequestAsync(e, uri);
             BrowserPage.Response += (sender, e) => HandleResponseAsync(e, uri);
         }
+
+        
         private void SetAccepLanguage(IPage browserPage, LanguageCode languageCode)
         {
             Dictionary<string, string> extraHeaders = [];

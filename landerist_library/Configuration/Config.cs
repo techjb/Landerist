@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "4.28";
+        public static readonly string VERSION = "4.29";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -41,7 +41,7 @@ namespace landerist_library.Configuration
 
         public static readonly int MAX_PAGETYPE_COUNTER = 1000;
 
-        public static readonly int DEFAULT_DAYS_NEXT_UPDATE = 5;
+        public static readonly int DEFAULT_DAYS_NEXT_UPDATE = 4;
 
         public static readonly bool LOGS_ENABLED = true;
 
