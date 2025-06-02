@@ -111,9 +111,8 @@ namespace landerist_library.Downloaders.Puppeteer
             Args = Config.TAKE_SCREENSHOT ? [.. LaunchOptionsArgs, .. LaunchOptionsScreenShot] : LaunchOptionsArgs,
         };
 
-
-        private static readonly HashSet<string> BlockDomains =
-        [
+        private static readonly HashSet<string> BlockDomains = new(StringComparer.OrdinalIgnoreCase)
+        {
             "www.google-analytics.com",
             "www.googletagmanager.com",
             "tagmanager.google.com",
@@ -162,8 +161,9 @@ namespace landerist_library.Downloaders.Puppeteer
             "gumgum.com",
             "outbrain.com",
             "bing.com",
-            "pippio.com"
-        ];
+            "pippio.com",
+            "static.addtoany.com"
+        };
 
         private static readonly HashSet<string> BlockedExtensions =
         [
@@ -177,8 +177,8 @@ namespace landerist_library.Downloaders.Puppeteer
         private static readonly NavigationOptions NavigationOptions = new()
         {
             WaitUntil = [WaitUntilNavigation.Networkidle2],
-            Timeout = GetTimeout(),
-        };
+            Timeout = GetTimeout()
+        };        
 
         private bool BrowserChrashed = false;
 
@@ -421,20 +421,22 @@ namespace landerist_library.Downloaders.Puppeteer
             {
                 if (!BrowserInitialized())
                 {
-                    BrowserChrashed = true;
-                    return (content, screenShot);
+                    throw new Exception("Browser is not initialized.");
                 }
                 await InitializePage(page.Website.LanguageCode, page.Uri);
                 if (!PageInitialized())
                 {
-                    BrowserChrashed = true;
-                    return (content, screenShot);
+                    throw new Exception("Page is not initialized.");
                 }
                 if (UseProxy)
                 {
                     await BrowserPage!.AuthenticateAsync(ProxyCredentials);
                 }
                 var response = await BrowserPage!.GoToAsync(page.Uri.ToString(), NavigationOptions);
+                if (response == null)
+                {
+                    throw new NavigationException("Response is null.");
+                }
                 if (response.Ok)
                 {
                     await BrowserPage.EvaluateExpressionAsync(ExpressionRemoveCookies);
@@ -463,16 +465,21 @@ namespace landerist_library.Downloaders.Puppeteer
                 var message =
                        $"HttpStatusCode: {HttpStatusCode} " +
                        $"UseProxy: {UseProxy} " +
-                       //$"SingleDownloader Id:{SingleDownloader!.Id} " +
-                       //$"ScrapedCounter:{SingleDownloader!.ScrapedCounter()} " +
+                       $"SingleDownloader Id:{SingleDownloader!.Id} " +
+                       $"ScrapedCounter:{SingleDownloader!.ScrapedCounter()} " +
                        $"Message: {exception.Message}";
                 //Logs.Log.WriteError("PuppeterDownloader GetAsync NavigationException", message);
 
             }
-            catch //(Exception exception)
+            catch (Exception exception)
             {
                 BrowserChrashed = true;
-                //var message = SingleDownloader!.Id.ToString() + " " + exception.GetType().ToString();
+                var message =
+                       $"HttpStatusCode: {HttpStatusCode} " +
+                       $"UseProxy: {UseProxy} " +
+                       $"SingleDownloader Id:{SingleDownloader!.Id} " +
+                       $"ScrapedCounter:{SingleDownloader!.ScrapedCounter()} " +
+                       $"Message: {exception.Message}";
                 //Logs.Log.WriteError("PuppeterDownloader GetAsync Exception", message);
             }
 
@@ -504,7 +511,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 Logs.Log.WriteInfo("PuppeterDownloader InitializePage", exception.Message);
                 return;
             }
-           
+
             BrowserPage.DefaultNavigationTimeout = GetTimeout();
             SetAccepLanguage(BrowserPage, languageCode);
             await BrowserPage.SetUserAgentAsync(Config.USER_AGENT);
@@ -514,7 +521,7 @@ namespace landerist_library.Downloaders.Puppeteer
             BrowserPage.Response += (sender, e) => HandleResponseAsync(e, uri);
         }
 
-        
+
         private void SetAccepLanguage(IPage browserPage, LanguageCode languageCode)
         {
             Dictionary<string, string> extraHeaders = [];
@@ -559,8 +566,15 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private void HandleResponseAsync(ResponseCreatedEventArgs e, Uri uri)
         {
+            
             try
             {
+                var request = e.Response.Request;
+                
+                if (!request.IsNavigationRequest)
+                {
+                    return;
+                }
                 if (!Uri.TryCreate(e.Response.Url, UriKind.RelativeOrAbsolute, out Uri? responseUri))
                 {
                     return;
@@ -569,11 +583,23 @@ namespace landerist_library.Downloaders.Puppeteer
                 {
                     return;
                 }
+                //Console.WriteLine(request.Url);
+                //Console.WriteLine(request.Url);
+                //string initialUrl = request.RedirectChain.Length > 0
+                //        ? request.RedirectChain.First().Url
+                //        : request.Url;
+
+
+                //if (!initialUrl.Equals(uri.ToString(), StringComparison.OrdinalIgnoreCase))
+                //{
+                //    RedirectUrl = initialUrl;                    
+                //}                
                 HttpStatusCode = (short)e.Response.Status;
                 if (e.Response.Headers.TryGetValue("Location", out string? location))
                 {
                     RedirectUrl = location;
                 }
+                
             }
             catch (Exception exception)
             {

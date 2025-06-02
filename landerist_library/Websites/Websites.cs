@@ -76,7 +76,6 @@ namespace landerist_library.Websites
             return new DataBase().QueryTable(query);
         }
 
-
         private static DataTable ToDataTableHttpStatusCodeOk()
         {
             string query =

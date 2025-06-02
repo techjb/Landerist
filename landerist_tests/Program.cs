@@ -77,6 +77,7 @@ namespace landerist_tests
 
             //var page = new Page("https://archigestion.com/manuel-perez-lima-realiza-una-firma-de-libros-en-el-cc-martianez-por-el-apoyo-a-la-lectura/");
             //var page = new Page("https://www.nicehousebyabagyan.com/house/4142004-flat-for-sale-in-lhospitalet-de-llobregat-of-54-m2-248990eur-BAI248/");
+            var page = new Page("http://www.navarrainmobiliaria.es/alquiler/local-comercial/navarra/pamplona/casco-antiguo/alquiler-local-comercial-navarra-pamplona-casco-antiguo-786.html");
 
             // listing 
             //var page = new Page("https://goldacreestates.com/realestate/top/026712-42136");            
@@ -123,6 +124,7 @@ namespace landerist_tests
             //Websites.TestListingExampleUri();
             //Websites.UpdateListingsExampleNodeSetNulls();
             //Websites.DeleteNullListingExampleHtml();
+            //Websites.UpdateRobotsTxt();
 
 
             #endregion
@@ -154,7 +156,7 @@ namespace landerist_tests
             //new Scraper().ScrapeAllPages();            
             //new Scraper().ScrapeResponseBodyRepeatedInListings();            
             //new Scraper().Start();
-            //new Scraper().Scrape(page, true);
+            new Scraper().Scrape(page, true);
             //new Scraper().DoTest();
             //landerist_library.Scrape.PageSelector.Select();
             //Console.WriteLine("Block: " + WebsitesBlocker.Block(page.Website));
@@ -267,9 +269,13 @@ namespace landerist_tests
             #region landerist.com
 
             //landerist_library.Statistics.StatisticsSnapshot.TakeSnapshots();
+            //landerist_library.Statistics.StatisticsSnapshot.SnapshotHttpStatusCode();
+            //landerist_library.Statistics.StatisticsSnapshot.SnapshotHttpStatusCode7Days();
+
             //DownloadFilesUpdater.UpdateListingsAndUpdates();
             //landerist_library.Landerist_com.DownloadFilesUpdater.UpdateListingsAndUpdates();
             //landerist_library.Landerist_com.DownloadFilesUpdater.UpdateUpdates();
+            //landerist_library.Landerist_com.Landerist_com.UpdateStatistics();
             //landerist_library.Landerist_com.Landerist_com.UpdateDownloads();
             //landerist_library.Landerist_com.Landerist_com.UpdateDownloadsAndStatisticsPages();
             //landerist_library.Landerist_com.Landerist_com.UpdateDownloadsAndStatisticsPages();

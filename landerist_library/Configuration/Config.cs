@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "4.29";
+        public static readonly string VERSION = "4.30";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -15,7 +15,7 @@ namespace landerist_library.Configuration
 
         public static readonly bool WORDS_ENABLED = false;
 
-        public static readonly int MAX_PAGES_PER_WEBSITE = 500;
+        public static readonly int MAX_PAGES_PER_WEBSITE = 1000;
 
         public static readonly int MIN_PAGES_PER_SCRAPE = 10;
 
@@ -127,7 +127,7 @@ namespace landerist_library.Configuration
 
         public const int MAX_PARKINGS = 10000;
 
-        public const int DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS = 90;
+        public const int DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS = 180;
         public static LLMProvider LLM_PROVIDER { get; set; }
         public static string? BATCH_DIRECTORY { get; set; }
         public static bool BATCH_ENABLED { get; set; }

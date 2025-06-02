@@ -503,11 +503,15 @@ namespace landerist_library.Websites
 
         public bool CanAddNewPages()
         {
+            if (Config.IsConfigurationLocal())
+            {
+                return true;
+            }
             if (AchievedMaxNumberOfPages())
             {
                 return false;
             }
-
+            
             string query =
                 "SELECT [NumPages] " +
                 "FROM " + Websites.WEBSITES + " " +

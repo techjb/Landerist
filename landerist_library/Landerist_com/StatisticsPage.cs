@@ -2,7 +2,9 @@
 using landerist_library.Export;
 using landerist_library.Logs;
 using landerist_library.Statistics;
+using PuppeteerSharp.BrowserData;
 using System.Data;
+using System.Diagnostics.Metrics;
 
 namespace landerist_library.Landerist_com
 {
@@ -29,13 +31,14 @@ namespace landerist_library.Landerist_com
                 UpdateTemplate(StatisticsKey.Pages, false);
                 UpdateTemplate(StatisticsKey.UpdatedPages, true);
                 UpdateTemplate(StatisticsKey.NeedUpdate, true);
-                UpdateTemplate(StatisticsKey.UnknownPageType, true);
+                UpdateTemplate(StatisticsKey.UnknownPageType, true);                
+                UpdateHttpStatusCode();
+                UpdateTemplate(StatisticsKey.HttpStatusCode_NULL, true);
 
                 if (UploadStatisticsFile())
                 {
                     Log.WriteInfo("StatisticsPage", "Updated");
                 }
-
             }
             catch (Exception exception)
             {
@@ -43,9 +46,35 @@ namespace landerist_library.Landerist_com
             }
         }
 
+        private static void UpdateHttpStatusCode()
+        {
+            var statisticsKey = StatisticsSnapshot.GetHttpStatusCodeKeys();
+            List<string> data = [];
+            foreach (var key in statisticsKey)
+            {
+                if (key.Equals(StatisticsKey.HttpStatusCode_NULL.ToString()))
+                {
+                    continue;
+                }
+                var values = GetValues(key, false);
+                var json = "{\"label\": \"" + key + "\", \"values\":[" + string.Join(",", [.. values]) + "]}";
+                data.Add(json);
+            }
+            string dataString = string.Join(",", [.. data]);
+            StatisticsTemplate = StatisticsTemplate.Replace("/*HttpStatusCode*/", dataString);
+        }
+
         private static void UpdateTemplate(StatisticsKey statisticsKey, bool yesterday)
         {
-            var dataTable = StatisticsSnapshot.GetTop100Statistics(statisticsKey);
+            var values = GetValues(statisticsKey.ToString(), yesterday);
+            string templateKey = "/*" + statisticsKey.ToString() + "*/";
+            string data = string.Join(",", [.. values]);
+            StatisticsTemplate = StatisticsTemplate.Replace(templateKey, data);
+        }
+
+        private static List<string> GetValues( string statisticKey, bool yesterday)
+        {
+            var dataTable = StatisticsSnapshot.GetTop100Statistics(statisticKey);
             List<string> values = [];
             foreach (DataRow dataRow in dataTable.Rows.Cast<DataRow>().Reverse())
             {
@@ -55,14 +84,10 @@ namespace landerist_library.Landerist_com
                 {
                     date = date.AddDays(-1);
                 }
-
                 var json = "{\"date\": \"" + date.ToShortDateString() + "\", \"count\": " + counter + "}";
                 values.Add(json);
             }
-
-            string templateKey = "/*" + statisticsKey.ToString() + "*/";
-            string valuesString = string.Join(",", [.. values]);
-            StatisticsTemplate = StatisticsTemplate.Replace(templateKey, valuesString);
+            return values;
         }
 
         private static bool UploadStatisticsFile()

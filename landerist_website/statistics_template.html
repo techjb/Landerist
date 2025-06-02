@@ -44,35 +44,57 @@
 
     <script>
 
-        const valuesListings = [/*Listings*/];
-        const valuesPublishedListings = [/*PublishedListings*/];
-        const valuesUnpublishedListings = [/*UnpublishedListings*/];
-        const valuesWebsites = [/*Websites*/];
-        const valuesPages = [/*Pages*/];
-        const valuesUpdatedPages = [/*UpdatedPages*/];
-        const valuesNeedUpdate = [/*NeedUpdate*/];
-        const valuesUnknownPageType = [/*UnknownPageType*/];
+        CreateLineChart("Listings", [/*Listings*/]);
+        CreateLineChart("Published listings", [/*PublishedListings*/]);
+        CreateLineChart("Unpublished listings", [/*UnpublishedListings*/]);
+        CreateLineChart("Websites", [/*Websites*/]);
+        CreateLineChart("Pages", [/*Pages*/]);
+        CreateLineChart("Updated pages", [/*UpdatedPages*/]);
+        CreateLineChart("Need update", [/*NeedUpdate*/]);
+        CreateLineChart("Unknown PageType", [/*UnknownPageType*/]);
+        CreateMultiLineChart("HttpStatusCode", [/*HttpStatusCode*/]);
+        CreateLineChart("HttpStatusCode NULL", [/*HttpStatusCode_NULL*/]);
 
-        CreateChart("ChartListings", "Listings", valuesListings);
-        CreateChart("ChartPublishedListings", "Published listings", valuesPublishedListings);
-        CreateChart("ChartUnpublishedListings", "Unpublished listings", valuesUnpublishedListings);
-        CreateChart("ChartWebsites", "Websites", valuesWebsites);
-        CreateChart("ChartPages", "Pages", valuesPages);
-        CreateChart("ChartUpdatedPages", "Updated pages", valuesUpdatedPages);
-        CreateChart("ChartNeedUpdate", "Need update", valuesNeedUpdate);
-        CreateChart("ChartUnknownPageType", "Unknown PageType", valuesUnknownPageType);
 
-        function CreateChart(id, title, values) {
-            const dataListings = {
+        function CreateLineChart(title, values) {
+            const data = {
                 labels: values.map(row => row.date),
                 datasets: [{
                     data: values.map(row => row.count),
                 }]
             };
+            CreateChart(title, data);
+        }
 
+        function CreateMultiLineChart(title, values) {
+            const data = {
+                labels: values[0].values.map(row => row.date),
+                datasets: values.map((serie, idx) => {
+                    const palette = [
+                        "rgb(75, 192, 192)",
+                        "rgb(255, 99, 132)",
+                        "rgb(54, 162, 235)",
+                        "rgb(255, 205, 86)",
+                        "rgb(153, 102, 255)",
+                        "rgb(201, 203, 207)"
+                    ];
+                    
+                    return {
+                        label: serie.label,
+                        data: serie.values.map(row => row.count),
+                        fill: false,
+                        borderColor: palette[idx % palette.length],
+                        tension: 0.1
+                    };
+                })
+            };
+            CreateChart(title, data);
+        }
+
+        function CreateChart(title, data) {
             const config = {
                 type: 'line',
-                data: dataListings,
+                data: data,
                 options: {
                     responsive: true,
                     plugins: {

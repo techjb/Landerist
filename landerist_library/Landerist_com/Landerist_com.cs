@@ -57,6 +57,12 @@ namespace landerist_library.Landerist_com
             DownloadsPage.Update();
             InvalidateCloudFront();
         }
+
+        public static void UpdateStatistics()
+        {
+            StatisticsPage.Update();
+            InvalidateCloudFront();
+        }
         public static void UpdateDownloadsAndStatisticsPages()
         {
             DownloadsPage.Update();
