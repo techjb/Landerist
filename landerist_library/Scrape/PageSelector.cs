@@ -5,9 +5,7 @@ namespace landerist_library.Scrape
 {
     public class PageSelector
     {
-        private static readonly List<Page> Pages = [];
-        //private static readonly Dictionary<string, int> DictionaryHosts = [];
-        //private static readonly Dictionary<string, int> DictionaryIps = [];
+        private static readonly List<Page> Pages = [];    
 
         public static List<Page> Select()
         {
@@ -20,17 +18,15 @@ namespace landerist_library.Scrape
         private static void Init()
         {
             Pages.Clear();
-            Websites.Pages.CleanLockedBy();
-            //DictionaryHosts.Clear();
-            //DictionaryIps.Clear();
+            Websites.Pages.CleanLockedBy();            
         }
 
         private static void SelectPages()
         {
+            //AddUnpublishedPages();
             AddUnknowPageType();
             AddNextUpdate();
             AddPagesToFillScrape();
-            //FilterMinPages();
         }
 
         private static void AddUnknowPageType()
@@ -47,14 +43,8 @@ namespace landerist_library.Scrape
                 return;
             }
             var topRows = GetTopRows();
-            //var (hosts, ips) = GetBlockedHostsAndIps();
             var pages = Websites.Pages.GetNextUpdate(topRows);
             AddPages(pages);
-        }
-
-        private static int GetTopRows()
-        {
-            return Config.MAX_PAGES_PER_SCRAPE - Pages.Count;
         }
 
         private static void AddPagesToFillScrape()
@@ -64,10 +54,26 @@ namespace landerist_library.Scrape
                 return;
             }
             var topRows = GetTopRows();
-            //var (hosts, ips) = GetBlockedHostsAndIps();
             var pages = Websites.Pages.GetNextUpdateFuture(topRows);
             AddPages(pages);
         }
+
+        private static void AddUnpublishedPages()
+        {
+            if (ScrapperIsFull())
+            {
+                return;
+            }
+            var topRows = GetTopRows();
+            var pages = Websites.Pages.GetUnpublishedPages(topRows);
+            AddPages(pages);
+        }
+
+        private static int GetTopRows()
+        {
+            return Config.MAX_PAGES_PER_SCRAPE - Pages.Count;
+        }
+
 
         private static List<Page> RemoveDuplicates(List<Page> pages)
         {
@@ -90,35 +96,6 @@ namespace landerist_library.Scrape
 
         private static bool AddPage(Page page)
         {
-            //var host = page.Website.Host;
-            //if (DictionaryHosts.TryGetValue(host, out int hostCounter))
-            //{
-            //    if (hostCounter >= Config.MAX_PAGES_PER_HOSTS_PER_SCRAPE)
-            //    {
-            //        return false;
-            //    }
-            //    DictionaryHosts[host] = hostCounter + 1;
-            //}
-            //else
-            //{
-            //    DictionaryHosts[host] = 1;
-            //}
-            //var ipAddress = page.Website.IpAddress;
-            //if (!string.IsNullOrEmpty(ipAddress))
-            //{
-            //    if (DictionaryIps.TryGetValue(ipAddress, out int ipCounter))
-            //    {
-            //        if (ipCounter >= Config.MAX_PAGES_PER_IP_PER_SCRAPE)
-            //        {
-            //            return false;
-            //        }
-            //        DictionaryIps[ipAddress] = ipCounter + 1;
-            //    }
-            //    else
-            //    {
-            //        DictionaryIps[ipAddress] = 1;
-            //    }
-            //}
             Pages.Add(page);
             return true;
         }
@@ -141,18 +118,5 @@ namespace landerist_library.Scrape
         {
             return Pages.Count >= Config.MAX_PAGES_PER_SCRAPE;
         }
-
-        //private static (List<string> hosts, List<string> ips) GetBlockedHostsAndIps()
-        //{
-        //    var hosts = DictionaryHosts
-        //        .Where(o => o.Value >= Config.MAX_PAGES_PER_HOSTS_PER_SCRAPE)
-        //        .Select(o => o.Key).ToList();
-
-        //    var ips = DictionaryIps
-        //        .Where(o => o.Value >= Config.MAX_PAGES_PER_IP_PER_SCRAPE)
-        //        .Select(o => o.Key).ToList();
-
-        //    return (hosts, ips);
-        //}
     }
 }

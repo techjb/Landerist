@@ -54,7 +54,7 @@ namespace landerist_library.Downloaders.Puppeteer
             "--disable-dev-shm-usage",
             "--disable-background-timer-throttling",
             "--disable-renderer-backgrounding",
-            "--incognito",
+            //"--incognito",
             "--disable-dev-profile",
             "--aggressive-cache-discard",
             "--disable-cache",
@@ -74,6 +74,7 @@ namespace landerist_library.Downloaders.Puppeteer
             "--disable-notifications",
             "--disable-background-networking",
             "--disable-component-update",
+            "--disable-blink-features=AutomationControlled"
           
             //"--single-process",
             //"--disable-web-security",
@@ -165,10 +166,10 @@ namespace landerist_library.Downloaders.Puppeteer
             "static.addtoany.com"
         };
 
-        private static readonly HashSet<string> BlockedExtensions =
-        [
+        private static readonly HashSet<string> BlockedExtensions = new(StringComparer.OrdinalIgnoreCase)
+        {
             ".exe", ".zip", ".rar", ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".tmp"
-        ];
+        };
 
         private IBrowser? Browser;
 
@@ -178,7 +179,7 @@ namespace landerist_library.Downloaders.Puppeteer
         {
             WaitUntil = [WaitUntilNavigation.Networkidle2],
             Timeout = GetTimeout()
-        };        
+        };
 
         private bool BrowserChrashed = false;
 
@@ -187,6 +188,8 @@ namespace landerist_library.Downloaders.Puppeteer
         private readonly bool UseProxy = false;
 
         private readonly Credentials? ProxyCredentials;
+
+        private bool FirstNavigationRequestReaded = false;
 
 
         public PuppeteerDownloader(SingleDownloader singleDownloader) : this(singleDownloader.GetUseProxy())
@@ -331,19 +334,19 @@ namespace landerist_library.Downloaders.Puppeteer
         public static void DoTest()
         {
             // working
-            //Websites.Page page = new("https://www.nbinmobiliaria.es/ad/99269515");
-            //Websites.Page page = new("http://www.finquesparellades.com/buscador/?Pagina=6");            
+            //Websites.Page Page = new("https://www.nbinmobiliaria.es/ad/99269515");
+            //Websites.Page Page = new("http://www.finquesparellades.com/buscador/?Pagina=6");            
 
             // http - > https
-            //var page = new Websites.Page("http://34mallorca.com/detalles-del-inmueble/carismatico-edificio-en-el-centro-de-palma/19675687");
-            //var page = new Websites.Page("http://www.inmogyb.com/es/buscador/alquiler/es/buscador/alquiler/trastero");
+            //var Page = new Websites.Page("http://34mallorca.com/detalles-del-inmueble/carismatico-edificio-en-el-centro-de-palma/19675687");
+            //var Page = new Websites.Page("http://www.inmogyb.com/es/buscador/alquiler/es/buscador/alquiler/trastero");
 
             // redirect example: has to throw error
-            //var page = new Websites.Page("https://www.realestate.bnpparibas.es/es/soluciones-medida/soluciones-para-inversores");
+            //var Page = new Websites.Page("https://www.realestate.bnpparibas.es/es/soluciones-medida/soluciones-para-inversores");
 
 
             //Logs.Log.WriteInfo("PuppeteerTest", "Starting test");
-            //string? text = new PuppeteerDownloader(true).GetText(page);
+            //string? text = new PuppeteerDownloader(true).GetText(Page);
 
             Websites.Page page1 = new("https://www.rualcasa.com/ficha/local-comercial/alicante/babel/1008/21300773/es/");
             Websites.Page page2 = new("https://www.ilanrealty.com/es/barcelona/barcelona/alquilar-propiedad-verano-vacaciones-con-familia-amigos-como-en-casa-todo-incluido-bcn30699.html");
@@ -437,16 +440,17 @@ namespace landerist_library.Downloaders.Puppeteer
                 {
                     throw new NavigationException("Response is null.");
                 }
-                if (response.Ok)
+                if (!response.Ok)
                 {
-                    await BrowserPage.EvaluateExpressionAsync(ExpressionRemoveCookies);
-                    if (Config.TAKE_SCREENSHOT)
-                    {
-                        screenShot = await PuppeteerScreenshot.TakeScreenshot(BrowserPage, page);
-                    }
-                    content = await BrowserPage.GetContentAsync();
-                    return (content, screenShot);
+                    throw new NavigationException("Response is not Ok.");
                 }
+                await BrowserPage.EvaluateExpressionAsync(ExpressionRemoveCookies);
+                if (Config.TAKE_SCREENSHOT)
+                {
+                    screenShot = await PuppeteerScreenshot.TakeScreenshot(BrowserPage, page);
+                }
+                content = await BrowserPage.GetContentAsync();
+                return (content, screenShot);
             }
             //catch (NullReferenceException exception)
             //{
@@ -463,13 +467,15 @@ namespace landerist_library.Downloaders.Puppeteer
             catch (NavigationException exception)
             {
                 var message =
-                       $"HttpStatusCode: {HttpStatusCode} " +
-                       $"UseProxy: {UseProxy} " +
-                       $"SingleDownloader Id:{SingleDownloader!.Id} " +
-                       $"ScrapedCounter:{SingleDownloader!.ScrapedCounter()} " +
-                       $"Message: {exception.Message}";
+                       $"{HttpStatusCode} " +
+                       $"{UseProxy} " +
+                       //$"SingleDownloader Id:{SingleDownloader!.Id} " +
+                       //$"ScrapedCounter:{SingleDownloader!.ScrapedCounter()} " +
+                       $"{exception.Message} " +
+                       $"{page.Uri}";
+                       ;
+                //Console.WriteLine("NavigationException " + message);
                 //Logs.Log.WriteError("PuppeterDownloader GetAsync NavigationException", message);
-
             }
             catch (Exception exception)
             {
@@ -477,9 +483,11 @@ namespace landerist_library.Downloaders.Puppeteer
                 var message =
                        $"HttpStatusCode: {HttpStatusCode} " +
                        $"UseProxy: {UseProxy} " +
-                       $"SingleDownloader Id:{SingleDownloader!.Id} " +
-                       $"ScrapedCounter:{SingleDownloader!.ScrapedCounter()} " +
+                       //$"SingleDownloader Id:{SingleDownloader!.Id} " +
+                       //$"ScrapedCounter:{SingleDownloader!.ScrapedCounter()} " +
                        $"Message: {exception.Message}";
+
+                //Console.WriteLine("Exception " + message);
                 //Logs.Log.WriteError("PuppeterDownloader GetAsync Exception", message);
             }
 
@@ -489,6 +497,7 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private async Task InitializePage(LanguageCode languageCode, Uri uri)
         {
+            FirstNavigationRequestReaded = false;
             if (PageInitialized())
             {
                 return;
@@ -566,40 +575,27 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private void HandleResponseAsync(ResponseCreatedEventArgs e, Uri uri)
         {
-            
+
             try
             {
-                var request = e.Response.Request;
-                
-                if (!request.IsNavigationRequest)
+                if (!e.Response.Request.IsNavigationRequest || FirstNavigationRequestReaded)
                 {
                     return;
                 }
-                if (!Uri.TryCreate(e.Response.Url, UriKind.RelativeOrAbsolute, out Uri? responseUri))
+                FirstNavigationRequestReaded = true;
+                if (Uri.TryCreate(e.Response.Url, UriKind.RelativeOrAbsolute, out Uri? responseUri))
                 {
-                    return;
+                    if (!responseUri.Equals(uri))
+                    {
+                        RedirectUrl = responseUri.ToString();
+                    }
                 }
-                if (!responseUri.Equals(uri))
-                {
-                    return;
-                }
-                //Console.WriteLine(request.Url);
-                //Console.WriteLine(request.Url);
-                //string initialUrl = request.RedirectChain.Length > 0
-                //        ? request.RedirectChain.First().Url
-                //        : request.Url;
-
-
-                //if (!initialUrl.Equals(uri.ToString(), StringComparison.OrdinalIgnoreCase))
-                //{
-                //    RedirectUrl = initialUrl;                    
-                //}                
                 HttpStatusCode = (short)e.Response.Status;
                 if (e.Response.Headers.TryGetValue("Location", out string? location))
                 {
                     RedirectUrl = location;
                 }
-                
+
             }
             catch (Exception exception)
             {

@@ -67,7 +67,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
             Page? page = GetPage(vertexAIBatchResponse);
             if (page == null)
             {
-                Log.WriteError("VertextAIBatchDownload ReadLine", "page is null  Id: " + id);
+                Log.WriteError("VertextAIBatchDownload ReadLine", "Page is null  Id: " + id);
                 return null;
             }
             var candidate = GetCandidate(vertexAIBatchResponse);

@@ -79,24 +79,11 @@ namespace landerist_library.Websites
             return GetPages(topRows, where);
         }
 
-
-        //public static List<Page> GetNextUpdate(int topRows, List<string> hosts, List<string> ips)
-        //{
-        //    string where = "P.[NextUpdate] < GETDATE() AND " + GetWhere(hosts, ips);
-        //    return GetPages(topRows, where);            
-        //}
-
         public static List<Page> GetNextUpdate(int topRows)
         {
             string where = "P.[NextUpdate] < GETDATE() ";
             return GetPages(topRows, where);
         }
-
-        //public static List<Page> GetNextUpdateFuture(int topRows, List<string> hosts, List<string> ips)
-        //{
-        //    string where = "P.[NextUpdate] >= GETDATE() AND " + GetWhere(hosts, ips);
-        //    return GetPages(topRows, where);
-        //}
 
         public static List<Page> GetNextUpdateFuture(int topRows)
         {
@@ -104,44 +91,15 @@ namespace landerist_library.Websites
             return GetPages(topRows, where);
         }
 
-
-        //private static List<Page> GetPages(int topRows, string where)
-        //{
-        //    string query =                
-        //        "SELECT TOP " + topRows + " " +
-        //            "P.[Host], " +
-        //            "P.[Uri], " +
-        //            "P.[UriHash], " +
-        //            "P.[Inserted], " +
-        //            "P.[Updated], " +
-        //            "P.[NextUpdate], " +
-        //            "P.[HttpStatusCode], " +
-        //            "P.[PageType], " +
-        //            "P.[PageTypeCounter], " +
-        //            "P.[WaitingStatus], " +
-        //            "P.[ResponseBodyTextHash], " +
-        //            "P.[ResponseBodyZipped], " +
-        //            "W.[MainUri], " +
-        //            "W.[LanguageCode], " +
-        //            "W.[CountryCode], " +
-        //            "W.[RobotsTxt], " +
-        //            "W.[RobotsTxtUpdated], " +
-        //            "W.[SitemapUpdated], " +
-        //            "W.[IpAddress], " +
-        //            "W.[IpAddressUpdated], " +
-        //            "W.[NumPages], " +
-        //            "W.[NumListings], " +
-        //            "W.[ListingExampleUri], " +
-        //            "W.[ListingExampleNodeSet], " +
-        //            "W.[ListingExampleNodeSetUpdated] " +                
-        //        "FROM " + PAGES + " AS P " +
-        //        "INNER JOIN " + Websites.WEBSITES + " AS W ON P.[Host] = W.[Host] " +
-        //        "WHERE " + where + " " +              
-        //        "ORDER BY [NextUpdate] ASC";
-
-        //    DataTable dataTable = new DataBase().QueryTable(query);
-        //    return GetPages(dataTable);
-        //}
+        public static List<Page> GetUnpublishedPages(int topRows)
+        {
+            string where = 
+                "P.[UriHash] IN (" +
+                "   SELECT [Guid] FROM "+ ES_Listings.TABLE_ES_LISTINGS +" " +
+                "   WHERE [ListingStatus] = 'unpublished' AND [UnlistingDate]>DATEADD(day, -2, getdate())" +
+                ")";
+            return GetPages(topRows, where);
+        }
 
         private static List<Page> GetPages(int topRows, string where)
         {
@@ -191,41 +149,6 @@ namespace landerist_library.Websites
             });
             return GetPages(dataTable);
         }
-
-        //private static List<Page> GetPages(int topRows, string where)
-        //{
-        //    string query =
-        //        "DECLARE @LockedPages TABLE (" +
-        //        "   Host                NVARCHAR(200), " +
-        //        "   Uri                 NVARCHAR(MAX), " +
-        //        "   UriHash             CHAR(64), " +
-        //        "   Inserted            DATETIME, " +
-        //        "   Updated             DATETIME, " +
-        //        "   NextUpdate          DATETIME, " +
-        //        "   HttpStatusCode      SMALLINT, " +
-        //        "   PageType            VARCHAR(50), " +
-        //        "   PageTypeCounter     SMALLINT, " +
-        //        "   WaitingStatus       VARCHAR(50), " +
-        //        "   ResponseBodyTextHash CHAR(64), " +
-        //        "   ResponseBodyZipped  VARBINARY(MAX), " +
-        //        "   MainUri             NVARCHAR(MAX), " +
-        //        "   LanguageCode        NVARCHAR(10), " +
-        //        "   CountryCode         NVARCHAR(10), " +
-        //        "   RobotsTxt           NVARCHAR(MAX), " +
-        //        "   RobotsTxtUpdated    DATETIME, " +
-        //        "   SitemapUpdated      DATETIME, " +
-        //        "   IpAddress           VARCHAR(45), " +
-        //        "   IpAddressUpdated    DATETIME, " +
-        //        "   NumPages            INT,   " +
-        //        "   NumListings         INT,   " +
-        //        "   ListingExampleUri   NVARCHAR(MAX), " +
-        //        "   ListingExampleNodeSet NVARCHAR(MAX),   " +
-        //        "   ListingExampleNodeSetUpdated DATETIME); " +
-        //        "";
-
-        //    DataTable dataTable = new DataBase().QueryTable(query);
-        //    return GetPages(dataTable);
-        //}
 
         public static List<Page> GetNonScrapedPages(Website website)
         {
@@ -307,20 +230,6 @@ namespace landerist_library.Websites
                 Websites.WEBSITES + ".[ListingExampleUri], " +
                 Websites.WEBSITES + ".[ListingExampleNodeSet], " +
                 Websites.WEBSITES + ".[ListingExampleNodeSetUpdated] ";
-        }
-
-        private static string GetWhere(List<string> hosts, List<string> ips)
-        {
-            string where = "P.[WaitingStatus] IS NULL ";
-            if (hosts.Count > 0)
-            {
-                where += "AND W.[Host] NOT IN ('" + string.Join("', '", [.. hosts]) + "') ";
-            }
-            if (ips.Count > 0)
-            {
-                where += "AND W.[IpAddress] NOT IN ('" + string.Join("', '", [.. ips]) + "') ";
-            }
-            return where;
         }
 
         private static List<Page> GetPages(DataTable dataTable)

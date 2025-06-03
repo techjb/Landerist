@@ -67,7 +67,7 @@ namespace landerist_library.Parse.ListingParser
                 {
                     return GetHtml(htmlDocument);
                     //return 
-                    //    "Url: " + page.Uri.ToString() + Environment.NewLine + " " +
+                    //    "Url: " + Page.Uri.ToString() + Environment.NewLine + " " +
                     //    "Html: " +  GetHtml(htmlDocument);
                 }
             }

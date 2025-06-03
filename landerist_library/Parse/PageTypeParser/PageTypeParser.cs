@@ -5,65 +5,77 @@ namespace landerist_library.Parse.PageTypeParser
 {
     public class PageTypeParser
     {
-        public static (PageType? pageType, landerist_orels.ES.Listing? listing, bool waitingAIRequest)
-            GetPageType(Page page)
+        private Page Page { get; }
+        public PageTypeParser(Page page)
         {
-            if (page == null || page.ResponseBodyIsNullOrEmpty() || page.HttpStatusCode != 200)
+            Page = page;
+        }
+
+        public (PageType? pageType, landerist_orels.ES.Listing? listing, bool waitingAIRequest)
+            GetPageType()
+        {
+            if (Page == null)
             {
                 return (PageType.DownloadError, null, false);
             }
-            if (page.MainPage())
+            if (Page.ResponseBodyIsNullOrEmpty())
+            {
+                //Console.WriteLine("ResponseBodyIsNullOrEmpty in GetPageType " + Page.Uri);
+                return (PageType.DownloadError, null, false);
+            }
+            if (Page.HttpStatusCode != 200)
+            {
+                //Console.WriteLine("HttpStatusCode is not 200 in GetPageType: " + Page.HttpStatusCode);
+                return (PageType.DownloadError, null, false);
+            }
+            if (Page.MainPage())
             {
                 return (PageType.MainPage, null, false);
             }
-            if (page.ContainsMetaRobotsNoIndex())
+            if (Page.ContainsMetaRobotsNoIndex())
             {
                 return (PageType.NotIndexable, null, false);
             }
-            if (page.NotCanonical())
+            if (Page.NotCanonical())
             {
                 return (PageType.NotCanonical, null, false);
             }            
-            if (page.IncorrectLanguage())
+            if (Page.IncorrectLanguage())
             {
                 return (PageType.IncorrectLanguage, null, false);
             }
 
-            page.SetResponseBodyText();
+            Page.SetResponseBodyText();
 
-            if (page.ResponseBodyTextHasNotChanged())
+            if (Page.ResponseBodyTextHasNotChanged())
             {
-                return (page.PageType, null, false);
+                return (Page.PageType, null, false);
             }
-            if (page.ResponseBodyTextIsError())
+            if (Page.ResponseBodyTextIsError())
             {
                 return (PageType.ResponseBodyIsError, null, false);
             }
-            if (page.ResponseBodyTextIsTooShort())
+            if (Page.ResponseBodyTextIsTooShort())
             {
                 return (PageType.ResponseBodyTooShort, null, false);
             }
-            if (page.ResponseBodyTextIsTooLarge())
+            if (Page.ResponseBodyTextIsTooLarge())
             {
                 return (PageType.ResponseBodyTooLarge, null, false);
             }
-            if (page.ReponseBodyTextRepeatedInHost())
+            if (Page.ReponseBodyTextRepeatedInHost())
             {
                 return (PageType.ResponseBodyRepeatedInHost, null, false);
             }
-            if (page.ReponseBodyTextRepeatedInListings())
+            if (Page.ReponseBodyTextRepeatedInListings())
             {
                 return (PageType.ResponseBodyRepeatedInListings, null, false);
             }
-            if (ParseListing.TooManyTokens(page))
+            if (ParseListing.TooManyTokens(Page))
             {
                 return (PageType.ResponseBodyTooManyTokens, null, false);
             }
-            //if (ListingSimilarity.HtmlNotSimilarToListing(page))
-            //{
-            //    return (PageType.HtmlNotSimilarToListing, null, false);
-            //}
-            return ParseListing.Parse(page);
+            return ParseListing.Parse(Page);
         }
     }
 }

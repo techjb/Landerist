@@ -33,7 +33,7 @@ namespace landerist_library.Insert.IdAgencies
 
         private static async void ScrapePage(int page = 1)
         {
-            Console.WriteLine("Scrapping province: " + CurrentProvince + " page: " + page);
+            Console.WriteLine("Scrapping province: " + CurrentProvince + " Page: " + page);
 
             var httpClient = new HttpClient();
             var location = "0-EU-ES-" + CurrentProvince.ToString().PadLeft(2, '0');

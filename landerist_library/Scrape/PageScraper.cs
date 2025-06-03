@@ -35,13 +35,13 @@ namespace landerist_library.Scrape
         {
             if (!Download())
             {
+                //Console.WriteLine("PageScraper Download failed for: " + Page.Uri);
                 return false;
             }
-
-            (var newPageType, var newListing, var waitingAIRequest) = PageTypeParser.GetPageType(Page);
-            SetPageType(newPageType, newListing, waitingAIRequest);
+            (var newPageType, var newListing, var waitingAIRequest) = new PageTypeParser(Page).GetPageType();
+            bool sucess = SetPageType(newPageType, newListing, waitingAIRequest);
             IndexPages();
-            return true;
+            return sucess;
         }
 
 
@@ -87,13 +87,14 @@ namespace landerist_library.Scrape
             {
                 if (!Page.SetResponseBodyZipped())
                 {
+                    Logs.Log.WriteError("PageScraper SetPageType", "Failed to set response body zipped");
                     return false;
                 }
                 Page.SetWaitingStatusAIRequest();
-                return Page.Update(false);
             }
+
             SetPageType(newPageType, newListing);
-            return Page.Update(true);
+            return Page.Update(!waitingAIRequest);
         }
 
         public void SetPageType(PageType? newPageType, Listing? newListing)

@@ -171,6 +171,10 @@ namespace landerist_library.Websites
 
         public bool Update(bool setNextUpdate)
         {
+            if (Config.IsConfigurationLocal())
+            {
+                return true;
+            }
             if (setNextUpdate)
             {
                 SetNextUpdate();
@@ -347,7 +351,7 @@ namespace landerist_library.Websites
                 !ResponseBodyTextHasChanged &&
                 PageType != null &&
                 !PageType.Equals(landerist_library.Websites.PageType.MayBeListing) &&
-                Config.IsConfigurationProduction();
+                !PageType.Equals(landerist_library.Websites.PageType.DownloadError);
         }
 
         public bool ResponseBodyTextIsError()

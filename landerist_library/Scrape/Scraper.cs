@@ -12,10 +12,6 @@ namespace landerist_library.Scrape
 {
     public class Scraper
     {
-        //private static readonly PageBlocker PageBlocker = new();
-
-        private static readonly object SyncPageBlocker = new();
-
         private static int TotalCounter = 0;
 
         private static int Scraped = 0;
@@ -63,7 +59,6 @@ namespace landerist_library.Scrape
 
         public void Start()
         {
-            //PageBlocker.Clean();
             WebsitesBlocker.Clean();
             MultipleDownloader.Clear();
             Pages = PageSelector.Select();
@@ -116,8 +111,8 @@ namespace landerist_library.Scrape
 
         //public void ScrapeMainPage(Website website)
         //{
-        //    var page = new Page(website);
-        //    Scrape(page);
+        //    var Page = new Page(website);
+        //    Scrape(Page);
         //}
 
         public void ScrapeResponseBodyRepeatedInListings()
@@ -173,14 +168,15 @@ namespace landerist_library.Scrape
                 new ParallelOptions()
                 {
                     MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
+                    //MaxDegreeOfParallelism = 10,
                     CancellationToken = CancellationTokenSource.Token
                 },
                 (page, state) =>
                 {
                     StartThread();
                     ProcessThread(page);
-                    WriteConsole();
-                    EndThread(state);
+                    WriteConsole(page);
+                    EndThread(page, state);
                 });
 
             LogResults();
@@ -207,62 +203,67 @@ namespace landerist_library.Scrape
                 page.Update(PageType.CrawlDelayTooBig, true);
                 return;
             }
-            //var isBlocked = PageBlocker.IsBlocked(page);
+            
             var isBlocked = WebsitesBlocker.IsBlocked(page.Website);
-            if (isBlocked && !Config.PROXY_ENABLED)
-            {
-                return;
-            }               
-            Scrape(page, isBlocked);
-            page.Dispose();
+            //if (isBlocked && !Config.PROXY_ENABLED)
+            //{
+            //    return;
+            //}   
+            bool useProxy = isBlocked && Config.PROXY_ENABLED;
+            Scrape(page, useProxy);            
             Interlocked.Increment(ref Scraped);
         }
 
 
-        private static void WriteConsole()
+        private static void WriteConsole(Page page)
         {
             if (Config.IsConfigurationProduction())
             {
                 return;
             }
+            var crashedPercentage = Math.Round((float)Crashed * 100 / Scraped, 0);
+            var downloadErrorsPercentage = Math.Round((float)DownloadErrors * 100 / Success, 0);            
 
-            var scrappedPercentage = Math.Round((float)Scraped * 100 / TotalCounter, 0);
-            Console.WriteLine(
-               "Threads: " + ThreadCounter + " " +
-               "Scraped: " + Scraped + "/" + TotalCounter + " (" + scrappedPercentage + "%) ");
+            var text =
+                $"Crashed: {Crashed} ({crashedPercentage}%) " +
+                $"DownloadErrors: {DownloadErrors} ({downloadErrorsPercentage}%) " +
+                $"{page.PageType} " + 
+                $"{page.Uri}"; 
+            Console.WriteLine(text);
         }
 
         private static void LogResults()
         {
-            //var downloaders = MultipleDownloader.GetDownloadersCounter();
-            //var maxDownloads = MultipleDownloader.GetMaxDownloads();
-            //var maxCrashes = MultipleDownloader.GetMaxCrashCounter();
+            Log.WriteInfo("scraper", GetLogText());
+        }
 
-            //int blocked = PageBlocker.CountBlockedPages();
+        private static string GetLogText()
+        {
             var scrappedPercentage = Math.Round((float)Scraped * 100 / TotalCounter, 0);
             var successPercentage = Math.Round((float)Success * 100 / Scraped, 0);
             var crashedPercentage = Math.Round((float)Crashed * 100 / Scraped, 0);
             var downloadErrorsPercentage = Math.Round((float)DownloadErrors * 100 / Success, 0);
 
-            Log.WriteInfo("scraper",
+            return
                 $"Scraped {Scraped}/{TotalCounter} ({scrappedPercentage}%) " +
                 //$"Blocked {blocked} " +
                 $"Success: {Success} ({successPercentage}%) " +
                 $"Crashed: {Crashed} ({crashedPercentage}%) " +
-                $"DownloadErrors: {DownloadErrors} ({downloadErrorsPercentage}%) "
+                $"DownloadErrors: {DownloadErrors} ({downloadErrorsPercentage}%) ";                
                 //$"Downloaders: {downloaders} " +
                 //$"MaxDownloads: {maxDownloads} " +
                 //$"MaxCrashes: {maxCrashes}"
-                );
+                ;
         }
 
 
-        private void EndThread(ParallelLoopState parallelLoopState)
+        private void EndThread(Page page, ParallelLoopState parallelLoopState)
         {
             //if(!Config.PROXY_ENABLED)
             //{
             //    AddUnblockedPages();
             //}            
+            page.Dispose();
             Interlocked.Decrement(ref ThreadCounter);
             if (BlockingCollection.IsAddingCompleted)
             {
@@ -278,15 +279,20 @@ namespace landerist_library.Scrape
             hashSet.Clear();
         }
 
+        public void Scrape(string url, bool useProxy)
+        {
+            var page = new Page(url);
+            Scrape(page, useProxy);
+        }
+
         public void Scrape(Page page, bool useProxy)
         {
-            //AddToPageBlocker(page);
             WebsitesBlocker.Block(page.Website);
             var pageScraper = new PageScraper(page, this, useProxy);
             if (pageScraper.Scrape())
             {
                 Interlocked.Increment(ref Success);
-                if (page.PageType == PageType.DownloadError)
+                if (page.PageType.Equals(PageType.DownloadError))
                 {
                     Interlocked.Increment(ref DownloadErrors);
                 }
@@ -294,14 +300,14 @@ namespace landerist_library.Scrape
             else
             {
                 Interlocked.Increment(ref Crashed);
-            }
+            }            
         }
 
-        //private static void AddToPageBlocker(Page page)
+        //private static void AddToPageBlocker(Page Page)
         //{
         //    lock (SyncPageBlocker)
         //    {
-        //        PageBlocker.Add(page.Website);
+        //        PageBlocker.Add(Page.Website);
         //    }
         //}
 
