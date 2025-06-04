@@ -569,7 +569,7 @@ namespace landerist_library.Downloaders.Puppeteer
                     await e.Request.AbortAsync();
                     return;
                 }                
-                Console.WriteLine(e.Request.Url);   
+                //Console.WriteLine(e.Request.Url);   
                 await e.Request.ContinueAsync();
             }
             catch //(Exception exception)
