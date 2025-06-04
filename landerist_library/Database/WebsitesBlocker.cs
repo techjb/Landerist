@@ -93,7 +93,7 @@ namespace landerist_library.Database
 
         private static int RandomSecconds()
         {
-            return new Random().Next(MinSecconds, MaxSecconds);
+            return Random.Shared.Next(MinSecconds, MaxSecconds);
         }
     }
 }

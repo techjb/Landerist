@@ -10,10 +10,10 @@
         {
             lock (Sync)
             {
-                var availables = Downloaders.Where(o => o.IsAvailable(useProxy)).ToList();
-                if (availables.Count != 0)
+                var availables = Downloaders.Where(o => o.IsAvailable(useProxy)).ToArray();
+                if (availables.Length != 0)
                 {
-                    return availables[new Random().Next(availables.Count)];
+                    return availables[Random.Shared.Next(availables.Length)];
                 }
 
                 int id = Downloaders.Count + 1;
