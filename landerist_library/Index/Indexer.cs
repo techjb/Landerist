@@ -18,8 +18,7 @@ namespace landerist_library.Index
 
         public void Insert(List<string?> urls)
         {
-            urls = [.. urls.Distinct()];
-            foreach (var url in urls)
+            foreach (var url in new HashSet<string?>(urls))
             {
                 if (url != null)
                 {
