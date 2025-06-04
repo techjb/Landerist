@@ -3,6 +3,7 @@ using Google.Protobuf;
 using Google.Protobuf.Collections;
 using landerist_library.Configuration;
 using landerist_library.Websites;
+using static Google.Cloud.AIPlatform.V1.GenerationConfig.Types;
 using static Google.Cloud.AIPlatform.V1.SafetySetting.Types;
 
 
@@ -69,7 +70,14 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                 {
                     Temperature = Temperature,
                     ResponseMimeType = "application/json",
-                    ResponseSchema = VertexAIResponseSchema.ResponseSchema
+                    ResponseSchema = VertexAIResponseSchema.ResponseSchema,
+
+                    // todo: uncomment from version 2.5
+                    //ThinkingConfig = new ThinkingConfig
+                    //{
+                    //    ThinkingBudget = 0                        
+                    //}
+
                 },
                 SafetySettings =
                 {
