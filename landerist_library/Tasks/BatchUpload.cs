@@ -99,14 +99,19 @@ namespace landerist_library.Tasks
             var errors = 0;
             var skipped = 0;
 
+            using StreamWriter writer = new(filePath, append: true)
+            {
+                AutoFlush = true
+            };
+
             Parallel.ForEach(pages, Config.PARALLELOPTIONS1INLOCAL, (page, state) =>
             {
-                if (!CanWriteFile(filePath))
+                if (!CanWriteFile(writer))
                 {
                     Interlocked.Increment(ref skipped);
                     state.Stop();
                 }
-                else if (!WriteToFile(page, filePath))
+                else if (!WriteToFile(page, writer))
                 {
                     Interlocked.Increment(ref errors);
                 }
@@ -127,21 +132,16 @@ namespace landerist_library.Tasks
             return filePath;
         }
 
-        private static bool CanWriteFile(string filePath)
+        private static bool CanWriteFile(StreamWriter writer)
         {
             lock (SyncWrite)
             {
-                if (!File.Exists(filePath))
-                {
-                    return true;
-                }
-
-                FileInfo fileInfo = new(filePath);
-                return fileInfo.Length < MaxFileSizeInBytes;
+                writer.Flush();
+                return writer.BaseStream.Length < MaxFileSizeInBytes;
             }
         }
 
-        private static bool WriteToFile(Page page, string filePath)
+        private static bool WriteToFile(Page page, StreamWriter writer)
         {
             try
             {
@@ -154,7 +154,8 @@ namespace landerist_library.Tasks
                 }
                 lock (SyncWrite)
                 {
-                    File.AppendAllText(filePath, json + Environment.NewLine);
+                    writer.WriteLine(json);
+                    writer.Flush();
                 }
                 return true;
             }
