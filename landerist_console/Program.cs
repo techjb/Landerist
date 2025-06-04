@@ -17,6 +17,8 @@ namespace landerist_console
         [LibraryImport("kernel32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static partial bool SetConsoleCtrlHandler(ConsoleEventDelegate callback, [MarshalAs(UnmanagedType.Bool)] bool add);
+        public delegate void KeyPressedHandler(ConsoleKeyInfo key);
+        public static event KeyPressedHandler? OnKeyPressed;
 
         static void Main()
         {
@@ -29,18 +31,44 @@ namespace landerist_console
         private static void Start()
         {
             SetConsoleCtrlHandler(Handler, true);
+            SetCtrlDListener();
 
             Console.CancelKeyPress += (s, e) => {
                 ManualResetEvent.Set();
                 End();
             };
 
-            Console.WriteLine("Press Ctrl+C to exit.");            
+            Console.WriteLine("Press Ctrl+C to exit. Ctrl+D to daily tasks.");            
 
             DateStart = DateTime.Now;
             Config.SetToProduction();            
             Log.Delete();
             Log.WriteInfo("landerist_console", "Started. Version: " + Config.VERSION);
+        }
+
+        static void SetCtrlDListener()
+        {
+            OnKeyPressed += keyInfo =>
+            {
+                if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0 &&
+                    keyInfo.Key == ConsoleKey.D)
+                {
+                    ServiceTasks.PerformDailyTask();
+                }
+            };
+            Thread inputThread = new(KeyboardListener);
+            inputThread.Start();
+        }
+        static void KeyboardListener()
+        {
+            while (true)
+            {
+                ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                OnKeyPressed?.Invoke(keyInfo);
+
+                if (keyInfo.Key == ConsoleKey.Escape)
+                    Environment.Exit(0);
+            }
         }
 
         private static bool ConsoleEventHandler(int eventType)

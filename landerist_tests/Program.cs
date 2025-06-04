@@ -28,8 +28,11 @@ namespace landerist_tests
         [LibraryImport("kernel32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static partial bool SetConsoleCtrlHandler(ConsoleEventDelegate callback, [MarshalAs(UnmanagedType.Bool)] bool add);
+        public delegate void KeyPressedHandler(ConsoleKeyInfo key);
+        public static event KeyPressedHandler? OnKeyPressed;
 
-       
+
+
         static void Main()
         {
             Console.Title = "Landerist Tests";
@@ -41,13 +44,42 @@ namespace landerist_tests
         private static void Start()
         {
             SetConsoleCtrlHandler(Handler, true);
+            SetCtrlDListener();
+
             DateStart = DateTime.Now;
             //Log.Delete();
             Log.Console("Started. Version: " + Config.VERSION);
         }
 
+        static void SetCtrlDListener()
+        {
+            OnKeyPressed += keyInfo =>
+            {
+                Console.WriteLine("si  " + keyInfo.Key + " " + keyInfo.Modifiers);
+                if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0 &&
+                    keyInfo.Key == ConsoleKey.D)
+                {
+                    Console.WriteLine("¡Ctrl + D detectado!");
+                }
+            };
+            Thread inputThread = new(KeyboardListener);
+            inputThread.Start();
+        }
+        static void KeyboardListener()
+        {
+            while (true)
+            {
+                ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                OnKeyPressed?.Invoke(keyInfo);
+
+                if (keyInfo.Key == ConsoleKey.Escape)
+                    Environment.Exit(0);
+            }
+        }
+
         private static bool ConsoleEventHandler(int eventType)
         {
+            Console.WriteLine(eventType);
             if (eventType == 2)
             {
                 End();
@@ -70,7 +102,7 @@ namespace landerist_tests
         {
             Config.SetOnlyDatabaseToProduction();
 
-            Thread.Sleep(1000);
+            //Thread.Sleep(10000);
 
             #region Urls
 
@@ -157,7 +189,7 @@ namespace landerist_tests
             //new Scraper().ScrapeResponseBodyRepeatedInListings();            
             //new Scraper().Start();
             //new Scraper().Scrape(page, false);
-            new Scraper().Scrape("https://www.decopisos.es/inmueble.php?ID=951895181512&amp;idio=8", false);
+           // new Scraper().Scrape("https://www.decopisos.es/inmueble.php?ID=951895181512&amp;idio=8", false);
 
             //new Scraper().DoTest();
             //landerist_library.Scrape.PageSelector.Select();

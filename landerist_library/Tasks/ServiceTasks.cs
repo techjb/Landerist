@@ -69,6 +69,11 @@ namespace landerist_library.Tasks
             return (int)(twelveAM - now).TotalMilliseconds;
         }
 
+        public void PerformDailyTask()
+        {
+            Console.WriteLine("Dayly task ..");
+            PerformDailyTasks = true;
+        }
         private void DailyTasks(object state)
         {
             PerformDailyTasks = true;
@@ -164,6 +169,12 @@ namespace landerist_library.Tasks
         public void DailyTask()
         {
             PerformDailyTasks = false;
+
+            if (!Configuration.Config.IsPrincipalMachine())
+            {
+                return;
+            }
+
             try
             {
                 Pages.DeleteUnpublishedListings();
