@@ -83,7 +83,7 @@ namespace landerist_library.Scrape
 
         private static int RandomSecconds()
         {
-            return new Random().Next(MinSecconds, MaxSecconds);
+            return Random.Shared.Next(MinSecconds, MaxSecconds);
         }
 
         private static void Add(Dictionary<string, DateTime> keyValuePairs, string? key, DateTime blockUntil)

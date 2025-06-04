@@ -202,7 +202,7 @@ namespace landerist_library.Downloaders.Puppeteer
             UseProxy = useProxy;
             if (UseProxy)
             {
-                var sessionId = new Random().Next(1, 1000000);
+                var sessionId = Random.Shared.Next(1, 1_000_000);
                 ProxyCredentials = new Credentials
                 {
                     Username = $"{PrivateConfig.BRIGTHDATA_USERNAME}-session-{sessionId}",
