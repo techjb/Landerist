@@ -39,7 +39,14 @@
             }
 
             string newQuery = string.Join("&", dictionary.Select(p => $"{p.Key}={p.Value}"));
-            newQuery += string.Join("&", hashSet.ToList());
+            if (hashSet.Count > 0)
+            {
+                if (newQuery.Length > 0)
+                {
+                    newQuery += "&";
+                }
+                newQuery += string.Join("&", hashSet);
+            }
             return newQuery;
         }
     }
