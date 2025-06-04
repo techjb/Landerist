@@ -71,7 +71,7 @@ namespace landerist_library.Tasks
 
         public void PerformDailyTask()
         {
-            Console.WriteLine("Dayly task ..");
+            Console.WriteLine("Daily task ..");
             PerformDailyTasks = true;
         }
         private void DailyTasks(object state)

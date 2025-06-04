@@ -163,7 +163,7 @@ namespace landerist_library.Downloaders.Puppeteer
             "outbrain.com",
             "bing.com",
             "pippio.com",
-            "static.addtoany.com"
+            "static.addtoany.com",
         };
 
         private static readonly HashSet<string> BlockedExtensions = new(StringComparer.OrdinalIgnoreCase)
@@ -553,9 +553,14 @@ namespace landerist_library.Downloaders.Puppeteer
             try
             {
                 var url = e.Request.Url.ToLower();
+                var requestHost = uri.Host;
+                if(Uri.TryCreate(e.Request.Url,UriKind.Absolute, out Uri? requestUri))
+                {
+                    requestHost = requestUri.Host;
+                }              
 
                 if (BlockResources.Contains(e.Request.ResourceType) ||
-                    BlockDomains.Contains(uri.Host) ||
+                    BlockDomains.Contains(requestHost) ||
                     BlockedExtensions.Any(url.EndsWith) ||
                     e.Request.IsNavigationRequest && e.Request.RedirectChain.Length != 0
                     //|| response.Request.IsNavigationRequest && response.Request.Url != uri.ToString()) // problematic
@@ -563,8 +568,8 @@ namespace landerist_library.Downloaders.Puppeteer
                 {
                     await e.Request.AbortAsync();
                     return;
-                }
-
+                }                
+                Console.WriteLine(e.Request.Url);   
                 await e.Request.ContinueAsync();
             }
             catch //(Exception exception)

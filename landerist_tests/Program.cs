@@ -189,7 +189,7 @@ namespace landerist_tests
             //new Scraper().ScrapeResponseBodyRepeatedInListings();            
             //new Scraper().Start();
             //new Scraper().Scrape(page, false);
-           // new Scraper().Scrape("https://www.decopisos.es/inmueble.php?ID=951895181512&amp;idio=8", false);
+            //new Scraper().Scrape("https://archigestion.com/manuel-perez-lima-realiza-una-firma-de-libros-en-el-cc-martianez-por-el-apoyo-a-la-lectura/", false);
 
             //new Scraper().DoTest();
             //landerist_library.Scrape.PageSelector.Select();
