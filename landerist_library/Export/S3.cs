@@ -114,7 +114,10 @@ namespace landerist_library.Export
             try
             {
                 var response = await AmazonS3Client.DeleteObjectsAsync(deleteObjectsRequest);
-                list = response.DeletedObjects;
+                if (response != null && response.DeletedObjects != null)
+                {
+                    list = response.DeletedObjects;
+                }                
             }
             catch (Exception exception)
             {
