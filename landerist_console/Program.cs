@@ -9,7 +9,7 @@ namespace landerist_console
     partial class Program
     {
         private static DateTime DateStart;
-        private static readonly ServiceTasks ServiceTasks = new();
+        private static readonly TasksService ServiceTasks = new();
 
         private delegate bool ConsoleEventDelegate(int eventType);
         private static readonly ConsoleEventDelegate Handler = new(ConsoleEventHandler);

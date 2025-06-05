@@ -8,7 +8,7 @@ namespace landerist_service
     {
         private readonly ILogger<WorkerService> Logger = logger;
 
-        private readonly ServiceTasks ServiceTasks = new();
+        private readonly TasksService ServiceTasks = new();
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {

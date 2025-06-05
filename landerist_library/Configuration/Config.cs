@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "4.32";
+        public static readonly string VERSION = "4.33";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -227,7 +227,7 @@ namespace landerist_library.Configuration
                 LLMProvider.VertexAI;
 
 
-            BATCH_ENABLED = true;
+            BATCH_ENABLED = ConfigurationProduction;
 
             MIN_PAGES_PER_BATCH = ConfigurationProduction ? 500 : 1;
 

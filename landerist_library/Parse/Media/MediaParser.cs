@@ -45,14 +45,27 @@ namespace landerist_library.Parse.Media
             {
                 new ImageParser(this).AddImages();
             }
-            new VideoParser(this).GetVideos();
-            new OtherParser(this).GetOthers();
+            //new VideoParser(this).GetVideos();
+            //new OtherParser(this).GetOthers();
             listing.SetMedia(Media);
         }
 
         public void AddMediaImages(Listing listing, string[]? list)
         {
-            if (HtmlDocument == null || list == null)
+            if (list == null || list.Length.Equals(0))
+            {
+                return;
+            }
+            if (!Page.ContainsMetaRobotsNoImageIndex())
+            {
+                new ImageParserUrls(this).AddImagesFromUrls(list);
+            }
+            listing.SetMedia(Media);
+        }
+
+        public void AddMediaImages(Listing listing, List<(string url, string? title)> list)
+        {
+            if (list == null || list.Count.Equals(0))
             {
                 return;
             }

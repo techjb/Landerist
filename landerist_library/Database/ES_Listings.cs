@@ -11,7 +11,7 @@ namespace landerist_library.Database
 
         public static void InsertUpdate(Website website, Listing newListing)
         {
-            Listing? oldListing = GetListing(newListing.guid);
+            Listing? oldListing = GetListing(newListing.guid, true);
             if (oldListing != null)
             {
                 if (!oldListing.Equals(newListing))
@@ -246,12 +246,12 @@ namespace landerist_library.Database
             return listings;
         }
 
-        public static Listing? GetListing(Page page, bool loadMedia = true)
+        public static Listing? GetListing(Page page, bool loadMedia)
         {
             return GetListing(page.UriHash, loadMedia);
         }
 
-        private static Listing? GetListing(string guid, bool loadMedia = true)
+        private static Listing? GetListing(string guid, bool loadMedia)
         {
             string query =
                 "SELECT * " +

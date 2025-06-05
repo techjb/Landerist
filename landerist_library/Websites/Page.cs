@@ -274,6 +274,7 @@ namespace landerist_library.Websites
 
         public HtmlDocument? GetHtmlDocument()
         {
+            
             if (HtmlDocument != null && OriginalOuterHtml != null &&
                 OriginalOuterHtml.Equals(HtmlDocument.DocumentNode.OuterHtml))
             {
@@ -348,6 +349,7 @@ namespace landerist_library.Websites
         public bool ResponseBodyTextHasNotChanged()
         {
             return
+                Config.IsConfigurationProduction() &&
                 !ResponseBodyTextHasChanged &&
                 PageType != null &&
                 !PageType.Equals(landerist_library.Websites.PageType.MayBeListing) &&
@@ -600,6 +602,11 @@ namespace landerist_library.Websites
         public void SetWaitingStatusAIResponse()
         {
             SetWaitingStatus(landerist_library.Websites.WaitingStatus.waiting_ai_response);
+        }
+
+        public bool IsWaitingForAIResponse()
+        {
+            return WaitingStatus is not null &&  WaitingStatus == landerist_library.Websites.WaitingStatus.waiting_ai_response;
         }
 
         public void SetWaitingStatus(WaitingStatus waitingStatus)

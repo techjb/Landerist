@@ -9,7 +9,7 @@ using landerist_library.Websites;
 
 namespace landerist_library.Tasks
 {
-    public class ServiceTasks
+    public class TasksService
     {
         private readonly Scraper Scraper;
         private Timer? Timer1;
@@ -34,7 +34,7 @@ namespace landerist_library.Tasks
 
         private bool PerformHourlyTasks = false;
 
-        public ServiceTasks()
+        public TasksService()
         {
             Scraper = new();
         }
@@ -153,8 +153,8 @@ namespace landerist_library.Tasks
         public void TenMinutesTasks()
         {
             PerformTenMinutesTasks = false;
-            BatchDownload.Start();
-            BatchUpload.Start();
+            TaskBatchDownload.Start();
+            //TaskBatchUpload.Start();
         }
 
         public void HourlyTasks()
@@ -163,7 +163,7 @@ namespace landerist_library.Tasks
             Websites.Websites.UpdateRobotsTxt();
             Websites.Websites.UpdateSitemaps();
             Websites.Websites.UpdateIpAddress();
-            BatchCleaner.Start();
+            TaskBatchCleaner.Start();
         }
 
         public void DailyTask()

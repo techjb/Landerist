@@ -21,7 +21,7 @@ namespace landerist_tests
     partial class Program
     {
         private static DateTime DateStart;
-        private static readonly ServiceTasks ServiceTasks = new();
+        private static readonly TasksService ServiceTasks = new();
 
         private delegate bool ConsoleEventDelegate(int eventType);
         private static readonly ConsoleEventDelegate Handler = new(ConsoleEventHandler);
@@ -189,7 +189,7 @@ namespace landerist_tests
             //new Scraper().ScrapeResponseBodyRepeatedInListings();            
             //new Scraper().Start();
             //new Scraper().Scrape(page, false);
-            //new Scraper().Scrape("https://archigestion.com/manuel-perez-lima-realiza-una-firma-de-libros-en-el-cc-martianez-por-el-apoyo-a-la-lectura/", false);
+            //new Scraper().Scrape("https://goldacreestates.com/realestate/top/026712-42136", false);
 
             //new Scraper().DoTest();
             //landerist_library.Scrape.PageSelector.Select();
@@ -328,7 +328,7 @@ namespace landerist_tests
 
             #endregion
 
-            #region ServiceTasks
+            #region Tasks
 
             //ServiceTasks.DailyTask();
             //new ServiceTasks().UpdateAndScrape();
@@ -339,12 +339,13 @@ namespace landerist_tests
             //ServiceTasks.Start();
             //BatchTasks.Start();
             //BatchUpload.Start();
-            //BatchDownload.Start();
+            //TaskBatchDownload.Start();
             //BatchPredictions.ListAllPredictionJobs();
             //BatchDownload.ReadFileTest();
             //BatchDownload.DownloadVertexAI("projects/942392546193/locations/europe-southwest1/batchPredictionJobs/391166654744100864");
             //VertexAIBatchCleaner.Clean();
-            //OpenAIBatchCleaner.RemoveFiles();            
+            //OpenAIBatchCleaner.RemoveFiles();
+            
 
             #endregion
 

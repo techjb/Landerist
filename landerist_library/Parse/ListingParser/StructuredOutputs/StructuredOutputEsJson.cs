@@ -208,6 +208,21 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         [Description(UrlsDeImagenesDelAnuncio)]
         public string[]? urls_de_imagenes_del_anuncio { get; set; } = null;
 
+
+        public const string ImagenesDelAnuncio = "Diez imágenes del anuncio";
+        [Description(ImagenesDelAnuncio)]
+        public string[]? imagenes_del_anuncio { get; set; } = null;
+
+        public const string UrlDeLaImagen = "Url de la imagen";
+        [Description(UrlDeLaImagen)]
+        public string? url_de_la_imagen { get; set; } = null;
+
+        public const string TituloDeLaImagen = "Título de la imagen";
+        [Description(TituloDeLaImagen)]
+        public string? titulo_de_la_imagen { get; set; } = null;
+
+
+
         public const long MAX_URLS_DE_IMAGENES_DEL_ANUNCIO = 10;
 
 

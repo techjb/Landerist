@@ -1,4 +1,5 @@
 ﻿using landerist_orels.ES;
+using Microsoft.IdentityModel.Tokens;
 
 namespace landerist_library.Parse.Media.Image
 {
@@ -9,28 +10,47 @@ namespace landerist_library.Parse.Media.Image
         readonly Dictionary<string, string> SrcTitle = [];
 
 
-        public void AddImagesFromUrls(string[] list)
+
+        public void AddImagesFromUrls(string[] urls)
         {
-            AddImagesOpenGraph();
-            AddImagesUrls(list);
+            //AddImagesOpenGraph();
+            AddImagesUrls(urls);
             foreach (var image in MediaImages)
             {
                 MediaParser.Add(image);
             }
         }
 
-        private void AddImagesUrls(string[] list)
+        public void AddImagesFromUrls(List<(string url, string? title)> tuples)
         {
-            HashSet<string> hashSet = [.. list];
-            InitDictionaries();
-            foreach (var image in hashSet)
+            tuples = [.. tuples.GroupBy(x => x.url).Select(g => g.First())];
+            foreach (var (url, title) in tuples)
             {
-                AddImage(image);
+                AddImage(url, title);
+            }            
+            foreach (var image in MediaImages)
+            {
+                MediaParser.Add(image);
+            }
+        }
+
+
+        private void AddImagesUrls(string[] urls)
+        {
+            HashSet<string> hashSetUrls = [.. urls];
+            InitDictionaries();
+            foreach (var url in hashSetUrls)
+            {
+                AddImage(url);
             }
         }
 
         private void InitDictionaries()
         {
+            if (MediaParser.HtmlDocument is null)
+            {
+                return;
+            }
             var imageNodes = MediaParser.HtmlDocument!.DocumentNode.SelectNodes("//img");
             if (imageNodes is null)
             {
@@ -85,7 +105,37 @@ namespace landerist_library.Parse.Media.Image
                 url = uri,
                 title = GetTitle(url),
             };
+            MediaImages.Add(media);
+        }
 
+        private void AddImage(string url, string? title)
+        {
+            if (string.IsNullOrEmpty(url) || string.IsNullOrWhiteSpace(url))
+            {
+                return;
+            }
+
+            if (!Uri.TryCreate(MediaParser.Page.Uri, url, out Uri? uri))
+            {
+                return;
+            }
+
+            if (!IsValidImageUri(uri))
+            {
+                return;
+            }
+
+            if(title.IsNullOrEmpty())
+            {
+                title = string.Empty;
+            }
+
+            var media = new landerist_orels.ES.Media()
+            {
+                mediaType = MediaType.image,
+                url = uri,
+                title = title,
+            };
             MediaImages.Add(media);
         }
 

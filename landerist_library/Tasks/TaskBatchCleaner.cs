@@ -4,7 +4,7 @@ using landerist_library.Parse.ListingParser.VertexAI.Batch;
 
 namespace landerist_library.Parse.ListingParser.OpenAI.Batch
 {
-    public class BatchCleaner
+    public class TaskBatchCleaner
     {
         public static void Start()
         {

@@ -8,7 +8,7 @@ using landerist_library.Websites;
 
 namespace landerist_library.Tasks
 {
-    public class BatchUpload
+    public class TaskBatchUpload
     {
         private static readonly object SyncWrite = new();
 

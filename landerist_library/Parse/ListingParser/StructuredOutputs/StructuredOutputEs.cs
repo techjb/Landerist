@@ -233,5 +233,29 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         [System.ComponentModel.Description(StructuredOutputEsJson.UrlsDeImagenesDelAnuncio)]
         public string[]? ImagenesDelAnuncio { get; private set; }
 
+
+        //[JsonProperty(nameof(StructuredOutputEsJson.imagenes_del_anuncio), Required = Required.Default)]
+        //[System.ComponentModel.Description(StructuredOutputEsJson.ImagenesDelAnuncio)]
+
+        //public List<ImagenDelAnuncio>? ImagenesDelAnuncio { get; private set; }
+    }
+
+
+    public class ImagenDelAnuncio
+    {
+        [JsonProperty(nameof(StructuredOutputEsJson.url_de_la_imagen), Required = Required.Always)]
+        [System.ComponentModel.Description(StructuredOutputEsJson.UrlDeLaImagen)]
+        public string Url { get; private set; }
+
+
+        [JsonProperty(nameof(StructuredOutputEsJson.titulo_de_la_imagen), Required = Required.Default)]
+        [System.ComponentModel.Description(StructuredOutputEsJson.TituloDeLaImagen)]
+        public string? Titulo { get; private set; }
+
+        public ImagenDelAnuncio(string url, string? titulo)
+        {
+            Url = url;
+            Titulo = titulo;
+        }
     }
 }

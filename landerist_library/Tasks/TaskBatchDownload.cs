@@ -10,7 +10,7 @@ using landerist_library.Websites;
 
 namespace landerist_library.Tasks
 {
-    public class BatchDownload
+    public class TaskBatchDownload
     {
         public static void Start()
         {
@@ -154,22 +154,27 @@ namespace landerist_library.Tasks
             }
 
             var page = result.Value.page;
+            if (!page.IsWaitingForAIResponse())
+            {
+                return false;
+            }
+            page.SetResponseBodyFromZipped();
             var (pageType, listing) = ParseListing.ParseResponse(page, result.Value.text);
+            bool sucess = false;
             if (pageType.Equals(PageType.MayBeListing))
             {
                 page.SetWaitingStatusAIRequest();
                 page.Update(false);
-                page.Dispose();
-                return false;
+                page.Dispose();                
             }
-
-            page.RemoveWaitingStatus();
-            page.SetResponseBodyFromZipped();
-            page.RemoveResponseBodyZipped();
-
-            new PageScraper(page).SetPageType(pageType, listing);
-            var sucess = page.Update(true);
-            page.Dispose();
+            else
+            {
+                page.RemoveWaitingStatus();
+                page.RemoveResponseBodyZipped();
+                new PageScraper(page).SetPageType(pageType, listing);
+                sucess = page.Update(true);
+                page.Dispose();
+            }
             return sucess;
         }
 
