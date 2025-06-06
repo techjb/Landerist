@@ -531,7 +531,7 @@ namespace landerist_library.Websites
             Logs.Log.WriteInfo("DeleteUnpublishedListings", "Deleted: " + deleted + "/" + total + " listings. Errors: " + errors);
         }
 
-        public static List<Page> SelectWaitingStatusAiRequest(int topRows )
+        public static List<Page> SelectWaitingStatusAiRequest(int topRows)
         {
             return SelectWaitingStatus(topRows, WaitingStatus.waiting_ai_request);
         }        
@@ -546,6 +546,11 @@ namespace landerist_library.Websites
                 {"WaitingStatus", waitingStatus.ToString() },
             });
             return GetPages(dataTable);
+        }
+
+        public static void UpdateWaitingStatusAiResponse(string uriHash)
+        {
+            UpdateWaitingStatus(uriHash, WaitingStatus.waiting_ai_response);
         }
 
         public static void UpdateWaitingStatus(string uriHash, WaitingStatus waitingStatus)

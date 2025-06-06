@@ -15,7 +15,10 @@ namespace landerist_library.Tasks
         public static void Start()
         {
             var batches = Batches.SelectNonDownloaded();
-            Parallel.ForEach(batches, Config.PARALLELOPTIONS1INLOCAL, Download);
+            foreach(var batch in batches)
+            {
+                Download(batch);
+            }            
         }
 
         private static void Download(Batch batch)
@@ -68,6 +71,7 @@ namespace landerist_library.Tasks
 
         private static string? DownloadFile(LLMProvider lLMProvider, string file)
         {
+            Console.WriteLine($"TaskBatchDownload {file}");
             switch (lLMProvider)
             {
                 case LLMProvider.OpenAI: return OpenAIBatchClient.DownloadFile(file);
@@ -93,13 +97,14 @@ namespace landerist_library.Tasks
         {
             try
             {
+                //Console.WriteLine($"Reading batch file: {filePath}");
                 var lines = File.ReadAllLines(filePath);
                 ReadLines(batch, lines);
                 return true;
             }
             catch (Exception exception)
             {
-                Log.WriteError("BatchDownload ReadFile", exception);
+                Log.WriteError("TaskBatchDownload ReadFile", exception);
                 return false;
             }
         }
@@ -125,7 +130,7 @@ namespace landerist_library.Tasks
                 }
                 catch (Exception exception)
                 {
-                    Log.WriteError("BatchDownload ReadLines", exception);
+                    Log.WriteError("TaskBatchDownload ReadLines", exception);
                 }
             });
 
@@ -138,15 +143,17 @@ namespace landerist_library.Tasks
             (Page page, string? text)? result = GetPageAndText(batch, line);
             if (result == null)
             {
+                //Console.WriteLine($"TaskBatchDownload ReadLine: Error reading line: {line}");
                 return false;
             }
 
             var page = result.Value.page;
-            if (Config.IsConfigurationProduction() && !page.IsWaitingForAIResponse())
-            {
-                page.Dispose();
-                return false;
-            }
+            //if (Config.IsConfigurationProduction() && !page.IsWaitingForAIResponse())
+            //{                
+            //    Log.WriteError("TaskBatchDownload ReadLine", "Page is not waiting for AI response: " + page.UriHash);
+            //    page.Dispose();
+            //    return true;
+            //}
             
             var (pageType, listing) = ParseListing.ParseResponse(page, result.Value.text);            
             if (Config.IsConfigurationLocal())
@@ -157,6 +164,7 @@ namespace landerist_library.Tasks
 
             if (pageType.Equals(PageType.MayBeListing))
             {
+                //Console.WriteLine($"TaskBatchDownload ReadLine: MayBeListing");
                 page.SetWaitingStatusAIRequest();
                 page.Update(false);
                 page.Dispose();
@@ -167,6 +175,10 @@ namespace landerist_library.Tasks
             page.RemoveResponseBodyZipped();
             new PageScraper(page).SetPageType(pageType, listing);
             var sucess = page.Update(true);
+            //if(!sucess)
+            //{
+            //    Log.WriteError("TaskBatchDownload ReadLine", "Failed to update page: " + page.UriHash);
+            //}
             page.Dispose();
             return sucess;
         }

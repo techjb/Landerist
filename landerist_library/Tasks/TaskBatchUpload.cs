@@ -96,6 +96,7 @@ namespace landerist_library.Tasks
                 Config.LLM_PROVIDER.ToString().ToLower() + "_" +
                 DateTime.Now.ToString("yyyyMMddHHmmss") + "_input.json";
 
+            Console.WriteLine("TaskBatchUpload " + filePath);    
             File.Delete(filePath);
 
             UriHashes = [];
@@ -131,7 +132,7 @@ namespace landerist_library.Tasks
 
             if (errors > 0)
             {
-                Log.WriteError("BatchUpload CreateFile", "Error creating file. Errors: " + errors);
+                Log.WriteError("TaskBatchUpload CreateFile", "Error creating file. Errors: " + errors);
             }
             return filePath;
         }
@@ -165,7 +166,7 @@ namespace landerist_library.Tasks
             }
             catch (Exception exception)
             {
-                Log.WriteError("BatchUpload AddToBatch", exception.Message);
+                Log.WriteError("TaskBatchUpload AddToBatch", exception.Message);
             }
             return false;
         }
@@ -179,7 +180,7 @@ namespace landerist_library.Tasks
 
             if (string.IsNullOrEmpty(userInput))
             {
-                Log.WriteError("BatchUpload GetJson", "Error getting user input. Page: " + page.UriHash);
+                Log.WriteError("TaskBatchUpload GetJson", "Error getting user input. Page: " + page.UriHash);
                 return null;
             }
 
@@ -196,28 +197,23 @@ namespace landerist_library.Tasks
 
         private static string? UploadFile(string filePath)
         {
-            switch (Config.LLM_PROVIDER)
+            //Console.WriteLine("Uploading batch file: " + filePath);
+            return Config.LLM_PROVIDER switch
             {
-                case LLMProvider.OpenAI:
-                    return OpenAIBatchClient.UploadFile(filePath);
-                case LLMProvider.VertexAI:
-                    return CloudStorage.UploadFile(filePath);
-                default:
-                    return null;
-            }
+                LLMProvider.OpenAI => OpenAIBatchClient.UploadFile(filePath),
+                LLMProvider.VertexAI => CloudStorage.UploadFile(filePath),
+                _ => null,
+            };
         }
 
         private static string? CreateBatch(string fileId)
         {
-            switch (Config.LLM_PROVIDER)
+            return Config.LLM_PROVIDER switch
             {
-                case LLMProvider.OpenAI:
-                    return OpenAIBatchClient.CreateBatch(fileId);
-                case LLMProvider.VertexAI:
-                    return BatchPredictions.CreateBatch(fileId);
-                default:
-                    return null;
-            }
+                LLMProvider.OpenAI => OpenAIBatchClient.CreateBatch(fileId),
+                LLMProvider.VertexAI => BatchPredictions.CreateBatch(fileId),
+                _ => null,
+            };
         }
 
         private static void Clear()
@@ -234,10 +230,7 @@ namespace landerist_library.Tasks
             {
                 return;
             }
-            Parallel.ForEach(UriHashes, Config.PARALLELOPTIONS1INLOCAL, uriHash =>
-            {
-                Pages.UpdateWaitingStatus(uriHash, WaitingStatus.waiting_ai_response);
-            });
+            Parallel.ForEach(UriHashes, Config.PARALLELOPTIONS1INLOCAL, Pages.UpdateWaitingStatusAiResponse);
         }
     }
 }

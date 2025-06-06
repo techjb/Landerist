@@ -47,12 +47,12 @@ namespace landerist_library.Tasks
 
         private void SetTimers()
         {
-            Timer1 = new Timer(Scrape!, null, 0, TenSeconds);
+            Timer1 = new Timer(Scrape!, null, OneSecond, TenSeconds);
             Timer2 = new Timer(BlockingCollection!, null, OneSecond, OneSecond);
 
             if (Configuration.Config.IsPrincipalMachine())
             {
-                Timer3 = new Timer(TenMinutesTasks!, null, TenMinutes, TenMinutes);
+                Timer3 = new Timer(TenMinutesTasks!, null, 0, TenMinutes);
                 Timer4 = new Timer(HourlyTasks!, null, OneHour, OneHour);
                 Timer5 = new Timer(DailyTasks!, null, GetDueTime(), OneDay);
             }
