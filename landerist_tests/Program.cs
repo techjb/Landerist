@@ -37,7 +37,7 @@ namespace landerist_tests
         {
             Console.Title = "Landerist Tests";
             Start();
-            Run();            
+            Run();
             End();
         }
 
@@ -337,15 +337,15 @@ namespace landerist_tests
             //ServiceTasks.Update();
             //ServiceTasks.Scrape();
             //ServiceTasks.Start();
-            //BatchTasks.Start();
-            //BatchUpload.Start();
+            //BatchTasks.Start();            
             //TaskBatchDownload.Start();
+            //TaskBatchUpload.Start(false);
             //BatchPredictions.ListAllPredictionJobs();
             //BatchDownload.ReadFileTest();
             //BatchDownload.DownloadVertexAI("projects/942392546193/locations/europe-southwest1/batchPredictionJobs/391166654744100864");
             //VertexAIBatchCleaner.Clean();
             //OpenAIBatchCleaner.RemoveFiles();
-            
+
 
             #endregion
 

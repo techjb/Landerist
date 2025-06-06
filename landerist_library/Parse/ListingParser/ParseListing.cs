@@ -87,7 +87,6 @@ namespace landerist_library.Parse.ListingParser
         {
             if (string.IsNullOrEmpty(text))
             {
-                //Logs.Log.WriteError("ParseListing ParseResponse", "Empty response");
                 return (PageType.MayBeListing, null);
             }
             try

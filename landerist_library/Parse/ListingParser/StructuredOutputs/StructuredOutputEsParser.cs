@@ -371,30 +371,18 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             }
             return null;
         }
-
+        
         private void SetMedia(Listing listing, Page page)
         {
             if (Anuncio!.ImagenesDelAnuncio is null ||
-                Anuncio!.ImagenesDelAnuncio.Length.Equals(0) ||
+                Anuncio!.ImagenesDelAnuncio.Count.Equals(0) ||
                 !Config.MEDIA_PARSER_ENABLED)
             {
                 return;
             }
             MediaParser mediaParser = new(page);
-            mediaParser.AddMediaImages(listing, Anuncio!.ImagenesDelAnuncio);
+            var list = Anuncio!.ImagenesDelAnuncio?.Select(img => (img.Url, img.Titulo)).ToList();            
+            mediaParser.AddMediaImages(listing, list);
         }
-
-        //private void SetMedia(Listing listing, Page page)
-        //{
-        //    if (Anuncio!.ImagenesDelAnuncio is null ||
-        //        Anuncio!.ImagenesDelAnuncio.Count.Equals(0) ||
-        //        !Config.MEDIA_PARSER_ENABLED)
-        //    {
-        //        return;
-        //    }
-        //    MediaParser mediaParser = new(page);
-        //    var listaTuplas = Anuncio!.ImagenesDelAnuncio?.Select(img => (img.Url, img.Titulo)).ToList();
-        //    mediaParser.AddMediaImages(listing, listaTuplas);
-        //}
     }
 }

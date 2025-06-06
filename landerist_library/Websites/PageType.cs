@@ -23,7 +23,7 @@
 
     public enum WaitingStatus
     {
-        waiting_for_scrape,
+        //waiting_for_scrape,
         waiting_ai_request,
         waiting_ai_response,
     }

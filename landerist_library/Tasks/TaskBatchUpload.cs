@@ -34,6 +34,10 @@ namespace landerist_library.Tasks
 
         private static int GetMaxPagesPerBatch()
         {
+            if (Config.IsConfigurationLocal())
+            {
+                return Config.MAX_PAGES_PER_BATCH_LOCAL;
+            }
             switch (Config.LLM_PROVIDER)
             {
                 case LLMProvider.OpenAI:
@@ -44,20 +48,20 @@ namespace landerist_library.Tasks
             return 0;
         }
 
-        public static void Start()
+        public static void Start(bool processAll = true)
         {
             Clear();
-            bool sucess = StartBatchUpload();
-            if (pages.Count >= MaxPagesPerBatch && sucess)
+            bool sucess = BatchUpload();
+            if (processAll && pages.Count >= MaxPagesPerBatch && sucess)
             {
-                Start();
+                Start(processAll);
             }
             Clear();
         }
 
-        private static bool StartBatchUpload()
+        private static bool BatchUpload()
         {
-            pages = Pages.SelectWaitingStatus(MaxPagesPerBatch, WaitingStatus.waiting_ai_request);
+            pages = Pages.SelectWaitingStatusAiRequest(MaxPagesPerBatch);
 
             if (pages.Count < Config.MIN_PAGES_PER_BATCH)
             {

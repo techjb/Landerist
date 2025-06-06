@@ -99,8 +99,11 @@ namespace landerist_library.Tasks
             RunningTimer2 = true;
             try
             {
-                PerformOtherTasks();
-                Scraper.Start();
+                if (!PerformPendingTasks())
+                {
+                    Scraper.Start();
+                }
+                
             }
             catch (Exception exception)
             {
@@ -112,20 +115,24 @@ namespace landerist_library.Tasks
             }
         }
 
-        private void PerformOtherTasks()
+        private bool PerformPendingTasks()
         {
             if (PerformTenMinutesTasks)
             {
                 TenMinutesTasks();
+                return true;
             }
             if (PerformHourlyTasks)
             {
                 HourlyTasks();
+                return true;
             }
             if (PerformDailyTasks)
             {
                 DailyTask();
+                return true;
             }
+            return false;
         }
 
         private void BlockingCollection(object state)
@@ -154,7 +161,7 @@ namespace landerist_library.Tasks
         {
             PerformTenMinutesTasks = false;
             TaskBatchDownload.Start();
-            //TaskBatchUpload.Start();
+            TaskBatchUpload.Start();
         }
 
         public void HourlyTasks()

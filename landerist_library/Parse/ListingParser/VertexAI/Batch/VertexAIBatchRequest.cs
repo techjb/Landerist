@@ -53,6 +53,13 @@
         public string response_mime_type { get; set; }
 
         public object response_schema { get; set; }
+
+        public ThinkingConfig thinking_config { get; set; }
+    }
+
+    public class ThinkingConfig
+    {
+        public int thinking_budget { get; set; }
     }
 
 

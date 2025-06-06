@@ -26,13 +26,13 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                     Nullable = true,
                     Properties =
                     {
-                        [nameof(StructuredOutputEsJson.fecha_de_publicacion)] = new()
+                        [nameof(StructuredOutputEsJson.fecha_de_publicación)] = new()
                         {
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
                             Format = "date",
                             Description = StructuredOutputEsJson.FechaDePublicaciónDescription,
                         },
-                        [nameof(StructuredOutputEsJson.tipo_de_operacion)] = new()
+                        [nameof(StructuredOutputEsJson.tipo_de_operación)] = new()
                         {
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
                             Enum = { GetEnumValues(typeof(TiposDeOperacion)) },
@@ -57,7 +57,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                             Format = "decimal",
                             Description = StructuredOutputEsJson.PrecioDelAnuncioDescription,
                         },
-                        [nameof(StructuredOutputEsJson.descripcion_del_anuncio)] = new()
+                        [nameof(StructuredOutputEsJson.descripción_del_anuncio)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
@@ -69,7 +69,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
                             Description = StructuredOutputEsJson.ReferenciaDelAnuncioDescription,
                         },
-                        [nameof(StructuredOutputEsJson.telefono_de_contacto)] = new()
+                        [nameof(StructuredOutputEsJson.teléfono_de_contacto)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
@@ -82,7 +82,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                             Format = "email",
                             Description = StructuredOutputEsJson.EmailDeContactoDescription,
                         },
-                        [nameof(StructuredOutputEsJson.direccion_del_inmueble)] = new()
+                        [nameof(StructuredOutputEsJson.dirección_del_inmueble)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
@@ -95,26 +95,26 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                             Description = StructuredOutputEsJson.ReferenciaCatastralDescription,
                         },
 
-                        [nameof(StructuredOutputEsJson.tamanio_del_inmueble)] = new()
+                        [nameof(StructuredOutputEsJson.tamaño_del_inmueble)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Integer,
                             Description = StructuredOutputEsJson.TamañoDelInmuebleDescription,
                         },
 
-                        [nameof(StructuredOutputEsJson.tamanio_de_la_parcela)] = new()
+                        [nameof(StructuredOutputEsJson.tamaño_de_la_parcela)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Integer,
                             Description = StructuredOutputEsJson.TamañoDeLaParcelaDescription,
                         },
-                        [nameof(StructuredOutputEsJson.anio_de_construccion)] = new()
+                        [nameof(StructuredOutputEsJson.año_de_construcción)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Integer,
                             Description = StructuredOutputEsJson.AñoDeConstrucciónDescription,
                         },
-                        [nameof(StructuredOutputEsJson.estado_de_la_construccion)] = new()
+                        [nameof(StructuredOutputEsJson.estado_de_la_construcción)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
@@ -133,19 +133,19 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
                             Description = StructuredOutputEsJson.PlantaDelInmuebleDescription,
                         },
-                        [nameof(StructuredOutputEsJson.numero_de_dormitorios)] = new()
+                        [nameof(StructuredOutputEsJson.número_de_dormitorios)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Integer,
                             Description = StructuredOutputEsJson.NúmeroDeDormitoriosDescription,
                         },
-                        [nameof(StructuredOutputEsJson.numero_de_banios)] = new()
+                        [nameof(StructuredOutputEsJson.número_de_baños)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Integer,
                             Description = StructuredOutputEsJson.NúmeroDeBañosDescription,
                         },
-                        [nameof(StructuredOutputEsJson.numero_de_parkings)] = new()
+                        [nameof(StructuredOutputEsJson.número_de_parkings)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Integer,
@@ -157,7 +157,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                             Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
                             Description = StructuredOutputEsJson.TieneTerrazaDescription,
                         },
-                        [nameof(StructuredOutputEsJson.tiene_jardin)] = new()
+                        [nameof(StructuredOutputEsJson.tiene_jardín)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
@@ -199,19 +199,19 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                             Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
                             Description = StructuredOutputEsJson.TieneTrasteroDescription,
                         },
-                        [nameof(StructuredOutputEsJson.esta_amueblado)] = new()
+                        [nameof(StructuredOutputEsJson.está_amueblado)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
                             Description = StructuredOutputEsJson.EstaAmuebladoDescription,
                         },
-                        [nameof(StructuredOutputEsJson.no_esta_amueblado)] = new()
+                        [nameof(StructuredOutputEsJson.no_está_amueblado)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
                             Description = StructuredOutputEsJson.NoEstaAmuebladoDescription,
                         },
-                        [nameof(StructuredOutputEsJson.tiene_calefaccion)] = new()
+                        [nameof(StructuredOutputEsJson.tiene_calefacción)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
@@ -234,46 +234,33 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
                             Description = StructuredOutputEsJson.TieneSistemasDeSeguridadDescription,
-                        },
-                        [nameof(StructuredOutputEsJson.urls_de_imagenes_del_anuncio)] = new()
+                        },                      
+                        [nameof(StructuredOutputEsJson.imágenes_del_anuncio)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.Array,
                             Items = new()
                             {
-                                Type = Google.Cloud.AIPlatform.V1.Type.String,
-                                Format = "uri"
+                                Type = Google.Cloud.AIPlatform.V1.Type.Object,
+                                Properties =
+                                {
+                                    [nameof(StructuredOutputEsJson.url_de_la_imagen)] = new()
+                                    {
+                                        Type = Google.Cloud.AIPlatform.V1.Type.String,
+                                        Format = "uri",
+                                        Description = StructuredOutputEsJson.UrlDeLaImagen,
+                                    },
+                                    [nameof(StructuredOutputEsJson.título_de_la_imagen)] = new()
+                                    {
+                                        Type = Google.Cloud.AIPlatform.V1.Type.String,
+                                        Nullable = true,
+                                        Description = StructuredOutputEsJson.TituloDeLaImagen,
+                                    },
+                                }
                             },
                             MaxItems = StructuredOutputEsJson.MAX_URLS_DE_IMAGENES_DEL_ANUNCIO,
-                            Description = StructuredOutputEsJson.UrlsDeImagenesDelAnuncio,
-                        },
-
-                        //[nameof(StructuredOutputEsJson.imagenes_del_anuncio)] = new()
-                        //{
-                        //    Nullable = true,
-                        //    Type = Google.Cloud.AIPlatform.V1.Type.Array,
-                        //    Items = new()
-                        //    {                                
-                        //        Type = Google.Cloud.AIPlatform.V1.Type.Object,
-                        //        Properties =
-                        //        {
-                        //            [nameof(StructuredOutputEsJson.url_de_la_imagen)] = new()
-                        //            {
-                        //                Type = Google.Cloud.AIPlatform.V1.Type.String,
-                        //                Format = "uri",
-                        //                Description = StructuredOutputEsJson.UrlDeLaImagen,
-                        //            },
-                        //            [nameof(StructuredOutputEsJson.titulo_de_la_imagen)] = new()
-                        //            {
-                        //                Type = Google.Cloud.AIPlatform.V1.Type.String,
-                        //                Nullable = true,
-                        //                Description = StructuredOutputEsJson.TituloDeLaImagen,
-                        //            },
-                        //        }
-                        //    },
-                        //    MaxItems = StructuredOutputEsJson.MAX_URLS_DE_IMAGENES_DEL_ANUNCIO,
-                        //    Description = StructuredOutputEsJson.ImagenesDelAnuncio,
-                        //}
+                            Description = StructuredOutputEsJson.ImagenesDelAnuncio,
+                        }
                     },
                 }
             },

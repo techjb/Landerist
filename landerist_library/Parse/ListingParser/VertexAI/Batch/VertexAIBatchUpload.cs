@@ -46,7 +46,11 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                     {
                         temperature = VertexAIRequest.Temperature,
                         response_mime_type = "application/json",
-                        response_schema = OpenApiSchemaSerializer.Serialize(VertexAIResponseSchema.ResponseSchema)
+                        response_schema = OpenApiSchemaSerializer.Serialize(VertexAIResponseSchema.ResponseSchema),
+                        thinking_config = new ThinkingConfig
+                        {
+                            thinking_budget = 0,
+                        }
                     },
                     safety_settings =
                     [

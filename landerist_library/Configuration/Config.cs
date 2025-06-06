@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "4.33";
+        public static readonly string VERSION = "4.34";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -107,7 +107,7 @@ namespace landerist_library.Configuration
 
         public const int MAX_PROPERTY_SIZE = 100000;
 
-        public const int MIN_LAND_SIZE = 1;
+        public const int MIN_LAND_SIZE = 10;
 
         public const int MAX_LAND_SIZE = 10000000;
 
@@ -131,6 +131,8 @@ namespace landerist_library.Configuration
         public static LLMProvider LLM_PROVIDER { get; set; }
         public static string? BATCH_DIRECTORY { get; set; }
         public static bool BATCH_ENABLED { get; set; }
+
+        public const int MAX_PAGES_PER_BATCH_LOCAL = 10;
 
         public const int MAX_PAGES_PER_BATCH_OPEN_AI = 1000;
 

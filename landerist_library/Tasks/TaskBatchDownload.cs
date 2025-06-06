@@ -18,18 +18,6 @@ namespace landerist_library.Tasks
             Parallel.ForEach(batches, Config.PARALLELOPTIONS1INLOCAL, Download);
         }
 
-
-        public static void DownloadVertexAI(string id)
-        {
-            Batch batch = new()
-            {
-                LLMProvider = LLMProvider.VertexAI,
-                Id = id,
-                Created = DateTime.Now,
-                Downloaded = false,
-            };
-            Download(batch);
-        }
         private static void Download(Batch batch)
         {
             var files = GetFiles(batch);
@@ -51,12 +39,12 @@ namespace landerist_library.Tasks
 
         private static List<string>? GetFiles(Batch batch)
         {
-            switch (batch.LLMProvider)
+            return batch.LLMProvider switch
             {
-                case LLMProvider.OpenAI: return OpenAIBatchDownload.GetFiles(batch.Id);
-                case LLMProvider.VertexAI: return VertexAIBatchDownload.GetFiles(batch.Id);
-                default: return null;
-            }
+                LLMProvider.OpenAI => OpenAIBatchDownload.GetFiles(batch.Id),
+                LLMProvider.VertexAI => VertexAIBatchDownload.GetFiles(batch.Id),
+                _ => null,
+            };
         }
 
         private static List<string>? DownloadFiles(LLMProvider lLMProvider, List<string> files)
@@ -120,7 +108,7 @@ namespace landerist_library.Tasks
         {
             int total = lines.Length;
             int readed = 0;
-            int errors = 0;            
+            int errors = 0;
 
             Parallel.ForEach(lines, Config.PARALLELOPTIONS1INLOCAL, line =>
             {
@@ -147,34 +135,39 @@ namespace landerist_library.Tasks
 
         private static bool ReadLine(Batch batch, string line)
         {
-            (Page page, string? text)? result = GetPageAndText(batch, line);            
+            (Page page, string? text)? result = GetPageAndText(batch, line);
             if (result == null)
             {
                 return false;
             }
 
             var page = result.Value.page;
-            if (!page.IsWaitingForAIResponse())
+            if (Config.IsConfigurationProduction() && !page.IsWaitingForAIResponse())
             {
+                page.Dispose();
                 return false;
             }
-            page.SetResponseBodyFromZipped();
-            var (pageType, listing) = ParseListing.ParseResponse(page, result.Value.text);
-            bool sucess = false;
+            
+            var (pageType, listing) = ParseListing.ParseResponse(page, result.Value.text);            
+            if (Config.IsConfigurationLocal())
+            {
+                page.Dispose();
+                return true;
+            }
+
             if (pageType.Equals(PageType.MayBeListing))
             {
                 page.SetWaitingStatusAIRequest();
                 page.Update(false);
-                page.Dispose();                
-            }
-            else
-            {
-                page.RemoveWaitingStatus();
-                page.RemoveResponseBodyZipped();
-                new PageScraper(page).SetPageType(pageType, listing);
-                sucess = page.Update(true);
                 page.Dispose();
+                return false;
             }
+            page.RemoveWaitingStatus();
+            page.SetResponseBodyFromZipped();
+            page.RemoveResponseBodyZipped();
+            new PageScraper(page).SetPageType(pageType, listing);
+            var sucess = page.Update(true);
+            page.Dispose();
             return sucess;
         }
 

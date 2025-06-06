@@ -531,7 +531,12 @@ namespace landerist_library.Websites
             Logs.Log.WriteInfo("DeleteUnpublishedListings", "Deleted: " + deleted + "/" + total + " listings. Errors: " + errors);
         }
 
-        public static List<Page> SelectWaitingStatus(int topRows, WaitingStatus waitingStatus)
+        public static List<Page> SelectWaitingStatusAiRequest(int topRows )
+        {
+            return SelectWaitingStatus(topRows, WaitingStatus.waiting_ai_request);
+        }        
+
+        private static List<Page> SelectWaitingStatus(int topRows, WaitingStatus waitingStatus)
         {
             string query =
                 SelectQuery(topRows) +

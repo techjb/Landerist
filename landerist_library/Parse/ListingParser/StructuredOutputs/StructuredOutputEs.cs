@@ -59,12 +59,12 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         };
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.fecha_de_publicacion), Required = Required.Default)]
+        [JsonProperty(nameof(StructuredOutputEsJson.fecha_de_publicación), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.FechaDePublicaciónDescription)]
         public string? FechaDePublicación { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.tipo_de_operacion), Required = Required.Default)]
+        [JsonProperty(nameof(StructuredOutputEsJson.tipo_de_operación), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.TipoDeOperaciónDescription)]
         public TiposDeOperacion? TipoDeOperación { get; private set; }
 
@@ -84,7 +84,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public decimal? PrecioDelAnuncio { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.descripcion_del_anuncio), Required = Required.Default)]
+        [JsonProperty(nameof(StructuredOutputEsJson.descripción_del_anuncio), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.DescripciónDelAnuncioDescription)]
         public string? DescripciónDelAnuncio { get; private set; }
 
@@ -94,7 +94,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public string? ReferenciaDelAnuncio { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.telefono_de_contacto), Required = Required.Default)]
+        [JsonProperty(nameof(StructuredOutputEsJson.teléfono_de_contacto), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.TeléfonoDeContactoDescription)]
         public string? TeléfonoDeContacto { get; private set; }
 
@@ -104,7 +104,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public string? EmailDeContacto { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.direccion_del_inmueble), Required = Required.Default)]
+        [JsonProperty(nameof(StructuredOutputEsJson.dirección_del_inmueble), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.DirecciónDelInmuebleDescription)]
         public string? DirecciónDelInmueble { get; private set; }
 
@@ -114,22 +114,22 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public string? ReferenciaCatastral { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.tamanio_del_inmueble), Required = Required.Default)]
+        [JsonProperty(nameof(StructuredOutputEsJson.tamaño_del_inmueble), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.TamañoDelInmuebleDescription)]
         public double? TamañoDelInmueble { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.tamanio_de_la_parcela), Required = Required.Default)]
+        [JsonProperty(nameof(StructuredOutputEsJson.tamaño_de_la_parcela), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.TamañoDeLaParcelaDescription)]
         public double? TamañoDeLaParcela { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.anio_de_construccion), Required = Required.Default)]
+        [JsonProperty(nameof(StructuredOutputEsJson.año_de_construcción), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.AñoDeConstrucciónDescription)]
         public int? AñoDeConstrucción { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.estado_de_la_construccion), Required = Required.Default)]
+        [JsonProperty(nameof(StructuredOutputEsJson.estado_de_la_construcción), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.EstadoDeLaConstrucciónDescription)]
         public EstadosDeLaConstrucción? EstadoDeLaConstrucción { get; private set; }
 
@@ -145,17 +145,17 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
 
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.numero_de_dormitorios), Required = Required.Default)]
+        [JsonProperty(nameof(StructuredOutputEsJson.número_de_dormitorios), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.NúmeroDeDormitoriosDescription)]
         public int? NúmeroDeDormitorios { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.numero_de_banios), Required = Required.Default)]
+        [JsonProperty(nameof(StructuredOutputEsJson.número_de_baños), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.NúmeroDeBañosDescription)]
         public int? NúmeroDeBaños { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.numero_de_parkings), Required = Required.Default)]
+        [JsonProperty(nameof(StructuredOutputEsJson.número_de_parkings), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.NúmeroDeParkingsDescription)]
         public int? NúmeroDeParkings { get; private set; }
 
@@ -165,7 +165,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public bool? TieneTerraza { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.tiene_jardin), Required = Required.Default)]
+        [JsonProperty(nameof(StructuredOutputEsJson.tiene_jardín), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.TieneJardínDescription)]
         public bool? TieneJardín { get; private set; }
 
@@ -200,17 +200,17 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public bool? TieneTrastero { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.esta_amueblado), Required = Required.Default)]
+        [JsonProperty(nameof(StructuredOutputEsJson.está_amueblado), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.EstaAmuebladoDescription)]
         public bool? EstaAmueblado { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.no_esta_amueblado), Required = Required.Default)]
+        [JsonProperty(nameof(StructuredOutputEsJson.no_está_amueblado), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.NoEstaAmuebladoDescription)]
         public bool? NoEstaAmueblado { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.tiene_calefaccion), Required = Required.Default)]
+        [JsonProperty(nameof(StructuredOutputEsJson.tiene_calefacción), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.TieneCalefacciónDescription)]
         public bool? TieneCalefacción { get; private set; }
 
@@ -229,15 +229,11 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         [System.ComponentModel.Description(StructuredOutputEsJson.TieneSistemasDeSeguridadDescription)]
         public bool? TieneSistemasDeSeguridad { get; private set; }
 
-        [JsonProperty(nameof(StructuredOutputEsJson.urls_de_imagenes_del_anuncio), Required = Required.Default)]
-        [System.ComponentModel.Description(StructuredOutputEsJson.UrlsDeImagenesDelAnuncio)]
-        public string[]? ImagenesDelAnuncio { get; private set; }
 
+        [JsonProperty(nameof(StructuredOutputEsJson.imágenes_del_anuncio), Required = Required.Default)]
+        [System.ComponentModel.Description(StructuredOutputEsJson.ImagenesDelAnuncio)]
 
-        //[JsonProperty(nameof(StructuredOutputEsJson.imagenes_del_anuncio), Required = Required.Default)]
-        //[System.ComponentModel.Description(StructuredOutputEsJson.ImagenesDelAnuncio)]
-
-        //public List<ImagenDelAnuncio>? ImagenesDelAnuncio { get; private set; }
+        public List<ImagenDelAnuncio>? ImagenesDelAnuncio { get; private set; }
     }
 
 
@@ -248,7 +244,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public string Url { get; private set; }
 
 
-        [JsonProperty(nameof(StructuredOutputEsJson.titulo_de_la_imagen), Required = Required.Default)]
+        [JsonProperty(nameof(StructuredOutputEsJson.título_de_la_imagen), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.TituloDeLaImagen)]
         public string? Titulo { get; private set; }
 

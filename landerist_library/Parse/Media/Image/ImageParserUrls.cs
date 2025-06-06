@@ -28,9 +28,9 @@ namespace landerist_library.Parse.Media.Image
             {
                 AddImage(url, title);
             }            
-            foreach (var image in MediaImages)
+            foreach (var media in MediaImages)
             {
-                MediaParser.Add(image);
+                MediaParser.Add(media);
             }
         }
 

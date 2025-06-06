@@ -23,13 +23,13 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public const string FechaDePublicaciónDescription = "fecha de la publicación del anuncio en ISO-8601 (YYYY-MM-DD)";
 
         [Description(FechaDePublicaciónDescription)]
-        public string? fecha_de_publicacion { get; set; } = null;
+        public string? fecha_de_publicación { get; set; } = null;
 
 
         public const string TipoDeOperaciónDescription = "tipo de operación inmobiliaria";
 
         [Description(TipoDeOperaciónDescription)]
-        public string? tipo_de_operacion { get; set; } = null;
+        public string? tipo_de_operación { get; set; } = null;
 
 
         public const string TipoDeInmuebleDescription = "tipología del inmueble";
@@ -53,7 +53,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public const string DescripciónDelAnuncioDescription = "texto plano con la descripción detallada del anuncio";
 
         [Description(DescripciónDelAnuncioDescription)]
-        public string? descripcion_del_anuncio { get; set; } = null;
+        public string? descripción_del_anuncio { get; set; } = null;
 
 
         public const string ReferenciaDelAnuncioDescription = "código de referencia del anuncio";
@@ -65,7 +65,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public const string TeléfonoDeContactoDescription = "número de teléfono de contacto";
 
         [Description(TeléfonoDeContactoDescription)]
-        public string? telefono_de_contacto { get; set; } = null;
+        public string? teléfono_de_contacto { get; set; } = null;
 
 
         public const string EmailDeContactoDescription = "dirección de email de contacto";
@@ -77,7 +77,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public const string DirecciónDelInmuebleDescription = "dirección en la que se encuentra el inmueble";
 
         [Description(DirecciónDelInmuebleDescription)]
-        public string? direccion_del_inmueble { get; set; } = null;
+        public string? dirección_del_inmueble { get; set; } = null;
 
         public const string ReferenciaCatastralDescription = "referencia catastral del anuncio (14 o 20 caracteres)";
 
@@ -87,25 +87,25 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public const string TamañoDelInmuebleDescription = "número de metros cuadrados del inmueble";
 
         [Description(TamañoDelInmuebleDescription)]
-        public double? tamanio_del_inmueble { get; set; } = null;
+        public double? tamaño_del_inmueble { get; set; } = null;
 
 
         public const string TamañoDeLaParcelaDescription = "número de metros cuadrados de la parcela";
 
         [Description(TamañoDeLaParcelaDescription)]
-        public double? tamanio_de_la_parcela { get; set; } = null;
+        public double? tamaño_de_la_parcela { get; set; } = null;
 
 
         public const string AñoDeConstrucciónDescription = "año de construcción del inmueble";
 
         [Description(AñoDeConstrucciónDescription)]
-        public double? anio_de_construccion { get; set; } = null;
+        public double? año_de_construcción { get; set; } = null;
 
 
         public const string EstadoDeLaConstrucciónDescription = "estado de la construcción en el que se encuentra el inmueble";
 
         [Description(EstadoDeLaConstrucciónDescription)]
-        public string? estado_de_la_construccion { get; set; } = null;
+        public string? estado_de_la_construcción { get; set; } = null;
 
         public const string PlantasDelEdificioDescription = "número de plantas del edificio";
 
@@ -120,17 +120,17 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public const string NúmeroDeDormitoriosDescription = "número de dormitorios";
 
         [Description(NúmeroDeDormitoriosDescription)]
-        public double? numero_de_dormitorios { get; set; } = null;
+        public double? número_de_dormitorios { get; set; } = null;
 
         public const string NúmeroDeBañosDescription = "número de baños";
 
         [Description(NúmeroDeBañosDescription)]
-        public double? numero_de_banios { get; set; } = null;
+        public double? número_de_baños { get; set; } = null;
 
         public const string NúmeroDeParkingsDescription = "número de parkings";
 
         [Description(NúmeroDeParkingsDescription)]
-        public double? numero_de_parkings { get; set; } = null;
+        public double? número_de_parkings { get; set; } = null;
 
         public const string TieneTerrazaDescription = "tiene terraza";
 
@@ -140,7 +140,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public const string TieneJardínDescription = "tiene jardín";
 
         [Description(TieneJardínDescription)]
-        public bool? tiene_jardin { get; set; } = null;
+        public bool? tiene_jardín { get; set; } = null;
 
         public const string TieneGarajeDescription = "tiene garaje";
 
@@ -176,17 +176,17 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public const string EstaAmuebladoDescription = "está amueblado";
 
         [Description(EstaAmuebladoDescription)]
-        public bool? esta_amueblado { get; set; } = null;
+        public bool? está_amueblado { get; set; } = null;
 
         public const string NoEstaAmuebladoDescription = "no está amueblado";
 
         [Description(NoEstaAmuebladoDescription)]
-        public bool? no_esta_amueblado { get; set; } = null;
+        public bool? no_está_amueblado { get; set; } = null;
 
         public const string TieneCalefacciónDescription = "tiene calefacción";
 
         [Description(TieneCalefacciónDescription)]
-        public bool? tiene_calefaccion { get; set; } = null;
+        public bool? tiene_calefacción { get; set; } = null;
 
         public const string TieneAireAcondicionadoDescription = "tiene aire acondicionado";
 
@@ -204,14 +204,9 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public bool? tiene_sistemas_de_seguridad { get; set; } = null;
 
 
-        public const string UrlsDeImagenesDelAnuncio = "Diez urls de imágenes del anuncio";
-        [Description(UrlsDeImagenesDelAnuncio)]
-        public string[]? urls_de_imagenes_del_anuncio { get; set; } = null;
-
-
         public const string ImagenesDelAnuncio = "Diez imágenes del anuncio";
         [Description(ImagenesDelAnuncio)]
-        public string[]? imagenes_del_anuncio { get; set; } = null;
+        public string? imágenes_del_anuncio { get; set; } = null;
 
         public const string UrlDeLaImagen = "Url de la imagen";
         [Description(UrlDeLaImagen)]
@@ -219,7 +214,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
 
         public const string TituloDeLaImagen = "Título de la imagen";
         [Description(TituloDeLaImagen)]
-        public string? titulo_de_la_imagen { get; set; } = null;
+        public string? título_de_la_imagen { get; set; } = null;
 
 
 

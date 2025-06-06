@@ -63,7 +63,7 @@ namespace landerist_library.Parse.Media
             listing.SetMedia(Media);
         }
 
-        public void AddMediaImages(Listing listing, List<(string url, string? title)> list)
+        public void AddMediaImages(Listing listing, List<(string url, string? title)>? list)
         {
             if (list == null || list.Count.Equals(0))
             {

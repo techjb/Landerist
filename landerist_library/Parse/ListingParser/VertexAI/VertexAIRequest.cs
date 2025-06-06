@@ -13,8 +13,9 @@ namespace landerist_library.Parse.ListingParser.VertexAI
     {
 
         public const int MAX_CONTEXT_WINDOW = 128000;
-        
-        public static readonly string ModelName = "gemini-2.0-flash-lite-001";
+
+        //public static readonly string ModelName = "gemini-2.0-flash-lite-001";
+        public static readonly string ModelName = "gemini-2.5-flash-preview-05-20";
 
         public const float Temperature = 0.1f;
 
@@ -71,12 +72,10 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                     Temperature = Temperature,
                     ResponseMimeType = "application/json",
                     ResponseSchema = VertexAIResponseSchema.ResponseSchema,
-
-                    // todo: uncomment from version 2.5
-                    //ThinkingConfig = new ThinkingConfig
-                    //{
-                    //    ThinkingBudget = 0                        
-                    //}
+                    ThinkingConfig = new ThinkingConfig
+                    {
+                        ThinkingBudget = 0
+                    }
 
                 },
                 SafetySettings =
@@ -100,12 +99,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                     {
                         Category = HarmCategory.SexuallyExplicit,
                         Threshold = HarmBlockThreshold.Off
-                    },
-                    //new SafetySetting
-                    //{
-                    //    Category = HarmCategory.CivicIntegrity,
-                    //    Threshold = HarmBlockThreshold.Off
-                    //},
+                    },                    
                     new SafetySetting
                     {
                         Category = HarmCategory.Unspecified,

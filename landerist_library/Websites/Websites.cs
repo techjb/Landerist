@@ -368,6 +368,11 @@ namespace landerist_library.Websites
         {
             Delete();
             Pages.DeleteAll();
+            DeleteAllListings();
+        }
+
+        public static void DeleteAllListings()
+        {
             ES_Listings.Delete();
             ES_Media.Delete();
         }
