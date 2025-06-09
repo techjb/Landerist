@@ -13,7 +13,7 @@ namespace landerist_console
 
         private delegate bool ConsoleEventDelegate(int eventType);
         private static readonly ConsoleEventDelegate Handler = new(ConsoleEventHandler);
-        private static ManualResetEvent ManualResetEvent = new (false);
+        private static ManualResetEvent ManualResetEvent = new(false);
         [LibraryImport("kernel32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static partial bool SetConsoleCtrlHandler(ConsoleEventDelegate callback, [MarshalAs(UnmanagedType.Bool)] bool add);
@@ -24,7 +24,7 @@ namespace landerist_console
         {
             Console.Title = "Landerist Console";
             Start();
-            Run();            
+            Run();
             //End();
         }
 
@@ -33,17 +33,18 @@ namespace landerist_console
             SetConsoleCtrlHandler(Handler, true);
             SetCtrlDListener();
 
-            Console.CancelKeyPress += (s, e) => {
+            Console.CancelKeyPress += (s, e) =>
+            {
                 ManualResetEvent.Set();
                 End();
             };
 
-            Console.WriteLine("Press Ctrl+C to exit. Ctrl+D to daily tasks.");            
+            Console.WriteLine("Press Ctrl+C to exit. Ctrl+D to daily tasks.");
 
             DateStart = DateTime.Now;
-            Config.SetToProduction();            
+            Config.SetToProduction();
             Log.Delete();
-            Log.WriteInfo("landerist_console", "Started. Version: " + Config.VERSION);
+            Log.WriteInfo("landerist_console", "Started. Machine: " + Config.MACHINE_NAME + " Version: " + Config.VERSION);
         }
 
         static void SetCtrlDListener()
@@ -78,7 +79,7 @@ namespace landerist_console
                 End();
             }
             return false;
-        }     
+        }
 
         private static void Run()
         {
@@ -93,8 +94,6 @@ namespace landerist_console
 
             var duration = (DateTime.Now - DateStart).ToString(@"dd\:hh\:mm\:ss\.fff");
             Log.WriteInfo("landerist_console", "Stopped. Version: " + Config.VERSION + " Duration: " + duration);
-
-            //Console.ReadLine();
         }
     }
 }

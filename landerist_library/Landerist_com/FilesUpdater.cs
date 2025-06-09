@@ -78,7 +78,6 @@ namespace landerist_library.Landerist_com
             }
             Log.WriteInfo("filesupdater", fileName);
             return true;
-
         }
 
         private static bool Update(SortedSet<Listing> listings, CountryCode countryCode, ExportType exportType, DateOnly? dateFrom, DateOnly? dateTo)
