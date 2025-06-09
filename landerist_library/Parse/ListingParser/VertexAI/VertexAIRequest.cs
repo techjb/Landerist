@@ -104,7 +104,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                     {
                         Category = HarmCategory.Unspecified,
                         Threshold = HarmBlockThreshold.Off
-                    },
+                    },                    
                 },
                 SystemInstruction = new Content
                 {

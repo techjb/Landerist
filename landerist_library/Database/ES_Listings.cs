@@ -206,14 +206,21 @@ namespace landerist_library.Database
             return ParseListings(dataTable, false);
         }
 
-        public static SortedSet<Listing> GetListings(bool loadMedia, DateTime dataSourceUpdate)
+        public static SortedSet<Listing> GetListings(bool loadMedia, DateOnly dateFrom, DateOnly dateTo)
         {
             string query =
                 "SELECT * " +
                 "FROM " + TABLE_ES_LISTINGS + " " +
-                "WHERE CONVERT(date, [dataSourceUpdate]) = CONVERT(date, @DataSourceUpdate)";
+                "WHERE " +
+                "   CAST([dataSourceUpdate] AS DATE) >= CAST(@DateFrom AS DATE) AND " +
+                "   CAST([dataSourceUpdate] AS DATE) <= CAST(@DateTo AS DATE)";                
 
-            DataTable dataTable = new DataBase().QueryTable(query, "DataSourceUpdate", dataSourceUpdate);
+            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>()
+            {
+                { "DateFrom", dateFrom },
+                { "DateTo", dateTo },
+            });
+            
             return GetAll(dataTable, loadMedia);
         }
 
@@ -234,7 +241,7 @@ namespace landerist_library.Database
             var sync = new object();
             Parallel.ForEach(dataTable.AsEnumerable(), new ParallelOptions()
             {
-                //MaxDegreeOfParallelism = Configuration.Config.MAX_DEGREE_OF_PARALLELISM
+                //MaxDegreeOfParallelism = 1
             }, dataRow =>
             {
                 var listing = GetListing(dataRow, loadMedia);

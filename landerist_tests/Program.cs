@@ -311,8 +311,8 @@ namespace landerist_tests
             //landerist_library.Landerist_com.DownloadFilesUpdater.UpdateUpdates();
             //landerist_library.Landerist_com.Landerist_com.UpdateStatistics();
             //landerist_library.Landerist_com.Landerist_com.UpdateDownloads();
-            //landerist_library.Landerist_com.Landerist_com.UpdateDownloadsAndStatisticsPages();
-            //landerist_library.Landerist_com.Landerist_com.UpdateDownloadsAndStatisticsPages();
+            //landerist_library.Landerist_com.Landerist_com.UpdatePages();
+            //landerist_library.Landerist_com.Landerist_com.UpdatePages();
             //landerist_library.Landerist_com.StatisticsPage.Update();
             //landerist_library.Landerist_com.Landerist_com.InvalidateCloudFront();
 
@@ -345,6 +345,7 @@ namespace landerist_tests
             //BatchDownload.DownloadVertexAI("projects/942392546193/locations/europe-southwest1/batchPredictionJobs/391166654744100864");
             //VertexAIBatchCleaner.Clean();
             //OpenAIBatchCleaner.RemoveFiles();
+            DownloadFilesUpdater.UpdateUpdates();
 
 
             #endregion

@@ -61,7 +61,7 @@ namespace landerist_library.Tasks
         private static int GetDueTime()
         {
             DateTime now = DateTime.Now;
-            DateTime twelveAM = new(now.Year, now.Month, now.Day, 0, 0, 10);
+            DateTime twelveAM = new(now.Year, now.Month, now.Day, 0, 0, 30);
             if (now > twelveAM)
             {
                 twelveAM = twelveAM.AddDays(1);
@@ -187,7 +187,7 @@ namespace landerist_library.Tasks
                 Pages.DeleteUnpublishedListings();
                 StatisticsSnapshot.TakeSnapshots();
                 DownloadFilesUpdater.UpdateListingsAndUpdates();
-                Landerist_com.Landerist_com.UpdateDownloadsAndStatisticsPages();
+                Landerist_com.Landerist_com.UpdatePages();
                 Backup.Update();
             }
             catch (Exception exception)

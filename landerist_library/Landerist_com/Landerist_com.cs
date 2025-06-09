@@ -46,9 +46,9 @@ namespace landerist_library.Landerist_com
             return countryCode.ToString() + "/" + exportType.ToString() + "/" + fileName;
         }
 
-        protected static string GetFileNameWidhDate(DateTime dateTime, string prefix, string extension)
+        protected static string GetFileNameWidhDate(DateOnly dateOnly, string prefix, string extension)
         {
-            string datePart = dateTime.ToString("yyyyMMdd");
+            string datePart = dateOnly.ToString("yyyyMMdd");
             return prefix + "_" + datePart + "." + extension;
         }
 
@@ -63,7 +63,7 @@ namespace landerist_library.Landerist_com
             StatisticsPage.Update();
             InvalidateCloudFront();
         }
-        public static void UpdateDownloadsAndStatisticsPages()
+        public static void UpdatePages()
         {
             DownloadsPage.Update();
             StatisticsPage.Update();

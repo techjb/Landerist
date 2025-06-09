@@ -2,6 +2,7 @@
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
+using Grpc.Core;
 using landerist_library.Configuration;
 using landerist_library.Logs;
 
@@ -16,14 +17,10 @@ namespace landerist_library.Export
             AmazonS3Client = new AmazonS3Client(PrivateConfig.AWS_ACESSKEYID, PrivateConfig.AWS_SECRETACCESSKEY, RegionEndpoint.EUWest3);
         }
 
-        public bool UploadFilePublicBucket(string file, string key)
-        {
-            return UploadFile(file, key, PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, string.Empty);
-        }
 
-        public bool UploadToDownloadsBucket(string file, string key, string subdirectoryInBucket)
+        public bool UploadToDownloadsBucket(string file, string key, string subdirectoryInBucket, List<(string, string)>? metadata)
         {
-            return UploadFile(file, key, PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, subdirectoryInBucket);
+            return UploadFile(file, key, PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, subdirectoryInBucket, metadata);
         }
 
         public bool UploadToWebsiteBucket(string file, string key, string subdirectoryInBucket)
@@ -36,7 +33,8 @@ namespace landerist_library.Export
             return UploadFile(file, key, bucketName, string.Empty);
         }
 
-        public bool UploadFile(string file, string key, string bucketName, string subdirectoryInBucket)
+
+        public bool UploadFile(string file, string key, string bucketName, string subdirectoryInBucket, List<(string, string)>? metadata = null)
         {
             bool success = false;
             if (!File.Exists(file))
@@ -53,8 +51,19 @@ namespace landerist_library.Export
             {
                 BucketName = bucketName,
                 Key = key,
-                FilePath = file
+                FilePath = file,
             };
+
+            if (metadata != null && metadata.Count > 0)
+            {
+                foreach (var (metadataKey, metadataValue) in metadata)
+                {
+                    if (!string.IsNullOrEmpty(metadataKey) && !string.IsNullOrEmpty(metadataValue))
+                    {
+                        transferUtilityUploadRequest.Metadata.Add(metadataKey, metadataValue);
+                    }
+                }
+            }
 
             TransferUtility transferUtitlity = new(AmazonS3Client);
 
@@ -70,6 +79,7 @@ namespace landerist_library.Export
             transferUtitlity.Dispose();
             return success;
         }
+
 
         public async Task<List<S3Object>> ListObjects(string bucketName, string directory = "")
         {
@@ -117,7 +127,7 @@ namespace landerist_library.Export
                 if (response != null && response.DeletedObjects != null)
                 {
                     list = response.DeletedObjects;
-                }                
+                }
             }
             catch (Exception exception)
             {
@@ -142,6 +152,24 @@ namespace landerist_library.Export
                 Log.WriteError("S3 GetFileInfo", e);
             }
             return (null, null);
+        }
+
+        public string? GetMetadataValue(string bucketName, string objectKey, string metaDataKey)
+        {
+            metaDataKey = "x-amz-meta-" + metaDataKey;
+            try
+            {
+                var metadataResponse = AmazonS3Client.GetObjectMetadataAsync(bucketName, objectKey).Result;
+                if (metadataResponse.Metadata.Keys.Any(k => k.Equals(metaDataKey, StringComparison.OrdinalIgnoreCase)))
+                {
+                    return metadataResponse.Metadata[metaDataKey];
+                }
+            }
+            catch (AmazonS3Exception e)
+            {
+                Log.WriteError("S3 GetFileInfo", e);
+            }
+            return null;
         }
     }
 }
