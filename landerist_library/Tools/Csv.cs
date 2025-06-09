@@ -41,7 +41,7 @@ namespace landerist_library.Tools
             AddRows(dataTable, csvWriter);
         }
 
-        public static void Write(HashSet<string> data, string filename)
+        public static bool Write(HashSet<string> data, string filename)
         {
             try
             {
@@ -52,10 +52,12 @@ namespace landerist_library.Tools
                     csvWriter.WriteField(item);
                     csvWriter.NextRecord();
                 }
-            }
+                return true;
+            }   
             catch (Exception exception)
             {
                 Console.WriteLine("Error writting the file: " + exception.Message);
+                return false;
             }
         }
 

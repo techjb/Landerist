@@ -18,7 +18,7 @@ namespace landerist_library.Export
         }
 
 
-        public bool UploadToDownloadsBucket(string file, string key, string subdirectoryInBucket, List<(string, string)>? metadata)
+        public bool UploadToDownloadsBucket(string file, string key, string subdirectoryInBucket, List<(string, string)>? metadata = null)
         {
             return UploadFile(file, key, PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, subdirectoryInBucket, metadata);
         }

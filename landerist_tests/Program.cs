@@ -258,7 +258,7 @@ namespace landerist_tests
 
             //Csv.Export(true);
             //landerist_library.Export.Json.Export("es_listings_full.json", true);
-            //landerist_library.Landerist_com.FilesUpdater.UpdateListingsAndUpdates();
+            //landerist_library.Landerist_com.FilesUpdater.Update();
             //new landerist_library.Landerist_com.DownloadsPage().Update();            
             //landerist_library.Landerist_com.StatisticsPage.Update();
             //landerist_library.Landerist_com.Landerist_com.InvalidateCloudFront();            
@@ -306,8 +306,8 @@ namespace landerist_tests
             //landerist_library.Statistics.StatisticsSnapshot.SnapshotHttpStatusCode();
             //landerist_library.Statistics.StatisticsSnapshot.SnapshotHttpStatusCode7Days();
 
-            //DownloadFilesUpdater.UpdateListingsAndUpdates();
-            //landerist_library.Landerist_com.DownloadFilesUpdater.UpdateListingsAndUpdates();
+            //DownloadFilesUpdater.Update();
+            //landerist_library.Landerist_com.DownloadFilesUpdater.Update();
             //landerist_library.Landerist_com.DownloadFilesUpdater.UpdateUpdates();
             //landerist_library.Landerist_com.Landerist_com.UpdateStatistics();
             //landerist_library.Landerist_com.Landerist_com.UpdateDownloads();
@@ -332,7 +332,7 @@ namespace landerist_tests
 
             //ServiceTasks.DailyTask();
             //new ServiceTasks().UpdateAndScrape();
-            //DownloadFilesUpdater.UpdateListingsAndUpdates();
+            //DownloadFilesUpdater.Update();
             //ServiceTasks.UpdateAndScrape();
             //ServiceTasks.Update();
             //ServiceTasks.Scrape();
@@ -345,7 +345,7 @@ namespace landerist_tests
             //BatchDownload.DownloadVertexAI("projects/942392546193/locations/europe-southwest1/batchPredictionJobs/391166654744100864");
             //VertexAIBatchCleaner.Clean();
             //OpenAIBatchCleaner.RemoveFiles();
-            DownloadFilesUpdater.UpdateUpdates();
+            //FilesUpdater.UpdateWebsites();
 
 
             #endregion

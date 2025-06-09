@@ -10,7 +10,8 @@ namespace landerist_library.Landerist_com
     public enum ExportType
     {
         Listings,
-        Updates
+        Updates,
+        Websites
     }
 
     public class Landerist_com

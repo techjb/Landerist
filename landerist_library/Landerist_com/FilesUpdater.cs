@@ -8,22 +8,23 @@ using System.Globalization;
 
 namespace landerist_library.Landerist_com
 {
-    public class DownloadFilesUpdater : Landerist_com
+    public class FilesUpdater : Landerist_com
     {
 
         private const string keyDateFrom = "dateFrom";
         private const string keyDateTo = "dateTo";
 
-        public static void UpdateListingsAndUpdates()
+        public static void Update()
         {
             try
             {
                 UpdateListings();
                 UpdateUpdates();
+                UpdateWebsites();
             }
             catch (Exception exception)
             {
-                Log.WriteError("UpdateListingsAndUpdates", exception);
+                Log.WriteError("Update", exception);
             }
         }
 
@@ -40,13 +41,44 @@ namespace landerist_library.Landerist_com
         public static void UpdateUpdates()
         {
             Console.WriteLine("Reading Updates ..");
-            DateOnly dateFrom = GetDateFrom();            
+            DateOnly dateFrom = GetDateFrom();
             DateOnly dateTo = Yesterday();
             var listings = ES_Listings.GetListings(true, dateFrom, dateTo);
             if (!Update(listings, CountryCode.ES, ExportType.Updates, dateFrom, dateTo))
             {
                 Log.WriteError("filesupdater", "Error updating Updates");
             }
+        }
+
+        public static bool UpdateWebsites()
+        {
+            Console.WriteLine("Reading Websites ..");
+            var websites = Websites.Websites.GetHosts();
+            if (websites.Count.Equals(0))
+            {
+                return true;
+            }
+            string fileName = GetFileName(CountryCode.ES, ExportType.Websites, "csv");
+            string subdirectory = GetLocalSubdirectory(CountryCode.ES, ExportType.Websites);
+            string filePath = GetFilePath(subdirectory, fileName);
+            if (!Directory.Exists(GetFilePath(subdirectory)))
+            {
+                Directory.CreateDirectory(GetFilePath(subdirectory));
+            }
+            if (!Tools.Csv.Write(websites, filePath))
+            {
+                Log.WriteError("filesupdater", "Error writing Websites CSV file");
+                return false;
+            }
+            string subdirectoryInBucket = subdirectory.Replace("\\", "/");
+            if (!new S3().UploadToDownloadsBucket(filePath, fileName, subdirectoryInBucket))
+            {
+                Log.WriteError("filesupdater", "Error uploading Websites CSV file to S3");
+                return false;
+            }
+            Log.WriteInfo("filesupdater", fileName);
+            return true;
+
         }
 
         private static bool Update(SortedSet<Listing> listings, CountryCode countryCode, ExportType exportType, DateOnly? dateFrom, DateOnly? dateTo)
@@ -98,22 +130,18 @@ namespace landerist_library.Landerist_com
             List<(string, string)> metadata = [];
             if (dateFrom.HasValue)
             {
-                //string dateFromValue = dateFrom.Value.ToString("dd-MM-yyyy");
-                string dateFromValue = dateFrom.Value.ToString();
-                metadata.Add((keyDateFrom, dateFromValue));
+                metadata.Add((keyDateFrom, dateFrom.Value.ToString()));
             }
             if (dateTo.HasValue)
             {
-                //string dateToValue = dateTo.Value.ToString("dd-MM-yyyy");
-                string dateToValue = dateTo.Value.ToString();
-                metadata.Add((keyDateTo, dateToValue));
+                metadata.Add((keyDateTo, dateTo.Value.ToString()));
             }
             return metadata;
         }
 
         private static bool UploadHistoricFile(CountryCode countryCode, ExportType exportType, string filePathZip, string subdirectoryInBucket, DateOnly? dateFrom, DateOnly? dateTo)
         {
-            string fileNameWithoutExtension = GetFileName(countryCode, exportType);            
+            string fileNameWithoutExtension = GetFileName(countryCode, exportType);
             string newFileNameZip = GetFileNameWidhDate(Yesterday(), fileNameWithoutExtension, "zip");
             string subdirectory = GetLocalSubdirectory(countryCode, exportType);
             string newFilePathZip = GetFilePath(subdirectory, newFileNameZip);
