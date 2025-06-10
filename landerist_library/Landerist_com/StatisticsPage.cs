@@ -37,7 +37,7 @@ namespace landerist_library.Landerist_com
 
                 if (UploadStatisticsFile())
                 {
-                    Log.WriteInfo("StatisticsPage", "Updated");
+                    Log.WriteInfo("StatisticsPage", "Updated statistics page");
                 }
             }
             catch (Exception exception)

@@ -27,7 +27,7 @@ namespace landerist_library.Landerist_com
                 UpdateDownloadsTemplate(CountryCode.ES, ExportType.Updates);
                 if (UploadDownloadsFile())
                 {
-                    Log.WriteInfo("DownloadsPage", "Updated");
+                    Log.WriteInfo("DownloadsPage", "Updated downloads page");
                 }
 
             }
