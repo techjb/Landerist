@@ -11,13 +11,6 @@ namespace landerist_library.Export
             try
             {
                 var schema = new Schema(listings);
-                //string json = schema.Serialize();
-                //if (File.Exists(filePath))
-                //{
-                //    File.Delete(filePath);
-                //}
-                //File.WriteAllText(filePath, json);
-
                 File.Delete(filePath);
                 using var file = File.CreateText(filePath);
                 using var writer = new JsonTextWriter(file);
