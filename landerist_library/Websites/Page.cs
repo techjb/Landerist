@@ -60,10 +60,6 @@ namespace landerist_library.Websites
 
         private bool Disposed;
 
-        public Page(Listing listing) : this(listing.dataSourceUrl)
-        {
-
-        }
         public Page(string url) : this(new Uri(url))
         {
 
@@ -253,18 +249,20 @@ namespace landerist_library.Websites
                 Website.DecreaseNumPages();
                 ES_Listings.Delete(UriHash);
                 ES_Media.Delete(UriHash);
+                ES_Sources.Delete(UriHash);
             }
             return sucess;
         }
 
         public bool DeleteListing()
         {
-            var listing = ES_Listings.GetListing(this, false);
+            var listing = ES_Listings.GetListing(this, false, false);
             if (listing != null)
             {
                 if (ES_Listings.Delete(listing))
                 {
                     ES_Media.Delete(listing);
+                    ES_Sources.Delete(listing);
                     Website.DecreaseNumListings();
                     return true;
                 }
@@ -434,14 +432,14 @@ namespace landerist_library.Websites
         }
 
 
-        public Listing? GetListing(bool loadMedia)
+        public Listing? GetListing(bool loadMedia, bool loadSources)
         {
-            return ES_Listings.GetListing(this, loadMedia);
+            return ES_Listings.GetListing(this, loadMedia, loadSources);
         }
 
         public bool ContainsListing()
         {
-            var listing = GetListing(false);
+            var listing = GetListing(false, false);
             return listing is not null;
         }
 

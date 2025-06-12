@@ -79,19 +79,19 @@
             return Domains.Contains(domain, StringComparer.OrdinalIgnoreCase);
         }
 
-        public static void DeleteBlockedWebsites()
-        {
-            var websites = Websites.Websites.GetAll();
-            int counter = 0;
-            foreach (var website in websites)
-            {
-                if (IsBlocked(website.MainUri))
-                {
-                    website.Delete();
-                    counter++;
-                }
-            }
-            Console.WriteLine("Deleted: " + counter + " websites.");
-        }
+        //public static void DeleteBlockedWebsites()
+        //{
+        //    var websites = Websites.Websites.GetAll();
+        //    int counter = 0;
+        //    foreach (var website in websites)
+        //    {
+        //        if (IsBlocked(website.MainUri))
+        //        {
+        //            website.Delete();
+        //            counter++;
+        //        }
+        //    }
+        //    Console.WriteLine("Deleted: " + counter + " websites.");
+        //}
     }
 }

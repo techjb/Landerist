@@ -31,7 +31,7 @@ namespace landerist_library.Parse.Media.Image
             ImageParser.ProcessMediaToRemove(true);
         }
 
-        private void DownloadImage(landerist_orels.ES.Media image)
+        private void DownloadImage(landerist_orels.Media image)
         {
 
             if (!ImageParser.MediaParser.Page.Website.IsAllowedByRobotsTxt(image.url))

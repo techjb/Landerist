@@ -31,7 +31,7 @@ namespace landerist_library.Parse.Media.Image
             }
         }
 
-        private void GetDuplicates(landerist_orels.ES.Media image)
+        private void GetDuplicates(landerist_orels.Media image)
         {
             if (!ImageParser.DictionaryMats.TryGetValue(image.url, out Mat? currentMat))
             {

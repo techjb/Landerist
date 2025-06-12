@@ -375,6 +375,7 @@ namespace landerist_library.Websites
         {
             ES_Listings.Delete();
             ES_Media.Delete();
+            ES_Sources.Delete();
         }
 
         public static void UpdateNumPages()

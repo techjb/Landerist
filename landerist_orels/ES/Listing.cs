@@ -56,6 +56,8 @@ namespace landerist_orels.ES
     {
         public const int MAX_MEDIA_ITEMS = 200;
 
+        public const int MAX_SOURCES_ITEMS = 20;
+
 #pragma warning disable IDE1006 // Naming Styles
 
         [JsonProperty(Order = 1)]
@@ -89,117 +91,108 @@ namespace landerist_orels.ES
         public string description { get; set; }
 
         [JsonProperty(Order = 11)]
-        public string dataSourceName { get; set; }
+        public SortedSet<Source> sources { get; set; } = new SortedSet<Source>(new SourceComparer());        
 
         [JsonProperty(Order = 12)]
-        public string dataSourceGuid { get; set; }
-
-        [JsonProperty(Order = 13)]
-        public DateTime? dataSourceUpdate { get; set; }
-
-        [JsonProperty(Order = 14)]
-        public Uri dataSourceUrl { get; set; }
-
-        [JsonProperty(Order = 15)]
         public string contactName { get; set; }
 
-        [JsonProperty(Order = 16)]
+        [JsonProperty(Order = 13)]
         public string contactPhone { get; set; }
 
-        [JsonProperty(Order = 17)]
+        [JsonProperty(Order = 14)]
         public string contactEmail { get; set; }
 
-        [JsonProperty(Order = 18)]
+        [JsonProperty(Order = 15)]
         public Uri contactUrl { get; set; }
 
-        [JsonProperty(Order = 19)]
+        [JsonProperty(Order = 16)]
         public string contactOther { get; set; }
 
-        [JsonProperty(Order = 20)]
+        [JsonProperty(Order = 17)]
         public string address { get; set; }
 
-        [JsonProperty(Order = 21)]
+        [JsonProperty(Order = 18)]
         public string lauId { get; set; }
 
-        [JsonProperty(Order = 22)]
+        [JsonProperty(Order = 19)]
         public double? latitude { get; set; }
 
-        [JsonProperty(Order = 23)]
+        [JsonProperty(Order = 20)]
         public double? longitude { get; set; }
 
-        [JsonProperty(Order = 24)]
+        [JsonProperty(Order = 21)]
         public bool? locationIsAccurate { get; set; }
 
-        [JsonProperty(Order = 25)]
+        [JsonProperty(Order = 22)]
         public string cadastralReference { get; set; }
 
-        [JsonProperty(Order = 26)]
+        [JsonProperty(Order = 23)]
         public double? propertySize { get; set; }
 
-        [JsonProperty(Order = 27)]
+        [JsonProperty(Order = 24)]
         public double? landSize { get; set; }
 
-        [JsonProperty(Order = 28)]
+        [JsonProperty(Order = 25)]
         public int? constructionYear { get; set; }
 
-        [JsonProperty(Order = 29)]
+        [JsonProperty(Order = 26)]
         public ConstructionStatus? constructionStatus { get; set; }
 
-        [JsonProperty(Order = 30)]
+        [JsonProperty(Order = 27)]
         public int? floors { get; set; }
 
-        [JsonProperty(Order = 31)]
+        [JsonProperty(Order = 28)]
         public string floor { get; set; }
 
-        [JsonProperty(Order = 32)]
+        [JsonProperty(Order = 29)]
         public int? bedrooms { get; set; }
 
-        [JsonProperty(Order = 33)]
+        [JsonProperty(Order = 30)]
         public int? bathrooms { get; set; }
 
-        [JsonProperty(Order = 34)]
+        [JsonProperty(Order = 31)]
         public int? parkings { get; set; }
 
-        [JsonProperty(Order = 35)]
+        [JsonProperty(Order = 32)]
         public bool? terrace { get; set; }
 
-        [JsonProperty(Order = 36)]
+        [JsonProperty(Order = 33)]
         public bool? garden { get; set; }
 
-        [JsonProperty(Order = 37)]
+        [JsonProperty(Order = 34)]
         public bool? garage { get; set; }
 
-        [JsonProperty(Order = 38)]
+        [JsonProperty(Order = 35)]
         public bool? motorbikeGarage { get; set; }
 
-        [JsonProperty(Order = 39)]
+        [JsonProperty(Order = 36)]
         public bool? pool { get; set; }
 
-        [JsonProperty(Order = 40)]
+        [JsonProperty(Order = 37)]
         public bool? lift { get; set; }
 
-        [JsonProperty(Order = 41)]
+        [JsonProperty(Order = 38)]
         public bool? disabledAccess { get; set; }
 
-        [JsonProperty(Order = 42)]
+        [JsonProperty(Order = 39)]
         public bool? storageRoom { get; set; }
 
-        [JsonProperty(Order = 43)]
+        [JsonProperty(Order = 40)]
         public bool? furnished { get; set; }
 
-        [JsonProperty(Order = 44)]
+        [JsonProperty(Order = 41)]
         public bool? nonFurnished { get; set; }
 
-        [JsonProperty(Order = 45)]
+        [JsonProperty(Order = 42)]
         public bool? heating { get; set; }
 
-        [JsonProperty(Order = 46)]
+        [JsonProperty(Order = 43)]
         public bool? airConditioning { get; set; }
 
-        [JsonProperty(Order = 47)]
+        [JsonProperty(Order = 44)]
         public bool? petsAllowed { get; set; }
 
-        [JsonProperty(Order = 48)]
+        [JsonProperty(Order = 45)]
         public bool? securitySystems { get; set; }
 
 #pragma warning restore IDE1006 // Naming Styles
@@ -234,12 +227,12 @@ namespace landerist_orels.ES
                 return;
             }
             List<Media> toRemove = new List<Media>();
-            int ccounter = 0;
+            int counter = 0;
             foreach (Media element in media)
             {
-                if (ccounter < MAX_MEDIA_ITEMS)
+                if (counter < MAX_MEDIA_ITEMS)
                 {
-                    ccounter++;
+                    counter++;
                     continue;
                 }
                 toRemove.Add(element);
@@ -248,6 +241,54 @@ namespace landerist_orels.ES
             foreach (Media element in toRemove)
             {
                 media.Remove(element);
+            }
+        }
+
+        public void AddSource(Source source)
+        {
+            if (source == null)
+            {
+                return;
+            }
+            if (sources.Count >= MAX_SOURCES_ITEMS)
+            {
+                return;
+            }
+            sources.Add(source);
+        }
+
+
+        public void SetSources(SortedSet<Source> sources)
+        {
+            if (sources == null || sources.Count.Equals(0))
+            {
+                return;
+            }
+            FitSources(sources);
+            this.sources = sources;
+        }
+
+        private void FitSources(SortedSet<Source> sources)
+        {
+            if (sources.Count <= MAX_SOURCES_ITEMS)
+            {
+                return;
+            }
+            List<Source> toRemove = new List<Source>();
+            int counter = 0;
+            foreach (Source source in sources)
+            {
+                if (counter < MAX_SOURCES_ITEMS)
+                {
+                    counter++;
+                    continue;
+                }
+                toRemove.Add(source);
+            }
+
+            foreach (Source source in toRemove)
+            {
+                sources.Remove(source);
             }
         }
 
@@ -278,10 +319,7 @@ namespace landerist_orels.ES
                 (media == other.media || (media != null && other.media != null && media.SetEquals(other.media))) &&
                 (price == other.price || (price != null && other.price != null && price.Equals(other.price))) &&
                 description == other.description &&
-                dataSourceName == other.dataSourceName &&
-                dataSourceGuid == other.dataSourceGuid &&
-                //dataSourceUpdate == other.dataSourceUpdate &&
-                dataSourceUrl == other.dataSourceUrl &&
+                (sources == other.sources || (sources != null && other.sources!= null && sources.SetEquals(other.sources))) &&             
                 contactName == other.contactName &&
                 contactPhone == other.contactPhone &&
                 contactEmail == other.contactEmail &&
@@ -331,10 +369,7 @@ namespace landerist_orels.ES
             hash ^= media?.GetHashCode() ?? 0;
             hash ^= price?.GetHashCode() ?? 0;
             hash ^= description?.GetHashCode() ?? 0;
-            hash ^= dataSourceName?.GetHashCode() ?? 0;
-            hash ^= dataSourceGuid?.GetHashCode() ?? 0;
-            //hash ^= (dataSourceUpdate?.GetHashCode() ?? 0);
-            hash ^= dataSourceUrl?.GetHashCode() ?? 0;
+            hash ^= sources?.GetHashCode() ?? 0;            
             hash ^= contactName?.GetHashCode() ?? 0;
             hash ^= contactPhone?.GetHashCode() ?? 0;
             hash ^= contactEmail?.GetHashCode() ?? 0;

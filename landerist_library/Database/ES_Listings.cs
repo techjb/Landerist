@@ -11,7 +11,7 @@ namespace landerist_library.Database
 
         public static void InsertUpdate(Website website, Listing newListing)
         {
-            Listing? oldListing = GetListing(newListing.guid, true);
+            Listing? oldListing = GetListing(newListing.guid, true, true);
             if (oldListing != null)
             {
                 if (!oldListing.Equals(newListing))
@@ -40,9 +40,8 @@ namespace landerist_library.Database
                 "INSERT INTO " + TABLE_ES_LISTINGS + " " +
                 "VALUES( " +
                 "@guid, @listingStatus, @listingDate, @unlistingDate, @operation, @propertyType, " +
-                "@propertySubtype, @priceAmount, @priceCurrency, @description, @dataSourceName, " +
-                "@dataSourceGuid, @dataSourceUpdate, @dataSourceUrl, @contactName, @contactPhone, " +
-                "@contactEmail, @contactUrl, @contactOther, @address, @lauId, @latitude, @longitude, " +
+                "@propertySubtype, @priceAmount, @priceCurrency, @description, " +
+                "@contactName, @contactPhone, @contactEmail, @contactUrl, @contactOther, @address, @lauId, @latitude, @longitude, " +
                 "@locationIsAccurate, @cadastralReference, @propertySize, @landSize, @constructionYear, " +
                 "@constructionStatus, @floors, @floor, @bedrooms, @bathrooms, @parkings, @terrace, @garden, " +
                 "@garage, @motorbikeGarage, @pool, @lift, @disabledAccess, @storageRoom, @furnished, " +
@@ -65,11 +64,7 @@ namespace landerist_library.Database
                 {"propertySubType", listing.propertySubtype?.ToString()},
                 {"priceAmount", listing.price?.amount },
                 {"priceCurrency", listing.price?.currency.ToString()},
-                {"description", listing.description },
-                {"dataSourceName", listing.dataSourceName },
-                {"dataSourceGuid", listing.dataSourceGuid },
-                {"dataSourceUpdate", listing.dataSourceUpdate},
-                {"dataSourceUrl", listing.dataSourceUrl?.ToString() },
+                {"description", listing.description },            
                 {"contactName", listing.contactName },
                 {"contactPhone", listing.contactPhone },
                 {"contactEmail", listing.contactEmail },
@@ -114,6 +109,10 @@ namespace landerist_library.Database
             {
                 ES_Media.Update(newListing);
             }
+            if (!ListingSourcesAreEquals(oldListing, newListing))
+            {
+                ES_Sources.Update(newListing);
+            }
         }
 
         private static bool ListingMediaAreEquals(Listing oldListing, Listing newListing)
@@ -121,6 +120,13 @@ namespace landerist_library.Database
             return
                 oldListing.media == newListing.media ||
                 (oldListing.media != null && newListing.media != null && oldListing.media.SetEquals(newListing.media));
+        }
+
+        private static bool ListingSourcesAreEquals(Listing oldListing, Listing newListing)
+        {
+            return
+                oldListing.sources == newListing.sources ||
+                (oldListing.sources != null && newListing.sources != null && oldListing.sources.SetEquals(newListing.sources));
         }
 
         public static bool Update(Listing listing)
@@ -135,11 +141,7 @@ namespace landerist_library.Database
                 "[propertySubtype] = @propertySubtype, " +
                 "[priceAmount] = @priceAmount, " +
                 "[priceCurrency] = @priceCurrency, " +
-                "[description] = @description, " +
-                "[dataSourceName] = @dataSourceName, " +
-                "[dataSourceGuid] = @dataSourceGuid, " +
-                "[dataSourceUpdate] = @dataSourceUpdate, " +
-                "[dataSourceUrl] = @dataSourceUrl, " +
+                "[description] = @description, " +           
                 "[contactName] = @contactName, " +
                 "[contactPhone] = @contactPhone, " +
                 "[contactEmail] = @contactEmail, " +
@@ -180,14 +182,14 @@ namespace landerist_library.Database
             return new DataBase().Query(query, queryParameters);
         }
 
-        public static SortedSet<Listing> GetAll(bool loadMedia)
+        public static SortedSet<Listing> GetAll(bool loadMedia, bool loadSources)
         {
             string query =
                 "SELECT * " +
                 "FROM " + TABLE_ES_LISTINGS;
 
             DataTable dataTable = new DataBase().QueryTable(query);
-            return GetAll(dataTable, loadMedia);
+            return GetAll(dataTable, loadMedia, loadSources);
         }
 
         public static SortedSet<Listing> GetUnpublishedListings(DateTime unlistingDate)
@@ -203,10 +205,10 @@ namespace landerist_library.Database
                 {"unlistingDate", unlistingDate }
             });
 
-            return ParseListings(dataTable, false);
+            return ParseListings(dataTable, false, true);
         }
 
-        public static SortedSet<Listing> GetListings(bool loadMedia, DateOnly dateFrom, DateOnly dateTo)
+        public static SortedSet<Listing> GetListings(bool loadMedia, bool loadSources, DateOnly dateFrom, DateOnly dateTo)
         {
             string query =
                 "SELECT * " +
@@ -221,21 +223,21 @@ namespace landerist_library.Database
                 { "DateTo", dateTo },
             });
             
-            return GetAll(dataTable, loadMedia);
+            return GetAll(dataTable, loadMedia, loadSources);
         }
 
-        private static SortedSet<Listing> ParseListings(DataTable dataTable, bool loadMedia)
+        private static SortedSet<Listing> ParseListings(DataTable dataTable, bool loadMedia, bool loadSources)
         {
             SortedSet<Listing> listings = new(new ListingComparer());
             foreach (DataRow dataRow in dataTable.Rows)
             {
-                var listing = GetListing(dataRow, loadMedia);
+                var listing = GetListing(dataRow, loadMedia, loadSources);
                 listings.Add(listing);
             }
             return listings;
         }
 
-        private static SortedSet<Listing> GetAll(DataTable dataTable, bool loadMedia)
+        private static SortedSet<Listing> GetAll(DataTable dataTable, bool loadMedia, bool loadSources)
         {
             SortedSet<Listing> listings = new(new ListingComparer());
             var sync = new object();
@@ -244,7 +246,7 @@ namespace landerist_library.Database
                 //MaxDegreeOfParallelism = 1
             }, dataRow =>
             {
-                var listing = GetListing(dataRow, loadMedia);
+                var listing = GetListing(dataRow, loadMedia, loadSources);
                 lock (sync)
                 {
                     listings.Add(listing);
@@ -253,12 +255,12 @@ namespace landerist_library.Database
             return listings;
         }
 
-        public static Listing? GetListing(Page page, bool loadMedia)
+        public static Listing? GetListing(Page page, bool loadMedia, bool loadSources)
         {
-            return GetListing(page.UriHash, loadMedia);
+            return GetListing(page.UriHash, loadMedia, loadSources);
         }
 
-        private static Listing? GetListing(string guid, bool loadMedia)
+        private static Listing? GetListing(string guid, bool loadMedia, bool loadSources)
         {
             string query =
                 "SELECT * " +
@@ -271,12 +273,12 @@ namespace landerist_library.Database
 
             if (dataTable.Rows.Count.Equals(1))
             {
-                return GetListing(dataTable.Rows[0], loadMedia);
+                return GetListing(dataTable.Rows[0], loadMedia, loadSources);
             }
             return null;
         }
 
-        private static Listing GetListing(DataRow dataRow, bool loadMedia)
+        private static Listing GetListing(DataRow dataRow, bool loadMedia, bool loadSources)
         {
             var listing = GetListingData(dataRow);
             if (loadMedia)
@@ -284,6 +286,11 @@ namespace landerist_library.Database
                 var media = ES_Media.GetMedia(listing);
                 listing.SetMedia(media);
             }
+            if(loadSources)
+            {
+                var sources = ES_Sources.GetSources(listing);
+                listing.SetSources(sources);
+            }   
             return listing;
         }
 
@@ -303,11 +310,7 @@ namespace landerist_library.Database
                     amount = Convert.ToDecimal(dataRow["priceAmount"]),
                     currency = (Currency)Enum.Parse(typeof(Currency), dataRow["priceCurrency"].ToString()!)
                 },
-                description = GetString(dataRow, "description"),
-                dataSourceName = GetString(dataRow, "dataSourceName"),
-                dataSourceGuid = GetString(dataRow, "dataSourceGuid"),
-                dataSourceUpdate = GetDateTime(dataRow, "dataSourceUpdate"),
-                dataSourceUrl = GetUri(dataRow, "dataSourceUrl"),
+                description = GetString(dataRow, "description"),              
                 contactName = GetString(dataRow, "contactName"),
                 contactPhone = GetString(dataRow, "contactPhone"),
                 contactEmail = GetString(dataRow, "contactEmail"),
@@ -399,51 +402,6 @@ namespace landerist_library.Database
                 "DELETE FROM " + TABLE_ES_LISTINGS;
 
             return new DataBase().Query(query);
-        }
-
-
-        public static DataTable GetTrainingListings()
-        {
-            string query =
-                "SELECT " +
-                Pages.PAGES + ".[ResponseBodyText], " +
-                "[operation], " +
-                "[propertyType], " +
-                "[propertySubtype], " +
-                "[priceAmount], " +
-                "[description], " +
-                "[dataSourceGuid], " +
-                "[contactPhone], " +
-                "[contactEmail], " +
-                "[address], " +
-                "[cadastralReference], " +
-                "[propertySize], " +
-                "[landSize], " +
-                "[constructionYear], " +
-                "[constructionStatus], " +
-                "[floors], " +
-                "[floor], " +
-                "[bedrooms], " +
-                "[bathrooms], " +
-                "[parkings], " +
-                "[terrace], " +
-                "[garden], " +
-                "[garage], " +
-                "[motorbikeGarage], " +
-                "[pool], " +
-                "[lift], " +
-                "[disabledAccess], " +
-                "[storageRoom], " +
-                "[furnished], " +
-                "[nonFurnished], " +
-                "[heating], " +
-                "[airConditioning], " +
-                "[petsAllowed], " +
-                "[securitySystems] " +
-                "FROM " + TABLE_ES_LISTINGS + " " +
-                "INNER JOIN PAGES ON " + TABLE_ES_LISTINGS + ".[guid] = " + Pages.PAGES + ".[UriHash] ";
-
-            return new DataBase().QueryTable(query);
         }
     }
 }

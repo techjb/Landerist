@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace landerist_orels.ES
+namespace landerist_orels
 {
     public enum MediaType
     {

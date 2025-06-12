@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using landerist_orels.ES;
+using landerist_orels;
 using System.Text.RegularExpressions;
 
 namespace landerist_library.Parse.Media.Video
@@ -60,7 +61,7 @@ namespace landerist_library.Parse.Media.Video
             {
                 return;
             }
-            var media = new landerist_orels.ES.Media()
+            var media = new landerist_orels.Media()
             {
                 mediaType = MediaType.video,
                 url = uri

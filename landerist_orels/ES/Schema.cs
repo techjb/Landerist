@@ -10,7 +10,7 @@ namespace landerist_orels.ES
 #pragma warning disable IDE1006
 
         [JsonProperty(Order = 1)]
-        public string schemaUrl { get; set; } = "https://github.com/techjb/Open-Real-Estate-Listings-Schema/blob/master/ES/1.0.json";
+        public string schemaUrl { get; set; } = "https://github.com/techjb/Open-Real-Estate-Listings-Schema/blob/master/ES/1.1.json";
 
         [JsonProperty(Order = 2)]
         public DateTime created { get; set; } = DateTime.Now;

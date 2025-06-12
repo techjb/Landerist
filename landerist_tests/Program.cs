@@ -11,6 +11,7 @@ using landerist_library.Scrape;
 using landerist_library.Statistics;
 using landerist_library.Tasks;
 using landerist_library.Websites;
+using landerist_orels.ES;
 using System.Runtime.InteropServices;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -267,11 +268,19 @@ namespace landerist_tests
             //Backup.DeleteRemoteOldBackups();
             #endregion
 
-            #region Listing Example
-            //string url1 = "https://www.inmobiliaria-teval.com/inmueble/salou-apartamento-ln-23523-eva-2/";            
-            //string url2 = "https://www.inmobiliaria-teval.com/inmueble/miami-playa-el-casalot-chalet-adosado/";
-            //ListingHTMLDom.Test(url1, url2);
-            //Csv.ExportHostsMainUri();
+            #region Listings
+            //var page = new Page("https://www.nerjasolproperty.com/es/apartamento-en-venta-en-torrox-costa/80124/s2");
+            //var listing1 = page.GetListing(true, true);
+
+            //var source = new landerist_orels.Source()
+            //{
+            //    sourceName = "www.nerjasolproperty.com",
+            //    sourceUrl = new Uri("https://www.nerjasolproperty.com/es/apartamento-en-venta-en-torrox-costa/80124/s2"),
+            //    sourceGuid = "4196"
+            //};
+            //listing1.AddSource(source);            
+            //ES_Listings.InsertUpdate(page.Website, listing1);
+            //ES_Sources.FixListingsWhitoutSource();
 
             #endregion
 

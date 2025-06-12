@@ -1,4 +1,5 @@
 ﻿using landerist_orels.ES;
+using landerist_orels;
 using Microsoft.IdentityModel.Tokens;
 
 namespace landerist_library.Parse.Media.Image
@@ -99,7 +100,7 @@ namespace landerist_library.Parse.Media.Image
                 return;
             }
 
-            var media = new landerist_orels.ES.Media()
+            var media = new landerist_orels.Media()
             {
                 mediaType = MediaType.image,
                 url = uri,
@@ -130,7 +131,7 @@ namespace landerist_library.Parse.Media.Image
                 title = string.Empty;
             }
 
-            var media = new landerist_orels.ES.Media()
+            var media = new landerist_orels.Media()
             {
                 mediaType = MediaType.image,
                 url = uri,

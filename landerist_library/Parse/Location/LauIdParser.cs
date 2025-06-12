@@ -28,7 +28,7 @@ namespace landerist_library.Parse.Location
 
         public static void SetLauIdToAllListings()
         {
-            var listings = Database.ES_Listings.GetAll(false);
+            var listings = Database.ES_Listings.GetAll(false, false);
             var total = listings.Count;
             var count = 0;
             var updated = 0;

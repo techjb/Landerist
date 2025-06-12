@@ -2,6 +2,7 @@
 using landerist_library.Parse.Media;
 using landerist_library.Websites;
 using landerist_orels.ES;
+using landerist_orels;
 using static landerist_library.Parse.ListingParser.StructuredOutputs.StructuredOutputEsListing;
 
 namespace landerist_library.Parse.ListingParser.StructuredOutputs
@@ -36,10 +37,10 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
                     propertySubtype = GetPropertySubtype(),
                     price = GetPropertyPrice(),
                     description = GetDescription(),
-                    dataSourceName = GetDataSourceName(page),
-                    dataSourceGuid = GetDataSourceGuid(),
-                    dataSourceUpdate = GetDataSourceUpdate(),
-                    dataSourceUrl = GetDataSourceUrl(page),
+                    //dataSourceName = GetSourceName(page),
+                    //dataSourceGuid = GetSourceGuid(),
+                    //dataSourceUpdate = GetDataSourceUpdate(),
+                    //dataSourceUrl = GetSourceUrl(page),
                     contactPhone = GetPhone(),
                     contactEmail = GetEmail(),
                     address = GetAddress(),
@@ -70,6 +71,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
                 };
 
                 SetMedia(listing, page);
+                SetSource(listing, page);
                 return (PageType.Listing, listing);
             }
             catch (Exception exception)
@@ -186,12 +188,17 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             return null;
         }
 
-        private static string GetDataSourceName(Page page)
+        private static string GetSourceName(Page page)
         {
             return page.Website.Host;
         }
 
-        private string? GetDataSourceGuid()
+        private static string GetUriHash(Page page)
+        {
+            return page.UriHash;
+        }
+
+        private string? GetSourceGuid()
         {
             if (string.IsNullOrEmpty(Anuncio!.ReferenciaDelAnuncio))
             {
@@ -205,7 +212,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             return DateTime.Now;
         }
 
-        private static Uri GetDataSourceUrl(Page page)
+        private static Uri GetSourceUrl(Page page)
         {
             return page.Uri;
         }
@@ -371,7 +378,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             }
             return null;
         }
-        
+
         private void SetMedia(Listing listing, Page page)
         {
             if (Anuncio!.ImagenesDelAnuncio is null ||
@@ -381,8 +388,19 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
                 return;
             }
             MediaParser mediaParser = new(page);
-            var list = Anuncio!.ImagenesDelAnuncio?.Select(img => (img.Url, img.Titulo)).ToList();            
+            var list = Anuncio!.ImagenesDelAnuncio?.Select(img => (img.Url, img.Titulo)).ToList();
             mediaParser.AddMediaImages(listing, list);
+        }
+
+        private void SetSource(Listing listing, Page page)
+        {
+            var source = new Source
+            {
+                sourceGuid = GetSourceGuid(),
+                sourceUrl = GetSourceUrl(page),
+                sourceName = GetSourceName(page),
+            };
+            listing.sources.Add(source);
         }
     }
 }

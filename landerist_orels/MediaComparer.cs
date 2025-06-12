@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace landerist_orels.ES
+namespace landerist_orels
 {
     public class MediaComparer : IComparer<Media>
     {

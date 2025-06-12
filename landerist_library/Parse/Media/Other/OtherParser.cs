@@ -1,5 +1,5 @@
 ﻿using HtmlAgilityPack;
-using landerist_orels.ES;
+using landerist_orels;
 
 namespace landerist_library.Parse.Media.Other
 {
@@ -46,7 +46,7 @@ namespace landerist_library.Parse.Media.Other
 
             string title = MediaParser.GetTitle(htmlNode);
 
-            var media = new landerist_orels.ES.Media()
+            var media = new landerist_orels.Media()
             {
                 mediaType = MediaType.other,
                 url = uri,

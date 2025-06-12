@@ -433,7 +433,7 @@ namespace landerist_library.Websites
             foreach (var page in pages)
             {
                 Console.WriteLine(counter++ + "/" + total);
-                var listing = page.GetListing(false);
+                var listing = page.GetListing(false, false);
                 if (listing != null && listing.cadastralReference != null)
                 {
                     if (!Validate.CadastralReference(listing.cadastralReference))
@@ -516,15 +516,19 @@ namespace landerist_library.Websites
                 listing =>
             {
                 Interlocked.Increment(ref processed);
-                var page = new Page(listing);
-                if (page.DeleteListing())
+                foreach(var source in listing.sources)
                 {
-                    Interlocked.Increment(ref deleted);
-                }
-                else
-                {
-                    Interlocked.Increment(ref errors);
-                }
+                    var page = new Page(source.sourceUrl);
+                    if (page.DeleteListing())
+                    {
+                        Interlocked.Increment(ref deleted);
+                    }
+                    else
+                    {
+                        Interlocked.Increment(ref errors);
+                    }
+                }                
+                
                 //Console.WriteLine(processed + "/" + total + " Deleted: " + deleted);
 
             });

@@ -109,8 +109,7 @@ namespace landerist_library.Scrape
         {
             if (Page.PageType.Equals(PageType.Listing))
             {
-                NewListing ??= Page.GetListing(true);
-                //SetMedia();
+                NewListing ??= Page.GetListing(true, true);                
                 SetLocation();
                 SetLauId();
                 UpdateNewListing();
@@ -121,7 +120,7 @@ namespace landerist_library.Scrape
                 OldPageType != null &&
                 OldPageType.Equals(PageType.Listing))
             {
-                NewListing ??= Page.GetListing(false);
+                NewListing ??= Page.GetListing(true, true);
                 if (NewListing != null)
                 {
                     NewListing.listingStatus = ListingStatus.unpublished;
@@ -158,10 +157,11 @@ namespace landerist_library.Scrape
 
         private void UpdateNewListing()
         {
-            if (NewListing != null)
+            if (NewListing == null)
             {
-                ES_Listings.InsertUpdate(Page.Website, NewListing);
+                return;   
             }
+            ES_Listings.InsertUpdate(Page.Website, NewListing);
         }
 
         private void IndexPages()

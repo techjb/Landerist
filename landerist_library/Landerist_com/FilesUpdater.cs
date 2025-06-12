@@ -31,7 +31,7 @@ namespace landerist_library.Landerist_com
         public static void UpdateListings()
         {
             Console.WriteLine("Reading Listings ..");
-            var listings = ES_Listings.GetAll(true);
+            var listings = ES_Listings.GetAll(true, true);
             if (!Update(listings, CountryCode.ES, ExportType.Listings, null, null))
             {
                 Log.WriteError("filesupdater", "Error updating Listings");
@@ -43,7 +43,7 @@ namespace landerist_library.Landerist_com
             Console.WriteLine("Reading Updates ..");
             DateOnly dateFrom = GetDateFrom();
             DateOnly dateTo = Yesterday();
-            var listings = ES_Listings.GetListings(true, dateFrom, dateTo);
+            var listings = ES_Listings.GetListings(true, true, dateFrom, dateTo);
             if (!Update(listings, CountryCode.ES, ExportType.Updates, dateFrom, dateTo))
             {
                 Log.WriteError("filesupdater", "Error updating Updates");

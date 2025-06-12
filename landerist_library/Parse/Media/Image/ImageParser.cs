@@ -1,6 +1,6 @@
 ﻿using HtmlAgilityPack;
 using landerist_library.Database;
-using landerist_orels.ES;
+using landerist_orels;
 using OpenCvSharp;
 using System.Text.RegularExpressions;
 
@@ -16,11 +16,11 @@ namespace landerist_library.Parse.Media.Image
 
         private const int MIN_IMAGE_SIZE = 256 * 256;
 
-        protected readonly SortedSet<landerist_orels.ES.Media> MediaImages = new(new MediaComparer());
+        protected readonly SortedSet<landerist_orels.Media> MediaImages = new(new MediaComparer());
 
-        public readonly List<landerist_orels.ES.Media> MediaToRemove = [];
+        public readonly List<landerist_orels.Media> MediaToRemove = [];
 
-        public readonly SortedSet<landerist_orels.ES.Media> UnknowIsValidImages = new(new MediaComparer());
+        public readonly SortedSet<landerist_orels.Media> UnknowIsValidImages = new(new MediaComparer());
 
         public readonly Dictionary<Uri, Mat> DictionaryMats = [];
 
@@ -103,7 +103,7 @@ namespace landerist_library.Parse.Media.Image
 
             string title = MediaParser.GetTitle(imgNode);
 
-            var media = new landerist_orels.ES.Media()
+            var media = new landerist_orels.Media()
             {
                 mediaType = MediaType.image,
                 url = uri,

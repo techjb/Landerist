@@ -3,6 +3,7 @@ using landerist_library.Parse.Media.Image;
 using landerist_library.Parse.Media.Other;
 using landerist_library.Parse.Media.Video;
 using landerist_library.Websites;
+using landerist_orels;
 using landerist_orels.ES;
 
 namespace landerist_library.Parse.Media
@@ -11,7 +12,7 @@ namespace landerist_library.Parse.Media
     {
         public readonly Page Page;
 
-        private readonly SortedSet<landerist_orels.ES.Media> Media = new(new MediaComparer());
+        private readonly SortedSet<landerist_orels.Media> Media = new(new MediaComparer());
 
         public HtmlDocument? HtmlDocument { get; set; }
 
@@ -21,7 +22,7 @@ namespace landerist_library.Parse.Media
             InitHtmlDocument();
         }
 
-        public void Add(landerist_orels.ES.Media media)
+        public void Add(landerist_orels.Media media)
         {
             if (media.url == null)
             {
