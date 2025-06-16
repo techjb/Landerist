@@ -51,10 +51,12 @@
         CreateLineChart("Pages", [/*Pages*/]);
         CreateLineChart("Updated pages", [/*UpdatedPages*/]);
         CreateLineChart("Need update", [/*NeedUpdate*/]);
-        CreateLineChart("Unknown PageType", [/*UnknownPageType*/]);
+        CreateLineChart("Total unknown PageType", [/*UnknownPageType*/]);
         CreateLineChart("HttpStatusCode 200", [/*HttpStatusCode_200*/]);
         CreateLineChart("HttpStatusCode NULL", [/*HttpStatusCode_NULL*/]);
         CreateMultiLineChart("HttpStatusCode Errors", [/*HttpStatusCode*/]);
+        CreateMultiLineChart("PageType", [/*PageType*/]);
+
 
 
         function CreateLineChart(title, values) {

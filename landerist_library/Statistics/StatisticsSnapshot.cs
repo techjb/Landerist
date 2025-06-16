@@ -20,9 +20,10 @@ namespace landerist_library.Statistics
         UpdatedWebsites,
         UpdatedRobotsTxt,
         UpdatedSitemaps,
-        HttpStatusCode,
+        HttpStatusCode,        
         HttpStatusCode_NULL,
         HttpStatusCode_200,
+        PageType,
     }
 
     public class StatisticsSnapshot
@@ -37,13 +38,14 @@ namespace landerist_library.Statistics
             SnapshotUpdatedIpAddress();
             SnapshotPages();
             SnapshotUpdatedPages();
-            SnapshotNeedUpdate();
+            SnapshotNeedUpdate();            
             SnapshotUnknownPageType();
             SnapshotListings();
             SnapshotPublishedListings();
             SnapshotUnPublishedListings();
             SnapshotMedia();
             SnapshotHttpStatusCode();
+            SnapshotPageType();
         }
 
         private static void SnapshotWebsites()
@@ -162,23 +164,126 @@ namespace landerist_library.Statistics
             InsertDaily(StatisticsKey.Media, query);
         }
 
-        private static bool InsertDaily(StatisticsKey statisticsKey, string queryInt)
+
+
+        public static void SnapshotHttpStatusCode7Days()
         {
-            int counter = new DataBase().QueryInt(queryInt);
+            for (var days = -7; days <= -1; days++)
+            {
+                SnapshotHttpStatusCode(days);
+            }
+        }
+
+        public static void SnapshotHttpStatusCode()
+        {
+            SnapshotHttpStatusCode(-1);
+        }
+
+        public static void SnapshotHttpStatusCode(int days)
+        {
+            DateTime date = DateTime.Now.AddDays(days);
 
             string query =
+                "SELECT [HttpStatusCode], COUNT(*) AS [Counter] " +
+                "FROM " + Websites.Pages.PAGES + " " +
+                "WHERE CAST([Updated] AS date) = CAST(@Date AS date) " +
+                "GROUP BY [HttpStatusCode] ";
+
+            var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>()
+            {
+                {"Date", date}
+            });
+
+            foreach (DataRow dataRow in dataTable.Rows)
+            {
+                short? httpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
+                int counter = (int)dataRow["Counter"];
+                string key = StatisticsKey.HttpStatusCode.ToString() + "_" + (httpStatusCode?.ToString() ?? "NULL");
+                Insert(date, key, counter);
+            }
+        }
+
+
+        public static List<string> GetHttpStatusCodeKeys()
+        {
+            return GetKeysLike(StatisticsKey.HttpStatusCode);
+        }
+
+        public static List<string> GetPageTypeKeys()
+        {
+            return GetKeysLike(StatisticsKey.PageType);            
+        }
+
+        public static List<string> GetKeysLike(StatisticsKey key)
+        {
+            string query =
+                "SELECT DISTINCT [Key] " +
+                "FROM " + TABLES_STATISTICS_SNAPSHOT + " " +
+                "WHERE [Key] LIKE '"+ key.ToString() + "%'";
+
+            return new DataBase().QueryListString(query);
+        }
+
+        public static void SnapshotPageType()
+        {
+            SnapshotPageType(-1);
+        }
+
+        public static void SnapshotPageType7Days()
+        {
+            for (var days = -7; days <= -1; days++)
+            {
+                SnapshotPageType(days);
+            }
+        }
+
+        public static void SnapshotPageType(int days)
+        {
+            DateTime date = DateTime.Now.AddDays(days);
+
+            string query =
+                "SELECT [PageType], COUNT(*) AS [Counter] " +
+                "FROM " + Websites.Pages.PAGES + " " +
+                "WHERE CAST([Updated] AS date) = CAST(@Date AS date) " +
+                "AND [PageType] IS NOT NULL " +
+                "GROUP BY [PageType] ";
+
+            var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>()
+            {
+                {"Date", date}
+            });
+
+            foreach (DataRow dataRow in dataTable.Rows)
+            {
+                string pageType = (string)dataRow["PageType"];
+                int counter = (int)dataRow["Counter"];
+                string key = StatisticsKey.PageType.ToString() + "_" + pageType?.ToString();
+                Insert(date, key, counter);
+            }
+        }
+
+       
+        private static bool InsertDaily(StatisticsKey key, string queryInt)
+        {
+            int counter = new DataBase().QueryInt(queryInt);
+            return Insert(DateTime.Now, key.ToString(), counter);
+        }
+
+        private static bool Insert(DateTime date, string key, int counter)
+        {
+            string query =
                 "DELETE FROM " + TABLES_STATISTICS_SNAPSHOT + " " +
-                "WHERE [key] = @Key AND CAST([Date] AS date) = CAST(@Date AS date) " +
+                "WHERE [Key] = @Key AND CAST([Date] AS date) = CAST(@Date AS date) " +
                 "INSERT INTO " + TABLES_STATISTICS_SNAPSHOT + " " +
                 "VALUES(@Date, @Key, @Counter) ";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
-                { "Date", DateTime.Now},
-                { "Key", statisticsKey.ToString() },
-                { "Counter", counter },
-
-                });
+                { "Date",date },
+                { "Key", key },
+                { "Counter", counter }
+            });
         }
+
 
         public static DataSet GetStatistics(int lastMonths)
         {
@@ -227,69 +332,6 @@ namespace landerist_library.Statistics
         }
 
         
-
-        public static void SnapshotHttpStatusCode7Days()
-        {
-            for(var days = -7; days <=-1; days++)
-            {
-                SnapshotHttpStatusCode(days);
-            }
-        }
-
-        public static void SnapshotHttpStatusCode()
-        {
-            SnapshotHttpStatusCode(-1);
-        }
-
-        public static void SnapshotHttpStatusCode(int days)
-        {
-            DateTime date = DateTime.Now.AddDays(days);
-            
-            string query =
-                "SELECT [HttpStatusCode], COUNT(*) AS [Counter] " +
-                "FROM " + Websites.Pages.PAGES + " " +
-                "WHERE CAST([Updated] AS date) = CAST(@Date AS date) " +
-                "GROUP BY [HttpStatusCode] ";
-
-            var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>()
-            {
-                {"Date", date}
-            });
-
-            foreach (DataRow dataRow in dataTable.Rows)
-            {
-                short? httpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
-                int counter = (int)dataRow["Counter"];
-                InsertHttpStatusCode(httpStatusCode, counter, date);
-            }
-        }
-
-        private static void InsertHttpStatusCode(int? httpStatusCode, int counter, DateTime date)
-        {
-            string key = StatisticsKey.HttpStatusCode.ToString() + "_" + (httpStatusCode?.ToString() ?? "NULL");
-
-            string query =
-                "DELETE FROM " + TABLES_STATISTICS_SNAPSHOT + " " +
-                "WHERE [Key] = @Key AND CAST([Date] AS date) = CAST(@Date AS date) " +
-                "INSERT INTO " + TABLES_STATISTICS_SNAPSHOT + " " +
-                "VALUES(@Date, @Key, @Counter) ";
-
-            new DataBase().Query(query, new Dictionary<string, object?> {
-                { "Date",date },
-                { "Key", key },
-                { "Counter", counter }
-            });
-        }
-
-        public static List<string> GetHttpStatusCodeKeys()
-        {
-            string query =
-                "SELECT DISTINCT [Key] " +
-                "FROM " + TABLES_STATISTICS_SNAPSHOT + " " +
-                "WHERE [Key] LIKE 'HttpStatusCode%'";
-
-            return new DataBase().QueryListString(query);
-        }
 
     }
 }

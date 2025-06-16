@@ -314,6 +314,7 @@ namespace landerist_tests
             //landerist_library.Statistics.StatisticsSnapshot.TakeSnapshots();
             //landerist_library.Statistics.StatisticsSnapshot.SnapshotHttpStatusCode();
             //landerist_library.Statistics.StatisticsSnapshot.SnapshotHttpStatusCode7Days();
+            //landerist_library.Statistics.StatisticsSnapshot.SnapshotPageType7Days();
 
             //DownloadFilesUpdater.Update();
             //landerist_library.Landerist_com.DownloadFilesUpdater.Update();

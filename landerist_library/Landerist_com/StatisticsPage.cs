@@ -2,9 +2,7 @@
 using landerist_library.Export;
 using landerist_library.Logs;
 using landerist_library.Statistics;
-using PuppeteerSharp.BrowserData;
 using System.Data;
-using System.Diagnostics.Metrics;
 
 namespace landerist_library.Landerist_com
 {
@@ -35,6 +33,7 @@ namespace landerist_library.Landerist_com
                 UpdateTemplate(StatisticsKey.HttpStatusCode_NULL, true);
                 UpdateTemplate(StatisticsKey.HttpStatusCode_200, true);
                 UpdateHttpStatusCode();
+                UpdatePageType();
 
                 if (UploadStatisticsFile())
                 {
@@ -49,21 +48,35 @@ namespace landerist_library.Landerist_com
 
         private static void UpdateHttpStatusCode()
         {
-            var statisticsKey = StatisticsSnapshot.GetHttpStatusCodeKeys();
+            var keys = StatisticsSnapshot.GetHttpStatusCodeKeys();
+            keys.RemoveAll(code => code == StatisticsKey.HttpStatusCode_NULL.ToString() || code == StatisticsKey.HttpStatusCode_200.ToString());
+            Update(keys, StatisticsKey.HttpStatusCode);
+        }
+
+        private static void UpdatePageType()
+        {
+            var keys = StatisticsSnapshot.GetPageTypeKeys();
+            Update(keys, StatisticsKey.PageType);
+        }
+
+        private static void Update(List<string> keys, StatisticsKey statisticsKey)
+        {
             List<string> data = [];
-            foreach (var key in statisticsKey)
+            foreach (var key in keys)
             {
-                if (key.Equals(StatisticsKey.HttpStatusCode_NULL.ToString()) || 
-                    key.Equals(StatisticsKey.HttpStatusCode_200.ToString()))
-                {
-                    continue;
-                }
                 var values = GetValues(key, false);
                 var json = "{\"label\": \"" + key + "\", \"values\":[" + string.Join(",", [.. values]) + "]}";
                 data.Add(json);
             }
             string dataString = string.Join(",", [.. data]);
-            StatisticsTemplate = StatisticsTemplate.Replace("/*HttpStatusCode*/", dataString);
+            StatisticsTemplate = StatisticsTemplate.Replace("/*"+ statisticsKey.ToString() +"*/", dataString);
+        }
+
+        private static void AddData(List<string> data, string key, StatisticsKey statisticsKey)
+        {
+            var values = GetValues(key, false);
+            var json = "{\"label\": \"" + key + "\", \"values\":[" + string.Join(",", [.. values]) + "]}";
+            data.Add(json);
         }
 
         private static void UpdateTemplate(StatisticsKey statisticsKey, bool yesterday)
