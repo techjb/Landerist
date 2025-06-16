@@ -31,6 +31,7 @@ namespace landerist_library.Database
             {
                 website.IncreaseNumListings();
                 ES_Media.Insert(listing);
+                ES_Sources.Insert(listing);
             }
         }
 
