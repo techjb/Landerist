@@ -31,9 +31,10 @@ namespace landerist_library.Landerist_com
                 UpdateTemplate(StatisticsKey.Pages, false);
                 UpdateTemplate(StatisticsKey.UpdatedPages, true);
                 UpdateTemplate(StatisticsKey.NeedUpdate, true);
-                UpdateTemplate(StatisticsKey.UnknownPageType, true);                
-                UpdateHttpStatusCode();
+                UpdateTemplate(StatisticsKey.UnknownPageType, true);                                
                 UpdateTemplate(StatisticsKey.HttpStatusCode_NULL, true);
+                UpdateTemplate(StatisticsKey.HttpStatusCode_200, true);
+                UpdateHttpStatusCode();
 
                 if (UploadStatisticsFile())
                 {
@@ -52,7 +53,8 @@ namespace landerist_library.Landerist_com
             List<string> data = [];
             foreach (var key in statisticsKey)
             {
-                if (key.Equals(StatisticsKey.HttpStatusCode_NULL.ToString()))
+                if (key.Equals(StatisticsKey.HttpStatusCode_NULL.ToString()) || 
+                    key.Equals(StatisticsKey.HttpStatusCode_200.ToString()))
                 {
                     continue;
                 }

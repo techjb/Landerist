@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace landerist_orels
 {
@@ -6,8 +7,15 @@ namespace landerist_orels
     {
         public int Compare(Media x, Media y)
         {
-            string yCompared = y.url.ToString().ToLower().Trim();
-            return x.url.ToString().ToLower().Trim().CompareTo(yCompared);
+            if (x.url == null && y.url == null) return 0;
+            if (x.url == null) return -1;
+            if (y.url == null) return 1;
+
+            return string.Compare(
+                x.url.AbsoluteUri.Trim(),
+                y.url.AbsoluteUri.Trim(),
+                StringComparison.OrdinalIgnoreCase
+            );
         }
     }
 }

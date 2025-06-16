@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace landerist_orels
 {
@@ -6,8 +7,10 @@ namespace landerist_orels
     {
         public int Compare(Source x, Source y)
         {
-            string yCompared = y.sourceUrl.ToString().ToLower().Trim();
-            return x.sourceUrl.ToString().ToLower().Trim().CompareTo(yCompared);
+            if (x == null && y == null) return 0;
+            if (x == null) return -1;
+            if (y == null) return 1;
+            return string.Compare(x.sourceUrl.AbsoluteUri, y.sourceUrl.AbsoluteUri, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

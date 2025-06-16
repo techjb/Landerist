@@ -22,6 +22,7 @@ namespace landerist_library.Statistics
         UpdatedSitemaps,
         HttpStatusCode,
         HttpStatusCode_NULL,
+        HttpStatusCode_200,
     }
 
     public class StatisticsSnapshot

@@ -1,7 +1,6 @@
 ﻿using landerist_orels;
 using landerist_orels.ES;
 using System.Data;
-using System.Reflection;
 
 namespace landerist_library.Database
 {
@@ -33,8 +32,10 @@ namespace landerist_library.Database
 
         public static void Update(Listing listing)
         {
-            Delete(listing);
-            Insert(listing);
+            if (Delete(listing))
+            {
+                Insert(listing);
+            }            
         }
 
         public static bool Delete(Listing listing)
@@ -106,21 +107,27 @@ namespace landerist_library.Database
 
         public static void FixListingsWhitoutSource()
         {
-            string query = 
+            string query =
                 "SELECT * FROM PAGES " +
                 "WHERE UriHash in (  " +
                 "   SELECT guid FROM [Landerist].[dbo].[ES_LISTINGS]  " +
                 "   WHERE guid NOT IN (SELECT listingGuid FROM ES_SOURCES)  " +
                 ")";
             DataTable dataTable = new DataBase().QueryTable(query);
-            foreach (DataRow dataRow in dataTable.Rows)
+            int total = dataTable.Rows.Count;
+            int counter = 0;
+            int errors = 0;
+            Parallel.ForEach(dataTable.AsEnumerable(), dataRow =>
             {
+                Interlocked.Increment(ref counter);
+                Console.WriteLine(counter + "/" + total + " Errors: " + errors);
                 string guid = dataRow["Uri"].ToString() ?? string.Empty;
                 var page = new Websites.Page(guid);
                 Listing? listing = ES_Listings.GetListing(page, true, true);
                 if (listing == null)
                 {
-                    continue;
+                    Interlocked.Increment(ref errors);
+                    return;
                 }
                 var source = new Source
                 {
@@ -130,7 +137,7 @@ namespace landerist_library.Database
                 };
                 listing.sources.Add(source);
                 ES_Listings.InsertUpdate(page.Website, listing);
-            }
+            });
         }
     }
 }
