@@ -216,7 +216,7 @@ namespace landerist_library.Websites
             {
                 landerist_library.Websites.PageType.MainPage => Config.DEFAULT_DAYS_NEXT_UPDATE,
                 landerist_library.Websites.PageType.MayBeListing => Config.DEFAULT_DAYS_NEXT_UPDATE,
-                landerist_library.Websites.PageType.Listing => Config.DEFAULT_DAYS_NEXT_UPDATE,
+                landerist_library.Websites.PageType.Listing => Config.DEFAULT_DAYS_NEXT_UPDATE_LISTING,
                 _ => (short)PageTypeCounter! * Config.DEFAULT_DAYS_NEXT_UPDATE,
             };
             NextUpdate = ((DateTime)Updated!).AddDays(addDays);

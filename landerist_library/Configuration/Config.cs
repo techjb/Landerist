@@ -41,7 +41,9 @@ namespace landerist_library.Configuration
 
         public static readonly int MAX_PAGETYPE_COUNTER = 1000;
 
-        public static readonly int DEFAULT_DAYS_NEXT_UPDATE = 4;
+        public static readonly int DEFAULT_DAYS_NEXT_UPDATE = 3;
+
+        public static readonly int DEFAULT_DAYS_NEXT_UPDATE_LISTING = 1;
 
         public static readonly bool LOGS_ENABLED = true;
 
