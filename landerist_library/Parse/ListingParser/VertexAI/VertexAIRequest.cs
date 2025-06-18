@@ -14,8 +14,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI
 
         public const int MAX_CONTEXT_WINDOW = 128000;
 
-        //public static readonly string ModelName = "gemini-2.0-flash-lite-001";
-        public static readonly string ModelName = "gemini-2.5-flash-preview-05-20";
+        public static readonly string ModelName = "gemini-2.5-flash";
 
         public const float Temperature = 0.1f;
 
