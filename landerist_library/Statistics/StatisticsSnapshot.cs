@@ -20,10 +20,15 @@ namespace landerist_library.Statistics
         UpdatedWebsites,
         UpdatedRobotsTxt,
         UpdatedSitemaps,
-        HttpStatusCode,        
+        HttpStatusCode,
         HttpStatusCode_NULL,
         HttpStatusCode_200,
         PageType,
+        ScrappedSuccess,
+        ScrapedCrashed,
+        ScrapedDownloadErrors,
+        BatchReaded,
+        BatchReadedErrors
     }
 
     public class StatisticsSnapshot
@@ -38,7 +43,7 @@ namespace landerist_library.Statistics
             SnapshotUpdatedIpAddress();
             SnapshotPages();
             SnapshotUpdatedPages();
-            SnapshotNeedUpdate();            
+            SnapshotNeedUpdate();
             SnapshotUnknownPageType();
             SnapshotListings();
             SnapshotPublishedListings();
@@ -164,8 +169,6 @@ namespace landerist_library.Statistics
             InsertDaily(StatisticsKey.Media, query);
         }
 
-
-
         public static void SnapshotHttpStatusCode7Days()
         {
             for (var days = -7; days <= -1; days++)
@@ -211,7 +214,7 @@ namespace landerist_library.Statistics
 
         public static List<string> GetPageTypeKeys()
         {
-            return GetKeysLike(StatisticsKey.PageType);            
+            return GetKeysLike(StatisticsKey.PageType);
         }
 
         public static List<string> GetKeysLike(StatisticsKey key)
@@ -219,7 +222,7 @@ namespace landerist_library.Statistics
             string query =
                 "SELECT DISTINCT [Key] " +
                 "FROM " + TABLES_STATISTICS_SNAPSHOT + " " +
-                "WHERE [Key] LIKE '"+ key.ToString() + "%'";
+                "WHERE [Key] LIKE '" + key.ToString() + "%'";
 
             return new DataBase().QueryListString(query);
         }
@@ -262,7 +265,7 @@ namespace landerist_library.Statistics
             }
         }
 
-       
+
         private static bool InsertDaily(StatisticsKey key, string queryInt)
         {
             int counter = new DataBase().QueryInt(queryInt);
@@ -282,6 +285,33 @@ namespace landerist_library.Statistics
                 { "Key", key },
                 { "Counter", counter }
             });
+        }
+
+        public static bool InsertDailyCounter(StatisticsKey key, int counter)
+        {
+            string query =
+                "MERGE " + TABLES_STATISTICS_SNAPSHOT + " AS target " +
+                "USING (" +
+                "   SELECT  " +
+                "       CAST(@Date AS DATE) AS DateOnly, " +
+                "       @Key AS [Key], " +
+                "       @Counter AS [Counter]" +
+                "   ) AS source " +
+                "ON " +
+                "   CAST(target.[Date] AS DATE) = source.DateOnly  " +
+                "   AND target.[Key] = source.[Key] " +
+                "WHEN MATCHED THEN" +
+                "   UPDATE SET target.[Counter] = target.[Counter] + source.[Counter] " +
+                "WHEN NOT MATCHED THEN" +
+                "   INSERT ([Date], [Key], [Counter])" +
+                "   VALUES (source.DateOnly, source.[Key], source.[Counter]);";
+
+            return new DataBase().Query(query, new Dictionary<string, object?> {
+                { "Date", DateTime.Now },
+                { "Key", key.ToString() },
+                { "Counter", counter }
+            });
+
         }
 
 
@@ -331,7 +361,7 @@ namespace landerist_library.Statistics
             });
         }
 
-        
+
 
     }
 }

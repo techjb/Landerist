@@ -5,6 +5,7 @@ using landerist_library.Parse.ListingParser;
 using landerist_library.Parse.ListingParser.OpenAI.Batch;
 using landerist_library.Parse.ListingParser.VertexAI.Batch;
 using landerist_library.Scrape;
+using landerist_library.Statistics;
 using landerist_library.Websites;
 
 
@@ -136,6 +137,9 @@ namespace landerist_library.Tasks
 
             int pertentage = (errors * 100) / total;
             Log.WriteInfo("batch", $"Readed {readed} Errors: {errors} ({pertentage}%)");
+            
+            StatisticsSnapshot.InsertDailyCounter(StatisticsKey.BatchReaded, readed);
+            StatisticsSnapshot.InsertDailyCounter(StatisticsKey.BatchReadedErrors, errors);
         }
 
         private static bool ReadLine(Batch batch, string line)

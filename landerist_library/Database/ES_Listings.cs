@@ -27,20 +27,24 @@ namespace landerist_library.Database
 
         private static void Insert(Website website, Listing listing)
         {
-            if (InsertData(listing))
+            if (Insert(listing))
             {
                 website.IncreaseNumListings();
                 ES_Media.Insert(listing);
                 ES_Sources.Insert(listing);
             }
+            else
+            {
+                Logs.Log.WriteError("ES_LISTINGS", "Insert error");
+            }
         }
 
-        private static bool InsertData(Listing listing)
+        private static bool Insert(Listing listing)
         {
             string query =
                 "INSERT INTO " + TABLE_ES_LISTINGS + " " +
                 "VALUES( " +
-                "@guid, @listingStatus, @listingDate, @unlistingDate, @operation, @propertyType, " +
+                "@guid, @listingStatus, @listingDate, @updated, @unlistingDate, @operation, @propertyType, " +
                 "@propertySubtype, @priceAmount, @priceCurrency, @description, " +
                 "@contactName, @contactPhone, @contactEmail, @contactUrl, @contactOther, @address, @lauId, @latitude, @longitude, " +
                 "@locationIsAccurate, @cadastralReference, @propertySize, @landSize, @constructionYear, " +
@@ -59,13 +63,14 @@ namespace landerist_library.Database
                 {"guid", listing.guid },
                 {"listingStatus", listing.listingStatus.ToString() },
                 {"listingDate", listing.listingDate},
+                {"updated", DateTime.Now},
                 {"unlistingDate", listing.unlistingDate},
                 {"operation", listing.operation.ToString() },
                 {"propertyType", listing.propertyType.ToString() },
                 {"propertySubType", listing.propertySubtype?.ToString()},
                 {"priceAmount", listing.price?.amount },
                 {"priceCurrency", listing.price?.currency.ToString()},
-                {"description", listing.description },            
+                {"description", listing.description },
                 {"contactName", listing.contactName },
                 {"contactPhone", listing.contactPhone },
                 {"contactEmail", listing.contactEmail },
@@ -105,7 +110,11 @@ namespace landerist_library.Database
 
         private static void Update(Listing oldListing, Listing newListing)
         {
-            Update(newListing);
+            if (!Update(newListing))
+            {
+                Logs.Log.WriteError("ES_LISTINGS", "Update error");
+                return;
+            }
             if (!ListingMediaAreEquals(oldListing, newListing))
             {
                 ES_Media.Update(newListing);
@@ -136,13 +145,14 @@ namespace landerist_library.Database
                 "UPDATE " + TABLE_ES_LISTINGS + " SET " +
                 "[listingStatus] = @listingStatus, " +
                 "[listingDate] = @listingDate, " +
+                "[updated] = @updated, " +
                 "[unlistingDate] = @unlistingDate, " +
                 "[operation] = @operation, " +
                 "[propertyType] = @propertyType, " +
                 "[propertySubtype] = @propertySubtype, " +
                 "[priceAmount] = @priceAmount, " +
                 "[priceCurrency] = @priceCurrency, " +
-                "[description] = @description, " +           
+                "[description] = @description, " +
                 "[contactName] = @contactName, " +
                 "[contactPhone] = @contactPhone, " +
                 "[contactEmail] = @contactEmail, " +
@@ -215,15 +225,15 @@ namespace landerist_library.Database
                 "SELECT * " +
                 "FROM " + TABLE_ES_LISTINGS + " " +
                 "WHERE " +
-                "   CAST([dataSourceUpdate] AS DATE) >= CAST(@DateFrom AS DATE) AND " +
-                "   CAST([dataSourceUpdate] AS DATE) <= CAST(@DateTo AS DATE)";                
+                "   CAST([updated] AS DATE) >= CAST(@DateFrom AS DATE) AND " +
+                "   CAST([updated] AS DATE) <= CAST(@DateTo AS DATE)";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>()
             {
                 { "DateFrom", dateFrom },
                 { "DateTo", dateTo },
             });
-            
+
             return GetAll(dataTable, loadMedia, loadSources);
         }
 
@@ -287,11 +297,11 @@ namespace landerist_library.Database
                 var media = ES_Media.GetMedia(listing);
                 listing.SetMedia(media);
             }
-            if(loadSources)
+            if (loadSources)
             {
                 var sources = ES_Sources.GetSources(listing);
                 listing.SetSources(sources);
-            }   
+            }
             return listing;
         }
 
@@ -311,7 +321,7 @@ namespace landerist_library.Database
                     amount = Convert.ToDecimal(dataRow["priceAmount"]),
                     currency = (Currency)Enum.Parse(typeof(Currency), dataRow["priceCurrency"].ToString()!)
                 },
-                description = GetString(dataRow, "description"),              
+                description = GetString(dataRow, "description"),
                 contactName = GetString(dataRow, "contactName"),
                 contactPhone = GetString(dataRow, "contactPhone"),
                 contactEmail = GetString(dataRow, "contactEmail"),

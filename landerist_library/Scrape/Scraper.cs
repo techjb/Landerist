@@ -3,6 +3,7 @@ using landerist_library.Database;
 using landerist_library.Downloaders.Multiple;
 using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Logs;
+using landerist_library.Statistics;
 using landerist_library.Websites;
 using landerist_orels.ES;
 using System.Collections.Concurrent;
@@ -180,6 +181,8 @@ namespace landerist_library.Scrape
                 });
 
             LogResults();
+            InsertStatistics();
+
             MultipleDownloader.Clear();
             PuppeteerDownloader.KillChrome();
             return true;
@@ -254,6 +257,13 @@ namespace landerist_library.Scrape
                 //$"MaxDownloads: {maxDownloads} " +
                 //$"MaxCrashes: {maxCrashes}"
                 ;
+        }
+
+        private static void InsertStatistics()
+        {
+            StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ScrappedSuccess, Success);
+            StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ScrapedCrashed, Crashed);
+            StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ScrapedDownloadErrors, DownloadErrors);
         }
 
 

@@ -256,16 +256,12 @@ namespace landerist_tests
             #endregion
 
             #region Backup 
-
-            //Csv.Export(true);
-            //landerist_library.Export.Json.Export("es_listings_full.json", true);
-            //landerist_library.Landerist_com.FilesUpdater.Update();
-            //new landerist_library.Landerist_com.DownloadsPage().Update();            
-            //landerist_library.Landerist_com.StatisticsPage.Update();
-            //landerist_library.Landerist_com.Landerist_com.InvalidateCloudFront();            
-
             //landerist_library.Database.Backup.Update();
             //Backup.DeleteRemoteOldBackups();
+            #endregion
+
+            #region Statistics
+            //landerist_library.Statistics.StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ScrappedSuccess, 23);
             #endregion
 
             #region Listings
@@ -317,8 +313,8 @@ namespace landerist_tests
             //landerist_library.Statistics.StatisticsSnapshot.SnapshotPageType7Days();
 
             //DownloadFilesUpdater.Update();
-            //landerist_library.Landerist_com.DownloadFilesUpdater.Update();
-            //landerist_library.Landerist_com.DownloadFilesUpdater.UpdateUpdates();
+            //landerist_library.Landerist_com.FilesUpdater.Update();
+            //landerist_library.Landerist_com.FilesUpdater.UpdateUpdates();
             //landerist_library.Landerist_com.Landerist_com.UpdateStatistics();
             //landerist_library.Landerist_com.Landerist_com.UpdateDownloads();
             //landerist_library.Landerist_com.Landerist_com.UpdatePages();
