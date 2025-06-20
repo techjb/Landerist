@@ -314,7 +314,10 @@ namespace landerist_tests
 
             //DownloadFilesUpdater.Update();
             //landerist_library.Landerist_com.FilesUpdater.Update();
+            //landerist_library.Landerist_com.FilesUpdater.UpdatePublished();
+            //landerist_library.Landerist_com.FilesUpdater.UpdateUnpublished();
             //landerist_library.Landerist_com.FilesUpdater.UpdateUpdates();
+            //landerist_library.Landerist_com.FilesUpdater.UpdateWebsites();
             //landerist_library.Landerist_com.Landerist_com.UpdateStatistics();
             //landerist_library.Landerist_com.Landerist_com.UpdateDownloads();
             //landerist_library.Landerist_com.Landerist_com.UpdatePages();

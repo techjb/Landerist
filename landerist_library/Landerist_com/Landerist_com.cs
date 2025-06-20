@@ -11,6 +11,8 @@ namespace landerist_library.Landerist_com
     {
         Listings,
         Updates,
+        Published,
+        Unpublished,        
         Websites
     }
 

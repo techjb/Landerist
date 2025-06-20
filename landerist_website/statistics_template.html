@@ -23,7 +23,6 @@
         canvas {
             margin: 20px 0px;
         }
-
     </style>
     <title>Statistics</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -54,9 +53,11 @@
         CreateLineChart("Total unknown PageType", [/*UnknownPageType*/]);
         CreateLineChart("HttpStatusCode 200", [/*HttpStatusCode_200*/]);
         CreateLineChart("HttpStatusCode NULL", [/*HttpStatusCode_NULL*/]);
-        CreateMultiLineChart("HttpStatusCode Errors", [/*HttpStatusCode*/]);
-        CreateMultiLineChart("PageType", [/*PageType*/]);
-
+        CreateAreaChart("HttpStatusCode Errors", [/*HttpStatusCode*/]);
+        CreateAreaChart("PageType", [/*PageType*/]);
+        CreateAreaChart("Scraped pages", [/*ScrapedPages*/]);
+        CreateAreaChart("Batch readed", [/*BatchReaded*/]);
+        CreateAreaChart("Listing insert update", [/*ListingInsertUpdate*/]);
 
 
         function CreateLineChart(title, values) {
@@ -66,10 +67,22 @@
                     data: values.map(row => row.count),
                 }]
             };
-            CreateChart(title, data);
+            var options = {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: title
+                    }
+                }
+            }
+            CreateChart(title, data, options);
         }
 
-        function CreateMultiLineChart(title, values) {
+        function CreateAreaChart(title, values) {
             const data = {
                 labels: values[0].values.map(row => row.date),
                 datasets: values.map((serie, idx) => {
@@ -81,35 +94,49 @@
                         "rgb(153, 102, 255)",
                         "rgb(201, 203, 207)"
                     ];
-                    
+
                     return {
                         label: serie.label,
                         data: serie.values.map(row => row.count),
-                        fill: false,
+                        fill: true,
                         borderColor: palette[idx % palette.length],
-                        tension: 0.1
+                        backgroundColor: palette[idx % palette.length],
+                        tension: 0.1,
+                        stack: 'stack1'
                     };
                 })
             };
-            CreateChart(title, data);
+
+
+            var options = {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: title
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true
+                    }
+                }
+            }
+            CreateChart(title, data, options);
         }
 
-        function CreateChart(title, data) {
+        function CreateChart(title, data, options) {
             const config = {
                 type: 'line',
                 data: data,
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        title: {
-                            display: true,
-                            text: title
-                        }
-                    }
-                },
+                options: options,
             };
 
             const canvas = document.createElement('canvas');

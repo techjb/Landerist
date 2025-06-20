@@ -34,6 +34,9 @@ namespace landerist_library.Landerist_com
                 UpdateTemplate(StatisticsKey.HttpStatusCode_200, true);
                 UpdateHttpStatusCode();
                 UpdatePageType();
+                UpdateScraped();
+                UpdateBathcReaded();
+                UpdateListingInsertUpdate();
 
                 if (UploadStatisticsFile())
                 {
@@ -59,7 +62,48 @@ namespace landerist_library.Landerist_com
             Update(keys, StatisticsKey.PageType);
         }
 
+        private static void UpdateScraped()
+        {
+            List<StatisticsKey> statisticsKeys =
+            [
+                StatisticsKey.ScrappedSuccess,
+                StatisticsKey.ScrapedDownloadErrors,
+                StatisticsKey.ScrapedCrashed,
+            ];
+            Update(statisticsKeys, "ScrapedPages");
+        }
+
+        private static void UpdateBathcReaded()
+        {
+            List<StatisticsKey> statisticsKeys =
+            [
+                StatisticsKey.BatchReaded,
+                StatisticsKey.BatchReadedErrors,                
+            ];
+            Update(statisticsKeys, "BatchReaded");
+        }
+
+        private static void UpdateListingInsertUpdate()
+        {
+            List<StatisticsKey> statisticsKeys =
+            [
+                StatisticsKey.ListingInsert,
+                StatisticsKey.ListingUpdate,
+            ];
+            Update(statisticsKeys, "ListingInsertUpdate");
+        }
+
+        private static void Update(List<StatisticsKey> keys, string statisticsKey)
+        {
+            List<string> list = [.. keys.Select(key => key.ToString())];
+            Update(list, statisticsKey);
+        }
+
         private static void Update(List<string> keys, StatisticsKey statisticsKey)
+        {
+            Update(keys, statisticsKey.ToString());
+        }
+        private static void Update(List<string> keys, string statisticsKey)
         {
             List<string> data = [];
             foreach (var key in keys)

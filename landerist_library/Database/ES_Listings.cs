@@ -1,4 +1,5 @@
-﻿using landerist_library.Websites;
+﻿using landerist_library.Statistics;
+using landerist_library.Websites;
 using landerist_orels.ES;
 using System.Data;
 
@@ -16,26 +17,34 @@ namespace landerist_library.Database
             {
                 if (!oldListing.Equals(newListing))
                 {
-                    Update(oldListing, newListing);
+                    if (Update(oldListing, newListing))
+                    {
+                        StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ListingUpdate);
+                    }
                 }
             }
             else
             {
-                Insert(website, newListing);
+                if (Insert(website, newListing))
+                {
+                    StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ListingInsert);
+                }
             }
         }
 
-        private static void Insert(Website website, Listing listing)
+        private static bool Insert(Website website, Listing listing)
         {
             if (Insert(listing))
             {
                 website.IncreaseNumListings();
                 ES_Media.Insert(listing);
                 ES_Sources.Insert(listing);
+                return true;
             }
             else
             {
                 Logs.Log.WriteError("ES_LISTINGS", "Insert error");
+                return false;
             }
         }
 
@@ -108,12 +117,12 @@ namespace landerist_library.Database
             };
         }
 
-        private static void Update(Listing oldListing, Listing newListing)
+        private static bool Update(Listing oldListing, Listing newListing)
         {
             if (!Update(newListing))
             {
                 Logs.Log.WriteError("ES_LISTINGS", "Update error");
-                return;
+                return false;
             }
             if (!ListingMediaAreEquals(oldListing, newListing))
             {
@@ -123,6 +132,7 @@ namespace landerist_library.Database
             {
                 ES_Sources.Update(newListing);
             }
+            return true;
         }
 
         private static bool ListingMediaAreEquals(Listing oldListing, Listing newListing)
@@ -201,6 +211,29 @@ namespace landerist_library.Database
 
             DataTable dataTable = new DataBase().QueryTable(query);
             return GetAll(dataTable, loadMedia, loadSources);
+        }
+
+        public static SortedSet<Listing> GetPublished()
+        {
+            return GetListinStatus(ListingStatus.published);
+        }
+
+        public static SortedSet<Listing> GetUnPublished()
+        {
+            return GetListinStatus(ListingStatus.unpublished);
+        }
+
+        public static SortedSet<Listing> GetListinStatus(ListingStatus listingStatus)
+        {
+            string query =
+                "SELECT * " +
+                "FROM " + TABLE_ES_LISTINGS + " " +
+                "WHERE [listingStatus] = @listingStatus";
+
+            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+                {"listingStatus", listingStatus.ToString() },
+            });
+            return GetAll(dataTable, true, true);
         }
 
         public static SortedSet<Listing> GetUnpublishedListings(DateTime unlistingDate)

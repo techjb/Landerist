@@ -28,7 +28,10 @@ namespace landerist_library.Statistics
         ScrapedCrashed,
         ScrapedDownloadErrors,
         BatchReaded,
-        BatchReadedErrors
+        BatchReadedErrors,
+        ListingInsert,
+        ListingUpdate,
+
     }
 
     public class StatisticsSnapshot
@@ -287,6 +290,10 @@ namespace landerist_library.Statistics
             });
         }
 
+        public static bool InsertDailyCounter(StatisticsKey key)
+        {
+            return InsertDailyCounter(key, 1);
+        }
         public static bool InsertDailyCounter(StatisticsKey key, int counter)
         {
             string query =
