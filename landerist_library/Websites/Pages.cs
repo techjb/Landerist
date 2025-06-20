@@ -2,6 +2,7 @@
 using landerist_library.Database;
 using landerist_library.Index;
 using landerist_library.Tools;
+using landerist_orels.ES;
 using System.Data;
 
 namespace landerist_library.Websites
@@ -123,6 +124,7 @@ namespace landerist_library.Websites
                     "INSERTED.[HttpStatusCode], " +
                     "INSERTED.[PageType], " +
                     "INSERTED.[PageTypeCounter], " +
+                    "INSERTED.[ListingStatus], " +
                     "INSERTED.[LockedBy], " +
                     "INSERTED.[WaitingStatus], " +
                     "INSERTED.[ResponseBodyTextHash], " +
@@ -213,6 +215,7 @@ namespace landerist_library.Websites
                 PAGES + ".[HttpStatusCode], " +
                 PAGES + ".[PageType], " +
                 PAGES + ".[PageTypeCounter], " +
+                PAGES + ".[ListingStatus], " +
                 PAGES + ".[LockedBy], " +
                 PAGES + ".[WaitingStatus], " +                
                 PAGES + ".[ResponseBodyTextHash], " +

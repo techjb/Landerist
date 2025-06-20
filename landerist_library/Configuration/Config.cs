@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "4.38";
+        public static readonly string VERSION = "4.40";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -153,6 +153,8 @@ namespace landerist_library.Configuration
         public readonly static string MACHINE_NAME = Environment.MachineName;
 
         public static bool PROXY_ENABLED = true;
+
+        public const int MINIMUM_PAGE_TYPE_COUNTER_TO_UNPUBLISH_LISTING = 3;
 
         public static bool IsConfigurationProduction()
         {

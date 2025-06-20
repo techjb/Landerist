@@ -2,18 +2,18 @@
 {
     public enum PageType
     {
-        DownloadError,
+        DownloadError,        
         IncorrectLanguage,
         BlockedByRobotsTxt,
         CrawlDelayTooBig,
         MainPage,
         NotIndexable,
         NotCanonical,
+        ResponseBodyNullOrEmpty,
         ResponseBodyIsError,
         ResponseBodyTooShort,
         ResponseBodyTooLarge,
         ResponseBodyRepeatedInHost,
-        ResponseBodyRepeatedInListings,
         ResponseBodyTooManyTokens,        
         MayBeListing,
         Listing,

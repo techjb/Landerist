@@ -36,11 +36,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
                     propertyType = GetPropertyType(),
                     propertySubtype = GetPropertySubtype(),
                     price = GetPropertyPrice(),
-                    description = GetDescription(),
-                    //dataSourceName = GetSourceName(page),
-                    //dataSourceGuid = GetSourceGuid(),
-                    //dataSourceUpdate = GetDataSourceUpdate(),
-                    //dataSourceUrl = GetSourceUrl(page),
+                    description = GetDescription(),                  
                     contactPhone = GetPhone(),
                     contactEmail = GetEmail(),
                     address = GetAddress(),
@@ -193,11 +189,6 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             return page.Website.Host;
         }
 
-        private static string GetUriHash(Page page)
-        {
-            return page.UriHash;
-        }
-
         private string? GetSourceGuid()
         {
             if (string.IsNullOrEmpty(Anuncio!.ReferenciaDelAnuncio))
@@ -205,11 +196,6 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
                 return null;
             }
             return Tools.Strings.Clean(Anuncio!.ReferenciaDelAnuncio);
-        }
-
-        private static DateTime GetDataSourceUpdate()
-        {
-            return DateTime.Now;
         }
 
         private static Uri GetSourceUrl(Page page)

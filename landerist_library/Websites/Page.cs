@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+﻿using Amazon.Runtime.Internal.Transform;
+using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Downloaders;
@@ -31,6 +32,8 @@ namespace landerist_library.Websites
         public PageType? PageType { get; private set; }
 
         public short? PageTypeCounter { get; private set; }
+
+        public ListingStatus? ListingStatus { get; set; }
 
         public string? LockedBy { get; set; }
 
@@ -97,11 +100,11 @@ namespace landerist_library.Websites
             Load(dataRow);
         }
 
-        public Page(DataRow dataRow)
-        {
-            Load(dataRow);
-            Website = Websites.GetWebsite(this);
-        }
+        //public Page(DataRow dataRow)
+        //{
+        //    Load(dataRow);
+        //    Website = Websites.GetWebsite(this);
+        //}
 
         private void Load(DataRow dataRow)
         {
@@ -115,6 +118,7 @@ namespace landerist_library.Websites
             HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
             PageType = dataRow["PageType"] is DBNull ? null : (PageType)Enum.Parse(typeof(PageType), dataRow["PageType"].ToString()!);
             PageTypeCounter = dataRow["PageTypeCounter"] is DBNull ? null : (short)dataRow["PageTypeCounter"];
+            ListingStatus = dataRow["ListingStatus"] is DBNull ? null : (ListingStatus)Enum.Parse(typeof(ListingStatus), dataRow["ListingStatus"].ToString()!);
             LockedBy = dataRow["LockedBy"] is DBNull ? null : dataRow["LockedBy"].ToString();
             WaitingStatus = dataRow["WaitingStatus"] is DBNull ? null : (WaitingStatus)Enum.Parse(typeof(WaitingStatus), dataRow["WaitingStatus"].ToString()!);
             ResponseBodyTextHash = dataRow["ResponseBodyTextHash"] is DBNull ? null : dataRow["ResponseBodyTextHash"].ToString();
@@ -143,13 +147,24 @@ namespace landerist_library.Websites
         {
             string query =
                 "INSERT INTO " + Pages.PAGES + " " +
-                "VALUES(@Host, @Uri, @UriHash, @Inserted, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
+                "VALUES(@Host, @Uri, @UriHash, @Inserted, @Updated, @NextUpdate, @HttpStatusCode, @PageType, " +
+                "@PageTypeCounter, @ListingStatus, @LockedBy, @WaitingStatus, @ResponseBodyTextHash, @ResponseBodyZipped)";
 
             bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
                 {"Host", Host },
                 {"Uri", Uri.ToString() },
                 {"UriHash", UriHash },
-                {"Inserted", Inserted }
+                {"Inserted", Inserted },
+                {"Updated", null },
+                {"NextUpdate", null },
+                {"HttpStatusCode", null },
+                {"PageType", null },
+                {"PageTypeCounter", null },
+                {"ListingStatus", null },
+                {"LockedBy", null },
+                {"WaitingStatus", null },
+                {"ResponseBodyTextHash", null },
+                {"ResponseBodyZipped", null },
             });
             if (sucess)
             {
@@ -183,6 +198,7 @@ namespace landerist_library.Websites
                 "[HttpStatusCode] = @HttpStatusCode, " +
                 "[PageType] = @PageType, " +
                 "[PageTypeCounter] = @PageTypeCounter, " +
+                "[ListingStatus] = @ListingStatus, " +
                 "[LockedBy] = @LockedBy, " +
                 "[WaitingStatus] = @WaitingStatus, " +
                 "[ResponseBodyTextHash] = @ResponseBodyTextHash, " +
@@ -195,6 +211,7 @@ namespace landerist_library.Websites
                 {"HttpStatusCode", HttpStatusCode},
                 {"PageType", PageType?.ToString()},
                 {"PageTypeCounter", PageTypeCounter},
+                {"ListingStatus", ListingStatus?.ToString()},
                 {"LockedBy", LockedBy?.ToString()},
                 {"WaitingStatus", WaitingStatus?.ToString()},
                 {"ResponseBodyTextHash", ResponseBodyTextHash},
@@ -248,7 +265,7 @@ namespace landerist_library.Websites
             {
                 Website.DecreaseNumPages();
                 ES_Listings.Delete(UriHash);
-                ES_Media.Delete(UriHash);                
+                ES_Media.Delete(UriHash);
                 ES_Sources.Delete(UriHash);
             }
             return sucess;
@@ -272,7 +289,7 @@ namespace landerist_library.Websites
 
         public HtmlDocument? GetHtmlDocument()
         {
-            
+
             if (HtmlDocument != null && OriginalOuterHtml != null &&
                 OriginalOuterHtml.Equals(HtmlDocument.DocumentNode.OuterHtml))
             {
@@ -351,7 +368,8 @@ namespace landerist_library.Websites
                 !ResponseBodyTextHasChanged &&
                 PageType != null &&
                 !PageType.Equals(landerist_library.Websites.PageType.MayBeListing) &&
-                !PageType.Equals(landerist_library.Websites.PageType.DownloadError);
+                !PageType.Equals(landerist_library.Websites.PageType.DownloadError) &&
+                !PageType.Equals(landerist_library.Websites.PageType.ResponseBodyNullOrEmpty);
         }
 
         public bool ResponseBodyTextIsError()
@@ -401,7 +419,8 @@ namespace landerist_library.Websites
                 "FROM " + Pages.PAGES + " " +
                 "WHERE [HOST] = @Host AND " +
                 "[UriHash] <> @UriHash AND " +
-                "[ResponseBodyTextHash] = @ResponseBodyTextHash";
+                "[ResponseBodyTextHash] = @ResponseBodyTextHash AND " +
+                "[ListingStatus] IS NOT NULL";
 
             return new DataBase().QueryExists(query, new Dictionary<string, object?> {
                 {"Host", Host},
@@ -409,28 +428,6 @@ namespace landerist_library.Websites
                 {"ResponseBodyTextHash", ResponseBodyTextHash },
             });
         }
-
-        public bool ReponseBodyTextRepeatedInListings()
-        {
-            if (string.IsNullOrEmpty(ResponseBodyText))
-            {
-                return false;
-            }
-
-            string query =
-                "SELECT 1 " +
-                "FROM " + Pages.PAGES + " " +
-                "WHERE [PageType] = @PageType AND " +
-                "[UriHash] <> @UriHash AND " +
-                "[ResponseBodyTextHash] = @ResponseBodyTextHash";
-
-            return new DataBase().QueryExists(query, new Dictionary<string, object?> {
-                {"PageType", landerist_library.Websites.PageType.Listing.ToString() },
-                {"UriHash", UriHash },
-                {"ResponseBodyTextHash", ResponseBodyTextHash },
-            });
-        }
-
 
         public Listing? GetListing(bool loadMedia, bool loadSources)
         {
@@ -537,32 +534,17 @@ namespace landerist_library.Websites
             return false;
         }
 
-        public void SetPageType(PageType? pageType)
+        public void SetPageType(PageType? newPageType)
         {
-            if (PageType == pageType)
+            if (PageType == newPageType)
             {
-                IncreasePageTypeCounter();
+                PageTypeCounter = (short)Math.Min((PageTypeCounter ?? 0) + 1, Config.MAX_PAGETYPE_COUNTER);
             }
             else
             {
                 PageTypeCounter = 1;
+                PageType = newPageType;
             }
-
-            PageType = pageType;
-        }
-
-        private void IncreasePageTypeCounter()
-        {
-            if (PageTypeCounter is null)
-            {
-                PageTypeCounter = 1;
-                return;
-            }
-            if (PageTypeCounter >= Config.MAX_PAGETYPE_COUNTER)
-            {
-                return;
-            }
-            PageTypeCounter = (short)(PageTypeCounter + 1);
         }
 
         public void Dispose()
@@ -604,7 +586,7 @@ namespace landerist_library.Websites
 
         public bool IsWaitingForAIResponse()
         {
-            return WaitingStatus is not null &&  WaitingStatus == landerist_library.Websites.WaitingStatus.waiting_ai_response;
+            return WaitingStatus is not null && WaitingStatus == landerist_library.Websites.WaitingStatus.waiting_ai_response;
         }
 
         public void SetWaitingStatus(WaitingStatus waitingStatus)
@@ -664,6 +646,38 @@ namespace landerist_library.Websites
             {
                 Logs.Log.WriteError("Page SetResponseBodyFromZipped", exception);
             }
+        }
+
+        public void SetListingStatusPublished()
+        {
+            ListingStatus = landerist_orels.ES.ListingStatus.published;
+        }
+
+        public void SetListingStatusUnpublished()
+        {
+            ListingStatus = landerist_orels.ES.ListingStatus.unpublished;
+        }
+
+        public bool IsListingStatusPublished()
+        {
+            return ListingStatus == landerist_orels.ES.ListingStatus.published;
+        }
+
+        public bool HaveToUnpublishListing()
+        {
+            return IsListingStatusPublished() &&
+                !IsMayBeListing() &&
+                PageTypeCounter >= Config.MINIMUM_PAGE_TYPE_COUNTER_TO_UNPUBLISH_LISTING;
+        }
+
+        public bool IsMayBeListing()
+        {
+            return PageType == landerist_library.Websites.PageType.MayBeListing;
+        }
+
+        public bool IsListing()
+        {
+            return PageType == landerist_library.Websites.PageType.Listing;
         }
     }
 }

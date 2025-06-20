@@ -14,20 +14,17 @@ namespace landerist_library.Parse.PageTypeParser
         public (PageType? pageType, landerist_orels.ES.Listing? listing, bool waitingAIRequest)
             GetPageType()
         {
-            if (Page == null)
-            {
-                return (PageType.DownloadError, null, false);
-            }
-            if (Page.ResponseBodyIsNullOrEmpty())
-            {
-                //Console.WriteLine("ResponseBodyIsNullOrEmpty in GetPageType " + Page.Uri);
-                return (PageType.DownloadError, null, false);
-            }
             if (Page.HttpStatusCode != 200)
             {
                 //Console.WriteLine("HttpStatusCode is not 200 in GetPageType: " + Page.HttpStatusCode);
                 return (PageType.DownloadError, null, false);
             }
+            if (Page.ResponseBodyIsNullOrEmpty())
+            {
+                //Console.WriteLine("ResponseBodyIsNullOrEmpty in GetPageType " + Page.Uri);
+                return (PageType.ResponseBodyNullOrEmpty, null, false);
+            }
+            
             if (Page.MainPage())
             {
                 return (PageType.MainPage, null, false);
@@ -66,11 +63,7 @@ namespace landerist_library.Parse.PageTypeParser
             if (Page.ReponseBodyTextRepeatedInHost())
             {
                 return (PageType.ResponseBodyRepeatedInHost, null, false);
-            }
-            if (Page.ReponseBodyTextRepeatedInListings())
-            {
-                return (PageType.ResponseBodyRepeatedInListings, null, false);
-            }
+            }            
             if (ParseListing.TooManyTokens(Page))
             {
                 return (PageType.ResponseBodyTooManyTokens, null, false);

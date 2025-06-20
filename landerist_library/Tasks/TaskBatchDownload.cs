@@ -16,10 +16,10 @@ namespace landerist_library.Tasks
         public static void Start()
         {
             var batches = Batches.SelectNonDownloaded();
-            foreach(var batch in batches)
+            foreach (var batch in batches)
             {
                 Download(batch);
-            }            
+            }
         }
 
         private static void Download(Batch batch)
@@ -100,8 +100,7 @@ namespace landerist_library.Tasks
             {
                 //Console.WriteLine($"Reading batch file: {filePath}");
                 var lines = File.ReadAllLines(filePath);
-                ReadLines(batch, lines);
-                return true;
+                return ReadLines(batch, lines);
             }
             catch (Exception exception)
             {
@@ -110,7 +109,7 @@ namespace landerist_library.Tasks
             }
         }
 
-        private static void ReadLines(Batch batch, string[] lines)
+        private static bool ReadLines(Batch batch, string[] lines)
         {
             int total = lines.Length;
             int readed = 0;
@@ -136,10 +135,12 @@ namespace landerist_library.Tasks
             });
 
             int pertentage = (errors * 100) / total;
-            Log.WriteInfo("batch", $"Readed {readed} Errors: {errors} ({pertentage}%)");
-            
+            Log.WriteInfo("batch", $"Readed {readed}/{total} Errors: {errors} ({pertentage}%)");
+
             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.BatchReaded, readed);
             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.BatchReadedErrors, errors);
+
+            return total > 0 && readed > 0;
         }
 
         private static bool ReadLine(Batch batch, string line)
@@ -152,21 +153,14 @@ namespace landerist_library.Tasks
             }
 
             var page = result.Value.page;
-            //if (Config.IsConfigurationProduction() && !page.IsWaitingForAIResponse())
-            //{                
-            //    Log.WriteError("TaskBatchDownload ReadLine", "Page is not waiting for AI response: " + page.UriHash);
-            //    page.Dispose();
-            //    return true;
-            //}
-            
-            var (pageType, listing) = ParseListing.ParseResponse(page, result.Value.text);            
+            var (newPageType, listing) = ParseListing.ParseResponse(page, result.Value.text);
             if (Config.IsConfigurationLocal())
             {
                 page.Dispose();
                 return true;
             }
 
-            if (pageType.Equals(PageType.MayBeListing))
+            if (newPageType.Equals(PageType.MayBeListing))
             {
                 //Console.WriteLine($"TaskBatchDownload ReadLine: MayBeListing");
                 page.SetWaitingStatusAIRequest();
@@ -177,7 +171,7 @@ namespace landerist_library.Tasks
             page.RemoveWaitingStatus();
             page.SetResponseBodyFromZipped();
             page.RemoveResponseBodyZipped();
-            new PageScraper(page).SetPageType(pageType, listing);
+            new PageScraper(page).SetPageType(newPageType, listing);
             var sucess = page.Update(true);
             //if(!sucess)
             //{

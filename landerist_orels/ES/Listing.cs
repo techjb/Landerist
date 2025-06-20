@@ -407,5 +407,18 @@ namespace landerist_orels.ES
 
             return hash;
         }
+
+        public void SetUnpublished()
+        {
+            listingStatus = ListingStatus.unpublished;
+            unlistingDate = DateTime.Now;
+        }
+
+        public void SetPublished()
+        {
+            listingStatus = ListingStatus.published;
+            listingDate = DateTime.Now;
+            unlistingDate = null;
+        }
     }
 }
