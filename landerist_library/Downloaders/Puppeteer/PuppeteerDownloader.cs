@@ -177,7 +177,8 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private static readonly NavigationOptions NavigationOptions = new()
         {
-            WaitUntil = [WaitUntilNavigation.Networkidle2],
+            //WaitUntil = [WaitUntilNavigation.Networkidle2],
+            WaitUntil = [WaitUntilNavigation.Networkidle0],
             Timeout = GetTimeout()
         };
 
@@ -444,11 +445,13 @@ namespace landerist_library.Downloaders.Puppeteer
                 {
                     throw new NavigationException("Response is not Ok.");
                 }
+
                 await BrowserPage.EvaluateExpressionAsync(ExpressionRemoveCookies);
                 if (Config.TAKE_SCREENSHOT)
                 {
                     screenShot = await PuppeteerScreenshot.TakeScreenshot(BrowserPage, page);
                 }
+                
                 content = await BrowserPage.GetContentAsync();
                 return (content, screenShot);
             }

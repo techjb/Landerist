@@ -1,8 +1,10 @@
-﻿using landerist_library.Configuration;
+﻿using Google.Cloud.AIPlatform.V1;
+using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Index;
 using landerist_library.Tools;
 using landerist_orels.ES;
+using System.ComponentModel;
 using System.Data;
 
 namespace landerist_library.Websites
@@ -17,11 +19,10 @@ namespace landerist_library.Websites
                 SelectQuery() +
                 "WHERE [UriHash] = @UriHash";
 
-            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+
+            var pages = GetPages(query, new Dictionary<string, object?> {
                 {"UriHash", uriHash }
             });
-
-            var pages = GetPages(dataTable);
             if (pages.Count.Equals(1))
             {
                 return pages[0];
@@ -32,9 +33,7 @@ namespace landerist_library.Websites
         {
             Console.WriteLine("Reading all pages");
             string query = SelectQuery();
-
-            var dataTable = new DataBase().QueryTable(query);
-            return GetPages(dataTable);
+            return GetPages(query);
         }
 
         public static List<Page> GetPages(Website website)
@@ -57,11 +56,9 @@ namespace landerist_library.Websites
                 SelectQuery() +
                 "WHERE [PageType] = @PageType";
 
-            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+            return GetPages(query, new Dictionary<string, object?> {
                 {"PageType", pageType.ToString() }
             });
-
-            return GetPages(dataTable);
         }
 
         public static List<Page> GetUnknownPageType()
@@ -70,8 +67,7 @@ namespace landerist_library.Websites
                 SelectQuery() +
                 "WHERE [PageType] IS NULL AND [WaitingStatus] IS NULL ";
 
-            DataTable dataTable = new DataBase().QueryTable(query);
-            return GetPages(dataTable);
+            return GetPages(query);
         }
 
         public static List<Page> GetUnknownPageType(int topRows)
@@ -80,9 +76,9 @@ namespace landerist_library.Websites
             return GetPages(topRows, where);
         }
 
-        public static List<Page> GetNextUpdate(int topRows)
+        public static List<Page> GetNextUpdate(int topRows, bool limitToNextUpdateLowerThanCurrentDate)
         {
-            string where = "P.[NextUpdate] < GETDATE() ";
+            string where = limitToNextUpdateLowerThanCurrentDate ? "P.[NextUpdate] < GETDATE()" : string.Empty;
             return GetPages(topRows, where);
         }
 
@@ -94,9 +90,9 @@ namespace landerist_library.Websites
 
         public static List<Page> GetUnpublishedPages(int topRows)
         {
-            string where = 
+            string where =
                 "P.[UriHash] IN (" +
-                "   SELECT [Guid] FROM "+ ES_Listings.TABLE_ES_LISTINGS +" " +
+                "   SELECT [Guid] FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
                 "   WHERE [ListingStatus] = 'unpublished' AND [UnlistingDate]>DATEADD(day, -2, getdate())" +
                 ")";
             return GetPages(topRows, where);
@@ -109,7 +105,7 @@ namespace landerist_library.Websites
                 "   SELECT TOP " + topRows + " P.[UriHash] " +
                 "   FROM " + PAGES + " AS P " +
                 "   INNER JOIN " + Websites.WEBSITES + " AS W ON P.[Host] = W.[Host] " +
-                "   WHERE P.[LockedBy] IS NULL AND P.[WaitingStatus] IS NULL AND " + where + " " +
+                "   WHERE P.[LockedBy] IS NULL AND P.[WaitingStatus] IS NULL " + (string.IsNullOrEmpty(where) ? string.Empty : " AND " + where) + " " +
                 "   ORDER BY P.[NextUpdate] ASC" +
                 ") " +
                 "UPDATE P " +
@@ -217,7 +213,7 @@ namespace landerist_library.Websites
                 PAGES + ".[PageTypeCounter], " +
                 PAGES + ".[ListingStatus], " +
                 PAGES + ".[LockedBy], " +
-                PAGES + ".[WaitingStatus], " +                
+                PAGES + ".[WaitingStatus], " +
                 PAGES + ".[ResponseBodyTextHash], " +
                 PAGES + ".[ResponseBodyZipped], " +
                 Websites.WEBSITES + ".[MainUri], " +
@@ -233,6 +229,17 @@ namespace landerist_library.Websites
                 Websites.WEBSITES + ".[ListingExampleUri], " +
                 Websites.WEBSITES + ".[ListingExampleNodeSet], " +
                 Websites.WEBSITES + ".[ListingExampleNodeSetUpdated] ";
+        }
+
+        public static List<Page> GetPages(string query)
+        {
+            return GetPages(query, []);
+        }
+
+        public static List<Page> GetPages(string query, Dictionary<string, object?> dictionary)
+        {
+            DataTable dataTable = new DataBase().QueryTable(query, dictionary);
+            return GetPages(dataTable);
         }
 
         private static List<Page> GetPages(DataTable dataTable)
@@ -282,10 +289,10 @@ namespace landerist_library.Websites
             return new DataBase().Query(query);
         }
 
-        public static void Insert(Website website, Uri uri)
+        public static bool Insert(Website website, Uri uri)
         {
             var page = new Page(website, uri);
-            page.Insert();
+            return page.Insert();
         }
 
         public static List<string> GetUris(bool isListing)
@@ -383,8 +390,7 @@ namespace landerist_library.Websites
                SelectQuery() +
                "WHERE [PageType] = 'Listing' and [HttpStatusCode] <> 200";
 
-            DataTable dataTable = new DataBase().QueryTable(query);
-            var pages = GetPages(dataTable);
+            var pages = GetPages(query);
             Delete(pages);
         }
 
@@ -394,8 +400,7 @@ namespace landerist_library.Websites
                SelectQuery() +
                "WHERE [PageType] = 'Listing' AND [ResponseBodyTextHash] IS NOT NULL";
 
-            DataTable dataTable = new DataBase().QueryTable(query);
-            var pages = GetPages(dataTable);
+            var pages = GetPages(query);
             HashSet<string> hashSet = [];
             List<Page> repeated = [];
             foreach (var page in pages)
@@ -412,18 +417,38 @@ namespace landerist_library.Websites
             Delete(repeated);
         }
 
+        public static void DeleteUrisLikePrint()
+        {
+            string query =
+               SelectQuery() +
+               "WHERE " +
+               "    Uri like '%print%' OR " +
+               "    Uri like '%imprimi%' ";
+
+            var pages = GetPages(query);
+            Delete(pages);
+        }
+
         public static void Delete(List<Page> pages)
         {
             Console.WriteLine("Deleting " + pages.Count + " pages..");
             int counter = 0;
-            Parallel.ForEach(pages, page =>
+            int errors = 0;
+            int total = pages.Count;
+            Parallel.ForEach(pages,
+                //new ParallelOptions(){MaxDegreeOfParallelism = 1}, 
+                page =>
             {
                 if (page.Delete())
                 {
                     Interlocked.Increment(ref counter);
                 }
+                else
+                {
+                    Interlocked.Increment(ref errors);
+                }
+                Console.WriteLine($"Deleted {counter}/{total} Errors: {errors}");
             });
-            Console.WriteLine("Deleted " + pages.Count + " pages");
         }
 
         public static void UpdateInvalidCadastastralReferences()
@@ -503,12 +528,12 @@ namespace landerist_library.Websites
         {
             DateTime unlistingDate = DateTime.Now.AddDays(-Config.DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS);
             var listings = ES_Listings.GetUnpublishedListings(unlistingDate);
-            if (listings.Equals(0))
-            {
-                return;
-            }
-            int total = listings.Count;
-            int processed = 0;
+            DeleteListings(listings);
+        }
+
+        private static void DeleteListings(SortedSet<Listing> listings)
+        {
+            int counter = 0;
             int deleted = 0;
             int errors = 0;
             Parallel.ForEach(listings,
@@ -517,31 +542,29 @@ namespace landerist_library.Websites
                     //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM,
                 },
                 listing =>
-            {
-                Interlocked.Increment(ref processed);
-                foreach(var source in listing.sources)
                 {
-                    var page = new Page(source.sourceUrl);
-                    if (page.DeleteListing())
+                    Interlocked.Increment(ref counter);
+                    foreach (var source in listing.sources)
                     {
-                        Interlocked.Increment(ref deleted);
+                        var page = new Page(source.sourceUrl);
+                        if (page.DeleteListing())
+                        {
+                            Interlocked.Increment(ref deleted);
+                        }
+                        else
+                        {
+                            Interlocked.Increment(ref errors);
+                        }
                     }
-                    else
-                    {
-                        Interlocked.Increment(ref errors);
-                    }
-                }                
-                
-                //Console.WriteLine(processed + "/" + total + " Deleted: " + deleted);
 
-            });
-            Logs.Log.WriteInfo("DeleteUnpublishedListings", "Deleted: " + deleted + "/" + total + " listings. Errors: " + errors);
+                    Console.WriteLine(counter + "/" + listings.Count + " Deleted: " + deleted);
+                });
         }
 
         public static List<Page> SelectWaitingStatusAiRequest(int topRows)
         {
             return SelectWaitingStatus(topRows, WaitingStatus.waiting_ai_request);
-        }        
+        }
 
         private static List<Page> SelectWaitingStatus(int topRows, WaitingStatus waitingStatus)
         {

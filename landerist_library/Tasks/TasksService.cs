@@ -184,7 +184,7 @@ namespace landerist_library.Tasks
 
             try
             {
-                Pages.DeleteUnpublishedListings();
+                //Pages.DeleteUnpublishedListings();
                 StatisticsSnapshot.TakeSnapshots();
                 FilesUpdater.Update();
                 Landerist_com.Landerist_com.UpdatePages();

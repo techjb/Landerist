@@ -23,10 +23,8 @@ namespace landerist_library.Scrape
 
         private static void SelectPages()
         {
-            //AddUnpublishedPages();
             AddUnknowPageType();
             AddNextUpdate();
-            AddPagesToFillScrape();
         }
 
         private static void AddUnknowPageType()
@@ -43,18 +41,7 @@ namespace landerist_library.Scrape
                 return;
             }
             var topRows = GetTopRows();
-            var pages = Websites.Pages.GetNextUpdate(topRows);
-            AddPages(pages);
-        }
-
-        private static void AddPagesToFillScrape()
-        {
-            if (ScrapperIsFull())
-            {
-                return;
-            }
-            var topRows = GetTopRows();
-            var pages = Websites.Pages.GetNextUpdateFuture(topRows);
+            var pages = Websites.Pages.GetNextUpdate(topRows, false);
             AddPages(pages);
         }
 

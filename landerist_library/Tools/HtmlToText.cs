@@ -299,7 +299,7 @@ namespace landerist_library.Tools
             var visibleNodes = htmlDocument.DocumentNode.DescendantsAndSelf()
                 .Where(n => n.NodeType == HtmlNodeType.Text)
                    .Where(n => !string.IsNullOrWhiteSpace(n.InnerHtml))
-                   ;
+                   ;            
 
             return visibleNodes.Select(n => n.InnerHtml.Trim());
         }

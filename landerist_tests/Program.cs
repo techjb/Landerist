@@ -174,6 +174,7 @@ namespace landerist_tests
             //Pages.RemoveResponseBodyTextHashToAll();
             //Pages.RemoveResponseBodyTextHash(PageType.NotListingByLastSegment);
             //Pages.DeleteUnpublishedListings();
+            //Pages.DeleteUrisLikePrint();
 
             #endregion
 
@@ -190,7 +191,7 @@ namespace landerist_tests
             //new Scraper().ScrapeResponseBodyRepeatedInListings();            
             //new Scraper().Start();
             //new Scraper().Scrape(page, false);
-            //new Scraper().Scrape("https://entrehogares.com/propiedad/habitacion-en-moncada-moncada-2/a0523-h3-alquilar-habitacion-moncada-9/", false);
+            new Scraper().Scrape("https://sunnierhomes.com/propiedad/24220/bungalow/nueva-construccion/espana/costa-blanca-sur/pilar-de-la-horadada/higuericas/", true);
 
             //new Scraper().DoTest();
             //landerist_library.Scrape.PageSelector.Select();

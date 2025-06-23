@@ -6,10 +6,7 @@ namespace landerist_library.Parse.PageTypeParser
     public class PageTypeParser
     {
         private Page Page { get; }
-        public PageTypeParser(Page page)
-        {
-            Page = page;
-        }
+        public PageTypeParser(Page page) => Page = page;
 
         public (PageType? pageType, landerist_orels.ES.Listing? listing, bool waitingAIRequest)
             GetPageType()

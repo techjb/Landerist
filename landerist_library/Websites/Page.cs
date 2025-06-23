@@ -154,7 +154,7 @@ namespace landerist_library.Websites
                 {"Host", Host },
                 {"Uri", Uri.ToString() },
                 {"UriHash", UriHash },
-                {"Inserted", Inserted },
+                {"Inserted", DateTime.Now },
                 {"Updated", null },
                 {"NextUpdate", null },
                 {"HttpStatusCode", null },
@@ -261,14 +261,11 @@ namespace landerist_library.Websites
             bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
                 {"UriHash", UriHash }
             });
-            if (sucess)
-            {
-                Website.DecreaseNumPages();
-                ES_Listings.Delete(UriHash);
-                ES_Media.Delete(UriHash);
-                ES_Sources.Delete(UriHash);
-            }
-            return sucess;
+            return sucess && 
+                Website.DecreaseNumPages() && 
+                ES_Listings.Delete(UriHash) &&
+                ES_Media.Delete(UriHash) &&
+                ES_Sources.Delete(UriHash);            
         }
 
         public bool DeleteListing()
