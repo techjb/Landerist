@@ -2,7 +2,7 @@
 {
     public enum PageType
     {
-        DownloadError,        
+        HttpStatusCodeNotOK,        
         IncorrectLanguage,
         BlockedByRobotsTxt,
         CrawlDelayTooBig,

@@ -69,8 +69,8 @@ namespace landerist_library.Landerist_com
         {
             List<StatisticsKey> statisticsKeys =
             [
-                StatisticsKey.ScrappedSuccess,
-                StatisticsKey.ScrapedDownloadErrors,
+                StatisticsKey.ScrapedSuccess,
+                StatisticsKey.ScrapedHttpStatusCodeNotOK,
                 StatisticsKey.ScrapedCrashed,
             ];
             Update(statisticsKeys, "ScrapedPages");

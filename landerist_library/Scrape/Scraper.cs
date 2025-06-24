@@ -110,12 +110,6 @@ namespace landerist_library.Scrape
             ScrapeUnknowHttpStatusCode();
         }
 
-        //public void ScrapeMainPage(Website website)
-        //{
-        //    var Page = new Page(website);
-        //    Scrape(Page);
-        //}
-
         public void ScrapeResponseBodyRepeatedInListings()
         {
             var pages = Websites.Pages.GetPages(PageType.Listing);
@@ -207,11 +201,7 @@ namespace landerist_library.Scrape
                 return;
             }
             
-            var isBlocked = WebsitesBlocker.IsBlocked(page.Website);
-            //if (isBlocked && !Config.PROXY_ENABLED)
-            //{
-            //    return;
-            //}   
+            var isBlocked = WebsitesBlocker.IsBlocked(page.Website);           
             bool useProxy = isBlocked && Config.PROXY_ENABLED;
             Scrape(page, useProxy);            
             Interlocked.Increment(ref Scraped);
@@ -261,18 +251,14 @@ namespace landerist_library.Scrape
 
         private static void InsertStatistics()
         {
-            StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ScrappedSuccess, Success);
+            StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ScrapedSuccess, Success);
             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ScrapedCrashed, Crashed);
-            StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ScrapedDownloadErrors, DownloadErrors);
+            StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ScrapedHttpStatusCodeNotOK, DownloadErrors);
         }
 
 
         private void EndThread(Page page, ParallelLoopState parallelLoopState)
         {
-            //if(!Config.PROXY_ENABLED)
-            //{
-            //    AddUnblockedPages();
-            //}            
             page.Dispose();
             Interlocked.Decrement(ref ThreadCounter);
             if (BlockingCollection.IsAddingCompleted)
@@ -302,7 +288,7 @@ namespace landerist_library.Scrape
             if (pageScraper.Scrape())
             {
                 Interlocked.Increment(ref Success);
-                if (page.PageType.Equals(PageType.DownloadError))
+                if (page.PageType.Equals(PageType.HttpStatusCodeNotOK))
                 {
                     Interlocked.Increment(ref DownloadErrors);
                 }
@@ -312,31 +298,5 @@ namespace landerist_library.Scrape
                 Interlocked.Increment(ref Crashed);
             }            
         }
-
-        //private static void AddToPageBlocker(Page Page)
-        //{
-        //    lock (SyncPageBlocker)
-        //    {
-        //        PageBlocker.Add(Page.Website);
-        //    }
-        //}
-
-        //private void AddUnblockedPages()
-        //{
-        //    if (BlockingCollection.IsAddingCompleted)
-        //    {
-        //        return;
-        //    }
-
-        //    lock (SyncPageBlocker)
-        //    {
-        //        var pages = PageBlocker.GetUnblockedPages();
-        //        if (pages.Count.Equals(0))
-        //        {
-        //            return;
-        //        }
-        //        pages.ForEach(BlockingCollection.Add);
-        //    }
-        //}
     }
 }

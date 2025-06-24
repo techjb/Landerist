@@ -13,15 +13,12 @@ namespace landerist_library.Parse.PageTypeParser
         {
             if (Page.HttpStatusCode != 200)
             {
-                //Console.WriteLine("HttpStatusCode is not 200 in GetPageType: " + Page.HttpStatusCode);
-                return (PageType.DownloadError, null, false);
+                return (PageType.HttpStatusCodeNotOK, null, false);
             }
             if (Page.ResponseBodyIsNullOrEmpty())
             {
-                //Console.WriteLine("ResponseBodyIsNullOrEmpty in GetPageType " + Page.Uri);
                 return (PageType.ResponseBodyNullOrEmpty, null, false);
-            }
-            
+            }            
             if (Page.MainPage())
             {
                 return (PageType.MainPage, null, false);

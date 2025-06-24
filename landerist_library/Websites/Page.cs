@@ -365,7 +365,7 @@ namespace landerist_library.Websites
                 !ResponseBodyTextHasChanged &&
                 PageType != null &&
                 !PageType.Equals(landerist_library.Websites.PageType.MayBeListing) &&
-                !PageType.Equals(landerist_library.Websites.PageType.DownloadError) &&
+                !PageType.Equals(landerist_library.Websites.PageType.HttpStatusCodeNotOK) &&
                 !PageType.Equals(landerist_library.Websites.PageType.ResponseBodyNullOrEmpty);
         }
 

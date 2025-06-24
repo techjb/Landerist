@@ -24,14 +24,13 @@ namespace landerist_library.Statistics
         HttpStatusCode_NULL,
         HttpStatusCode_200,
         PageType,
-        ScrappedSuccess,
+        ScrapedSuccess,
         ScrapedCrashed,
-        ScrapedDownloadErrors,
+        ScrapedHttpStatusCodeNotOK,
         BatchReaded,
         BatchReadedErrors,
         ListingInsert,
         ListingUpdate,
-
     }
 
     public class StatisticsSnapshot
@@ -367,8 +366,5 @@ namespace landerist_library.Statistics
                 { "Key", statisticsKey}
             });
         }
-
-
-
     }
 }

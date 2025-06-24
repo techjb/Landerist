@@ -263,7 +263,7 @@ namespace landerist_tests
             #endregion
 
             #region Statistics
-            //landerist_library.Statistics.StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ScrappedSuccess, 23);
+            //landerist_library.Statistics.StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ScrapedSuccess, 23);
             #endregion
 
             #region Listings

@@ -77,9 +77,9 @@ namespace landerist_library.Websites
             return GetPages(topRows, where);
         }
 
-        public static List<Page> GetNextUpdate(int topRows, bool limitToNextUpdateLowerThanCurrentDate)
+        public static List<Page> GetNextUpdate(int topRows, bool extendToFillTopRows)
         {
-            string where = limitToNextUpdateLowerThanCurrentDate ? "P.[NextUpdate] < GETDATE()" : string.Empty;
+            string where = extendToFillTopRows ? string.Empty : "P.[NextUpdate] < GETDATE()";
             return GetPages(topRows, where);
         }
 
