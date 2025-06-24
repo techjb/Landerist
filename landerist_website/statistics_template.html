@@ -84,8 +84,6 @@
         CreatePieChart("Unpublished Listings PageType", [/*unpublishedPageType*/]);
 
 
-
-
         function CreateLineChart(title, values) {
             const data = {
                 labels: values.map(row => row.date),
@@ -135,7 +133,7 @@
             const data = {
                 labels: values.map(row => row.label),
                 datasets: [{
-                    label: title,
+                    label: '',
                     data: values.map(row => row.value),                    
                     borderColor: palette,
                     backgroundColor: palette,
