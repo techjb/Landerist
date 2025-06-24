@@ -175,6 +175,7 @@ namespace landerist_tests
             //Pages.RemoveResponseBodyTextHash(PageType.NotListingByLastSegment);
             //Pages.DeleteUnpublishedListings();
             //Pages.DeleteUrisLikePrint();
+            //Pages.DeleteProhibitedUris();
 
             #endregion
 
@@ -191,7 +192,7 @@ namespace landerist_tests
             //new Scraper().ScrapeResponseBodyRepeatedInListings();            
             //new Scraper().Start();
             //new Scraper().Scrape(page, false);
-            new Scraper().Scrape("https://sunnierhomes.com/propiedad/24220/bungalow/nueva-construccion/espana/costa-blanca-sur/pilar-de-la-horadada/higuericas/", true);
+            //new Scraper().Scrape("https://sunnierhomes.com/propiedad/24220/bungalow/nueva-construccion/espana/costa-blanca-sur/pilar-de-la-horadada/higuericas/", true);
 
             //new Scraper().DoTest();
             //landerist_library.Scrape.PageSelector.Select();

@@ -1,4 +1,5 @@
-﻿using Google.Cloud.AIPlatform.V1;
+﻿using Amazon.Runtime.Internal.Transform;
+using Google.Cloud.AIPlatform.V1;
 using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Index;
@@ -186,6 +187,23 @@ namespace landerist_library.Websites
 
             DataTable dataTable = new DataBase().QueryTable(query);
             return GetPages(dataTable);
+        }
+
+        public static Dictionary<string, object?> GetByPageType(ListingStatus status)
+        {
+            string query =
+                "SELECT [PageType], COUNT(*) " +
+                "FROM " + PAGES + " " +
+                "WHERE [UriHash] IN (" +
+                "   SELECT GUID " +
+                "   FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+                "   WHERE [listingStatus]= @listingStatus) " +
+                "GROUP BY [PageType] " +
+                "ORDER BY COUNT(*) DESC";
+            return new DataBase().QueryDictionary(query, new Dictionary<string, object?>
+            {
+                { "listingStatus", status.ToString() }
+            });
         }
 
         private static string SelectQuery(int? topRows = null)
@@ -429,6 +447,18 @@ namespace landerist_library.Websites
             Delete(pages);
         }
 
+        // Also removes url with prohibited host
+        public static void DeleteProhibitedUris()
+        {
+            string where = string.Join(" OR ", ProhibitedUrls.Prohibited_ES.Select(uri => $"Uri LIKE '%{uri}%'"));
+            string query =
+               SelectQuery() +
+               "WHERE " + where;
+
+            var pages = GetPages(query);
+            Delete(pages);
+        }
+
         public static void Delete(List<Page> pages)
         {
             Console.WriteLine("Deleting " + pages.Count + " pages..");
@@ -439,6 +469,7 @@ namespace landerist_library.Websites
                 //new ParallelOptions(){MaxDegreeOfParallelism = 1}, 
                 page =>
             {
+                Console.WriteLine(page.Uri);
                 if (page.Delete())
                 {
                     Interlocked.Increment(ref counter);

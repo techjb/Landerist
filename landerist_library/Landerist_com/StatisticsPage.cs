@@ -2,6 +2,7 @@
 using landerist_library.Export;
 using landerist_library.Logs;
 using landerist_library.Statistics;
+using landerist_library.Websites;
 using System.Data;
 
 namespace landerist_library.Landerist_com
@@ -37,6 +38,8 @@ namespace landerist_library.Landerist_com
                 UpdateScraped();
                 UpdateBathcReaded();
                 UpdateListingInsertUpdate();
+                UpdatePublishedPageType();
+                UpdateUnPublishedPageType();
 
                 if (UploadStatisticsFile())
                 {
@@ -93,6 +96,23 @@ namespace landerist_library.Landerist_com
             Update(statisticsKeys, "ListingInsertUpdate");
         }
 
+        private static void UpdatePublishedPageType()
+        {
+            UpdatePageType(landerist_orels.ES.ListingStatus.published);
+        }
+
+        private static void UpdateUnPublishedPageType()
+        {
+            UpdatePageType(landerist_orels.ES.ListingStatus.unpublished);
+        }
+
+        private static void UpdatePageType(landerist_orels.ES.ListingStatus listingStatus)
+        {
+            var dictionary = Pages.GetByPageType(listingStatus);
+            string statisticsKey = listingStatus.ToString() + "PageType";
+            Update(dictionary, statisticsKey);
+        }
+
         private static void Update(List<StatisticsKey> keys, string statisticsKey)
         {
             List<string> list = [.. keys.Select(key => key.ToString())];
@@ -103,6 +123,7 @@ namespace landerist_library.Landerist_com
         {
             Update(keys, statisticsKey.ToString());
         }
+
         private static void Update(List<string> keys, string statisticsKey)
         {
             List<string> data = [];
@@ -116,11 +137,16 @@ namespace landerist_library.Landerist_com
             StatisticsTemplate = StatisticsTemplate.Replace("/*"+ statisticsKey.ToString() +"*/", dataString);
         }
 
-        private static void AddData(List<string> data, string key, StatisticsKey statisticsKey)
+        private static void Update(Dictionary<string, object?> dictionary, string statisticsKey)
         {
-            var values = GetValues(key, false);
-            var json = "{\"label\": \"" + key + "\", \"values\":[" + string.Join(",", [.. values]) + "]}";
-            data.Add(json);
+            List<string> data = [];
+            foreach (var keyValuePair in dictionary)
+            {
+                var json = "{\"label\": \"" + keyValuePair.Key + "\", \"value\":" + keyValuePair.Value + "}";
+                data.Add(json);
+            }
+            string dataString = string.Join(",", [.. data]);
+            StatisticsTemplate = StatisticsTemplate.Replace("/*" + statisticsKey.ToString() + "*/", dataString);
         }
 
         private static void UpdateTemplate(StatisticsKey statisticsKey, bool yesterday)

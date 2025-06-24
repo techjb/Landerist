@@ -4,7 +4,7 @@ namespace landerist_library.Index
 {
     public class ProhibitedUrls
     {
-        private static readonly HashSet<string> Prohibited_ES = new(StringComparer.OrdinalIgnoreCase)
+        public static readonly HashSet<string> Prohibited_ES = new(StringComparer.OrdinalIgnoreCase)
         {
             "contact",
             "politic",
@@ -105,6 +105,7 @@ namespace landerist_library.Index
             "financiacion",
             "imprimi",
             "print",
+            "whatsapp"
         };
 
         public static bool IsProhibited(Uri uri, LanguageCode languageCode)

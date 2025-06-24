@@ -387,9 +387,7 @@ namespace landerist_library.Database
             return dataSet;
         }
 
-        public List<string> QueryListString(string query,
-            IDictionary<string, object?>? parameters = null,
-            SqlParameter[]? sqlParameters = null)
+        public List<string> QueryListString(string query, IDictionary<string, object?>? parameters = null, SqlParameter[]? sqlParameters = null)
         {
             List<string> list = [];
             try
@@ -460,6 +458,32 @@ namespace landerist_library.Database
             CloseConnection();
             return hashSet;
         }
+
+        public Dictionary<string, object?> QueryDictionary(string query, IDictionary<string, object?>? parameters = null, SqlParameter[]? sqlParameters = null)
+        {
+            Dictionary<string, object?> dictionary = [];
+            try
+            {
+                Init(query, parameters, sqlParameters);
+                SqlDataAdapter.SelectCommand = SqlCommand;
+
+                using SqlDataReader reader = SqlCommand.ExecuteReader();
+                while (reader.Read())
+                {
+                    var key = reader.GetString(0);
+                    var value = reader.GetValue(1);
+                    dictionary.Add(key, value);
+                }
+            }
+            catch (Exception exception)
+            {
+                exception.ToString();
+            }
+
+            CloseConnection();
+            return dictionary;
+        }
+
 
         #endregion Public Methods
 

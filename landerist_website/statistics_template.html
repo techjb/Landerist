@@ -43,6 +43,28 @@
 
     <script>
 
+        const palette = [
+            "rgb(75, 192, 192)",
+            "rgb(255, 99, 132)",
+            "rgb(54, 162, 235)",
+            "rgb(255, 205, 86)",
+            "rgb(153, 102, 255)",
+            "rgb(201, 203, 207)"
+        ];
+
+        function GetPlugins(title) {
+            return {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: title
+                }
+            };
+        }
+
+
         CreateLineChart("Listings", [/*Listings*/]);
         CreateLineChart("Published listings", [/*PublishedListings*/]);
         CreateLineChart("Unpublished listings", [/*UnpublishedListings*/]);
@@ -58,6 +80,10 @@
         CreateAreaChart("Scraped pages", [/*ScrapedPages*/]);
         CreateAreaChart("Batch readed", [/*BatchReaded*/]);
         CreateAreaChart("Listing insert update", [/*ListingInsertUpdate*/]);
+        CreatePieChart("Published Listings PageType", [/*publishedPageType*/]);
+        CreatePieChart("Unpublished Listings PageType", [/*unpublishedPageType*/]);
+
+
 
 
         function CreateLineChart(title, values) {
@@ -69,32 +95,15 @@
             };
             var options = {
                 responsive: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    title: {
-                        display: true,
-                        text: title
-                    }
-                }
+                plugins: GetPlugins(title)
             }
-            CreateChart(title, data, options);
+            CreateChart('line', data, options);
         }
 
         function CreateAreaChart(title, values) {
             const data = {
                 labels: values[0].values.map(row => row.date),
                 datasets: values.map((serie, idx) => {
-                    const palette = [
-                        "rgb(75, 192, 192)",
-                        "rgb(255, 99, 132)",
-                        "rgb(54, 162, 235)",
-                        "rgb(255, 205, 86)",
-                        "rgb(153, 102, 255)",
-                        "rgb(201, 203, 207)"
-                    ];
-
                     return {
                         label: serie.label,
                         data: serie.values.map(row => row.count),
@@ -106,19 +115,9 @@
                     };
                 })
             };
-
-
             var options = {
                 responsive: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    title: {
-                        display: true,
-                        text: title
-                    }
-                },
+                plugins: GetPlugins(title),
                 scales: {
                     x: {
                         stacked: true
@@ -129,12 +128,35 @@
                     }
                 }
             }
-            CreateChart(title, data, options);
+            CreateChart('line', data, options);
         }
 
-        function CreateChart(title, data, options) {
+        function CreatePieChart(title, values) {
+            const data = {
+                labels: values.map(row => row.label),
+                datasets: [{
+                    label: title,
+                    data: values.map(row => row.value),                    
+                    borderColor: palette,
+                    backgroundColor: palette,
+                }]
+            }
+
+            var options = {
+                responsive: true,
+                plugins: GetPlugins(title),
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+            CreateChart('pie', data, options);
+        }
+      
+        function CreateChart(type, data, options) {
             const config = {
-                type: 'line',
+                type: type,
                 data: data,
                 options: options,
             };

@@ -5,7 +5,6 @@ using landerist_library.Logs;
 using landerist_library.Parse.ListingParser.OpenAI.Batch;
 using landerist_library.Scrape;
 using landerist_library.Statistics;
-using landerist_library.Websites;
 
 namespace landerist_library.Tasks
 {
@@ -184,7 +183,6 @@ namespace landerist_library.Tasks
 
             try
             {
-                //Pages.DeleteUnpublishedListings();
                 StatisticsSnapshot.TakeSnapshots();
                 FilesUpdater.Update();
                 Landerist_com.Landerist_com.UpdatePages();
