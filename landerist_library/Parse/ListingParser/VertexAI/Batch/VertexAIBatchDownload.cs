@@ -17,18 +17,29 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
         };
 
 
-        public static List<string>? GetFiles(string batchId)
+        public static (string? fileSucess, string? fileError)? GetFiles(string batchId)
         {
             try
             {
                 var batchPredictionJob = BatchPredictions.GetBatchPredictionJob(batchId);
-                if (batchPredictionJob != null && batchPredictionJob.State.Equals(JobState.Succeeded))
+                if (batchPredictionJob != null)
                 {
-                    string file = batchPredictionJob.OutputInfo.GcsOutputDirectory.
-                        Replace("gs://" + PrivateConfig.GOOGLE_CLOUD_BUCKET_NAME + "/", "") + "/predictions.jsonl";
+                    if (batchPredictionJob.State.Equals(JobState.Succeeded))
+                    {
+                        string file = batchPredictionJob.OutputInfo.GcsOutputDirectory.
+                            Replace("gs://" + PrivateConfig.GOOGLE_CLOUD_BUCKET_NAME + "/", "") + "/predictions.jsonl";
 
-                    return [file];
+                        return (file, null);
+                    }
+                    if (batchPredictionJob.State.Equals(JobState.Failed))
+                    {
+                        string file = batchPredictionJob.InputConfig.GcsSource.Uris[0].
+                           Replace("gs://" + PrivateConfig.GOOGLE_CLOUD_BUCKET_NAME + "/", "");
+
+                        return (null, file);
+                    }
                 }
+
             }
             catch (Exception exception)
             {
@@ -111,7 +122,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
             if (candidate.Content != null && candidate.Content.Parts != null && candidate.Content.Parts.Count > 0)
             {
                 return candidate.Content.Parts[0].Text;
-            }            
+            }
             return null;
         }
 
@@ -120,9 +131,9 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
             if (vertexAIBatchResponse.Request != null)
             {
                 var labels = vertexAIBatchResponse.Request.labels;
-                if (labels.TryGetValue("custom_id", out string? label))
+                if (labels.TryGetValue(VertexAIBatchUpload.LABEL_URIHASH, out string? uriHash))
                 {
-                    return Pages.GetPage(label);
+                    return Pages.GetPage(uriHash);
                 }
             }
             return null;

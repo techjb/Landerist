@@ -345,7 +345,7 @@ namespace landerist_tests
             //new ServiceTasks().UpdateAndScrape();
             //DownloadFilesUpdater.Update();
             //ServiceTasks.UpdateAndScrape();
-            //ServiceTasks.Update();
+            //ServiceTasks.HourlyTasks();
             //ServiceTasks.Scrape();
             //ServiceTasks.Start();
             //BatchTasks.Start();            

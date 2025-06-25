@@ -182,10 +182,10 @@ namespace landerist_library.Websites
 
         public bool Update(bool setNextUpdate)
         {
-            if (Config.IsConfigurationLocal())
-            {
-                return true;
-            }
+            //if (Config.IsConfigurationLocal())
+            //{
+            //    return true;
+            //}
             if (setNextUpdate)
             {
                 SetNextUpdate();
@@ -206,7 +206,7 @@ namespace landerist_library.Websites
                 "WHERE [UriHash] = @UriHash";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
-                {"Updated", Updated },
+                {"Updated", DateTime.Now },
                 {"NextUpdate", NextUpdate },
                 {"HttpStatusCode", HttpStatusCode},
                 {"PageType", PageType?.ToString()},
@@ -222,8 +222,6 @@ namespace landerist_library.Websites
 
         public void SetNextUpdate()
         {
-            Updated = DateTime.Now;
-
             if (PageType == null || PageTypeCounter == null)
             {
                 NextUpdate = null;
@@ -236,7 +234,7 @@ namespace landerist_library.Websites
                 landerist_library.Websites.PageType.Listing => Config.DEFAULT_DAYS_NEXT_UPDATE_LISTING,
                 _ => (short)PageTypeCounter! * Config.DEFAULT_DAYS_NEXT_UPDATE,
             };
-            NextUpdate = ((DateTime)Updated!).AddDays(addDays);
+            NextUpdate = ((DateTime)DateTime.Now!).AddDays(addDays);
         }
 
         public bool UpdateNextUpdate()
@@ -586,7 +584,7 @@ namespace landerist_library.Websites
             return WaitingStatus is not null && WaitingStatus == landerist_library.Websites.WaitingStatus.waiting_ai_response;
         }
 
-        public void SetWaitingStatus(WaitingStatus waitingStatus)
+        private void SetWaitingStatus(WaitingStatus waitingStatus)
         {
             WaitingStatus = waitingStatus;
         }

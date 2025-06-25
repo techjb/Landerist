@@ -1,13 +1,16 @@
-﻿using landerist_library.Parse.ListingParser.StructuredOutputs;
+﻿using Google.Cloud.AIPlatform.V1;
+using landerist_library.Parse.ListingParser.OpenAI.Batch;
+using landerist_library.Parse.ListingParser.StructuredOutputs;
 using landerist_library.Websites;
 using System.Text.Json;
-using Google.Cloud.AIPlatform.V1;
 using static Google.Cloud.AIPlatform.V1.SafetySetting.Types;
 
 namespace landerist_library.Parse.ListingParser.VertexAI.Batch
 {
     public class VertexAIBatchUpload
     {
+        public const string LABEL_URIHASH = "uri_hash";
+
         private static readonly JsonSerializerOptions JsonSerializerOptions = new()
         {
             WriteIndented = false
@@ -73,7 +76,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                         {
                             category = (int)HarmCategory.SexuallyExplicit,
                             threshold = (int)HarmBlockThreshold.BlockOnlyHigh
-                        },                      
+                        },
                         new SafetySetting
                         {
                             category = (int)HarmCategory.Unspecified,
@@ -82,12 +85,27 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                     ],
                     labels = new Dictionary<string, string>()
                     {
-                        {"custom_id", page.UriHash}
+                        {LABEL_URIHASH, page.UriHash}
                     }
                 }
             };
 
             return JsonSerializer.Serialize(structuredRequestData, JsonSerializerOptions);
+        }
+
+        public static Page? GetPage(string json)
+        {
+            var vertexAIBatchRequest = JsonSerializer.Deserialize<VertexAIBatchRequest>(json);
+            if (vertexAIBatchRequest is null || vertexAIBatchRequest.request is null)
+            {
+                return null;
+            }
+            var uriHash = vertexAIBatchRequest.request.labels[LABEL_URIHASH];
+            if (string.IsNullOrEmpty(uriHash))
+            {
+                return null;
+            }
+            return Pages.GetPage(uriHash);
         }
     }
 }

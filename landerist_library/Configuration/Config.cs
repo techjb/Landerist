@@ -43,7 +43,7 @@ namespace landerist_library.Configuration
 
         public static readonly int DEFAULT_DAYS_NEXT_UPDATE = 3;
 
-        public static readonly int DEFAULT_DAYS_NEXT_UPDATE_LISTING = 2;
+        public static readonly int DEFAULT_DAYS_NEXT_UPDATE_LISTING = 1;
 
         public static readonly bool LOGS_ENABLED = true;
 
@@ -241,7 +241,7 @@ namespace landerist_library.Configuration
                 PrivateConfig.BATCH_DIRECTORY_PRODUCTION :
                 PrivateConfig.BATCH_DIRECTORY_LOCAL;
 
-            DAYS_TO_REMOVE_BATCH_FILES = -5;
+            DAYS_TO_REMOVE_BATCH_FILES = -30;
 
             MAX_DEGREE_OF_PARALLELISM_SCRAPER = ConfigurationProduction ?
                 Environment.ProcessorCount * 70 / 100 : // % of the processors

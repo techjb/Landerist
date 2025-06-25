@@ -16,7 +16,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
             ReferenceHandler = ReferenceHandler.IgnoreCycles
         };
 
-        public static List<string>? GetFiles(string batchId)
+        public static (string? fileSucess, string? fileError)? GetFiles(string batchId)
         {
             var batchResponse = GetBatch(batchId);
             if (batchResponse == null || !BatchIsCompleted(batchResponse))
@@ -24,7 +24,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
                 return null;
             }
 
-            return [batchResponse.OutputFileId, batchResponse.ErrorFileId];
+            return (batchResponse.OutputFileId, batchResponse.ErrorFileId);
         }
 
         public static (Page page, string? text)? ReadLine(string line)
