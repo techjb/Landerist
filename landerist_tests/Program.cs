@@ -32,8 +32,6 @@ namespace landerist_tests
         public delegate void KeyPressedHandler(ConsoleKeyInfo key);
         public static event KeyPressedHandler? OnKeyPressed;
 
-
-
         static void Main()
         {
             Console.Title = "Landerist Tests";

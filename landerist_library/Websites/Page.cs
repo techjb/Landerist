@@ -100,12 +100,6 @@ namespace landerist_library.Websites
             Load(dataRow);
         }
 
-        //public Page(DataRow dataRow)
-        //{
-        //    Load(dataRow);
-        //    Website = Websites.GetWebsite(this);
-        //}
-
         private void Load(DataRow dataRow)
         {
             Host = dataRow["Host"].ToString()!;
@@ -186,6 +180,8 @@ namespace landerist_library.Websites
             //{
             //    return true;
             //}
+
+            Updated = DateTime.Now;
             if (setNextUpdate)
             {
                 SetNextUpdate();
@@ -206,7 +202,7 @@ namespace landerist_library.Websites
                 "WHERE [UriHash] = @UriHash";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
-                {"Updated", DateTime.Now },
+                {"Updated", Updated },
                 {"NextUpdate", NextUpdate },
                 {"HttpStatusCode", HttpStatusCode},
                 {"PageType", PageType?.ToString()},
@@ -234,7 +230,12 @@ namespace landerist_library.Websites
                 landerist_library.Websites.PageType.Listing => Config.DEFAULT_DAYS_NEXT_UPDATE_LISTING,
                 _ => (short)PageTypeCounter! * Config.DEFAULT_DAYS_NEXT_UPDATE,
             };
-            NextUpdate = ((DateTime)DateTime.Now!).AddDays(addDays);
+
+            if (addDays > Config.MAX_DAYS_NEXT_UPDATE)
+            {
+                addDays = Config.MAX_DAYS_NEXT_UPDATE;
+            }
+            NextUpdate = DateTime.Now!.AddDays(addDays);
         }
 
         public bool UpdateNextUpdate()

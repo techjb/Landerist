@@ -45,6 +45,8 @@ namespace landerist_library.Configuration
 
         public static readonly int DEFAULT_DAYS_NEXT_UPDATE_LISTING = 1;
 
+        public static readonly int MAX_DAYS_NEXT_UPDATE = 90;
+
         public static readonly bool LOGS_ENABLED = true;
 
         public static readonly bool LOGS_INFO_IN_CONSOLE = true;
