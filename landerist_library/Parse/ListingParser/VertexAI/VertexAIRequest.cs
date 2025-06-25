@@ -16,7 +16,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI
 
         public static readonly string ModelName = "gemini-2.5-flash";
 
-        public const float Temperature = 0.1f;
+        public const float Temperature = 0.2f;
 
         public static bool TooManyTokens(Page page)
         {

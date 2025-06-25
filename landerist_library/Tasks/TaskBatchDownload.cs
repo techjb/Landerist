@@ -183,27 +183,22 @@ namespace landerist_library.Tasks
             }
 
             var page = result.Value.page;
-            var (newPageType, listing) = ParseListing.ParseResponse(page, result.Value.text);
-            if (Config.IsConfigurationLocal())
-            {
-                page.Dispose();
-                return true;
-            }
-
+            var (newPageType, listing) = ParseListing.ParseResponse(page, result.Value.text);           
             if (newPageType.Equals(PageType.MayBeListing))
             {
                 page.SetWaitingStatusAIRequest();
-                page.Update(false);
-                page.Dispose();
-                return false;
+                page.Update(false);                            
             }
-            page.RemoveWaitingStatus();
-            page.SetResponseBodyFromZipped();
-            page.RemoveResponseBodyZipped();
-            new PageScraper(page).SetPageType(newPageType, listing);
-            var sucess = page.Update(true);
+            else
+            {
+                page.RemoveWaitingStatus();
+                page.SetResponseBodyFromZipped();
+                page.RemoveResponseBodyZipped();
+                new PageScraper(page).SetPageType(newPageType, listing);
+                page.Update(true);
+            }
             page.Dispose();
-            return sucess;
+            return true;
         }
 
         private static (Page page, string? text)? GetPageAndText(Batch batch, string line)

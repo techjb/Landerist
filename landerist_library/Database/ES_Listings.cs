@@ -43,7 +43,7 @@ namespace landerist_library.Database
             }
             else
             {
-                Logs.Log.WriteError("ES_LISTINGS", "Insert error");
+                Logs.Log.WriteError("ES_Listings", "Insert error");
                 return false;
             }
         }
@@ -121,7 +121,7 @@ namespace landerist_library.Database
         {
             if (!Update(newListing))
             {
-                Logs.Log.WriteError("ES_LISTINGS", "Update error");
+                Logs.Log.WriteError("ES_Listings", "Update error");
                 return false;
             }
             if (!ListingMediaAreEquals(oldListing, newListing))

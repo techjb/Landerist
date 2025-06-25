@@ -1,5 +1,4 @@
-﻿using Amazon.Runtime.Internal.Transform;
-using HtmlAgilityPack;
+﻿using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Downloaders;
@@ -33,7 +32,7 @@ namespace landerist_library.Websites
 
         public short? PageTypeCounter { get; private set; }
 
-        public ListingStatus? ListingStatus { get; set; }
+        private ListingStatus? ListingStatus { get; set; }
 
         public string? LockedBy { get; set; }
 
@@ -231,10 +230,12 @@ namespace landerist_library.Websites
                 _ => (short)PageTypeCounter! * Config.DEFAULT_DAYS_NEXT_UPDATE,
             };
 
-            if (addDays > Config.MAX_DAYS_NEXT_UPDATE)
+            if (IsListingStatusPublished())
             {
-                addDays = Config.MAX_DAYS_NEXT_UPDATE;
+                addDays = Config.DEFAULT_DAYS_NEXT_UPDATE_LISTING;
             }
+
+            addDays = Math.Clamp(addDays, Config.MIN_DAYS_NEXT_UPDATE, Config.MAX_DAYS_NEXT_UPDATE);
             NextUpdate = DateTime.Now!.AddDays(addDays);
         }
 
@@ -260,11 +261,11 @@ namespace landerist_library.Websites
             bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
                 {"UriHash", UriHash }
             });
-            return sucess && 
-                Website.DecreaseNumPages() && 
+            return sucess &&
+                Website.DecreaseNumPages() &&
                 ES_Listings.Delete(UriHash) &&
                 ES_Media.Delete(UriHash) &&
-                ES_Sources.Delete(UriHash);            
+                ES_Sources.Delete(UriHash);
         }
 
         public bool DeleteListing()
@@ -657,6 +658,11 @@ namespace landerist_library.Websites
         public bool IsListingStatusPublished()
         {
             return ListingStatus == landerist_orels.ES.ListingStatus.published;
+        }
+
+        public bool IsListingStatusUnPublished()
+        {
+            return ListingStatus == landerist_orels.ES.ListingStatus.unpublished;
         }
 
         public bool HaveToUnpublishListing()
