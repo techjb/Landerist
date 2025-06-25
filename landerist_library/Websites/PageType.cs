@@ -18,7 +18,6 @@
         MayBeListing,
         Listing,
         NotListingByParser,
-        ListingButNotParsed,
     };
 
     public enum WaitingStatus

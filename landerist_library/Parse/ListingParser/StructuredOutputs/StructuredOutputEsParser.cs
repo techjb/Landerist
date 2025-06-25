@@ -22,10 +22,10 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
 
             try
             {
-                if (!IsValidResponse())
-                {
-                    return (PageType.ListingButNotParsed, null);
-                }
+                //if (!IsValidResponse())
+                //{
+                //    return (PageType.MayBeListing, null);
+                //}
 
                 var listing = new Listing
                 {
@@ -36,7 +36,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
                     propertyType = GetPropertyType(),
                     propertySubtype = GetPropertySubtype(),
                     price = GetPropertyPrice(),
-                    description = GetDescription(),                  
+                    description = GetDescription(),
                     contactPhone = GetPhone(),
                     contactEmail = GetEmail(),
                     address = GetAddress(),
@@ -74,48 +74,52 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             {
                 Logs.Log.WriteError("OpenAIStructuredOutput ParseListing", page.Uri, exception);
             }
-            return (PageType.ListingButNotParsed, null);
+            return (PageType.MayBeListing, null);
         }
 
-        private bool IsValidResponse()
-        {
-            return IsValidListingDate() &&
-                IsValidDescription()
-            ;
-        }
+        //private bool IsValidResponse()
+        //{
+        //    return
+        //        IsValidListingDate() &&
+        //        IsValidDescription()
+        //    ;
+        //}
 
-        private bool IsValidListingDate()
-        {
-            var listingDate = GetListingDate();
-            var maxListingDate = DateTime.Now.AddDays(1);
-            var minListingDate = DateTime.Now.AddYears(-Config.MAX_YEARS_SINCE_PUBLISHED_LISTING);
+        //private bool IsValidListingDate()
+        //{
+        //    var listingDate = GetListingDate();
+        //    var maxListingDate = DateTime.Now.AddDays(1);
+        //    var minListingDate = DateTime.Now.AddYears(-Config.MAX_YEARS_SINCE_PUBLISHED_LISTING);
 
-            return listingDate <= maxListingDate && listingDate >= minListingDate;
-        }
+        //    return listingDate <= maxListingDate && listingDate >= minListingDate;
+        //}
 
         private DateTime GetListingDate()
         {
-            if (Anuncio != null && Anuncio.FechaDePublicación != null)
+            var now = DateTime.Now;
+            if (DateTime.TryParse(Anuncio?.FechaDePublicación, out DateTime listingDateParsed))
             {
-                if (DateTime.TryParse(Anuncio.FechaDePublicación, out DateTime listingDate))
+                var maxListingDate = now.AddDays(1);
+                var minListingDate = now.AddYears(-Config.MAX_YEARS_SINCE_PUBLISHED_LISTING);
+                if (listingDateParsed >= minListingDate && listingDateParsed <= maxListingDate)
                 {
-                    return listingDate;
+                    return listingDateParsed;
                 }
             }
-            return DateTime.Now;
+            return now;
         }
 
-        private bool IsValidDescription()
-        {
-            var description = GetDescription();
-            return !string.IsNullOrEmpty(description);
-        }
+        //private bool IsValidDescription()
+        //{
+        //    var description = GetDescription();
+        //    return !string.IsNullOrEmpty(description);
+        //}
 
-        private string? GetDescription()
+        private string GetDescription()
         {
             if (Anuncio == null || string.IsNullOrEmpty(Anuncio.DescripciónDelAnuncio))
             {
-                return null;
+                return string.Empty;
             }
             return Tools.Strings.Clean(Anuncio.DescripciónDelAnuncio);
         }

@@ -298,11 +298,7 @@ namespace landerist_orels.ES
             {
                 return false;
             }
-            return Equals((Listing)obj);
-        }
-
-        private bool Equals(Listing other)
-        {
+            var other = (Listing)obj;           
             if (other == null)
             {
                 return false;
