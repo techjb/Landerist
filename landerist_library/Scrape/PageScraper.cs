@@ -103,10 +103,15 @@ namespace landerist_library.Scrape
             if (Page.IsListing())
             {
                 HandleLPublishedListing();
+                return;
             }
-            else if (Page.HaveToUnpublishListing())
+            if (Page.HaveToUnpublishListing())
             {
                 HandleUnpublishedListing();
+            }
+            if (Page.IsNotCanonicalListing())
+            {
+                // todo: handle not canonical listing
             }
         }
 
@@ -116,10 +121,10 @@ namespace landerist_library.Scrape
             if (NewListing == null) return;
 
             NewListing.SetPublished();
-            Page.SetListingStatusPublished();
             new LatLngParser(Page, NewListing).SetLatLng();
             new LauIdParser(Page, NewListing).SetLauId();
             ES_Listings.InsertUpdate(Page.Website, NewListing);
+            Page.SetListingStatusPublished();
         }
 
         private void HandleUnpublishedListing()
@@ -128,8 +133,8 @@ namespace landerist_library.Scrape
             if (NewListing == null) return;
 
             NewListing.SetUnpublished();
-            Page.SetListingStatusUnpublished();
             ES_Listings.InsertUpdate(Page.Website, NewListing);
+            Page.SetListingStatusUnpublished();
         }
 
         private void IndexPages()

@@ -470,8 +470,8 @@ namespace landerist_library.Database
                 using SqlDataReader reader = SqlCommand.ExecuteReader();
                 while (reader.Read())
                 {
-                    var key = reader.GetString(0);
-                    var value = reader.GetValue(1);
+                    string key = reader.IsDBNull(0) ? "null" : reader.GetString(0);
+                    object? value = reader.IsDBNull(1) ? null : reader.GetValue(1);
                     dictionary.Add(key, value);
                 }
             }

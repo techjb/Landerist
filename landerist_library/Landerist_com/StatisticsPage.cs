@@ -2,7 +2,6 @@
 using landerist_library.Export;
 using landerist_library.Logs;
 using landerist_library.Statistics;
-using landerist_library.Websites;
 using landerist_orels.ES;
 using System.Data;
 
@@ -40,9 +39,10 @@ namespace landerist_library.Landerist_com
                 BathcReaded();
                 ListingInsertUpdate();
                 PageType();
-                //PublishedPageType();
-                //UnPublishedPageType();
-                ListingsPageType();
+                PublishedPageType();
+                UnPublishedPageType();
+                HttpStatusCode();
+                //ListingsPageType();
 
                 if (UpdateStatisctisPage())
                 {
@@ -109,7 +109,7 @@ namespace landerist_library.Landerist_com
         private static void UpdatedPageType()
         {
             var keys = StatisticsSnapshot.GetPageTypeKeys();
-            BarChart("Updated UpdatedPageType", keys, false);
+            BarChart("Updated PageType", keys, false);
         }
 
         private static void ScrapedPages()
@@ -145,29 +145,41 @@ namespace landerist_library.Landerist_com
 
         private static void PageType()
         {
-            var dictionary = landerist_library.Websites.Pages.GetByPageType(ListingStatus.published);
+            var dictionary = landerist_library.Websites.Pages.CountByPageType();
             PieChart("PageType", dictionary);
         }
 
         private static void ListingsPageType()
         {
-            var dictionaryPublished = landerist_library.Websites.Pages.GetByPageType(ListingStatus.published);
-            var dictionaryUnPublished = landerist_library.Websites.Pages.GetByPageType(ListingStatus.unpublished);
-            List<Dictionary<string, object?>> dictionaries = [dictionaryPublished, dictionaryUnPublished];
-            //PieChart("Listings PageType", dictionary);
-        }
+            var dictionaryPublished = landerist_library.Websites.Pages.CountByPageType(ListingStatus.published);
+            var dictionaryUnPublished = landerist_library.Websites.Pages.CountByPageType(ListingStatus.unpublished);
 
+            var published = GetLabelValues("published", dictionaryPublished);
+            var unpublished = GetLabelValues("unpublished", dictionaryUnPublished);
+
+            var data = new List<string>
+            {
+                published, unpublished
+            };
+            BarChart("Listings PageType", string.Join(",", [.. data]));
+        }
 
         private static void PublishedPageType()
         {
-            var dictionary = landerist_library.Websites.Pages.GetByPageType(ListingStatus.published);
-            PieChart("Published PageType", dictionary);
+            var dictionary = landerist_library.Websites.Pages.CountByPageType(ListingStatus.published);
+            BarChart("Published Listings PageType", "published", dictionary);
         }
 
         private static void UnPublishedPageType()
         {
-            var dictionary = landerist_library.Websites.Pages.GetByPageType(ListingStatus.unpublished);
-            PieChart("Unpublished PageType", dictionary);
+            var dictionary = landerist_library.Websites.Pages.CountByPageType(ListingStatus.unpublished);
+            BarChart("Unpublished Listings PageType", "unpublished", dictionary);
+        }
+
+        private static void HttpStatusCode()
+        {
+            var dictionary = landerist_library.Websites.Pages.CountByHttpStatusCode();
+            PieChart("HttpStatusCode", dictionary);
         }
 
 
@@ -191,7 +203,7 @@ namespace landerist_library.Landerist_com
 
         private static void PieChart(string title, Dictionary<string, object?> dictionary)
         {
-            string dataString = GetDataString(dictionary);
+            string dataString = GetValues(dictionary);
             PieChart(title, dataString);
         }
 
@@ -224,27 +236,10 @@ namespace landerist_library.Landerist_com
             BarChart(title, data);
         }
 
-        private static string GetDataString(List<string> keys, bool yesterday, bool last10)
+        private static void BarChart(string title, string key, Dictionary<string, object?> dictionary)
         {
-            List<string> data = [];
-            foreach (var key in keys)
-            {
-                var values = GetDatesValues(key, yesterday, last10);
-                var json = "{\"key\": \"" + key + "\", \"values\":[" + string.Join(",", [.. values]) + "]}";
-                data.Add(json);
-            }
-            return string.Join(",", [.. data]);
-        }
-
-        private static string GetDataString(Dictionary<string, object?> dictionary)
-        {
-            List<string> data = [];
-            foreach (var keyValuePair in dictionary)
-            {
-                var json = "{\"key\": \"" + keyValuePair.Key + "\", \"value\":" + keyValuePair.Value + "}";
-                data.Add(json);
-            }
-            return string.Join(",", [.. data]);            
+            string dataString = GetLabelValues(key, dictionary);
+            BarChart(title, dataString);
         }
 
         private static void AreaChart(string title, string data)
@@ -273,7 +268,19 @@ namespace landerist_library.Landerist_com
             Charts.Add(chart);
         }
 
-        private static List<string> GetDatesValues(string statisticKey, bool yesterday, bool last10)
+        private static string GetDataString(List<string> keys, bool yesterday, bool last10)
+        {
+            List<string> data = [];
+            foreach (var key in keys)
+            {
+                var values = GetValues(key, yesterday, last10);
+                var json = "{\"label\": \"" + key + "\", \"values\":[" + string.Join(",", [.. values]) + "]}";
+                data.Add(json);
+            }
+            return string.Join(",", [.. data]);
+        }
+
+        private static List<string> GetValues(string statisticKey, bool yesterday, bool last10)
         {
             int top = last10 ? 10 : 100;
             var dataTable = StatisticsSnapshot.GetLatestStatistics(statisticKey, top);
@@ -291,6 +298,25 @@ namespace landerist_library.Landerist_com
             }
             return values;
         }
+
+        private static string GetLabelValues(string key, Dictionary<string, object?> dictionary)
+        {
+            var values = GetValues(dictionary);
+            return "{\"label\": \"" + key + "\", \"values\":[" + values + "]}";
+        }
+
+
+        private static string GetValues(Dictionary<string, object?> dictionary)
+        {
+            List<string> data = [];
+            foreach (var keyValuePair in dictionary)
+            {
+                var json = "{\"key\": \"" + keyValuePair.Key + "\", \"value\":" + keyValuePair.Value + "}";
+                data.Add(json);
+            }
+            return string.Join(",", [.. data]);
+        }
+
 
         private static bool UpdateStatisctisPage()
         {

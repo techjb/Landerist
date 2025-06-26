@@ -306,7 +306,7 @@ namespace landerist_library.Tools
 
         private static string CleanText(IEnumerable<string>? lines)
         {
-            List<string> cleanedLines = new();
+            List<string> cleanedLines = [];
             if (lines == null)
             {
                 return string.Empty;

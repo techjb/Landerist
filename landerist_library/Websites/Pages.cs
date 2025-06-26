@@ -189,23 +189,33 @@ namespace landerist_library.Websites
             return GetPages(dataTable);
         }
 
-        public static Dictionary<string, object?> GetByPageType(ListingStatus? listingStatus)
+        public static Dictionary<string, object?> CountByPageType(ListingStatus? listingStatus = null)
         {
-            string where = listingStatus.HasValue ? "WHERE [listingStatus] = @listingStatus)" : "";
+            string where = listingStatus != null
+                ? "WHERE [listingStatus] = @listingStatus "
+                : string.Empty;
             string query =
                 "SELECT [PageType], COUNT(*) " +
                 "FROM " + PAGES + " " +
-                "WHERE [UriHash] IN (" +
-                "   SELECT GUID " +
-                "   FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
-                "   " + where + " " +
+                where + " " +
                 "GROUP BY [PageType] " +
                 "ORDER BY COUNT(*) DESC";
 
             return new DataBase().QueryDictionary(query, new Dictionary<string, object?>
             {
-                { "listingStatus", listingStatus?.ToString() }
+                { "listingStatus", listingStatus.ToString() }
             });
+        }
+
+        public static Dictionary<string, object?> CountByHttpStatusCode()
+        {
+            string query =
+                "SELECT CAST([HttpStatusCode] AS VARCHAR), COUNT(*) " +
+                "FROM " + PAGES + " " +
+                "GROUP BY [HttpStatusCode] " +
+                "ORDER BY COUNT(*) DESC";
+
+            return new DataBase().QueryDictionary(query);
         }
 
         private static string SelectQuery(int? topRows = null)

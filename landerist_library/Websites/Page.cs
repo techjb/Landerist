@@ -163,6 +163,10 @@ namespace landerist_library.Websites
             {
                 Website.IncreaseNumPages();
             }
+            else
+            {
+                Logs.Log.WriteError("Page Insert", "Failed to insert page: " + Uri);
+            }
             return sucess;
         }
 
@@ -200,7 +204,7 @@ namespace landerist_library.Websites
                 "[ResponseBodyZipped] = CASE WHEN @ResponseBodyZipped IS NULL THEN NULL ELSE CONVERT(varbinary(max), @ResponseBodyZipped) END " +
                 "WHERE [UriHash] = @UriHash";
 
-            return new DataBase().Query(query, new Dictionary<string, object?> {
+            var sucess = new DataBase().Query(query, new Dictionary<string, object?> {
                 {"Updated", Updated },
                 {"NextUpdate", NextUpdate },
                 {"HttpStatusCode", HttpStatusCode},
@@ -213,6 +217,12 @@ namespace landerist_library.Websites
                 {"ResponseBodyZipped", ResponseBodyZipped},
                 {"UriHash", UriHash },
             });
+
+            if(!sucess)
+            {
+                Logs.Log.WriteError("Page Update", "Failed to update page: " + Uri);
+            }
+            return sucess;
         }
 
         public void SetNextUpdate()
@@ -361,12 +371,12 @@ namespace landerist_library.Websites
         public bool ResponseBodyTextHasNotChanged()
         {
             return
-                Config.IsConfigurationProduction() &&
+                //Config.IsConfigurationProduction() &&
                 !ResponseBodyTextHasChanged &&
                 PageType != null &&
-                !PageType.Equals(landerist_library.Websites.PageType.MayBeListing) &&
-                !PageType.Equals(landerist_library.Websites.PageType.HttpStatusCodeNotOK) &&
-                !PageType.Equals(landerist_library.Websites.PageType.ResponseBodyNullOrEmpty);
+                !IsMayBeListing() &&
+                !IsHttpStatusCodeNotOK() &&
+                !IsResponseBodyNullOrEmpty();
         }
 
         public bool ResponseBodyTextIsError()
@@ -665,10 +675,16 @@ namespace landerist_library.Websites
             return ListingStatus == landerist_orels.ES.ListingStatus.unpublished;
         }
 
+        public bool ContainsListingStatus()
+        {
+            return ListingStatus is not null;
+        }
+
         public bool HaveToUnpublishListing()
         {
             return IsListingStatusPublished() &&
                 !IsMayBeListing() &&
+                !IsListing() &&
                 PageTypeCounter >= Config.MINIMUM_PAGE_TYPE_COUNTER_TO_UNPUBLISH_LISTING;
         }
 
@@ -677,9 +693,29 @@ namespace landerist_library.Websites
             return PageType == landerist_library.Websites.PageType.MayBeListing;
         }
 
+        public bool IsHttpStatusCodeNotOK()
+        {
+            return PageType == landerist_library.Websites.PageType.HttpStatusCodeNotOK;
+        }
+
+        public bool IsResponseBodyNullOrEmpty()
+        {
+            return PageType == landerist_library.Websites.PageType.ResponseBodyNullOrEmpty;
+        }
+
         public bool IsListing()
         {
             return PageType == landerist_library.Websites.PageType.Listing;
+        }
+
+        public bool IsNotCanonical()
+        {
+            return PageType == landerist_library.Websites.PageType.NotCanonical;
+        }
+
+        public bool IsNotCanonicalListing()
+        {
+            return IsNotCanonical() && ContainsListingStatus();
         }
     }
 }

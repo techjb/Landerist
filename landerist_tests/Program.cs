@@ -190,7 +190,7 @@ namespace landerist_tests
             //new Scraper().ScrapeResponseBodyRepeatedInListings();            
             //new Scraper().Start();
             //new Scraper().Scrape(page, false);
-            //new Scraper().Scrape("https://sunnierhomes.com/propiedad/24220/bungalow/nueva-construccion/espana/costa-blanca-sur/pilar-de-la-horadada/higuericas/", true);
+            //new Scraper().Scrape("https://www.locabarcelona.com/es/property/en-alquiler-piso-de-2-habitaciones-dobles/",false);
 
             //new Scraper().DoTest();
             //landerist_library.Scrape.PageSelector.Select();
