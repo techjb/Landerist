@@ -39,101 +39,101 @@ namespace landerist_library.Statistics
 
         public static void TakeSnapshots()
         {
-            SnapshotWebsites();
-            SnapshotUpdatedRobotsTxt();
-            SnapshotUpdatedSitemaps();
-            SnapshotUpdatedIpAddress();
-            SnapshotPages();
-            SnapshotUpdatedPages();
-            SnapshotNeedUpdate();
-            SnapshotUnknownPageType();
-            SnapshotListings();
-            SnapshotPublishedListings();
-            SnapshotUnPublishedListings();
-            SnapshotMedia();
-            SnapshotHttpStatusCode();
-            SnapshotPageType();
+            Websites();
+            UpdatedRobotsTxt();
+            UpdatedSitemaps();
+            UpdatedIpAddress();
+            Pages();
+            UpdatedPages();
+            NeedUpdate();
+            UnknownPageType();
+            Listings();
+            PublishedListings();
+            UnPublishedListings();
+            Media();
+            HttpStatusCode();
+            PageType();
         }
 
-        private static void SnapshotWebsites()
+        private static void Websites()
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + Websites.Websites.WEBSITES;
+                "FROM " + landerist_library.Websites.Websites.WEBSITES;
 
             InsertDaily(StatisticsKey.Websites, query);
         }
 
-        private static void SnapshotUpdatedRobotsTxt()
+        private static void UpdatedRobotsTxt()
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + Websites.Websites.WEBSITES + " " +
+                "FROM " + landerist_library.Websites.Websites.WEBSITES + " " +
                 "WHERE CONVERT(date, [RobotsTxtUpdated]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
 
             InsertDaily(StatisticsKey.UpdatedRobotsTxt, query);
         }
 
-        private static void SnapshotUpdatedSitemaps()
+        private static void UpdatedSitemaps()
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + Websites.Websites.WEBSITES + " " +
+                "FROM " + landerist_library.Websites.Websites.WEBSITES + " " +
                 "WHERE CONVERT(date, [SitemapUpdated]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
 
             InsertDaily(StatisticsKey.UpdatedSitemaps, query);
         }
 
-        private static void SnapshotUpdatedIpAddress()
+        private static void UpdatedIpAddress()
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + Websites.Websites.WEBSITES + " " +
+                "FROM " + landerist_library.Websites.Websites.WEBSITES + " " +
                 "WHERE CONVERT(date, [IpAddressUpdated]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
 
             InsertDaily(StatisticsKey.UpdatedIpAddress, query);
         }
 
-        private static void SnapshotPages()
+        private static void Pages()
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + Websites.Pages.PAGES;
+                "FROM " + landerist_library.Websites.Pages.PAGES;
 
             InsertDaily(StatisticsKey.Pages, query);
         }
 
-        private static void SnapshotUpdatedPages()
+        private static void UpdatedPages()
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + Websites.Pages.PAGES + " " +
+                "FROM " + landerist_library.Websites.Pages.PAGES + " " +
                 "WHERE CONVERT(date, [Updated]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
 
             InsertDaily(StatisticsKey.UpdatedPages, query);
         }
 
-        private static void SnapshotNeedUpdate()
+        private static void NeedUpdate()
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + Websites.Pages.PAGES + " " +
+                "FROM " + landerist_library.Websites.Pages.PAGES + " " +
                 "WHERE [NextUpdate] < GETDATE()";
 
             InsertDaily(StatisticsKey.NeedUpdate, query);
         }
 
-        private static void SnapshotUnknownPageType()
+        private static void UnknownPageType()
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + Websites.Pages.PAGES + " " +
+                "FROM " + landerist_library.Websites.Pages.PAGES + " " +
                 "WHERE [PageType] IS NULL";
 
             InsertDaily(StatisticsKey.UnknownPageType, query);
         }
 
-        private static void SnapshotListings()
+        private static void Listings()
         {
             string query =
                 "SELECT COUNT(*) " +
@@ -142,12 +142,12 @@ namespace landerist_library.Statistics
             InsertDaily(StatisticsKey.Listings, query);
         }
 
-        private static void SnapshotPublishedListings()
+        private static void PublishedListings()
         {
             SnapshotListings(StatisticsKey.PublishedListings, ListingStatus.published);
         }
 
-        private static void SnapshotUnPublishedListings()
+        private static void UnPublishedListings()
         {
             SnapshotListings(StatisticsKey.UnpublishedListings, ListingStatus.unpublished);
         }
@@ -162,7 +162,7 @@ namespace landerist_library.Statistics
             InsertDaily(statisticsKey, query);
         }
 
-        private static void SnapshotMedia()
+        private static void Media()
         {
             string query =
                 "SELECT COUNT(*) " +
@@ -179,7 +179,7 @@ namespace landerist_library.Statistics
             }
         }
 
-        public static void SnapshotHttpStatusCode()
+        public static void HttpStatusCode()
         {
             SnapshotHttpStatusCode(-1);
         }
@@ -190,7 +190,7 @@ namespace landerist_library.Statistics
 
             string query =
                 "SELECT [HttpStatusCode], COUNT(*) AS [Counter] " +
-                "FROM " + Websites.Pages.PAGES + " " +
+                "FROM " + landerist_library.Websites.Pages.PAGES + " " +
                 "WHERE CAST([Updated] AS date) = CAST(@Date AS date) " +
                 "GROUP BY [HttpStatusCode] ";
 
@@ -229,7 +229,7 @@ namespace landerist_library.Statistics
             return new DataBase().QueryListString(query);
         }
 
-        public static void SnapshotPageType()
+        public static void PageType()
         {
             SnapshotPageType(-1);
         }
@@ -248,7 +248,7 @@ namespace landerist_library.Statistics
 
             string query =
                 "SELECT [PageType], COUNT(*) AS [Counter] " +
-                "FROM " + Websites.Pages.PAGES + " " +
+                "FROM " + landerist_library.Websites.Pages.PAGES + " " +
                 "WHERE CAST([Updated] AS date) = CAST(@Date AS date) " +
                 "AND [PageType] IS NOT NULL " +
                 "GROUP BY [PageType] ";
@@ -354,10 +354,10 @@ namespace landerist_library.Statistics
             });
         }
 
-        public static DataTable GetTop100Statistics(string statisticsKey)
+        public static DataTable GetLatestStatistics(string statisticsKey, int top)
         {
             string query =
-                "SELECT TOP 100 [Date], [Counter] " +
+                "SELECT TOP "+ top + " [Date], [Counter] " +
                 "FROM " + TABLES_STATISTICS_SNAPSHOT + " " +
                 "WHERE [Key] = @Key " +
                 "ORDER BY [Date] DESC";

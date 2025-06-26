@@ -3,6 +3,7 @@ using landerist_library.Export;
 using landerist_library.Logs;
 using landerist_library.Statistics;
 using landerist_library.Websites;
+using landerist_orels.ES;
 using System.Data;
 
 namespace landerist_library.Landerist_com
@@ -16,56 +17,102 @@ namespace landerist_library.Landerist_com
         private static readonly string StatisticsHtmlFile =
             Config.LANDERIST_COM_OUTPUT + "statistics.html";
 
-        private static string StatisticsTemplate = string.Empty;
+
+        private static readonly List<string> Charts = [];
 
         public static void Update()
         {
             try
             {
-                StatisticsTemplate = File.ReadAllText(StatisticsTemplateHtmlFile);
-                UpdateTemplate(StatisticsKey.Listings, false);
-                UpdateTemplate(StatisticsKey.PublishedListings, false);
-                UpdateTemplate(StatisticsKey.UnpublishedListings, false);
-                UpdateTemplate(StatisticsKey.Websites, false);
-                UpdateTemplate(StatisticsKey.Pages, false);
-                UpdateTemplate(StatisticsKey.UpdatedPages, true);
-                UpdateTemplate(StatisticsKey.NeedUpdate, true);
-                UpdateTemplate(StatisticsKey.UnknownPageType, true);                                
-                UpdateTemplate(StatisticsKey.HttpStatusCode_NULL, true);
-                UpdateTemplate(StatisticsKey.HttpStatusCode_200, true);
-                UpdateHttpStatusCode();
-                UpdatePageType();
-                UpdateScraped();
-                UpdateBathcReaded();
-                UpdateListingInsertUpdate();
-                UpdatePublishedPageType();
-                UpdateUnPublishedPageType();
+                Charts.Clear();
 
-                if (UploadStatisticsFile())
+                Listings();
+                Websites();
+                Pages();
+                UpdatedPages();
+                NeedUpdate();
+                UnknownPageType();
+                UpdatedHttpStatusCodeNull();
+                UpdatedHttpStatusCode200();
+                UpdatedHttpStatusCodeErrors();
+                UpdatedPageType();
+                ScrapedPages();
+                BathcReaded();
+                ListingInsertUpdate();
+                PageType();
+                //PublishedPageType();
+                //UnPublishedPageType();
+                ListingsPageType();
+
+                if (UpdateStatisctisPage())
                 {
                     Log.WriteInfo("StatisticsPage", "Updated statistics page");
                 }
             }
             catch (Exception exception)
             {
-                Log.WriteError("StatisticsPage Update", exception);
+                Log.WriteError("StatisticsPage AreaChart", exception);
             }
         }
 
-        private static void UpdateHttpStatusCode()
+        private static void Listings()
+        {
+            List<StatisticsKey> statisticsKeys =
+            [
+                StatisticsKey.PublishedListings,
+                StatisticsKey.UnpublishedListings,
+            ];
+            AreaChart("Listings", statisticsKeys, false);
+        }
+
+        private static void Websites()
+        {
+            AreaChart("Websites", StatisticsKey.Websites, false);
+        }
+
+        private static void Pages()
+        {
+            AreaChart("Pages", StatisticsKey.Pages, false);
+        }
+
+        private static void UpdatedPages()
+        {
+            LineChart("Updated Pages", StatisticsKey.UpdatedPages, false);
+        }
+
+        private static void NeedUpdate()
+        {
+            AreaChart("Need Update", StatisticsKey.NeedUpdate, true);
+        }
+
+        private static void UnknownPageType()
+        {
+            AreaChart("Unknown PageType", StatisticsKey.UnknownPageType, true);
+        }
+
+        private static void UpdatedHttpStatusCodeNull()
+        {
+            LineChart("Updated HttpStatusCode null", StatisticsKey.HttpStatusCode_NULL, true);
+        }
+
+        private static void UpdatedHttpStatusCode200()
+        {
+            LineChart("Updated HttpStatusCode 200", StatisticsKey.HttpStatusCode_200, true);
+        }
+        private static void UpdatedHttpStatusCodeErrors()
         {
             var keys = StatisticsSnapshot.GetHttpStatusCodeKeys();
             keys.RemoveAll(code => code == StatisticsKey.HttpStatusCode_NULL.ToString() || code == StatisticsKey.HttpStatusCode_200.ToString());
-            Update(keys, StatisticsKey.HttpStatusCode);
+            BarChart("Updated HttpStatusCode errors", keys, false);
         }
 
-        private static void UpdatePageType()
+        private static void UpdatedPageType()
         {
             var keys = StatisticsSnapshot.GetPageTypeKeys();
-            Update(keys, StatisticsKey.PageType);
+            BarChart("Updated UpdatedPageType", keys, false);
         }
 
-        private static void UpdateScraped()
+        private static void ScrapedPages()
         {
             List<StatisticsKey> statisticsKeys =
             [
@@ -73,93 +120,163 @@ namespace landerist_library.Landerist_com
                 StatisticsKey.ScrapedHttpStatusCodeNotOK,
                 StatisticsKey.ScrapedCrashed,
             ];
-            Update(statisticsKeys, "ScrapedPages");
+            BarChart("Scraped Pages", statisticsKeys, false);
         }
 
-        private static void UpdateBathcReaded()
+        private static void BathcReaded()
         {
             List<StatisticsKey> statisticsKeys =
             [
                 StatisticsKey.BatchReaded,
-                StatisticsKey.BatchReadedErrors,                
+                StatisticsKey.BatchReadedErrors,
             ];
-            Update(statisticsKeys, "BatchReaded");
+            BarChart("Batch Readed", statisticsKeys, false);
         }
 
-        private static void UpdateListingInsertUpdate()
+        private static void ListingInsertUpdate()
         {
             List<StatisticsKey> statisticsKeys =
             [
                 StatisticsKey.ListingInsert,
                 StatisticsKey.ListingUpdate,
             ];
-            Update(statisticsKeys, "ListingInsertUpdate");
+            BarChart("Listing Insert/Update", statisticsKeys, false);
         }
 
-        private static void UpdatePublishedPageType()
+        private static void PageType()
         {
-            UpdatePageType(landerist_orels.ES.ListingStatus.published);
+            var dictionary = landerist_library.Websites.Pages.GetByPageType(ListingStatus.published);
+            PieChart("PageType", dictionary);
         }
 
-        private static void UpdateUnPublishedPageType()
+        private static void ListingsPageType()
         {
-            UpdatePageType(landerist_orels.ES.ListingStatus.unpublished);
+            var dictionaryPublished = landerist_library.Websites.Pages.GetByPageType(ListingStatus.published);
+            var dictionaryUnPublished = landerist_library.Websites.Pages.GetByPageType(ListingStatus.unpublished);
+            List<Dictionary<string, object?>> dictionaries = [dictionaryPublished, dictionaryUnPublished];
+            //PieChart("Listings PageType", dictionary);
         }
 
-        private static void UpdatePageType(landerist_orels.ES.ListingStatus listingStatus)
+
+        private static void PublishedPageType()
         {
-            var dictionary = Pages.GetByPageType(listingStatus);
-            string statisticsKey = listingStatus.ToString() + "PageType";
-            Update(dictionary, statisticsKey);
+            var dictionary = landerist_library.Websites.Pages.GetByPageType(ListingStatus.published);
+            PieChart("Published PageType", dictionary);
         }
 
-        private static void Update(List<StatisticsKey> keys, string statisticsKey)
+        private static void UnPublishedPageType()
+        {
+            var dictionary = landerist_library.Websites.Pages.GetByPageType(ListingStatus.unpublished);
+            PieChart("Unpublished PageType", dictionary);
+        }
+
+
+        private static void AreaChart(string title, StatisticsKey statisticKey, bool yesterday)
+        {
+            var keys = new List<StatisticsKey> { statisticKey };
+            AreaChart(title, keys, yesterday);
+        }
+
+        private static void AreaChart(string title, List<StatisticsKey> keys, bool yesterday)
         {
             List<string> list = [.. keys.Select(key => key.ToString())];
-            Update(list, statisticsKey);
+            AreaChart(title, list, yesterday);
         }
 
-        private static void Update(List<string> keys, StatisticsKey statisticsKey)
+        private static void AreaChart(string title, List<string> keys, bool yesterday)
         {
-            Update(keys, statisticsKey.ToString());
+            var dataString = GetDataString(keys, yesterday, false);
+            AreaChart(title, dataString);
         }
 
-        private static void Update(List<string> keys, string statisticsKey)
+        private static void PieChart(string title, Dictionary<string, object?> dictionary)
+        {
+            string dataString = GetDataString(dictionary);
+            PieChart(title, dataString);
+        }
+
+        private static void LineChart(string title, StatisticsKey statisticsKey, bool yesterday)
+        {
+            List<string> keys = [statisticsKey.ToString()];
+            LineChart(title, keys, yesterday);
+        }
+
+        private static void LineChart(string title, List<StatisticsKey> keys, bool yesterday)
+        {
+            List<string> list = [.. keys.Select(key => key.ToString())];
+            LineChart(title, list, yesterday);
+        }
+
+        private static void LineChart(string title, List<string> keys, bool yesterday)
+        {
+            var data = GetDataString(keys, yesterday, false);
+            LineChart(title, data);
+        }
+
+        private static void BarChart(string title, List<StatisticsKey> keys, bool yesterday)
+        {
+            List<string> list = [.. keys.Select(key => key.ToString())];
+            BarChart(title, list, yesterday);
+        }
+        private static void BarChart(string title, List<string> keys, bool yesterday)
+        {
+            var data = GetDataString(keys, yesterday, true);
+            BarChart(title, data);
+        }
+
+        private static string GetDataString(List<string> keys, bool yesterday, bool last10)
         {
             List<string> data = [];
             foreach (var key in keys)
             {
-                var values = GetValues(key, false);
-                var json = "{\"label\": \"" + key + "\", \"values\":[" + string.Join(",", [.. values]) + "]}";
+                var values = GetDatesValues(key, yesterday, last10);
+                var json = "{\"key\": \"" + key + "\", \"values\":[" + string.Join(",", [.. values]) + "]}";
                 data.Add(json);
             }
-            string dataString = string.Join(",", [.. data]);
-            StatisticsTemplate = StatisticsTemplate.Replace("/*"+ statisticsKey.ToString() +"*/", dataString);
+            return string.Join(",", [.. data]);
         }
 
-        private static void Update(Dictionary<string, object?> dictionary, string statisticsKey)
+        private static string GetDataString(Dictionary<string, object?> dictionary)
         {
             List<string> data = [];
             foreach (var keyValuePair in dictionary)
             {
-                var json = "{\"label\": \"" + keyValuePair.Key + "\", \"value\":" + keyValuePair.Value + "}";
+                var json = "{\"key\": \"" + keyValuePair.Key + "\", \"value\":" + keyValuePair.Value + "}";
                 data.Add(json);
             }
-            string dataString = string.Join(",", [.. data]);
-            StatisticsTemplate = StatisticsTemplate.Replace("/*" + statisticsKey.ToString() + "*/", dataString);
+            return string.Join(",", [.. data]);            
         }
 
-        private static void UpdateTemplate(StatisticsKey statisticsKey, bool yesterday)
+        private static void AreaChart(string title, string data)
         {
-            var values = GetValues(statisticsKey.ToString(), yesterday);
-            string templateKey = "/*" + statisticsKey.ToString() + "*/";
-            string data = string.Join(",", [.. values]);
-            StatisticsTemplate = StatisticsTemplate.Replace(templateKey, data);
+            AddChart("AreaChart", title, data);
         }
 
-        private static List<string> GetValues( string statisticKey, bool yesterday)
+        private static void LineChart(string title, string data)
         {
-            var dataTable = StatisticsSnapshot.GetTop100Statistics(statisticKey);
+            AddChart("LineChart", title, data);
+        }
+
+        private static void BarChart(string title, string data)
+        {
+            AddChart("BarChart", title, data);
+        }
+
+        private static void PieChart(string title, string data)
+        {
+            AddChart("PieChart", title, data);
+        }
+
+        private static void AddChart(string charType, string title, string data)
+        {
+            string chart = charType + "('" + title + "', [" + data + "])";
+            Charts.Add(chart);
+        }
+
+        private static List<string> GetDatesValues(string statisticKey, bool yesterday, bool last10)
+        {
+            int top = last10 ? 10 : 100;
+            var dataTable = StatisticsSnapshot.GetLatestStatistics(statisticKey, top);
             List<string> values = [];
             foreach (DataRow dataRow in dataTable.Rows.Cast<DataRow>().Reverse())
             {
@@ -169,15 +286,19 @@ namespace landerist_library.Landerist_com
                 {
                     date = date.AddDays(-1);
                 }
-                var json = "{\"date\": \"" + date.ToShortDateString() + "\", \"count\": " + counter + "}";
+                var json = "{\"key\": \"" + date.ToShortDateString() + "\", \"value\": " + counter + "}";
                 values.Add(json);
             }
             return values;
         }
 
-        private static bool UploadStatisticsFile()
+        private static bool UpdateStatisctisPage()
         {
-            File.WriteAllText(StatisticsHtmlFile, StatisticsTemplate);
+            var statisticsTemplate = File.ReadAllText(StatisticsTemplateHtmlFile);
+            var charts = string.Join("; " + Environment.NewLine, [.. Charts]);
+            statisticsTemplate = statisticsTemplate.Replace("/*CHARTS*/", charts);
+
+            File.WriteAllText(StatisticsHtmlFile, statisticsTemplate);
             return new S3().UploadToWebsiteBucket(StatisticsHtmlFile, "index.html", "statistics");
         }
     }

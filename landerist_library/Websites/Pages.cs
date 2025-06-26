@@ -189,20 +189,22 @@ namespace landerist_library.Websites
             return GetPages(dataTable);
         }
 
-        public static Dictionary<string, object?> GetByPageType(ListingStatus status)
+        public static Dictionary<string, object?> GetByPageType(ListingStatus? listingStatus)
         {
+            string where = listingStatus.HasValue ? "WHERE [listingStatus] = @listingStatus)" : "";
             string query =
                 "SELECT [PageType], COUNT(*) " +
                 "FROM " + PAGES + " " +
                 "WHERE [UriHash] IN (" +
                 "   SELECT GUID " +
                 "   FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
-                "   WHERE [listingStatus]= @listingStatus) " +
+                "   " + where + " " +
                 "GROUP BY [PageType] " +
                 "ORDER BY COUNT(*) DESC";
+
             return new DataBase().QueryDictionary(query, new Dictionary<string, object?>
             {
-                { "listingStatus", status.ToString() }
+                { "listingStatus", listingStatus?.ToString() }
             });
         }
 

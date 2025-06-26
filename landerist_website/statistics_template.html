@@ -64,47 +64,70 @@
             };
         }
 
-
-        CreateLineChart("Listings", [/*Listings*/]);
-        CreateLineChart("Published listings", [/*PublishedListings*/]);
-        CreateLineChart("Unpublished listings", [/*UnpublishedListings*/]);
-        CreateLineChart("Websites", [/*Websites*/]);
-        CreateLineChart("Pages", [/*Pages*/]);
-        CreateLineChart("Updated pages", [/*UpdatedPages*/]);
-        CreateLineChart("Need update", [/*NeedUpdate*/]);
-        CreateLineChart("Total unknown PageType", [/*UnknownPageType*/]);
-        CreateLineChart("HttpStatusCode 200", [/*HttpStatusCode_200*/]);
-        CreateLineChart("HttpStatusCode NULL", [/*HttpStatusCode_NULL*/]);
-        CreateAreaChart("HttpStatusCode Errors", [/*HttpStatusCode*/]);
-        CreateAreaChart("PageType", [/*PageType*/]);
-        CreateAreaChart("Scraped pages", [/*ScrapedPages*/]);
-        CreateAreaChart("Batch readed", [/*BatchReaded*/]);
-        CreateAreaChart("Listing insert update", [/*ListingInsertUpdate*/]);
-        CreatePieChart("Published Listings PageType", [/*publishedPageType*/]);
-        CreatePieChart("Unpublished Listings PageType", [/*unpublishedPageType*/]);
-
-
-        function CreateLineChart(title, values) {
-            const data = {
-                labels: values.map(row => row.date),
-                datasets: [{
-                    data: values.map(row => row.count),
-                }]
+        function GetScales(stacked, ticks) {
+            return {
+                x: {
+                    stacked: stacked,
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        display: ticks
+                    },
+                    border: {
+                        display: ticks
+                    }
+                },
+                y: {
+                    stacked: stacked,
+                    beginAtZero: true,
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        display: ticks
+                    },
+                    border: {
+                        display: ticks
+                    }
+                }
             };
-            var options = {
-                responsive: true,
-                plugins: GetPlugins(title)
-            }
-            CreateChart('line', data, options);
         }
 
-        function CreateAreaChart(title, values) {
+        function GetOptions(title, stacked, ticks) {
+            return {
+                responsive: true,
+                plugins: GetPlugins(title),
+                scales: GetScales(stacked, ticks)
+            }
+        }
+
+        /*CHARTS*/
+
+        function LineChart(title, values) {
             const data = {
-                labels: values[0].values.map(row => row.date),
+                labels: values[0].values.map(row => row.key),
                 datasets: values.map((serie, idx) => {
                     return {
                         label: serie.label,
-                        data: serie.values.map(row => row.count),
+                        data: serie.values.map(row => row.value),
+                        borderColor: palette[idx % palette.length],
+                        backgroundColor: palette[idx % palette.length],
+                    };
+                })
+            };
+
+            var options = GetOptions(title, false, true);
+            CreateChart('line', data, options);
+        }
+
+        function AreaChart(title, values) {
+            const data = {
+                labels: values[0].values.map(row => row.key),
+                datasets: values.map((serie, idx) => {
+                    return {
+                        label: serie.label,
+                        data: serie.values.map(row => row.value),
                         fill: true,
                         borderColor: palette[idx % palette.length],
                         backgroundColor: palette[idx % palette.length],
@@ -113,45 +136,45 @@
                     };
                 })
             };
-            var options = {
-                responsive: true,
-                plugins: GetPlugins(title),
-                scales: {
-                    x: {
-                        stacked: true
-                    },
-                    y: {
-                        stacked: true,
-                        beginAtZero: true
-                    }
-                }
-            }
+
+            var options = GetOptions(title, true, true);
             CreateChart('line', data, options);
         }
 
-        function CreatePieChart(title, values) {
+        function BarChart(title, values) {
             const data = {
-                labels: values.map(row => row.label),
+                labels: values[0].values.map(row => row.key),
+                datasets: values.map((serie, idx) => {
+                    return {
+                        label: serie.label,
+                        data: serie.values.map(row => row.value),
+                        fill: true,
+                        borderColor: palette[idx % palette.length],
+                        backgroundColor: palette[idx % palette.length],
+                        tension: 0.1,
+                        stack: 'stack1'
+                    };
+                })
+            };
+            var options = GetOptions(title, true, true);
+            CreateChart('bar', data, options);
+        }
+
+        function PieChart(title, values) {
+            const data = {
+                labels: values.map(row => row.key),
                 datasets: [{
                     label: '',
-                    data: values.map(row => row.value),                    
+                    data: values.map(row => row.value),
                     borderColor: palette,
                     backgroundColor: palette,
                 }]
             }
 
-            var options = {
-                responsive: true,
-                plugins: GetPlugins(title),
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
+            var options = GetOptions(title, false, false);
             CreateChart('pie', data, options);
         }
-      
+
         function CreateChart(type, data, options) {
             const config = {
                 type: type,

@@ -93,7 +93,7 @@ namespace landerist_library.Scrape
             SetPageType(newPageType, newListing);
             var setNextUpdate = !waitingAIRequest;
             return Page.Update(setNextUpdate);
-        }      
+        }
 
         public void SetPageType(PageType? newPageType, Listing? newListing)
         {
@@ -102,60 +102,33 @@ namespace landerist_library.Scrape
 
             if (Page.IsListing())
             {
-                HandleListingPublished();
+                HandleLPublishedListing();
             }
             else if (Page.HaveToUnpublishListing())
             {
-                HandleListingUnpublished();
+                HandleUnpublishedListing();
             }
         }
 
-        private void HandleListingPublished()
+        private void HandleLPublishedListing()
         {
-            Page.SetListingStatusPublished();
             NewListing ??= Page.GetListing(true, true);
-
             if (NewListing == null) return;
 
             NewListing.SetPublished();
-            SetLocation();
-            SetLauId();
-            UpdateListing();
+            Page.SetListingStatusPublished();
+            new LatLngParser(Page, NewListing).SetLatLng();
+            new LauIdParser(Page, NewListing).SetLauId();
+            ES_Listings.InsertUpdate(Page.Website, NewListing);
         }
 
-        private void HandleListingUnpublished()
+        private void HandleUnpublishedListing()
         {
-            Page.SetListingStatusUnpublished();
             NewListing ??= Page.GetListing(true, true);
-
             if (NewListing == null) return;
 
             NewListing.SetUnpublished();
-            UpdateListing();
-        }
-
-        private void SetLocation()
-        {
-            if (NewListing != null)
-            {
-                new LatLngParser(Page, NewListing).SetLatLng();
-            }
-        }
-
-        private void SetLauId()
-        {
-            if (NewListing != null)
-            {
-                new LauIdParser(Page, NewListing).SetLauId();
-            }
-        }
-
-        private void UpdateListing()
-        {
-            if (NewListing == null)
-            {
-                return;
-            }
+            Page.SetListingStatusUnpublished();
             ES_Listings.InsertUpdate(Page.Website, NewListing);
         }
 

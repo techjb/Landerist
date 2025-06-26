@@ -308,7 +308,7 @@ namespace landerist_tests
             #region landerist.com
 
             //landerist_library.Statistics.StatisticsSnapshot.TakeSnapshots();
-            //landerist_library.Statistics.StatisticsSnapshot.SnapshotHttpStatusCode();
+            //landerist_library.Statistics.StatisticsSnapshot.HttpStatusCode();
             //landerist_library.Statistics.StatisticsSnapshot.SnapshotHttpStatusCode7Days();
             //landerist_library.Statistics.StatisticsSnapshot.SnapshotPageType7Days();
 
