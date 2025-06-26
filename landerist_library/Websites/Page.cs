@@ -163,10 +163,10 @@ namespace landerist_library.Websites
             {
                 Website.IncreaseNumPages();
             }
-            else
-            {
-                Logs.Log.WriteError("Page Insert", "Failed to insert page: " + Uri);
-            }
+            //else
+            //{
+            //    Logs.Log.WriteError("Page Insert", "Failed to insert page: " + Uri);
+            //}
             return sucess;
         }
 
