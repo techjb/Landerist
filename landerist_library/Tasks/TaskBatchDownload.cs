@@ -130,8 +130,8 @@ namespace landerist_library.Tasks
                 }
             });
 
-            int percentage = (errors * 100) / total;
-            Log.WriteInfo("batch", $"ReadSucessFileLines {readed}/{total} errors: {errors} ({percentage}%)");
+            //int percentage = (errors * 100) / total;
+            Log.WriteInfo("batch", $"Downloaded {readed} errors: {errors}");
 
             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.BatchReaded, readed);
             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.BatchReadedErrors, errors);

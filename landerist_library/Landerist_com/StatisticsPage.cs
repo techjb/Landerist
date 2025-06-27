@@ -30,6 +30,7 @@ namespace landerist_library.Landerist_com
                 Pages();
                 UpdatedPages();
                 NeedUpdate();
+                NextUpdateDistribution();
                 UnknownPageType();
                 UpdatedHttpStatusCodeNull();
                 UpdatedHttpStatusCode200();
@@ -83,6 +84,12 @@ namespace landerist_library.Landerist_com
         private static void NeedUpdate()
         {
             AreaChart("Need Update", StatisticsKey.NeedUpdate, true);
+        }
+
+        private static void NextUpdateDistribution()
+        {
+            var dictionary = landerist_library.Websites.Pages.GroupByNextUpdate();
+            BarChart("Next Update Distribution", "nextupdate", dictionary);
         }
 
         private static void UnknownPageType()
@@ -145,14 +152,14 @@ namespace landerist_library.Landerist_com
 
         private static void PageType()
         {
-            var dictionary = landerist_library.Websites.Pages.CountByPageType();
+            var dictionary = landerist_library.Websites.Pages.GroupByPageType();
             PieChart("PageType", dictionary);
         }
 
         private static void ListingsPageType()
         {
-            var dictionaryPublished = landerist_library.Websites.Pages.CountByPageType(ListingStatus.published);
-            var dictionaryUnPublished = landerist_library.Websites.Pages.CountByPageType(ListingStatus.unpublished);
+            var dictionaryPublished = landerist_library.Websites.Pages.GroupByPageType(ListingStatus.published);
+            var dictionaryUnPublished = landerist_library.Websites.Pages.GroupByPageType(ListingStatus.unpublished);
 
             var published = GetLabelValues("published", dictionaryPublished);
             var unpublished = GetLabelValues("unpublished", dictionaryUnPublished);
@@ -166,13 +173,13 @@ namespace landerist_library.Landerist_com
 
         private static void PublishedPageType()
         {
-            var dictionary = landerist_library.Websites.Pages.CountByPageType(ListingStatus.published);
+            var dictionary = landerist_library.Websites.Pages.GroupByPageType(ListingStatus.published);
             BarChart("Published Listings PageType", "published", dictionary);
         }
 
         private static void UnPublishedPageType()
         {
-            var dictionary = landerist_library.Websites.Pages.CountByPageType(ListingStatus.unpublished);
+            var dictionary = landerist_library.Websites.Pages.GroupByPageType(ListingStatus.unpublished);
             BarChart("Unpublished Listings PageType", "unpublished", dictionary);
         }
 
@@ -241,6 +248,12 @@ namespace landerist_library.Landerist_com
             string dataString = GetLabelValues(key, dictionary);
             BarChart(title, dataString);
         }
+
+        //private static void BarChart(string title, List<StatisticsKey> keys, bool yesterday)
+        //{
+        //    List<string> list = [.. keys.Select(key => key.ToString())];
+        //    BarChart(title, list, yesterday);
+        //}
 
         private static void AreaChart(string title, string data)
         {

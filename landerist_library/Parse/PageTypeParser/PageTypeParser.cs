@@ -38,14 +38,6 @@ namespace landerist_library.Parse.PageTypeParser
 
             Page.SetResponseBodyText();
 
-            if (Page.ResponseBodyTextHasNotChanged())
-            {
-                return (Page.PageType, null, false);
-            }
-            if (Page.ResponseBodyTextIsError())
-            {
-                return (PageType.ResponseBodyIsError, null, false);
-            }
             if (Page.ResponseBodyTextIsTooShort())
             {
                 return (PageType.ResponseBodyTooShort, null, false);
@@ -54,7 +46,15 @@ namespace landerist_library.Parse.PageTypeParser
             {
                 return (PageType.ResponseBodyTooLarge, null, false);
             }
-            if (Page.ReponseBodyTextRepeatedInHost())
+            if (Page.ResponseBodyTextIsError())
+            {
+                return (PageType.ResponseBodyIsError, null, false);
+            }
+            if (Page.ResponseBodyTextAlreadyParsed())
+            {
+                return (Page.PageType, null, false);
+            }
+            if (Page.ReponseBodyTextIsAnotherListingInHost())
             {
                 return (PageType.ResponseBodyRepeatedInHost, null, false);
             }            

@@ -1,11 +1,8 @@
-﻿using Amazon.Runtime.Internal.Transform;
-using Google.Cloud.AIPlatform.V1;
-using landerist_library.Configuration;
+﻿using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Index;
 using landerist_library.Tools;
 using landerist_orels.ES;
-using System.ComponentModel;
 using System.Data;
 
 namespace landerist_library.Websites
@@ -189,7 +186,7 @@ namespace landerist_library.Websites
             return GetPages(dataTable);
         }
 
-        public static Dictionary<string, object?> CountByPageType(ListingStatus? listingStatus = null)
+        public static Dictionary<string, object?> GroupByPageType(ListingStatus? listingStatus = null)
         {
             string where = listingStatus != null
                 ? "WHERE [listingStatus] = @listingStatus "
@@ -205,6 +202,17 @@ namespace landerist_library.Websites
             {
                 { "listingStatus", listingStatus.ToString() }
             });
+        }
+
+        public static Dictionary<string, object?> GroupByNextUpdate()
+        {
+            string query =
+                "SELECT  CONVERT(VARCHAR, [NextUpdate], 23) AS [DateWhithoutTime], COUNT(*) AS [Total] " +
+                "FROM " + PAGES + " " +
+                "GROUP BY CONVERT(VARCHAR, [NextUpdate], 23) " +
+                "ORDER BY [DateWhithoutTime] ASC";
+
+            return new DataBase().QueryDictionary(query);
         }
 
         public static Dictionary<string, object?> CountByHttpStatusCode()

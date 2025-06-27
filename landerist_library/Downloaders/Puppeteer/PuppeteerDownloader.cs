@@ -178,7 +178,7 @@ namespace landerist_library.Downloaders.Puppeteer
         private static readonly NavigationOptions NavigationOptions = new()
         {
             //WaitUntil = [WaitUntilNavigation.Networkidle2],
-            WaitUntil = [WaitUntilNavigation.Networkidle0],
+            WaitUntil = [WaitUntilNavigation.Networkidle2],
             Timeout = GetTimeout()
         };
 

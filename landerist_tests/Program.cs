@@ -1,19 +1,7 @@
 ﻿using landerist_library.Configuration;
-using landerist_library.Database;
-using landerist_library.Downloaders.Puppeteer;
-using landerist_library.Landerist_com;
 using landerist_library.Logs;
-using landerist_library.Parse.ListingParser.OpenAI.Batch;
-using landerist_library.Parse.ListingParser.StructuredOutputs;
-using landerist_library.Parse.ListingParser.VertexAI;
-using landerist_library.Parse.ListingParser.VertexAI.Batch;
-using landerist_library.Scrape;
-using landerist_library.Statistics;
 using landerist_library.Tasks;
-using landerist_library.Websites;
-using landerist_orels.ES;
 using System.Runtime.InteropServices;
-using static System.Net.Mime.MediaTypeNames;
 
 
 
@@ -190,12 +178,12 @@ namespace landerist_tests
             //new Scraper().ScrapeResponseBodyRepeatedInListings();            
             //new Scraper().Start();
             //new Scraper().Scrape(page, false);
-            //new Scraper().Scrape("https://www.locabarcelona.com/es/property/en-alquiler-piso-de-2-habitaciones-dobles/",false);
-
+            new landerist_library.Scrape.Scraper().Scrape("https://www.inmobiliariaiberia.com/inmueble.php?ID=72668726683058&amp;idio=12", false);
             //new Scraper().DoTest();
             //landerist_library.Scrape.PageSelector.Select();
             //Console.WriteLine("Block: " + WebsitesBlocker.Block(page.Website));
-            //Console.WriteLine("IsBlocked: " + WebsitesBlocker.IsBlocked(page.Website));
+            //Console.WriteLine("IsBlocked: " + WebsitesBlocker.IsBlocked(page.Website));        
+
 
 
             #endregion

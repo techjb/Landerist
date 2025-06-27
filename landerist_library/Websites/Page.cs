@@ -46,7 +46,7 @@ namespace landerist_library.Websites
 
         public byte[]? ResponseBodyZipped { get; private set; }
 
-        public bool ResponseBodyTextHasChanged { get; set; } = false;
+        public bool ResponseBodyTextNotChanged { get; set; } = false;
 
         public byte[]? Screenshot { get; set; }
 
@@ -352,31 +352,19 @@ namespace landerist_library.Websites
                 return;
             }
             ResponseBodyText = HtmlToText.GetText(htmlDocument);
-            if (ResponseBodyText is null)
+            if (string.IsNullOrEmpty(ResponseBodyText))
             {
                 return;
             }
             string hash = Strings.GetHash(ResponseBodyText);
-            ResponseBodyTextHasChanged = ResponseBodyTextHash == null || !hash.Equals(ResponseBodyTextHash);
+            ResponseBodyTextNotChanged = hash == ResponseBodyTextHash;
             ResponseBodyTextHash = hash;
         }
 
-        public void SetResponseBodyTextHashToNull()
-        {
-            ResponseBodyTextHash = null;
-            ResponseBodyTextHasChanged = false;
-        }
 
-
-        public bool ResponseBodyTextHasNotChanged()
+        public bool ResponseBodyTextAlreadyParsed()
         {
-            return
-                //Config.IsConfigurationProduction() &&
-                !ResponseBodyTextHasChanged &&
-                PageType != null &&
-                !IsMayBeListing() &&
-                !IsHttpStatusCodeNotOK() &&
-                !IsResponseBodyNullOrEmpty();
+            return ResponseBodyTextNotChanged && (IsListing() || IsNotListing());
         }
 
         public bool ResponseBodyTextIsError()
@@ -414,7 +402,7 @@ namespace landerist_library.Websites
             return ResponseBodyText.Length < Config.MIN_RESPONSEBODYTEXT_LENGTH;
         }
 
-        public bool ReponseBodyTextRepeatedInHost()
+        public bool ReponseBodyTextIsAnotherListingInHost()
         {
             if (string.IsNullOrEmpty(ResponseBodyText))
             {
@@ -706,6 +694,11 @@ namespace landerist_library.Websites
         public bool IsListing()
         {
             return PageType == landerist_library.Websites.PageType.Listing;
+        }
+
+        public bool IsNotListing()
+        {
+            return PageType == landerist_library.Websites.PageType.NotListingByParser;
         }
 
         public bool IsNotCanonical()
