@@ -178,7 +178,7 @@ namespace landerist_tests
             //new Scraper().ScrapeResponseBodyRepeatedInListings();            
             //new Scraper().Start();
             //new Scraper().Scrape(page, false);
-            new landerist_library.Scrape.Scraper().Scrape("https://www.inmobiliariaiberia.com/inmueble.php?ID=72668726683058&amp;idio=12", false);
+            //new landerist_library.Scrape.Scraper().Scrape("https://www.inmobiliariaiberia.com/inmueble.php?ID=72668726683058&amp;idio=12", false);
             //new Scraper().DoTest();
             //landerist_library.Scrape.PageSelector.Select();
             //Console.WriteLine("Block: " + WebsitesBlocker.Block(page.Website));
@@ -336,7 +336,7 @@ namespace landerist_tests
             //ServiceTasks.Start();
             //BatchTasks.Start();            
             //TaskBatchDownload.Start();
-            //TaskBatchUpload.Start(false);
+            TaskBatchUpload.Start(false);
             //BatchPredictions.ListAllPredictionJobs();
             //BatchDownload.ReadFileTest();
             //BatchDownload.DownloadVertexAI("projects/942392546193/locations/europe-southwest1/batchPredictionJobs/391166654744100864");

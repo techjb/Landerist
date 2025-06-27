@@ -118,7 +118,11 @@ namespace landerist_library.Scrape
         private void HandleLPublishedListing()
         {
             NewListing ??= Page.GetListing(true, true);
-            if (NewListing == null) return;
+            if (NewListing == null)
+            {
+                Logs.Log.WriteError("PageScraper HandleLPublishedListing", "NewListing is null");
+                return;
+            }
 
             NewListing.SetPublished();
             new LatLngParser(Page, NewListing).SetLatLng();
@@ -130,7 +134,11 @@ namespace landerist_library.Scrape
         private void HandleUnpublishedListing()
         {
             NewListing ??= Page.GetListing(true, true);
-            if (NewListing == null) return;
+            if (NewListing == null)
+            {
+                Logs.Log.WriteError("PageScraper HandleUnpublishedListing", "NewListing is null");  
+                return;
+            }
 
             NewListing.SetUnpublished();
             ES_Listings.InsertUpdate(Page.Website, NewListing);
