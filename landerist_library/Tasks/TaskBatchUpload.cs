@@ -50,7 +50,7 @@ namespace landerist_library.Tasks
         {
             Clear();
             bool sucess = BatchUpload();
-            if (processAll && pages.Count >= MaxPagesPerBatch && sucess)
+            if (processAll && sucess && UriHashes.Count < pages.Count)
             {
                 Start(processAll);
             }
@@ -75,15 +75,14 @@ namespace landerist_library.Tasks
             {
                 return false;
             }
-
             var batchId = CreateBatch(fileId);
             if (string.IsNullOrEmpty(batchId))
             {
                 return false;
-            }            
+            }
 
             Batches.Insert(batchId, UriHashes);
-            SetWaitingStatusAIResponse();           
+            SetWaitingStatusAIResponse();
             return true;
         }
 
@@ -93,10 +92,10 @@ namespace landerist_library.Tasks
                 Config.LLM_PROVIDER.ToString().ToLower() + "_" +
                 DateTime.Now.ToString("yyyyMMddHHmmss") + "_input.json";
 
-            Console.WriteLine("TaskBatchUpload " + filePath);    
+            Console.WriteLine("TaskBatchUpload " + filePath);
             File.Delete(filePath);
 
-            UriHashes = [];            
+            UriHashes = [];
             var errors = 0;
             var skipped = 0;
 
@@ -126,7 +125,7 @@ namespace landerist_library.Tasks
                 page.Dispose();
             });
 
-            
+
             Log.WriteInfo("batch", $"CreateFile {UriHashes.Count}/{pages.Count} errors: {errors}");
             return filePath;
         }
@@ -224,6 +223,8 @@ namespace landerist_library.Tasks
             {
                 return;
             }
+
+            Log.WriteInfo("TaskBatchUpload", "SetWaitingStatusAIResponse: " + UriHashes.Count);
             Parallel.ForEach(UriHashes, Config.PARALLELOPTIONS1INLOCAL, Pages.UpdateWaitingStatusAiResponse);
         }
     }
