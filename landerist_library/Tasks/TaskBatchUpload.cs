@@ -127,7 +127,7 @@ namespace landerist_library.Tasks
             });
 
             
-            Log.WriteInfo("batch", $"CreateFile {UriHashes.Count}/{pages} errors: {errors}");
+            Log.WriteInfo("batch", $"CreateFile {UriHashes.Count}/{pages.Count} errors: {errors}");
             return filePath;
         }
 
