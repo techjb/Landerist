@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "4.41";
+        public static readonly string VERSION = "4.42";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -43,7 +43,7 @@ namespace landerist_library.Configuration
 
         public static readonly int DEFAULT_DAYS_NEXT_UPDATE = 3;
 
-        public static readonly int DEFAULT_DAYS_NEXT_UPDATE_LISTING = 1;
+        public static readonly int DEFAULT_DAYS_NEXT_UPDATE_LISTING = 2;
 
         public static readonly int MIN_DAYS_NEXT_UPDATE = 1;
 
@@ -156,7 +156,7 @@ namespace landerist_library.Configuration
 
         public readonly static string MACHINE_NAME = Environment.MachineName;
 
-        public static bool PROXY_ENABLED = true;
+        public const bool PROXY_ENABLED = true;
 
         public const int MINIMUM_PAGE_TYPE_COUNTER_TO_UNPUBLISH_LISTING = 3;
 
