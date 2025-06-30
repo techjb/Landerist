@@ -336,7 +336,7 @@ namespace landerist_tests
             //ServiceTasks.Start();
             //BatchTasks.Start();            
             //TaskBatchDownload.Start();
-            TaskBatchUpload.Start(false);
+            //TaskBatchUpload.Start(false);
             //BatchPredictions.ListAllPredictionJobs();
             //BatchDownload.ReadFileTest();
             //BatchDownload.DownloadVertexAI("projects/942392546193/locations/europe-southwest1/batchPredictionJobs/391166654744100864");

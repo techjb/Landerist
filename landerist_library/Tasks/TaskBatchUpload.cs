@@ -18,7 +18,7 @@ namespace landerist_library.Tasks
 
         private static List<Page> pages = [];
 
-        private static List<string> UriHashes = [];
+        private static HashSet<string> UriHashes = [];
 
         private static long SetMaxFileSize()
         {
@@ -82,9 +82,9 @@ namespace landerist_library.Tasks
             if (string.IsNullOrEmpty(batchId))
             {
                 return false;
-            }
+            }            
 
-            Batches.Insert(batchId);
+            Batches.Insert(batchId, UriHashes);
             SetWaitingStatusAIResponse();
             Log.WriteInfo("batch", $"Uploaded {UriHashes.Count}");
             return true;

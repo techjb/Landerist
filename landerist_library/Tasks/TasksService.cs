@@ -40,7 +40,7 @@ namespace landerist_library.Tasks
 
         public void Start()
         {
-            PuppeteerDownloader.UpdateChrome();
+            PuppeteerDownloader.UpdateChrome();            
             SetTimers();
         }
 

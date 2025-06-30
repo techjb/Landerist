@@ -8,15 +8,16 @@ namespace landerist_library.Database
     {
         private const string BATCHES = "[BATCHES]";
 
-        public static bool Insert(string id)
+        public static bool Insert(string id, HashSet<string> pagesUriHashes)
         {
             string query =
                 "INSERT INTO " + BATCHES + " " +
-                "VALUES (GETDATE(), @LLMProvider, @Id, 0)";
+                "VALUES (GETDATE(), @LLMProvider, @Id, @PagesUriHashes, 0)";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"LLMProvider", Config.LLM_PROVIDER.ToString() },
-                {"Id", id }
+                {"Id", id },
+                {"PagesUriHashes", string.Join(",", [.. pagesUriHashes]) },
             });
         }
 
@@ -80,6 +81,7 @@ namespace landerist_library.Database
                     Created = (DateTime)dataRow["Created"],
                     LLMProvider = (LLMProvider)Enum.Parse(typeof(LLMProvider), (string)dataRow["LLMProvider"]),
                     Id = (string)dataRow["Id"],
+                    PagesUriHashes = [.. ((string)dataRow["PagesUriHashes"]).Split(',', StringSplitOptions.RemoveEmptyEntries)],
                     Downloaded = (bool)dataRow["Downloaded"]
                 };
                 batches.Add(batch);
@@ -99,6 +101,11 @@ namespace landerist_library.Database
             {
                 { "LLMProvider", lLMProvider.ToString() }
             });
+        }
+
+        public static bool UpdateToDownloaded(Batch batch)
+        {
+            return Update(batch.Id, true);
         }
 
         public static bool UpdateToDownloaded(string id)

@@ -11,6 +11,8 @@ namespace landerist_library.Database
 
         public required string Id { get; set; }
 
+        public HashSet<string> PagesUriHashes { get; set; } = [];
+
         public required bool Downloaded { get; set; }
     }
 }
