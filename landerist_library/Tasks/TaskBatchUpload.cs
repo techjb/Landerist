@@ -10,8 +10,6 @@ namespace landerist_library.Tasks
 {
     public class TaskBatchUpload
     {
-        private static readonly object SyncWrite = new();
-
         private static readonly long MaxFileSizeInBytes = SetMaxFileSize();
 
         private static readonly int MaxPagesPerBatch = GetMaxPagesPerBatch();
@@ -85,8 +83,7 @@ namespace landerist_library.Tasks
             }            
 
             Batches.Insert(batchId, UriHashes);
-            SetWaitingStatusAIResponse();
-            Log.WriteInfo("batch", $"Uploaded {UriHashes.Count}");
+            SetWaitingStatusAIResponse();           
             return true;
         }
 
@@ -99,8 +96,7 @@ namespace landerist_library.Tasks
             Console.WriteLine("TaskBatchUpload " + filePath);    
             File.Delete(filePath);
 
-            UriHashes = [];
-            var sync = new object();
+            UriHashes = [];            
             var errors = 0;
             var skipped = 0;
 
@@ -116,30 +112,28 @@ namespace landerist_library.Tasks
                     Interlocked.Increment(ref skipped);
                     state.Stop();
                 }
-                else if (!WriteToFile(page, writer))
+                else if (WriteToFile(page, writer))
                 {
-                    Interlocked.Increment(ref errors);
-                }
-                else
-                {
-                    lock (sync)
+                    lock (UriHashes)
                     {
                         UriHashes.Add(page.UriHash);
                     }
                 }
+                else
+                {
+                    Interlocked.Increment(ref errors);
+                }
                 page.Dispose();
             });
 
-            if (errors > 0)
-            {
-                Log.WriteError("TaskBatchUpload CreateFile", "Error creating file. Errors: " + errors);
-            }
+            
+            Log.WriteInfo("batch", $"CreateFile {UriHashes.Count}/{pages} errors: {errors}");
             return filePath;
         }
 
         private static bool CanWriteFile(StreamWriter writer)
         {
-            lock (SyncWrite)
+            lock (writer)
             {
                 writer.Flush();
                 return writer.BaseStream.Length < MaxFileSizeInBytes;
@@ -157,7 +151,7 @@ namespace landerist_library.Tasks
                     page.Update(false);
                     return false;
                 }
-                lock (SyncWrite)
+                lock (writer)
                 {
                     writer.WriteLine(json);
                     writer.Flush();

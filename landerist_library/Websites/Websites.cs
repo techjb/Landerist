@@ -172,7 +172,6 @@ namespace landerist_library.Websites
             int counter = 0;
             int successed = 0;
             int errors = 0;
-            var sync = new object();
             Parallel.ForEach(websites,
                 new ParallelOptions()
                 {
@@ -185,17 +184,14 @@ namespace landerist_library.Websites
                     {
                         website.Update();
                     }
-                    lock (sync)
+                    Interlocked.Increment(ref counter);
+                    if (success)
                     {
-                        counter++;
-                        if (success)
-                        {
-                            successed++;
-                        }
-                        else
-                        {
-                            errors++;
-                        }
+                        Interlocked.Increment(ref successed);
+                    }
+                    else
+                    {
+                        Interlocked.Increment(ref errors);
                     }
                     double progressPercentage = Math.Round((double)counter * 100 / total, 2);
                     Console.WriteLine(counter + "/" + total + " (" + progressPercentage + "%) " +
@@ -221,7 +217,7 @@ namespace landerist_library.Websites
             int counter = 0;
             int successed = 0;
             int errors = 0;
-            var sync = new object();
+            
             Parallel.ForEach(websites,
                 new ParallelOptions()
                 {
@@ -234,17 +230,14 @@ namespace landerist_library.Websites
                 {
                     website.Update();
                 }
-                lock (sync)
+                Interlocked.Increment(ref counter);
+                if (success)
                 {
-                    counter++;
-                    if (success)
-                    {
-                        successed++;
-                    }
-                    else
-                    {
-                        errors++;
-                    }
+                    Interlocked.Increment(ref successed);
+                }
+                else
+                {
+                    Interlocked.Increment(ref errors);
                 }
                 double progressPercentage = Math.Round((double)counter * 100 / total, 2);
                 Console.WriteLine(counter + "/" + total + " (" + progressPercentage + "%) " +
@@ -264,7 +257,7 @@ namespace landerist_library.Websites
             int counter = 0;
             int errors = 0;
             int successed = 0;
-            var sync = new object();
+            
             Parallel.ForEach(websites,
                 new ParallelOptions()
                 {
@@ -277,17 +270,14 @@ namespace landerist_library.Websites
                     {
                         website.Update();
                     }
-                    lock (sync)
+                    Interlocked.Increment(ref counter);
+                    if (success)
                     {
-                        counter++;
-                        if (success)
-                        {
-                            successed++;
-                        }
-                        else
-                        {
-                            errors++;
-                        }
+                        Interlocked.Increment(ref successed);
+                    }
+                    else
+                    {
+                        Interlocked.Increment(ref errors);
                     }
                     double progressPercentage = Math.Round((double)counter * 100 / total, 2);
                     Console.WriteLine(counter + "/" + total + " (" + progressPercentage + "%) " +

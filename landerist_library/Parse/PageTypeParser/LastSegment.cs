@@ -178,7 +178,7 @@ namespace landerist_library.Parse.PageTypeParser
         {
             Dictionary<string, int> dictionary = [];
             int total = urls.Count;
-            var sync = new object();
+            
             int counter = 0;
             Parallel.ForEach(urls,
               new ParallelOptions()
@@ -214,7 +214,7 @@ namespace landerist_library.Parse.PageTypeParser
                       return;
                   }
 
-                  lock (sync)
+                  lock (dictionary)
                   {
                       if (dictionary.TryGetValue(lastSegment, out int value))
                       {

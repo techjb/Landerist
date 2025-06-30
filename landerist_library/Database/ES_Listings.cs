@@ -283,15 +283,14 @@ namespace landerist_library.Database
 
         private static SortedSet<Listing> GetAll(DataTable dataTable, bool loadMedia, bool loadSources)
         {
-            SortedSet<Listing> listings = new(new ListingComparer());
-            var sync = new object();
+            SortedSet<Listing> listings = new(new ListingComparer());            
             Parallel.ForEach(dataTable.AsEnumerable(), new ParallelOptions()
             {
                 //MaxDegreeOfParallelism = 1
             }, dataRow =>
             {
                 var listing = GetListing(dataRow, loadMedia, loadSources);
-                lock (sync)
+                lock (listings)
                 {
                     listings.Add(listing);
                 }
