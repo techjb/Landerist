@@ -251,7 +251,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             {
                 return null;
             }
-            var referenciaCatastral = Tools.Strings.Clean(Anuncio!.ReferenciaDelAnuncio);
+            var referenciaCatastral = Tools.Strings.Clean(Anuncio!.ReferenciaDelAnuncio).ToUpper();
             if (!Tools.Validate.CadastralReference(referenciaCatastral))
             {
                 return null;

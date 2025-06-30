@@ -24,8 +24,8 @@ namespace landerist_library.Tools
 
         public static bool CadastralReference(string cadastralReference)
         {
-            Regex rgx = RegexCadastralReference();
-            return rgx.IsMatch(cadastralReference);
+            Regex regex = RegexCadastralReference();
+            return regex.IsMatch(cadastralReference);
         }
 
         public static bool Phone(string phone)
@@ -48,8 +48,40 @@ namespace landerist_library.Tools
             return false;
         }
 
-        [GeneratedRegex(@"^([a-zA-Z0-9]{14}|[a-zA-Z0-9]{20})$")]
-
+        [GeneratedRegex(@"^[0-9]{7}[A-Z]{2}[0-9]{4}[A-Z]{1}([0-9]{4}[A-Z]{2})?$")]
         private static partial Regex RegexCadastralReference();
+
+
+        //public static void RemoveInvalidCatastralReferences()
+        //{
+        //    var listings = ES_Listings.GetListingWithCatastralReference();
+        //    int total = listings.Count;
+        //    int validCount = 0;
+        //    int invalidCount = 0;
+        //    foreach (var listing in listings)
+        //    {
+        //        RemoveInvalidCatastralReference(listing);
+        //    }
+        //    Console.WriteLine($"Total: {total}, Valid: {validCount}, Invalid: {invalidCount}");
+        //}
+
+        //private static void RemoveInvalidCatastralReference(Listing listing)
+        //{
+        //    if (string.IsNullOrEmpty(listing.cadastralReference))
+        //    {
+        //        return;
+        //    }
+        //    var isValid = CadastralReference(listing.cadastralReference);
+        //    if (!isValid)
+        //    {
+        //        string query =
+        //            "UPDATE " + ES_Listings.TABLE_ES_LISTINGS + " " +
+        //            "SET [CadastralReference] = NULL " +
+        //            "WHERE [Guid] = @Guid";
+        //        new DataBase().Query(query, new Dictionary<string, object?> {
+        //            { "Guid" , listing.guid }
+        //        });
+        //    }
+        //}
     }
 }

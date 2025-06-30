@@ -198,19 +198,11 @@ namespace landerist_tests
 
             #endregion
 
-            #region Parse
+            #region ListingParser
 
             //landerist_library.Parse.Listing.ListingsParser.Start();
             //landerist_library.Parse.Listing.ListingsParser.ParseListing(page);
 
-            //var tuple1 = landerist_library.Parse.Location.GoogleMaps.AddressToLatLng.Parse("Av. Domingo Bueno, 126. O Porriño, 36.400 Pontevedra", CountryCode.ES);
-            //Console.WriteLine(tuple1);
-
-            //var tuple1 = landerist_library.Parse.Location.Goolzoom.CadastralRefToLatLng.Parse("9441515XM7094A0001FT");
-            //Console.WriteLine(tuple1);
-
-            //var tuple2 = landerist_library.Parse.Location.Goolzoom.CadastralRefToLatLng.Parse("9441515XM7094A");
-            //Console.WriteLine(tuple2);
 
             //landerist_library.Index.ProhibitedUrls.FindNewProhibitedStartsWith();
             //landerist_library.Parse.PageType.LastSegment.FindProhibitedEndsSegments();
@@ -233,6 +225,23 @@ namespace landerist_tests
             //landerist_library.Parse.ListingParser.VertexAI.Batch.VertexAIBatch.Test();
             //landerist_library.Parse.ListingParser.VertexAI.Batch.VertexAIBatch.ListAllPredictionJobs();
             //VertexAIBatchCleaner.RemoveFiles();
+
+
+            #endregion
+
+            #region Parse Location
+
+            //var tuple1 = landerist_library.Parse.Location.GoogleMaps.AddressToLatLng.Parse("Av. Domingo Bueno, 126. O Porriño, 36.400 Pontevedra", CountryCode.ES);
+            //Console.WriteLine(tuple1);
+
+            //var tuple1 = landerist_library.Parse.Location.Goolzoom.CadastralRefToLatLng.Parse("9441515XM7094A0001FT");
+            //Console.WriteLine(tuple1);
+
+            //var tuple2 = landerist_library.Parse.Location.Goolzoom.CadastralRefToLatLng.Parse("9441515XM7094A");
+            //Console.WriteLine(tuple2);
+
+            //Console.WriteLine(landerist_library.Tools.Validate.CadastralReference("3979515DD7737H0002LX"));
+            //landerist_library.Tools.Validate.RemoveInvalidCatastralReferences();
 
 
             #endregion

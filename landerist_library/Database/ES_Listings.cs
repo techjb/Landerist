@@ -235,6 +235,17 @@ namespace landerist_library.Database
             });
             return GetAll(dataTable, true, true);
         }
+        public static SortedSet<Listing> GetListingWithCatastralReference()
+        {
+            string query =
+                "SELECT * " +
+                "FROM " + TABLE_ES_LISTINGS + " " +
+                "WHERE [cadastralReference] IS NOT NULL";
+
+            DataTable dataTable = new DataBase().QueryTable(query);
+            return GetAll(dataTable, false, false);
+        }
+
 
         public static SortedSet<Listing> GetUnpublishedListings(DateTime unlistingDate)
         {
