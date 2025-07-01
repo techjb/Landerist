@@ -629,19 +629,19 @@ namespace landerist_library.Websites
             return GetPages(dataTable);
         }
 
-        public static void UpdateWaitingStatusAiResponse(string uriHash)
+        public static bool UpdateWaitingStatusAiResponse(string uriHash)
         {
-            UpdateWaitingStatus(uriHash, WaitingStatus.waiting_ai_response);
+            return UpdateWaitingStatus(uriHash, WaitingStatus.waiting_ai_response);
         }
 
-        public static void UpdateWaitingStatus(string uriHash, WaitingStatus waitingStatus)
+        public static bool UpdateWaitingStatus(string uriHash, WaitingStatus waitingStatus)
         {
             string query =
                 "UPDATE " + PAGES + " " +
                 "SET [WaitingStatus] = @WaitingStatus " +
                 "WHERE [UriHash] = @UriHash";
 
-            new DataBase().Query(query, new Dictionary<string, object?> {
+            return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"WaitingStatus", waitingStatus.ToString() },
                 {"UriHash", uriHash }
             });

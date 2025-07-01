@@ -11,6 +11,7 @@ namespace landerist_library.Logs
         public const string LogKeyError = "error";
         public const string LogKeyInfo = "info";
         public const string LogKeyScrapper = "scrapper";
+        public const string LogKeyBatch = "batch";
 
         private static void Write(string logKey, string source, string text)
         {
@@ -146,6 +147,15 @@ namespace landerist_library.Logs
         {
             string textError = GetText(exception);
             WriteInfo(source, textError);
+        }
+
+        public static void WriteBatch(string source, string text)
+        {
+            if (Config.LOGS_INFO_IN_CONSOLE)
+            {
+                Console(text);
+            }
+            Write(LogKeyBatch, source, text);
         }
 
         #endregion Write Logs

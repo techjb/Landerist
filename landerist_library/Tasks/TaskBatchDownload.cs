@@ -39,7 +39,7 @@ namespace landerist_library.Tasks
                 return;
             }
 
-            SetErrorsToWaitingAIRequest(batch);
+            RemoveWaitingStatus(batch);
             Batches.UpdateToDownloaded(batch);
         }
 
@@ -129,7 +129,7 @@ namespace landerist_library.Tasks
                 }
             });
 
-            Log.WriteInfo("batch", $"ReadSucessFile {readed}/{lines.Length} errors: {errors}");
+            Log.WriteBatch("TaskBatchDownload", $"ReadSucessFile {readed}/{lines.Length} errors: {errors}");            
 
             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.BatchReaded, readed);
             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.BatchReadedErrors, errors);
@@ -170,7 +170,7 @@ namespace landerist_library.Tasks
             };
         }
 
-        private static void SetErrorsToWaitingAIRequest(Batch batch)
+        private static void RemoveWaitingStatus(Batch batch)
         {
             var difference = new HashSet<string>(batch.PagesUriHashes);
             difference.ExceptWith(DownloadedPagesUriHashes);
@@ -186,14 +186,14 @@ namespace landerist_library.Tasks
                 var page = Pages.GetPage(uriHash);
                 if (page != null)
                 {
-                    page.SetWaitingStatusAIRequest();
+                    page.RemoveWaitingStatus();
                     if (page.Update(false))
                     {
                         Interlocked.Increment(ref counter);
                     }
                 }
             });            
-            Log.WriteInfo("batch", $"SetErrorsToWaitingAIRequest {counter}/{difference.Count}.");
+            Log.WriteBatch("TaskBatchDownload", $"RemoveWaitingStatus {counter}/{difference.Count}");
         }
     }
 }
