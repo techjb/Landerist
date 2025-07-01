@@ -6,8 +6,6 @@
 
         public static bool Insert(string address, string region, double lat, double lng, bool isAccurate)
         {
-            address = ParseAddress(address);
-
             string query =
                 "INSERT INTO " + ADDRESS_LAT_LNG + " " +
                 "VALUES (GETDATE(), @Address, @Region, @Lat, @Lng, @IsAccurate)";
@@ -20,9 +18,8 @@
             });
         }
 
-        public static (double, double, bool)? Select(string address, string region)
+        public static (double lat, double lng, bool isAccurate)? Select(string address, string region)
         {
-            address = ParseAddress(address);
             string query =
                 "SELECT TOP 1 Lat, Lng, IsAccurate " +
                 "FROM " + ADDRESS_LAT_LNG + " " +
@@ -45,16 +42,11 @@
             return (lat, lng, isAccurate);
         }
 
-        private static string ParseAddress(string address)
-        {
-            return Tools.Strings.Clean(address.ToLower());
-        }
-
         public static bool Clean()
         {
             string query =
                 "DELETE FROM " + ADDRESS_LAT_LNG + " " +
-                "WHERE Date < DATEADD(YEAR, -2, GETDATE())";
+                "WHERE [DateInsert] < DATEADD(YEAR, -2, GETDATE())";
 
             return new DataBase().Query(query);
         }

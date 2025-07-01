@@ -246,6 +246,17 @@ namespace landerist_library.Database
             return GetAll(dataTable, false, false);
         }
 
+        public static SortedSet<Listing> GetListingLocationAccurate()
+        {
+            string query =
+                "SELECT * " +
+                "FROM " + TABLE_ES_LISTINGS + " " +
+                "WHERE [locationIsAccurate] = 1 AND " +
+                "   [cadastralReference] IS NULL";
+
+            DataTable dataTable = new DataBase().QueryTable(query);
+            return GetAll(dataTable, false, false);
+        }
 
         public static SortedSet<Listing> GetUnpublishedListings(DateTime unlistingDate)
         {
@@ -294,7 +305,7 @@ namespace landerist_library.Database
 
         private static SortedSet<Listing> GetAll(DataTable dataTable, bool loadMedia, bool loadSources)
         {
-            SortedSet<Listing> listings = new(new ListingComparer());            
+            SortedSet<Listing> listings = new(new ListingComparer());
             Parallel.ForEach(dataTable.AsEnumerable(), new ParallelOptions()
             {
                 //MaxDegreeOfParallelism = 1
@@ -456,6 +467,23 @@ namespace landerist_library.Database
                 "DELETE FROM " + TABLE_ES_LISTINGS;
 
             return new DataBase().Query(query);
+        }
+
+        public bool UpdateAddress(string guid, double? latitude, double? longitude, bool? locationIsAccurate)
+        {
+            string query =
+                "UPDATE " + TABLE_ES_LISTINGS + " SET " +
+                "[latitude] = @latitude, " +
+                "[longitude] = @longitude, " +
+                "[locationIsAccurate] = @locationIsAccurate " +
+                "WHERE [guid] = @guid";
+
+            return new DataBase().Query(query, new Dictionary<string, object?> {
+                {"guid", guid },
+                {"latitude", latitude },
+                {"longitude", longitude },
+                {"locationIsAccurate", locationIsAccurate }
+            });
         }
     }
 }

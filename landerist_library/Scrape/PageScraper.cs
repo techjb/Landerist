@@ -125,7 +125,7 @@ namespace landerist_library.Scrape
             }
 
             NewListing.SetPublished();
-            new LatLngParser(Page, NewListing).SetLatLng();
+            new LocationParser(Page, NewListing).SetLatLng();
             new LauIdParser(Page, NewListing).SetLauId();
             ES_Listings.InsertUpdate(Page.Website, NewListing);
             Page.SetListingStatusPublished();

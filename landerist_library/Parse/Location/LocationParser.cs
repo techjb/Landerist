@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace landerist_library.Parse.Location
 {
-    public class LatLngParser(Page page, landerist_orels.ES.Listing listing)
+    public class LocationParser(Page page, landerist_orels.ES.Listing listing)
     {
         private readonly Page Page = page;
 
@@ -21,22 +21,31 @@ namespace landerist_library.Parse.Location
                 return;
             }
 
-            CatastralReferenceToLatLng();
-            if (LatLngs.Count > 0)
+            FindLatLng();
+            SetLatLngToListing();
+        }
+
+        private void FindLatLng()
+        {
+            if (AddCatastralReferenceLatLng())
             {
-                SetLatLngToListing();
                 return;
             }
 
+            if (AddAddressLatLng())
+            {
+                return;
+            }
             var htmlDocument = Page.GetHtmlDocument();
             if (htmlDocument == null)
             {
                 return;
             }
-            LatLngIframeGoogleMaps(htmlDocument);
-            LatLngInHtmlLatLng(htmlDocument);
-            AddressToLatLng();
-            SetLatLngToListing();
+            if (AddframeGoogleMapsLatLng(htmlDocument))
+            {
+                return;
+            }
+            AddCoordinatesInHtmlLatLng(htmlDocument);
         }
 
         private void SetLatLngToListing()
@@ -45,25 +54,21 @@ namespace landerist_library.Parse.Location
             {
                 return;
             }
-            if (LatLngs.Count.Equals(1))
+            var tuple = LatLngs.FirstOrDefault();
+            if (tuple != null)
             {
-                var tuple = LatLngs.Single();
                 Listing.latitude = tuple.Item1;
                 Listing.longitude = tuple.Item2;
                 Listing.locationIsAccurate = tuple.Item3;
             }
-            else
-            {
-                // todo: decide later
-            }
         }
 
-        private void LatLngIframeGoogleMaps(HtmlDocument htmlDocument)
+        private bool AddframeGoogleMapsLatLng(HtmlDocument htmlDocument)
         {
             var iframes = htmlDocument.DocumentNode.Descendants("iframe");
             if (iframes == null)
             {
-                return;
+                return false;
             }
             foreach (var iframe in iframes)
             {
@@ -72,29 +77,34 @@ namespace landerist_library.Parse.Location
                 {
                     continue;
                 }
-                LatLngIframeGoogleMaps(src);
+                if (LatLngIframeGoogleMaps(src))
+                {
+                    return true;
+                }
             }
+            return false;
         }
 
-        public void LatLngIframeGoogleMaps(string src)
+        public bool LatLngIframeGoogleMaps(string src)
         {
             if (!src.Contains("https://www.google.com/maps/embed?pb="))
             {
-                return;
+                return false;
             }
 
             // in this order.
             if (src.Contains("!2d") && src.Contains("!3d"))
             {
-                LatLngIframeGoogleMaps(src, "!2d", "!3d", false);
+                return LatLngIframeGoogleMaps(src, "!2d", "!3d", false);
             }
-            else if (src.Contains("!1d") && src.Contains("!2d"))
+            if (src.Contains("!1d") && src.Contains("!2d"))
             {
-                LatLngIframeGoogleMaps(src, "!1d", "!2d", true);
+                return LatLngIframeGoogleMaps(src, "!1d", "!2d", true);
             }
+            return false;
         }
 
-        private void LatLngIframeGoogleMaps(string src, string key1, string key2, bool inverted)
+        private bool LatLngIframeGoogleMaps(string src, string key1, string key2, bool inverted)
         {
             try
             {
@@ -106,20 +116,21 @@ namespace landerist_library.Parse.Location
 
                 if (inverted)
                 {
-                    AddLatLng(lat, lng, false);
+                    return AddLatLng(lat, lng, false);
                 }
                 else
                 {
-                    AddLatLng(lng, lat, false);
+                    return AddLatLng(lng, lat, false);
                 }
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteError("LatLngParser LatLngIframeGoogleMaps", src, exception);
+                Logs.Log.WriteError("LatLngParser AddframeGoogleMapsLatLng", src, exception);
             }
+            return false;
         }
 
-        private void LatLngInHtmlLatLng(HtmlDocument htmlDocument)
+        private bool AddCoordinatesInHtmlLatLng(HtmlDocument htmlDocument)
         {
             List<string> listRegex =
             [
@@ -133,11 +144,15 @@ namespace landerist_library.Parse.Location
 
             foreach (var regex in listRegex)
             {
-                LatLngRegex(text, regex);
+                if (LatLngRegex(text, regex))
+                {
+                    return true;
+                }
             }
+            return false;
         }
 
-        public void LatLngRegex(string text, string regexPattern)
+        public bool LatLngRegex(string text, string regexPattern)
         {
             var regex = new Regex(regexPattern, RegexOptions.IgnoreCase);
             var matches = regex.Matches(text);
@@ -165,73 +180,76 @@ namespace landerist_library.Parse.Location
                     {
                         longitude = latOrLng;
                         AddLatLng((double)latitude, (double)longitude, false);
-                        break;
+                        return true;
                     }
                 }
             }
+            return false;
         }
 
 
-        private void AddLatLng(string latitude, string longitude, bool isAccurate)
+        private bool AddLatLng(string latitude, string longitude, bool isAccurate)
         {
             if (double.TryParse(longitude, NumberStyles.Float, CultureInfo.InvariantCulture, out double lng) &&
                 double.TryParse(latitude, NumberStyles.Float, CultureInfo.InvariantCulture, out double lat))
             {
-                AddLatLng(lat, lng, isAccurate);
+                return AddLatLng(lat, lng, isAccurate);
             }
-        }
-        private void AddLatLng(double latitude, double longitude, bool isAccurate)
-        {
-            if (!CountriesParser.ContainsCountry(Page.Website.CountryCode, latitude, longitude))
-            {
-                return;
-            }
-            var tuple = Tuple.Create(latitude, longitude, isAccurate);
-            LatLngs.Add(tuple);
+            return false;
         }
 
-        private void AddLatLng(Tuple<double, double>? tuple, bool? isAccurate)
+        private bool AddLatLng(Tuple<double, double>? tuple, bool? isAccurate)
         {
             if (tuple == null)
             {
-                return;
+                return false;
             }
             if (!isAccurate.HasValue)
             {
                 isAccurate = false;
             }
-            AddLatLng(tuple.Item1, tuple.Item2, (bool)isAccurate);
+            return AddLatLng(tuple.Item1, tuple.Item2, (bool)isAccurate);
+        }
+        private bool AddLatLng(double latitude, double longitude, bool isAccurate)
+        {
+            if (!CountriesParser.ContainsCountry(Page.Website.CountryCode, latitude, longitude))
+            {
+                return false;
+            }
+            var tuple = Tuple.Create(latitude, longitude, isAccurate);
+            LatLngs.Add(tuple);
+            return true;
         }
 
 
-        private void AddressToLatLng()
+        private bool AddAddressLatLng()
         {
             if (string.IsNullOrEmpty(Listing.address))
             {
-                return;
+                return false;
             }
-
-            if (LatLngs.Count > 0)
+            var latLng = new GoogleMaps.AddressToLatLng().Parse(Listing.address, Page.Website.CountryCode);
+            if (latLng == null)
             {
-                return;
+                return false;
             }
+            return AddLatLng(latLng.Value.latLng, latLng.Value.isAccurate);
 
-            var (latLng, isAccurate) = GoogleMaps.AddressToLatLng.Parse(Listing.address, Page.Website.CountryCode);
-            AddLatLng(latLng, isAccurate);
         }
 
-        public void CatastralReferenceToLatLng()
+        public bool AddCatastralReferenceLatLng()
         {
             if (string.IsNullOrEmpty(Listing.cadastralReference))
             {
-                return;
+                return false;
             }
-            var tuple = Goolzoom.CadastralRefToLatLng.Parse(Listing.cadastralReference);
+            var tuple = new Goolzoom.CadastralRefToLatLng().Parse(Listing.cadastralReference);
             if (tuple == null)
             {
-                return;
+                return false;
             }
             AddLatLng(tuple.Item1, tuple.Item2, true);
+            return true;
         }
     }
 }

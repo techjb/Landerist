@@ -242,7 +242,8 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             {
                 return null;
             }
-            return Tools.Strings.Clean(Anuncio!.DirecciónDelInmueble);
+            char[] trimChars = { '*', '-', ' ', ',', '.' };
+            return Tools.Strings.Clean(Anuncio!.DirecciónDelInmueble).Trim(trimChars);
         }
 
         private string? GetCadastralReference()

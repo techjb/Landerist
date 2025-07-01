@@ -1,6 +1,9 @@
 ﻿using landerist_library.Configuration;
+using landerist_library.Database;
 using landerist_library.Logs;
+using landerist_library.Parse.Location.GoogleMaps;
 using landerist_library.Tasks;
+using landerist_orels.ES;
 using System.Runtime.InteropServices;
 
 
@@ -242,6 +245,13 @@ namespace landerist_tests
 
             //Console.WriteLine(landerist_library.Tools.Validate.CadastralReference("3979515DD7737H0002LX"));
             //landerist_library.Tools.Validate.RemoveInvalidCatastralReferences();
+
+            //string address = "Avenida Diagonal Número 431, 08006";
+            //string address = "Calle Juan Sebastian Elcano 14 - Local 3, Sevilla";
+            //var d = new AddressToLatLng().Parse(address, landerist_library.Websites.CountryCode.ES);
+            //Console.WriteLine(d);
+            //Console.WriteLine(d.latLng.ToString() + " " +  d.isAccurate);
+            //AddressToLatLng.UpdateListingsLocationIsAccurate();
 
 
             #endregion

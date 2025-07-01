@@ -74,7 +74,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public string? email_de_contacto { get; set; } = null;
 
 
-        public const string DirecciónDelInmuebleDescription = "dirección en la que se encuentra el inmueble";
+        public const string DirecciónDelInmuebleDescription = "dirección postal completa en la que se encuentra el inmueble";
 
         [Description(DirecciónDelInmuebleDescription)]
         public string? dirección_del_inmueble { get; set; } = null;

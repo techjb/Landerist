@@ -186,7 +186,8 @@ namespace landerist_library.Tasks
                 StatisticsSnapshot.TakeSnapshots();
                 FilesUpdater.Update();
                 Landerist_com.Landerist_com.UpdatePages();
-                Backup.Update();
+                AddressLatLng.Clean();
+                Backup.Update();                
             }
             catch (Exception exception)
             {

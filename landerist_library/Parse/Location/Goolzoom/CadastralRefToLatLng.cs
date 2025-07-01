@@ -11,7 +11,7 @@ namespace landerist_library.Parse.Location.Goolzoom
 
     public class CadastralRefToLatLng
     {
-        public static Tuple<double, double>? Parse(string cadastralReference)
+        public Tuple<double, double>? Parse(string cadastralReference)
         {
             string requestUrl =
                 "https://api.goolzoom.com/v1/cadastre/cadastralreference/" +
