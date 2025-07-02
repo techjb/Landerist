@@ -246,6 +246,30 @@ namespace landerist_library.Database
             return GetAll(dataTable, false, false);
         }
 
+        public static SortedSet<Listing> GetListingWithCatastralReferenceAndNoAddress()
+        {
+            string query =
+                "SELECT * " +
+                "FROM " + TABLE_ES_LISTINGS + " " +
+                "WHERE [cadastralReference] IS NOT NULL " +
+                "AND [address] IS NULL";
+
+            DataTable dataTable = new DataBase().QueryTable(query);
+            return GetAll(dataTable, false, false);
+        }
+
+        public static SortedSet<Listing> GetListingsWithoutCatastralReferenceAndLocationIsAccurate()
+        {
+            string query =
+                "SELECT * " +
+                "FROM " + TABLE_ES_LISTINGS + " " +
+                "WHERE [cadastralReference] IS NULL " +
+                "AND [locationIsAccurate] = 1";
+
+            DataTable dataTable = new DataBase().QueryTable(query);
+            return GetAll(dataTable, false, true);
+        }
+
         public static SortedSet<Listing> GetListingLocationAccurate()
         {
             string query =
@@ -323,6 +347,11 @@ namespace landerist_library.Database
         public static Listing? GetListing(Page page, bool loadMedia, bool loadSources)
         {
             return GetListing(page.UriHash, loadMedia, loadSources);
+        }
+
+        public static Listing? GetListing(string guid)
+        {
+            return GetListing(guid, false, false);
         }
 
         private static Listing? GetListing(string guid, bool loadMedia, bool loadSources)

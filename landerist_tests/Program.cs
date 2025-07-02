@@ -234,7 +234,7 @@ namespace landerist_tests
 
             #endregion
 
-            #region Parse Location
+            #region LocationParser
 
             //var tuple1 = landerist_library.GetLatLng.Location.GoogleMaps.AddressToLatLng.GetLatLng("Av. Domingo Bueno, 126. O Porriño, 36.400 Pontevedra", CountryCode.ES);
             //Console.WriteLine(tuple1);
@@ -248,15 +248,19 @@ namespace landerist_tests
             //Console.WriteLine(landerist_library.Tools.Validate.CadastralReference("3979515DD7737H0002LX"));
             //landerist_library.Tools.Validate.RemoveInvalidCatastralReferences();
 
-            //string address = "Avenida Diagonal Número 431, 08006";
+            //string address = "Avenida Diagonal Número 431, 08006";            
             //string address = "Calle Juan Sebastian Elcano 14 - Local 3, Sevilla";
-            //var d = new AddressToLatLng().GetLatLng(address, landerist_library.Websites.CountryCode.ES);
+            //var d = new AddressToLatLng().Parse(address, landerist_library.Websites.CountryCode.ES);
             //Console.WriteLine(d);
             //Console.WriteLine(d.latLng.ToString() + " " +  d.isAccurate);
             //AddressToLatLng.UpdateListingsLocationIsAccurate();
             //CadastralRefToLatLng.UpdateLocationFromCadastralRef();
-
             //Console.WriteLine(new CadastralRefToLatLng().GetLatLng("F239324UK8141N0001HP"));
+            //Console.WriteLine(new GoolzoomApi().GetAddrees("7979409YJ1677N0005BE"));
+            //GoolzoomApi.UpdateAddressFromCadastralRef();
+            //GoolzoomApi.UpdateCadastralReferenceFromLocationIsAccurate();
+            //var listing = ES_Listings.GetListing("0074C7FF345F923A06992C15431EA2630A114713CC96D6DDA8DE35372286902A");
+            //new landerist_library.Parse.Location.GoogleMaps.GoogleMapsApi().Parse(listing.address);
 
 
             #endregion

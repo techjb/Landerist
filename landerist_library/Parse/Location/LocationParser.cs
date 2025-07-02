@@ -23,6 +23,7 @@ namespace landerist_library.Parse.Location
 
             FindLatLng();
             SetLatLngToListing();
+            SetCadastralReferenceToListing();
         }
 
         private void FindLatLng()
@@ -228,7 +229,7 @@ namespace landerist_library.Parse.Location
             {
                 return false;
             }
-            var latLng = new GoogleMaps.AddressToLatLng().Parse(Listing.address, Page.Website.CountryCode);
+            var latLng = new GoogleMaps.GoogleMapsApi().Parse(Listing.address, Page.Website.CountryCode);
             if (latLng == null)
             {
                 return false;
@@ -243,7 +244,7 @@ namespace landerist_library.Parse.Location
             {
                 return false;
             }
-            var result = new Goolzoom.CadastralRefToLatLng().GetLatLng(Listing.cadastralReference);
+            var result = new Goolzoom.GoolzoomApi().GetLatLng(Listing.cadastralReference);
             if (result == null || !result.Value.requestSucess)
             {
                 return false;
@@ -253,7 +254,24 @@ namespace landerist_library.Parse.Location
                 Listing.cadastralReference = null;
                 return false;
             }
+            if (string.IsNullOrEmpty(Listing.address))
+            {
+                var address = new Goolzoom.GoolzoomApi().GetAddrees(Listing.cadastralReference);
+                if (!string.IsNullOrEmpty(address))
+                {
+                    Listing.address = address;
+                }
+            }
             return AddLatLng((double)result.Value.lat, (double)result.Value.lng, true);
+        }
+
+        private void SetCadastralReferenceToListing()
+        {
+            if (!string.IsNullOrEmpty(Listing.cadastralReference) || Listing.locationIsAccurate != true)
+            {
+                return;
+            }
+            // todo: set cadastral reference doing manual check
         }
     }
 }

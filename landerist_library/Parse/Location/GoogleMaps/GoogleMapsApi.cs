@@ -7,12 +7,13 @@ using Newtonsoft.Json.Linq;
 
 namespace landerist_library.Parse.Location.GoogleMaps
 {
-    public class AddressToLatLng
+    public class GoogleMapsApi
     {
-        public (Tuple<double, double> latLng, bool isAccurate)? Parse(string address, CountryCode countryCode)
+        public (Tuple<double, double> latLng, bool isAccurate)? Parse(string address, CountryCode countryCode = CountryCode.ES)
         {
             var region = GetRegion(countryCode);
-            if (AddressLatLng.Select(address, region) is (double lat, double lng, bool isAccurate))
+            if (//Config.IsConfigurationProduction() && 
+                AddressLatLng.Select(address, region) is (double lat, double lng, bool isAccurate))
             {
                 return (Tuple.Create(lat, lng), isAccurate);
             }
@@ -54,6 +55,7 @@ namespace landerist_library.Parse.Location.GoogleMaps
             "address=" + Uri.EscapeDataString(address) +
             "&region=" + GetRegion(countryCode) +
             "&extra_computations=BUILDING_AND_ENTRANCES" +
+            //"&extra_computations=GROUNDS" +
             "&key=" + PrivateConfig.GOOGLE_CLOUD_LANDERIST_API_KEY;
 
         private (Tuple<double, double> latLng, bool isAccurate)? GetLatLng(Result result)
@@ -256,7 +258,7 @@ namespace landerist_library.Parse.Location.GoogleMaps
 
                 if (listing.address != null)
                 {
-                    var result = new AddressToLatLng().Parse(listing.address, CountryCode.ES);
+                    var result = new GoogleMapsApi().Parse(listing.address, CountryCode.ES);
                     if (result != null)
                     {
                         lat = result.Value.latLng.Item1;
