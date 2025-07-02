@@ -1,10 +1,8 @@
-﻿using Amazon.S3.Model.Internal.MarshallTransformations;
-using landerist_library.Database;
+﻿using landerist_library.Database;
 using Newtonsoft.Json;
 
 namespace landerist_library.Parse.Location.Goolzoom
 {
-
     public class GoolzoomCenter
     {
         public double lat;

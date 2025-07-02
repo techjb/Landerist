@@ -92,7 +92,7 @@ namespace landerist_library.Tasks
             try
             {
                 var lines = File.ReadAllLines(filePath);
-                ReadSucessFile(batch, lines);               
+                ReadSucessFile(batch, lines);
                 return true;
             }
 
@@ -106,7 +106,7 @@ namespace landerist_library.Tasks
         private static void ReadSucessFile(Batch batch, string[] lines)
         {
             int total = lines.Length;
-            int readed = 0;            
+            int readed = 0;
             int errors = 0;
 
             Parallel.ForEach(lines, Config.PARALLELOPTIONS1INLOCAL, line =>
@@ -129,7 +129,7 @@ namespace landerist_library.Tasks
                 }
             });
 
-            Log.WriteBatch("TaskBatchDownload", $"ReadSucessFile {readed}/{lines.Length} errors: {errors}");            
+            Log.WriteBatch("TaskBatchDownload", $"ReadSucessFile {readed}/{lines.Length} errors: {errors}");
 
             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.BatchReaded, readed);
             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.BatchReadedErrors, errors);
@@ -150,7 +150,11 @@ namespace landerist_library.Tasks
                 return false;
             }
 
-            DownloadedPagesUriHashes.Add(page.UriHash);
+            lock (DownloadedPagesUriHashes)
+            {
+                DownloadedPagesUriHashes.Add(page.UriHash);
+            }
+
             page.RemoveWaitingStatus();
             page.SetResponseBodyFromZipped();
             page.RemoveResponseBodyZipped();
@@ -187,12 +191,13 @@ namespace landerist_library.Tasks
                 if (page != null)
                 {
                     page.RemoveWaitingStatus();
+                    page.RemoveResponseBodyZipped();
                     if (page.Update(false))
                     {
                         Interlocked.Increment(ref counter);
                     }
                 }
-            });            
+            });
             Log.WriteBatch("TaskBatchDownload", $"RemoveWaitingStatus {counter}/{difference.Count}");
         }
     }
