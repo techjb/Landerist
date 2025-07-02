@@ -326,7 +326,7 @@ namespace landerist_tests
             //landerist_library.Landerist_com.FilesUpdater.UpdateUnpublished();
             //landerist_library.Landerist_com.FilesUpdater.UpdateUpdates();
             //landerist_library.Landerist_com.FilesUpdater.UpdateWebsites();
-            //landerist_library.Landerist_com.Landerist_com.UpdateStatistics();
+            landerist_library.Landerist_com.Landerist_com.UpdateStatistics();
             //landerist_library.Landerist_com.Landerist_com.UpdateDownloads();
             //landerist_library.Landerist_com.Landerist_com.UpdatePages();
             //landerist_library.Landerist_com.Landerist_com.UpdatePages();
@@ -363,9 +363,8 @@ namespace landerist_tests
             //VertexAIBatchCleaner.Clean();
             //OpenAIBatchCleaner.RemoveFiles();
             //FilesUpdater.UpdateWebsites();
-
-            var page = Pages.GetPage("850E272404903B49361120C9F468694C4C0F1975C141111CF8334C8F04A75727");
-            TaskBatchUpload.GetJson(page);
+            //var page = Pages.GetPage("850E272404903B49361120C9F468694C4C0F1975C141111CF8334C8F04A75727");
+            //TaskBatchUpload.GetJson(page);
 
 
             #endregion

@@ -204,6 +204,24 @@ namespace landerist_library.Websites
             });
         }
 
+        public static Dictionary<string, object?> GroupByHttpStatusCode(ListingStatus? listingStatus = null)
+        {
+            string where = listingStatus != null
+                ? "WHERE [listingStatus] = @listingStatus "
+                : string.Empty;
+            string query =
+                "SELECT CONVERT(VARCHAR,  [HttpStatusCode], 23), COUNT(*) " +
+                "FROM " + PAGES + " " +
+                where + " " +
+                "GROUP BY CONVERT(VARCHAR,  [HttpStatusCode], 23) " +
+                "ORDER BY COUNT(*) DESC";
+
+            return new DataBase().QueryDictionary(query, new Dictionary<string, object?>
+            {
+                { "listingStatus", listingStatus.ToString() }
+            });
+        }
+
         public static Dictionary<string, object?> GroupByNextUpdate()
         {
             string query =

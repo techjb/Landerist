@@ -42,6 +42,7 @@ namespace landerist_library.Landerist_com
                 PageType();
                 PublishedPageType();
                 UnPublishedPageType();
+                UnPublishedHttpStatusCode();
                 HttpStatusCode();
                 //ListingsPageType();
 
@@ -181,6 +182,12 @@ namespace landerist_library.Landerist_com
         {
             var dictionary = landerist_library.Websites.Pages.GroupByPageType(ListingStatus.unpublished);
             BarChart("Unpublished Listings PageType", "unpublished", dictionary);
+        }
+
+        private static void UnPublishedHttpStatusCode()
+        {
+            var dictionary = landerist_library.Websites.Pages.GroupByHttpStatusCode(ListingStatus.unpublished);
+            BarChart("Unpublished Listings HttpStatusCode", "unpublished", dictionary);
         }
 
         private static void HttpStatusCode()
