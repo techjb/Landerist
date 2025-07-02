@@ -243,13 +243,17 @@ namespace landerist_library.Parse.Location
             {
                 return false;
             }
-            var tuple = new Goolzoom.CadastralRefToLatLng().Parse(Listing.cadastralReference);
-            if (tuple == null)
+            var result = new Goolzoom.CadastralRefToLatLng().GetLatLng(Listing.cadastralReference);
+            if (result == null || !result.Value.requestSucess)
             {
                 return false;
             }
-            AddLatLng(tuple.Item1, tuple.Item2, true);
-            return true;
+            if (result.Value.lat == null || result.Value.lng == null)
+            {
+                Listing.cadastralReference = null;
+                return false;
+            }
+            return AddLatLng((double)result.Value.lat, (double)result.Value.lng, true);
         }
     }
 }

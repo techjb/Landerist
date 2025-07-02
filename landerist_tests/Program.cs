@@ -2,6 +2,7 @@
 using landerist_library.Database;
 using landerist_library.Logs;
 using landerist_library.Parse.Location.GoogleMaps;
+using landerist_library.Parse.Location.Goolzoom;
 using landerist_library.Tasks;
 using landerist_library.Websites;
 using landerist_orels.ES;
@@ -204,30 +205,30 @@ namespace landerist_tests
 
             #region ListingParser
 
-            //landerist_library.Parse.Listing.ListingsParser.Start();
-            //landerist_library.Parse.Listing.ListingsParser.ParseListing(page);
+            //landerist_library.GetLatLng.Listing.ListingsParser.Start();
+            //landerist_library.GetLatLng.Listing.ListingsParser.ParseListing(page);
 
 
             //landerist_library.Index.ProhibitedUrls.FindNewProhibitedStartsWith();
-            //landerist_library.Parse.PageType.LastSegment.FindProhibitedEndsSegments();
+            //landerist_library.GetLatLng.PageType.LastSegment.FindProhibitedEndsSegments();
 
-            //landerist_library.Parse.PageType.PageTypeParser.ResponseBodyValidToIsListing();
-            //landerist_library.Parse.PageType.PageTypeParser.ResponseBodyValidToIsListing(page);            
+            //landerist_library.GetLatLng.PageType.PageTypeParser.ResponseBodyValidToIsListing();
+            //landerist_library.GetLatLng.PageType.PageTypeParser.ResponseBodyValidToIsListing(page);            
 
             //new ChatGPTRequest().ListModels();
-            //landerist_library.Parse.Location.LauIdParser.SetLauIdToAllListings();
+            //landerist_library.GetLatLng.Location.LauIdParser.SetLauIdToAllListings();
 
-            //landerist_library.Parse.Listing.VertexAI.ParseListingVertexAI.Test();
+            //landerist_library.GetLatLng.Listing.VertexAI.ParseListingVertexAI.Test();
 
-            //landerist_library.Parse.ListingParser.Listing.OpenAI.Batch.BatchUpload.Start();
-            //landerist_library.Parse.Listing.OpenAI.Batch.BatchDownload.Start();
-            //landerist_library.Parse.Listing.OpenAI.Batch.BatchDownload.Test();
-            //landerist_library.Parse.Listing.OpenAI.Batch.BatchTasks.Start();            
-            //landerist_library.Parse.Listing.OpenAI.Batch.BatchCleaner.DeleteAllRemoteFiles();
-            //landerist_library.Parse.Listing.OpenAI.Batch.BatchClient.DeleteFile("dd");
+            //landerist_library.GetLatLng.ListingParser.Listing.OpenAI.Batch.BatchUpload.Start();
+            //landerist_library.GetLatLng.Listing.OpenAI.Batch.BatchDownload.Start();
+            //landerist_library.GetLatLng.Listing.OpenAI.Batch.BatchDownload.Test();
+            //landerist_library.GetLatLng.Listing.OpenAI.Batch.BatchTasks.Start();            
+            //landerist_library.GetLatLng.Listing.OpenAI.Batch.BatchCleaner.DeleteAllRemoteFiles();
+            //landerist_library.GetLatLng.Listing.OpenAI.Batch.BatchClient.DeleteFile("dd");
 
-            //landerist_library.Parse.ListingParser.VertexAI.Batch.VertexAIBatch.Test();
-            //landerist_library.Parse.ListingParser.VertexAI.Batch.VertexAIBatch.ListAllPredictionJobs();
+            //landerist_library.GetLatLng.ListingParser.VertexAI.Batch.VertexAIBatch.Test();
+            //landerist_library.GetLatLng.ListingParser.VertexAI.Batch.VertexAIBatch.ListAllPredictionJobs();
             //VertexAIBatchCleaner.RemoveFiles();
 
 
@@ -235,13 +236,13 @@ namespace landerist_tests
 
             #region Parse Location
 
-            //var tuple1 = landerist_library.Parse.Location.GoogleMaps.AddressToLatLng.Parse("Av. Domingo Bueno, 126. O Porriño, 36.400 Pontevedra", CountryCode.ES);
+            //var tuple1 = landerist_library.GetLatLng.Location.GoogleMaps.AddressToLatLng.GetLatLng("Av. Domingo Bueno, 126. O Porriño, 36.400 Pontevedra", CountryCode.ES);
             //Console.WriteLine(tuple1);
 
-            //var tuple1 = landerist_library.Parse.Location.Goolzoom.CadastralRefToLatLng.Parse("9441515XM7094A0001FT");
+            //var tuple1 = landerist_library.GetLatLng.Location.Goolzoom.CadastralRefToLatLng.GetLatLng("9441515XM7094A0001FT");
             //Console.WriteLine(tuple1);
 
-            //var tuple2 = landerist_library.Parse.Location.Goolzoom.CadastralRefToLatLng.Parse("9441515XM7094A");
+            //var tuple2 = landerist_library.GetLatLng.Location.Goolzoom.CadastralRefToLatLng.GetLatLng("9441515XM7094A");
             //Console.WriteLine(tuple2);
 
             //Console.WriteLine(landerist_library.Tools.Validate.CadastralReference("3979515DD7737H0002LX"));
@@ -249,10 +250,13 @@ namespace landerist_tests
 
             //string address = "Avenida Diagonal Número 431, 08006";
             //string address = "Calle Juan Sebastian Elcano 14 - Local 3, Sevilla";
-            //var d = new AddressToLatLng().Parse(address, landerist_library.Websites.CountryCode.ES);
+            //var d = new AddressToLatLng().GetLatLng(address, landerist_library.Websites.CountryCode.ES);
             //Console.WriteLine(d);
             //Console.WriteLine(d.latLng.ToString() + " " +  d.isAccurate);
             //AddressToLatLng.UpdateListingsLocationIsAccurate();
+            //CadastralRefToLatLng.UpdateLocationFromCadastralRef();
+
+            //Console.WriteLine(new CadastralRefToLatLng().GetLatLng("F239324UK8141N0001HP"));
 
 
             #endregion
@@ -285,6 +289,7 @@ namespace landerist_tests
             //listing1.AddSource(source);            
             //ES_Listings.InsertUpdate(page.Website, listing1);
             //ES_Sources.FixListingsWhitoutSource();
+
 
             #endregion
 
@@ -326,7 +331,7 @@ namespace landerist_tests
             //landerist_library.Landerist_com.FilesUpdater.UpdateUnpublished();
             //landerist_library.Landerist_com.FilesUpdater.UpdateUpdates();
             //landerist_library.Landerist_com.FilesUpdater.UpdateWebsites();
-            landerist_library.Landerist_com.Landerist_com.UpdateStatistics();
+            //landerist_library.Landerist_com.Landerist_com.UpdateStatistics();
             //landerist_library.Landerist_com.Landerist_com.UpdateDownloads();
             //landerist_library.Landerist_com.Landerist_com.UpdatePages();
             //landerist_library.Landerist_com.Landerist_com.UpdatePages();
