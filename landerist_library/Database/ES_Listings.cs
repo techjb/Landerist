@@ -215,15 +215,15 @@ namespace landerist_library.Database
 
         public static SortedSet<Listing> GetPublished()
         {
-            return GetListinStatus(ListingStatus.published);
+            return GetListings(ListingStatus.published);
         }
 
         public static SortedSet<Listing> GetUnPublished()
         {
-            return GetListinStatus(ListingStatus.unpublished);
+            return GetListings(ListingStatus.unpublished);
         }
 
-        public static SortedSet<Listing> GetListinStatus(ListingStatus listingStatus)
+        public static SortedSet<Listing> GetListings(ListingStatus listingStatus)
         {
             string query =
                 "SELECT * " +
@@ -270,13 +270,13 @@ namespace landerist_library.Database
             return GetAll(dataTable, false, true);
         }
 
-        public static SortedSet<Listing> GetListingLocationAccurate()
+        public static SortedSet<Listing> GetListingsLocationIsAccurateNoCadastralReference()
         {
             string query =
                 "SELECT * " +
                 "FROM " + TABLE_ES_LISTINGS + " " +
                 "WHERE [locationIsAccurate] = 1 AND " +
-                "   [cadastralReference] IS NULL";
+                " [cadastralReference] IS NULL";
 
             DataTable dataTable = new DataBase().QueryTable(query);
             return GetAll(dataTable, false, false);

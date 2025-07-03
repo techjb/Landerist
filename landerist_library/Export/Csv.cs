@@ -11,7 +11,6 @@ namespace landerist_library.Export
 
         private const string ZIP_FILE = "listings.csv.zip";
 
-
         public static bool Export(bool makeZip)
         {
             var success = ExportListings() && ExportMedia();

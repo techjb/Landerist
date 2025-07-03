@@ -229,7 +229,7 @@ namespace landerist_library.Parse.Location
             {
                 return false;
             }
-            var latLng = new GoogleMaps.GoogleMapsApi().Parse(Listing.address, Page.Website.CountryCode);
+            var latLng = new GoogleMaps.GoogleMapsApi().GetLatLng(Listing.address, Page.Website.CountryCode);
             if (latLng == null)
             {
                 return false;

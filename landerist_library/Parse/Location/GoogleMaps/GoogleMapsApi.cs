@@ -9,11 +9,12 @@ namespace landerist_library.Parse.Location.GoogleMaps
 {
     public class GoogleMapsApi
     {
-        public (Tuple<double, double> latLng, bool isAccurate)? Parse(string address, CountryCode countryCode = CountryCode.ES)
+        public (Tuple<double, double> latLng, bool isAccurate)? GetLatLng(string address, CountryCode countryCode = CountryCode.ES)
         {
             var region = GetRegion(countryCode);
-            if (//Config.IsConfigurationProduction() && 
-                AddressLatLng.Select(address, region) is (double lat, double lng, bool isAccurate))
+            if (AddressLatLng.Select(address, region) is (double lat, double lng, bool isAccurate)
+                //&& Config.IsConfigurationProduction()
+                )
             {
                 return (Tuple.Create(lat, lng), isAccurate);
             }
@@ -29,7 +30,7 @@ namespace landerist_library.Parse.Location.GoogleMaps
                 {
                     var geocodeData = JsonConvert.DeserializeObject<GeocodeData>(content);
                     var results = geocodeData?.results;
-                    if (results != null && results.Length > 0)
+                    if (results != null && results.Length.Equals(1)) // discarded multiple results
                     {
                         var parsedCoordinates = GetLatLng(results[0]);
                         if (parsedCoordinates.HasValue)
@@ -47,14 +48,13 @@ namespace landerist_library.Parse.Location.GoogleMaps
             {
                 Console.WriteLine(exception.Message);
             }
-
             return null;
         }
 
         private string GetUrl(string address, CountryCode countryCode) => "https://maps.googleapis.com/maps/api/geocode/json?" +
             "address=" + Uri.EscapeDataString(address) +
             "&region=" + GetRegion(countryCode) +
-            "&extra_computations=BUILDING_AND_ENTRANCES" +
+            //"&extra_computations=BUILDING_AND_ENTRANCES" +
             //"&extra_computations=GROUNDS" +
             "&key=" + PrivateConfig.GOOGLE_CLOUD_LANDERIST_API_KEY;
 
@@ -67,17 +67,29 @@ namespace landerist_library.Parse.Location.GoogleMaps
                 var isAccurate = IsAccurate(result);
                 resultLatLng = (latLng, isAccurate);
 
-                if (isAccurate && result.buildings?[0].building_outlines?[0].display_polygon is DisplayPolygon displayPolygon)
-                {
-                    latLng = GetCentroid(displayPolygon);
-                    if (latLng != null)
-                    {
-                        resultLatLng = (latLng, true);
-                    }
-                }
+                //if (isAccurate && result.buildings?[0].building_outlines?[0].display_polygon is DisplayPolygon displayPolygon)
+                //{
+                //    latLng = GetCentroid(displayPolygon);
+                //    if (latLng != null)
+                //    {
+                //        resultLatLng = (latLng, true);
+                //    }
+                //}
             }
 
             return resultLatLng;
+        }
+
+        private static bool IsAccurate(Result result)
+        {
+            if (result == null || result.types == null || result.geometry?.location_type == null)
+            {
+                return false;
+            }
+            return result.geometry.location_type.Equals("ROOFTOP") &&
+                   (result.types.Contains("street_address") ||
+                    result.types.Contains("premise") ||
+                    result.types.Contains("subpremise"));
         }
 
         private static Tuple<double, double>? GetCentroid(DisplayPolygon displayPolygon)
@@ -102,17 +114,6 @@ namespace landerist_library.Parse.Location.GoogleMaps
             return null;
         }
 
-        private bool IsAccurate(Result result)
-        {
-            if (result == null || result.types == null || result.geometry?.location_type == null)
-            {
-                return false;
-            }
-            return result.geometry.location_type.Equals("ROOFTOP") &&
-                   (result.types.Contains("street_address") ||
-                    result.types.Contains("premise") ||
-                    result.types.Contains("subpremise"));
-        }
 
         public static double[][][]? ToPolygon(object obj)
         {
@@ -234,31 +235,29 @@ namespace landerist_library.Parse.Location.GoogleMaps
 
         public static void UpdateListingsLocationIsAccurate()
         {
-            var listings = ES_Listings.GetListingLocationAccurate();
+            var listings = ES_Listings.GetListingsLocationIsAccurateNoCadastralReference();
             if (listings == null || listings.Count == 0)
             {
                 return;
             }
             int total = listings.Count;
             int processed = 0;
-            int latLngFound= 0;
+            int latLngFound = 0;
             int latLngNotFound = 0;
             int accurate = 0;
             int notAccurate = 0;
             int errors = 0;
             Parallel.ForEach(listings,
-                new ParallelOptions() { MaxDegreeOfParallelism = 1 },
+                new ParallelOptions() { MaxDegreeOfParallelism = 10 },
                 listing =>
             {
-                Interlocked.Increment(ref processed);
-
                 double? lat = null;
                 double? lng = null;
                 bool? locationIsAccurate = null;
 
                 if (listing.address != null)
                 {
-                    var result = new GoogleMapsApi().Parse(listing.address, CountryCode.ES);
+                    var result = new GoogleMapsApi().GetLatLng(listing.address, CountryCode.ES);
                     if (result != null)
                     {
                         lat = result.Value.latLng.Item1;
@@ -288,7 +287,7 @@ namespace landerist_library.Parse.Location.GoogleMaps
                 }
                 else
                 {
-                    Interlocked.Increment(ref latLngNotFound);  
+                    Interlocked.Increment(ref latLngNotFound);
                 }
 
                 var accuratePercentage = total > 0 ? (double)accurate / total * 100 : 0;
@@ -307,5 +306,4 @@ namespace landerist_library.Parse.Location.GoogleMaps
             });
         }
     }
-
 }
