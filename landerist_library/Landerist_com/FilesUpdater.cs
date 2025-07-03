@@ -20,8 +20,9 @@ namespace landerist_library.Landerist_com
             try
             {
                 UpdateListings();
-                UpdatePublished();
                 UpdateUpdates();
+                UpdatePublished();
+                UpdateUnpublished();
                 UpdateWebsites();
             }
             catch (Exception exception)
@@ -37,6 +38,18 @@ namespace landerist_library.Landerist_com
             if (!Update(listings, CountryCode.ES, ExportType.Listings, null, null))
             {
                 Log.WriteError("filesupdater", "Error updating all listings");
+            }
+        }
+
+        public static void UpdateUpdates()
+        {
+            Console.WriteLine("Reading Updates ..");
+            DateOnly dateFrom = GetDateFrom();
+            DateOnly dateTo = Yesterday();
+            var listings = ES_Listings.GetListings(true, true, dateFrom, dateTo);
+            if (!Update(listings, CountryCode.ES, ExportType.Updates, dateFrom, dateTo))
+            {
+                Log.WriteError("filesupdater", "Error updating Updates");
             }
         }
 
@@ -56,18 +69,6 @@ namespace landerist_library.Landerist_com
             if (!Update(listings, CountryCode.ES, ExportType.Unpublished, null, null))
             {
                 Log.WriteError("filesupdater", "Error updating Unpublished");
-            }
-        }
-
-        public static void UpdateUpdates()
-        {
-            Console.WriteLine("Reading Updates ..");
-            DateOnly dateFrom = GetDateFrom();
-            DateOnly dateTo = Yesterday();
-            var listings = ES_Listings.GetListings(true, true, dateFrom, dateTo);
-            if (!Update(listings, CountryCode.ES, ExportType.Updates, dateFrom, dateTo))
-            {
-                Log.WriteError("filesupdater", "Error updating Updates");
             }
         }
 
@@ -159,7 +160,7 @@ namespace landerist_library.Landerist_com
             if (dateTo.HasValue)
             {
                 metadata.Add((METADATA_KEY_DATETO, dateTo.Value.ToString()));
-            }            
+            }
             return metadata;
         }
 
