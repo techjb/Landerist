@@ -14,7 +14,7 @@
         ResponseBodyTooShort,
         ResponseBodyTooLarge,
         ResponseBodyRepeatedInHost,
-        ResponseBodyTooManyTokens,        
+        ResponseBodyTooManyTokens,
         MayBeListing,
         Listing,
         NotListingByParser,

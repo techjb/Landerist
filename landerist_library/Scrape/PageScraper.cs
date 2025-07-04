@@ -105,6 +105,10 @@ namespace landerist_library.Scrape
                 HandleLPublishedListing();
                 return;
             }
+            if (Page.IsNotListingByParser())
+            {
+                Page.InsertNotListingResponseBodyText();                
+            }
             if (Page.HaveToUnpublishListing())
             {
                 HandleUnpublishedListing();
@@ -136,7 +140,7 @@ namespace landerist_library.Scrape
             NewListing ??= Page.GetListing(true, true);
             if (NewListing == null)
             {
-                Logs.Log.WriteError("PageScraper HandleUnpublishedListing", "NewListing is null");  
+                Logs.Log.WriteError("PageScraper HandleUnpublishedListing", "NewListing is null");
                 return;
             }
 

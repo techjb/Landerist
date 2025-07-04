@@ -291,9 +291,20 @@ namespace landerist_library.Statistics
 
         public static bool InsertDailyCounter(StatisticsKey key)
         {
+            return InsertDailyCounter(key.ToString());
+        }
+
+        public static bool InsertDailyCounter(string key)
+        {
             return InsertDailyCounter(key, 1);
         }
+
         public static bool InsertDailyCounter(StatisticsKey key, int counter)
+        {
+            return InsertDailyCounter(key.ToString(), counter);
+        }
+
+        public static bool InsertDailyCounter(string key, int counter)
         {
             string query =
                 "MERGE " + TABLES_STATISTICS_SNAPSHOT + " AS target " +
@@ -314,10 +325,10 @@ namespace landerist_library.Statistics
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
                 { "Date", DateTime.Now },
-                { "Key", key.ToString() },
+                { "Key", key },
                 { "Counter", counter }
-            });
 
+            });
         }
 
 

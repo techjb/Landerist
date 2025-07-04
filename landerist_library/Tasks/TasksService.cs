@@ -40,7 +40,7 @@ namespace landerist_library.Tasks
 
         public void Start()
         {
-            PuppeteerDownloader.UpdateChrome();            
+            PuppeteerDownloader.UpdateChrome();
             SetTimers();
         }
 
@@ -102,7 +102,7 @@ namespace landerist_library.Tasks
                 {
                     Scraper.Start();
                 }
-                
+
             }
             catch (Exception exception)
             {
@@ -186,13 +186,19 @@ namespace landerist_library.Tasks
                 StatisticsSnapshot.TakeSnapshots();
                 FilesUpdater.Update();
                 Landerist_com.Landerist_com.UpdatePages();
-                AddressLatLng.Clean();
-                Backup.Update();                
+                CleanDatabase();
+                Backup.Update();
             }
             catch (Exception exception)
             {
                 Log.WriteError("ServiceTasks DailyTask", exception);
             }
+        }
+
+        private static void CleanDatabase()
+        {
+            AddressLatLng.Clean();
+            NotListings.Clean();
         }
 
         public void Stop()

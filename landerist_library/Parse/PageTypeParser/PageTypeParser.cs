@@ -1,4 +1,5 @@
 ﻿using landerist_library.Parse.ListingParser;
+using landerist_library.Statistics;
 using landerist_library.Websites;
 
 namespace landerist_library.Parse.PageTypeParser
@@ -18,7 +19,7 @@ namespace landerist_library.Parse.PageTypeParser
             if (Page.ResponseBodyIsNullOrEmpty())
             {
                 return (PageType.ResponseBodyNullOrEmpty, null, false);
-            }            
+            }
             if (Page.MainPage())
             {
                 return (PageType.MainPage, null, false);
@@ -30,7 +31,7 @@ namespace landerist_library.Parse.PageTypeParser
             if (Page.NotCanonical())
             {
                 return (PageType.NotCanonical, null, false);
-            }            
+            }
             if (Page.IncorrectLanguage())
             {
                 return (PageType.IncorrectLanguage, null, false);
@@ -50,6 +51,11 @@ namespace landerist_library.Parse.PageTypeParser
             {
                 return (PageType.ResponseBodyIsError, null, false);
             }
+            if (Page.ResponseBodyTextAlreadyParsedToNotListing())
+            {
+                StatisticsSnapshot.InsertDailyCounter("ResponseBodyTextAlreadyParsedToNotListing");
+                return (PageType.NotListingByParser, null, false);
+            }
             if (Page.ResponseBodyTextAlreadyParsed())
             {
                 return (Page.PageType, null, false);
@@ -57,7 +63,8 @@ namespace landerist_library.Parse.PageTypeParser
             if (Page.ReponseBodyTextIsAnotherListingInHost())
             {
                 return (PageType.ResponseBodyRepeatedInHost, null, false);
-            }            
+            }
+
             if (ParseListing.TooManyTokens(Page))
             {
                 return (PageType.ResponseBodyTooManyTokens, null, false);

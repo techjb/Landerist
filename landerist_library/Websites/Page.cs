@@ -218,7 +218,7 @@ namespace landerist_library.Websites
                 {"UriHash", UriHash },
             });
 
-            if(!sucess)
+            if (!sucess)
             {
                 Logs.Log.WriteError("Page Update", "Failed to update page: " + Uri);
             }
@@ -364,7 +364,7 @@ namespace landerist_library.Websites
 
         public bool ResponseBodyTextAlreadyParsed()
         {
-            return ResponseBodyTextNotChanged && (IsListing() || IsNotListing());
+            return ResponseBodyTextNotChanged && (IsListing() || IsNotListingByParser());
         }
 
         public bool ResponseBodyTextIsError()
@@ -422,6 +422,20 @@ namespace landerist_library.Websites
                 {"UriHash", UriHash },
                 {"ResponseBodyTextHash", ResponseBodyTextHash },
             });
+        }
+
+        public bool ResponseBodyTextAlreadyParsedToNotListing()
+        {
+            if (string.IsNullOrEmpty(ResponseBodyTextHash))
+            {
+                return false;
+            }
+            return NotListings.IsNotListing(ResponseBodyTextHash);
+        }
+
+        public bool InsertNotListingResponseBodyText()
+        {
+            return (ResponseBodyTextHash != null) && NotListings.Insert(ResponseBodyTextHash);
         }
 
         public Listing? GetListing(bool loadMedia, bool loadSources)
@@ -696,7 +710,7 @@ namespace landerist_library.Websites
             return PageType == landerist_library.Websites.PageType.Listing;
         }
 
-        public bool IsNotListing()
+        public bool IsNotListingByParser()
         {
             return PageType == landerist_library.Websites.PageType.NotListingByParser;
         }
