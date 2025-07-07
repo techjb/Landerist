@@ -24,7 +24,7 @@ namespace landerist_library.Parse.Location
 
             FindLatLng();
             SetLatLngToListing();
-            SetCadastralReferenceToListing();
+            SetCadastralReferenceFromAddress();
         }
 
         private void FindLatLng()
@@ -266,13 +266,13 @@ namespace landerist_library.Parse.Location
             return AddLatLng((double)result.Value.lat, (double)result.Value.lng, true);
         }
 
-        private void SetCadastralReferenceToListing()
+        private void SetCadastralReferenceFromAddress()
         {
-            if (!string.IsNullOrEmpty(Listing.cadastralReference) || Listing.locationIsAccurate != true)
+            if (!string.IsNullOrEmpty(Listing.cadastralReference) || Listing.locationIsAccurate != true || string.IsNullOrEmpty(Listing.address))
             {
                 return;
             }
-            var cadastralReference = new AddressToCadastralReference().GetCadastalReference(listing.latitude, listing.longitude, listing.address);            
+            var cadastralReference = new AddressToCadastralReference().GetCadastalReference(listing.latitude, listing.longitude, listing.address);
             if (!string.IsNullOrEmpty(cadastralReference))
             {
                 Listing.cadastralReference = cadastralReference;
