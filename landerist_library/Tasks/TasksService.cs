@@ -198,6 +198,7 @@ namespace landerist_library.Tasks
         private static void CleanDatabase()
         {
             AddressLatLng.Clean();
+            AddressCadastralReference.Clean();
             NotListings.Clean();
         }
 

@@ -1,11 +1,13 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Logs;
+using landerist_library.Parse.CadastralReference;
 using landerist_library.Parse.Location.GoogleMaps;
 using landerist_library.Parse.Location.Goolzoom;
 using landerist_library.Tasks;
 using landerist_library.Websites;
 using landerist_orels.ES;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 
@@ -248,9 +250,10 @@ namespace landerist_tests
             //Console.WriteLine(landerist_library.Tools.Validate.CadastralReference("3979515DD7737H0002LX"));
             //landerist_library.Tools.Validate.RemoveInvalidCatastralReferences();
 
-            //string address = "4 Carrer Esparver";
+            //string address = "Calle Uruguay 1, Local 7, Toledo";
             //string address = "Calle Juan Sebastian Elcano 14 - Local 3, Sevilla";
-            //Console.WriteLine( new GoogleMapsApi().GetLatLng(address, landerist_library.Websites.CountryCode.ES));
+            //var latLNg = new GoogleMapsApi().GetLatLng(address, CountryCode.ES);
+            //var cadastralReference = new AddressToCadastralReference().GetCadastalReference(latLNg.Value.latLng.Item1, latLNg.Value.latLng.Item2, address);
 
             //Console.WriteLine(d.latLng.ToString() + " " +  d.isAccurate);
             //GoogleMapsApi.UpdateListingsLocationIsAccurate();
@@ -258,9 +261,10 @@ namespace landerist_tests
             //Console.WriteLine(new CadastralRefToLatLng().GetLatLng("F239324UK8141N0001HP"));
             //Console.WriteLine(new GoolzoomApi().GetAddrees("7979409YJ1677N0005BE"));
             //GoolzoomApi.UpdateAddressFromCadastralRef();
-            //GoolzoomApi.UpdateCadastralReferenceFromLocationIsAccurate();            
+            AddressToCadastralReference.UpdateCadastralReferences();            
             //var listing = ES_Listings.GetListing("0074C7FF345F923A06992C15431EA2630A114713CC96D6DDA8DE35372286902A");
             //new landerist_library.GetLatLng.Location.GoogleMaps.GoogleMapsApi().GetLatLng(listing.address);
+            //new GoolzoomApi().GetAddresses(40.4243178, -3.7021782, 50);
 
 
             #endregion

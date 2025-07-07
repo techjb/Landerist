@@ -46,7 +46,7 @@ namespace landerist_library.Parse.Location.GoogleMaps
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception.Message);
+                Logs.Log.WriteError("GoogleMapsApi GetLatLng", exception);
             }
             return null;
         }
@@ -66,17 +66,7 @@ namespace landerist_library.Parse.Location.GoogleMaps
                 var latLng = Tuple.Create(latitude, loongitude);
                 var isAccurate = IsAccurate(result);
                 resultLatLng = (latLng, isAccurate);
-
-                //if (isAccurate && result.buildings?[0].building_outlines?[0].display_polygon is DisplayPolygon displayPolygon)
-                //{
-                //    latLng = GetCentroid(displayPolygon);
-                //    if (latLng != null)
-                //    {
-                //        resultLatLng = (latLng, true);
-                //    }
-                //}
             }
-
             return resultLatLng;
         }
 
@@ -92,137 +82,137 @@ namespace landerist_library.Parse.Location.GoogleMaps
                     result.types.Contains("subpremise"));
         }
 
-        private static Tuple<double, double>? GetCentroid(DisplayPolygon displayPolygon)
-        {
-            if (displayPolygon == null || displayPolygon.coordinates == null)
-            {
-                return null;
-            }
-            switch (displayPolygon.type)
-            {
-                case "Polygon":
-                    {
-                        var polygon = ToPolygon(displayPolygon.coordinates);
-                        return GetCentroid(polygon);
-                    }
-                case "MultiPolygon":
-                    {
-                        var multiPolygon = ToMultiPolygon(displayPolygon.coordinates);
-                        return GetCentroid(multiPolygon);
-                    }
-            }
-            return null;
-        }
+        //private static Tuple<double, double>? GetCentroid(DisplayPolygon displayPolygon)
+        //{
+        //    if (displayPolygon == null || displayPolygon.coordinates == null)
+        //    {
+        //        return null;
+        //    }
+        //    switch (displayPolygon.type)
+        //    {
+        //        case "Polygon":
+        //            {
+        //                var polygon = ToPolygon(displayPolygon.coordinates);
+        //                return GetCentroid(polygon);
+        //            }
+        //        case "MultiPolygon":
+        //            {
+        //                var multiPolygon = ToMultiPolygon(displayPolygon.coordinates);
+        //                return GetCentroid(multiPolygon);
+        //            }
+        //    }
+        //    return null;
+        //}
 
 
-        public static double[][][]? ToPolygon(object obj)
-        {
-            if (obj is JArray jArray)
-            {
-                return jArray.ToObject<double[][][]>();
-            }
+        //public static double[][][]? ToPolygon(object obj)
+        //{
+        //    if (obj is JArray jArray)
+        //    {
+        //        return jArray.ToObject<double[][][]>();
+        //    }
 
-            if (obj is List<object> outerList)
-            {
-                return [.. outerList
-                    .Cast<List<object>>()
-                    .Select(innerList => innerList
-                        .Cast<List<object>>()
-                        .Select(innerInnerList => innerInnerList
-                            .Select(Convert.ToDouble)
-                            .ToArray()
-                        ).ToArray()
-                    )];
-            }
-            return null;
-        }
+        //    if (obj is List<object> outerList)
+        //    {
+        //        return [.. outerList
+        //            .Cast<List<object>>()
+        //            .Select(innerList => innerList
+        //                .Cast<List<object>>()
+        //                .Select(innerInnerList => innerInnerList
+        //                    .Select(Convert.ToDouble)
+        //                    .ToArray()
+        //                ).ToArray()
+        //            )];
+        //    }
+        //    return null;
+        //}
 
-        public static double[][][][]? ToMultiPolygon(object obj)
-        {
-            if (obj is JArray jArray)
-            {
-                return jArray.ToObject<double[][][][]>();
-            }
+        //public static double[][][][]? ToMultiPolygon(object obj)
+        //{
+        //    if (obj is JArray jArray)
+        //    {
+        //        return jArray.ToObject<double[][][][]>();
+        //    }
 
-            if (obj is List<object> outerList)
-            {
-                return [.. outerList
-                    .Cast<List<object>>()
-                    .Select(level1 => level1
-                        .Cast<List<object>>()
-                        .Select(level2 => level2
-                            .Cast<List<object>>()
-                            .Select(level3 => level3
-                                .Select(Convert.ToDouble)
-                                .ToArray()
-                            ).ToArray()
-                        ).ToArray()
-                    )];
-            }
-            return null;
-        }
+        //    if (obj is List<object> outerList)
+        //    {
+        //        return [.. outerList
+        //            .Cast<List<object>>()
+        //            .Select(level1 => level1
+        //                .Cast<List<object>>()
+        //                .Select(level2 => level2
+        //                    .Cast<List<object>>()
+        //                    .Select(level3 => level3
+        //                        .Select(Convert.ToDouble)
+        //                        .ToArray()
+        //                    ).ToArray()
+        //                ).ToArray()
+        //            )];
+        //    }
+        //    return null;
+        //}
 
 
-        private static Tuple<double, double>? GetCentroid(double[][][]? coordinates)
-        {
-            if (coordinates is null)
-            {
-                return null;
-            }
-            try
-            {
-                var geometryFactory = new GeometryFactory();
-                var shellCoordinates = coordinates[0]
-                    .Select(coord => new Coordinate(coord[0], coord[1]))
-                    .ToArray();
+        //private static Tuple<double, double>? GetCentroid(double[][][]? coordinates)
+        //{
+        //    if (coordinates is null)
+        //    {
+        //        return null;
+        //    }
+        //    try
+        //    {
+        //        var geometryFactory = new GeometryFactory();
+        //        var shellCoordinates = coordinates[0]
+        //            .Select(coord => new Coordinate(coord[0], coord[1]))
+        //            .ToArray();
 
-                LinearRing shell = geometryFactory.CreateLinearRing(shellCoordinates);
-                Polygon polygon = geometryFactory.CreatePolygon(shell);
-                Point centroid = polygon.Centroid;
-                return Tuple.Create(centroid.Y, centroid.X);
-            }
-            catch// (Exception excption)
-            {
+        //        LinearRing shell = geometryFactory.CreateLinearRing(shellCoordinates);
+        //        Polygon polygon = geometryFactory.CreatePolygon(shell);
+        //        Point centroid = polygon.Centroid;
+        //        return Tuple.Create(centroid.Y, centroid.X);
+        //    }
+        //    catch// (Exception excption)
+        //    {
 
-            }
-            return null;
-        }
+        //    }
+        //    return null;
+        //}
 
-        private static Tuple<double, double>? GetCentroid(double[][][][]? coordinates)
-        {
-            if (coordinates is null)
-            {
-                return null;
-            }
-            try
-            {
-                var geometryFactory = new GeometryFactory();
+        //private static Tuple<double, double>? GetCentroid(double[][][][]? coordinates)
+        //{
+        //    if (coordinates is null)
+        //    {
+        //        return null;
+        //    }
+        //    try
+        //    {
+        //        var geometryFactory = new GeometryFactory();
 
-                Polygon[] polygons = [.. coordinates.Select(polygonCoords =>
-                {
-                    Coordinate[] exteriorCoords = [.. polygonCoords[0].Select(point => new Coordinate(point[0], point[1]))];
-                    LinearRing shell = geometryFactory.CreateLinearRing(exteriorCoords);
-                    LinearRing[] holes = [.. polygonCoords.Skip(1)
-                        .Select(ringCoords =>
-                            geometryFactory.CreateLinearRing(
-                                [.. ringCoords.Select(point => new Coordinate(point[0], point[1]))]
-                            )
-                        )];
+        //        Polygon[] polygons = [.. coordinates.Select(polygonCoords =>
+        //        {
+        //            Coordinate[] exteriorCoords = [.. polygonCoords[0].Select(point => new Coordinate(point[0], point[1]))];
+        //            LinearRing shell = geometryFactory.CreateLinearRing(exteriorCoords);
+        //            LinearRing[] holes = [.. polygonCoords.Skip(1)
+        //                .Select(ringCoords =>
+        //                    geometryFactory.CreateLinearRing(
+        //                        [.. ringCoords.Select(point => new Coordinate(point[0], point[1]))]
+        //                    )
+        //                )];
 
-                    return geometryFactory.CreatePolygon(shell, holes);
-                })];
+        //            return geometryFactory.CreatePolygon(shell, holes);
+        //        })];
 
-                MultiPolygon multiPolygon = geometryFactory.CreateMultiPolygon(polygons);
+        //        MultiPolygon multiPolygon = geometryFactory.CreateMultiPolygon(polygons);
 
-                Point centroid = multiPolygon.Centroid;
-                return Tuple.Create(centroid.Y, centroid.X);
-            }
-            catch// (Exception excption)
-            {
+        //        Point centroid = multiPolygon.Centroid;
+        //        return Tuple.Create(centroid.Y, centroid.X);
+        //    }
+        //    catch// (Exception excption)
+        //    {
 
-            }
-            return null;
-        }
+        //    }
+        //    return null;
+        //}
 
         private static string GetRegion(CountryCode countryCode)
         {

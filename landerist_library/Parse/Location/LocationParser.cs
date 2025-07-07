@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using landerist_library.Parse.CadastralReference;
 using landerist_library.Parse.Location.Delimitations;
 using landerist_library.Websites;
 using System.Globalization;
@@ -271,7 +272,11 @@ namespace landerist_library.Parse.Location
             {
                 return;
             }
-            // todo: set cadastral reference doing manual check
+            var cadastralReference = new AddressToCadastralReference().GetCadastalReference(listing.latitude, listing.longitude, listing.address);            
+            if (!string.IsNullOrEmpty(cadastralReference))
+            {
+                Listing.cadastralReference = cadastralReference;
+            }
         }
     }
 }

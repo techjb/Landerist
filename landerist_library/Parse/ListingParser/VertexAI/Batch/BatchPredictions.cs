@@ -16,7 +16,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                 {
                     Name = name,
                     DisplayName = name,
-                    Model = "publishers/google/models/" + VertexAIRequest.ModelName,
+                    Model = "publishers/google/models/" + Config.VERTEXT_AI_MODEL_NAME,
                     InputConfig = new BatchPredictionJob.Types.InputConfig()
                     {
                         InstancesFormat = "jsonl",

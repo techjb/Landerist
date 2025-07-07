@@ -1,8 +1,6 @@
 ﻿using landerist_library.Database;
-using NetTopologySuite.Triangulate.Tri;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Schema.Generation;
+using System;
 using System.Data;
 using System.Globalization;
 
@@ -16,16 +14,15 @@ namespace landerist_library.Parse.Location.Goolzoom
 
     public class GoolzoomApi
     {
+        private const string BASE_URL = "https://api.goolzoom.com/v1/cadastre/";
+
         public (bool requestSucess, double? lat, double? lng)? GetLatLng(string cadastralReference)
         {
             if (string.IsNullOrEmpty(cadastralReference))
             {
                 return null;
             }
-            string url =
-                "https://api.goolzoom.com/v1/cadastre/cadastralreference/" +
-                cadastralReference + "/center";
-
+            string url = BASE_URL + "cadastralreference/" + cadastralReference + "/center";
 
             bool requestSucess = false;
             double? lat = null;
@@ -33,8 +30,7 @@ namespace landerist_library.Parse.Location.Goolzoom
 
             try
             {
-                var httpClient = GetHttpClient();
-                var response = httpClient.GetAsync(url).Result;
+                var response = HttpClient.GetAsync(url).Result;
                 response.EnsureSuccessStatusCode();
                 var content = response.Content.ReadAsStringAsync().Result;
                 requestSucess = true;
@@ -48,9 +44,9 @@ namespace landerist_library.Parse.Location.Goolzoom
                     }
                 }
             }
-            catch
+            catch (Exception exception)
             {
-
+                Logs.Log.WriteError("GoolzoomApi GetLatLng", exception);
             }
             return (requestSucess, lat, lng);
         }
@@ -63,14 +59,13 @@ namespace landerist_library.Parse.Location.Goolzoom
             }
             bool isCadastraReference = cadastralReference.Length.Equals(20);
             string url =
-                "https://api.goolzoom.com/v1/cadastre/" +
+                BASE_URL +
                 (isCadastraReference ? "cadastralreference/" : "cadastralparcel/") +
-                cadastralReference + "/dataTable?language=es";
+                cadastralReference + "/?language=es";
 
             try
             {
-                var httpClient = GetHttpClient();
-                var response = httpClient.GetAsync(url).Result;
+                var response = HttpClient.GetAsync(url).Result;
                 response.EnsureSuccessStatusCode();
                 var content = response.Content.ReadAsStringAsync().Result;
                 if (!string.IsNullOrEmpty(content))
@@ -79,8 +74,9 @@ namespace landerist_library.Parse.Location.Goolzoom
                     return GetAddress(data);
                 }
             }
-            catch
+            catch(Exception exception)
             {
+                Logs.Log.WriteError("GoolzoomApi GetAddrees", exception);
             }
             return null;
         }
@@ -113,59 +109,35 @@ namespace landerist_library.Parse.Location.Goolzoom
             return null;
         }
 
-        private string? GetCadastalReference(double? latitude, double? longitude)
+        public string? GetAddresses(double latitude, double longitude, int radio)
         {
-            if (latitude == null || longitude == null)
-            {
-                return null;
-            }
             string url =
-                "https://api.goolzoom.com/v1/cadastre/latlng/" +
+                BASE_URL + "radio/" +
                 ((double)latitude).ToString(CultureInfo.InvariantCulture) + "/" +
                 ((double)longitude).ToString(CultureInfo.InvariantCulture) + "/" +
-                "cadastralreferences";
+                radio + "/addresses";
             try
             {
-                var httpClient = GetHttpClient();
-                var response = httpClient.GetAsync(url).Result;
+                var response = HttpClient.GetAsync(url).Result;
                 response.EnsureSuccessStatusCode();
-                var content = response.Content.ReadAsStringAsync().Result;
-                if (!string.IsNullOrEmpty(content))
-                {
-                    var data = JsonConvert.DeserializeObject<dynamic>(content);
-                    return GetCadastalReference(data);
-                }
+                return response.Content.ReadAsStringAsync().Result;
             }
-            catch
+            catch (Exception exception)
             {
+                Console.WriteLine($"Error in GoolzoomApi GetAddresses: {exception.Message} {url}");
+                Logs.Log.WriteError("GoolzoomApi GetAddresses", exception);
             }
             return null;
         }
-        private static string? GetCadastalReference(dynamic data)
+
+        private HttpClient HttpClient
         {
-            if (data?.cadastralreferences is not JArray cadastralReferences || cadastralReferences.Count == 0)
+            get
             {
-                return null;
+                HttpClient client = new();
+                client.DefaultRequestHeaders.Add("x-api-key", Configuration.PrivateConfig.GOOLZOOM_API);
+                return client;
             }
-
-            var cadastralReference = (string?)cadastralReferences[0]?["cadatralreference"];
-            if (string.IsNullOrEmpty(cadastralReference))
-            {
-                return null;
-            }
-
-            return cadastralReferences.Count == 1
-                ? cadastralReference
-                : cadastralReference.Length >= 14
-                    ? cadastralReference[..14]
-                    : null;
-        }       
-
-        private HttpClient GetHttpClient()
-        {
-            HttpClient client = new();
-            client.DefaultRequestHeaders.Add("x-api-key", Configuration.PrivateConfig.GOOLZOOM_API);
-            return client;
         }
 
         public static void UpdateLocationFromCadastralRef()
@@ -222,60 +194,6 @@ namespace landerist_library.Parse.Location.Goolzoom
                 }
                 Console.WriteLine($"Processed {processed}/{total}, Updated: {updated}, Errors: {errors}");
             }
-        }
-
-        public static void UpdateCadastralReferenceFromLocationIsAccurate()
-        {
-            var listings = ES_Listings.GetListingsWithoutCatastralReferenceAndLocationIsAccurate();
-            int total = listings.Count;
-            int processed = 0;
-            int updated = 0;
-            int errors = 0;
-
-            DataTable dataTable = new();
-            dataTable.Columns.Add("LocalId", typeof(string));
-            dataTable.Columns.Add("Title", typeof(string));
-            dataTable.Columns.Add("DocumentLink", typeof(string));
-            dataTable.Columns.Add("Description", typeof(string));
-
-
-            foreach (var listing in listings)
-            {
-                processed++;
-                if (processed >= 100)
-                {
-                    break;
-                }
-                var cadastralReference = new GoolzoomApi().GetCadastalReference(listing.latitude, listing.longitude);
-                if (cadastralReference != null)
-                {
-
-                    listing.cadastralReference = cadastralReference;
-                    //if (ES_Listings.Update(listing))
-                    if (true)
-                    {
-                        updated++;
-                    }
-                    else
-                    {
-                        errors++;
-                    }
-
-                    DataRow dataRow = dataTable.NewRow();
-                    dataRow.ItemArray = [
-                        listing.cadastralReference, 
-                        listing.address, 
-                        listing.sources.FirstOrDefault().sourceUrl,
-                        listing.guid,
-                        ];
-                    dataTable.Rows.Add(dataRow);
-
-                }
-                Console.WriteLine($"Processed {processed}/{total}, Updated: {updated}, Errors: {errors}");
-            }
-
-            Tools.Csv.Write(dataTable, 
-                Configuration.PrivateConfig.EXPORT_DIRECTORY_LOCAL + "CatastralReferencesAddress.csv", true);
         }
     }
 }

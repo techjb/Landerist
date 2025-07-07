@@ -13,10 +13,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI
     {
 
         public const int MAX_CONTEXT_WINDOW = 128000;
-
-        public static readonly string ModelName = "gemini-2.5-flash";
-        //public static readonly string ModelName = "gemini-2.5-flash-lite-preview-06-17";
-
+        
         public const float Temperature = 0.2f;
 
         public static bool TooManyTokens(Page page)
@@ -28,19 +25,19 @@ namespace landerist_library.Parse.ListingParser.VertexAI
         {
             try
             {
-                var predictionServiceClient = GetPredictionServiceClient();
                 var generateContentRequest = GetGenerateContentRequest(page, text);
                 DateTime dateStart = DateTime.Now;
-                var response = await predictionServiceClient.GenerateContentAsync(generateContentRequest);
+                var response = await GetPredictionServiceClient().GenerateContentAsync(generateContentRequest);
                 Timers.Timer.SaveTimerVertexAI("VertexAIRequest", dateStart);
                 return response;
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteError("VertexAIRequest GetResponse", exception);
+                Logs.Log.WriteError("VertexAIRequest GetAddress", exception);
             }
             return null;
         }
+
 
         private static PredictionServiceClient GetPredictionServiceClient()
         {
@@ -53,9 +50,9 @@ namespace landerist_library.Parse.ListingParser.VertexAI
 
         public static GenerateContentRequest GetGenerateContentRequest(Page page, string text)
         {
-            var generateContentRequest = new GenerateContentRequest
+            return new GenerateContentRequest
             {
-                Model = $"projects/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PROJECTID}/locations/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}/publishers/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PUBLISHER}/models/{ModelName}",
+                Model = $"projects/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PROJECTID}/locations/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}/publishers/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PUBLISHER}/models/{Config.VERTEXT_AI_MODEL_NAME}",
                 Contents =
                 {
                     new Content()
@@ -99,12 +96,12 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                     {
                         Category = HarmCategory.SexuallyExplicit,
                         Threshold = HarmBlockThreshold.Off
-                    },                    
+                    },
                     new SafetySetting
                     {
                         Category = HarmCategory.Unspecified,
                         Threshold = HarmBlockThreshold.Off
-                    },                    
+                    },
                 },
                 SystemInstruction = new Content
                 {
@@ -121,7 +118,6 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                     { "custom_id", page.UriHash }
                 }
             };
-            return generateContentRequest;
         }
 
         private static RepeatedField<Part> GetParts(Page page, string text)
@@ -145,12 +141,12 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                 ];
             }
             return
-                [
-                    new Part
+              [
+                  new Part
                     {
                         Text = text
                     }
-                ];
+              ];
         }
     }
 }

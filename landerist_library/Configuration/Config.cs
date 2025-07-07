@@ -160,6 +160,8 @@ namespace landerist_library.Configuration
 
         public const int MINIMUM_PAGE_TYPE_COUNTER_TO_UNPUBLISH_LISTING = 3;
 
+        public static readonly string VERTEXT_AI_MODEL_NAME = "gemini-2.5-flash";
+
         public static bool IsConfigurationProduction()
         {
             return ConfigurationProduction;

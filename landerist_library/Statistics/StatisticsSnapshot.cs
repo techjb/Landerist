@@ -306,6 +306,10 @@ namespace landerist_library.Statistics
 
         public static bool InsertDailyCounter(string key, int counter)
         {
+            if (Configuration.Config.IsConfigurationLocal())
+            {
+                return true;
+            }
             string query =
                 "MERGE " + TABLES_STATISTICS_SNAPSHOT + " AS target " +
                 "USING (" +
@@ -368,7 +372,7 @@ namespace landerist_library.Statistics
         public static DataTable GetLatestStatistics(string statisticsKey, int top)
         {
             string query =
-                "SELECT TOP "+ top + " [Date], [Counter] " +
+                "SELECT TOP " + top + " [Date], [Counter] " +
                 "FROM " + TABLES_STATISTICS_SNAPSHOT + " " +
                 "WHERE [Key] = @Key " +
                 "ORDER BY [Date] DESC";
