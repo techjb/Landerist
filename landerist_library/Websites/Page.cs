@@ -141,7 +141,8 @@ namespace landerist_library.Websites
             string query =
                 "INSERT INTO " + Pages.PAGES + " " +
                 "VALUES(@Host, @Uri, @UriHash, @Inserted, @Updated, @NextUpdate, @HttpStatusCode, @PageType, " +
-                "@PageTypeCounter, @ListingStatus, @LockedBy, @WaitingStatus, @ResponseBodyTextHash, @ResponseBodyZipped)";
+                "@PageTypeCounter, @ListingStatus, @LockedBy, @WaitingStatus, @ResponseBodyTextHash, " +
+                "CONVERT(varbinary(max), @ResponseBodyZipped))";
 
             bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
                 {"Host", Host },
@@ -157,16 +158,16 @@ namespace landerist_library.Websites
                 {"LockedBy", null },
                 {"WaitingStatus", null },
                 {"ResponseBodyTextHash", null },
-                {"ResponseBodyZipped", null },
+                {"ResponseBodyZipped", null  },
             });
             if (sucess)
             {
                 Website.IncreaseNumPages();
             }
-            else
-            {
-                Logs.Log.WriteError("Page Insert", "Failed to insert page: " + Uri);
-            }
+            //else
+            //{
+            //    Logs.Log.WriteError("Page Insert", "Failed to insert page: " + Uri);
+            //}
             return sucess;
         }
 

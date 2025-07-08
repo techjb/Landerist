@@ -169,6 +169,8 @@ namespace landerist_tests
             //Pages.DeleteUnpublishedListings();
             //Pages.DeleteUrisLikePrint();
             //Pages.DeleteProhibitedUris();
+            //new Page("https://areagestio.com/propiedades/25974555/").Insert();
+            
 
             #endregion
 
@@ -261,7 +263,7 @@ namespace landerist_tests
             //Console.WriteLine(new CadastralRefToLatLng().GetLatLng("F239324UK8141N0001HP"));
             //Console.WriteLine(new GoolzoomApi().GetAddrees("7979409YJ1677N0005BE"));
             //GoolzoomApi.UpdateAddressFromCadastralRef();
-            AddressToCadastralReference.UpdateCadastralReferences();            
+            //AddressToCadastralReference.UpdateCadastralReferences();            
             //var listing = ES_Listings.GetListing("0074C7FF345F923A06992C15431EA2630A114713CC96D6DDA8DE35372286902A");
             //new landerist_library.GetLatLng.Location.GoogleMaps.GoogleMapsApi().GetLatLng(listing.address);
             //new GoolzoomApi().GetAddresses(40.4243178, -3.7021782, 50);

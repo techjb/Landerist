@@ -133,7 +133,8 @@ namespace landerist_library.Parse.CadastralReference
                     }
                 }
                 Interlocked.Increment(ref processed);
-                Console.WriteLine($"Processed {processed}/{total} Found: {found}  Not Found: {notFound}");
+                int processedPercentage = (int)((double)processed / total * 100);
+                Console.WriteLine($"Processed {processed}/{total} ({processedPercentage}%) Found: {found}  Not Found: {notFound}");
             });
 
             Tools.Csv.Write(dataTableFound, Configuration.PrivateConfig.EXPORT_DIRECTORY_LOCAL + "Found.csv", true);
