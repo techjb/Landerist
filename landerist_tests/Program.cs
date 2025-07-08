@@ -187,7 +187,7 @@ namespace landerist_tests
             //new Scraper().Scrape(page, false);
             //new landerist_library.Scrape.Scraper().Scrape("https://www.inmobiliariaiberia.com/inmueble.php?ID=72668726683058&amp;idio=12", false);
             //new Scraper().DoTest();
-            //landerist_library.Scrape.PageSelector.Select();
+            //landerist_library.Scrape.PageSelector.SelectTop1();
             //Console.WriteLine("Block: " + WebsitesBlocker.Block(page.Website));
             //Console.WriteLine("IsBlocked: " + WebsitesBlocker.IsBlocked(page.Website));        
 
@@ -250,10 +250,10 @@ namespace landerist_tests
             //Console.WriteLine(landerist_library.Tools.Validate.CadastralReference("3979515DD7737H0002LX"));
             //landerist_library.Tools.Validate.RemoveInvalidCatastralReferences();
 
-            //string address = "Calle Uruguay 1, Local 7, Toledo";
+            //string address = "Calle Castillo de Fuensaldaña 4, Las Rozas de Madrid";
             //string address = "Calle Juan Sebastian Elcano 14 - Local 3, Sevilla";
             //var latLNg = new GoogleMapsApi().GetLatLng(address, CountryCode.ES);
-            //var cadastralReference = new AddressToCadastralReference().GetCadastalReference(latLNg.Value.latLng.Item1, latLNg.Value.latLng.Item2, address);
+            //var cadastralReference = new AddressToCadastralReference().GetCadastralReference(latLNg.Value.latLng.Item1, latLNg.Value.latLng.Item2, address);
 
             //Console.WriteLine(d.latLng.ToString() + " " +  d.isAccurate);
             //GoogleMapsApi.UpdateListingsLocationIsAccurate();

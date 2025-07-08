@@ -116,10 +116,10 @@ namespace landerist_library.Parse.Location.GoogleMaps
         //    {
         //        return [.. outerList
         //            .Cast<List<object>>()
-        //            .Select(innerList => innerList
+        //            .SelectTop1(innerList => innerList
         //                .Cast<List<object>>()
-        //                .Select(innerInnerList => innerInnerList
-        //                    .Select(Convert.ToDouble)
+        //                .SelectTop1(innerInnerList => innerInnerList
+        //                    .SelectTop1(Convert.ToDouble)
         //                    .ToArray()
         //                ).ToArray()
         //            )];
@@ -138,12 +138,12 @@ namespace landerist_library.Parse.Location.GoogleMaps
         //    {
         //        return [.. outerList
         //            .Cast<List<object>>()
-        //            .Select(level1 => level1
+        //            .SelectTop1(level1 => level1
         //                .Cast<List<object>>()
-        //                .Select(level2 => level2
+        //                .SelectTop1(level2 => level2
         //                    .Cast<List<object>>()
-        //                    .Select(level3 => level3
-        //                        .Select(Convert.ToDouble)
+        //                    .SelectTop1(level3 => level3
+        //                        .SelectTop1(Convert.ToDouble)
         //                        .ToArray()
         //                    ).ToArray()
         //                ).ToArray()
@@ -163,7 +163,7 @@ namespace landerist_library.Parse.Location.GoogleMaps
         //    {
         //        var geometryFactory = new GeometryFactory();
         //        var shellCoordinates = coordinates[0]
-        //            .Select(coord => new Coordinate(coord[0], coord[1]))
+        //            .SelectTop1(coord => new Coordinate(coord[0], coord[1]))
         //            .ToArray();
 
         //        LinearRing shell = geometryFactory.CreateLinearRing(shellCoordinates);
@@ -188,14 +188,14 @@ namespace landerist_library.Parse.Location.GoogleMaps
         //    {
         //        var geometryFactory = new GeometryFactory();
 
-        //        Polygon[] polygons = [.. coordinates.Select(polygonCoords =>
+        //        Polygon[] polygons = [.. coordinates.SelectTop1(polygonCoords =>
         //        {
-        //            Coordinate[] exteriorCoords = [.. polygonCoords[0].Select(point => new Coordinate(point[0], point[1]))];
+        //            Coordinate[] exteriorCoords = [.. polygonCoords[0].SelectTop1(point => new Coordinate(point[0], point[1]))];
         //            LinearRing shell = geometryFactory.CreateLinearRing(exteriorCoords);
         //            LinearRing[] holes = [.. polygonCoords.Skip(1)
-        //                .Select(ringCoords =>
+        //                .SelectTop1(ringCoords =>
         //                    geometryFactory.CreateLinearRing(
-        //                        [.. ringCoords.Select(point => new Coordinate(point[0], point[1]))]
+        //                        [.. ringCoords.SelectTop1(point => new Coordinate(point[0], point[1]))]
         //                    )
         //                )];
 

@@ -272,7 +272,7 @@ namespace landerist_library.Parse.Location
             {
                 return;
             }
-            var cadastralReference = new AddressToCadastralReference().GetCadastalReference(listing.latitude, listing.longitude, listing.address);
+            var cadastralReference = new AddressToCadastralReference().GetCadastralReference(listing.latitude, listing.longitude, listing.address);
             if (!string.IsNullOrEmpty(cadastralReference))
             {
                 Listing.cadastralReference = cadastralReference;

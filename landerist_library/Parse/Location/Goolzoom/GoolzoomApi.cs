@@ -74,7 +74,7 @@ namespace landerist_library.Parse.Location.Goolzoom
                     return GetAddress(data);
                 }
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 Logs.Log.WriteError("GoolzoomApi GetAddrees", exception);
             }

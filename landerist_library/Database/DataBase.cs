@@ -161,25 +161,6 @@ namespace landerist_library.Database
             return result;
         }
 
-        //public bool Query(string query)
-        //{
-        //    bool result = false;
-        //    try
-        //    {
-        //        using SqlConnection conn = new(ConnectionString);
-        //        using SqlCommand cmd = new(query, conn) { CommandTimeout = TimeOut };
-        //        conn.Open();
-        //        cmd.ExecuteNonQuery();
-        //        result = true;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Aquí se puede registrar el error con un sistema de logging
-        //        Console.WriteLine(ex);
-        //    }
-        //    return result;
-        //}
-
         public bool Query(string query, string parameterName, object parameterValue)
         {
             var dictionary = new Dictionary<string, object?> {

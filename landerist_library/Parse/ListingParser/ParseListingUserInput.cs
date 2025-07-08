@@ -146,7 +146,7 @@ namespace landerist_library.Parse.ListingParser
         //           .Where(n => !string.IsNullOrWhiteSpace(n.InnerHtml))
         //           ;
 
-        //    return visibleNodes.Select(n => n.InnerHtml.Trim());
+        //    return visibleNodes.SelectTop1(n => n.InnerHtml.Trim());
         //}
 
         [GeneratedRegex(@"\s+")]

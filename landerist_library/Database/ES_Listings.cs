@@ -261,7 +261,7 @@ namespace landerist_library.Database
         public static SortedSet<Listing> GetListingsWithoutCatastralReferenceAndLocationIsAccurate()
         {
             string query =
-                "SELECT * " +
+                "SELECT TOP 5000 * " +
                 "FROM " + TABLE_ES_LISTINGS + " " +
                 "WHERE [cadastralReference] IS NULL " +
                 "AND [locationIsAccurate] = 1";

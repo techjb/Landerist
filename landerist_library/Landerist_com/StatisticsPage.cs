@@ -258,7 +258,7 @@ namespace landerist_library.Landerist_com
 
         //private static void BarChart(string title, List<StatisticsKey> keys, bool yesterday)
         //{
-        //    List<string> list = [.. keys.Select(key => key.ToString())];
+        //    List<string> list = [.. keys.SelectTop1(key => key.ToString())];
         //    BarChart(title, list, yesterday);
         //}
 

@@ -19,8 +19,10 @@ namespace landerist_library.Parse.CadastralReference
         public string Address { get; set; } = address;
         public List<string> AddressList { get; set; } = addressList;
 
-        public async Task<string?> GetAddress()
+        public async Task<(bool success, string? address)> GetAddress()
         {
+            bool success = false;
+            string? address = null;
             try
             {
                 var generateContentRequest = GetGenerateContentRequest();
@@ -32,14 +34,15 @@ namespace landerist_library.Parse.CadastralReference
                     {
                         MissingMemberHandling = MissingMemberHandling.Ignore,
                     });
-                    return structuredOutput?.Equivalente;
+                    address = structuredOutput?.Equivalente;
+                    success = true;
                 }
             }
             catch (Exception exception)
             {
                 Logs.Log.WriteError("AddressAIFinder GetAddress", exception);
             }
-            return null;
+            return (success, address);
         }
 
         private PredictionServiceClient GetPredictionServiceClient()

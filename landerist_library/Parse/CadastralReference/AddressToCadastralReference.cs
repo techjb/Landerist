@@ -1,6 +1,7 @@
 ﻿using landerist_library.Database;
 using landerist_library.Parse.Location.Goolzoom;
 using landerist_library.Statistics;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System.Data;
 
@@ -8,55 +9,62 @@ namespace landerist_library.Parse.CadastralReference
 {
     public class AddressToCadastralReference
     {
-        public string? GetCadastalReference(double? latitude, double? longitude, string address, bool firstTry = true)
+        public string? GetCadastralReference(double? latitude, double? longitude, string address, bool firstTry = true)
         {
             if (latitude == null || longitude == null || address == null)
             {
                 return null;
             }
 
-            string? cadastralReference = new AddressCadastralReference().Select(address);
-            if (cadastralReference != null)
+            if (firstTry)
             {
-                return cadastralReference;
+                var dataTable = new AddressCadastralReference().SelectTop1(address);
+                if (dataTable.Rows.Count.Equals(1))
+                {
+                    return dataTable.Rows[0].Field<string>("cadastralReference");
+                }
             }
+
+            bool sueccess = false;
+            string? cadastralReference = null;
 
             try
             {
-                
                 StatisticsSnapshot.InsertDailyCounter("AddressToCadastralReferenceRequest");
                 int radio = firstTry ? 50 : 100;
                 var content = new GoolzoomApi().GetAddresses((double)latitude, (double)longitude, radio);
                 if (!string.IsNullOrEmpty(content))
                 {
                     var addressList = JsonConvert.DeserializeObject<AddressList>(content);
-                    cadastralReference = GetLocalId(address, addressList);
-                    if (cadastralReference == null && firstTry)
+                    (sueccess, cadastralReference) = GetLocalId(address, addressList);
+                    if (sueccess && cadastralReference == null && firstTry)
                     {
-                        cadastralReference = GetCadastalReference(latitude, longitude, address, false);
+                        cadastralReference = GetCadastralReference(latitude, longitude, address, false);
                     }
                 }
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteError("AddressToCadastralReference GetCadastalReference", exception);
+                Logs.Log.WriteError("AddressToCadastralReference GetCadastralReference", exception);
             }
-            if (cadastralReference != null)
+            if (sueccess)
             {
                 new AddressCadastralReference().Insert(address, cadastralReference);
-                StatisticsSnapshot.InsertDailyCounter("AddressToCadastralReferenceSuccess");
             }
             return cadastralReference;
         }
-        private string? GetLocalId(string searchAddress, AddressList? addressList)
+        private (bool success, string? localId) GetLocalId(string searchAddress, AddressList? addressList)
         {
             if (string.IsNullOrEmpty(searchAddress) || addressList == null || addressList.Addresses.Count == 0)
             {
-                return null;
+                return (false, null);
             }
             AddressAIFinder addressAIFinder = new(searchAddress, [.. addressList.Addresses.Select(a => a.AddressValue)]);
-            string? addressFound = addressAIFinder.GetAddress().Result;
-            if (!string.IsNullOrEmpty(addressFound))
+            var result = addressAIFinder.GetAddress().Result;
+
+            string? localId = null;
+
+            if (!string.IsNullOrEmpty(result.address))
             {
                 foreach (var address in addressList.Addresses)
                 {
@@ -64,13 +72,14 @@ namespace landerist_library.Parse.CadastralReference
                     {
                         continue;
                     }
-                    if (string.Equals(address.AddressValue, addressFound, StringComparison.OrdinalIgnoreCase))
+                    if (string.Equals(address.AddressValue, result.address, StringComparison.OrdinalIgnoreCase))
                     {
-                        return address?.LocalId;
+                        localId = address?.LocalId;
+                        break;
                     }
                 }
             }
-            return null;
+            return (result.success, localId);
         }
 
         public static void UpdateCadastralReferences()
@@ -79,9 +88,7 @@ namespace landerist_library.Parse.CadastralReference
             int total = listings.Count;
             int processed = 0;
             int found = 0;
-            int updated = 0;
             int notFound = 0;
-            int errors = 0;
 
             DataTable dataTableFound = new();
             dataTableFound.Columns.Add("LocalId", typeof(string));
@@ -93,25 +100,15 @@ namespace landerist_library.Parse.CadastralReference
 
 
             Parallel.ForEach(listings,
-                new ParallelOptions() { MaxDegreeOfParallelism = 10 },
+                new ParallelOptions() { MaxDegreeOfParallelism = 6 },
                 listing =>
             {
-                Interlocked.Increment(ref processed);
-
-                var cadastralReference = new AddressToCadastralReference().GetCadastalReference(listing.latitude, listing.longitude, listing.address);
+                var cadastralReference = new AddressToCadastralReference().GetCadastralReference(listing.latitude, listing.longitude, listing.address);
                 if (!string.IsNullOrEmpty(cadastralReference))
                 {
                     Interlocked.Increment(ref found);
                     listing.cadastralReference = cadastralReference;
-                    if (ES_Listings.Update(listing))
-                    //if (true)
-                    {
-                        Interlocked.Increment(ref updated);
-                    }
-                    else
-                    {
-                        Interlocked.Increment(ref errors);
-                    }
+                    ES_Listings.Update(listing);
 
 
                     lock (dataTableFound)
@@ -135,7 +132,8 @@ namespace landerist_library.Parse.CadastralReference
                         dataTableNotFound.Rows.Add(dataRow);
                     }
                 }
-                Console.WriteLine($"Processed {processed}/{total}, Found: {found}, Updated: {updated}, Not Found: {notFound}");
+                Interlocked.Increment(ref processed);
+                Console.WriteLine($"Processed {processed}/{total} Found: {found}  Not Found: {notFound}");
             });
 
             Tools.Csv.Write(dataTableFound, Configuration.PrivateConfig.EXPORT_DIRECTORY_LOCAL + "Found.csv", true);
