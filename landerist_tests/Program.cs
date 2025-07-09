@@ -187,7 +187,7 @@ namespace landerist_tests
             //new Scraper().ScrapeResponseBodyRepeatedInListings();            
             //new Scraper().Start();
             //new Scraper().Scrape(page, false);
-            //new landerist_library.Scrape.Scraper().Scrape("https://www.inmobiliariaiberia.com/inmueble.php?ID=72668726683058&amp;idio=12", false);
+            //new landerist_library.Scrape.Scraper().Scrape("https://serenityhouses.es/property/chalet-independiente-en-molino-de-la-hoz-para-entrar-a-vivir/", false);
             //new Scraper().DoTest();
             //landerist_library.Scrape.PageSelector.SelectTop1();
             //Console.WriteLine("Block: " + WebsitesBlocker.Block(page.Website));
@@ -200,7 +200,7 @@ namespace landerist_tests
             #region Downloaders
 
             //new HttpClientDownloader().Get(uriPage);
-            //PuppeteerDownloader.UpdateChrome();
+            //landerist_library.Downloaders.Puppeteer.PuppeteerDownloader.UpdateChrome();
             //PuppeteerDownloader.KillChrome();
             //PuppeteerDownloader.DoTest();            
             //PuppeteerDownloader.UpdateChrome();

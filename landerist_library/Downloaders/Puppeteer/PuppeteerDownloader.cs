@@ -20,6 +20,35 @@ namespace landerist_library.Downloaders.Puppeteer
         private const string ExpressionRemoveCookies =
             @"document.querySelectorAll('[class*=""cookie"" i], [id*=""cookie"" i]').forEach(el => el.remove());";
 
+        private const string ExpressionRemoveInvisibleElements = @"
+            () => {
+                const isVisible = (elem) => {
+                    if (!(elem instanceof Element)) return false;
+                    const style = window.getComputedStyle(elem);
+                    if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
+                        return false;
+                    }
+                    return true;
+                };
+
+                const removeInvisibleElements = (root) => {
+                    const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, null, false);
+                    const toRemove = [];
+                    while (walker.nextNode()) {
+                        const node = walker.currentNode;
+                        if (!isVisible(node)) {
+                            toRemove.push(node);
+                        }
+                    }
+                    for (const node of toRemove) {
+                        node.remove();
+                    }
+                };
+
+                removeInvisibleElements(document.body);
+            }
+        ";
+
         private static readonly HashSet<ResourceType> BlockResources = Config.TAKE_SCREENSHOT ?
         [
             ResourceType.Font,
@@ -447,11 +476,12 @@ namespace landerist_library.Downloaders.Puppeteer
                 }
 
                 await BrowserPage.EvaluateExpressionAsync(ExpressionRemoveCookies);
+                await BrowserPage.EvaluateFunctionAsync(ExpressionRemoveInvisibleElements);
                 if (Config.TAKE_SCREENSHOT)
                 {
                     screenShot = await PuppeteerScreenshot.TakeScreenshot(BrowserPage, page);
                 }
-                
+
                 content = await BrowserPage.GetContentAsync();
                 return (content, screenShot);
             }
@@ -476,7 +506,7 @@ namespace landerist_library.Downloaders.Puppeteer
                        //$"ScrapedCounter:{SingleDownloader!.ScrapedCounter()} " +
                        $"{exception.Message} " +
                        $"{page.Uri}";
-                       ;
+                ;
                 //Console.WriteLine("NavigationException " + message);
                 //Logs.Log.WriteError("PuppeterDownloader GetAsync NavigationException", message);
             }
@@ -557,10 +587,10 @@ namespace landerist_library.Downloaders.Puppeteer
             {
                 var url = e.Request.Url.ToLower();
                 var requestHost = uri.Host;
-                if(Uri.TryCreate(e.Request.Url,UriKind.Absolute, out Uri? requestUri))
+                if (Uri.TryCreate(e.Request.Url, UriKind.Absolute, out Uri? requestUri))
                 {
                     requestHost = requestUri.Host;
-                }              
+                }
 
                 if (BlockResources.Contains(e.Request.ResourceType) ||
                     BlockDomains.Contains(requestHost) ||
@@ -571,7 +601,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 {
                     await e.Request.AbortAsync();
                     return;
-                }                
+                }
                 //Console.WriteLine(e.Request.Url);   
                 await e.Request.ContinueAsync();
             }
