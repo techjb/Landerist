@@ -185,7 +185,8 @@ namespace landerist_tests
             //new Scraper().ScrapeResponseBodyRepeatedInListings();            
             //new Scraper().Start();
             //new Scraper().Scrape(page, false);
-            //new landerist_library.Scrape.Scraper().Scrape("https://serenityhouses.es/property/chalet-independiente-en-molino-de-la-hoz-para-entrar-a-vivir/", false);
+            
+            //new landerist_library.Scrape.Scraper().Scrape("https://inmogallardo.com/propiedades/vive-el-sueno-mediterraneo-en-torreblanca-fuengirola-ref-008652/", false);
             //new Scraper().DoTest();
             //landerist_library.Scrape.PageSelector.SelectTop1();
             //Console.WriteLine("Block: " + WebsitesBlocker.Block(page.Website));
@@ -250,10 +251,12 @@ namespace landerist_tests
             //Console.WriteLine(landerist_library.Tools.Validate.CadastralReference("3979515DD7737H0002LX"));
             //landerist_library.Tools.Validate.RemoveInvalidCatastralReferences();
 
-            //string address = "Calle Castillo de Fuensaldaña 4, Las Rozas de Madrid";
-            //string address = "Calle Juan Sebastian Elcano 14 - Local 3, Sevilla";
+            
+            //string address = "Fuengirola, Torreblanca del Sol, Málaga, España, 29640";
             //var latLNg = new GoogleMapsApi().GetLatLng(address, CountryCode.ES);
             //var cadastralReference = new AddressToCadastralReference().GetCadastralReference(latLNg.Value.latLng.Item1, latLNg.Value.latLng.Item2, address);
+            //Console.WriteLine(cadastralReference);
+
 
             //Console.WriteLine(d.latLng.ToString() + " " +  d.isAccurate);
             //GoogleMapsApi.UpdateListingsLocationIsAccurate();
@@ -362,7 +365,7 @@ namespace landerist_tests
 
             //ServiceTasks.DailyTask();
             //new ServiceTasks().UpdateAndScrape();
-            //DownloadFilesUpdater.Update();
+            //landerist_library.Landerist_com.FilesUpdater.Update();
             //ServiceTasks.UpdateAndScrape();
             //ServiceTasks.HourlyTasks();
             //ServiceTasks.Scrape();

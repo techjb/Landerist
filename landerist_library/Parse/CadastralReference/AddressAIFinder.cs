@@ -130,7 +130,10 @@ namespace landerist_library.Parse.CadastralReference
 
         private RepeatedField<Part> GetParts()
         {
-            string text = $"Dirección buscada: {Address}\r\n\r\nListado de direcciones postales equivalentes:\r\n" + string.Join("\r\n", [.. AddressList]);
+            string text = 
+                $"Dirección buscada:\r\n{Address}\r\n\r\n" +
+                $"Listado de direcciones postales equivalentes:\r\n" + string.Join("\r\n", [.. AddressList]);
+
             return
               [
                   new Part

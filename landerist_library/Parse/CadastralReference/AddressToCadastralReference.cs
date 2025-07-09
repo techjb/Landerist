@@ -1,7 +1,6 @@
 ﻿using landerist_library.Database;
 using landerist_library.Parse.Location.Goolzoom;
 using landerist_library.Statistics;
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System.Data;
 
@@ -59,12 +58,13 @@ namespace landerist_library.Parse.CadastralReference
             {
                 return (false, null);
             }
-            AddressAIFinder addressAIFinder = new(searchAddress, [.. addressList.Addresses.Select(a => a.AddressValue)]);
+            List<string> list = [.. addressList.Addresses.Select(a => a.AddressValue)];
+            AddressAIFinder addressAIFinder = new(searchAddress, list);
             var result = addressAIFinder.GetAddress().Result;
 
             string? localId = null;
 
-            if (!string.IsNullOrEmpty(result.address))
+            if (!string.IsNullOrEmpty(result.address) && !result.address.Equals("null"))
             {
                 foreach (var address in addressList.Addresses)
                 {
