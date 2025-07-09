@@ -55,7 +55,7 @@ namespace landerist_library.Database
                 "VALUES( " +
                 "@guid, @listingStatus, @listingDate, @updated, @unlistingDate, @operation, @propertyType, " +
                 "@propertySubtype, @priceAmount, @priceCurrency, @description, " +
-                "@contactName, @contactPhone, @contactEmail, @contactUrl, @contactOther, @address, @lauId, @latitude, @longitude, " +
+                "@contactName, @contactPhone, @contactEmail, @contactUrl, @contactOther, @address, @lauId, @lauName, @latitude, @longitude, " +
                 "@locationIsAccurate, @cadastralReference, @propertySize, @landSize, @constructionYear, " +
                 "@constructionStatus, @floors, @floor, @bedrooms, @bathrooms, @parkings, @terrace, @garden, " +
                 "@garage, @motorbikeGarage, @pool, @lift, @disabledAccess, @storageRoom, @furnished, " +
@@ -87,6 +87,7 @@ namespace landerist_library.Database
                 {"contactOther", listing.contactOther },
                 {"address", listing.address },
                 {"lauId", listing.lauId},
+                {"lauName", listing.lauName},
                 {"latitude", listing.latitude},
                 {"longitude", listing.longitude},
                 {"locationIsAccurate", listing.locationIsAccurate},
@@ -170,6 +171,7 @@ namespace landerist_library.Database
                 "[contactOther] = @contactOther, " +
                 "[address] = @address, " +
                 "[lauId] = @lauId, " +
+                "[lauName] = @lauName, " +
                 "[latitude] = @latitude, " +
                 "[longitude] = @longitude, " +
                 "[locationIsAccurate] = @locationIsAccurate, " +
@@ -241,6 +243,19 @@ namespace landerist_library.Database
                 "SELECT * " +
                 "FROM " + TABLE_ES_LISTINGS + " " +
                 "WHERE [cadastralReference] IS NOT NULL";
+
+            DataTable dataTable = new DataBase().QueryTable(query);
+            return GetAll(dataTable, false, false);
+        }
+
+        public static SortedSet<Listing> GetListingsWithoutLauName()
+        {
+            string query =
+                "SELECT * " +
+                "FROM " + TABLE_ES_LISTINGS + " " +
+                "WHERE [lauName] IS NULL AND " +
+                "[latitude] IS NOT NULL AND " +
+                "[longitude] IS NOT NULL";
 
             DataTable dataTable = new DataBase().QueryTable(query);
             return GetAll(dataTable, false, false);
@@ -412,6 +427,7 @@ namespace landerist_library.Database
                 contactOther = GetString(dataRow, "contactOther"),
                 address = GetString(dataRow, "address"),
                 lauId = GetString(dataRow, "lauId"),
+                lauName = GetString(dataRow, "lauName"),
                 latitude = GetDouble(dataRow, "latitude"),
                 longitude = GetDouble(dataRow, "longitude"),
                 locationIsAccurate = GetBoolean(dataRow, "locationIsAccurate"),

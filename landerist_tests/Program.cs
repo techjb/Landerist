@@ -96,8 +96,6 @@ namespace landerist_tests
         {
             Config.SetOnlyDatabaseToProduction();
 
-            //Thread.Sleep(10000);
-
             #region Urls
 
 
@@ -170,7 +168,7 @@ namespace landerist_tests
             //Pages.DeleteUrisLikePrint();
             //Pages.DeleteProhibitedUris();
             //new Page("https://areagestio.com/propiedades/25974555/").Insert();
-            
+
 
             #endregion
 
@@ -220,7 +218,7 @@ namespace landerist_tests
             //landerist_library.GetLatLng.PageType.PageTypeParser.ResponseBodyValidToIsListing(page);            
 
             //new ChatGPTRequest().ListModels();
-            //landerist_library.GetLatLng.Location.LauIdParser.SetLauIdToAllListings();
+            //landerist_library.Parse.Location.LauIdParser.SetLauIdAndLauNameToListings();
 
             //landerist_library.GetLatLng.Listing.VertexAI.ParseListingVertexAI.Test();
 

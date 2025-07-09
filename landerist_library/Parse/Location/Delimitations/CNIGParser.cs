@@ -60,28 +60,14 @@ namespace landerist_library.Parse.Location.Delimitations
             Console.WriteLine("Success: " + success + " Errors: " + errors);
         }
 
-        public static string? GetNatCode(landerist_orels.ES.Listing listing)
+        public static (string natCode, string nameUnit)? GetNatCodeAndNameUnit(landerist_orels.ES.Listing listing)
         {
             if (listing.latitude == null || listing.longitude == null)
             {
                 return null;
             }
-            return GetNatCode((double)listing.latitude, (double)listing.longitude);
-        }
 
-        public static string? GetNatCode(double latitude, double longitude)
-        {
-            var tuple = GetNatCodeAndNatUnit(latitude, longitude);
-            if (tuple == null)
-            {
-                return null;
-            }
-            return tuple.Item1;
-        }
-
-        public static Tuple<string, string>? GetNatCodeAndNatUnit(double latitude, double longitude)
-        {
-            DataRow? dataRow = Database.CNIG.Get(latitude, longitude);
+            DataRow? dataRow = Database.CNIG.Get((double)listing.latitude, (double)listing.longitude);
             if (dataRow == null)
             {
                 return null;
@@ -90,7 +76,7 @@ namespace landerist_library.Parse.Location.Delimitations
             string nameUnit = dataRow["nameunit"].ToString()!;
 
             natCode = natCode[6..]; // always natCode is 11 length
-            return Tuple.Create(natCode, nameUnit);
+            return (natCode, nameUnit);
         }
     }
 }

@@ -52,28 +52,14 @@ namespace landerist_library.Parse.Location.Delimitations
             Console.WriteLine("Success: " + success + " Errors: " + errors);
         }
 
-        public static string? GetId(landerist_orels.ES.Listing listing)
+        public static (string lau_id, string lau_name)? GetLauIdAndLauName(landerist_orels.ES.Listing listing)
         {
             if (listing.latitude == null || listing.longitude == null)
             {
                 return null;
             }
-            return GetId((double)listing.latitude, (double)listing.longitude);
-        }
-
-        public static string? GetId(double latitude, double longitude)
-        {
-            var idAndName = GetIdAndName(latitude, longitude);
-            if (idAndName == null)
-            {
-                return null;
-            }
-            return idAndName.Item1;
-        }
-
-        public static Tuple<string, string>? GetIdAndName(double latitude, double longitude)
-        {
-            DataRow? dataRow = Database.LAU.Get(latitude, longitude);
+            
+            DataRow? dataRow = Database.LAU.Get((double)listing.latitude, (double)listing.longitude);
             if (dataRow == null)
             {
                 return null;
@@ -81,7 +67,7 @@ namespace landerist_library.Parse.Location.Delimitations
             string lau_id = dataRow["lau_id"].ToString()!;
             string lau_name = dataRow["lau_name"].ToString()!;
 
-            return Tuple.Create(lau_id, lau_name);
+            return (lau_id, lau_name);
         }
     }
 }

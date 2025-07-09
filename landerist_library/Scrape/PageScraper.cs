@@ -130,7 +130,7 @@ namespace landerist_library.Scrape
 
             NewListing.SetPublished();
             new LocationParser(Page, NewListing).SetLatLng();
-            new LauIdParser(Page, NewListing).SetLauId();
+            new LauIdParser(Page.Website.CountryCode, NewListing).SetLauIdAndLauName();
             ES_Listings.InsertUpdate(Page.Website, NewListing);
             Page.SetListingStatusPublished();
         }

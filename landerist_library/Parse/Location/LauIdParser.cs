@@ -1,56 +1,83 @@
-﻿using landerist_library.Websites;
+﻿using landerist_library.Database;
+using landerist_library.Websites;
+using landerist_orels.ES;
 
 namespace landerist_library.Parse.Location
 {
-    public class LauIdParser(Page page, landerist_orels.ES.Listing listing)
+    public class LauIdParser(CountryCode countryCode, Listing listing)
     {
-        private readonly Page Page = page;
+        private readonly CountryCode CountryCode = countryCode;
 
-        private readonly landerist_orels.ES.Listing Listing = listing;
+        private readonly Listing Listing = listing;
 
-        public void SetLauId()
+        public void SetLauIdAndLauName()
         {
-            switch (Page.Website.CountryCode)
+            switch (CountryCode)
             {
                 // More precise map
                 case CountryCode.ES:
                     {
-                        Listing.lauId = Delimitations.CNIGParser.GetNatCode(Listing);
+                        var natCodeAndNameUnit = Delimitations.CNIGParser.GetNatCodeAndNameUnit(Listing);
+                        if (natCodeAndNameUnit != null)
+                        {
+                            Listing.lauId = natCodeAndNameUnit.Value.natCode;
+                            Listing.lauName = natCodeAndNameUnit.Value.nameUnit;
+                        }
                     }
                     break;
                 default:
                     {
-                        Listing.lauId = Delimitations.LAUParser.GetId(Listing);
+                        var lauIdAndLauName = Delimitations.LAUParser.GetLauIdAndLauName(Listing);
+                        if (lauIdAndLauName != null)
+                        {
+                            Listing.lauId = lauIdAndLauName.Value.lau_id;
+                            Listing.lauName = lauIdAndLauName.Value.lau_name;
+                        }
                     }
                     break;
             }
         }
 
-        public static void SetLauIdToAllListings()
+        public static void SetLauIdAndLauNameToListings()
         {
-            var listings = Database.ES_Listings.GetAll(false, false);
+            var listings = ES_Listings.GetListingsWithoutLauName();
             var total = listings.Count;
-            var count = 0;
+            var counter = 0;
             var updated = 0;
+            var errors = 0;
             Parallel.ForEach(listings, new ParallelOptions()
             {
                 //MaxDegreeOfParallelism = 1
             }, listing =>
             {
-                Interlocked.Increment(ref count);
-                Console.WriteLine("Setting LAU ID to listing " + count + "/" + total + " Updated: " + updated);
-                if (listing.lauId != null)
+                Interlocked.Increment(ref counter);
+                var lauIdParser = new LauIdParser(CountryCode.ES, listing);
+                lauIdParser.SetLauIdAndLauName();
+                if (lauIdParser.UpdateLauIdAndLauName())
                 {
-                    return;
+                    Interlocked.Increment(ref updated);
                 }
-                var lauId = Delimitations.CNIGParser.GetNatCode(listing);
-                if (lauId is null)
+                else
                 {
-                    return;
+                    Interlocked.Increment(ref errors);
                 }
-                listing.lauId = lauId;
-                Database.ES_Listings.Update(listing);
-                Interlocked.Increment(ref updated);
+                int percentage =(int)((double)counter / total * 100);
+                Console.WriteLine(counter + "/" + total + " (" + percentage + "%) Updated: " + updated + " Errors: " + errors);
+            });
+        }
+
+        public bool UpdateLauIdAndLauName()
+        {
+            string query =
+                "UPDATE " + ES_Listings.TABLE_ES_LISTINGS + " " +
+                "SET [lauId] = @lauId, [lauName] = @lauName " +
+                "WHERE [guid] = @guid";
+
+            return new DataBase().Query(query, new Dictionary<string, object?>
+            {
+                { "lauId", Listing.lauId },
+                { "lauName", Listing.lauName },
+                { "guid", Listing.guid.ToString() }
             });
         }
     }

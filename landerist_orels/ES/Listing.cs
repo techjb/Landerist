@@ -115,84 +115,89 @@ namespace landerist_orels.ES
         public string lauId { get; set; }
 
         [JsonProperty(Order = 19)]
-        public double? latitude { get; set; }
+
+        public string lauName { get; set; }
 
         [JsonProperty(Order = 20)]
-        public double? longitude { get; set; }
+
+        public double? latitude { get; set; }
 
         [JsonProperty(Order = 21)]
-        public bool? locationIsAccurate { get; set; }
+        public double? longitude { get; set; }
 
         [JsonProperty(Order = 22)]
-        public string cadastralReference { get; set; }
+        public bool? locationIsAccurate { get; set; }
 
         [JsonProperty(Order = 23)]
-        public double? propertySize { get; set; }
+        public string cadastralReference { get; set; }
 
         [JsonProperty(Order = 24)]
-        public double? landSize { get; set; }
+        public double? propertySize { get; set; }
 
         [JsonProperty(Order = 25)]
-        public int? constructionYear { get; set; }
+        public double? landSize { get; set; }
 
         [JsonProperty(Order = 26)]
-        public ConstructionStatus? constructionStatus { get; set; }
+        public int? constructionYear { get; set; }
 
         [JsonProperty(Order = 27)]
-        public int? floors { get; set; }
+        public ConstructionStatus? constructionStatus { get; set; }
 
         [JsonProperty(Order = 28)]
-        public string floor { get; set; }
+        public int? floors { get; set; }
 
         [JsonProperty(Order = 29)]
-        public int? bedrooms { get; set; }
+        public string floor { get; set; }
 
         [JsonProperty(Order = 30)]
-        public int? bathrooms { get; set; }
+        public int? bedrooms { get; set; }
 
         [JsonProperty(Order = 31)]
-        public int? parkings { get; set; }
+        public int? bathrooms { get; set; }
 
         [JsonProperty(Order = 32)]
-        public bool? terrace { get; set; }
+        public int? parkings { get; set; }
 
         [JsonProperty(Order = 33)]
-        public bool? garden { get; set; }
+        public bool? terrace { get; set; }
 
         [JsonProperty(Order = 34)]
-        public bool? garage { get; set; }
+        public bool? garden { get; set; }
 
         [JsonProperty(Order = 35)]
-        public bool? motorbikeGarage { get; set; }
+        public bool? garage { get; set; }
 
         [JsonProperty(Order = 36)]
-        public bool? pool { get; set; }
+        public bool? motorbikeGarage { get; set; }
 
         [JsonProperty(Order = 37)]
-        public bool? lift { get; set; }
+        public bool? pool { get; set; }
 
         [JsonProperty(Order = 38)]
-        public bool? disabledAccess { get; set; }
+        public bool? lift { get; set; }
 
         [JsonProperty(Order = 39)]
-        public bool? storageRoom { get; set; }
+        public bool? disabledAccess { get; set; }
 
         [JsonProperty(Order = 40)]
-        public bool? furnished { get; set; }
+        public bool? storageRoom { get; set; }
 
         [JsonProperty(Order = 41)]
-        public bool? nonFurnished { get; set; }
+        public bool? furnished { get; set; }
 
         [JsonProperty(Order = 42)]
-        public bool? heating { get; set; }
+        public bool? nonFurnished { get; set; }
 
         [JsonProperty(Order = 43)]
-        public bool? airConditioning { get; set; }
+        public bool? heating { get; set; }
 
         [JsonProperty(Order = 44)]
-        public bool? petsAllowed { get; set; }
+        public bool? airConditioning { get; set; }
 
         [JsonProperty(Order = 45)]
+        public bool? petsAllowed { get; set; }
+
+        [JsonProperty(Order = 46)]
         public bool? securitySystems { get; set; }
 
 #pragma warning restore IDE1006 // Naming Styles
@@ -323,6 +328,7 @@ namespace landerist_orels.ES
                 contactOther == other.contactOther &&
                 address == other.address &&
                 lauId == other.lauId &&
+                lauName == other.lauName &&
                 latitude == other.latitude &&
                 longitude == other.longitude &&
                 locationIsAccurate == other.locationIsAccurate &&
@@ -373,6 +379,7 @@ namespace landerist_orels.ES
             hash ^= contactOther?.GetHashCode() ?? 0;
             hash ^= address?.GetHashCode() ?? 0;
             hash ^= lauId?.GetHashCode() ?? 0;
+            hash ^= lauName?.GetHashCode() ?? 0;
             hash ^= latitude?.GetHashCode() ?? 0;
             hash ^= longitude?.GetHashCode() ?? 0;
             hash ^= locationIsAccurate?.GetHashCode() ?? 0;
