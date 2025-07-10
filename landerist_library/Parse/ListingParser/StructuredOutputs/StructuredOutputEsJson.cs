@@ -61,6 +61,11 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         [Description(ReferenciaDelAnuncioDescription)]
         public string? referencia_del_anuncio { get; set; } = null;
 
+        public const string NombreDeContactoDescription = "nombre de la persona o empresa de contacto";
+
+        [Description(NombreDeContactoDescription)]
+        public string? nombre_de_contacto { get; set; } = null;
+
 
         public const string TeléfonoDeContactoDescription = "número de teléfono de contacto";
 

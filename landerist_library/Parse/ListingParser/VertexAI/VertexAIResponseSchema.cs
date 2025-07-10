@@ -69,6 +69,12 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
                             Description = StructuredOutputEsJson.ReferenciaDelAnuncioDescription,
                         },
+                        [nameof(StructuredOutputEsJson.nombre_de_contacto)] = new()
+                        {
+                            Nullable = true,
+                            Type = Google.Cloud.AIPlatform.V1.Type.String,
+                            Description = StructuredOutputEsJson.NombreDeContactoDescription,
+                        },
                         [nameof(StructuredOutputEsJson.teléfono_de_contacto)] = new()
                         {
                             Nullable = true,

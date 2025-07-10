@@ -94,6 +94,10 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public string? ReferenciaDelAnuncio { get; private set; }
 
 
+        [JsonProperty(nameof(StructuredOutputEsJson.nombre_de_contacto), Required = Required.Default)]
+        [System.ComponentModel.Description(StructuredOutputEsJson.NombreDeContactoDescription)]
+        public string? NombreDeContacto { get; private set; }
+
         [JsonProperty(nameof(StructuredOutputEsJson.teléfono_de_contacto), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.TeléfonoDeContactoDescription)]
         public string? TeléfonoDeContacto { get; private set; }

@@ -31,6 +31,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI
             AddNumber(properties, nameof(precio_del_anuncio));
             AddString(properties, nameof(descripción_del_anuncio));
             AddString(properties, nameof(referencia_del_anuncio));
+            AddString(properties, nameof(nombre_de_contacto));
             AddString(properties, nameof(teléfono_de_contacto));
             AddString(properties, nameof(email_de_contacto));
             AddString(properties, nameof(dirección_del_inmueble));

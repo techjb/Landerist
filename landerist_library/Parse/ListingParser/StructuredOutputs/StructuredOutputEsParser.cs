@@ -37,8 +37,9 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
                     propertySubtype = GetPropertySubtype(),
                     price = GetPropertyPrice(),
                     description = GetDescription(),
-                    contactPhone = GetPhone(),
-                    contactEmail = GetEmail(),
+                    contactName = GetContactName(),
+                    contactPhone = GetContactPhone(),
+                    contactEmail = GetContactEmail(),
                     address = GetAddress(),
                     cadastralReference = GetCadastralReference(),
                     propertySize = GetPropertySize(),
@@ -207,7 +208,21 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             return page.Uri;
         }
 
-        private string? GetPhone()
+        private string? GetContactName()
+        {
+            if (string.IsNullOrEmpty(Anuncio!.NombreDeContacto))
+            {
+                return null;
+            }
+            var nombreDeContacto = Tools.Strings.Clean(Anuncio!.NombreDeContacto);
+            if (string.IsNullOrEmpty(nombreDeContacto))
+            {
+                return null;
+            }
+            return nombreDeContacto;
+        }
+
+        private string? GetContactPhone()
         {
             if (string.IsNullOrEmpty(Anuncio!.TeléfonoDeContacto))
             {
@@ -221,7 +236,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             return telefonoDeContacto;
         }
 
-        private string? GetEmail()
+        private string? GetContactEmail()
         {
             if (string.IsNullOrEmpty(Anuncio!.EmailDeContacto))
             {
