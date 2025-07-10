@@ -24,7 +24,7 @@ namespace landerist_library.Parse.CadastralReference
                 }
             }
 
-            bool sueccess = false;
+            bool success = false;
             string? cadastralReference = null;
 
             try
@@ -35,8 +35,8 @@ namespace landerist_library.Parse.CadastralReference
                 if (!string.IsNullOrEmpty(content))
                 {
                     var addressList = JsonConvert.DeserializeObject<AddressList>(content);
-                    (sueccess, cadastralReference) = GetLocalId(address, addressList);
-                    if (sueccess && cadastralReference == null && firstTry)
+                    (success, cadastralReference) = GetLocalId(address, addressList);
+                    if (success && cadastralReference == null && firstTry)
                     {
                         cadastralReference = GetCadastralReference(latitude, longitude, address, false);
                     }
@@ -46,7 +46,7 @@ namespace landerist_library.Parse.CadastralReference
             {
                 Logs.Log.WriteError("AddressToCadastralReference GetCadastralReference", exception);
             }
-            if (sueccess)
+            if (success)
             {
                 new AddressCadastralReference().Insert(address, cadastralReference);
             }
@@ -59,6 +59,8 @@ namespace landerist_library.Parse.CadastralReference
                 return (false, null);
             }
             List<string> list = [.. addressList.Addresses.Select(a => a.AddressValue)];
+
+            //Console.WriteLine(string.Join('\n', [.. list]));
             AddressAIFinder addressAIFinder = new(searchAddress, list);
             var result = addressAIFinder.GetAddress().Result;
 
