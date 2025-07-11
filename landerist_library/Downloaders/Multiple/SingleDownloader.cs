@@ -59,12 +59,7 @@ namespace landerist_library.Downloaders.Multiple
             }
             SetAvailable();
             return true;
-        }
-
-        public string? GetRedirectUrl()
-        {
-            return Downloader.RedirectUrl;
-        }
+        }       
 
         public void CloseBrowser()
         {

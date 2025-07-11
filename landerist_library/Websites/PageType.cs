@@ -9,6 +9,7 @@
         MainPage,
         NotIndexable,
         NotCanonical,
+        RedirectToAnotherUrl,
         ResponseBodyNullOrEmpty,
         ResponseBodyIsError,
         ResponseBodyTooShort,

@@ -2,6 +2,7 @@
 using landerist_library.Configuration;
 using landerist_library.Downloaders.Multiple;
 using landerist_library.Websites;
+using Microsoft.IdentityModel.Tokens;
 using PuppeteerSharp;
 using System;
 using System.Diagnostics;
@@ -12,9 +13,9 @@ namespace landerist_library.Downloaders.Puppeteer
 {
     public class PuppeteerDownloader : IDownloader
     {
-        public short? HttpStatusCode { get; set; } = null;
         public string? Content { get; set; } = null;
         public byte[]? Screenshot { get; set; } = null;
+        public short? HttpStatusCode { get; set; } = null;
         public string? RedirectUrl { get; set; } = null;
 
         private const string ExpressionRemoveCookies =
@@ -585,13 +586,14 @@ namespace landerist_library.Downloaders.Puppeteer
         {
             try
             {
-                var url = e.Request.Url.ToLower();
+
                 var requestHost = uri.Host;
                 if (Uri.TryCreate(e.Request.Url, UriKind.Absolute, out Uri? requestUri))
                 {
                     requestHost = requestUri.Host;
                 }
 
+                var url = e.Request.Url.ToLower();
                 if (BlockResources.Contains(e.Request.ResourceType) ||
                     BlockDomains.Contains(requestHost) ||
                     BlockedExtensions.Any(url.EndsWith) ||
@@ -613,7 +615,6 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private void HandleResponseAsync(ResponseCreatedEventArgs e, Uri uri)
         {
-
             try
             {
                 if (!e.Response.Request.IsNavigationRequest || FirstNavigationRequestReaded)
@@ -621,17 +622,16 @@ namespace landerist_library.Downloaders.Puppeteer
                     return;
                 }
                 FirstNavigationRequestReaded = true;
-                if (Uri.TryCreate(e.Response.Url, UriKind.RelativeOrAbsolute, out Uri? responseUri))
-                {
-                    if (!responseUri.Equals(uri))
-                    {
-                        RedirectUrl = responseUri.ToString();
-                    }
-                }
+
+                Uri.TryCreate(e.Response.Url, UriKind.RelativeOrAbsolute, out Uri? redirectUrl);
                 HttpStatusCode = (short)e.Response.Status;
                 if (e.Response.Headers.TryGetValue("Location", out string? location))
                 {
-                    RedirectUrl = location;
+                    Uri.TryCreate(location, UriKind.RelativeOrAbsolute, out redirectUrl);
+                }
+                if (redirectUrl != null && !uri.Equals(redirectUrl))
+                {
+                    RedirectUrl = redirectUrl.ToString();
                 }
 
             }

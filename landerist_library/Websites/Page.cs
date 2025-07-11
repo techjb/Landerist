@@ -5,6 +5,7 @@ using landerist_library.Downloaders;
 using landerist_library.Index;
 using landerist_library.Tools;
 using landerist_orels.ES;
+using System;
 using System.Data;
 using System.IO.Compression;
 using System.Text;
@@ -27,6 +28,8 @@ namespace landerist_library.Websites
         public DateTime? NextUpdate { get; set; }
 
         public short? HttpStatusCode { get; set; }
+
+        public string? RedirectUrl { get; set; } = null;
 
         public PageType? PageType { get; private set; }
 
@@ -82,7 +85,7 @@ namespace landerist_library.Websites
             Website = website;
             Host = uri.Host;
             Uri = uri;
-            UriHash = Strings.GetHash(uri.ToString());
+            UriHash = GetUriHash();
             Inserted = DateTime.Now;
             Updated = DateTime.Now;
 
@@ -91,6 +94,12 @@ namespace landerist_library.Websites
             {
                 Load(dataRow);
             }
+        }
+
+        public string GetUriHash()
+        {
+            var uriString = Uri.ToString();
+            return Strings.GetHash(uriString);
         }
 
         public Page(Website website, DataRow dataRow)
@@ -343,6 +352,7 @@ namespace landerist_library.Websites
             ResponseBodyText = null;
             Screenshot = downloader.Screenshot;
             HttpStatusCode = downloader.HttpStatusCode;
+            RedirectUrl = downloader.RedirectUrl;
         }
 
         public void SetResponseBodyText()
@@ -468,22 +478,20 @@ namespace landerist_library.Websites
         public bool NotCanonical()
         {
             var canonicalUri = GetCanonicalUri();
-            if (canonicalUri != null)
+            if (canonicalUri == null)
             {
-                return !UrisAreEquals(Uri, canonicalUri);
+                return false;
             }
-            return false;
+            return !Uri.Equals(canonicalUri);
+            //return 
+            //    !Uri.ToString().Equals(canonicalUri.ToString(), StringComparison.OrdinalIgnoreCase) || 
+            //    !Uri.Host.Equals(canonicalUri.Host, StringComparison.OrdinalIgnoreCase) || 
+            //    !Uri.Scheme.Equals(canonicalUri.Scheme, StringComparison.OrdinalIgnoreCase) || 
+            //    !Uri.Port.Equals(canonicalUri.Port);
         }
-
-        public static bool UrisAreEquals(Uri uri1, Uri uri2)
+        public bool RedirectToAnotherUrl()
         {
-            string normalizedUri1 = uri1.ToString().TrimEnd('/');
-            string normalizedUri2 = uri2.ToString().TrimEnd('/');
-
-            return normalizedUri1.Equals(normalizedUri2, StringComparison.OrdinalIgnoreCase)
-                && uri1.Host.Equals(uri2.Host, StringComparison.OrdinalIgnoreCase)
-                && uri1.Scheme.Equals(uri2.Scheme, StringComparison.OrdinalIgnoreCase)
-                && uri1.Port == uri2.Port;
+            return !string.IsNullOrEmpty(RedirectUrl);
         }
 
         public bool IncorrectLanguage()

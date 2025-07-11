@@ -32,6 +32,10 @@ namespace landerist_library.Parse.PageTypeParser
             {
                 return (PageType.NotCanonical, null, false);
             }
+            if (Page.RedirectToAnotherUrl())
+            {
+                return (PageType.RedirectToAnotherUrl, null, false);
+            }
             if (Page.IncorrectLanguage())
             {
                 return (PageType.IncorrectLanguage, null, false);

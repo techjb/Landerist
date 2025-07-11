@@ -107,7 +107,7 @@ namespace landerist_library.Scrape
             }
             if (Page.IsNotListingByParser())
             {
-                Page.InsertNotListingResponseBodyText();                
+                Page.InsertNotListingResponseBodyText();
             }
             if (Page.HaveToUnpublishListing())
             {
@@ -159,15 +159,9 @@ namespace landerist_library.Scrape
             {
                 return;
             }
-
-            if (SingleDownloader == null)
+            if (!string.IsNullOrEmpty(Page.RedirectUrl))
             {
-                return;
-            }
-            var redirectUrl = SingleDownloader.GetRedirectUrl();
-            if (!string.IsNullOrEmpty(redirectUrl))
-            {
-                new Indexer(Page).Insert(redirectUrl);
+                new Indexer(Page).Insert(Page.RedirectUrl);
                 return;
             }
             if (Page.ContainsMetaRobotsNoFollow())
