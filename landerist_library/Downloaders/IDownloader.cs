@@ -9,6 +9,7 @@ namespace landerist_library.Downloaders
         public byte[]? Screenshot { get; set; }
 
         public short? HttpStatusCode { get; set; }
+
         public string? RedirectUrl { get; set; }
 
         public void Download(Page page);

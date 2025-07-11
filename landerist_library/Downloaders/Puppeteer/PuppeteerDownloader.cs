@@ -2,11 +2,8 @@
 using landerist_library.Configuration;
 using landerist_library.Downloaders.Multiple;
 using landerist_library.Websites;
-using Microsoft.IdentityModel.Tokens;
 using PuppeteerSharp;
-using System;
 using System.Diagnostics;
-using System.Net;
 
 
 namespace landerist_library.Downloaders.Puppeteer
@@ -17,6 +14,8 @@ namespace landerist_library.Downloaders.Puppeteer
         public byte[]? Screenshot { get; set; } = null;
         public short? HttpStatusCode { get; set; } = null;
         public string? RedirectUrl { get; set; } = null;
+
+        private Websites.Page? Page;
 
         private const string ExpressionRemoveCookies =
             @"document.querySelectorAll('[class*=""cookie"" i], [id*=""cookie"" i]').forEach(el => el.remove());";
@@ -422,6 +421,7 @@ namespace landerist_library.Downloaders.Puppeteer
             Screenshot = null;
             HttpStatusCode = null;
             RedirectUrl = null;
+            Page = page;
 
             var delay = GetTimeout();
             if (Config.IsConfigurationLocal())
@@ -431,7 +431,7 @@ namespace landerist_library.Downloaders.Puppeteer
 
             try
             {
-                var taskGetAsync = Task.Run(async () => await GetAsync(page));
+                var taskGetAsync = Task.Run(GetAsync);
                 var taskDelay = Task.Delay(delay);
                 var completedTask = Task.WhenAny(taskGetAsync, taskDelay).Result;
                 if (completedTask == taskGetAsync)
@@ -445,7 +445,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
         }
 
-        private async Task<(string? content, byte[]? screenShot)> GetAsync(Websites.Page page)
+        private async Task<(string? content, byte[]? screenShot)> GetAsync()
         {
             string? content = null;
             byte[]? screenShot = null;
@@ -457,7 +457,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 {
                     throw new Exception("Browser is not initialized.");
                 }
-                await InitializePage(page.Website.LanguageCode, page.Uri);
+                await InitializePage();
                 if (!PageInitialized())
                 {
                     throw new Exception("Page is not initialized.");
@@ -466,7 +466,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 {
                     await BrowserPage!.AuthenticateAsync(ProxyCredentials);
                 }
-                var response = await BrowserPage!.GoToAsync(page.Uri.ToString(), NavigationOptions);
+                var response = await BrowserPage!.GoToAsync(Page!.Uri.ToString(), NavigationOptions);
                 if (response == null)
                 {
                     throw new NavigationException("Response is null.");
@@ -480,7 +480,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 await BrowserPage.EvaluateFunctionAsync(ExpressionRemoveInvisibleElements);
                 if (Config.TAKE_SCREENSHOT)
                 {
-                    screenShot = await PuppeteerScreenshot.TakeScreenshot(BrowserPage, page);
+                    screenShot = await PuppeteerScreenshot.TakeScreenshot(BrowserPage, Page);
                 }
 
                 content = await BrowserPage.GetContentAsync();
@@ -506,7 +506,7 @@ namespace landerist_library.Downloaders.Puppeteer
                        //$"SingleDownloader Id:{SingleDownloader!.Id} " +
                        //$"ScrapedCounter:{SingleDownloader!.ScrapedCounter()} " +
                        $"{exception.Message} " +
-                       $"{page.Uri}";
+                       $"{Page!.Uri}";
                 ;
                 //Console.WriteLine("NavigationException " + message);
                 //Logs.Log.WriteError("PuppeterDownloader GetAsync NavigationException", message);
@@ -529,7 +529,7 @@ namespace landerist_library.Downloaders.Puppeteer
         }
 
 
-        private async Task InitializePage(LanguageCode languageCode, Uri uri)
+        private async Task InitializePage()
         {
             FirstNavigationRequestReaded = false;
             if (PageInitialized())
@@ -556,12 +556,12 @@ namespace landerist_library.Downloaders.Puppeteer
             }
 
             BrowserPage.DefaultNavigationTimeout = GetTimeout();
-            SetAccepLanguage(BrowserPage, languageCode);
+            SetAccepLanguage(BrowserPage, Page!.Website.LanguageCode);
             await BrowserPage.SetUserAgentAsync(Config.USER_AGENT);
             await BrowserPage.SetCacheEnabledAsync(false);
             await BrowserPage.SetRequestInterceptionAsync(true);
-            BrowserPage.Request += async (sender, e) => await HandleRequestAsync(e, uri);
-            BrowserPage.Response += (sender, e) => HandleResponseAsync(e, uri);
+            BrowserPage.Request += async (sender, e) => await HandleRequestAsync(e);
+            BrowserPage.Response += (sender, e) => HandleResponseAsync(e);
         }
 
 
@@ -582,12 +582,11 @@ namespace landerist_library.Downloaders.Puppeteer
             }
         }
 
-        private async Task HandleRequestAsync(RequestEventArgs e, Uri uri)
+        private async Task HandleRequestAsync(RequestEventArgs e)
         {
             try
             {
-
-                var requestHost = uri.Host;
+                var requestHost = Page!.Uri.Host;
                 if (Uri.TryCreate(e.Request.Url, UriKind.Absolute, out Uri? requestUri))
                 {
                     requestHost = requestUri.Host;
@@ -613,7 +612,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
         }
 
-        private void HandleResponseAsync(ResponseCreatedEventArgs e, Uri uri)
+        private void HandleResponseAsync(ResponseCreatedEventArgs e)
         {
             try
             {
@@ -623,15 +622,16 @@ namespace landerist_library.Downloaders.Puppeteer
                 }
                 FirstNavigationRequestReaded = true;
 
-                Uri.TryCreate(e.Response.Url, UriKind.RelativeOrAbsolute, out Uri? redirectUrl);
+                Uri.TryCreate(e.Response.Url, UriKind.RelativeOrAbsolute, out Uri? redirectUri);
                 HttpStatusCode = (short)e.Response.Status;
                 if (e.Response.Headers.TryGetValue("Location", out string? location))
                 {
-                    Uri.TryCreate(location, UriKind.RelativeOrAbsolute, out redirectUrl);
+                    Uri.TryCreate(location, UriKind.RelativeOrAbsolute, out redirectUri);
                 }
-                if (redirectUrl != null && !uri.Equals(redirectUrl))
+                if (redirectUri != null && !Page!.Uri.Equals(redirectUri))
                 {
-                    RedirectUrl = redirectUrl.ToString();
+                    RedirectUrl = redirectUri.ToString();
+                    //new Database.RedirectUrl().Insert(Page!.Uri.ToString(), RedirectUrl);
                 }
 
             }

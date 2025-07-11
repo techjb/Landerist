@@ -170,23 +170,6 @@ namespace landerist_tests
             //Pages.DeleteProhibitedUris();
             //new Page("https://areagestio.com/propiedades/25974555/").Insert();
 
-            //List<string> args =
-            //[
-            //    "http://www.m2mallorca.com/find/?province=ILLES BALEARS&amp;town=FELANITX",
-            //    "http://www.m2mallorca.com/find/?province=Illes Balears&amp;town=felanitx",
-            //    "http://www.m2mallorca.com/find/?province=illes balears&amp;town=felanitx",
-            //    "http://www.m2mallorca.com/find/?province=Illes Balears&amp;town=FELANITX",
-            //    "http://www.m2mallorca.com/find/?province=Illes Balears&amp;town=Felanitx",
-            //    "http://www.m2mallorca.com/find/?province=illes balears&amp;town=Felanitx",
-            //];
-
-            //foreach(var arg in args)
-            //{
-            //    var page = new Page(arg);
-            //    Console.WriteLine(page.UriHash);
-            //}
-
-
 
             #endregion
 
@@ -204,9 +187,9 @@ namespace landerist_tests
             //new Scraper().Start();
             //new Scraper().Scrape(page, false);
 
-            //new landerist_library.Scrape.Scraper().Scrape("http://123javeavillas.com/properties-for-sale/location-4-javea/currency-EUR/javea-property-valuation/", false);
+            //new landerist_library.Scrape.Scraper().Scrape("http://www.altorasesores.com/es/pisos/madrid/salamanca/ref-2512", false);
 
-            //new landerist_library.Scrape.Scraper().Scrape("https://123immo.es/es/apartamentos.html", false);
+            //new landerist_library.Scrape.Scraper().Scrape("https://dosagui.com/es/property/15746", true);
             //new Scraper().DoTest();
             //landerist_library.Scrape.PageSelector.SelectTop1();
             //Console.WriteLine("Block: " + WebsitesBlocker.Block(page.Website));
@@ -377,6 +360,7 @@ namespace landerist_tests
 
             //var h = landerist_library.Database.CountrySpain.Contains(-3.6886920000, 40.4199410000); // false
             //Console.WriteLine(h);            
+            //landerist_library.Database.RedirectUrl.Insert("test1", "test2");
 
             #endregion
 
