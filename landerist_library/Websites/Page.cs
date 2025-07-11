@@ -483,11 +483,6 @@ namespace landerist_library.Websites
                 return false;
             }
             return !Uri.Equals(canonicalUri);
-            //return 
-            //    !Uri.ToString().Equals(canonicalUri.ToString(), StringComparison.OrdinalIgnoreCase) || 
-            //    !Uri.Host.Equals(canonicalUri.Host, StringComparison.OrdinalIgnoreCase) || 
-            //    !Uri.Scheme.Equals(canonicalUri.Scheme, StringComparison.OrdinalIgnoreCase) || 
-            //    !Uri.Port.Equals(canonicalUri.Port);
         }
         public bool RedirectToAnotherUrl()
         {
