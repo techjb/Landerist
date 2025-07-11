@@ -16,11 +16,15 @@ namespace landerist_library.Parse.PageTypeParser
             {
                 return (PageType.HttpStatusCodeNotOK, null, false);
             }
+            if (Page.RedirectToAnotherUrl())
+            {
+                return (PageType.RedirectToAnotherUrl, null, false);
+            }
             if (Page.ResponseBodyIsNullOrEmpty())
             {
                 return (PageType.ResponseBodyNullOrEmpty, null, false);
             }
-            if (Page.MainPage())
+            if (Page.IsMainPage())
             {
                 return (PageType.MainPage, null, false);
             }
@@ -31,11 +35,7 @@ namespace landerist_library.Parse.PageTypeParser
             if (Page.NotCanonical())
             {
                 return (PageType.NotCanonical, null, false);
-            }
-            if (Page.RedirectToAnotherUrl())
-            {
-                return (PageType.RedirectToAnotherUrl, null, false);
-            }
+            }            
             if (Page.IncorrectLanguage())
             {
                 return (PageType.IncorrectLanguage, null, false);

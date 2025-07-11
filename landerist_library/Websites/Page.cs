@@ -332,7 +332,7 @@ namespace landerist_library.Websites
             return null;
         }
 
-        public bool MainPage()
+        public bool IsMainPage()
         {
             if (Website == null)
             {

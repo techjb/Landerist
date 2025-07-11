@@ -393,7 +393,7 @@ namespace landerist_library.Websites
                 Parallel.ForEach(pages, page =>
                 {
                     Interlocked.Increment(ref pageCounter);
-                    if (page.MainPage())
+                    if (page.IsMainPage())
                     {
                         return;
                     }
