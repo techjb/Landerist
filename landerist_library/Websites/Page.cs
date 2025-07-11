@@ -729,9 +729,19 @@ namespace landerist_library.Websites
             return PageType == landerist_library.Websites.PageType.NotCanonical;
         }
 
+        public bool IsRedirectToAnotherUrl()
+        {
+            return PageType == landerist_library.Websites.PageType.RedirectToAnotherUrl;
+        }
+
         public bool IsNotCanonicalListing()
         {
             return IsNotCanonical() && ContainsListingStatus();
+        }
+
+        public bool IsRedirectToAnotherUrlListing()
+        {
+            return IsRedirectToAnotherUrl() && ContainsListingStatus();
         }
     }
 }

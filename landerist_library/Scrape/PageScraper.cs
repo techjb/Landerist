@@ -113,7 +113,7 @@ namespace landerist_library.Scrape
             {
                 HandleUnpublishedListing();
             }
-            if (Page.IsNotCanonicalListing())
+            if (Page.IsNotCanonicalListing() || Page.IsRedirectToAnotherUrlListing())
             {
                 // todo: handle not canonical listing
             }
