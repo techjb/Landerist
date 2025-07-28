@@ -68,8 +68,7 @@ namespace landerist_library.Parse.PageTypeParser
             {
                 return (PageType.ResponseBodyRepeatedInHost, null, false);
             }
-
-            if (ParseListing.TooManyTokens(Page))
+            if (ParseListingSystem.TooManyTokens(Page))
             {
                 return (PageType.ResponseBodyTooManyTokens, null, false);
             }

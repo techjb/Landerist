@@ -16,11 +16,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI
         
         public const float Temperature = 0.2f;
 
-        public static bool TooManyTokens(Page page)
-        {
-            return TooManyTokens(page, MAX_CONTEXT_WINDOW);
-        }
-
+        
         public static async Task<GenerateContentResponse?> GetResponse(Page page, string text)
         {
             try
@@ -52,7 +48,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI
         {
             return new GenerateContentRequest
             {
-                Model = $"projects/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PROJECTID}/locations/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}/publishers/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PUBLISHER}/models/{Config.VERTEXT_AI_MODEL_NAME}",
+                Model = $"projects/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PROJECTID}/locations/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}/publishers/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PUBLISHER}/models/{Config.VERTEXT_AI_MODEL_NAME_GEMINI_FLASH_LITE}",
                 Contents =
                 {
                     new Content()

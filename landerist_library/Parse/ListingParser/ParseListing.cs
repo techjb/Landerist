@@ -5,6 +5,8 @@ using landerist_library.Parse.ListingParser.VertexAI;
 using landerist_library.Websites;
 using landerist_orels.ES;
 using Newtonsoft.Json;
+using System.Reflection;
+using landerist_library.Parse.ListingParser.LocalAI;
 
 namespace landerist_library.Parse.ListingParser
 {
@@ -13,7 +15,8 @@ namespace landerist_library.Parse.ListingParser
         OpenAI,
         //Gemini,
         VertexAI,
-        //Anthropic
+        //Anthropic,
+        LocalAI,
     }
 
     public class ParseListing
@@ -22,17 +25,6 @@ namespace landerist_library.Parse.ListingParser
         {
             MissingMemberHandling = MissingMemberHandling.Ignore,
         };
-        public static bool TooManyTokens(Page page)
-        {
-            switch (Config.LLM_PROVIDER)
-            {
-                case LLMProvider.OpenAI: return OpenAIRequest.TooManyTokens(page);
-                case LLMProvider.VertexAI: return VertexAIRequest.TooManyTokens(page);
-                default:
-                    break;
-            }
-            return false;
-        }
 
         public static (PageType pageType, Listing? listing, bool waitingAIRequest)
             Parse(Page page)
@@ -49,6 +41,7 @@ namespace landerist_library.Parse.ListingParser
                 {
                     case LLMProvider.OpenAI: return ParseOpenAI(page, userInput);
                     case LLMProvider.VertexAI: return ParseVertextAI(page, userInput);
+                    case LLMProvider.LocalAI: return ParseLocalAI(page, userInput);
                     default:
                         break;
 
@@ -64,7 +57,7 @@ namespace landerist_library.Parse.ListingParser
             if (response == null || response.FirstChoice == null)
             {
                 return (PageType.MayBeListing, null, true);
-            }            
+            }
             var (pageType, listing) = ParseResponse(page, response.FirstChoice);
             return (pageType, listing, false);
         }
@@ -83,6 +76,19 @@ namespace landerist_library.Parse.ListingParser
             return (pageType, listing, false);
         }
 
+        private static (PageType pageType, Listing? listing, bool waitingAIRequest)
+            ParseLocalAI(Page page, string text)
+        {
+            var response = new LocalAIRequest().GetResponse(text).Result;
+            if (response == null)
+            {
+                return (PageType.MayBeListing, null, true);
+            }
+            string? responseText = response.GetResponseText();
+            var (pageType, listing) = ParseResponse(page, responseText);
+            return (pageType, listing, false);
+        }
+
         public static (PageType pageType, Listing? listing) ParseResponse(Page page, string? text)
         {
             if (string.IsNullOrEmpty(text))
@@ -90,7 +96,7 @@ namespace landerist_library.Parse.ListingParser
                 return (PageType.MayBeListing, null);
             }
             try
-            {                
+            {
                 var structuredOutput = JsonConvert.DeserializeObject<StructuredOutputEs>(text, JsonSerializerSettings);
                 if (structuredOutput != null)
                 {

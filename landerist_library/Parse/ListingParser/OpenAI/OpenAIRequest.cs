@@ -44,10 +44,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI
             }
         };
 
-        public static bool TooManyTokens(Page page)
-        {
-            return TooManyTokens(page, MAX_CONTEXT_WINDOW);
-        }
+   
 
         public static ChatResponse? GetChatResponse(string userInput)
         {

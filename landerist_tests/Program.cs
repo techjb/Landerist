@@ -1,6 +1,7 @@
 ﻿using Google.Cloud.AIPlatform.V1;
 using landerist_library.Configuration;
 using landerist_library.Database;
+using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Logs;
 using landerist_library.Parse.CadastralReference;
 using landerist_library.Parse.Location.GoogleMaps;
@@ -223,18 +224,23 @@ namespace landerist_tests
             //new ChatGPTRequest().ListModels();
             //landerist_library.Parse.Location.LauIdParser.SetLauIdAndLauNameToListings();
 
-            //landerist_library.GetLatLng.Listing.VertexAI.ParseListingVertexAI.Test();
+            //landerist_library.GetLatLng.Listing.VertexAI.ParseListingVertexAI.GetResponse();
 
             //landerist_library.GetLatLng.ListingParser.Listing.OpenAI.Batch.BatchUpload.Start();
             //landerist_library.GetLatLng.Listing.OpenAI.Batch.BatchDownload.Start();
-            //landerist_library.GetLatLng.Listing.OpenAI.Batch.BatchDownload.Test();
+            //landerist_library.GetLatLng.Listing.OpenAI.Batch.BatchDownload.GetResponse();
             //landerist_library.GetLatLng.Listing.OpenAI.Batch.BatchTasks.Start();            
             //landerist_library.GetLatLng.Listing.OpenAI.Batch.BatchCleaner.DeleteAllRemoteFiles();
             //landerist_library.GetLatLng.Listing.OpenAI.Batch.BatchClient.DeleteFile("dd");
 
-            //landerist_library.GetLatLng.ListingParser.VertexAI.Batch.VertexAIBatch.Test();
+            //landerist_library.GetLatLng.ListingParser.VertexAI.Batch.VertexAIBatch.GetResponse();
             //landerist_library.GetLatLng.ListingParser.VertexAI.Batch.VertexAIBatch.ListAllPredictionJobs();
             //VertexAIBatchCleaner.RemoveFiles();
+
+            var localAIResponse = new landerist_library.Parse.ListingParser.LocalAI.LocalAIRequest().GetResponse("¿Cual es la capital de francia?").Result;
+            var text = localAIResponse.GetResponseText();
+            Console.WriteLine(text);    
+
 
 
             #endregion
