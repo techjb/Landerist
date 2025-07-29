@@ -10,7 +10,7 @@ namespace landerist_library.Parse.ListingParser
     public class ParseListingSystem
     {
         protected static readonly string SystemPrompt =
-            "Tu tarea consiste en analizar la url y el código html proporcionado por el usuario, identificando si corresponde a una página web de un único anuncio inmobiliario. " +
+            "Tu tarea consiste en analizar el código html proporcionado por el usuario, identificando si corresponde a una página web de un único anuncio inmobiliario. " +
             "Si corresponde a un página que es el resultado de una búsqueda, donde aparecen uno o varios anuncios listados como resultado de una búsqueda, entonces no es un anuncio. " +
             "En caso de ser una página con los datos de un anuncio inmobiliario, deberás proceder a extraer los datos relevantes del código html en formato json. " +
             "Asegúrate de tener una precisión exhaustiva en la identificación y extracción de los elementos clave. Mantén un enfoque riguroso durante el proceso para ofrecer la respuesta más precisa y de la más alta calidad posible.";

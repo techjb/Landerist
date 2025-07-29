@@ -35,14 +35,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI
         private static readonly OpenAIClient OpenAIClient = new(PrivateConfig.OPENAI_API_KEY);
 
         public static readonly string? TOOL_CHOICE = "required";
-        private static readonly JSchemaGenerator JSchemaGenerator = new()
-        {
-            DefaultRequired = Required.AllowNull,
-            GenerationProviders =
-            {
-                new StringEnumGenerationProvider(),
-            }
-        };
+        
 
    
 
@@ -78,60 +71,8 @@ namespace landerist_library.Parse.ListingParser.OpenAI
 
         public static global::OpenAI.JsonSchema GetOpenAIJsonSchema()
         {
-            var schema = GetSchema();
+            var schema = StructuredOutputSchema.GetSchema();
             return new global::OpenAI.JsonSchema("OpenAIStructuredOutput", schema);
-        }
-
-        public static string GetSchema()
-        {
-            JSchema jSChema = JSchemaGenerator.Generate(typeof(StructuredOutputEs));
-            SetAdditionalPropertiesFalse(jSChema);
-            return jSChema.ToString();
-        }
-
-        private static void SetAdditionalPropertiesFalse(JSchema schema)
-        {
-            if ((schema.Type & JSchemaType.Object) == JSchemaType.Object)
-            {
-                schema.AllowAdditionalProperties = false;
-            }
-
-            foreach (var propertySchema in schema.Properties.Values)
-            {
-                SetAdditionalPropertiesFalse(propertySchema);
-            }
-
-            if (schema.Items != null)
-            {
-                foreach (var itemSchema in schema.Items)
-                {
-                    SetAdditionalPropertiesFalse(itemSchema);
-                }
-            }
-
-            if (schema.AnyOf != null)
-            {
-                foreach (var subschema in schema.AnyOf)
-                {
-                    SetAdditionalPropertiesFalse(subschema);
-                }
-            }
-
-            if (schema.AllOf != null)
-            {
-                foreach (var subschema in schema.AllOf)
-                {
-                    SetAdditionalPropertiesFalse(subschema);
-                }
-            }
-
-            if (schema.OneOf != null)
-            {
-                foreach (var subschema in schema.OneOf)
-                {
-                    SetAdditionalPropertiesFalse(subschema);
-                }
-            }
-        }
+        }       
     }
 }

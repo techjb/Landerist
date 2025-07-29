@@ -162,7 +162,9 @@ namespace landerist_library.Configuration
 
         public static readonly string VERTEXT_AI_MODEL_NAME_GEMINI_FLASH = "gemini-2.5-flash";
 
-        public static readonly string VERTEXT_AI_MODEL_NAME_GEMINI_FLASH_LITE = "gemini-2.5-flash-lite";        
+        public static readonly string VERTEXT_AI_MODEL_NAME_GEMINI_FLASH_LITE = "gemini-2.5-flash-lite";
+
+        
 
         public static bool IsConfigurationProduction()
         {
@@ -234,7 +236,7 @@ namespace landerist_library.Configuration
 
             TIMERS_ENABLED = !ConfigurationProduction;
 
-            LLM_PROVIDER = !ConfigurationProduction ?
+            LLM_PROVIDER = ConfigurationProduction ?
                 LLMProvider.VertexAI :
                 //LLMProvider.OpenAI :
                 //LLMProvider.OpenAI;
