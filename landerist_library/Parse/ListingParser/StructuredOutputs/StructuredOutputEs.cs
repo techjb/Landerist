@@ -11,11 +11,11 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
 
         [JsonProperty(StructuredOutputEsJson.FunctionNameListing, Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.FunctionNameListingDescription)]
-        public StructuredOutputEsListing? Anuncio { get; private set; }
+        public Anuncio? Anuncio { get; private set; }
 
     }
 
-    public class StructuredOutputEsListing
+    public class Anuncio
     {
         public enum TiposDeOperacion
         {
@@ -235,11 +235,15 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public bool? TieneSistemasDeSeguridad { get; private set; }
 
 
+        //[JsonIgnore]
         [JsonProperty(nameof(StructuredOutputEsJson.imágenes_del_anuncio), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.ImagenesDelAnuncio)]
 
         public List<ImagenDelAnuncio>? ImagenesDelAnuncio { get; private set; }
     }
+
+
+
 
 
     public class ImagenDelAnuncio
@@ -259,4 +263,5 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             Titulo = titulo;
         }
     }
+
 }

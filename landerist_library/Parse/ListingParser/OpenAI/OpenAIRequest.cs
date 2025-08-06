@@ -71,8 +71,14 @@ namespace landerist_library.Parse.ListingParser.OpenAI
 
         public static global::OpenAI.JsonSchema GetOpenAIJsonSchema()
         {
-            var schema = StructuredOutputSchema.GetSchema();
-            return new global::OpenAI.JsonSchema("OpenAIStructuredOutput", schema);
-        }       
+            var schema = StructuredOutputSchema.GetJsonSchema();
+            return new global::OpenAI.JsonSchema("ParseListingSchema", schema);
+        }
+
+        public static global::OpenAI.JsonSchema GetOpenAIJsonSchema2()
+        {
+            var schema = StructuredOutputSchema.GetJsonSchema2();            
+            return new global::OpenAI.JsonSchema("esquema_de_respuesta", schema);
+        }
     }
 }

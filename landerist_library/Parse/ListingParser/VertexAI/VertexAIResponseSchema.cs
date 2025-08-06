@@ -1,7 +1,7 @@
 ﻿using Google.Cloud.AIPlatform.V1;
 using Google.Protobuf.Collections;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
-using static landerist_library.Parse.ListingParser.StructuredOutputs.StructuredOutputEsListing;
+using static landerist_library.Parse.ListingParser.StructuredOutputs.Anuncio;
 
 
 namespace landerist_library.Parse.ListingParser.VertexAI

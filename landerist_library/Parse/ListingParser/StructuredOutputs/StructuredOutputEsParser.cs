@@ -3,7 +3,7 @@ using landerist_library.Parse.Media;
 using landerist_library.Websites;
 using landerist_orels.ES;
 using landerist_orels;
-using static landerist_library.Parse.ListingParser.StructuredOutputs.StructuredOutputEsListing;
+using static landerist_library.Parse.ListingParser.StructuredOutputs.Anuncio;
 
 namespace landerist_library.Parse.ListingParser.StructuredOutputs
 {
@@ -11,7 +11,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
     {
         public bool EsUnAnuncio = structuredOutputEs.EsUnAnuncio;
 
-        public StructuredOutputEsListing? Anuncio = structuredOutputEs.Anuncio;
+        public Anuncio? Anuncio = structuredOutputEs.Anuncio;
 
         public (PageType pageType, Listing? listing) Parse(Page page)
         {

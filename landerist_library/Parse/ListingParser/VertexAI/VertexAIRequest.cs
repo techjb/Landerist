@@ -13,10 +13,24 @@ namespace landerist_library.Parse.ListingParser.VertexAI
     {
 
         public const int MAX_CONTEXT_WINDOW = 128000;
-        
+
         public const float Temperature = 0.2f;
 
-        
+
+        public static async Task<GenerateContentResponse?> GetResponse(string text)
+        {
+            try
+            {
+                var generateContentRequest = GetGenerateContentRequest(text);
+                return await GetPredictionServiceClient().GenerateContentAsync(generateContentRequest);
+            }
+            catch //(Exception exception)
+            {
+                
+            }
+            return null;
+        }
+
         public static async Task<GenerateContentResponse?> GetResponse(Page page, string text)
         {
             try
@@ -116,6 +130,74 @@ namespace landerist_library.Parse.ListingParser.VertexAI
             };
         }
 
+        public static GenerateContentRequest GetGenerateContentRequest(string text)
+        {
+            return new GenerateContentRequest
+            {
+                Model = $"projects/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PROJECTID}/locations/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}/publishers/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PUBLISHER}/models/{Config.VERTEXT_AI_MODEL_NAME_GEMINI_FLASH}",
+                Contents =
+                {
+                    new Content()
+                    {
+                        Role = "USER",
+                        Parts =
+                        {
+                            GetParts(text)
+                        }
+                    }
+                },
+                GenerationConfig = new GenerationConfig()
+                {
+                    Temperature = Temperature,
+                    ResponseMimeType = "application/json",
+                    ResponseSchema = VertexAIResponseSchema.ResponseSchema,
+                    //ThinkingConfig = new ThinkingConfig
+                    //{
+                    //    ThinkingBudget = 0
+                    //}
+
+                },
+                SafetySettings =
+                {
+                    new SafetySetting
+                    {
+                        Category = HarmCategory.HateSpeech,
+                        Threshold = HarmBlockThreshold.Off
+                    },
+                    new SafetySetting
+                    {
+                        Category = HarmCategory.DangerousContent,
+                        Threshold = HarmBlockThreshold.Off
+                    },
+                    new SafetySetting
+                    {
+                        Category = HarmCategory.Harassment,
+                        Threshold = HarmBlockThreshold.Off
+                    },
+                    new SafetySetting
+                    {
+                        Category = HarmCategory.SexuallyExplicit,
+                        Threshold = HarmBlockThreshold.Off
+                    },
+                    new SafetySetting
+                    {
+                        Category = HarmCategory.Unspecified,
+                        Threshold = HarmBlockThreshold.Off
+                    },
+                },
+                SystemInstruction = new Content
+                {
+                    Parts =
+                    {
+                        new Part
+                        {
+                            Text = SystemPrompt
+                        }
+                    }
+                }
+            };
+        }
+
         private static RepeatedField<Part> GetParts(Page page, string text)
         {
             if (page.ContainsScreenshot())
@@ -136,6 +218,11 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                         },
                 ];
             }
+            return GetParts(text);
+        }
+
+        private static RepeatedField<Part> GetParts(string text)
+        {
             return
               [
                   new Part

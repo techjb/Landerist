@@ -1,6 +1,7 @@
 ﻿using HtmlAgilityPack;
 using landerist_library.Websites;
 using System.Text.RegularExpressions;
+using System.Web;
 
 namespace landerist_library.Parse.ListingParser
 {
@@ -132,10 +133,8 @@ namespace landerist_library.Parse.ListingParser
         static string CleanHtml(HtmlDocument htmlDocument)
         {
             string html = htmlDocument.DocumentNode.OuterHtml;
+            html = HttpUtility.HtmlDecode(html);
             html = RegexSpace().Replace(html, " ");
-            //html = Regex1().Replace(html, ">");
-            //html = Regex2().Replace(html, "<");
-
             return html.Trim();
         }
 

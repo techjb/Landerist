@@ -1,20 +1,10 @@
 ﻿using landerist_library.Configuration;
-using landerist_library.Insert.FtAgencies;
-using landerist_library.Insert.IdAgencies;
 using landerist_library.Parse.ListingParser.OpenAI;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
-using landerist_library.Websites;
-using OpenAI;
-using OpenAI.Chat;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace landerist_library.Parse.ListingParser.LocalAI
 {
@@ -22,11 +12,10 @@ namespace landerist_library.Parse.ListingParser.LocalAI
     {
 
         private const string SERVER_PORT = "1234";
-        //private const string MODEL_NAME = "qwen/qwen3-30b-a3b";
-        private const string MODEL_NAME = "qwen/qwen3-30b-a3b";
-        private const float TEMPERATURE = 0.2f;
-        private string SYSTEM_PROMPT = ParseListingSystem.GetSystemPrompt();
-        public const int MAX_CONTEXT_WINDOW = 32768;
+        //private const string MODEL_NAME = "qwen/qwen3-30b-a3b-2507";        
+        private const string MODEL_NAME = "openai/gpt-oss-20b";
+        private const float TEMPERATURE = 0.3f;
+        public const int MAX_CONTEXT_WINDOW = 65536;
         private readonly string Url;
 
 
@@ -43,16 +32,20 @@ namespace landerist_library.Parse.ListingParser.LocalAI
             {
                 model = MODEL_NAME,
                 temperature = TEMPERATURE,
-                enable_thinking = true,
+                max_tokens = -1,
+                //top_p= 0.8f,
+                enable_thinking = false,
+                //stream = false,
                 messages = new[]
                 {
-                    new { role = "system", content = SYSTEM_PROMPT },
+                    new { role = "system", content = ParseListingSystem.GetSystemPrompt() },
                     new { role = "user", content = text }
                 },
                 response_format = new
                 {
                     type = "json_schema",
-                    json_schema = OpenAIRequest.GetOpenAIJsonSchema()
+                    json_schema = OpenAIRequest.GetOpenAIJsonSchema2()
+                    //json_schema = OpenAIRequest.GetOpenAIJsonSchema()
                 }
             };
 
@@ -78,7 +71,7 @@ namespace landerist_library.Parse.ListingParser.LocalAI
 
         public static void PrintOutputSchema()
         {
-            var schema =  StructuredOutputSchema.GetSchema();
+            var schema = StructuredOutputSchema.GetJsonSchema2();
             Console.WriteLine(schema);
         }
     }

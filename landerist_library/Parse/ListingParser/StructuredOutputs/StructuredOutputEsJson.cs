@@ -15,7 +15,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
 
         public const string FunctionNameListing = "anuncio";
 
-        public const string FunctionNameListingDescription = "En caso de ser un anuncio, contiene la descripción del anuncio.";
+        public const string FunctionNameListingDescription = "En caso de ser un anuncio, contiene los datos del anuncio.";
 
 #pragma warning disable IDE1006
 
@@ -32,9 +32,21 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public string? tipo_de_operación { get; set; } = null;
 
 
-        public const string TipoDeInmuebleDescription = "tipología del inmueble";
-
+        public const string TipoDeInmuebleDescription = "categoría del tipo de inmueble anunciado";
+        //public const string TipoDeInmuebleDescription = 
+        //    "Extrae la categoría del tipo de inmueble anunciado. " +
+        //    "- Vivienda: Propiedad residencial completa destinada a vivienda familiar: piso, ático, dúplex, apartamento, chalet, adosado, casa rústica. " +
+        //    "- Dormitorio: Habitación individual o espacio para dormir. " +
+        //    "- Local Comercial: Espacio destinado a actividades comerciales y venta al público. " +
+        //    "- Nave industrial: Instalación industrial para actividades de producción o almacenamiento. " +
+        //    "- Garaje: Plaza de aparcamiento cubierta para vehículos. " +
+        //    "- Trastero: Espacio pequeño destinado al almacenamiento de objetos personales. " +
+        //    "- Oficina: Espacio destinado a actividades profesionales y administrativas. " +
+        //    "- Parcela: Terreno o parcela sin construcción, apto para edificación. " +
+        //    "- Edificio: Construcción completa que puede contener múltiples unidades." +
+        //    "";
         [Description(TipoDeInmuebleDescription)]
+        
         public string? tipo_de_inmueble { get; set; } = null;
 
 

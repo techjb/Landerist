@@ -34,14 +34,14 @@ namespace landerist_library.Parse.ListingParser
                 return (PageType.MayBeListing, null, true);
             }
 
-            var userInput = ParseListingUserInput.GetText(page);
-            if (!string.IsNullOrEmpty(userInput))
+            var text = ParseListingUserInput.GetText(page);
+            if (!string.IsNullOrEmpty(text))
             {
                 switch (Config.LLM_PROVIDER)
                 {
-                    case LLMProvider.OpenAI: return ParseOpenAI(page, userInput);
-                    case LLMProvider.VertexAI: return ParseVertextAI(page, userInput);
-                    case LLMProvider.LocalAI: return ParseLocalAI(page, userInput);
+                    case LLMProvider.OpenAI: return ParseOpenAI(page, text);
+                    case LLMProvider.VertexAI: return ParseVertextAI(page, text);
+                    case LLMProvider.LocalAI: return ParseLocalAI(page, text);
                     default:
                         break;
 
