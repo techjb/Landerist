@@ -1,6 +1,7 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Parse.ListingParser.OpenAI;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -12,9 +13,9 @@ namespace landerist_library.Parse.ListingParser.LocalAI
     {
 
         private const string SERVER_PORT = "1234";
-        private const string MODEL_NAME = "qwen/qwen3-30b-a3b-2507";        
-        //private const string MODEL_NAME = "openai/gpt-oss-20b";
-        private const float TEMPERATURE = 0.3f;
+        private const string MODEL_NAME = "qwen/qwen3-30b-a3b-2507";
+        //private const string MODEL_NAME = "qwen/qwen3-4b-2507";
+        private const float TEMPERATURE = 0.1f;
         public const int MAX_CONTEXT_WINDOW = 65536;
         private readonly string Url;
 
@@ -28,6 +29,7 @@ namespace landerist_library.Parse.ListingParser.LocalAI
 
         public async Task<LocaAIResponse?> GetResponse(string text)
         {
+
             var requestBody = new
             {
                 model = MODEL_NAME,
@@ -38,15 +40,16 @@ namespace landerist_library.Parse.ListingParser.LocalAI
                 //stream = false,
                 messages = new[]
                 {
-                    new { role = "system", content = ParseListingSystem.GetSystemPrompt() },
+                    //new { role = "system", content = ParseListingSystem.GetExtendedSystemPrompt() },
+                    new { role = "system", content = GetExtendedSystemPrompt() },
                     new { role = "user", content = text }
                 },
-                response_format = new
-                {
-                    type = "json_schema",
-                    json_schema = OpenAIRequest.GetOpenAIJsonSchema2()
-                    //json_schema = OpenAIRequest.GetOpenAIJsonSchema()
-                }
+                format = "json",                
+                //response_format = new
+                //{
+                //    type = "json_schema",
+                //    json_schema = OpenAIRequest.GetOpenAIJsonSchema2()                    
+                //}
             };
 
             string json = JsonSerializer.Serialize(requestBody);
@@ -54,8 +57,12 @@ namespace landerist_library.Parse.ListingParser.LocalAI
 
             try
             {
+                Stopwatch stopwatch = Stopwatch.StartNew();
                 using HttpClient client = new();
                 HttpResponseMessage response = await client.PostAsync(Url, httpContent);
+
+                stopwatch.Stop();
+                Console.WriteLine($"LocalAIRequest GetResponse took {stopwatch.ElapsedMilliseconds} ms");
                 string result = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)
                 {
@@ -69,9 +76,17 @@ namespace landerist_library.Parse.ListingParser.LocalAI
             return null;
         }
 
+        private static string GetExtendedSystemPrompt()
+        {
+            return ParseListingSystem.SystemPrompt + " " +
+                "Responde SIEMPRE y ÚNICAMENTE con un objeto JSON. No añadas texto antes ni después del JSON. " +
+                "El objeto JSON debe tener la siguiente estructura exacta: " + OpenAIRequest.GetOpenAIJsonSchema() + " " +
+                "Si no encuentras algún dato, usa 'null'. No incluyas texto adicional fuera del JSON.";
+        }
+
         public static void PrintOutputSchema()
         {
-            var schema = StructuredOutputSchema.GetJsonSchema2();
+            var schema = StructuredOutputSchema.GetJsonSchema();
             Console.WriteLine(schema);
         }
     }

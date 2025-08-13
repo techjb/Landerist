@@ -1,11 +1,8 @@
-﻿using landerist_orels.ES;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
 using Newtonsoft.Json.Schema.Generation;
 using System.ComponentModel.DataAnnotations;
-using System.Reflection.Emit;
 
 
 namespace landerist_library.Parse.ListingParser.StructuredOutputs
@@ -26,6 +23,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             JSchema jSChema = JSchemaGenerator.Generate(typeof(StructuredOutputEs));
             SetSchemaVersion(jSChema);
             SetAllOf(jSChema);
+            ParsePropertyType(jSChema);
             SetAdditionalPropertiesFalse(jSChema);
             return jSChema.ToString(SchemaVersion.Draft7)
                 //.Replace("\"definitions\"", "\"$defs\"")
@@ -33,26 +31,24 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
                 ;
         }
 
-        public static string GetJsonSchema2()
-        {
-            JSchema jSChema = JSchemaGenerator.Generate(typeof(StructuredOutputEs2));
-            
-            SetSchemaVersion(jSChema);
-            SetAllOf(jSChema);            
-            ParsePropertyType(jSChema);
-            SetAdditionalPropertiesFalse(jSChema);
-            string schema = jSChema.ToString(SchemaVersion.Draft7);
-            return schema;
-        }
+        //public static string GetJsonSchema2()
+        //{
+        //    JSchema jSChema = JSchemaGenerator.Generate(typeof(StructuredOutputEs));            
+        //    SetSchemaVersion(jSChema);
+        //    SetAllOf(jSChema);
+        //    ParsePropertyType(jSChema);
+        //    SetAdditionalPropertiesFalse(jSChema);
+        //    return jSChema.ToString(SchemaVersion.Draft7);            
+        //}
 
-        public static string GetJsonSchema3()
-        {
-            JSchema jSChema = JSchemaGenerator.Generate(typeof(StructuredOutputEs));
-            //SetSchemaVersion(jSChema);
-            //SetAllOf(jSChema);
-            SetAdditionalPropertiesFalse(jSChema);
-            return jSChema.ToString(SchemaVersion.Draft7);
-        }
+        //public static string GetJsonSchema3()
+        //{
+        //    JSchema jSChema = JSchemaGenerator.Generate(typeof(StructuredOutputEs));
+        //    //SetSchemaVersion(jSChema);
+        //    //SetAllOf(jSChema);
+        //    SetAdditionalPropertiesFalse(jSChema);
+        //    return jSChema.ToString(SchemaVersion.Draft7);
+        //}
 
         private static void ParsePropertyType(JSchema jSChema)
         {

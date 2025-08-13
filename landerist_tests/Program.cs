@@ -6,6 +6,7 @@ using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Logs;
 using landerist_library.Parse.CadastralReference;
 using landerist_library.Parse.ListingParser;
+using landerist_library.Parse.ListingParser.LocalAI;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
 using landerist_library.Parse.ListingParser.VertexAI;
 using landerist_library.Parse.Location.GoogleMaps;
@@ -192,9 +193,13 @@ namespace landerist_tests
             //new Scraper().Start();
             //new Scraper().Scrape(page, false);
 
-            
-            //new landerist_library.Scrape.Scraper().Scrape("https://dosagui.com/es/property/15746", true);
+
+            new landerist_library.Scrape.Scraper().Scrape("https://dosagui.com/es/property/15746", true);
             //new landerist_library.Scrape.Scraper().Scrape("https://20punto20rb.com/propiedades/propiedad/luminoso-piso-en-don-ramon-de-la-cruz/", false);
+
+            //new landerist_library.Scrape.Scraper().Scrape("https://1mast.com/es/pisos-en-coin/", false);// not listing
+            //new landerist_library.Scrape.Scraper().Scrape("https://360mallorcaproperty.com/es/property-location/porto-petro-es/page/2/", false);// not listing
+
 
             //new Scraper().DoTest();
             //landerist_library.Scrape.PageSelector.SelectTop1();
@@ -247,6 +252,9 @@ namespace landerist_tests
             //Console.WriteLine(new landerist_library.Parse.ListingParser.LocalAI.LocalAIRequest().GetResponse(text).Result.GetResponseText());            
             //Console.WriteLine(VertexAIResponse.GetResponseText(VertexAIRequest.GetResponse(text).Result));
             //Console.WriteLine(landerist_library.Parse.ListingParser.OpenAI.OpenAIRequest.GetChatResponse(text).FirstChoice.ToString());
+
+            //var response = new LocalAIRequest().GetResponse(text).Result;
+
 
             //landerist_library.Parse.ListingParser.LocalAI.LocalAIRequest.PrintOutputSchema();
             //var json_squema_string = StructuredOutputSchema.Serialize();

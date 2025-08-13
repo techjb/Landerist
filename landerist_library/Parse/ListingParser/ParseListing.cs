@@ -24,6 +24,7 @@ namespace landerist_library.Parse.ListingParser
         private static readonly JsonSerializerSettings JsonSerializerSettings = new()
         {
             MissingMemberHandling = MissingMemberHandling.Ignore,
+            NullValueHandling = NullValueHandling.Include,            
         };
 
         public static (PageType pageType, Listing? listing, bool waitingAIRequest)

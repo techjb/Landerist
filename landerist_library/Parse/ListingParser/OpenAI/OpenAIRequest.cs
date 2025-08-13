@@ -53,7 +53,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI
                      model: MODEL_NAME,
                      //temperature: TEMPERATURE,
                      responseFormat: TextResponseFormat.JsonSchema,
-                     jsonSchema: GetOpenAIJsonSchema3()
+                     jsonSchema: GetOpenAIJsonSchema()
                      );
 
             try
@@ -76,16 +76,16 @@ namespace landerist_library.Parse.ListingParser.OpenAI
             return new global::OpenAI.JsonSchema("ParseListingSchema", schema);
         }
 
-        public static global::OpenAI.JsonSchema GetOpenAIJsonSchema2()
-        {
-            var schema = StructuredOutputSchema.GetJsonSchema2();            
-            return new global::OpenAI.JsonSchema("esquema_de_respuesta", schema);            
-        }
+        //public static global::OpenAI.JsonSchema GetOpenAIJsonSchema2()
+        //{
+        //    var schema = StructuredOutputSchema.GetJsonSchema2();            
+        //    return new global::OpenAI.JsonSchema("esquema_de_respuesta", schema);            
+        //}
 
-        public static global::OpenAI.JsonSchema GetOpenAIJsonSchema3()
-        {
-            var schema = StructuredOutputSchema.GetJsonSchema3();
-            return new global::OpenAI.JsonSchema("esquema_de_respuesta", schema, strict : false);
-        }
+        //public static global::OpenAI.JsonSchema GetOpenAIJsonSchema3()
+        //{
+        //    var schema = StructuredOutputSchema.GetJsonSchema();
+        //    return new global::OpenAI.JsonSchema("esquema_de_respuesta", schema, strict : false);
+        //}
     }
 }

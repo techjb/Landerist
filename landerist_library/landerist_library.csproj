@@ -30,6 +30,7 @@
   <ItemGroup>
     <Compile Remove="Downloaders\SeleniumDownloader.cs" />
     <Compile Remove="Parse\ListingParser\OpenAI\OpenAIStructuredOutput__.cs" />
+    <Compile Remove="Parse\ListingParser\StructuredOutputs\StructuredOutputEsOld.cs" />
     <Compile Remove="Scrape\PageBlocker.cs" />
   </ItemGroup>
 
