@@ -5,7 +5,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Schema;
 using Newtonsoft.Json.Schema.Generation;
 using OpenAI;
+using OpenAI.Batch;
 using OpenAI.Chat;
+using System.Runtime.InteropServices;
 
 
 namespace landerist_library.Parse.ListingParser.OpenAI
@@ -26,11 +28,10 @@ namespace landerist_library.Parse.ListingParser.OpenAI
 
         public static readonly int MAX_CONTEXT_WINDOW = 128000;
 
-        public static readonly string MODEL_NAME =
-            "gpt-4o-mini";
-        //"gpt-4o";
+        //public static readonly string MODEL_NAME = "gpt-5";
+        public static readonly string MODEL_NAME = "gpt-5-mini-2025-08-07";
 
-        public static readonly double TEMPERATURE = 0;
+        public static readonly double TEMPERATURE = 0f;
 
         private static readonly OpenAIClient OpenAIClient = new(PrivateConfig.OPENAI_API_KEY);
 
@@ -44,15 +45,15 @@ namespace landerist_library.Parse.ListingParser.OpenAI
             var messages = new List<Message>
             {
                 new(Role.System, SystemPrompt),
-                new(Role.User, userInput),
+                new(Role.User, userInput),                
             };
 
             ChatRequest chatRequest = new(
                      messages: messages,
                      model: MODEL_NAME,
-                     temperature: TEMPERATURE,
-                     responseFormat: ChatResponseFormat.JsonSchema,
-                     jsonSchema: GetOpenAIJsonSchema()
+                     //temperature: TEMPERATURE,
+                     responseFormat: TextResponseFormat.JsonSchema,
+                     jsonSchema: GetOpenAIJsonSchema3()
                      );
 
             try
@@ -78,7 +79,13 @@ namespace landerist_library.Parse.ListingParser.OpenAI
         public static global::OpenAI.JsonSchema GetOpenAIJsonSchema2()
         {
             var schema = StructuredOutputSchema.GetJsonSchema2();            
-            return new global::OpenAI.JsonSchema("esquema_de_respuesta", schema);
+            return new global::OpenAI.JsonSchema("esquema_de_respuesta", schema);            
+        }
+
+        public static global::OpenAI.JsonSchema GetOpenAIJsonSchema3()
+        {
+            var schema = StructuredOutputSchema.GetJsonSchema3();
+            return new global::OpenAI.JsonSchema("esquema_de_respuesta", schema, strict : false);
         }
     }
 }

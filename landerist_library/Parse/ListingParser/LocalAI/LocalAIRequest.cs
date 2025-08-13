@@ -12,8 +12,8 @@ namespace landerist_library.Parse.ListingParser.LocalAI
     {
 
         private const string SERVER_PORT = "1234";
-        //private const string MODEL_NAME = "qwen/qwen3-30b-a3b-2507";        
-        private const string MODEL_NAME = "openai/gpt-oss-20b";
+        private const string MODEL_NAME = "qwen/qwen3-30b-a3b-2507";        
+        //private const string MODEL_NAME = "openai/gpt-oss-20b";
         private const float TEMPERATURE = 0.3f;
         public const int MAX_CONTEXT_WINDOW = 65536;
         private readonly string Url;

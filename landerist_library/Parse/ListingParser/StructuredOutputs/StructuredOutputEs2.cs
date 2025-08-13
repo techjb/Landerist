@@ -15,7 +15,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public bool EsUnAnuncio { get; private set; }
 
 
-        [JsonProperty(StructuredOutputEsJson.FunctionNameListing, Required = Required.Default)]
+        [JsonProperty(StructuredOutputEsJson.FunctionNameListing, Required = Required.Always)]
         [System.ComponentModel.Description(StructuredOutputEsJson.FunctionNameListingDescription)]
         public DatosDelAnuncio? Anuncio { get; private set; }
 
