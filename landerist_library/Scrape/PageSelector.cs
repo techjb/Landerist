@@ -18,7 +18,7 @@ namespace landerist_library.Scrape
         private static void Init()
         {
             Pages.Clear();
-            Websites.Pages.CleanLockedBy();            
+            Websites.Pages.CleanLockedBy();
         }
 
         private static void SelectPages()

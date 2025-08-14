@@ -56,7 +56,7 @@ namespace landerist_library.Parse.PageTypeParser
                 return (PageType.ResponseBodyIsError, null, false);
             }
             if (Page.ResponseBodyTextAlreadyParsedToNotListing() 
-                && Configuration.Config.IsConfigurationProduction()
+               // && Configuration.Config.IsConfigurationProduction()
                 )
             {
                 StatisticsSnapshot.InsertDailyCounter("ResponseBodyTextAlreadyParsedToNotListing");

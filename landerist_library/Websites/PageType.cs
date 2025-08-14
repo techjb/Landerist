@@ -24,6 +24,8 @@
     public enum WaitingStatus
     {
         waiting_ai_request,
+        readed_by_batch,
+        readed_by_localai,
         waiting_ai_response,
     }
 }

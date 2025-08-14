@@ -8,7 +8,7 @@ using System.Globalization;
 
 namespace landerist_library.Landerist_com
 {
-    public class FilesUpdater : Landerist_com
+    public class DownloadsUpdater : Landerist_com
     {
 
         public const string METADATA_KEY_DATEFROM = "dateFrom";

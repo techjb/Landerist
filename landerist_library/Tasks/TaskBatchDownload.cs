@@ -13,9 +13,8 @@ namespace landerist_library.Tasks
 {
     public class TaskBatchDownload
     {
-
-        public static readonly HashSet<string> DownloadedPagesUriHashes = [];
-        public static void Start()
+        public readonly HashSet<string> DownloadedPagesUriHashes = [];
+        public void Start()
         {
             var batches = Batches.SelectNonDownloaded();
             foreach (var batch in batches)
@@ -24,7 +23,7 @@ namespace landerist_library.Tasks
             }
         }
 
-        private static void Download(Batch batch)
+        private void Download(Batch batch)
         {
             DownloadedPagesUriHashes.Clear();
 
@@ -43,7 +42,7 @@ namespace landerist_library.Tasks
             Batches.UpdateToDownloaded(batch);
         }
 
-        private static bool DownloadFile(Batch batch, string? file)
+        private bool DownloadFile(Batch batch, string? file)
         {
             if (file == null)
             {
@@ -87,7 +86,7 @@ namespace landerist_library.Tasks
             }
         }
 
-        private static bool ReadFile(Batch batch, string filePath)
+        private bool ReadFile(Batch batch, string filePath)
         {
             try
             {
@@ -103,7 +102,7 @@ namespace landerist_library.Tasks
             }
         }
 
-        private static void ReadSucessFile(Batch batch, string[] lines)
+        private void ReadSucessFile(Batch batch, string[] lines)
         {
             int total = lines.Length;
             int readed = 0;
@@ -135,7 +134,7 @@ namespace landerist_library.Tasks
             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.BatchReadedErrors, errors);
         }
 
-        private static bool ReadSuceesLine(Batch batch, string line)
+        private bool ReadSuceesLine(Batch batch, string line)
         {
             (Page page, string? text)? result = GetPageAndText(batch, line);
             if (result == null)
@@ -145,23 +144,17 @@ namespace landerist_library.Tasks
 
             var page = result.Value.page;
             var (newPageType, listing) = ParseListing.ParseResponse(page, result.Value.text);
-            if (newPageType.Equals(PageType.MayBeListing))
+            bool success = new PageScraper(page).SetPageTypeAfterParsing(newPageType, listing);
+            if (success)
             {
-                return false;
+                lock (DownloadedPagesUriHashes)
+                {
+                    DownloadedPagesUriHashes.Add(page.UriHash);
+                }
             }
 
-            lock (DownloadedPagesUriHashes)
-            {
-                DownloadedPagesUriHashes.Add(page.UriHash);
-            }
-
-            page.RemoveWaitingStatus();
-            page.SetResponseBodyFromZipped();
-            page.RemoveResponseBodyZipped();
-            new PageScraper(page).SetPageType(newPageType, listing);
-            var suceess = page.Update(true);
             page.Dispose();
-            return suceess;
+            return success;
         }
 
         private static (Page page, string? text)? GetPageAndText(Batch batch, string line)
@@ -174,7 +167,7 @@ namespace landerist_library.Tasks
             };
         }
 
-        private static void RemoveWaitingStatus(Batch batch)
+        private void RemoveWaitingStatus(Batch batch)
         {
             var difference = new HashSet<string>(batch.PagesUriHashes);
             difference.ExceptWith(DownloadedPagesUriHashes);

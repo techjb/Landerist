@@ -12,6 +12,8 @@ namespace landerist_library.Logs
         public const string LogKeyInfo = "info";
         public const string LogKeyScrapper = "scrapper";
         public const string LogKeyBatch = "batch";
+        public const string LogKeyLocalAI = "localai";
+
 
         private static void Write(string logKey, string source, string text)
         {
@@ -156,6 +158,15 @@ namespace landerist_library.Logs
                 Console(text);
             }
             Write(LogKeyBatch, source, text);
+        }
+
+        public static void WriteLocalAI(string source, string text)
+        {
+            if (Config.LOGS_INFO_IN_CONSOLE)
+            {
+                Console(text);
+            }
+            Write(LogKeyLocalAI, source, text);
         }
 
         #endregion Write Logs

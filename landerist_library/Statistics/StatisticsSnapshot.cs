@@ -1,5 +1,4 @@
-﻿using Amazon.Runtime.Internal.Transform;
-using landerist_library.Database;
+﻿using landerist_library.Database;
 using landerist_orels.ES;
 using System.Data;
 
@@ -31,6 +30,8 @@ namespace landerist_library.Statistics
         BatchReadedErrors,
         ListingInsert,
         ListingUpdate,
+        LocalAIParsingErrors,
+        LocalAIParsingSuccess,
     }
 
     public class StatisticsSnapshot

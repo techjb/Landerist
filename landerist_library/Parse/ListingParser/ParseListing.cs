@@ -77,7 +77,7 @@ namespace landerist_library.Parse.ListingParser
             return (pageType, listing, false);
         }
 
-        private static (PageType pageType, Listing? listing, bool waitingAIRequest)
+        public static (PageType pageType, Listing? listing, bool waitingAIRequest)
             ParseLocalAI(Page page, string text)
         {
             var response = new LocalAIRequest().GetResponse(text).Result;

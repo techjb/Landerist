@@ -1,13 +1,7 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
-using landerist_library.Websites;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Schema;
-using Newtonsoft.Json.Schema.Generation;
 using OpenAI;
-using OpenAI.Batch;
 using OpenAI.Chat;
-using System.Runtime.InteropServices;
 
 
 namespace landerist_library.Parse.ListingParser.OpenAI
@@ -28,7 +22,6 @@ namespace landerist_library.Parse.ListingParser.OpenAI
 
         public static readonly int MAX_CONTEXT_WINDOW = 128000;
 
-        //public static readonly string MODEL_NAME = "gpt-5";
         public static readonly string MODEL_NAME = "gpt-5-mini-2025-08-07";
 
         public static readonly double TEMPERATURE = 0f;
@@ -73,19 +66,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI
         public static global::OpenAI.JsonSchema GetOpenAIJsonSchema()
         {
             var schema = StructuredOutputSchema.GetJsonSchema();
-            return new global::OpenAI.JsonSchema("ParseListingSchema", schema);
+            return new global::OpenAI.JsonSchema("esquema_de_respuesta", schema);
         }
-
-        //public static global::OpenAI.JsonSchema GetOpenAIJsonSchema2()
-        //{
-        //    var schema = StructuredOutputSchema.GetJsonSchema2();            
-        //    return new global::OpenAI.JsonSchema("esquema_de_respuesta", schema);            
-        //}
-
-        //public static global::OpenAI.JsonSchema GetOpenAIJsonSchema3()
-        //{
-        //    var schema = StructuredOutputSchema.GetJsonSchema();
-        //    return new global::OpenAI.JsonSchema("esquema_de_respuesta", schema, strict : false);
-        //}
     }
 }

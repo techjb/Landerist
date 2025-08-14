@@ -117,7 +117,7 @@ namespace landerist_library.Downloaders.Puppeteer
             //"--mute-audio",            
             //"--disable-domain-reliability",
             //"--autoplay-policy=user-gesture-required",
-            //"--disable-component-extensions-with-background-pages",
+            //"--disable-component-extensions-with-background-Pages",
             ];
 
         private static readonly string[] LaunchOptionsProxy =

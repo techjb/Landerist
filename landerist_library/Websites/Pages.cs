@@ -255,23 +255,27 @@ namespace landerist_library.Websites
                 " ON " + PAGES + ".[Host] = " + Websites.WEBSITES + ".[Host] ";
         }
 
-        private static string SelectColumns()
+        private static string SelectColumns(string pagesTableName = "")
         {
+            if (string.IsNullOrEmpty(pagesTableName))
+            {
+                pagesTableName = PAGES;
+            }
             return
-                PAGES + ".[Host], " +
-                PAGES + ".[Uri], " +
-                PAGES + ".[UriHash], " +
-                PAGES + ".[Inserted], " +
-                PAGES + ".[Updated], " +
-                PAGES + ".[NextUpdate], " +
-                PAGES + ".[HttpStatusCode], " +
-                PAGES + ".[PageType], " +
-                PAGES + ".[PageTypeCounter], " +
-                PAGES + ".[ListingStatus], " +
-                PAGES + ".[LockedBy], " +
-                PAGES + ".[WaitingStatus], " +
-                PAGES + ".[ResponseBodyTextHash], " +
-                PAGES + ".[ResponseBodyZipped], " +
+                pagesTableName + ".[Host], " +
+                pagesTableName + ".[Uri], " +
+                pagesTableName + ".[UriHash], " +
+                pagesTableName + ".[Inserted], " +
+                pagesTableName + ".[Updated], " +
+                pagesTableName + ".[NextUpdate], " +
+                pagesTableName + ".[HttpStatusCode], " +
+                pagesTableName + ".[PageType], " +
+                pagesTableName + ".[PageTypeCounter], " +
+                pagesTableName + ".[ListingStatus], " +
+                pagesTableName + ".[LockedBy], " +
+                pagesTableName + ".[WaitingStatus], " +
+                pagesTableName + ".[ResponseBodyTextHash], " +
+                pagesTableName + ".[ResponseBodyZipped], " +
                 Websites.WEBSITES + ".[MainUri], " +
                 Websites.WEBSITES + ".[LanguageCode], " +
                 Websites.WEBSITES + ".[CountryCode], " +
@@ -630,24 +634,35 @@ namespace landerist_library.Websites
                 });
         }
 
-        public static List<Page> SelectWaitingStatusAiRequest(int topRows)
+        public static List<Page> SelectWaitingStatusAIRequest(int topRows, WaitingStatus waitingStatusTo)
         {
-            return SelectWaitingStatus(topRows, WaitingStatus.waiting_ai_request);
+            return SelectWaitingStatus(topRows, WaitingStatus.waiting_ai_request, waitingStatusTo);
         }
 
-        private static List<Page> SelectWaitingStatus(int topRows, WaitingStatus waitingStatus)
+        private static List<Page> SelectWaitingStatus(int topRows, WaitingStatus waitingStatusFrom, WaitingStatus waitingStatusTo)
         {
             string query =
-                SelectQuery(topRows) +
-                "WHERE [WaitingStatus] = @WaitingStatus";
+                "BEGIN TRANSACTION; " +
+                "UPDATE TOP (" + topRows + ") " + PAGES + " " +
+                "SET [WaitingStatus] = @waitingStatusTo " +
+                "OUTPUT " + SelectColumns("INSERTED") + " " +
+                "FROM " + PAGES + " " +
+                "INNER JOIN " + Websites.WEBSITES + " ON " + PAGES + ".[Host] = " + Websites.WEBSITES + ".[Host] " +
+                "WHERE " + PAGES + ".[WaitingStatus] = @waitingStatusFrom; " +
+                "COMMIT TRANSACTION;";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"WaitingStatus", waitingStatus.ToString() },
+                {"WaitingStatusFrom", waitingStatusFrom.ToString() },
+                {"waitingStatusTo", waitingStatusTo.ToString() },
             });
             return GetPages(dataTable);
         }
+        public static bool UpdateWaitingStatusAIRequest(string uriHash)
+        {
+            return UpdateWaitingStatus(uriHash, WaitingStatus.waiting_ai_request);
+        }
 
-        public static bool UpdateWaitingStatusAiResponse(string uriHash)
+        public static bool UpdateWaitingStatusAIResponse(string uriHash)
         {
             return UpdateWaitingStatus(uriHash, WaitingStatus.waiting_ai_response);
         }
@@ -662,6 +677,19 @@ namespace landerist_library.Websites
             return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"WaitingStatus", waitingStatus.ToString() },
                 {"UriHash", uriHash }
+            });
+        }
+
+        public static bool UpdateWaitingStatus(WaitingStatus waitingStatusFrom, WaitingStatus waitingStatusTo)
+        {
+            string query =
+                "UPDATE " + PAGES + " " +
+                "SET [WaitingStatus] = @WaitingStatusTo " +
+                "WHERE [WaitingStatus] = @WaitingStatusFrom";
+
+            return new DataBase().Query(query, new Dictionary<string, object?> {
+                { "WaitingStatusFrom", waitingStatusFrom.ToString() },
+                { "WaitingStatusTo", waitingStatusTo.ToString() }
             });
         }
 

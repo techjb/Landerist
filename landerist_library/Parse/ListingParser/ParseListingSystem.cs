@@ -37,14 +37,14 @@ namespace landerist_library.Parse.ListingParser
 
         public static bool TooManyTokens(Page page)
         {
-            var maxContextWindow = DEFAULT_MAX_TOKENS;
-
-            switch (Config.LLM_PROVIDER)
-            {
-                case LLMProvider.OpenAI: maxContextWindow = OpenAIRequest.MAX_CONTEXT_WINDOW; break;
-                case LLMProvider.VertexAI: maxContextWindow = VertexAIRequest.MAX_CONTEXT_WINDOW; break;
-                case LLMProvider.LocalAI: maxContextWindow = LocalAIRequest.MAX_CONTEXT_WINDOW; break;
-            }
+            //var maxContextWindow = DEFAULT_MAX_TOKENS;
+            //switch (Config.LLM_PROVIDER)
+            //{
+            //    case LLMProvider.OpenAI: maxContextWindow = OpenAIRequest.MAX_CONTEXT_WINDOW; break;
+            //    case LLMProvider.VertexAI: maxContextWindow = VertexAIRequest.MAX_CONTEXT_WINDOW; break;
+            //    case LLMProvider.LocalAI: maxContextWindow = LocalAIRequest.MAX_CONTEXT_WINDOW; break;
+            //}
+            var maxContextWindow = LocalAIRequest.MAX_CONTEXT_WINDOW;
             return TooManyTokens(page, maxContextWindow);
         }
 

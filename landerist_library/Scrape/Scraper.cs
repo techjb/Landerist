@@ -112,9 +112,9 @@ namespace landerist_library.Scrape
 
         //public void ScrapeResponseBodyRepeatedInListings()
         //{
-        //    var pages = Websites.Pages.GetPages(PageType.Listing);
+        //    var Pages = Websites.Pages.GetPages(PageType.Listing);
         //    HashSet<string> hashSets = [];
-        //    foreach (var page in pages)
+        //    foreach (var page in Pages)
         //    {
         //        if (page.ResponseBodyTextHash is null)
         //        {

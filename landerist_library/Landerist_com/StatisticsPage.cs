@@ -38,6 +38,7 @@ namespace landerist_library.Landerist_com
                 UpdatedPageType();
                 ScrapedPages();
                 BathcReaded();
+                LocalAIParsing();
                 ListingInsertUpdate();
                 PageType();
                 PublishedPageType();
@@ -139,6 +140,16 @@ namespace landerist_library.Landerist_com
                 StatisticsKey.BatchReadedErrors,
             ];
             BarChart("Batch Readed", statisticsKeys, false);
+        }
+
+        private static void LocalAIParsing()
+        {
+            List<StatisticsKey> statisticsKeys =
+            [
+                StatisticsKey.LocalAIParsingSuccess,
+                StatisticsKey.LocalAIParsingErrors,
+            ];
+            BarChart("LocalAI Parsing", statisticsKeys, false);
         }
 
         private static void ListingInsertUpdate()

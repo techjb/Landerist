@@ -11,16 +11,21 @@ namespace landerist_library.Tasks
     public class TasksService
     {
         private readonly Scraper Scraper;
+        private readonly TaskLocalAIParsing TaskLocalAIParsing;
+        private readonly TaskBatchDownload TaskBatchDownload = new();
+        private readonly TaskBatchUpload TaskBatchUpload = new();
+
         private Timer? Timer1;
         private Timer? Timer2;
         private Timer? Timer3;
         private Timer? Timer4;
         private Timer? Timer5;
 
+        private bool RunningTimer1 = false;
         private bool RunningTimer2 = false;
-        private bool RunningTimer3 = false;
 
         private const int OneSecond = 1000;
+        private const int TwoSeconds = 2000;
         private const int TenSeconds = 10 * OneSecond;
         private const int OneMinute = 60 * OneSecond;
         private const int TenMinutes = 10 * OneMinute;
@@ -28,32 +33,35 @@ namespace landerist_library.Tasks
         private const int OneDay = 24 * OneHour;
 
         private bool PerformDailyTasks = false;
-
         private bool PerformTenMinutesTasks = false;
+        private bool PerformHourlyTasks = false;        
 
-        private bool PerformHourlyTasks = false;
 
         public TasksService()
         {
             Scraper = new();
+            TaskLocalAIParsing = new();
         }
 
         public void Start()
         {
-            PuppeteerDownloader.UpdateChrome();
-            SetTimers();
-        }
-
-        private void SetTimers()
-        {
-            Timer1 = new Timer(Scrape!, null, OneSecond, TenSeconds);
-            Timer2 = new Timer(BlockingCollection!, null, OneSecond, OneSecond);
-
-            if (Configuration.Config.IsPrincipalMachine())
+            if (Configuration.Config.IsLocalAIMachine())
             {
-                Timer3 = new Timer(TenMinutesTasks!, null, 0, TenMinutes);
-                Timer4 = new Timer(HourlyTasks!, null, OneHour, OneHour);
-                Timer5 = new Timer(DailyTasks!, null, GetDueTime(), OneDay);
+                Timer1 = new Timer(LocalAIParsing!, null, OneSecond, TwoSeconds);
+            }
+            else
+            {
+                PuppeteerDownloader.UpdateChrome();
+
+                Timer1 = new Timer(Scrape!, null, OneSecond, TenSeconds);
+                Timer2 = new Timer(BlockingCollection!, null, OneSecond, OneSecond);
+
+                if (Configuration.Config.IsPrincipalMachine())
+                {
+                    Timer3 = new Timer(TenMinutesTasks!, null, 0, TenMinutes);
+                    Timer4 = new Timer(HourlyTasks!, null, OneHour, OneHour);
+                    Timer5 = new Timer(DailyTasks!, null, GetDueTime(), OneDay);
+                }
             }
         }
 
@@ -90,19 +98,18 @@ namespace landerist_library.Tasks
 
         private void Scrape(object state)
         {
-            if (RunningTimer2)
+            if (RunningTimer1)
             {
                 return;
             }
 
-            RunningTimer2 = true;
+            RunningTimer1 = true;
             try
             {
                 if (!PerformPendingTasks())
                 {
                     Scraper.Start();
                 }
-
             }
             catch (Exception exception)
             {
@@ -110,7 +117,29 @@ namespace landerist_library.Tasks
             }
             finally
             {
-                RunningTimer2 = false;
+                RunningTimer1 = false;
+            }
+        }
+
+        private void LocalAIParsing(object state)
+        {
+            if (RunningTimer1)
+            {
+                return;
+            }
+
+            RunningTimer1 = true;
+            try
+            {
+                TaskLocalAIParsing.Start();
+            }
+            catch (Exception exception)
+            {
+                Log.WriteError("ServiceTasks LocalAIParsing", exception);
+            }
+            finally
+            {
+                RunningTimer1 = false;
             }
         }
 
@@ -136,12 +165,12 @@ namespace landerist_library.Tasks
 
         private void BlockingCollection(object state)
         {
-            if (RunningTimer3)
+            if (RunningTimer2)
             {
                 return;
             }
 
-            RunningTimer3 = true;
+            RunningTimer2 = true;
             try
             {
                 Scraper.FinalizeBlockingCollection();
@@ -152,7 +181,7 @@ namespace landerist_library.Tasks
             }
             finally
             {
-                RunningTimer3 = false;
+                RunningTimer2 = false;
             }
         }
 
@@ -184,7 +213,7 @@ namespace landerist_library.Tasks
             try
             {
                 StatisticsSnapshot.TakeSnapshots();
-                FilesUpdater.Update();
+                DownloadsUpdater.Update();
                 Landerist_com.Landerist_com.UpdatePages();
                 CleanDatabase();
                 Backup.Update();

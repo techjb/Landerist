@@ -95,6 +95,20 @@ namespace landerist_library.Scrape
             return Page.Update(setNextUpdate);
         }
 
+        public bool SetPageTypeAfterParsing(PageType newPageType, Listing? listing)
+        {
+            if (newPageType.Equals(PageType.MayBeListing))
+            {
+                return false;
+            }
+            Page.RemoveWaitingStatus();
+            Page.SetResponseBodyFromZipped();
+            Page.RemoveResponseBodyZipped();
+            SetPageType(newPageType, listing);
+            return Page.Update(true);
+        }
+
+
         public void SetPageType(PageType? newPageType, Listing? newListing)
         {
             NewListing = newListing;
@@ -119,6 +133,7 @@ namespace landerist_library.Scrape
             }
         }
 
+        
         private void HandleLPublishedListing()
         {
             NewListing ??= Page.GetListing(true, true);

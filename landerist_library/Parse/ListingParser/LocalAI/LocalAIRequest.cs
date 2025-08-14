@@ -1,7 +1,6 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Parse.ListingParser.OpenAI;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -44,7 +43,7 @@ namespace landerist_library.Parse.ListingParser.LocalAI
                     new { role = "system", content = GetExtendedSystemPrompt() },
                     new { role = "user", content = text }
                 },
-                format = "json",                
+                format = "json",
                 //response_format = new
                 //{
                 //    type = "json_schema",
@@ -57,13 +56,11 @@ namespace landerist_library.Parse.ListingParser.LocalAI
 
             try
             {
-                Stopwatch stopwatch = Stopwatch.StartNew();
+                DateTime dateStart = DateTime.Now;
                 using HttpClient client = new();
                 HttpResponseMessage response = await client.PostAsync(Url, httpContent);
-
-                stopwatch.Stop();
-                Console.WriteLine($"LocalAIRequest GetResponse took {stopwatch.ElapsedMilliseconds} ms");
                 string result = await response.Content.ReadAsStringAsync();
+                Timers.Timer.SaveTimerOpenAI("LocalAIRequest", dateStart);
                 if (response.IsSuccessStatusCode)
                 {
                     return JsonSerializer.Deserialize<LocaAIResponse>(result);

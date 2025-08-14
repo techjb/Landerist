@@ -31,25 +31,6 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
                 ;
         }
 
-        //public static string GetJsonSchema2()
-        //{
-        //    JSchema jSChema = JSchemaGenerator.Generate(typeof(StructuredOutputEs));            
-        //    SetSchemaVersion(jSChema);
-        //    SetAllOf(jSChema);
-        //    ParsePropertyType(jSChema);
-        //    SetAdditionalPropertiesFalse(jSChema);
-        //    return jSChema.ToString(SchemaVersion.Draft7);            
-        //}
-
-        //public static string GetJsonSchema3()
-        //{
-        //    JSchema jSChema = JSchemaGenerator.Generate(typeof(StructuredOutputEs));
-        //    //SetSchemaVersion(jSChema);
-        //    //SetAllOf(jSChema);
-        //    SetAdditionalPropertiesFalse(jSChema);
-        //    return jSChema.ToString(SchemaVersion.Draft7);
-        //}
-
         private static void ParsePropertyType(JSchema jSChema)
         {
             if (!jSChema.Properties[StructuredOutputEsJson.FunctionNameListing].Properties.TryGetValue(nameof(StructuredOutputEsJson.tipo_de_inmueble), out var propertyTypeSchema))
@@ -162,6 +143,4 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             }
         }
     }
-
-
 }

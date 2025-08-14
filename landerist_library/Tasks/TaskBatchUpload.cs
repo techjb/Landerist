@@ -14,9 +14,11 @@ namespace landerist_library.Tasks
 
         private static readonly int MaxPagesPerBatch = GetMaxPagesPerBatch();
 
-        private static List<Page> pages = [];
+        private static List<Page> Pages = [];
 
-        private static HashSet<string> UriHashes = [];
+        private static HashSet<string> WaitingAIResponse = [];
+
+        private static bool FirstTime = true;
 
         private static long SetMaxFileSize()
         {
@@ -46,22 +48,34 @@ namespace landerist_library.Tasks
             return 0;
         }
 
-        public static void Start(bool processAll = true)
+        public void Start(bool processAll = true)
         {
+            Initialize();
             Clear();
             bool sucess = BatchUpload();
-            if (processAll && sucess && UriHashes.Count < pages.Count)
+            if (processAll && sucess && WaitingAIResponse.Count < Pages.Count)
             {
                 Start(processAll);
             }
             Clear();
         }
 
-        private static bool BatchUpload()
+        private static void Initialize()
         {
-            pages = Pages.SelectWaitingStatusAiRequest(MaxPagesPerBatch);
+            if (!FirstTime)
+            {
+                return;
+            }
 
-            if (pages.Count < Config.MIN_PAGES_PER_BATCH)
+            Websites.Pages.UpdateWaitingStatus(WaitingStatus.readed_by_batch, WaitingStatus.waiting_ai_request);
+            FirstTime = false;
+        }
+
+        private bool BatchUpload()
+        {
+            Pages = Websites.Pages.SelectWaitingStatusAIRequest(MaxPagesPerBatch, WaitingStatus.readed_by_batch);
+
+            if (Pages.Count < Config.MIN_PAGES_PER_BATCH)
             {
                 return false;
             }
@@ -81,12 +95,13 @@ namespace landerist_library.Tasks
                 return false;
             }
 
-            Batches.Insert(batchId, UriHashes);
+            Batches.Insert(batchId, WaitingAIResponse);
             SetWaitingAIResponse();
+            SetWaitingAIRequest();
             return true;
         }
 
-        private static string? CreateFile()
+        private string? CreateFile()
         {
             var filePath = Config.BATCH_DIRECTORY + "batch_" +
                 Config.LLM_PROVIDER.ToString().ToLower() + "_" +
@@ -95,7 +110,8 @@ namespace landerist_library.Tasks
             Console.WriteLine("TaskBatchUpload " + filePath);
             File.Delete(filePath);
 
-            UriHashes = [];
+            WaitingAIResponse = [];
+
             var errors = 0;
             var skipped = 0;
 
@@ -104,7 +120,7 @@ namespace landerist_library.Tasks
                 AutoFlush = true
             };
 
-            Parallel.ForEach(pages, Config.PARALLELOPTIONS1INLOCAL, (page, state) =>
+            Parallel.ForEach(Pages, Config.PARALLELOPTIONS1INLOCAL, (page, state) =>
             {
                 if (!CanWriteFile(writer))
                 {
@@ -113,20 +129,19 @@ namespace landerist_library.Tasks
                 }
                 else if (WriteToFile(page, writer))
                 {
-                    lock (UriHashes)
+                    lock (WaitingAIResponse)
                     {
-                        UriHashes.Add(page.UriHash);
+                        WaitingAIResponse.Add(page.UriHash);
                     }
                 }
                 else
                 {
                     Interlocked.Increment(ref errors);
                 }
-                page.Dispose();
             });
 
 
-            Log.WriteBatch("TaskBatchUpload", $"CreateFile {UriHashes.Count}/{pages.Count} errors: {errors}");
+            Log.WriteBatch("TaskBatchUpload", $"CreateFile {WaitingAIResponse.Count}/{Pages.Count} errors: {errors}");
             return filePath;
         }
 
@@ -139,7 +154,7 @@ namespace landerist_library.Tasks
             }
         }
 
-        private static bool WriteToFile(Page page, StreamWriter writer)
+        private bool WriteToFile(Page page, StreamWriter writer)
         {
             try
             {
@@ -163,8 +178,6 @@ namespace landerist_library.Tasks
             }
             return false;
         }
-
-
         public static string? GetJson(Page page)
         {
             page.SetResponseBodyFromZipped();
@@ -211,11 +224,10 @@ namespace landerist_library.Tasks
 
         private static void Clear()
         {
-            Parallel.ForEach(pages, page => page.Dispose());
-            pages.Clear();
-            UriHashes.Clear();
+            Parallel.ForEach(Pages, page => page.Dispose());
+            Pages.Clear();
+            WaitingAIResponse.Clear();
         }
-
 
         static void SetWaitingAIResponse()
         {
@@ -223,16 +235,39 @@ namespace landerist_library.Tasks
             {
                 return;
             }
-            int total = UriHashes.Count;
-            int counter = 0;
-            Parallel.ForEach(UriHashes, Config.PARALLELOPTIONS1INLOCAL, uriHash =>
+            if (WaitingAIResponse.Count.Equals(0))
             {
-                if (Pages.UpdateWaitingStatusAiResponse(uriHash))
+                return;
+            }
+
+            int counter = 0;
+            Parallel.ForEach(WaitingAIResponse, Config.PARALLELOPTIONS1INLOCAL, uriHash =>
+            {
+                if (Websites.Pages.UpdateWaitingStatusAIResponse(uriHash))
                 {
                     Interlocked.Increment(ref counter);
                 }
             });
-            Log.WriteBatch("TaskBatchUpload", "SetWaitingAIResponse: " + counter + "/" + UriHashes.Count);
+            Log.WriteBatch("TaskBatchUpload", "SetWaitingAIResponse: " + counter + "/" + WaitingAIResponse.Count);
+        }
+
+        static void SetWaitingAIRequest()
+        {
+            var pages = Pages.Where(page => !WaitingAIResponse.Contains(page.UriHash)).ToList();
+            if (pages.Count.Equals(0))
+            {
+                return;
+            }
+
+            int counter = 0;
+            Parallel.ForEach(pages, Config.PARALLELOPTIONS1INLOCAL, page =>
+            {
+                if (Websites.Pages.UpdateWaitingStatusAIRequest(page.UriHash))
+                {
+                    Interlocked.Increment(ref counter);
+                }
+            });
+            Log.WriteBatch("TaskBatchUpload", "SetWaitingAIRequest: " + counter + "/" + pages.Count);
         }
     }
 }

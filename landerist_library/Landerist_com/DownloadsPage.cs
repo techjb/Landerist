@@ -47,7 +47,7 @@ namespace landerist_library.Landerist_com
                 return;
             }
 
-            var counter = new S3().GetMetadataValue(PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey, FilesUpdater.METADATA_KEY_COUNTER);
+            var counter = new S3().GetMetadataValue(PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey, DownloadsUpdater.METADATA_KEY_COUNTER);
 
             string commentCounter = Comment(countryCode, exportType, "Counter");            
             Replace(commentCounter, counter);
