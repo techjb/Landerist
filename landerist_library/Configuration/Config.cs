@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "4.44";
+        public static readonly string VERSION = "4.45";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -167,7 +167,6 @@ namespace landerist_library.Configuration
         public static readonly string VERTEXT_AI_MODEL_NAME_GEMINI_FLASH_LITE = "gemini-2.5-flash-lite";
 
 
-
         public static bool IsConfigurationProduction()
         {
             return ConfigurationProduction;
@@ -245,7 +244,8 @@ namespace landerist_library.Configuration
 
             LLM_PROVIDER = ConfigurationProduction ?
                 LLMProvider.VertexAI :
-                LLMProvider.LocalAI;                
+                //LLMProvider.LocalAI;                
+                LLMProvider.VertexAI;
 
 
             BATCH_ENABLED = ConfigurationProduction;

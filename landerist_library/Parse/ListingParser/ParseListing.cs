@@ -1,4 +1,6 @@
 ﻿using landerist_library.Configuration;
+using landerist_library.Database;
+using landerist_library.Parse.ListingParser.LocalAI;
 using landerist_library.Parse.ListingParser.OpenAI;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
 using landerist_library.Parse.ListingParser.VertexAI;
@@ -6,7 +8,6 @@ using landerist_library.Websites;
 using landerist_orels.ES;
 using Newtonsoft.Json;
 using System.Reflection;
-using landerist_library.Parse.ListingParser.LocalAI;
 
 namespace landerist_library.Parse.ListingParser
 {
@@ -24,7 +25,7 @@ namespace landerist_library.Parse.ListingParser
         private static readonly JsonSerializerSettings JsonSerializerSettings = new()
         {
             MissingMemberHandling = MissingMemberHandling.Ignore,
-            NullValueHandling = NullValueHandling.Include,            
+            NullValueHandling = NullValueHandling.Include,
         };
 
         public static (PageType pageType, Listing? listing, bool waitingAIRequest)
@@ -98,11 +99,25 @@ namespace landerist_library.Parse.ListingParser
             }
             try
             {
-                var structuredOutput = JsonConvert.DeserializeObject<StructuredOutputEs>(text, JsonSerializerSettings);
-                if (structuredOutput != null)
+                StructuredOutputEs? structuredOutputEs = null;
+                if (Config.LLM_PROVIDER.Equals(LLMProvider.VertexAI))
                 {
-                    return new StructuredOutputEsParser(structuredOutput).Parse(page);
+                    var structuredOutputVertexAIEs = JsonConvert.DeserializeObject<StructuredOutputVertexAIEs>(text, JsonSerializerSettings);
+                    if (structuredOutputVertexAIEs != null)
+                    {
+                        structuredOutputEs = structuredOutputVertexAIEs?.Parse();
+                    }
                 }
+                else
+                {
+                    structuredOutputEs = JsonConvert.DeserializeObject<StructuredOutputEs>(text, JsonSerializerSettings);
+
+                }
+                if (structuredOutputEs != null)
+                {
+                    return new StructuredOutputEsParser(structuredOutputEs).Parse(page);
+                }
+
                 Logs.Log.WriteError("ParseListing ParseResponse", "StructuredOutput null");
             }
             catch (Exception exception)

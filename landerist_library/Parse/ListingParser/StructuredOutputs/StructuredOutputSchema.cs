@@ -49,7 +49,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
                         continue;
                     }
 
-                    var fieldInfo = typeof(Anuncio.TiposDeInmueble).GetField(valueStr);
+                    var fieldInfo = typeof(TiposDeInmueble).GetField(valueStr);
                     string? desc = null;
                     if (fieldInfo != null)
                     {

@@ -195,7 +195,7 @@ namespace landerist_tests
 
 
             //new landerist_library.Scrape.Scraper().Scrape("https://dosagui.com/es/property/15746", true);
-            //new landerist_library.Scrape.Scraper().Scrape("https://20punto20rb.com/propiedades/propiedad/luminoso-piso-en-don-ramon-de-la-cruz/", false);
+            new landerist_library.Scrape.Scraper().Scrape("https://20punto20rb.com/propiedades/propiedad/luminoso-piso-en-don-ramon-de-la-cruz/", false);
 
             //new landerist_library.Scrape.Scraper().Scrape("https://1mast.com/es/pisos-en-coin/", false);// not listing
             //new landerist_library.Scrape.Scraper().Scrape("https://360mallorcaproperty.com/es/property-location/porto-petro-es/page/2/", false);// not listing
@@ -394,7 +394,7 @@ namespace landerist_tests
             //ServiceTasks.Start();
             //BatchTasks.Start();            
             //TaskBatchDownload.Start();
-            new TaskBatchUpload().Start();
+            //new TaskBatchUpload().Start();
             //BatchPredictions.ListAllPredictionJobs();
             //BatchDownload.ReadFileTest();
             //BatchDownload.DownloadVertexAI("projects/942392546193/locations/europe-southwest1/batchPredictionJobs/391166654744100864");

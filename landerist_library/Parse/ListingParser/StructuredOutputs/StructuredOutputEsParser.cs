@@ -3,7 +3,6 @@ using landerist_library.Parse.Media;
 using landerist_library.Websites;
 using landerist_orels.ES;
 using landerist_orels;
-using static landerist_library.Parse.ListingParser.StructuredOutputs.Anuncio;
 
 namespace landerist_library.Parse.ListingParser.StructuredOutputs
 {

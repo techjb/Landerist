@@ -48,15 +48,24 @@ namespace landerist_library.Tasks
             return 0;
         }
 
-        public void Start(bool processAll = true)
+        public void Start()
         {
             Initialize();
             Clear();
             bool sucess = BatchUpload();
-            if (processAll && sucess && WaitingAIResponse.Count < Pages.Count)
+            if (sucess)
             {
-                Start(processAll);
+                if (WaitingAIResponse.Count < Pages.Count)
+                {
+                    Start();
+                    return;
+                }
             }
+            else
+            {
+                SetWaitingAIRequestToAllPages();
+            }
+
             Clear();
         }
 
@@ -66,9 +75,8 @@ namespace landerist_library.Tasks
             {
                 return;
             }
-
-            Websites.Pages.UpdateWaitingStatus(WaitingStatus.readed_by_batch, WaitingStatus.waiting_ai_request);
             FirstTime = false;
+            Websites.Pages.UpdateWaitingStatus(WaitingStatus.readed_by_batch, WaitingStatus.waiting_ai_request);
         }
 
         private bool BatchUpload()
@@ -268,6 +276,25 @@ namespace landerist_library.Tasks
                 }
             });
             Log.WriteBatch("TaskBatchUpload", "SetWaitingAIRequest: " + counter + "/" + pages.Count);
+        }
+
+        static void SetWaitingAIRequestToAllPages()
+        {
+
+            if (Pages.Count.Equals(0))
+            {
+                return;
+            }
+
+            int counter = 0;
+            Parallel.ForEach(Pages, Config.PARALLELOPTIONS1INLOCAL, page =>
+            {
+                if (Websites.Pages.UpdateWaitingStatusAIRequest(page.UriHash))
+                {
+                    Interlocked.Increment(ref counter);
+                }
+            });
+            Log.WriteBatch("TaskBatchUpload", "SetWaitingAIRequestToAllPages: " + counter + "/" + Pages.Count);
         }
     }
 }
