@@ -29,7 +29,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
                 var listing = new Listing
                 {
                     guid = page.UriHash,
-                    listingStatus = ListingStatus.published, // todo: as ai for listing status
+                    listingStatus = ListingStatus.published, // todo: ad ai for listing status
                     listingDate = GetListingDate(),
                     operation = GetOperation(),
                     propertyType = GetPropertyType(),

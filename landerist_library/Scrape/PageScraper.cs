@@ -103,7 +103,7 @@ namespace landerist_library.Scrape
             }
             Page.RemoveWaitingStatus();
             Page.SetResponseBodyFromZipped();
-            Page.RemoveResponseBodyZipped();
+            //Page.RemoveResponseBodyZipped(); // todo: uncomment after creating dataset for AI training
             SetPageType(newPageType, listing);
             return Page.Update(true);
         }
