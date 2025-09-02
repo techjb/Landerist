@@ -408,6 +408,13 @@ namespace landerist_tests
 
             #endregion
 
+            #region TrainginDate
+
+            //var page = new Page("https://dosagui.com/es/property/15746");
+            //new landerist_library.Database.TrainingData().Insert(page);
+
+            #endregion
+
         }
     }
 }
