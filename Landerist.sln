@@ -32,6 +32,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "landerist_scraper", "lander
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "landerist_tests", "landerist_tests\landerist_tests.csproj", "{862B91A5-AE29-4016-B0FD-DD024B320D23}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LocalIsListing", "LocalIsListing", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		E:\Landerist\LocalIsListing\baseline_tfidf.py = E:\Landerist\LocalIsListing\baseline_tfidf.py
+		E:\Landerist\LocalIsListing\infer.py = E:\Landerist\LocalIsListing\infer.py
+		E:\Landerist\LocalIsListing\train_transformer.py = E:\Landerist\LocalIsListing\train_transformer.py
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

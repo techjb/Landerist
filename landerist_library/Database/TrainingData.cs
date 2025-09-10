@@ -66,12 +66,12 @@ namespace landerist_library.Database
             Console.WriteLine("Parsing " + dataTable.Rows.Count + " rows");
             DataTable parsedDataTable = new();
             parsedDataTable.Columns.Add("text", typeof(string));
-            parsedDataTable.Columns.Add("label", typeof(bool));
+            parsedDataTable.Columns.Add("label", typeof(string));
 
             Parallel.ForEach(dataTable.AsEnumerable(), row =>
             {
                 byte[] responseBodyZipped = (byte[])row["ResponseBodyZipped"];
-                bool label = (bool)row["IsListing"];
+                string label = (bool)row["IsListing"]? "1": "0";
                 string responseBody = GetResponseBody(responseBodyZipped);
                 var text = ParseListingUserInput.GetText(responseBody);
                 lock (parsedDataTable)
