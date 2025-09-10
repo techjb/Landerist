@@ -105,7 +105,7 @@ namespace landerist_library.Scrape
             Page.SetResponseBodyFromZipped();
             SetPageType(newPageType, listing);
 
-            //new TrainingData().Insert(Page); // todo: remove when finshed testing
+            //new TrainingData().Insert(Page);
 
             Page.RemoveResponseBodyZipped();
             return Page.Update(true);

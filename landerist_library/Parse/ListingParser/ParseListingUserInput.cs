@@ -59,6 +59,13 @@ namespace landerist_library.Parse.ListingParser
             return string.Join(" | ", TagsToRemove.ToList());
         }
 
+        public static string? GetText(string responseBody)
+        {
+            var HtmlDocument = new HtmlDocument();
+            HtmlDocument.LoadHtml(responseBody);
+            return GetHtml(HtmlDocument);
+        }
+
         public static string? GetText(Page page)
         {
             try
@@ -67,9 +74,6 @@ namespace landerist_library.Parse.ListingParser
                 if (htmlDocument != null)
                 {
                     return GetHtml(htmlDocument);
-                    //return 
-                    //    "Url: " + Page.Uri.ToString() + Environment.NewLine + " " +
-                    //    "Html: " +  GetHtml(htmlDocument);
                 }
             }
             catch// (Exception exception)

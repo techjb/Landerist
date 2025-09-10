@@ -412,6 +412,7 @@ namespace landerist_tests
 
             //var page = new Page("https://dosagui.com/es/property/15746");
             //new landerist_library.Database.TrainingData().Insert(page);
+            //landerist_library.Database.TrainingData.CreateCsvs();
 
             #endregion
 
