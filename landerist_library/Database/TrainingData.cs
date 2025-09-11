@@ -37,6 +37,13 @@ namespace landerist_library.Database
             WriteFiles(train, valid, test);
         }
 
+        public static void CreateCsv()
+        {
+            DataTable dataTable = GetDataTable(5000);
+            dataTable = Parse(dataTable);
+            WriteFile(dataTable);
+        }
+
         private static DataTable GetDataTable(int rows)
         {
             Console.WriteLine("Reading " + rows + " rows");
@@ -71,7 +78,7 @@ namespace landerist_library.Database
             Parallel.ForEach(dataTable.AsEnumerable(), row =>
             {
                 byte[] responseBodyZipped = (byte[])row["ResponseBodyZipped"];
-                string label = (bool)row["IsListing"]? "1": "0";
+                string label = (bool)row["IsListing"] ? "1" : "0";
                 string responseBody = GetResponseBody(responseBodyZipped);
                 var text = ParseListingUserInput.GetText(responseBody);
                 lock (parsedDataTable)
@@ -123,6 +130,12 @@ namespace landerist_library.Database
             Tools.Csv.Write(dataTableTrain, Configuration.PrivateConfig.TRAININGDATA_DIRECTORY_LOCAL + "train.csv", true);
             Tools.Csv.Write(dataTableValid, Configuration.PrivateConfig.TRAININGDATA_DIRECTORY_LOCAL + "valid.csv", true);
             Tools.Csv.Write(dataTableTest, Configuration.PrivateConfig.TRAININGDATA_DIRECTORY_LOCAL + "test.csv", true);
+        }
+
+        private static void WriteFile(DataTable dataTable)
+        {
+            Console.WriteLine("Writing file ..");
+            Tools.Csv.Write(dataTable, Configuration.PrivateConfig.TRAININGDATA_DIRECTORY_LOCAL + "data.csv", true);
         }
     }
 }
