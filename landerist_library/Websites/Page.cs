@@ -641,7 +641,7 @@ namespace landerist_library.Websites
             }
         }
 
-        public async void SetResponseBodyFromZipped()
+        public void SetResponseBodyFromZipped()
         {
             if (ResponseBodyZipped is null)
             {
@@ -652,7 +652,7 @@ namespace landerist_library.Websites
                 using var memoryStream = new MemoryStream(ResponseBodyZipped);
                 using var gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress);
                 using var streamReader = new StreamReader(gzipStream);
-                ResponseBody = await streamReader.ReadToEndAsync();
+                ResponseBody = streamReader.ReadToEnd();
             }
             catch (Exception exception)
             {
