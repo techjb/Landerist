@@ -215,13 +215,13 @@ namespace landerist_library.Scrape
                 return;
             }
             var crashedPercentage = Math.Round((float)Crashed * 100 / Scraped, 0);
-            var downloadErrorsPercentage = Math.Round((float)DownloadErrors * 100 / Success, 0);            
+            var (downloadErrorsPercentage, downloadErrorsBasis) = GetDownloadErrorsMetrics();
 
             var text =
                 $"Crashed: {Crashed} ({crashedPercentage}%) " +
-                $"DownloadErrors: {DownloadErrors} ({downloadErrorsPercentage}%) " +
-                $"{page.PageType} " + 
-                $"{page.Uri}"; 
+                $"DownloadErrors: {DownloadErrors} ({downloadErrorsPercentage}% of {downloadErrorsBasis}) " +
+                $"{page.PageType} " +
+                $"{page.Uri}";
             Console.WriteLine(text);
         }
 
@@ -235,18 +235,35 @@ namespace landerist_library.Scrape
             var scrappedPercentage = Math.Round((float)Scraped * 100 / TotalCounter, 0);
             var successPercentage = Math.Round((float)Success * 100 / Scraped, 0);
             var crashedPercentage = Math.Round((float)Crashed * 100 / Scraped, 0);
-            var downloadErrorsPercentage = Math.Round((float)DownloadErrors * 100 / Success, 0);
+            var (downloadErrorsPercentage, downloadErrorsBasis) = GetDownloadErrorsMetrics();
 
             return
                 $"Scraped {Scraped}/{TotalCounter} ({scrappedPercentage}%) " +
                 //$"Blocked {blocked} " +
                 $"Success: {Success} ({successPercentage}%) " +
                 $"Crashed: {Crashed} ({crashedPercentage}%) " +
-                $"DownloadErrors: {DownloadErrors} ({downloadErrorsPercentage}%) ";                
+                $"DownloadErrors: {DownloadErrors} ({downloadErrorsPercentage}% of {downloadErrorsBasis}) ";
                 //$"Downloaders: {downloaders} " +
                 //$"MaxDownloads: {maxDownloads} " +
                 //$"MaxCrashes: {maxCrashes}"
                 ;
+        }
+
+        private static (double Percentage, string Basis) GetDownloadErrorsMetrics()
+        {
+            if (Success > 0)
+            {
+                var percentage = Math.Round((double)DownloadErrors * 100 / Success, 0);
+                return (percentage, nameof(Success));
+            }
+
+            if (Scraped > 0)
+            {
+                var percentage = Math.Round((double)DownloadErrors * 100 / Scraped, 0);
+                return (percentage, nameof(Scraped));
+            }
+
+            return (0, nameof(Scraped));
         }
 
         private static void InsertStatistics()
