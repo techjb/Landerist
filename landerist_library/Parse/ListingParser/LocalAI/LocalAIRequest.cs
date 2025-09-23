@@ -12,8 +12,11 @@ namespace landerist_library.Parse.ListingParser.LocalAI
     {
 
         private const string SERVER_PORT = "1234";
-        private const string MODEL_NAME = "qwen/qwen3-30b-a3b-2507";
-        //private const string MODEL_NAME = "qwen/qwen3-4b-2507";
+        private const string MODEL_NAME =
+            "qwen/qwen3-30b-a3b-2507"
+            //"qwen/qwen3-4b-2507"
+            ;
+        
         private const float TEMPERATURE = 0.1f;
         public const int MAX_CONTEXT_WINDOW = 65536;
         private readonly string Url;
@@ -60,7 +63,7 @@ namespace landerist_library.Parse.ListingParser.LocalAI
                 using HttpClient client = new();
                 HttpResponseMessage response = await client.PostAsync(Url, httpContent);
                 string result = await response.Content.ReadAsStringAsync();
-                Timers.Timer.SaveTimerOpenAI("LocalAIRequest", dateStart);
+                Timers.Timer.SaveTimerLocalAI("LocalAIRequest", dateStart);
                 if (response.IsSuccessStatusCode)
                 {
                     return JsonSerializer.Deserialize<LocaAIResponse>(result);

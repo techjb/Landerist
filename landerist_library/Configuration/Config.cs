@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "4.47";
+        public static readonly string VERSION = "4.48";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -244,8 +244,7 @@ namespace landerist_library.Configuration
 
             LLM_PROVIDER = ConfigurationProduction ?
                 LLMProvider.VertexAI :
-                //LLMProvider.LocalAI;                
-                LLMProvider.VertexAI;
+                LLMProvider.LocalAI;
 
 
             BATCH_ENABLED = ConfigurationProduction;
@@ -276,6 +275,11 @@ namespace landerist_library.Configuration
             DATABASE_CONNECTION = configurationProduction ?
                 DATABASE_CONNECTION_PRODUCTION :
                 DATABASE_CONNECTION_LOCAL;
+        }
+
+        public static void SetLLMProviderLocalAI()
+        {
+            LLM_PROVIDER = LLMProvider.LocalAI;
         }
     }
 }

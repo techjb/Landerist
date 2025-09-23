@@ -11,6 +11,8 @@ namespace landerist_library.Timers
 
         public const string TimerKeyChatGPT = "chatgpt";
 
+        public const string TimerKeyLocalAI = "localai";
+
         public const string TimerKeyDownloadPage = "downloadpage";
 
         public static void SaveTimer(string timerKey, string source, DateTime dateStart)
@@ -53,6 +55,11 @@ namespace landerist_library.Timers
         public static void SaveTimerOpenAI(string source, DateTime dateStart)
         {
             SaveTimer(TimerKeyChatGPT, source, dateStart);
+        }
+
+        public static void SaveTimerLocalAI(string source, DateTime dateStart)
+        {
+            SaveTimer(TimerKeyLocalAI, source, dateStart);
         }
 
         public static void SaveTimerVertexAI(string source, DateTime dateStart)

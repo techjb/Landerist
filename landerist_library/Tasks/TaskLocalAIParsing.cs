@@ -27,6 +27,7 @@ namespace landerist_library.Tasks
             }
 
             Log.WriteLocalAI("Initialize", "Initialized");
+            Configuration.Config.SetLLMProviderLocalAI();
             Pages.UpdateWaitingStatus(WaitingStatus.readed_by_localai, WaitingStatus.waiting_ai_request);
             FirstTime = false;
         }
@@ -41,17 +42,17 @@ namespace landerist_library.Tasks
             int sucess = 0;
             int errors = 0;
             Log.Console($"Processing {total} pages ..");
-            foreach (var page in pages)
+            Parallel.ForEach(pages, new ParallelOptions() { MaxDegreeOfParallelism = 1 }, page =>
             {
                 if (ProcessPage(page))
                 {
-                    sucess++;
+                    Interlocked.Increment(ref sucess);
                 }
                 else
                 {
-                    errors++;
+                    Interlocked.Increment(ref errors);
                 }
-            }
+            });
             Log.WriteLocalAI("ProcessPages", $"Total {total} Success: {sucess} Errors: {errors}");
             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.LocalAIParsingSuccess, sucess);
             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.LocalAIParsingErrors, errors);

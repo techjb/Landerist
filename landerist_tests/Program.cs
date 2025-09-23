@@ -245,7 +245,12 @@ namespace landerist_tests
 
             //landerist_library.GetLatLng.ListingParser.VertexAI.Batch.VertexAIBatch.GetResponse();
             //landerist_library.GetLatLng.ListingParser.VertexAI.Batch.VertexAIBatch.ListAllPredictionJobs();
-            //VertexAIBatchCleaner.RemoveFiles();
+            //VertexAIBatchCleaner.RemoveFiles();            
+
+            #endregion
+
+
+            #region LocalAI
 
             //Console.WriteLine(new landerist_library.Parse.ListingParser.LocalAI.LocalAIRequest().GetResponse(text).Result.GetResponseText());            
             //Console.WriteLine(VertexAIResponse.GetResponseText(VertexAIRequest.GetResponse(text).Result));
@@ -253,8 +258,7 @@ namespace landerist_tests
 
             //landerist_library.Parse.ListingParser.LocalAI.LocalAIRequest.PrintOutputSchema();
             //Console.WriteLine(ParseListingSystem.GetSystemPrompt());
-
-
+            //new TaskLocalAIParsing().Start();
 
             #endregion
 
@@ -412,7 +416,7 @@ namespace landerist_tests
 
             //var page = new Page("https://dosagui.com/es/property/15746");
             //new landerist_library.Database.TrainingData().Insert(page);
-            //landerist_library.Database.TrainingData.CreateCsv();
+            //landerist_library.Database.TrainingData.CreateCsv(false);
 
             #endregion
 

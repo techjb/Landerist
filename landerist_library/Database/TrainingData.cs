@@ -1,8 +1,9 @@
-﻿using landerist_library.Websites;
+﻿using landerist_library.Parse.ListingParser;
+using landerist_library.Websites;
+using NetTopologySuite.Triangulate;
 using System.Data;
 using System.IO.Compression;
-using landerist_library.Parse.ListingParser;
-using NetTopologySuite.Triangulate;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace landerist_library.Database
 {
@@ -29,19 +30,12 @@ namespace landerist_library.Database
             });
         }
 
-        public static void CreateCsvs()
-        {
-            DataTable dataTable = GetDataTable(10000);
-            dataTable = Parse(dataTable);
-            var (train, valid, test) = DivideTable(dataTable);
-            WriteFiles(train, valid, test);
-        }
 
-        public static void CreateCsv()
+        public static void CreateCsv(bool html)
         {
-            DataTable dataTable = GetDataTable(5000);
-            dataTable = Parse(dataTable);
-            WriteFile(dataTable);
+            DataTable dataTable = GetDataTable(50000);
+            dataTable = Parse(dataTable, html);
+            WriteFile(dataTable, html);
         }
 
         private static DataTable GetDataTable(int rows)
@@ -68,7 +62,7 @@ namespace landerist_library.Database
             });
         }
 
-        public static DataTable Parse(DataTable dataTable)
+        public static DataTable Parse(DataTable dataTable, bool html)
         {
             Console.WriteLine("Parsing " + dataTable.Rows.Count + " rows");
             DataTable parsedDataTable = new();
@@ -80,10 +74,14 @@ namespace landerist_library.Database
                 byte[] responseBodyZipped = (byte[])row["ResponseBodyZipped"];
                 string label = (bool)row["IsListing"] ? "1" : "0";
                 string responseBody = GetResponseBody(responseBodyZipped);
-                var text = ParseListingUserInput.GetText(responseBody);
-                lock (parsedDataTable)
+                var text = ParseListingUserInput.GetText(responseBody, html);
+                if (!string.IsNullOrEmpty(text))
                 {
-                    parsedDataTable.Rows.Add(text, label);
+                    lock (parsedDataTable)
+                    {
+                        parsedDataTable.Rows.Add(text, label);
+                        Console.WriteLine("Parsed " + parsedDataTable.Rows.Count + " rows");
+                    }
                 }
             });
             return parsedDataTable;
@@ -132,10 +130,11 @@ namespace landerist_library.Database
             Tools.Csv.Write(dataTableTest, Configuration.PrivateConfig.TRAININGDATA_DIRECTORY_LOCAL + "test.csv", true);
         }
 
-        private static void WriteFile(DataTable dataTable)
+        private static void WriteFile(DataTable dataTable, bool html)
         {
             Console.WriteLine("Writing file ..");
-            Tools.Csv.Write(dataTable, Configuration.PrivateConfig.TRAININGDATA_DIRECTORY_LOCAL + "data.csv", true);
+            string fileName = html ? "data_html.csv" : "data_text.csv";
+            Tools.Csv.Write(dataTable, Configuration.PrivateConfig.TRAININGDATA_DIRECTORY_LOCAL + fileName, true);
         }
     }
 }

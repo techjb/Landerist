@@ -1,7 +1,9 @@
 ﻿using HtmlAgilityPack;
 using landerist_library.Websites;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace landerist_library.Parse.ListingParser
 {
@@ -42,11 +44,16 @@ namespace landerist_library.Parse.ListingParser
             "//param",
         ];
 
+        private static readonly HashSet<string> TagsToRemove2 =
+        [
+            "//head",
+            "//noscript",
+        ];
+
         private static readonly HashSet<string> AttributesToRemove =
         [
             "width",
             "height",
-            //"src",
             "target",
             "style",
             "tabindex",
@@ -54,16 +61,29 @@ namespace landerist_library.Parse.ListingParser
 
         private static readonly string XpathTagsToRemove = InitXpathTagsToRemove();
 
+        private static readonly string XpathTagsToRemove2 = InitXpathTagsToRemove2();
+
         private static string InitXpathTagsToRemove()
         {
             return string.Join(" | ", TagsToRemove.ToList());
         }
 
-        public static string? GetText(string responseBody)
+        private static string InitXpathTagsToRemove2()
+        {
+            return string.Join(" | ", TagsToRemove2.ToList());
+        }
+
+        public static string? GetText(string responseBody, bool html)
         {
             var HtmlDocument = new HtmlDocument();
             HtmlDocument.LoadHtml(responseBody);
-            return GetHtml(HtmlDocument);
+            if (html)
+            {
+                return GetHtml(HtmlDocument);
+            }
+            
+            return GetText(HtmlDocument);
+
         }
 
         public static string? GetText(Page page)
@@ -90,11 +110,40 @@ namespace landerist_library.Parse.ListingParser
             {
                 RemoveNodes(htmlDocument, XpathTagsToRemove);
                 RemoveAttributes(htmlDocument);
-                text = CleanHtml(htmlDocument);
+                text = Clean(htmlDocument);
                 return text;
             }
             catch { }
             return text;
+        }
+
+        public static string? GetText(HtmlDocument htmlDocument)
+        {
+            try
+            {
+                RemoveNodes(htmlDocument, XpathTagsToRemove);
+                RemoveNodes(htmlDocument, XpathTagsToRemove2);
+                string text = GetVisibleText(htmlDocument);
+                return Clean(text);
+            }
+            catch { }
+            return null;
+        }
+        private static string GetVisibleText(HtmlDocument htmlDocument)
+        {
+            var stringBuilder = new StringBuilder();
+            foreach (var node in htmlDocument.DocumentNode.DescendantsAndSelf())
+            {
+                if (node.NodeType == HtmlNodeType.Text)
+                {
+                    string innerText = node.InnerText;
+                    if (!string.IsNullOrWhiteSpace(innerText))
+                    {
+                        stringBuilder.AppendLine(innerText.Trim());
+                    }
+                }
+            }
+            return stringBuilder.ToString();
         }
 
         private static void RemoveNodes(HtmlDocument htmlDocument, string select)
@@ -134,23 +183,18 @@ namespace landerist_library.Parse.ListingParser
             }
         }
 
-        static string CleanHtml(HtmlDocument htmlDocument)
+        static string Clean(HtmlDocument htmlDocument)
         {
             string html = htmlDocument.DocumentNode.OuterHtml;
+            return Clean(html);
+        }
+
+        static string Clean(string html)
+        {
             html = HttpUtility.HtmlDecode(html);
             html = RegexSpace().Replace(html, " ");
             return html.Trim();
         }
-
-        //private static IEnumerable<string>? GetVisibleText(HtmlDocument htmlDocument)
-        //{
-        //    var visibleNodes = htmlDocument.DocumentNode.DescendantsAndSelf()
-        //        .Where(n => n.NodeType == HtmlNodeType.Text)
-        //           .Where(n => !string.IsNullOrWhiteSpace(n.InnerHtml))
-        //           ;
-
-        //    return visibleNodes.SelectTop1(n => n.InnerHtml.Trim());
-        //}
 
         [GeneratedRegex(@"\s+")]
         private static partial Regex RegexSpace();
