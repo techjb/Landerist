@@ -249,7 +249,6 @@ namespace landerist_tests
 
             #endregion
 
-
             #region LocalAI
 
             //Console.WriteLine(new landerist_library.Parse.ListingParser.LocalAI.LocalAIRequest().GetResponse(text).Result.GetResponseText());            

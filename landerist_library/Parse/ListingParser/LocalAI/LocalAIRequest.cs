@@ -5,13 +5,17 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace landerist_library.Parse.ListingParser.LocalAI
 {
     public class LocalAIRequest
     {
 
-        private const string SERVER_PORT = "1234";
+        private const string SERVER_PORT =
+            //"1234"
+            "9000"
+            ;
         private const string MODEL_NAME =
             "qwen/qwen3-30b-a3b-2507"
             //"qwen/qwen3-4b-2507"
@@ -27,33 +31,11 @@ namespace landerist_library.Parse.ListingParser.LocalAI
             var hostEntry = Dns.GetHostEntry(PrivateConfig.MACHINE_NAME_LANDERIST_03);
             string ip = hostEntry.AddressList.First(x => x.AddressFamily == AddressFamily.InterNetwork).ToString();
             Url = $"http://{ip}:{SERVER_PORT}/v1/chat/completions";
-        }
+        }       
 
         public async Task<LocaAIResponse?> GetResponse(string text)
         {
-
-            var requestBody = new
-            {
-                model = MODEL_NAME,
-                temperature = TEMPERATURE,
-                max_tokens = -1,
-                //top_p= 0.8f,
-                enable_thinking = false,
-                //stream = false,
-                messages = new[]
-                {
-                    //new { role = "system", content = ParseListingSystem.GetExtendedSystemPrompt() },
-                    new { role = "system", content = GetExtendedSystemPrompt() },
-                    new { role = "user", content = text }
-                },
-                format = "json",
-                //response_format = new
-                //{
-                //    type = "json_schema",
-                //    json_schema = OpenAIRequest.GetOpenAIJsonSchema2()                    
-                //}
-            };
-
+            var requestBody = GetRequestBody(text);
             string json = JsonSerializer.Serialize(requestBody);
             using var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -61,7 +43,7 @@ namespace landerist_library.Parse.ListingParser.LocalAI
             {
                 DateTime dateStart = DateTime.Now;
                 using HttpClient client = new();
-                HttpResponseMessage response = await client.PostAsync(Url, httpContent);
+                HttpResponseMessage response = await client.PostAsync(Url, httpContent);                
                 string result = await response.Content.ReadAsStringAsync();
                 Timers.Timer.SaveTimerLocalAI("LocalAIRequest", dateStart);
                 if (response.IsSuccessStatusCode)
@@ -74,6 +56,43 @@ namespace landerist_library.Parse.ListingParser.LocalAI
                 Logs.Log.WriteError("LocalAIRequest GetResponse", exception);
             }
             return null;
+        }
+
+        private object GetRequestBody(string text)
+        {
+            // LMStudio
+            //return new
+            //{
+            //    model = MODEL_NAME,
+            //    temperature = TEMPERATURE,
+            //    max_tokens = -1,
+            //    //top_p= 0.8f,
+            //    enable_thinking = false,
+            //    //stream = false,
+            //    messages = new[]
+            //    {
+            //        //new { role = "system", content = ParseListingSystem.GetExtendedSystemPrompt() },
+            //        new { role = "system", content = GetExtendedSystemPrompt() },
+            //        new { role = "user", content = text }
+            //    },
+            //    format = "json",
+            //    //response_format = new
+            //    //{
+            //    //    type = "json_schema",
+            //    //    json_schema = OpenAIRequest.GetOpenAIJsonSchema2()                    
+            //    //}
+            //};
+
+            return new
+            {
+                temperature = TEMPERATURE,
+                messages = new[]
+                {
+                    //new { role = "system", content = ParseListingSystem.GetSystemPrompt() },
+                    new { role = "system", content = GetExtendedSystemPrompt() },
+                    new { role = "user", content = text }
+                },
+            };
         }
 
         private static string GetExtendedSystemPrompt()
