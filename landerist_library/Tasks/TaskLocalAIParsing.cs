@@ -44,8 +44,7 @@ namespace landerist_library.Tasks
             int counter = 0;
             Log.Console($"Processing {total} pages ..");
             Parallel.ForEach(pages,
-                //new ParallelOptions() { MaxDegreeOfParallelism = 4 }, 
-                //new ParallelOptions() { MaxDegreeOfParallelism = 8 },
+                Configuration.Config.PARALLELOPTIONS1INLOCAL,
                 page =>
             {
                 Interlocked.Increment(ref counter);
