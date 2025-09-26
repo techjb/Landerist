@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace landerist_library.Parse.ListingParser.LocalAI
 {
@@ -88,10 +87,15 @@ namespace landerist_library.Parse.ListingParser.LocalAI
                 temperature = TEMPERATURE,
                 messages = new[]
                 {
-                    //new { role = "system", content = ParseListingSystem.GetSystemPrompt() },
-                    new { role = "system", content = GetExtendedSystemPrompt() },
+                    new { role = "system", content = ParseListingSystem.GetSystemPrompt() },
+                    //new { role = "system", content = GetExtendedSystemPrompt() },
                     new { role = "user", content = text }
                 },
+                response_format = new
+                {
+                    type = "json_schema",
+                    json_schema = OpenAIRequest.GetOpenAIJsonSchemaVllm()                    
+                }
             };
         }
 
