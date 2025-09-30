@@ -9,7 +9,7 @@ namespace landerist_library.Tasks
 {
     public class TaskLocalAIParsing
     {
-        private const int MaxPagesPerTask = 10;
+        private const int MaxPagesPerTask = 20;
 
         private bool FirstTime = true;
         public void Start()
@@ -44,7 +44,10 @@ namespace landerist_library.Tasks
             int counter = 0;
             Log.Console($"Processing {total} pages ..");
             Parallel.ForEach(pages,
-                Configuration.Config.PARALLELOPTIONS1INLOCAL,
+                new ParallelOptions()
+                {
+                    MaxDegreeOfParallelism = 3
+                },
                 page =>
             {
                 Interlocked.Increment(ref counter);

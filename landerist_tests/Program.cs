@@ -175,6 +175,8 @@ namespace landerist_tests
             //Pages.DeleteUrisLikePrint();
             //Pages.DeleteProhibitedUris();
             //new Page("https://areagestio.com/propiedades/25974555/").Insert();
+            //var page = new Page("https://inmobiliariascalifal.com/inmueble/venta/piso/cordoba/cordoba/cal04135/");
+            //page.Insert();
 
 
             #endregion

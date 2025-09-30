@@ -57,8 +57,12 @@ namespace landerist_library.Parse.ListingParser
             {
                 return false;
             }
-            int userTokens = GPT3Tokenizer.Encode(text).Count;
-            int totalTokens = systemTokens + userTokens;
+            page.TokenCount = GPT3Tokenizer.Encode(text).Count;
+            if (page.TokenCount is null)
+            {
+                return false;
+            }
+            int totalTokens = systemTokens + (int)page.TokenCount;
             return totalTokens > maxContextWindow;
         }
 

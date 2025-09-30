@@ -123,6 +123,7 @@ namespace landerist_library.Websites
                     "INSERTED.[WaitingStatus], " +
                     "INSERTED.[ResponseBodyTextHash], " +
                     "INSERTED.[ResponseBodyZipped], " +
+                    "INSERTED.[TokenCount], " +
                     "W.[MainUri], " +
                     "W.[LanguageCode], " +
                     "W.[CountryCode], " +
@@ -276,6 +277,7 @@ namespace landerist_library.Websites
                 pagesTableName + ".[WaitingStatus], " +
                 pagesTableName + ".[ResponseBodyTextHash], " +
                 pagesTableName + ".[ResponseBodyZipped], " +
+                pagesTableName + ".[TokenCount], " +
                 Websites.WEBSITES + ".[MainUri], " +
                 Websites.WEBSITES + ".[LanguageCode], " +
                 Websites.WEBSITES + ".[CountryCode], " +

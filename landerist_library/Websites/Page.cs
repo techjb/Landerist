@@ -48,6 +48,8 @@ namespace landerist_library.Websites
 
         public byte[]? ResponseBodyZipped { get; private set; }
 
+        public int? TokenCount { get; set; } = null;
+
         public bool ResponseBodyTextNotChanged { get; set; } = false;
 
         public byte[]? Screenshot { get; set; }
@@ -124,6 +126,7 @@ namespace landerist_library.Websites
             WaitingStatus = dataRow["WaitingStatus"] is DBNull ? null : (WaitingStatus)Enum.Parse(typeof(WaitingStatus), dataRow["WaitingStatus"].ToString()!);
             ResponseBodyTextHash = dataRow["ResponseBodyTextHash"] is DBNull ? null : dataRow["ResponseBodyTextHash"].ToString();
             ResponseBodyZipped = dataRow["ResponseBodyZipped"] is DBNull ? null : (byte[])dataRow["ResponseBodyZipped"];
+            TokenCount = dataRow["TokenCount"] is DBNull ? null : (int?)dataRow["TokenCount"];
         }
 
         public DataRow? GetDataRow()
@@ -150,7 +153,7 @@ namespace landerist_library.Websites
                 "INSERT INTO " + Pages.PAGES + " " +
                 "VALUES(@Host, @Uri, @UriHash, @Inserted, @Updated, @NextUpdate, @HttpStatusCode, @PageType, " +
                 "@PageTypeCounter, @ListingStatus, @LockedBy, @WaitingStatus, @ResponseBodyTextHash, " +
-                "CONVERT(varbinary(max), @ResponseBodyZipped))";
+                "CONVERT(varbinary(max), @ResponseBodyZipped), @TokenCount)";
 
             bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
                 {"Host", Host },
@@ -167,15 +170,12 @@ namespace landerist_library.Websites
                 {"WaitingStatus", null },
                 {"ResponseBodyTextHash", null },
                 {"ResponseBodyZipped", null  },
+                {"TokenCount", null  },
             });
             if (sucess)
             {
                 Website.IncreaseNumPages();
-            }
-            //else
-            //{
-            //    Logs.Log.WriteError("Page Insert", "Failed to insert page: " + Uri);
-            //}
+            }            
             return sucess;
         }
 
@@ -210,7 +210,8 @@ namespace landerist_library.Websites
                 "[LockedBy] = @LockedBy, " +
                 "[WaitingStatus] = @WaitingStatus, " +
                 "[ResponseBodyTextHash] = @ResponseBodyTextHash, " +
-                "[ResponseBodyZipped] = CASE WHEN @ResponseBodyZipped IS NULL THEN NULL ELSE CONVERT(varbinary(max), @ResponseBodyZipped) END " +
+                "[ResponseBodyZipped] = CASE WHEN @ResponseBodyZipped IS NULL THEN NULL ELSE CONVERT(varbinary(max), @ResponseBodyZipped) END," +
+                "[TokenCount] = @TokenCount " +
                 "WHERE [UriHash] = @UriHash";
 
             var sucess = new DataBase().Query(query, new Dictionary<string, object?> {
@@ -224,13 +225,14 @@ namespace landerist_library.Websites
                 {"WaitingStatus", WaitingStatus?.ToString()},
                 {"ResponseBodyTextHash", ResponseBodyTextHash},
                 {"ResponseBodyZipped", ResponseBodyZipped},
+                {"TokenCount", TokenCount},
                 {"UriHash", UriHash },
             });
 
             if (!sucess)
             {
                 Logs.Log.WriteError("Page Update", "Failed to update page: " + Uri);
-            }
+            }            
             return sucess;
         }
 

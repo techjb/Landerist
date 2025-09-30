@@ -299,21 +299,21 @@ namespace landerist_library.Landerist_com
             Charts.Add(chart);
         }
 
-        private static string GetDataString(List<string> keys, bool yesterday, bool last10)
+        private static string GetDataString(List<string> keys, bool yesterday, bool last15)
         {
             List<string> data = [];
             foreach (var key in keys)
             {
-                var values = GetValues(key, yesterday, last10);
+                var values = GetValues(key, yesterday, last15);
                 var json = "{\"label\": \"" + key + "\", \"values\":[" + string.Join(",", [.. values]) + "]}";
                 data.Add(json);
             }
             return string.Join(",", [.. data]);
         }
 
-        private static List<string> GetValues(string statisticKey, bool yesterday, bool last10)
+        private static List<string> GetValues(string statisticKey, bool yesterday, bool last15)
         {
-            int top = last10 ? 10 : 100;
+            int top = last15 ? 15 : 100;
             var dataTable = StatisticsSnapshot.GetLatestStatistics(statisticKey, top);
             List<string> values = [];
             foreach (DataRow dataRow in dataTable.Rows.Cast<DataRow>().Reverse())
@@ -336,7 +336,6 @@ namespace landerist_library.Landerist_com
             return "{\"label\": \"" + key + "\", \"values\":[" + values + "]}";
         }
 
-
         private static string GetValues(Dictionary<string, object?> dictionary)
         {
             List<string> data = [];
@@ -347,7 +346,6 @@ namespace landerist_library.Landerist_com
             }
             return string.Join(",", [.. data]);
         }
-
 
         private static bool UpdateStatisctisPage()
         {
