@@ -1,5 +1,6 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
+using Newtonsoft.Json.Schema;
 using OpenAI;
 using OpenAI.Chat;
 using System.Text.Json.Nodes;
@@ -29,8 +30,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI
 
         private static readonly OpenAIClient OpenAIClient = new(PrivateConfig.OPENAI_API_KEY);
 
-        public static readonly string? TOOL_CHOICE = "required";
-        
+        public static readonly string? TOOL_CHOICE = "required";        
 
    
 
@@ -47,7 +47,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI
                      model: MODEL_NAME,
                      //temperature: TEMPERATURE,
                      responseFormat: TextResponseFormat.JsonSchema,
-                     jsonSchema: GetOpenAIJsonSchema()
+                     jsonSchema: OpenAIJsonSchema
                      );
 
             try
@@ -64,49 +64,13 @@ namespace landerist_library.Parse.ListingParser.OpenAI
             return null;
         }
 
-        public static global::OpenAI.JsonSchema GetOpenAIJsonSchema()
+        public static global::OpenAI.JsonSchema OpenAIJsonSchema
         {
-            var schema = StructuredOutputSchema.GetJsonSchema();
-            return new global::OpenAI.JsonSchema("esquema_de_respuesta", schema);
-        }
-
-        public static global::OpenAI.JsonSchema GetOpenAIJsonSchemaVllm()
-        {
-            var schema = new JsonObject
+            get
             {
-                ["type"] = "object",
-                ["properties"] = new JsonObject
-                {
-                    ["title"] = new JsonObject
-                    {
-                        ["type"] = "string",
-                        ["description"] = "Título del anuncio inmobiliario"
-                    },
-                    ["price"] = new JsonObject
-                    {
-                        ["type"] = "integer",
-                        ["description"] = "Precio en euros"
-                    },
-                    ["location"] = new JsonObject
-                    {
-                        ["type"] = "string",
-                        ["description"] = "Dirección o ciudad del inmueble"
-                    },
-                    ["rooms"] = new JsonObject
-                    {
-                        ["type"] = "integer",
-                        ["description"] = "Número de habitaciones"
-                    },
-                    ["area_m2"] = new JsonObject
-                    {
-                        ["type"] = "integer",
-                        ["description"] = "Superficie en metros cuadrados"
-                    }
-                },
-                ["required"] = new JsonArray("title", "price", "location")
-            };
-            
-            return new JsonSchema("anuncio_inmobiliario", schema);
+                var schema = StructuredOutputSchema.GetJsonSchemaString();
+                return new global::OpenAI.JsonSchema("esquema_de_respuesta", schema);
+            }
         }
     }
 }

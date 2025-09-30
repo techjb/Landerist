@@ -18,17 +18,19 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             }
         };
 
-        public static string GetJsonSchema()
+        public static string GetJsonSchemaString()
         {
-            JSchema jSChema = JSchemaGenerator.Generate(typeof(StructuredOutputEs));
+            JSchema jSChema = GetJsonSchema();
             SetSchemaVersion(jSChema);
-            SetAllOf(jSChema);
+            //SetAllOf(jSChema); // problems in vllm
             ParsePropertyType(jSChema);
             SetAdditionalPropertiesFalse(jSChema);
-            return jSChema.ToString(SchemaVersion.Draft7)
-                //.Replace("\"definitions\"", "\"$defs\"")
-                //.Replace("#/definitions/", "#/$defs/")
-                ;
+            return jSChema.ToString(SchemaVersion.Draft7);
+        }
+
+        public static JSchema GetJsonSchema()
+        {
+            return JSchemaGenerator.Generate(typeof(StructuredOutputEs));            
         }
 
         private static void ParsePropertyType(JSchema jSChema)

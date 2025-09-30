@@ -14,11 +14,7 @@ namespace landerist_library.Parse.ListingParser.LocalAI
         private const string SERVER_PORT =
             //"1234"
             "9000"
-            ;
-        private const string MODEL_NAME =
-            "qwen/qwen3-30b-a3b-2507"
-            //"qwen/qwen3-4b-2507"
-            ;
+            ;     
         
         private const float TEMPERATURE = 0.1f;
         public const int MAX_CONTEXT_WINDOW = 65536;
@@ -48,7 +44,7 @@ namespace landerist_library.Parse.ListingParser.LocalAI
                 if (response.IsSuccessStatusCode)
                 {
                     return JsonSerializer.Deserialize<LocaAIResponse>(result);
-                }
+                }                
             }
             catch (Exception exception)
             {
@@ -62,7 +58,7 @@ namespace landerist_library.Parse.ListingParser.LocalAI
             // LMStudio
             //return new
             //{
-            //    model = MODEL_NAME,
+            //    model = "qwen/qwen3-30b-a3b-2507",
             //    temperature = TEMPERATURE,
             //    max_tokens = -1,
             //    //top_p= 0.8f,
@@ -94,7 +90,7 @@ namespace landerist_library.Parse.ListingParser.LocalAI
                 response_format = new
                 {
                     type = "json_schema",
-                    json_schema = OpenAIRequest.GetOpenAIJsonSchemaVllm()                    
+                    json_schema = OpenAIRequest.OpenAIJsonSchema
                 }
             };
         }
@@ -103,13 +99,13 @@ namespace landerist_library.Parse.ListingParser.LocalAI
         {
             return ParseListingSystem.SystemPrompt + " " +
                 "Responde SIEMPRE y ÚNICAMENTE con un objeto JSON. No añadas texto antes ni después del JSON. " +
-                "El objeto JSON debe tener la siguiente estructura exacta: " + OpenAIRequest.GetOpenAIJsonSchema() + " " +
+                "El objeto JSON debe tener la siguiente estructura exacta: " + OpenAIRequest.OpenAIJsonSchema + " " +
                 "Si no encuentras algún dato, usa 'null'. No incluyas texto adicional fuera del JSON.";
         }
 
         public static void PrintOutputSchema()
         {
-            var schema = StructuredOutputSchema.GetJsonSchema();
+            var schema = StructuredOutputSchema.GetJsonSchemaString();
             Console.WriteLine(schema);
         }
     }

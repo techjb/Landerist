@@ -36,7 +36,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
                     response_format = new StructuredResponseFormat
                     {
                         type = "json_schema",
-                        json_schema = OpenAIRequest.GetOpenAIJsonSchema()
+                        json_schema = OpenAIRequest.OpenAIJsonSchema
                     },
                 }
             };
