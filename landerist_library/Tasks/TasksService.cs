@@ -45,7 +45,9 @@ namespace landerist_library.Tasks
 
         public void Start()
         {
-            if (Configuration.Config.IsLocalAIMachine())
+            if (Configuration.Config.IsLocalAIMachine()
+                || Configuration.Config.IsConfigurationLocal()
+                )
             {
                 Timer1 = new Timer(LocalAIParsing!, null, OneSecond, TwoSeconds);
             }

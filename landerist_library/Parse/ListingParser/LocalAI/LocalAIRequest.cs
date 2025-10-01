@@ -1,4 +1,5 @@
-﻿using landerist_library.Configuration;
+﻿using AI.Dev.OpenAI.GPT;
+using landerist_library.Configuration;
 using landerist_library.Parse.ListingParser.OpenAI;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
 using System.Net;
@@ -13,7 +14,7 @@ namespace landerist_library.Parse.ListingParser.LocalAI
 
         private const string SERVER_PORT =
             //"1234"
-            "9000"
+            "8000"
             ;     
         
         private const float TEMPERATURE = 0.1f;
@@ -49,7 +50,7 @@ namespace landerist_library.Parse.ListingParser.LocalAI
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception.Message);
+                Console.WriteLine(exception.Message + " Tokens: " +  GPT3Tokenizer.Encode(text).Count);
                 Logs.Log.WriteError("LocalAIRequest GetResponse", exception);
             }
             return null;

@@ -1,4 +1,5 @@
-﻿using landerist_library.Logs;
+﻿using Amazon.Auth.AccessControlPolicy;
+using landerist_library.Logs;
 using landerist_library.Parse.ListingParser;
 using landerist_library.Scrape;
 using landerist_library.Statistics;
@@ -46,6 +47,7 @@ namespace landerist_library.Tasks
             Parallel.ForEach(pages,
                 new ParallelOptions()
                 {
+                    //MaxDegreeOfParallelism = Configuration.Config.IsConfigurationLocal() ? 1 : 3
                     MaxDegreeOfParallelism = 3
                 },
                 page =>
