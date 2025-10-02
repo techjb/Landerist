@@ -28,9 +28,6 @@ namespace landerist_tests
 
         private delegate bool ConsoleEventDelegate(int eventType);
         private static readonly ConsoleEventDelegate Handler = new(ConsoleEventHandler);
-        //[LibraryImport("kernel32.dll")]
-        //[return: MarshalAs(UnmanagedType.Bool)]
-        //private static partial bool SetConsoleCtrlHandler(ConsoleEventDelegate callback, [MarshalAs(UnmanagedType.Bool)] bool add);
         public delegate void KeyPressedHandler(ConsoleKeyInfo key);
         public static event KeyPressedHandler? OnKeyPressed;
 
@@ -44,7 +41,6 @@ namespace landerist_tests
 
         private static void Start()
         {
-            //SetConsoleCtrlHandler(Handler, true);
             SetCtrlDListener();
 
             DateStart = DateTime.Now;
@@ -56,7 +52,6 @@ namespace landerist_tests
         {
             OnKeyPressed += keyInfo =>
             {
-                Console.WriteLine("si  " + keyInfo.Key + " " + keyInfo.Modifiers);
                 if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0 &&
                     keyInfo.Key == ConsoleKey.D)
                 {
@@ -101,7 +96,7 @@ namespace landerist_tests
 
         private static void Run()
         {
-            Config.SetOnlyDatabaseToProduction();
+            Config.SetOnlyDatabaseToProduction();            
 
             #region Urls
 
@@ -391,7 +386,7 @@ namespace landerist_tests
             #region Tasks
 
             //ServiceTasks.DailyTask();
-            ServiceTasks.Start();
+            //ServiceTasks.Start();
             //new ServiceTasks().UpdateAndScrape();
             //landerist_library.Landerist_com.FilesUpdater.Update();
             //ServiceTasks.UpdateAndScrape();

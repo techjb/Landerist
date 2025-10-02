@@ -1,4 +1,5 @@
 ﻿using landerist_library.Configuration;
+using landerist_library.Database;
 using landerist_library.Landerist_com;
 using landerist_library.Logs;
 using landerist_library.Tasks;
@@ -14,9 +15,6 @@ namespace landerist_console
         private delegate bool ConsoleEventDelegate(int eventType);
         private static readonly ConsoleEventDelegate Handler = new(ConsoleEventHandler);
         private static ManualResetEvent ManualResetEvent = new(false);
-        //[LibraryImport("kernel32.dll")]
-        //[return: MarshalAs(UnmanagedType.Bool)]
-        //private static partial bool SetConsoleCtrlHandler(ConsoleEventDelegate callback, [MarshalAs(UnmanagedType.Bool)] bool add);
         public delegate void KeyPressedHandler(ConsoleKeyInfo key);
         public static event KeyPressedHandler? OnKeyPressed;
 
@@ -25,12 +23,10 @@ namespace landerist_console
             Console.Title = "Landerist Console " + Config.VERSION;
             Start();
             Run();
-            //End();
         }
 
         private static void Start()
         {
-            //SetConsoleCtrlHandler(Handler, true);
             SetCtrlDListener();
 
             Console.CancelKeyPress += (s, e) =>
@@ -42,14 +38,8 @@ namespace landerist_console
             Console.WriteLine("Press Ctrl+C to exit. Ctrl+D to daily tasks.");
 
             DateStart = DateTime.Now;
-            Console.WriteLine("Setting to production ..");
             Config.SetToProduction();
-            Console.WriteLine("Deleting logs ..");
-            if (Log.Delete())
-            {
-                Console.WriteLine("Logs Deleted");
-            }
-            
+            Log.Delete();            
             Log.WriteInfo("landerist_console", "Started. Machine: " + Config.MACHINE_NAME + " Version: " + Config.VERSION);
         }
 

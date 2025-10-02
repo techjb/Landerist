@@ -15,8 +15,8 @@ namespace landerist_library.Parse.ListingParser.LocalAI
         private const string SERVER_PORT =
             //"1234"
             "8000"
-            ;     
-        
+            ;
+
         private const float TEMPERATURE = 0.1f;
         public const int MAX_CONTEXT_WINDOW = 65536;
         private readonly string Url;
@@ -24,10 +24,14 @@ namespace landerist_library.Parse.ListingParser.LocalAI
 
         public LocalAIRequest()
         {
-            var hostEntry = Dns.GetHostEntry(PrivateConfig.MACHINE_NAME_LANDERIST_03);
-            string ip = hostEntry.AddressList.First(x => x.AddressFamily == AddressFamily.InterNetwork).ToString();
+            string ip = "localhost";
+            if (Config.IsConfigurationLocal())
+            {
+                var hostEntry = Dns.GetHostEntry(PrivateConfig.MACHINE_NAME_LANDERIST_03);
+                ip = hostEntry.AddressList.First(x => x.AddressFamily == AddressFamily.InterNetwork).ToString();
+            }
             Url = $"http://{ip}:{SERVER_PORT}/v1/chat/completions";
-        }       
+        }
 
         public async Task<LocaAIResponse?> GetResponse(string text)
         {
@@ -40,17 +44,17 @@ namespace landerist_library.Parse.ListingParser.LocalAI
                 DateTime dateStart = DateTime.Now;
                 using HttpClient client = new();
                 client.Timeout = TimeSpan.FromMinutes(2);
-                HttpResponseMessage response = await client.PostAsync(Url, httpContent);                
+                HttpResponseMessage response = await client.PostAsync(Url, httpContent);
                 string result = await response.Content.ReadAsStringAsync();
                 Timers.Timer.SaveTimerLocalAI("LocalAIRequest", dateStart);
                 if (response.IsSuccessStatusCode)
                 {
                     return JsonSerializer.Deserialize<LocaAIResponse>(result);
-                }                
+                }
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception.Message + " Tokens: " +  GPT3Tokenizer.Encode(text).Count);
+                Console.WriteLine(exception.Message + " Tokens: " + GPT3Tokenizer.Encode(text).Count);
                 Logs.Log.WriteError("LocalAIRequest GetResponse", exception);
             }
             return null;

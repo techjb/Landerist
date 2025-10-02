@@ -1,5 +1,7 @@
 ﻿using landerist_library.Parse.ListingParser;
 using PuppeteerSharp;
+using System.Net;
+using System.Net.Sockets;
 
 namespace landerist_library.Configuration
 {
@@ -7,7 +9,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "4.50";
+        public static readonly string VERSION = "4.51";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -70,22 +72,8 @@ namespace landerist_library.Configuration
 
         public const string DATABASE_PW = PrivateConfig.DATABASE_PW;
 
-        private static readonly string CONNECTION_USER =
-            "User ID=" + DATABASE_USER + ";" +
-            "Password=" + DATABASE_PW + ";" +
-            "Connect Timeout=100000;";
-
         public static string? DATASOURCE { get; set; }
 
-        private static readonly string DATABASE_CONNECTION_LOCAL = CONNECTION_USER +
-            "Data Source=" + PrivateConfig.DATASOURCE_LOCAL + ";" +
-            "Initial Catalog=";
-
-        private static readonly string DATABASE_CONNECTION_PRODUCTION = CONNECTION_USER +
-            "Data Source=" + PrivateConfig.DATASOURCE_PRODUCTION + ";" +
-            "Initial Catalog=";
-
-        public static string? DATABASE_CONNECTION { get; set; }
         public static string? EXPORT_DIRECTORY { get; set; }
         public static string? LANDERIST_COM_OUTPUT { get; set; }
         public static string? LANDERIST_COM_TEMPLATES { get; set; }
@@ -270,11 +258,7 @@ namespace landerist_library.Configuration
         {
             DATASOURCE = configurationProduction ?
                 PrivateConfig.DATASOURCE_PRODUCTION :
-                PrivateConfig.DATASOURCE_LOCAL;
-
-            DATABASE_CONNECTION = configurationProduction ?
-                DATABASE_CONNECTION_PRODUCTION :
-                DATABASE_CONNECTION_LOCAL;
+                PrivateConfig.DATASOURCE_LOCAL;            
         }
 
         public static void SetLLMProviderLocalAI()

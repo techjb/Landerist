@@ -32,7 +32,7 @@ namespace landerist_library.Database
                 "Initial Catalog=" + databaseName + ";" +
                 "Connect Timeout=100000;" +
                 "Data Source=" + Config.DATASOURCE + ";" +
-                "TrustServerCertificate=True;")
+                "TrustServerCertificate=True;Encrypt=false;")
         {
 
         }
@@ -495,5 +495,25 @@ namespace landerist_library.Database
         }
 
         #endregion Stack
+
+        #region
+
+        public static void TestConnection()
+        {
+            Console.WriteLine("Testing database connection ..");
+            var dataBase = new DataBase();
+            Console.WriteLine("Database: " + dataBase.ConnectionString);
+            string? query  = new DataBase().QueryString("SELECT '1'");
+            if (query == "1")
+            {
+                Console.WriteLine("Database connection successful.");
+            }
+            else
+            {
+                Console.WriteLine("Database connection failed.");
+            }
+        }
+
+        #endregion
     }
 }

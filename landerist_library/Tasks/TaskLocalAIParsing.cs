@@ -10,9 +10,11 @@ namespace landerist_library.Tasks
 {
     public class TaskLocalAIParsing
     {
-        private const int MaxPagesPerTask = 20;
+        private const int MaxPagesPerTask = 10;
 
         private bool FirstTime = true;
+        private static int TotalProcessed = 0;
+        private static int TotalErrors = 0;
         public void Start()
         {
             Initialize();
@@ -27,10 +29,13 @@ namespace landerist_library.Tasks
                 return;
             }
 
-            Log.WriteLocalAI("Initialize", "Initialized");
             Configuration.Config.SetLLMProviderLocalAI();
             Pages.UpdateWaitingStatus(WaitingStatus.readed_by_localai, WaitingStatus.waiting_ai_request);
             FirstTime = false;
+            TotalProcessed = 0;
+            TotalErrors = 0;
+
+            Log.WriteLocalAI("Initialize", "LocalAIParsing initialized");
         }
 
         private static void ProcessPages(List<Page> pages)
@@ -47,8 +52,7 @@ namespace landerist_library.Tasks
             Parallel.ForEach(pages,
                 new ParallelOptions()
                 {
-                    //MaxDegreeOfParallelism = Configuration.Config.IsConfigurationLocal() ? 1 : 3
-                    MaxDegreeOfParallelism = 3
+                    MaxDegreeOfParallelism = Configuration.Config.IsConfigurationLocal() ? 1 : 2
                 },
                 page =>
             {
@@ -63,7 +67,13 @@ namespace landerist_library.Tasks
                     Interlocked.Increment(ref errors);
                 }
             });
-            Log.WriteLocalAI("ProcessPages", $"Total {total} Success: {sucess} Errors: {errors}");
+
+            TotalProcessed += total;
+            TotalErrors += errors;
+
+            int errorPercentage = TotalProcessed == 0 ? 0 : (int)Math.Round((double)TotalErrors * 100 / TotalProcessed, 2);
+
+            Log.WriteLocalAI("ProcessPages", $"{sucess}/{total} Processed: {TotalProcessed} Errors: {TotalErrors} ({errorPercentage} %) ");
             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.LocalAIParsingSuccess, sucess);
             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.LocalAIParsingErrors, errors);
         }
