@@ -43,7 +43,7 @@ namespace landerist_library.Parse.ListingParser.LocalAI
             {
                 DateTime dateStart = DateTime.Now;
                 using HttpClient client = new();
-                client.Timeout = TimeSpan.FromMinutes(2);
+                client.Timeout = TimeSpan.FromMinutes(3);
                 HttpResponseMessage response = await client.PostAsync(Url, httpContent);
                 string result = await response.Content.ReadAsStringAsync();
                 Timers.Timer.SaveTimerLocalAI("LocalAIRequest", dateStart);
