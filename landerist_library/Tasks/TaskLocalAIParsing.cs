@@ -10,7 +10,7 @@ namespace landerist_library.Tasks
 {
     public class TaskLocalAIParsing
     {
-        private const int MaxPagesPerTask = 20;
+        private const int MaxPagesPerTask = 50;
 
         private bool FirstTime = true;
         private static int TotalProcessed = 0;

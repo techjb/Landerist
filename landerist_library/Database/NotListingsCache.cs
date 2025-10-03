@@ -1,8 +1,8 @@
 ﻿namespace landerist_library.Database
 {
-    public class NotListings
+    public class NotListingsCache
     {
-        public const string TableName = "NOT_LISTINGS";
+        public const string TableName = "NOT_LISTINGS_CACHE";
 
 
         public static bool Insert(string responseBodyTextHash)

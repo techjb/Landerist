@@ -32,6 +32,9 @@ namespace landerist_library.Statistics
         ListingUpdate,
         LocalAIParsingErrors,
         LocalAIParsingSuccess,
+        NotListingCache,
+        ResponseBodyTextAlreadyParsed,
+        ReponseBodyTextIsAnotherListingInHost,
     }
 
     public class StatisticsSnapshot

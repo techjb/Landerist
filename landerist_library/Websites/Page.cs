@@ -436,18 +436,18 @@ namespace landerist_library.Websites
             });
         }
 
-        public bool ResponseBodyTextAlreadyParsedToNotListing()
+        public bool IsNotListingCache()
         {
             if (string.IsNullOrEmpty(ResponseBodyTextHash))
             {
                 return false;
             }
-            return NotListings.IsNotListing(ResponseBodyTextHash);
+            return NotListingsCache.IsNotListing(ResponseBodyTextHash);
         }
 
         public bool InsertNotListingResponseBodyText()
         {
-            return (ResponseBodyTextHash != null) && NotListings.Insert(ResponseBodyTextHash);
+            return (ResponseBodyTextHash != null) && NotListingsCache.Insert(ResponseBodyTextHash);
         }
 
         public Listing? GetListing(bool loadMedia, bool loadSources)

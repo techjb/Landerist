@@ -1,4 +1,5 @@
 ﻿using landerist_library.Configuration;
+using landerist_library.Database;
 using landerist_library.Export;
 using landerist_library.Logs;
 using landerist_library.Statistics;
@@ -37,8 +38,11 @@ namespace landerist_library.Landerist_com
                 UpdatedHttpStatusCodeErrors();
                 UpdatedPageType();
                 ScrapedPages();
-                BathcReaded();
-                LocalAIParsing();
+                NotListingsCache();
+                ResponseBodyTextAlreadyParsed();
+                ReponseBodyTextIsAnotherListingInHost();
+                BatchReaded();
+                LocalAIParsing();                
                 ListingInsertUpdate();
                 PageType();
                 PublishedPageType();
@@ -132,7 +136,7 @@ namespace landerist_library.Landerist_com
             BarChart("Scraped Pages", statisticsKeys, false);
         }
 
-        private static void BathcReaded()
+        private static void BatchReaded()
         {
             List<StatisticsKey> statisticsKeys =
             [
@@ -150,6 +154,21 @@ namespace landerist_library.Landerist_com
                 StatisticsKey.LocalAIParsingErrors,
             ];
             BarChart("LocalAI Parsing", statisticsKeys, false);
+        }
+
+        private static void NotListingsCache()
+        {
+            BarChart("Not Listings Cache", StatisticsKey.NotListingCache, false);
+        }
+
+        private static void ResponseBodyTextAlreadyParsed()
+        {
+            BarChart("ResponseBodyText already parsed", StatisticsKey.ResponseBodyTextAlreadyParsed, false);
+        }
+
+        private static void ReponseBodyTextIsAnotherListingInHost()
+        {
+            BarChart("ResponseBodyText is another listing in host", StatisticsKey.ReponseBodyTextIsAnotherListingInHost, false);
         }
 
         private static void ListingInsertUpdate()
@@ -248,6 +267,12 @@ namespace landerist_library.Landerist_com
         {
             var data = GetDataString(keys, yesterday, false);
             LineChart(title, data);
+        }
+
+        private static void BarChart(string title, StatisticsKey statisticsKey, bool yesterday)
+        {
+            List<string> keys = [statisticsKey.ToString()];
+            BarChart(title, keys, yesterday);
         }
 
         private static void BarChart(string title, List<StatisticsKey> keys, bool yesterday)

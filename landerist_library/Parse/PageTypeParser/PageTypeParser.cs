@@ -55,19 +55,23 @@ namespace landerist_library.Parse.PageTypeParser
             {
                 return (PageType.ResponseBodyIsError, null, false);
             }
-            if (Page.ResponseBodyTextAlreadyParsedToNotListing() 
-               // && Configuration.Config.IsConfigurationProduction()
-                )
+            if (Page.IsNotListingCache() 
+                && Configuration.Config.IsConfigurationProduction()
+               )
             {
-                StatisticsSnapshot.InsertDailyCounter("ResponseBodyTextAlreadyParsedToNotListing");
+                StatisticsSnapshot.InsertDailyCounter(StatisticsKey.NotListingCache);
                 return (PageType.NotListingByParser, null, false);
             }
-            if (Page.ResponseBodyTextAlreadyParsed() && Configuration.Config.IsConfigurationProduction())
+            if (Page.ResponseBodyTextAlreadyParsed() && 
+                Configuration.Config.IsConfigurationProduction()
+                )
             {
+                StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ResponseBodyTextAlreadyParsed);
                 return (Page.PageType, null, false);
             }
             if (Page.ReponseBodyTextIsAnotherListingInHost())
             {
+                StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ReponseBodyTextIsAnotherListingInHost);
                 return (PageType.ResponseBodyRepeatedInHost, null, false);
             }
             if (ParseListingSystem.TooManyTokens(Page))

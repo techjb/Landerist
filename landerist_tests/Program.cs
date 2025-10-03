@@ -254,7 +254,7 @@ namespace landerist_tests
 
             //landerist_library.Parse.ListingParser.LocalAI.LocalAIRequest.PrintOutputSchema();
             //Console.WriteLine(ParseListingSystem.GetSystemPrompt());
-            new TaskLocalAIParsing().Start();
+            //new TaskLocalAIParsing().Start();
 
             #endregion
 

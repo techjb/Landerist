@@ -104,9 +104,7 @@ namespace landerist_library.Scrape
             Page.RemoveWaitingStatus();
             Page.SetResponseBodyFromZipped();
             SetPageType(newPageType, listing);
-
             //new TrainingData().Insert(Page);
-
             Page.RemoveResponseBodyZipped();
             return Page.Update(true);
         }

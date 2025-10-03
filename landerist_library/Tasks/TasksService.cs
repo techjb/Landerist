@@ -230,7 +230,7 @@ namespace landerist_library.Tasks
         {
             AddressLatLng.Clean();
             AddressCadastralReference.Clean();
-            NotListings.Clean();
+            NotListingsCache.Clean();
         }
 
         public void Stop()
