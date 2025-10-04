@@ -636,21 +636,37 @@ namespace landerist_library.Websites
                 });
         }
 
-        public static List<Page> SelectWaitingStatusAIRequest(int topRows, WaitingStatus waitingStatusTo)
+        public static List<Page> SelectWaitingStatusAIRequest(int topRows, WaitingStatus waitingStatusTo, bool orderTokenCountAscending)
         {
-            return SelectWaitingStatus(topRows, WaitingStatus.waiting_ai_request, waitingStatusTo);
+            return SelectWaitingStatus(topRows, WaitingStatus.waiting_ai_request, waitingStatusTo, orderTokenCountAscending);
         }
 
-        private static List<Page> SelectWaitingStatus(int topRows, WaitingStatus waitingStatusFrom, WaitingStatus waitingStatusTo)
+
+        private static List<Page> SelectWaitingStatus(int topRows, WaitingStatus waitingStatusFrom, WaitingStatus waitingStatusTo, bool orderTokenCountAscending)
         {
+            //string query =
+            //    "BEGIN TRANSACTION; " +
+            //    "UPDATE TOP (" + topRows + ") " + PAGES + " " +
+            //    "SET [WaitingStatus] = @waitingStatusTo " +
+            //    "OUTPUT " + SelectColumns("INSERTED") + " " +
+            //    "FROM " + PAGES + " " +                
+            //    "INNER JOIN " + Websites.WEBSITES + " ON " + PAGES + ".[Host] = " + Websites.WEBSITES + ".[Host] " +
+            //    "WHERE " + PAGES + ".[WaitingStatus] = @waitingStatusFrom; " +                
+            //    "COMMIT TRANSACTION;";
+
             string query =
                 "BEGIN TRANSACTION; " +
-                "UPDATE TOP (" + topRows + ") " + PAGES + " " +
+                "UPDATE " + PAGES + " " +
                 "SET [WaitingStatus] = @waitingStatusTo " +
                 "OUTPUT " + SelectColumns("INSERTED") + " " +
                 "FROM " + PAGES + " " +
                 "INNER JOIN " + Websites.WEBSITES + " ON " + PAGES + ".[Host] = " + Websites.WEBSITES + ".[Host] " +
-                "WHERE " + PAGES + ".[WaitingStatus] = @waitingStatusFrom; " +
+                "WHERE " + PAGES + ".[UriHash] IN (" +
+                "   SELECT TOP (" + topRows + ") [UriHash]   " +
+                "   FROM " + PAGES + " " +
+                "   WHERE [WaitingStatus] = @WaitingStatusFrom " +
+                "   ORDER BY [TokenCount] " + (orderTokenCountAscending ? "ASC" : "DESC") + " " +
+                "); " +
                 "COMMIT TRANSACTION;";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {

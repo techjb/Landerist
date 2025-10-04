@@ -1,5 +1,4 @@
-﻿using Amazon.Auth.AccessControlPolicy;
-using landerist_library.Logs;
+﻿using landerist_library.Logs;
 using landerist_library.Parse.ListingParser;
 using landerist_library.Scrape;
 using landerist_library.Statistics;
@@ -10,7 +9,7 @@ namespace landerist_library.Tasks
 {
     public class TaskLocalAIParsing
     {
-        private const int MaxPagesPerTask = 50;
+        private const int MaxPagesPerTask = 50;        
 
         private bool FirstTime = true;
         private static int TotalProcessed = 0;
@@ -18,7 +17,7 @@ namespace landerist_library.Tasks
         public void Start()
         {
             Initialize();
-            var pages = Pages.SelectWaitingStatusAIRequest(MaxPagesPerTask, WaitingStatus.readed_by_localai);
+            var pages = Pages.SelectWaitingStatusAIRequest(MaxPagesPerTask, WaitingStatus.readed_by_localai, true);
             ProcessPages(pages);
         }
 
@@ -73,7 +72,7 @@ namespace landerist_library.Tasks
 
             int errorPercentage = TotalProcessed == 0 ? 0 : (int)Math.Round((double)TotalErrors * 100 / TotalProcessed, 2);
 
-            Log.WriteLocalAI("ProcessPages", $"{sucess}/{total} Processed: {TotalProcessed} Errors: {TotalErrors} ({errorPercentage} %) ");
+            Log.WriteLocalAI("ProcessPages", $"Errors: {errors}/{total} Total errors: {TotalErrors} / {TotalProcessed} ({errorPercentage} %) ");
             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.LocalAIParsingSuccess, sucess);
             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.LocalAIParsingErrors, errors);
         }
