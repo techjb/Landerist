@@ -675,6 +675,30 @@ namespace landerist_library.Websites
             });
             return GetPages(dataTable);
         }
+
+
+        public static List<Page> SelectWaitingStatusAIRequest(int topRows, WaitingStatus waitingStatusTo, int maxTokenCount)
+        {
+            return SelectWaitingStatus(topRows, WaitingStatus.waiting_ai_request, waitingStatusTo, maxTokenCount);
+        }
+        private static List<Page> SelectWaitingStatus(int topRows, WaitingStatus waitingStatusFrom, WaitingStatus waitingStatusTo, int maxTokenCount)
+        {
+            string query =
+                "BEGIN TRANSACTION; " +
+                "UPDATE TOP (" + topRows + ") " + PAGES + " " +
+                "SET [WaitingStatus] = @waitingStatusTo " +
+                "OUTPUT " + SelectColumns("INSERTED") + " " +
+                "FROM " + PAGES + " " +
+                "INNER JOIN " + Websites.WEBSITES + " ON " + PAGES + ".[Host] = " + Websites.WEBSITES + ".[Host] " +
+                "WHERE " + PAGES + ".[WaitingStatus] = @waitingStatusFrom AND [TokenCount] < " + maxTokenCount + " ; " +
+                "COMMIT TRANSACTION;";
+
+            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+                {"WaitingStatusFrom", waitingStatusFrom.ToString() },
+                {"waitingStatusTo", waitingStatusTo.ToString() },
+            });
+            return GetPages(dataTable);
+        }
         public static bool UpdateWaitingStatusAIRequest(string uriHash)
         {
             return UpdateWaitingStatus(uriHash, WaitingStatus.waiting_ai_request);

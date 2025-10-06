@@ -36,7 +36,7 @@ namespace landerist_library.Parse.ListingParser
                 return (PageType.MayBeListing, null, true);
             }
 
-            var text = ParseListingUserInput.GetText(page);
+            var text = page.GetParseListingUserInput();
             if (!string.IsNullOrEmpty(text))
             {
                 switch (Config.LLM_PROVIDER)

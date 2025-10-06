@@ -3,6 +3,7 @@ using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Downloaders;
 using landerist_library.Index;
+using landerist_library.Parse.ListingParser;
 using landerist_library.Tools;
 using landerist_orels.ES;
 using System.Data;
@@ -59,6 +60,8 @@ namespace landerist_library.Websites
 
 
         private string? OriginalOuterHtml = null;
+
+        private string? ParseListingUserInput = null;
 
 
         public Website Website = new();
@@ -592,17 +595,7 @@ namespace landerist_library.Websites
         {
             SetWaitingStatus(landerist_library.Websites.WaitingStatus.waiting_ai_request);
         }
-
-        //public void SetWaitingStatusAIResponse()
-        //{
-        //    SetWaitingStatus(landerist_library.Websites.WaitingStatus.waiting_ai_response);
-        //}
-
-        //public bool IsWaitingForAIResponse()
-        //{
-        //    return WaitingStatus is not null && WaitingStatus == landerist_library.Websites.WaitingStatus.waiting_ai_response;
-        //}
-
+      
         private void SetWaitingStatus(WaitingStatus waitingStatus)
         {
             WaitingStatus = waitingStatus;
@@ -738,6 +731,17 @@ namespace landerist_library.Websites
         public bool IsRedirectToAnotherUrlListing()
         {
             return IsRedirectToAnotherUrl() && ContainsListingStatus();
+        }
+
+        public string? GetParseListingUserInput()
+        {
+            if (!string.IsNullOrEmpty(ParseListingUserInput))
+            {
+                return ParseListingUserInput;
+            }
+
+            ParseListingUserInput = Parse.ListingParser.ParseListingUserInput.GetText(this);
+            return ParseListingUserInput;
         }
     }
 }

@@ -4,6 +4,7 @@ using landerist_library.Parse.ListingParser.LocalAI;
 using landerist_library.Parse.ListingParser.OpenAI;
 using landerist_library.Parse.ListingParser.VertexAI;
 using landerist_library.Websites;
+using SharpToken;
 
 namespace landerist_library.Parse.ListingParser
 {
@@ -50,14 +51,15 @@ namespace landerist_library.Parse.ListingParser
 
         public static bool TooManyTokens(Page page, int maxContextWindow)
         {
-            //https://github.com/dluc/openai-tools
-            int systemTokens = GPT3Tokenizer.Encode(SystemPrompt).Count;
-            string? text = ParseListingUserInput.GetText(page);
-            if (text == null)
+            var encoding = GptEncoding.GetEncoding(Config.LOCAL_AI_TOKENIZER);
+
+            int systemTokens = encoding.CountTokens(SystemPrompt);
+            string? userInput = page.GetParseListingUserInput();
+            if (userInput == null)
             {
                 return false;
             }
-            page.TokenCount = GPT3Tokenizer.Encode(text).Count;
+            page.TokenCount = encoding.CountTokens(userInput);
             if (page.TokenCount is null)
             {
                 return false;

@@ -189,10 +189,10 @@ namespace landerist_library.Tasks
         public static string? GetJson(Page page)
         {
             page.SetResponseBodyFromZipped();
-            var userInput = ParseListingUserInput.GetText(page);
+            var text = page.GetParseListingUserInput();
             page.RemoveResponseBody();
 
-            if (string.IsNullOrEmpty(userInput))
+            if (string.IsNullOrEmpty(text))
             {
                 Log.WriteError("TaskBatchUpload GetJson", "Error getting user input. Page: " + page.UriHash);
                 return null;
@@ -201,9 +201,9 @@ namespace landerist_library.Tasks
             switch (Config.LLM_PROVIDER)
             {
                 case LLMProvider.OpenAI:
-                    return OpenAIBatchUpload.GetJson(page, userInput);
+                    return OpenAIBatchUpload.GetJson(page, text);
                 case LLMProvider.VertexAI:
-                    return VertexAIBatchUpload.GetJson(page, userInput);
+                    return VertexAIBatchUpload.GetJson(page, text);
                 default:
                     return null;
             }

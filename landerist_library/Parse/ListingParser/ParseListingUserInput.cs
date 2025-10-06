@@ -3,7 +3,6 @@ using landerist_library.Websites;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace landerist_library.Parse.ListingParser
 {
@@ -103,7 +102,7 @@ namespace landerist_library.Parse.ListingParser
             return null;
         }
 
-        public static string? GetHtml(HtmlDocument htmlDocument)
+        private static string? GetHtml(HtmlDocument htmlDocument)
         {
             string? text = null;
             try
