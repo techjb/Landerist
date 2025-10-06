@@ -1,5 +1,4 @@
-﻿using AI.Dev.OpenAI.GPT;
-using landerist_library.Configuration;
+﻿using landerist_library.Configuration;
 using landerist_library.Parse.ListingParser.OpenAI;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
 using System.Net;
@@ -63,29 +62,6 @@ namespace landerist_library.Parse.ListingParser.LocalAI
 
         private object GetRequestBody(string text)
         {
-            // LMStudio
-            //return new
-            //{
-            //    model = "qwen/qwen3-30b-a3b-2507",
-            //    temperature = TEMPERATURE,
-            //    max_tokens = -1,
-            //    //top_p= 0.8f,
-            //    enable_thinking = false,
-            //    //stream = false,
-            //    messages = new[]
-            //    {
-            //        //new { role = "system", content = ParseListingSystem.GetExtendedSystemPrompt() },
-            //        new { role = "system", content = GetExtendedSystemPrompt() },
-            //        new { role = "user", content = text }
-            //    },
-            //    format = "json",
-            //    //response_format = new
-            //    //{
-            //    //    type = "json_schema",
-            //    //    json_schema = OpenAIRequest.GetOpenAIJsonSchema2()                    
-            //    //}
-            //};
-
             return new
             {
                 temperature = TEMPERATURE,
