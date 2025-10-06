@@ -36,6 +36,7 @@ namespace landerist_library.Tasks
             }
 
             Configuration.Config.SetLLMProviderLocalAI();
+            Configuration.Config.EnableLogsErrorsInConsole();
             Pages.UpdateWaitingStatus(WaitingStatus.readed_by_localai, WaitingStatus.waiting_ai_request);
             FirstTime = false;
             TotalProcessed = 0;
@@ -43,11 +44,9 @@ namespace landerist_library.Tasks
 
             var systemPrompt = ParseListingSystem.GetSystemPrompt();
             var systemTokens = GptEncoding.GetEncoding(Configuration.Config.LOCAL_AI_TOKENIZER).CountTokens(systemPrompt);
-
-
             MAX_TOKEN_COUNT = MAX_MODEL_LEN - systemTokens - COMPLETION_TOKENS;
 
-            Log.WriteLocalAI("Initialize", "LocalAIParsing initialized");
+            Log.WriteLocalAI("Initialize", "LocalAIParsing");
         }
 
         private static void ProcessPages(List<Page> pages)
@@ -60,7 +59,7 @@ namespace landerist_library.Tasks
             int sucess = 0;
             int errors = 0;
             int counter = 0;
-            Log.Console($"Processing {total} pages ..");
+            Log.WriteLocalAI("ProcessPages", $"{total} pages ..");
             Parallel.ForEach(pages,
                 new ParallelOptions()
                 {
@@ -103,8 +102,8 @@ namespace landerist_library.Tasks
                 }
                 else
                 {
-                    (PageType newPageType, Listing? listing, bool waitingAIRequest) = ParseListing.ParseLocalAI(page, userInput);
-                    success = new PageScraper(page).SetPageTypeAfterParsing(newPageType, listing);
+                    (PageType newPageType, Listing? listing, bool waitingAIRequest) = ParseListing.ParseLocalAI(page, userInput);                    
+                    success = new PageScraper(page).SetPageTypeAfterParsing(newPageType, listing);                    
                 }
             }
             catch (Exception exception)

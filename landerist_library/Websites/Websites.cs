@@ -418,7 +418,7 @@ namespace landerist_library.Websites
             }
 
             int counter = 0;
-            Logs.Log.Console("Updating robots.txt of " + websites.Count + " websites");
+            Console.WriteLine("Updating robots.txt of " + websites.Count + " websites");
             Parallel.ForEach(websites, new ParallelOptions()
             {
                 //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
@@ -458,7 +458,7 @@ namespace landerist_library.Websites
             }
 
             int counter = 0;
-            Logs.Log.Console("Updating sitemaps of " + websites.Count + " websites");
+            Console.WriteLine("Updating sitemaps of " + websites.Count + " websites");
             Parallel.ForEach(websites, new ParallelOptions()
             {
                 //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
@@ -498,7 +498,7 @@ namespace landerist_library.Websites
             }
 
             int counter = 0;
-            Logs.Log.Console("Updating ip address of " + websites.Count + " websites");
+            Console.WriteLine("Updating ip address of " + websites.Count + " websites");
             Parallel.ForEach(websites, new ParallelOptions()
             {
                 //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM

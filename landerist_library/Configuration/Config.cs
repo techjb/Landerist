@@ -1,4 +1,5 @@
-﻿using landerist_library.Parse.ListingParser;
+﻿using Amazon.Comprehend.Model.Internal.MarshallTransformations;
+using landerist_library.Parse.ListingParser;
 using PuppeteerSharp;
 using System.Net;
 using System.Net.Sockets;
@@ -55,7 +56,7 @@ namespace landerist_library.Configuration
 
         public static readonly bool LOGS_INFO_IN_CONSOLE = true;
 
-        public static readonly bool LOGS_ERRORS_IN_CONSOLE = false;
+        public static bool LOGS_ERRORS_IN_CONSOLE = false;
         public static bool TIMERS_ENABLED { get; set; }
 
         public static readonly string USER_AGENT = "Mozilla/5.0 (compatible; AcmeInc/1.0)";
@@ -267,5 +268,10 @@ namespace landerist_library.Configuration
         {
             LLM_PROVIDER = LLMProvider.LocalAI;
         }
+
+        public static void EnableLogsErrorsInConsole()
+        {
+            LOGS_ERRORS_IN_CONSOLE = true;            
+        }   
     }
 }

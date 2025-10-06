@@ -9,7 +9,7 @@ namespace landerist_library.Scrape
 
         public static List<Page> Select()
         {
-            Logs.Log.Console("Selecting pages");
+            Console.WriteLine("Selecting pages");
             Init();
             SelectPages();
             return Pages;

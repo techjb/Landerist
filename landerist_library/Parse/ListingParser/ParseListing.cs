@@ -7,7 +7,9 @@ using landerist_library.Parse.ListingParser.VertexAI;
 using landerist_library.Websites;
 using landerist_orels.ES;
 using Newtonsoft.Json;
+using System.Data;
 using System.Reflection;
+using System.Text.Json;
 
 namespace landerist_library.Parse.ListingParser
 {
@@ -84,9 +86,15 @@ namespace landerist_library.Parse.ListingParser
             var response = new LocalAIRequest().GetResponse(text).Result;
             if (response == null)
             {
+                Console.WriteLine("ParseListing ParseLocalAI response is null");
                 return (PageType.MayBeListing, null, true);
             }
             string? responseText = response.GetResponseText();
+            if(string.IsNullOrEmpty(responseText))
+            {
+                Console.WriteLine("ParseListing ParseLocalAI responseText is null or empty. Finish Reason: " + response.GetFinishReason());
+                return (PageType.MayBeListing, null, true);
+            }
             var (pageType, listing) = ParseResponse(page, responseText);
             return (pageType, listing, false);
         }
@@ -111,19 +119,20 @@ namespace landerist_library.Parse.ListingParser
                 else
                 {
                     structuredOutputEs = JsonConvert.DeserializeObject<StructuredOutputEs>(text, JsonSerializerSettings);
-
                 }
                 if (structuredOutputEs != null)
                 {
                     return new StructuredOutputEsParser(structuredOutputEs).Parse(page);
                 }
-
-                Logs.Log.WriteError("ParseListing ParseResponse", "StructuredOutput null");
+                else
+                {
+                    throw new Exception("StructuredOutputEs is null");
+                }                    
             }
             catch (Exception exception)
-            {
+            {                
                 Logs.Log.WriteError("ParseListing ParseResponse", exception.Message);
-            }
+            }            
             return (PageType.MayBeListing, null);
         }
     }

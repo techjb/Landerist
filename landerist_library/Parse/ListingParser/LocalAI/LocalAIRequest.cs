@@ -35,28 +35,29 @@ namespace landerist_library.Parse.ListingParser.LocalAI
 
         public async Task<LocaAIResponse?> GetResponse(string text)
         {
-            var requestBody = GetRequestBody(text);
-            string json = JsonSerializer.Serialize(requestBody);
-            using var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
-
             try
             {
+                var requestBody = GetRequestBody(text);
+                string json = JsonSerializer.Serialize(requestBody);
+                using var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+
                 DateTime dateStart = DateTime.Now;
                 using HttpClient client = new();
                 client.Timeout = TimeSpan.FromMinutes(3);
                 HttpResponseMessage response = await client.PostAsync(Url, httpContent);
                 string result = await response.Content.ReadAsStringAsync();
                 Timers.Timer.SaveTimerLocalAI("LocalAIRequest", dateStart);
-                if (response.IsSuccessStatusCode)
+                if (!response.IsSuccessStatusCode)
                 {
-                    return JsonSerializer.Deserialize<LocaAIResponse>(result);
+                    throw new Exception($"LocalAIRequest GetResponse error: {response.StatusCode} - {result}");
                 }
+                return JsonSerializer.Deserialize<LocaAIResponse>(result);
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception.Message + " Tokens: " + GPT3Tokenizer.Encode(text).Count);
                 Logs.Log.WriteError("LocalAIRequest GetResponse", exception);
             }
+            Console.WriteLine("LocalAIRequest GetResponse returned null");
             return null;
         }
 
@@ -98,7 +99,7 @@ namespace landerist_library.Parse.ListingParser.LocalAI
                 {
                     type = "json_schema",
                     json_schema = OpenAIRequest.OpenAIJsonSchema
-                }
+                }                
             };
         }
 

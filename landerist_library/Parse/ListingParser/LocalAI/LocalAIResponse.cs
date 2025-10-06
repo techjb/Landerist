@@ -36,9 +36,18 @@ namespace landerist_library.Parse.ListingParser.LocalAI
             if (Choices != null && Choices.Count > 0)
             {
                 return Choices[0].Message.Content;
-            }
+            }            
             return null;
         }
+
+        public string? GetFinishReason()
+        {
+            if (Choices != null && Choices.Count > 0)
+            {
+                return Choices[0].FinishReason;                
+            }
+            return null;
+        }   
     }
 
     public class Choice

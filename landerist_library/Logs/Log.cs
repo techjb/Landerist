@@ -1,5 +1,6 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Database;
+using landerist_orels;
 using System.Data;
 
 namespace landerist_library.Logs
@@ -31,6 +32,11 @@ namespace landerist_library.Logs
         {
             DateTime date = DateTime.Now;
             System.Console.WriteLine($"{date:HH\\:mm\\:ss} {text}");
+        }
+        public static void Console(string source, string text)
+        {
+            DateTime date = DateTime.Now;
+            System.Console.WriteLine($"{date:HH\\:mm\\:ss} {source} {text}");
         }
 
         private static bool WriteDB(string logKey, string source, string text)
@@ -102,7 +108,7 @@ namespace landerist_library.Logs
         {
             if (Config.LOGS_ERRORS_IN_CONSOLE)
             {
-                Console(text);
+                Console(source, text);
             }
             Write(LogKeyError, source, text);
         }
@@ -135,7 +141,7 @@ namespace landerist_library.Logs
         {
             if (Config.LOGS_INFO_IN_CONSOLE)
             {
-                Console(text);
+                Console(source, text);
             }
             Write(LogKeyInfo, source, text);
         }
@@ -155,7 +161,7 @@ namespace landerist_library.Logs
         {
             if (Config.LOGS_INFO_IN_CONSOLE)
             {
-                Console(text);
+                Console(source, text);
             }
             Write(LogKeyBatch, source, text);
         }
@@ -164,7 +170,7 @@ namespace landerist_library.Logs
         {
             if (Config.LOGS_INFO_IN_CONSOLE)
             {
-                Console(text);
+                Console(source, text);
             }
             Write(LogKeyLocalAI, source, text);
         }

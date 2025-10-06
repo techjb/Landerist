@@ -18,7 +18,7 @@ namespace landerist_library.Parse.ListingParser
 
 
         public static readonly string SystemPrompt =
-            "Tu tarea es analizar el código HTML proporcionado por el usuario y determinar si corresponde a una página web de un único anuncio inmobiliario. Si la página representa un listado de resultados de búsqueda (es decir, contiene múltiples anuncios inmobiliarios o resúmenes de anuncios), no se considera un anuncio individual y no debes extraer datos. En caso de identificar que el HTML corresponde a un único anuncio inmobiliario, extrae los datos relevantes del código HTML y devuélvelos en formato JSON.";
+            "Tu tarea es analizar el código HTML proporcionado por el usuario y determinar si corresponde a una página web de un único anuncio inmobiliario. Si la página representa un listado de resultados de búsqueda (es decir, contiene múltiples anuncios inmobiliarios o resúmenes de anuncios), no se considera un anuncio individual y no debes extraer datos. En caso de identificar que el HTML corresponde a un único anuncio inmobiliario, extrae los datos relevantes del código HTML y devuélvelos en formato JSON válido. No incluyas explicaciones ni razonamiento.";
 
         //public static readonly string SystemPrompt =
         //    "Actúas como un sistema automatizado de extracción de datos (scraper) especializado en el sector inmobiliario. Tu objetivo es analizar el código HTML proporcionado y rellenar el JSON Schema adjunto con la información extraída. " +

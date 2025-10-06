@@ -155,7 +155,7 @@ namespace landerist_library.Scrape
             DownloadErrors = 0;
             ThreadCounter = 0;
 
-            Log.Console("Scrapping " + TotalCounter + " pages ..");
+            Console.WriteLine("Scrapping " + TotalCounter + " pages ..");
             var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
 
             Parallel.ForEach(
