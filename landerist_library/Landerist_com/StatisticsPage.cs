@@ -143,7 +143,7 @@ namespace landerist_library.Landerist_com
                 StatisticsKey.BatchReaded,
                 StatisticsKey.BatchReadedErrors,
             ];
-            BarChart("Batch Readed", statisticsKeys, false);
+            BarChart(" AI Batch Readed", statisticsKeys, false);
         }
 
         private static void LocalAIParsing()
@@ -158,7 +158,7 @@ namespace landerist_library.Landerist_com
 
         private static void NotListingsCache()
         {
-            BarChart("Not Listings Cache", StatisticsKey.NotListingCache, false);
+            BarChart("Hit Not Listing Cache", StatisticsKey.NotListingCache, false);
         }
 
         private static void ResponseBodyTextAlreadyParsed()
