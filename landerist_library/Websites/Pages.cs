@@ -677,11 +677,11 @@ namespace landerist_library.Websites
         }
 
 
-        public static List<Page> SelectWaitingStatusAIRequest(int topRows, WaitingStatus waitingStatusTo, int maxTokenCount)
+        public static List<Page> SelectWaitingStatusAIRequest(int topRows, WaitingStatus waitingStatusTo, int tokenCount, bool isMaxTokenCount)
         {
-            return SelectWaitingStatus(topRows, WaitingStatus.waiting_ai_request, waitingStatusTo, maxTokenCount);
+            return SelectWaitingStatus(topRows, WaitingStatus.waiting_ai_request, waitingStatusTo, tokenCount, isMaxTokenCount);
         }
-        private static List<Page> SelectWaitingStatus(int topRows, WaitingStatus waitingStatusFrom, WaitingStatus waitingStatusTo, int maxTokenCount)
+        private static List<Page> SelectWaitingStatus(int topRows, WaitingStatus waitingStatusFrom, WaitingStatus waitingStatusTo, int tokenCount, bool isMaxTokenCount)
         {
             string query =
                 "BEGIN TRANSACTION; " +
@@ -690,7 +690,7 @@ namespace landerist_library.Websites
                 "OUTPUT " + SelectColumns("INSERTED") + " " +
                 "FROM " + PAGES + " " +
                 "INNER JOIN " + Websites.WEBSITES + " ON " + PAGES + ".[Host] = " + Websites.WEBSITES + ".[Host] " +
-                "WHERE " + PAGES + ".[WaitingStatus] = @waitingStatusFrom AND [TokenCount] < " + maxTokenCount + " ; " +
+                "WHERE " + PAGES + ".[WaitingStatus] = @waitingStatusFrom AND [TokenCount] " + (isMaxTokenCount ? "<=" : ">") + " " + tokenCount + " ; " +
                 "COMMIT TRANSACTION;";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {

@@ -81,7 +81,9 @@ namespace landerist_library.Tasks
 
         private bool BatchUpload()
         {
-            Pages = Websites.Pages.SelectWaitingStatusAIRequest(MaxPagesPerBatch, WaitingStatus.readed_by_batch, false);
+            //Pages = Websites.Pages.SelectWaitingStatusAIRequest(MaxPagesPerBatch, WaitingStatus.readed_by_batch, false);
+            var tokenCount = TaskLocalAIParsing.GetMaxTokenCount();
+            Pages = Websites.Pages.SelectWaitingStatusAIRequest(MaxPagesPerBatch, WaitingStatus.readed_by_batch, tokenCount, false);
 
             if (Pages.Count < Config.MIN_PAGES_PER_BATCH)
             {

@@ -11,12 +11,8 @@ namespace landerist_library.Parse.ListingParser.LocalAI
     public class LocalAIRequest
     {
 
-        private const string SERVER_PORT =
-            //"1234"
-            "8000"
-            ;
-
-        private const float TEMPERATURE = 0.1f;
+        private const string SERVER_PORT = "8000";
+        private const float TEMPERATURE = 0.0f;
         public const int MAX_CONTEXT_WINDOW = 65536;
         private readonly string Url;
 
@@ -68,14 +64,13 @@ namespace landerist_library.Parse.ListingParser.LocalAI
                 messages = new[]
                 {
                     new { role = "system", content = ParseListingSystem.GetSystemPrompt() },
-                    //new { role = "system", content = GetExtendedSystemPrompt() },
                     new { role = "user", content = text }
                 },
                 response_format = new
                 {
                     type = "json_schema",
                     json_schema = OpenAIRequest.OpenAIJsonSchema
-                }                
+                }
             };
         }
 

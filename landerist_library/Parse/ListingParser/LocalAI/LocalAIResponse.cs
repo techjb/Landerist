@@ -48,6 +48,15 @@ namespace landerist_library.Parse.ListingParser.LocalAI
             }
             return null;
         }   
+
+        public string GetStats()
+        {
+            if (Stats != null && Stats.Count > 0)
+            {
+                return string.Join(", ", Stats.Select(kv => kv.Key + ": " + kv.Value));
+            }
+            return string.Empty;
+        }   
     }
 
     public class Choice

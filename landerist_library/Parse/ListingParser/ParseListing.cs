@@ -1,5 +1,4 @@
 ﻿using landerist_library.Configuration;
-using landerist_library.Database;
 using landerist_library.Parse.ListingParser.LocalAI;
 using landerist_library.Parse.ListingParser.OpenAI;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
@@ -7,9 +6,6 @@ using landerist_library.Parse.ListingParser.VertexAI;
 using landerist_library.Websites;
 using landerist_orels.ES;
 using Newtonsoft.Json;
-using System.Data;
-using System.Reflection;
-using System.Text.Json;
 
 namespace landerist_library.Parse.ListingParser
 {
@@ -90,12 +86,16 @@ namespace landerist_library.Parse.ListingParser
                 return (PageType.MayBeListing, null, true);
             }
             string? responseText = response.GetResponseText();
-            if(string.IsNullOrEmpty(responseText))
+            if (string.IsNullOrEmpty(responseText))
             {
-                Console.WriteLine("ParseListing ParseLocalAI responseText is null or empty. Finish Reason: " + response.GetFinishReason());
+                Console.WriteLine("ParseListing ParseLocalAI responseText is null or empty. Finish Reason: " + response.GetFinishReason() + " TokenCount: " + page.TokenCount);
                 return (PageType.MayBeListing, null, true);
             }
             var (pageType, listing) = ParseResponse(page, responseText);
+            if (pageType.Equals(PageType.MayBeListing))
+            {
+                Console.WriteLine("ParseListing ParseLocalAI pageType is MayBeListing. Finish Reason: " + response.GetFinishReason() + " TokenCount " + page.TokenCount);
+            }
             return (pageType, listing, false);
         }
 
@@ -127,12 +127,12 @@ namespace landerist_library.Parse.ListingParser
                 else
                 {
                     throw new Exception("StructuredOutputEs is null");
-                }                    
+                }
             }
             catch (Exception exception)
-            {                
+            {
                 Logs.Log.WriteError("ParseListing ParseResponse", exception.Message);
-            }            
+            }
             return (PageType.MayBeListing, null);
         }
     }
