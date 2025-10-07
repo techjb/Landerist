@@ -110,25 +110,6 @@ namespace landerist_library.Scrape
             ScrapeUnknowHttpStatusCode();
         }
 
-        //public void ScrapeResponseBodyRepeatedInListings()
-        //{
-        //    var Pages = Websites.Pages.GetPages(PageType.Listing);
-        //    HashSet<string> hashSets = [];
-        //    foreach (var page in Pages)
-        //    {
-        //        if (page.ResponseBodyTextHash is null)
-        //        {
-        //            continue;
-        //        }
-        //        if (!hashSets.Add(page.ResponseBodyTextHash))
-        //        {
-        //            page.SetResponseBodyTextHashToNull();
-        //            Pages.Add(page);
-        //        }
-        //    }
-        //    Scrape();
-        //}
-
         public bool Scrape(Website website)
         {
             Pages = website.GetPages();
