@@ -35,10 +35,7 @@ namespace landerist_console
                 End();
             };
             Console.WriteLine("Press Ctrl+C to exit.");
-
-            //DateStart = DateTime.Now;           
-
-            Console.WriteLine("Setting to production");
+            //DateStart = DateTime.Now; // not working in linux            
             Config.SetToProduction();
             Console.WriteLine("Deleting logs..");
             Log.DeleteCurentMachineLogs();
@@ -63,6 +60,7 @@ namespace landerist_console
             Thread inputThread = new(KeyboardListener);
             inputThread.Start();
         }
+
         static void KeyboardListener()
         {
             while (true)
@@ -73,15 +71,6 @@ namespace landerist_console
                 if (keyInfo.Key == ConsoleKey.Escape)
                     Environment.Exit(0);
             }
-        }
-
-        private static bool ConsoleEventHandler(int eventType)
-        {
-            if (eventType == 2)
-            {
-                End();
-            }
-            return false;
         }
 
         private static void Run()

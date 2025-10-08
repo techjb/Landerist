@@ -1,5 +1,4 @@
-﻿using Amazon.Comprehend;
-using landerist_library.Logs;
+﻿using landerist_library.Logs;
 using landerist_library.Parse.ListingParser;
 using landerist_library.Scrape;
 using landerist_library.Statistics;
@@ -7,7 +6,6 @@ using landerist_library.Websites;
 using landerist_orels.ES;
 using SharpToken;
 using System.Collections.Concurrent;
-using System.Runtime.CompilerServices;
 
 namespace landerist_library.Tasks
 {
@@ -71,9 +69,8 @@ namespace landerist_library.Tasks
                     Interlocked.Increment(ref TotalProcessed);
                     if (TotalProcessed % 10 == 0)
                     {
-                        int totalErrorPercentage = TotalProcessed == 0 ? 0 : (int)Math.Round((double)TotalErrors * 100 / TotalProcessed, 2);
-                        //int dailyEstimate = DailyEstimate();
-                        //Log.WriteLocalAI("ProcessPages", $"Errors: {TotalErrors}/{TotalProcessed} ({totalErrorPercentage}%) Daily estimate: " + dailyEstimate);
+                        double totalErrorPercentage = TotalProcessed == 0 ? 0 : (int)Math.Round((double)TotalErrors * 100 / TotalProcessed, 2);                        
+                        //Log.WriteLocalAI("ProcessPages", $"Errors: {TotalErrors}/{TotalProcessed} ({totalErrorPercentage}%) Daily estimate: " + DailyEstimate());
                         Log.WriteLocalAI("ProcessPages", $"Errors: {TotalErrors}/{TotalProcessed} ({totalErrorPercentage}%)");
                     }
                 });
