@@ -41,6 +41,7 @@ namespace landerist_library.Landerist_com
                 NotListingsCache();
                 ResponseBodyTextAlreadyParsed();
                 ReponseBodyTextIsAnotherListingInHost();
+                WaitingAIRequest();
                 BatchReaded();
                 LocalAIParsing();                
                 ListingInsertUpdate();
@@ -136,6 +137,11 @@ namespace landerist_library.Landerist_com
             BarChart("Scraped Pages", statisticsKeys, false);
         }
 
+        private static void WaitingAIRequest()
+        {
+            BarChart("Waiting AI Request", StatisticsKey.WaitingAIRequest, false);
+        }
+
         private static void BatchReaded()
         {
             List<StatisticsKey> statisticsKeys =
@@ -143,7 +149,7 @@ namespace landerist_library.Landerist_com
                 StatisticsKey.BatchReaded,
                 StatisticsKey.BatchReadedErrors,
             ];
-            BarChart(" AI Batch Readed", statisticsKeys, false);
+            BarChart("AI Batch Readed", statisticsKeys, false);
         }
 
         private static void LocalAIParsing()

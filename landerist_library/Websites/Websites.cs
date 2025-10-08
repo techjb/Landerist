@@ -591,7 +591,7 @@ namespace landerist_library.Websites
         //            {
         //                inserted++;
         //                Website website = new(host);
-        //                if (website.Delete())
+        //                if (website.DeleteCurentMachineLogs())
         //                {
         //                    deleted++;
         //                }

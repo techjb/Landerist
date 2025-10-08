@@ -43,9 +43,9 @@ namespace landerist_tests
         {
             SetCtrlDListener();
 
-            DateStart = DateTime.Now;
-            //Log.Delete();
-            Log.Console("Started. Version: " + Config.VERSION);
+            DateStart = DateTime.Now;            
+            Log.DeleteCurentMachineLogs();
+            Log.Console("Started. Machine: " + Config.MACHINE_NAME + " Version: " + Config.VERSION);
         }
 
         static void SetCtrlDListener()
@@ -96,7 +96,7 @@ namespace landerist_tests
 
         private static void Run()
         {
-            Config.SetOnlyDatabaseToProduction();            
+            Config.SetOnlyDatabaseToProduction();
 
             #region Urls
 
@@ -127,8 +127,8 @@ namespace landerist_tests
             #region Websites
 
             //var website = new Website(uri);
-            //Websites.Delete(website); return;
-            //Websites.Delete(uri); return;
+            //Websites.DeleteCurentMachineLogs(website); return;
+            //Websites.DeleteCurentMachineLogs(uri); return;
             //Websites.DeleteAll(); return;            
 
             //Websites.SetHttpStatusCodesToNull();
@@ -143,7 +143,7 @@ namespace landerist_tests
             //Websites.Update();
 
             //Websites.DeleteFromFile();
-            //new Website("promoaguilera.com").Delete();
+            //new Website("promoaguilera.com").DeleteCurentMachineLogs();
             //new Website("inmobiliariainsignia.com").UpdateListingExample("https://inmobiliariainsignia.com/inmueble/preciosa-casa-reformada-a-capricho-en-la-localidad-urrugne/");
             //new Website("aransahomes.es").RemoveListingExample();
             //Websites.UpdateListingExampleUriFromFile();
@@ -158,7 +158,7 @@ namespace landerist_tests
             #region Pages
 
             //Pages.DeleteNumPagesExceded();
-            //Pages.Delete(PageType.ForbiddenLastSegment);
+            //Pages.DeleteCurentMachineLogs(PageType.ForbiddenLastSegment);
             //Pages.DeleteDuplicateUriQuery();
             //Pages.DeleteListingsHttpStatusCodeError();
             //Pages.DeleteListingsResponseBodyRepeated();            
@@ -187,7 +187,7 @@ namespace landerist_tests
             //new Scraper().ScrapeUnknowPageType(website);
             //new Scraper().ScrapeAllPages();            
             //new Scraper().ScrapeResponseBodyRepeatedInListings();            
-            //new Scraper().Start();
+            //new Scraper().ProcessPages();
             //new Scraper().Scrape(page, false);
 
 
@@ -218,7 +218,7 @@ namespace landerist_tests
 
             #region ListingParser
 
-            //landerist_library.GetLatLng.Listing.ListingsParser.Start();
+            //landerist_library.GetLatLng.Listing.ListingsParser.ProcessPages();
             //landerist_library.GetLatLng.Listing.ListingsParser.ParseListing(page);
 
 
@@ -233,10 +233,10 @@ namespace landerist_tests
 
             //landerist_library.GetLatLng.Listing.VertexAI.ParseListingVertexAI.GetResponse();
 
-            //landerist_library.GetLatLng.ListingParser.Listing.OpenAI.Batch.BatchUpload.Start();
-            //landerist_library.GetLatLng.Listing.OpenAI.Batch.BatchDownload.Start();
+            //landerist_library.GetLatLng.ListingParser.Listing.OpenAI.Batch.BatchUpload.ProcessPages();
+            //landerist_library.GetLatLng.Listing.OpenAI.Batch.BatchDownload.ProcessPages();
             //landerist_library.GetLatLng.Listing.OpenAI.Batch.BatchDownload.GetResponse();
-            //landerist_library.GetLatLng.Listing.OpenAI.Batch.BatchTasks.Start();            
+            //landerist_library.GetLatLng.Listing.OpenAI.Batch.BatchTasks.ProcessPages();            
             //landerist_library.GetLatLng.Listing.OpenAI.Batch.BatchCleaner.DeleteAllRemoteFiles();
             //landerist_library.GetLatLng.Listing.OpenAI.Batch.BatchClient.DeleteFile("dd");
 
@@ -254,7 +254,7 @@ namespace landerist_tests
 
             //landerist_library.Parse.ListingParser.LocalAI.LocalAIRequest.PrintOutputSchema();
             //Console.WriteLine(ParseListingSystem.GetSystemPrompt());
-            //new TaskLocalAIParsing().Start();
+            //new TaskLocalAIParsing().ProcessPages();
 
             #endregion
 
@@ -328,20 +328,20 @@ namespace landerist_tests
             #region Insert
 
             //PlacesSearch.Search();
-            //CustomSearch.Start();
-            //InsertIdUrls.Start();
-            //GetAgenciesUrls.Start();            
-            //ExportAgenciesUrls.Start();
+            //CustomSearch.ProcessPages();
+            //InsertIdUrls.ProcessPages();
+            //GetAgenciesUrls.ProcessPages();            
+            //ExportAgenciesUrls.ProcessPages();
 
             //landerist_library.Insert.FtAgencies.InsertFtUrls.GetProvincesList();
-            //landerist_library.Insert.FtAgencies.FtAgenciesInsertUrls.Start();
-            //landerist_library.Insert.FtAgencies.FtAgenciesSetAgenciesUrls.Start();
-            //landerist_library.Insert.FtAgencies.FtAgenciesExport.Start();
-            //landerist_library.Insert.FtAgencies.FtAgenciesInsertWebsites.Start();
+            //landerist_library.Insert.FtAgencies.FtAgenciesInsertUrls.ProcessPages();
+            //landerist_library.Insert.FtAgencies.FtAgenciesSetAgenciesUrls.ProcessPages();
+            //landerist_library.Insert.FtAgencies.FtAgenciesExport.ProcessPages();
+            //landerist_library.Insert.FtAgencies.FtAgenciesInsertWebsites.ProcessPages();
 
-            //landerist_library.Insert.BancoDeDatos.InsertBancoDeDatos.Start();
-            //landerist_library.Insert.BaseDeDatosEmpresas.InsertBaseDeDatosEmpresas.Start();
-            //landerist_library.Insert.IdAgencies.IdAgenciesInsertWebsites.Start();
+            //landerist_library.Insert.BancoDeDatos.InsertBancoDeDatos.ProcessPages();
+            //landerist_library.Insert.BaseDeDatosEmpresas.InsertBaseDeDatosEmpresas.ProcessPages();
+            //landerist_library.Insert.IdAgencies.IdAgenciesInsertWebsites.ProcessPages();
 
             //WebsitesInserter.DeleteAndInsert(uri);return;
             //new WebsitesInserter(false).DeleteAndInsert(uri); return;
@@ -386,16 +386,16 @@ namespace landerist_tests
             #region Tasks
 
             //ServiceTasks.DailyTask();
-            //ServiceTasks.Start();
+            //ServiceTasks.ProcessPages();
             //new ServiceTasks().UpdateAndScrape();
             //landerist_library.Landerist_com.FilesUpdater.Update();
             //ServiceTasks.UpdateAndScrape();
             //ServiceTasks.HourlyTasks();
             //ServiceTasks.Scrape();
-            //ServiceTasks.Start();
-            //BatchTasks.Start();            
-            //TaskBatchDownload.Start();
-            //new TaskBatchUpload().Start();
+            //ServiceTasks.ProcessPages();
+            //BatchTasks.ProcessPages();            
+            //TaskBatchDownload.ProcessPages();
+            //new TaskBatchUpload().ProcessPages();
             //BatchPredictions.ListAllPredictionJobs();
             //BatchDownload.ReadFileTest();
             //BatchDownload.DownloadVertexAI("projects/942392546193/locations/europe-southwest1/batchPredictionJobs/391166654744100864");
@@ -404,7 +404,7 @@ namespace landerist_tests
             //FilesUpdater.UpdateWebsites();
             //var page = Pages.GetPage("850E272404903B49361120C9F468694C4C0F1975C141111CF8334C8F04A75727");
             //TaskBatchUpload.GetJson(page);
-            new TaskLocalAIParsing().Start();
+            //new TaskLocalAIParsing().ProcessPages();
 
 
             #endregion

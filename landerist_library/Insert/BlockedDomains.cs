@@ -87,7 +87,7 @@
         //    {
         //        if (IsBlocked(website.MainUri))
         //        {
-        //            website.Delete();
+        //            website.DeleteCurentMachineLogs();
         //            counter++;
         //        }
         //    }

@@ -133,7 +133,7 @@ namespace landerist_library.Tasks
             RunningTimer1 = true;
             try
             {
-                TaskLocalAIParsing.Start();
+                TaskLocalAIParsing.ProcessPages();
             }
             catch (Exception exception)
             {

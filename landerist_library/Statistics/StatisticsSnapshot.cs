@@ -1,4 +1,5 @@
 ﻿using landerist_library.Database;
+using landerist_library.Websites;
 using landerist_orels.ES;
 using System.Data;
 
@@ -15,6 +16,7 @@ namespace landerist_library.Statistics
         UpdatedIpAddress,
         UpdatedPages,
         NeedUpdate,
+        WaitingAIRequest,
         UnknownPageType,
         UpdatedWebsites,
         UpdatedRobotsTxt,
@@ -50,6 +52,7 @@ namespace landerist_library.Statistics
             Pages();
             UpdatedPages();
             NeedUpdate();
+            WaitingAIRequest();
             UnknownPageType();
             Listings();
             PublishedListings();
@@ -125,6 +128,16 @@ namespace landerist_library.Statistics
                 "WHERE [NextUpdate] < GETDATE()";
 
             InsertDaily(StatisticsKey.NeedUpdate, query);
+        }
+
+        private static void WaitingAIRequest()
+        {
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + landerist_library.Websites.Pages.PAGES + " " +
+                "WHERE [WaitingStatus] = '" + WaitingStatus.waiting_ai_request.ToString()+"'";
+
+            InsertDaily(StatisticsKey.WaitingAIRequest, query);
         }
 
         private static void UnknownPageType()

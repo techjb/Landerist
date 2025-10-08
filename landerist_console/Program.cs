@@ -1,20 +1,16 @@
 ﻿using landerist_library.Configuration;
-using landerist_library.Database;
-using landerist_library.Landerist_com;
 using landerist_library.Logs;
 using landerist_library.Tasks;
-using System.Runtime.InteropServices;
 
 namespace landerist_console
 {
     partial class Program
     {
-        private static DateTime DateStart;
+        private static DateTime? DateStart = null;
         private static readonly TasksService ServiceTasks = new();
 
         private delegate bool ConsoleEventDelegate(int eventType);
-        private static readonly ConsoleEventDelegate Handler = new(ConsoleEventHandler);
-        private static ManualResetEvent ManualResetEvent = new(false);
+        private static readonly ManualResetEvent ManualResetEvent = new(false);
         public delegate void KeyPressedHandler(ConsoleKeyInfo key);
         public static event KeyPressedHandler? OnKeyPressed;
 
@@ -27,24 +23,35 @@ namespace landerist_console
 
         private static void Start()
         {
-            SetCtrlDListener();
-
+            if (!Config.IsLocalAIMachine())
+            {
+                Console.WriteLine("Ctrl+D to daily tasks.");
+                DateStart = DateTime.Now;
+                SetCtrlDListener();
+            }
             Console.CancelKeyPress += (s, e) =>
             {
                 ManualResetEvent.Set();
                 End();
             };
+            Console.WriteLine("Press Ctrl+C to exit.");
 
-            Console.WriteLine("Press Ctrl+C to exit. Ctrl+D to daily tasks.");
+            //DateStart = DateTime.Now;           
 
-            DateStart = DateTime.Now;
+            Console.WriteLine("Setting to production");
             Config.SetToProduction();
-            Log.Delete();            
+            Console.WriteLine("Deleting logs..");
+            Log.DeleteCurentMachineLogs();
             Log.WriteInfo("landerist_console", "Started. Machine: " + Config.MACHINE_NAME + " Version: " + Config.VERSION);
         }
 
         static void SetCtrlDListener()
         {
+            if (Config.IsLocalAIMachine())
+            {
+                return;
+            }
+
             OnKeyPressed += keyInfo =>
             {
                 if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0 &&
@@ -88,7 +95,11 @@ namespace landerist_console
             Log.WriteInfo("landerist_console", "Stopping...");
             ServiceTasks.Stop();
 
-            var duration = (DateTime.Now - DateStart).ToString(@"dd\:hh\:mm\:ss\.fff");
+            if (DateStart is null)
+            {
+                return;
+            }
+            var duration = (DateTime.Now - (DateTime)DateStart).ToString(@"dd\:hh\:mm\:ss\.fff");
             Log.WriteInfo("landerist_console", "Stopped. Version: " + Config.VERSION + " Duration: " + duration);
         }
     }

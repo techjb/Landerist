@@ -636,45 +636,45 @@ namespace landerist_library.Websites
                 });
         }
 
-        public static List<Page> SelectWaitingStatusAIRequest(int topRows, WaitingStatus waitingStatusTo, bool orderTokenCountAscending)
-        {
-            return SelectWaitingStatus(topRows, WaitingStatus.waiting_ai_request, waitingStatusTo, orderTokenCountAscending);
-        }
+        //public static List<Page> SelectWaitingStatusAIRequest(int topRows, WaitingStatus waitingStatusTo, bool orderTokenCountAscending)
+        //{
+        //    return SelectWaitingStatus(topRows, WaitingStatus.waiting_ai_request, waitingStatusTo, orderTokenCountAscending);
+        //}
 
 
-        private static List<Page> SelectWaitingStatus(int topRows, WaitingStatus waitingStatusFrom, WaitingStatus waitingStatusTo, bool orderTokenCountAscending)
-        {
-            //string query =
-            //    "BEGIN TRANSACTION; " +
-            //    "UPDATE TOP (" + topRows + ") " + PAGES + " " +
-            //    "SET [WaitingStatus] = @waitingStatusTo " +
-            //    "OUTPUT " + SelectColumns("INSERTED") + " " +
-            //    "FROM " + PAGES + " " +                
-            //    "INNER JOIN " + Websites.WEBSITES + " ON " + PAGES + ".[Host] = " + Websites.WEBSITES + ".[Host] " +
-            //    "WHERE " + PAGES + ".[WaitingStatus] = @waitingStatusFrom; " +                
-            //    "COMMIT TRANSACTION;";
+        //private static List<Page> SelectWaitingStatus(int topRows, WaitingStatus waitingStatusFrom, WaitingStatus waitingStatusTo, bool orderTokenCountAscending)
+        //{
+        //    //string query =
+        //    //    "BEGIN TRANSACTION; " +
+        //    //    "UPDATE TOP (" + topRows + ") " + PAGES + " " +
+        //    //    "SET [WaitingStatus] = @waitingStatusTo " +
+        //    //    "OUTPUT " + SelectColumns("INSERTED") + " " +
+        //    //    "FROM " + PAGES + " " +                
+        //    //    "INNER JOIN " + Websites.WEBSITES + " ON " + PAGES + ".[Host] = " + Websites.WEBSITES + ".[Host] " +
+        //    //    "WHERE " + PAGES + ".[WaitingStatus] = @waitingStatusFrom; " +                
+        //    //    "COMMIT TRANSACTION;";
 
-            string query =
-                "BEGIN TRANSACTION; " +
-                "UPDATE " + PAGES + " " +
-                "SET [WaitingStatus] = @waitingStatusTo " +
-                "OUTPUT " + SelectColumns("INSERTED") + " " +
-                "FROM " + PAGES + " " +
-                "INNER JOIN " + Websites.WEBSITES + " ON " + PAGES + ".[Host] = " + Websites.WEBSITES + ".[Host] " +
-                "WHERE " + PAGES + ".[UriHash] IN (" +
-                "   SELECT TOP (" + topRows + ") [UriHash]   " +
-                "   FROM " + PAGES + " " +
-                "   WHERE [WaitingStatus] = @WaitingStatusFrom " +
-                "   ORDER BY [TokenCount] " + (orderTokenCountAscending ? "ASC" : "DESC") + " " +
-                "); " +
-                "COMMIT TRANSACTION;";
+        //    string query =
+        //        "BEGIN TRANSACTION; " +
+        //        "UPDATE " + PAGES + " " +
+        //        "SET [WaitingStatus] = @waitingStatusTo " +
+        //        "OUTPUT " + SelectColumns("INSERTED") + " " +
+        //        "FROM " + PAGES + " " +
+        //        "INNER JOIN " + Websites.WEBSITES + " ON " + PAGES + ".[Host] = " + Websites.WEBSITES + ".[Host] " +
+        //        "WHERE " + PAGES + ".[UriHash] IN (" +
+        //        "   SELECT TOP (" + topRows + ") [UriHash]   " +
+        //        "   FROM " + PAGES + " " +
+        //        "   WHERE [WaitingStatus] = @WaitingStatusFrom " +
+        //        "   ORDER BY [TokenCount] " + (orderTokenCountAscending ? "ASC" : "DESC") + " " +
+        //        "); " +
+        //        "COMMIT TRANSACTION;";
 
-            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"WaitingStatusFrom", waitingStatusFrom.ToString() },
-                {"waitingStatusTo", waitingStatusTo.ToString() },
-            });
-            return GetPages(dataTable);
-        }
+        //    DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+        //        {"WaitingStatusFrom", waitingStatusFrom.ToString() },
+        //        {"waitingStatusTo", waitingStatusTo.ToString() },
+        //    });
+        //    return GetPages(dataTable);
+        //}
 
 
         public static List<Page> SelectWaitingStatusAIRequest(int topRows, WaitingStatus waitingStatusTo, int tokenCount, bool isMaxTokenCount)

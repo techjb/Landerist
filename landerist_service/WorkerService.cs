@@ -15,7 +15,7 @@ namespace landerist_service
             Logger.LogInformation("ExecuteAsync");
             while (!stoppingToken.IsCancellationRequested)
             {
-                Log.Delete();
+                Log.DeleteCurentMachineLogs();
                 Log.WriteInfo("landerist_service", "Started. Version: " + Config.VERSION);
                 ServiceTasks.Start();
                 //Scraper.DoTest();

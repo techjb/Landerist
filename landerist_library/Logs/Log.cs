@@ -177,10 +177,10 @@ namespace landerist_library.Logs
 
         #endregion Write Logs
 
-        public static bool Delete()
+        public static bool DeleteCurentMachineLogs()
         {
             string query =
-                "DELETE FROM " + TABLE_LOGS;
+                "DELETE FROM " + TABLE_LOGS + " WHERE [MachineName] = '" + Config.MACHINE_NAME + "'";
 
             return new DataBase().Query(query);
         }
