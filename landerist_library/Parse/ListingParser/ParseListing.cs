@@ -82,7 +82,7 @@ namespace landerist_library.Parse.ListingParser
             var response = new LocalAIRequest().GetResponse(text).Result;
             if (response == null)
             {
-                Console.WriteLine("ParseListing ParseLocalAI response is null");
+                Console.WriteLine("ParseListing ParseLocalAI response is null.");
                 return (PageType.MayBeListing, null, true);
             }
             string? responseText = response.GetResponseText();

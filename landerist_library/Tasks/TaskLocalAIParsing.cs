@@ -11,7 +11,7 @@ namespace landerist_library.Tasks
 {
     public class TaskLocalAIParsing
     {
-        private const int MAX_PAGES_PER_TASK = 50;
+        private const int MAX_PAGES_PER_TASK = 100;
         private const int MAX_MODEL_LEN = 18000; // same as in localAI server
         private const int COMPLETION_TOKENS = 5000;  // structured output and completion tokens aproximately        
         private readonly int MAX_TOKEN_COUNT;
@@ -52,7 +52,7 @@ namespace landerist_library.Tasks
             Parallel.ForEach(orderablePartitioner,
                 new ParallelOptions()
                 {
-                    MaxDegreeOfParallelism = Configuration.Config.IsConfigurationLocal() ? 1 : 8
+                    MaxDegreeOfParallelism = Configuration.Config.IsConfigurationLocal() ? 1 : 16
                 },
                 page =>
                 {
@@ -67,7 +67,7 @@ namespace landerist_library.Tasks
                         StatisticsSnapshot.InsertDailyCounter(StatisticsKey.LocalAIParsingErrors);
                     }
                     Interlocked.Increment(ref TotalProcessed);
-                    if (TotalProcessed % 10 == 0)
+                    if (TotalProcessed % 100 == 0)
                     {
                         double totalErrorPercentage = TotalProcessed == 0 ? 0 : (int)Math.Round((double)TotalErrors * 100 / TotalProcessed, 2);                        
                         //Log.WriteLocalAI("ProcessPages", $"Errors: {TotalErrors}/{TotalProcessed} ({totalErrorPercentage}%) Daily estimate: " + DailyEstimate());

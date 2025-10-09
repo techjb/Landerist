@@ -51,8 +51,7 @@ namespace landerist_library.Parse.ListingParser.LocalAI
             catch (Exception exception)
             {
                 Logs.Log.WriteError("LocalAIRequest GetResponse", exception);
-            }
-            Console.WriteLine("LocalAIRequest GetResponse returned null");
+            }            
             return null;
         }
 
