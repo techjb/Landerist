@@ -13,6 +13,8 @@ namespace landerist_library.Tasks
     {
         private const int MAX_PAGES_PER_TASK = 100;
         private const int MAX_MODEL_LEN = 18000; // same as in localAI server
+        private const int MAX_NUM_SEQS = 32;  // same as in localAI server
+        private const int MAX_DEGREE_OF_PARALLELISM = MAX_NUM_SEQS + 20;
         private const int COMPLETION_TOKENS = 5000;  // structured output and completion tokens aproximately        
         private readonly int MAX_TOKEN_COUNT;
 
@@ -52,7 +54,7 @@ namespace landerist_library.Tasks
             Parallel.ForEach(orderablePartitioner,
                 new ParallelOptions()
                 {
-                    MaxDegreeOfParallelism = Configuration.Config.IsConfigurationLocal() ? 1 : 16
+                    MaxDegreeOfParallelism = Configuration.Config.IsConfigurationLocal() ? 1 : MAX_DEGREE_OF_PARALLELISM
                 },
                 page =>
                 {
