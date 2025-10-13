@@ -30,7 +30,10 @@ namespace landerist_library.Tasks
         {
             Configuration.Config.SetLLMProviderLocalAI();
             //Configuration.Config.EnableLogsErrorsInConsole();
-            Pages.UpdateWaitingStatus(WaitingStatus.readed_by_localai, WaitingStatus.waiting_ai_request);
+            if(Configuration.Config.IsConfigurationProduction())
+            {
+                Pages.UpdateWaitingStatus(WaitingStatus.readed_by_localai, WaitingStatus.waiting_ai_request);
+            }            
             MAX_TOKEN_COUNT = GetMaxTokenCount();
         }
 

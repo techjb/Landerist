@@ -181,7 +181,7 @@ namespace landerist_library.Configuration
         public static void SetToProduction()
         {
             Init(true);
-        }
+        }               
 
         public static void SetOnlyDatabaseToProduction()
         {

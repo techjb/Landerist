@@ -23,8 +23,7 @@ namespace landerist_tests
 {
     partial class Program
     {
-        private static DateTime DateStart;
-        private static readonly TasksService ServiceTasks = new();
+        private static DateTime DateStart;        
 
         private delegate bool ConsoleEventDelegate(int eventType);
         private static readonly ConsoleEventDelegate Handler = new(ConsoleEventHandler);
@@ -85,7 +84,7 @@ namespace landerist_tests
 
         private static void End()
         {
-            ServiceTasks.Stop();
+            //ServiceTasks.Stop();
             var duration = (DateTime.Now - DateStart).ToString(@"dd\:hh\:mm\:ss\.fff");
             Log.Console("Stopped. Version: " + Config.VERSION + " Duration: " + duration);
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
