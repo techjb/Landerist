@@ -7,11 +7,16 @@ using System.Text.RegularExpressions;
 
 namespace landerist_library.Parse.Location
 {
-    public class LocationParser(Page page, landerist_orels.ES.Listing listing)
+    public class LocationParser
     {
-        private readonly Page Page = page;
+        private readonly Page Page;
+        private readonly landerist_orels.ES.Listing Listing;
 
-        private readonly landerist_orels.ES.Listing Listing = listing;
+        public LocationParser(Page page, landerist_orels.ES.Listing listing)
+        {
+            Page = page;
+            Listing = listing;
+        }
 
         private readonly HashSet<Tuple<double, double, bool>> LatLngs = [];
 
@@ -272,7 +277,7 @@ namespace landerist_library.Parse.Location
             {
                 return;
             }
-            var cadastralReference = new AddressToCadastralReference().GetCadastralReference(listing.latitude, listing.longitude, listing.address);
+            var cadastralReference = new AddressToCadastralReference().GetCadastralReference(Listing.latitude, Listing.longitude, Listing.address);
             if (!string.IsNullOrEmpty(cadastralReference))
             {
                 Listing.cadastralReference = cadastralReference;

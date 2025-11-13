@@ -23,7 +23,7 @@ namespace landerist_console
 
         private static void Start()
         {
-            if (!Config.IsLocalAIMachine())
+            if (Config.IsPrincipalMachine())
             {
                 Console.WriteLine("Ctrl+D to daily tasks.");
                 DateStart = DateTime.Now;

@@ -1,4 +1,5 @@
-﻿using landerist_library.Logs;
+﻿using landerist_library.Configuration;
+using landerist_library.Logs;
 using landerist_library.Parse.ListingParser;
 using landerist_library.Scrape;
 using landerist_library.Statistics;
@@ -11,8 +12,7 @@ namespace landerist_library.Tasks
 {
     public class TaskLocalAIParsing
     {
-        private const int MAX_PAGES_PER_TASK = 100;
-        private const int MAX_MODEL_LEN = 18000; // same as in localAI server
+        private const int MAX_PAGES_PER_TASK = 100;        
         private const int MAX_NUM_SEQS = 32;  // same as in localAI server
         private const int MAX_DEGREE_OF_PARALLELISM = MAX_NUM_SEQS + 20;
         private const int COMPLETION_TOKENS = 5000;  // structured output and completion tokens aproximately        
@@ -28,9 +28,9 @@ namespace landerist_library.Tasks
 
         public TaskLocalAIParsing()
         {
-            Configuration.Config.SetLLMProviderLocalAI();
+            Config.SetLLMProviderLocalAI();
             //Configuration.Config.EnableLogsErrorsInConsole();
-            if(Configuration.Config.IsConfigurationProduction())
+            if (Config.IsConfigurationProduction())
             {
                 Pages.UpdateWaitingStatus(WaitingStatus.readed_by_localai, WaitingStatus.waiting_ai_request);
             }            
@@ -40,8 +40,8 @@ namespace landerist_library.Tasks
         public static int GetMaxTokenCount()
         {
             var systemPrompt = ParseListingSystem.GetSystemPrompt();
-            var systemTokens = GptEncoding.GetEncoding(Configuration.Config.LOCAL_AI_TOKENIZER).CountTokens(systemPrompt);
-            return MAX_MODEL_LEN - systemTokens - COMPLETION_TOKENS;
+            int systemTokens = GptEncoding.GetEncoding(Config.LOCAL_AI_TOKENIZER).CountTokens(systemPrompt);
+            return Config.LOCAL_AI_MAX_MODEL_LEN - systemTokens - COMPLETION_TOKENS;
         }
 
         public void ProcessPages()
@@ -57,7 +57,7 @@ namespace landerist_library.Tasks
             Parallel.ForEach(orderablePartitioner,
                 new ParallelOptions()
                 {
-                    MaxDegreeOfParallelism = Configuration.Config.IsConfigurationLocal() ? 1 : MAX_DEGREE_OF_PARALLELISM
+                    MaxDegreeOfParallelism = Config.IsConfigurationLocal() ? 1 : MAX_DEGREE_OF_PARALLELISM
                 },
                 page =>
                 {
