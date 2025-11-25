@@ -12,7 +12,7 @@ namespace landerist_library.Tasks
 {
     public class TaskLocalAIParsing
     {
-        private const int MAX_PAGES_PER_TASK = 100;        
+        private const int MAX_PAGES_PER_TASK = 100;
         private const int MAX_NUM_SEQS = 32;  // same as in localAI server
         private const int MAX_DEGREE_OF_PARALLELISM = MAX_NUM_SEQS + 20;
         private const int COMPLETION_TOKENS = 5000;  // structured output and completion tokens aproximately        
@@ -29,11 +29,11 @@ namespace landerist_library.Tasks
         public TaskLocalAIParsing()
         {
             Config.SetLLMProviderLocalAI();
-            //Configuration.Config.EnableLogsErrorsInConsole();
+            Config.EnableLogsErrorsInConsole();            
             if (Config.IsConfigurationProduction())
             {
                 Pages.UpdateWaitingStatus(WaitingStatus.readed_by_localai, WaitingStatus.waiting_ai_request);
-            }            
+            }
             MAX_TOKEN_COUNT = GetMaxTokenCount();
         }
 
@@ -74,7 +74,7 @@ namespace landerist_library.Tasks
                     Interlocked.Increment(ref TotalProcessed);
                     if (TotalProcessed % 100 == 0)
                     {
-                        double totalErrorPercentage = TotalProcessed == 0 ? 0 : (int)Math.Round((double)TotalErrors * 100 / TotalProcessed, 2);                        
+                        double totalErrorPercentage = TotalProcessed == 0 ? 0 : (int)Math.Round((double)TotalErrors * 100 / TotalProcessed, 2);
                         //Log.WriteLocalAI("ProcessPages", $"Errors: {TotalErrors}/{TotalProcessed} ({totalErrorPercentage}%) Daily estimate: " + DailyEstimate());
                         Log.WriteLocalAI("ProcessPages", $"Errors: {TotalErrors}/{TotalProcessed} ({totalErrorPercentage}%)");
                     }
@@ -159,6 +159,7 @@ namespace landerist_library.Tasks
                 if (string.IsNullOrEmpty(userInput))
                 {
                     Log.WriteError("TaskLocalAIParsing ProcessPage", "Error getting user input. Page: " + page.UriHash);
+                    success = ReturnPageToScrape(page);                    
                 }
                 else
                 {
@@ -176,6 +177,13 @@ namespace landerist_library.Tasks
             }
             page.Dispose();
             return success;
+        }
+
+        private static bool ReturnPageToScrape(Page page)
+        {
+            page.RemoveWaitingStatus();
+            page.RemoveResponseBodyZipped();
+            return page.Update(false);
         }
     }
 }
