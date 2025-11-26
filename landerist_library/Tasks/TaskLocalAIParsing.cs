@@ -50,7 +50,7 @@ namespace landerist_library.Tasks
             InitializeBlockingCollection();
             if (BlockingCollection.Count.Equals(0))
             {
-                Log.WriteLocalAI("ProcessPages", $"No pages to process.");
+                //Console.WriteLine("No pages to process.");
                 return;
             }
             var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
@@ -72,10 +72,9 @@ namespace landerist_library.Tasks
                         StatisticsSnapshot.InsertDailyCounter(StatisticsKey.LocalAIParsingErrors);
                     }
                     Interlocked.Increment(ref TotalProcessed);
-                    if (TotalProcessed % 100 == 0)
+                    if (TotalProcessed % 10 == 0)
                     {
-                        double totalErrorPercentage = TotalProcessed == 0 ? 0 : (int)Math.Round((double)TotalErrors * 100 / TotalProcessed, 2);
-                        //Log.WriteLocalAI("ProcessPages", $"Errors: {TotalErrors}/{TotalProcessed} ({totalErrorPercentage}%) Daily estimate: " + DailyEstimate());
+                        double totalErrorPercentage = TotalProcessed == 0 ? 0 : (int)Math.Round((double)TotalErrors * 100 / TotalProcessed, 2);                        
                         Log.WriteLocalAI("ProcessPages", $"Errors: {TotalErrors}/{TotalProcessed} ({totalErrorPercentage}%)");
                     }
                 });
