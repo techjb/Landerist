@@ -35,6 +35,7 @@ namespace landerist_library.Tasks
                 Pages.UpdateWaitingStatus(WaitingStatus.readed_by_localai, WaitingStatus.waiting_ai_request);
             }
             MAX_TOKEN_COUNT = GetMaxTokenCount();
+            Log.Console("TaskLocalAIParsing", "Started");
         }
 
         public static int GetMaxTokenCount()
@@ -46,7 +47,6 @@ namespace landerist_library.Tasks
 
         public void ProcessPages()
         {
-            Log.Console("TaskLocalAIParsing", "Processing pages ..");
             InitializeBlockingCollection();
             if (BlockingCollection.Count.Equals(0))
             {
