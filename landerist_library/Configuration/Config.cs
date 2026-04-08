@@ -10,7 +10,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "4.66";
+        public static readonly string VERSION = "4.68";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -159,6 +159,8 @@ namespace landerist_library.Configuration
 
         public const int LOCAL_AI_MAX_MODEL_LEN = 20000; // same as in localAI server
 
+        public static bool HEADLESS_BROWSER  { get; set; }
+
 
         public static bool IsConfigurationProduction()
         {
@@ -250,13 +252,19 @@ namespace landerist_library.Configuration
 
             DAYS_TO_REMOVE_BATCH_FILES = -30;
 
-            MAX_DEGREE_OF_PARALLELISM_SCRAPER = ConfigurationProduction ?
-                Environment.ProcessorCount * 70 / 100 : // % of the processors
-                1;
+            //MAX_DEGREE_OF_PARALLELISM_SCRAPER = ConfigurationProduction ?
+            //    Environment.ProcessorCount * 20 / 100 : // % of the processors
+            //    1;
+
+            MAX_DEGREE_OF_PARALLELISM_SCRAPER = 5;
 
             PARALLELOPTIONS1INLOCAL = ConfigurationProduction ?
                 new() :
                 new ParallelOptions() { MaxDegreeOfParallelism = 1 };
+
+
+            HEADLESS_BROWSER = ConfigurationProduction;
+            //HEADLESS_BROWSER = false;
         }
 
         private static void InitDatabase(bool configurationProduction)

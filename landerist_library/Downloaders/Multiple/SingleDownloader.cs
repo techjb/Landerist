@@ -66,7 +66,7 @@ namespace landerist_library.Downloaders.Multiple
 
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
                 Chrashes++;
                 RestartBrowser();

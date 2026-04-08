@@ -165,8 +165,8 @@ namespace landerist_library.Scrape
                     orderablePartitioner,
                     new ParallelOptions()
                     {
-                        MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
-                        //MaxDegreeOfParallelism = 10,
+                        //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
+                        MaxDegreeOfParallelism = 10,
                         CancellationToken = CancellationTokenSource.Token
                     },
                     (page, state) =>
@@ -217,7 +217,8 @@ namespace landerist_library.Scrape
                 return;
             }
 
-            Scrape(page, isBlocked);
+            var useProxy = isBlocked;
+            Scrape(page, useProxy);
             Interlocked.Increment(ref Scraped);
         }
 

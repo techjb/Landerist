@@ -34,7 +34,7 @@ namespace landerist_library.Scrape
         {
             if (!Download())
             {
-                //Console.WriteLine("PageScraper Download failed for: " + _page.Uri);
+                //Console.WriteLine("PageScraper Download failed");
                 return false;
             }
 
@@ -45,6 +45,10 @@ namespace landerist_library.Scrape
             {
                 IndexPages();
             }
+            //else
+            //{
+            //    Console.WriteLine("PageScraper SetPageType failed");
+            //}
 
             return success;
         }
@@ -69,10 +73,11 @@ namespace landerist_library.Scrape
             _singleDownloader = MultipleDownloader.GetDownloader(_useProxy);
             if (_singleDownloader is null)
             {
+                //Console.WriteLine("PageScraper DownloadMultipleDownloaders failed to get downloader");
                 return false;
             }
 
-            return _singleDownloader.Download(_page);
+            return _singleDownloader.Download(_page);            
         }
 
         private bool DownloadSingleDownloader()

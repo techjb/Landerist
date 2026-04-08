@@ -31,6 +31,10 @@ namespace landerist_library.Downloaders.Puppeteer
                 };
 
                 const removeInvisibleElements = (root) => {
+                    if (!(root instanceof Node)) {
+                        return;
+                    }
+
                     const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, null, false);
                     const toRemove = [];
                     while (walker.nextNode()) {
@@ -44,7 +48,8 @@ namespace landerist_library.Downloaders.Puppeteer
                     }
                 };
 
-                removeInvisibleElements(document.body);
+                const root = document.body ?? document.documentElement;
+                removeInvisibleElements(root);
             }
         ";
 
@@ -132,8 +137,7 @@ namespace landerist_library.Downloaders.Puppeteer
         private readonly LaunchOptions launchOptions = new()
         {
             //Headless = true, // if false, maybe need to comment await browserPage.SetRequestInterceptionAsync(true);
-            Headless = Config.IsConfigurationProduction(),
-            //Headless = false,
+            Headless = Config.HEADLESS_BROWSER,
             Devtools = false,
             //IgnoreHTTPSErrors = true,
             Args = Config.TAKE_SCREENSHOT ? [.. LaunchOptionsArgs, .. LaunchOptionsScreenShot] : LaunchOptionsArgs,
@@ -397,11 +401,10 @@ namespace landerist_library.Downloaders.Puppeteer
             //Logs.Log.WriteInfo("PuppeteerTest", "Starting test");
             //string? text = new PuppeteerDownloader(true).GetText(Page);
 
-            Websites.Page page1 = new("https://www.rualcasa.com/ficha/local-comercial/alicante/babel/1008/21300773/es/");
-            Websites.Page page2 = new("https://www.ilanrealty.com/es/barcelona/barcelona/alquilar-propiedad-verano-vacaciones-con-familia-amigos-como-en-casa-todo-incluido-bcn30699.html");
-            var puppeteerDownloader = new PuppeteerDownloader(true);
-            Console.WriteLine(puppeteerDownloader.GetText(page1));
-            Console.WriteLine(puppeteerDownloader.GetText(page2));
+            Websites.Page page1 = new("https://www.rualcasa.com/ficha/local-comercial/alicante/babel/1008/21300773/es/");            
+            var puppeteerDownloader = new PuppeteerDownloader(false);
+            //Console.WriteLine(puppeteerDownloader.GetText(page1));
+            
         }
 
         private string? GetText(Websites.Page page)
@@ -514,8 +517,24 @@ namespace landerist_library.Downloaders.Puppeteer
                     throw new NavigationException("Response is not Ok.");
                 }
 
-                await BrowserPage.EvaluateExpressionAsync(ExpressionRemoveCookies);
-                await BrowserPage.EvaluateFunctionAsync(ExpressionRemoveInvisibleElements);
+                try
+                {
+                    await BrowserPage.EvaluateExpressionAsync(ExpressionRemoveCookies);
+                }
+                catch (Exception exception)
+                {
+                    Logs.Log.WriteInfo("PuppeteerDownloader ExpressionRemoveCookies", exception.Message);
+                }
+
+                try
+                {
+                    await BrowserPage.EvaluateFunctionAsync(ExpressionRemoveInvisibleElements);
+                }
+                catch (Exception exception)
+                {
+                    Logs.Log.WriteInfo("PuppeteerDownloader ExpressionRemoveInvisibleElements", exception.Message);
+                }
+
                 if (Config.TAKE_SCREENSHOT)
                 {
                     screenShot = await PuppeteerScreenshot.TakeScreenshot(BrowserPage, Page);
@@ -561,7 +580,7 @@ namespace landerist_library.Downloaders.Puppeteer
                        //$"ScrapedCounter:{SingleDownloader!.ScrapedCounter()} " +
                        $"Message: {exception.Message}";
 
-                //Console.WriteLine("Exception " + message);
+                Console.WriteLine("Exception " + message);
                 //Logs.Log.WriteError("PuppeterDownloader GetAsync Exception", message);
             }
 

@@ -93,15 +93,7 @@ namespace landerist_library.Tools
             " buscador",
             " legal",
             "sesión",
-            " spam",
-            //"escríbenos",
-            //"contacta",
-            //"contáctanos",
-            //"no encontrada",
-            //"no existe",
-            //"404 Not Found",
-            //"algo salió mal",
-            //"no pudimos encontrar",
+            " spam",            
             "comparte este inmueble",
             "suscríbete",
             "loading",
@@ -213,7 +205,7 @@ namespace landerist_library.Tools
             var enumerable = TextContains.Select(word =>
                 $"contains(translate(., '{UppercaseLetters}', '{LowercaseLetters}'), '{word.ToLowerInvariant()}')");
 
-            return "//*[text() and (" + string.Join(" or ", enumerable) + ")]";
+            return "//text()[" + string.Join(" or ", enumerable) + "]";
         }
 
         private static string InitXpathTextEquals()
