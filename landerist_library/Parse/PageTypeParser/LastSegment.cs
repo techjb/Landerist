@@ -1,4 +1,5 @@
-﻿using landerist_library.Index;
+﻿using System.Collections.Concurrent;
+using landerist_library.Index;
 using landerist_library.Websites;
 
 namespace landerist_library.Parse.PageTypeParser
@@ -140,24 +141,26 @@ namespace landerist_library.Parse.PageTypeParser
             {
                 return false;
             }
-            var lastSegment = GetLastSegment(uri);
-            return ProhibitedLatestSegments.Any(item => lastSegment.Equals(item, StringComparison.OrdinalIgnoreCase));
-        }
 
+            var lastSegment = GetLastSegment(uri);
+            return ProhibitedLatestSegments.Contains(lastSegment);
+        }
 
         private static string GetLastSegment(Uri uri)
         {
-            string[] segments = uri.Segments;
-            string segment = segments[0].TrimEnd('/').ToLower();
+            var segments = uri.Segments;
+            var segment = segments[0].TrimEnd('/').ToLowerInvariant();
+
             for (int i = segments.Length - 1; i >= 0; i--)
             {
-                var currentSegment = segments[i].TrimEnd('/').ToLower();
-                if (!currentSegment.Equals(string.Empty))
+                var currentSegment = segments[i].TrimEnd('/').ToLowerInvariant();
+                if (!currentSegment.Equals(string.Empty, StringComparison.Ordinal))
                 {
                     segment = currentSegment;
                     break;
                 }
             }
+
             return segment;
         }
 
@@ -165,74 +168,68 @@ namespace landerist_library.Parse.PageTypeParser
         {
             var urls = Pages.GetUris();
             var dictionary = ToDictionary(urls);
-            int count = dictionary.Count;
-            dictionary = dictionary.Take(100).ToDictionary(x => x.Key, x => x.Value);
+            var count = dictionary.Count;
+
+            dictionary = dictionary.Take(100).ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
+
             foreach (var entry in dictionary)
             {
-                float percentage = entry.Value * 100 / count;
+                var percentage = count == 0 ? 0f : (float)entry.Value * 100f / count;
                 Console.WriteLine(entry.Key + " " + entry.Value + " (" + Math.Round(percentage, 2) + "%)");
             }
         }
 
-        private static Dictionary<string, int> ToDictionary(List<string> urls)
+        private static Dictionary<string, int> ToDictionary(IEnumerable<string> urls)
         {
-            Dictionary<string, int> dictionary = [];
-            int total = urls.Count;
-            
-            int counter = 0;
-            Parallel.ForEach(urls,
-              new ParallelOptions()
-              {
-                  //MaxDegreeOfParallelism = Configuration.Config.MAX_DEGREE_OF_PARALLELISM
-              },
-              url =>
-              {
-                  Interlocked.Increment(ref counter);
-                  Console.WriteLine(counter + " / " + total);
+            var urlList = urls as IList<string> ?? urls.ToList();
+            var total = urlList.Count;
+            var counter = 0;
+            var dictionary = new ConcurrentDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
-                  if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
-                  {
-                      return;
-                  }
-                  if (!string.IsNullOrEmpty(uri.Query))
-                  {
-                      return;
-                  }
-                  if (ProhibitedUrls.IsProhibited(uri, LanguageCode.es))
-                  {
-                      return;
-                  }
+            Parallel.ForEach(
+                urlList,
+                new ParallelOptions()
+                {
+                    //MaxDegreeOfParallelism = Configuration.Config.MAX_DEGREE_OF_PARALLELISM
+                },
+                url =>
+                {
+                    var current = Interlocked.Increment(ref counter);
+                    Console.WriteLine(current + " / " + total);
 
-                  var lastSegment = GetLastSegment(uri);
-                  if (ProhibitedLatestSegments.Contains(lastSegment))
-                  {
-                      return;
-                  }
+                    if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
+                    {
+                        return;
+                    }
 
-                  if (!lastSegment.EndsWith(".html"))
-                  {
-                      return;
-                  }
+                    if (!string.IsNullOrEmpty(uri.Query))
+                    {
+                        return;
+                    }
 
-                  lock (dictionary)
-                  {
-                      if (dictionary.TryGetValue(lastSegment, out int value))
-                      {
-                          dictionary[lastSegment] = value + 1;
-                      }
-                      else
-                      {
-                          dictionary[lastSegment] = 1;
-                      }
-                  }
-              });
+                    if (ProhibitedUrls.IsProhibited(uri, LanguageCode.es))
+                    {
+                        return;
+                    }
 
+                    var lastSegment = GetLastSegment(uri);
+                    if (ProhibitedLatestSegments.Contains(lastSegment))
+                    {
+                        return;
+                    }
 
-            dictionary = dictionary.Where(pair => pair.Value > 2).ToDictionary(pair => pair.Key, pair => pair.Value);
-            var sortedDict = from entry in dictionary orderby entry.Value descending select entry;
-            dictionary = sortedDict.ToDictionary(x => x.Key, x => x.Value);
-            return dictionary;
+                    if (!lastSegment.EndsWith(".html", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return;
+                    }
+
+                    dictionary.AddOrUpdate(lastSegment, 1, static (_, value) => value + 1);
+                });
+
+            return dictionary
+                .Where(pair => pair.Value > 2)
+                .OrderByDescending(pair => pair.Value)
+                .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.OrdinalIgnoreCase);
         }
-
     }
 }

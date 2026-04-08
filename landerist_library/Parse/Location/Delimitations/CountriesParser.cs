@@ -5,7 +5,6 @@ using Newtonsoft.Json;
 
 namespace landerist_library.Parse.Location.Delimitations
 {
-
     public class CountriesParser
     {
         // CSV obtained from https://rtr.carto.com/tables/world_countries_geojson/public/map
@@ -57,7 +56,7 @@ namespace landerist_library.Parse.Location.Delimitations
         //        else
         //        {
         //            ErrorsMainUri++;
-        //        }                
+        //        }
         //    }
         //    Console.WriteLine("Success: " + success + " ErrorsMainUri: " + ErrorsMainUri);
         //}
@@ -72,27 +71,54 @@ namespace landerist_library.Parse.Location.Delimitations
             string file = Configuration.PrivateConfig.DELIMITATIONS_DIRECTORY + @"Countries\countries.geojson";
             Console.WriteLine("Reading " + file);
 
+            if (!File.Exists(file))
+            {
+                Console.WriteLine("File not found: " + file);
+                return;
+            }
+
             var geoJsonSerializer = GeoJsonSerializer.Create();
-            FeatureCollection featureCollection;
+            FeatureCollection? featureCollection;
 
             using var streamReader = new StreamReader(file);
             using var jsonTextReader = new JsonTextReader(streamReader);
-            featureCollection = geoJsonSerializer.Deserialize<FeatureCollection>(jsonTextReader)!;
+            featureCollection = geoJsonSerializer.Deserialize<FeatureCollection>(jsonTextReader);
+
+            if (featureCollection is null)
+            {
+                Console.WriteLine("Could not deserialize countries GeoJSON.");
+                return;
+            }
 
             int success = 0;
             int errors = 0;
 
-            var wKBWriter = new WKBWriter();
-            foreach (Feature feature in featureCollection.Cast<Feature>())
+            var wkbWriter = new WKBWriter();
+
+            foreach (var feature in featureCollection)
             {
-                byte[] wkb = wKBWriter.Write(feature.Geometry);
-                string the_geom = WKBWriter.ToHex(wkb);
-                string iso_a3 = feature.Attributes["ISO_A3"].ToString()!.Trim();
-                if (iso_a3 == "-99")
+                if (feature?.Geometry is null)
+                {
+                    errors++;
+                    continue;
+                }
+
+                if (!feature.Attributes.Exists("ISO_A3"))
+                {
+                    errors++;
+                    continue;
+                }
+
+                string isoA3 = feature.Attributes["ISO_A3"]?.ToString()?.Trim() ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(isoA3) || isoA3 == "-99")
                 {
                     continue;
                 }
-                if (Database.Countries.Insert(the_geom, iso_a3))
+
+                byte[] wkb = wkbWriter.Write(feature.Geometry);
+                string theGeom = WKBWriter.ToHex(wkb);
+
+                if (Database.Countries.Insert(theGeom, isoA3))
                 {
                     success++;
                 }
@@ -101,10 +127,12 @@ namespace landerist_library.Parse.Location.Delimitations
                     errors++;
                 }
             }
+
             Database.Countries.MakeValidAll();
             // run twice because there is a problen in ios_a3 = "NOR"
             Database.Countries.ReorientIfNeccesary();
             Database.Countries.ReorientIfNeccesary();
+
             Console.WriteLine("Success: " + success + " Errors: " + errors);
         }
 
@@ -117,22 +145,19 @@ namespace landerist_library.Parse.Location.Delimitations
             };
         }
 
-
         public static bool ContainsCountryAll(CountryCode countryCode, double latitude, double longitude)
         {
-            string? iso_3 = Database.Countries.Get(latitude, longitude);
-            if (iso_3 != null)
+            string? iso3 = Database.Countries.Get(latitude, longitude);
+            if (iso3 is null)
             {
-                switch (countryCode)
-                {
-                    case CountryCode.ES: return iso_3 == "ESP";
-                    default:
-                        break;
-                }
+                return false;
             }
-            return false;
+
+            return countryCode switch
+            {
+                CountryCode.ES => iso3 == "ESP",
+                _ => false
+            };
         }
-
-
     }
 }

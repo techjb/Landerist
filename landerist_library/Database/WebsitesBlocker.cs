@@ -4,9 +4,9 @@ namespace landerist_library.Database
 {
     public class WebsitesBlocker
     {
-        private const int MinSecconds = 3;
+        private const int BlockMinSecconds = 2;
 
-        private const int MaxSecconds = 6;
+        private const int BlockMaxSecconds = 5;
 
         private const string WEBSITES_BLOCKER = "[WEBSITES_BLOCKER]";
 
@@ -93,7 +93,7 @@ namespace landerist_library.Database
 
         private static int RandomSecconds()
         {
-            return Random.Shared.Next(MinSecconds, MaxSecconds);
+            return Random.Shared.Next(BlockMinSecconds, BlockMaxSecconds);
         }
     }
 }

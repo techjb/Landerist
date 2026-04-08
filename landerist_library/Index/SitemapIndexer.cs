@@ -3,13 +3,17 @@ using Louw.SitemapParser;
 
 namespace landerist_library.Index
 {
-
     public class SitemapIndexer(Website website) : Indexer(website)
     {
-        readonly HashSet<string> SitemapsIndexes = [];
+        private readonly HashSet<string> SitemapsIndexes = new(StringComparer.OrdinalIgnoreCase);
 
         public void InsertSitemaps(List<Com.Bekijkhet.RobotsTxt.Sitemap> sitemaps)
         {
+            if (sitemaps == null || sitemaps.Count == 0)
+            {
+                return;
+            }
+
             sitemaps = [.. sitemaps.Take(Configuration.Config.MAX_SITEMAPS_PER_WEBSITE)];
             foreach (var sitemap in sitemaps)
             {
@@ -24,18 +28,21 @@ namespace landerist_library.Index
                 return;
             }
 
-            var sitemap = new Sitemap(uri);
-            InsertSitemap(sitemap);
+            InsertSitemap(new Sitemap(uri));
         }
 
-        private void InsertSitemap(Sitemap sitemap)
+        private void InsertSitemap(Sitemap? sitemap)
         {
+            if (sitemap == null)
+            {
+                return;
+            }
             if (!IsValidSitemap(sitemap))
             {
                 return;
             }
 
-            if (!CannAddMoreSitemaps())
+            if (!TryRegisterSitemap(sitemap.SitemapLocation))
             {
                 return;
             }
@@ -44,22 +51,22 @@ namespace landerist_library.Index
             {
                 sitemap = DownloadSitemap(sitemap);
             }
+
             if (sitemap == null || !sitemap.IsLoaded)
             {
                 return;
             }
+
             if (sitemap.SitemapType == SitemapType.Index)
             {
                 foreach (var sitemapIndex in sitemap.Sitemaps)
                 {
-                    if (!CannAddMoreSitemaps())
+                    if (!CanAddMoreSitemaps())
                     {
                         break;
                     }
-                    if (SitemapsIndexes.Add(sitemapIndex.SitemapLocation.ToString()))
-                    {
-                        InsertSitemap(sitemapIndex);
-                    }
+
+                    InsertSitemap(sitemapIndex);
                 }
             }
             else if (sitemap.SitemapType == SitemapType.Items)
@@ -71,36 +78,42 @@ namespace landerist_library.Index
             }
         }
 
-        private bool CannAddMoreSitemaps()
+        private bool CanAddMoreSitemaps()
         {
             return SitemapsIndexes.Count < Configuration.Config.MAX_SITEMAPS_PER_WEBSITE;
         }
 
-        private static Sitemap DownloadSitemap(Sitemap siteMap)
+        private bool TryRegisterSitemap(Uri location)
         {
+            if (location == null || !CanAddMoreSitemaps())
+            {
+                return false;
+            }
+
+            return SitemapsIndexes.Add(location.ToString());
+        }
+
+        private static Sitemap? DownloadSitemap(Sitemap siteMap)
+        {
+            if (siteMap == null)
+            {
+                return null;
+            }
+
             try
             {
                 // can return null.
-                var task = Task.Run(() => siteMap.LoadAsync());
-                if (task != null)
-                {
-                    try
-                    {
-                        siteMap = task.Result;
-                    }
-                    catch //(AggregateException ae)
-                    {
-
-                    }
-                }
+                return siteMap.LoadAsync().ConfigureAwait(false).GetAwaiter().GetResult();
             }
-            catch { }
-            return siteMap;
+            catch
+            {
+                return null;
+            }
         }
 
         private bool IsValidSitemap(Sitemap sitemap)
         {
-            if (sitemap == null)
+            if (sitemap?.SitemapLocation == null)
             {
                 return false;
             }

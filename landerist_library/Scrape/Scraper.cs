@@ -8,7 +8,6 @@ using landerist_library.Websites;
 using landerist_orels.ES;
 using System.Collections.Concurrent;
 
-
 namespace landerist_library.Scrape
 {
     public class Scraper
@@ -25,9 +24,11 @@ namespace landerist_library.Scrape
 
         private static int ThreadCounter = 0;
 
-        private BlockingCollection<Page> BlockingCollection = [];
+        private static int Skipped = 0;
 
-        private readonly CancellationTokenSource CancellationTokenSource = new();
+        private BlockingCollection<Page> BlockingCollection = new();
+
+        private CancellationTokenSource CancellationTokenSource = new();
 
         private List<Page> Pages = [];
 
@@ -38,7 +39,7 @@ namespace landerist_library.Scrape
 
         public void FinalizeBlockingCollection()
         {
-            if (BlockingCollection.Count < Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER)
+            if (!BlockingCollection.IsAddingCompleted)
             {
                 BlockingCollection.CompleteAdding();
             }
@@ -60,6 +61,7 @@ namespace landerist_library.Scrape
 
         public void Start()
         {
+            ResetCancellationTokenSource();
             WebsitesBlocker.Clean();
             MultipleDownloader.Clear();
             Pages = PageSelector.Select();
@@ -68,7 +70,16 @@ namespace landerist_library.Scrape
 
         public void Stop()
         {
-            CancellationTokenSource.Cancel();
+            if (!CancellationTokenSource.IsCancellationRequested)
+            {
+                CancellationTokenSource.Cancel();
+            }
+
+            if (!BlockingCollection.IsAddingCompleted)
+            {
+                BlockingCollection.CompleteAdding();
+            }
+
             MultipleDownloader.Clear();
             Websites.Pages.CleanLockedBy();
             PuppeteerDownloader.KillChrome();
@@ -81,6 +92,7 @@ namespace landerist_library.Scrape
             {
                 return;
             }
+
             ScrapeUnknowPageType();
         }
 
@@ -97,6 +109,7 @@ namespace landerist_library.Scrape
             {
                 return;
             }
+
             ScrapeNonScrapped(website);
         }
 
@@ -107,6 +120,7 @@ namespace landerist_library.Scrape
             {
                 return;
             }
+
             ScrapeUnknowHttpStatusCode();
         }
 
@@ -124,36 +138,48 @@ namespace landerist_library.Scrape
 
         private bool Scrape()
         {
+            ResetCancellationTokenSource();
             InitBlockingCollection();
             if (BlockingCollection.Count.Equals(0))
             {
                 return false;
             }
+
             TotalCounter = BlockingCollection.Count;
             Scraped = 0;
             Success = 0;
             Crashed = 0;
+            Skipped = 0;
             DownloadErrors = 0;
             ThreadCounter = 0;
 
             Console.WriteLine("Scrapping " + TotalCounter + " pages ..");
-            var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
 
-            Parallel.ForEach(
-                orderablePartitioner,
-                new ParallelOptions()
-                {
-                    MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
-                    //MaxDegreeOfParallelism = 10,
-                    CancellationToken = CancellationTokenSource.Token
-                },
-                (page, state) =>
-                {
-                    StartThread();
-                    ProcessThread(page);
-                    WriteConsole(page);
-                    EndThread(page, state);
-                });
+            var orderablePartitioner = Partitioner.Create(
+                BlockingCollection.GetConsumingEnumerable(),
+                EnumerablePartitionerOptions.NoBuffering);
+
+            try
+            {
+                Parallel.ForEach(
+                    orderablePartitioner,
+                    new ParallelOptions()
+                    {
+                        MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
+                        //MaxDegreeOfParallelism = 10,
+                        CancellationToken = CancellationTokenSource.Token
+                    },
+                    (page, state) =>
+                    {
+                        StartThread();
+                        ProcessThread(page);
+                        WriteConsole(page);
+                        EndThread(page, state);
+                    });
+            }
+            catch (OperationCanceledException)
+            {
+            }
 
             LogResults();
             InsertStatistics();
@@ -162,7 +188,6 @@ namespace landerist_library.Scrape
             PuppeteerDownloader.KillChrome();
             return true;
         }
-
 
         private static void StartThread()
         {
@@ -174,20 +199,27 @@ namespace landerist_library.Scrape
             if (!page.Website.IsAllowedByRobotsTxt(page.Uri))
             {
                 page.Update(PageType.BlockedByRobotsTxt, true);
+                Interlocked.Increment(ref Skipped);
                 return;
             }
+
             if (page.Website.CrawlDelayTooBig())
             {
                 page.Update(PageType.CrawlDelayTooBig, true);
+                Interlocked.Increment(ref Skipped);
                 return;
             }
-            
-            var isBlocked = WebsitesBlocker.IsBlocked(page.Website);           
-            bool useProxy = isBlocked && Config.PROXY_ENABLED;
-            Scrape(page, useProxy);            
+
+            var isBlocked = WebsitesBlocker.IsBlocked(page.Website);
+            if (isBlocked && !Config.PROXY_ENABLED)
+            {
+                Interlocked.Increment(ref Skipped);
+                return;
+            }
+
+            Scrape(page, isBlocked);
             Interlocked.Increment(ref Scraped);
         }
-
 
         private static void WriteConsole(Page page)
         {
@@ -195,7 +227,8 @@ namespace landerist_library.Scrape
             {
                 return;
             }
-            var crashedPercentage = Math.Round((float)Crashed * 100 / Scraped, 0);
+
+            var crashedPercentage = GetPercentage(Crashed, Scraped);
             var (downloadErrorsPercentage, downloadErrorsBasis) = GetDownloadErrorsMetrics();
 
             var text =
@@ -213,38 +246,49 @@ namespace landerist_library.Scrape
 
         private static string GetLogText()
         {
-            var scrappedPercentage = Math.Round((float)Scraped * 100 / TotalCounter, 0);
-            var successPercentage = Math.Round((float)Success * 100 / Scraped, 0);
-            var crashedPercentage = Math.Round((float)Crashed * 100 / Scraped, 0);
+            var scrappedPercentage = GetPercentage(Scraped, TotalCounter);
+            var skippedPercentage = GetPercentage(Skipped, TotalCounter);
+            var successPercentage = GetPercentage(Success, Scraped);
+            var crashedPercentage = GetPercentage(Crashed, Scraped);
             var (downloadErrorsPercentage, downloadErrorsBasis) = GetDownloadErrorsMetrics();
 
             return
-                $"Scraped {Scraped}/{TotalCounter} ({scrappedPercentage}%) " +
-                //$"Blocked {blocked} " +
-                $"Success: {Success} ({successPercentage}%) " +
-                $"Crashed: {Crashed} ({crashedPercentage}%) " +
-                $"DownloadErrors: {DownloadErrors} ({downloadErrorsPercentage}% of {downloadErrorsBasis}) ";
-                //$"Downloaders: {downloaders} " +
-                //$"MaxDownloads: {maxDownloads} " +
-                //$"MaxCrashes: {maxCrashes}"
-                ;
+             $"Scraped {Scraped}/{TotalCounter} ({scrappedPercentage}%) " +
+             $"Skip {Skipped} ({skippedPercentage}%) " +
+             $"Ok {Success} ({successPercentage}%) " +
+             $"Crash {Crashed} ({crashedPercentage}%) " +
+             $"DlErr {DownloadErrors} ({downloadErrorsPercentage}%/{downloadErrorsBasis})";
+            //$"Downloaders: {downloaders} " +
+            //$"MaxDownloads: {maxDownloads} " +
+            //$"MaxCrashes: {maxCrashes}"
+            ;
         }
 
         private static (double Percentage, string Basis) GetDownloadErrorsMetrics()
         {
             if (Success > 0)
             {
-                var percentage = Math.Round((double)DownloadErrors * 100 / Success, 0);
+                var percentage = GetPercentage(DownloadErrors, Success);
                 return (percentage, nameof(Success));
             }
 
             if (Scraped > 0)
             {
-                var percentage = Math.Round((double)DownloadErrors * 100 / Scraped, 0);
+                var percentage = GetPercentage(DownloadErrors, Scraped);
                 return (percentage, nameof(Scraped));
             }
 
             return (0, nameof(Scraped));
+        }
+
+        private static double GetPercentage(int value, int total)
+        {
+            if (total <= 0)
+            {
+                return 0;
+            }
+
+            return Math.Round((double)value * 100 / total, 0);
         }
 
         private static void InsertStatistics()
@@ -254,23 +298,33 @@ namespace landerist_library.Scrape
             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ScrapedHttpStatusCodeNotOK, DownloadErrors);
         }
 
-
         private void EndThread(Page page, ParallelLoopState parallelLoopState)
         {
             page.Dispose();
             Interlocked.Decrement(ref ThreadCounter);
-            if (BlockingCollection.IsAddingCompleted)
-            {
-                parallelLoopState.Stop();
-            }
         }
 
         private void InitBlockingCollection()
         {
             HashSet<Page> hashSet = new(Pages, new PageComparer());
-            BlockingCollection = [.. hashSet];
+
+            BlockingCollection.Dispose();
+            BlockingCollection = new BlockingCollection<Page>(new ConcurrentQueue<Page>(hashSet));
+            BlockingCollection.CompleteAdding();
+
             Pages.Clear();
             hashSet.Clear();
+        }
+
+        private void ResetCancellationTokenSource()
+        {
+            if (!CancellationTokenSource.IsCancellationRequested)
+            {
+                return;
+            }
+
+            CancellationTokenSource.Dispose();
+            CancellationTokenSource = new CancellationTokenSource();
         }
 
         public void Scrape(string url, bool useProxy)
@@ -294,7 +348,7 @@ namespace landerist_library.Scrape
             else
             {
                 Interlocked.Increment(ref Crashed);
-            }            
+            }
         }
     }
 }

@@ -38,7 +38,7 @@ namespace landerist_library.Parse.PageTypeParser
             "//i",
             "//b",
             "//u",
-            "//s",
+            //"//s",
             "//em",
             "//br",
             "//small",
@@ -69,20 +69,22 @@ namespace landerist_library.Parse.PageTypeParser
 
         private static string InitXpathTagsToRemove()
         {
-            return string.Join(" | ", TagsToRemove.ToList());
+            return string.Join(" | ", TagsToRemove);
         }
 
         public static bool HtmlNotSimilarToListing(Page page)
         {
-            if (page.Website.ListingExampleNodeSet == null)
+            if (page?.Website?.ListingExampleNodeSet == null)
             {
                 return false;
             }
+
             var htmlDocument = page.GetHtmlDocument();
-            if (htmlDocument == null)
+            if (htmlDocument?.DocumentNode == null)
             {
                 return false;
             }
+
             try
             {
                 var nodeSet1 = JsonConvert.DeserializeObject<HashSet<string>>(page.Website.ListingExampleNodeSet);
@@ -90,7 +92,7 @@ namespace landerist_library.Parse.PageTypeParser
                 {
                     var nodeSet2 = GetNodeSet(htmlDocument);
 
-                    double similarity = JacardCompare(nodeSet1, nodeSet2);
+                    double similarity = JaccardCompare(nodeSet1, nodeSet2);
                     return similarity < Configuration.Config.MINIMUM_PERCENTAGE_TO_BE_SIMILAR_PAGE;
                 }
             }
@@ -102,38 +104,42 @@ namespace landerist_library.Parse.PageTypeParser
             return false;
         }
 
-        //private static double JacardCompare(HtmlDocument htmlDocument1, HtmlDocument htmlDocument2)
+        //private static double JaccardCompare(HtmlDocument htmlDocument1, HtmlDocument htmlDocument2)
         //{
         //    HashSet<string> nodeSet1 = [];
         //    HashSet<string> nodeSet2 = [];
-
+        //
         //    BuildNodeSet(htmlDocument1.DocumentNode, nodeSet1);
         //    BuildNodeSet(htmlDocument2.DocumentNode, nodeSet2);
-
-        //    return JacardCompare(nodeSet1, nodeSet2);
+        //
+        //    return JaccardCompare(nodeSet1, nodeSet2);
         //}
 
-        //private static double JacardCompare(HashSet<string> nodeSet1, HtmlDocument htmlDocument)
+        //private static double JaccardCompare(HashSet<string> nodeSet1, HtmlDocument htmlDocument)
         //{
         //    HashSet<string> nodeSet2 = [];
-
+        //
         //    BuildNodeSet(htmlDocument.DocumentNode, nodeSet2);
-        //    return JacardCompare(nodeSet1 , nodeSet2);
+        //    return JaccardCompare(nodeSet1 , nodeSet2);
         //}
 
-        private static double JacardCompare(HashSet<string> nodeSet1, HashSet<string> nodeSet2)
+        private static double JaccardCompare(HashSet<string> nodeSet1, HashSet<string> nodeSet2)
         {
-            var intersection = new HashSet<string>(nodeSet1);
-            intersection.IntersectWith(nodeSet2);
+            if (nodeSet1 == null || nodeSet2 == null)
+            {
+                return 0d;
+            }
 
             var union = new HashSet<string>(nodeSet1);
             union.UnionWith(nodeSet2);
 
-            var except1 = new HashSet<string>(nodeSet1);
-            except1.ExceptWith(nodeSet2);
+            if (union.Count == 0)
+            {
+                return 1d;
+            }
 
-            var except2 = new HashSet<string>(nodeSet2);
-            except2.ExceptWith(nodeSet1);
+            var intersection = new HashSet<string>(nodeSet1);
+            intersection.IntersectWith(nodeSet2);
 
             return (double)intersection.Count / union.Count;
         }
@@ -146,30 +152,48 @@ namespace landerist_library.Parse.PageTypeParser
 
         private static HashSet<string> GetNodeSet(HtmlDocument htmlDocument)
         {
-            RemoveTextContent(htmlDocument.DocumentNode);
-            RemoveTags(htmlDocument);
+            if (htmlDocument?.DocumentNode == null)
+            {
+                return [];
+            }
+
+            var rootNode = htmlDocument.DocumentNode.CloneNode(deep: true);
+
+            RemoveTextContent(rootNode);
+            RemoveTags(rootNode);
+
             HashSet<string> nodeSet = [];
-            BuildNodeSet(htmlDocument.DocumentNode, nodeSet);
+            BuildNodeSet(rootNode, nodeSet);
             return nodeSet;
         }
+
         public static void RemoveTextContent(HtmlNode node)
         {
+            if (node == null)
+            {
+                return;
+            }
+
             if (node.NodeType == HtmlNodeType.Text)
             {
                 node.Remove();
+                return;
             }
-            else
+
+            foreach (var child in node.ChildNodes.ToArray())
             {
-                foreach (var child in node.ChildNodes.ToArray())
-                {
-                    RemoveTextContent(child);
-                }
+                RemoveTextContent(child);
             }
         }
 
-        private static void RemoveTags(HtmlDocument htmlDocument)
+        private static void RemoveTags(HtmlNode rootNode)
         {
-            var htmlNodeCollection = htmlDocument.DocumentNode.SelectNodes(XpathTagsToRemove);
+            if (rootNode == null)
+            {
+                return;
+            }
+
+            var htmlNodeCollection = rootNode.SelectNodes(XpathTagsToRemove);
             if (htmlNodeCollection != null)
             {
                 List<HtmlNode> nodesToRemove = [.. htmlNodeCollection];
@@ -182,9 +206,14 @@ namespace landerist_library.Parse.PageTypeParser
 
         private static void BuildNodeSet(HtmlNode node, HashSet<string> nodeSet)
         {
-            string nodeRepresentation = (node.NodeType == HtmlNodeType.Element) ?
-                node.Name.ToLower() :
-                node.NodeType.ToString();
+            if (node == null)
+            {
+                return;
+            }
+
+            string nodeRepresentation = node.NodeType == HtmlNodeType.Element
+                ? node.Name.ToLowerInvariant()
+                : node.NodeType.ToString();
 
             nodeSet.Add(nodeRepresentation);
             foreach (HtmlNode child in node.ChildNodes)

@@ -24,11 +24,11 @@ namespace landerist_library.Websites
 
         public static Dictionary<string, Website> GetDicionaryStatusCodeOk()
         {
-            Dictionary<string, Website> dictionary = [];
+            Dictionary<string, Website> dictionary = new(StringComparer.OrdinalIgnoreCase);
             var websites = GetStatusCodeOk();
             foreach (var website in websites)
             {
-                dictionary.Add(website.Host, website);
+                dictionary[website.Host] = website;
             }
             return dictionary;
         }
@@ -105,19 +105,27 @@ namespace landerist_library.Websites
 
         public static Website GetWebsite(Page page)
         {
+            ArgumentNullException.ThrowIfNull(page);
             return GetWebsite(page.Host);
         }
 
         public static Website GetWebsite(string host)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(host);
+
             string query =
                 "SELECT TOP 1 * " +
                 "FROM " + WEBSITES + " " +
-                "WHERE Host = @Host";
+                "WHERE [Host] = @Host";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"Host", host }
             });
+
+            if (dataTable.Rows.Count == 0)
+            {
+                throw new KeyNotFoundException("Website not found for host: " + host);
+            }
 
             var dataRow = dataTable.Rows[0];
             return new Website(dataRow);
@@ -149,7 +157,7 @@ namespace landerist_library.Websites
         public static HashSet<string> GetUrls()
         {
             string query =
-                "SELECT Uri " +
+                "SELECT [Uri] " +
                 "FROM " + WEBSITES;
             return new DataBase().QueryHashSet(query);
         }
@@ -172,6 +180,7 @@ namespace landerist_library.Websites
             int counter = 0;
             int successed = 0;
             int errors = 0;
+
             Parallel.ForEach(websites,
                 new ParallelOptions()
                 {
@@ -179,23 +188,32 @@ namespace landerist_library.Websites
                 },
                 website =>
                 {
-                    bool success = website.SetMainUri();
-                    if (success)
+                    try
                     {
-                        website.Update();
+                        bool success = website.SetMainUri();
+                        if (success)
+                        {
+                            website.Update();
+                        }
+
+                        int current = Interlocked.Increment(ref counter);
+                        if (success)
+                        {
+                            Interlocked.Increment(ref successed);
+                        }
+                        else
+                        {
+                            Interlocked.Increment(ref errors);
+                        }
+
+                        double progressPercentage = Math.Round((double)current * 100 / total, 2);
+                        Console.WriteLine(current + "/" + total + " (" + progressPercentage + "%) " +
+                            "Success: " + successed + " Errors: " + errors + " " + GetWebsiteDisplayText(website));
                     }
-                    Interlocked.Increment(ref counter);
-                    if (success)
+                    finally
                     {
-                        Interlocked.Increment(ref successed);
+                        website.Dispose();
                     }
-                    else
-                    {
-                        Interlocked.Increment(ref errors);
-                    }
-                    double progressPercentage = Math.Round((double)counter * 100 / total, 2);
-                    Console.WriteLine(counter + "/" + total + " (" + progressPercentage + "%) " +
-                        "Success: " + successed + " Errors: " + errors + " " + website.MainUri.ToString());
                 });
         }
 
@@ -217,32 +235,41 @@ namespace landerist_library.Websites
             int counter = 0;
             int successed = 0;
             int errors = 0;
-            
+
             Parallel.ForEach(websites,
                 new ParallelOptions()
                 {
-                    //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM 
+                    //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
                 },
                 website =>
-            {
-                bool success = website.SetRobotsTxt();
-                if (success)
                 {
-                    website.Update();
-                }
-                Interlocked.Increment(ref counter);
-                if (success)
-                {
-                    Interlocked.Increment(ref successed);
-                }
-                else
-                {
-                    Interlocked.Increment(ref errors);
-                }
-                double progressPercentage = Math.Round((double)counter * 100 / total, 2);
-                Console.WriteLine(counter + "/" + total + " (" + progressPercentage + "%) " +
-                    "Success: " + successed + " Errors: " + errors + " " + website.MainUri.ToString());
-            });
+                    try
+                    {
+                        bool success = website.SetRobotsTxt();
+                        if (success)
+                        {
+                            website.Update();
+                        }
+
+                        int current = Interlocked.Increment(ref counter);
+                        if (success)
+                        {
+                            Interlocked.Increment(ref successed);
+                        }
+                        else
+                        {
+                            Interlocked.Increment(ref errors);
+                        }
+
+                        double progressPercentage = Math.Round((double)current * 100 / total, 2);
+                        Console.WriteLine(current + "/" + total + " (" + progressPercentage + "%) " +
+                            "Success: " + successed + " Errors: " + errors + " " + GetWebsiteDisplayText(website));
+                    }
+                    finally
+                    {
+                        website.Dispose();
+                    }
+                });
         }
 
         public static void SetIpAdress()
@@ -257,31 +284,40 @@ namespace landerist_library.Websites
             int counter = 0;
             int errors = 0;
             int successed = 0;
-            
+
             Parallel.ForEach(websites,
                 new ParallelOptions()
                 {
-                    //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM 
+                    //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
                 },
                 website =>
                 {
-                    bool success = website.SetIpAddress();
-                    if (success)
+                    try
                     {
-                        website.Update();
+                        bool success = website.SetIpAddress();
+                        if (success)
+                        {
+                            website.Update();
+                        }
+
+                        int current = Interlocked.Increment(ref counter);
+                        if (success)
+                        {
+                            Interlocked.Increment(ref successed);
+                        }
+                        else
+                        {
+                            Interlocked.Increment(ref errors);
+                        }
+
+                        double progressPercentage = Math.Round((double)current * 100 / total, 2);
+                        Console.WriteLine(current + "/" + total + " (" + progressPercentage + "%) " +
+                            "Success: " + successed + " Errors: " + errors + " " + GetWebsiteDisplayText(website));
                     }
-                    Interlocked.Increment(ref counter);
-                    if (success)
+                    finally
                     {
-                        Interlocked.Increment(ref successed);
+                        website.Dispose();
                     }
-                    else
-                    {
-                        Interlocked.Increment(ref errors);
-                    }
-                    double progressPercentage = Math.Round((double)counter * 100 / total, 2);
-                    Console.WriteLine(counter + "/" + total + " (" + progressPercentage + "%) " +
-                        "Success: " + successed + " Errors: " + errors + " " + website.MainUri.ToString());
                 });
         }
 
@@ -301,7 +337,7 @@ namespace landerist_library.Websites
                 {
                     counterNo++;
                 }
-                Console.WriteLine("Yes: " + counterYes + " No: " + counterNo + " " + website.MainUri);
+                Console.WriteLine("Yes: " + counterYes + " No: " + counterNo + " " + GetWebsiteDisplayText(website));
             }
         }
 
@@ -337,12 +373,15 @@ namespace landerist_library.Websites
 
         public static void Delete(Uri uri)
         {
+            ArgumentNullException.ThrowIfNull(uri);
+
             var website = new Website(uri);
             Delete(website);
         }
 
         public static void Delete(Website website)
         {
+            ArgumentNullException.ThrowIfNull(website);
             website.Delete();
         }
 
@@ -375,8 +414,8 @@ namespace landerist_library.Websites
             int counter = 0;
             Parallel.ForEach(websites, website =>
             {
-                counter++;
-                Console.WriteLine(counter + "/" + total);
+                int current = Interlocked.Increment(ref counter);
+                Console.WriteLine(current + "/" + total);
                 UpdateNumPages(website);
             });
         }
@@ -424,13 +463,19 @@ namespace landerist_library.Websites
                 //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
             }, website =>
             {
-                website.SetRobotsTxt();
-                website.Update();
-                website.Dispose();
-                Interlocked.Increment(ref counter);
+                try
+                {
+                    website.SetRobotsTxt();
+                    website.Update();
+                    Interlocked.Increment(ref counter);
+                }
+                finally
+                {
+                    website.Dispose();
+                }
             });
 
-            //Logs.Log.WriteLogInfo("service", "Updated Robots.txt " + counter + "/" + websites.Count);    
+            //Logs.Log.WriteLogInfo("service", "Updated Robots.txt " + counter + "/" + websites.Count);
         }
 
         private static HashSet<Website> GetNeedToUpdateRobotsTxt()
@@ -440,7 +485,7 @@ namespace landerist_library.Websites
             string query =
                 "SELECT * " +
                 "FROM " + WEBSITES + " " +
-                "WHERE [RobotsTxtUpdated] < @RobotsTxtUpdated ";
+                "WHERE [RobotsTxtUpdated] < @RobotsTxtUpdated OR [RobotsTxtUpdated] IS NULL";
 
             var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"RobotsTxtUpdated", robotsTxtUpdated },
@@ -464,10 +509,16 @@ namespace landerist_library.Websites
                 //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
             }, website =>
             {
-                website.SetSitemap();
-                website.Update();
-                website.Dispose();
-                Interlocked.Increment(ref counter);
+                try
+                {
+                    website.SetSitemap();
+                    website.Update();
+                    Interlocked.Increment(ref counter);
+                }
+                finally
+                {
+                    website.Dispose();
+                }
             });
 
             //Logs.Log.WriteLogInfo("service", "Updated Sitemaps " + counter + "/" + websites.Count);
@@ -480,7 +531,7 @@ namespace landerist_library.Websites
             string query =
                 "SELECT * " +
                 "FROM " + WEBSITES + " " +
-                "WHERE [SitemapUpdated] < @SitemapUpdated ";
+                "WHERE [SitemapUpdated] < @SitemapUpdated OR [SitemapUpdated] IS NULL";
 
             var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"SitemapUpdated", sitemapUpdated },
@@ -504,10 +555,16 @@ namespace landerist_library.Websites
                 //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
             }, website =>
             {
-                website.SetIpAddress();
-                website.Update();
-                website.Dispose();
-                Interlocked.Increment(ref counter);
+                try
+                {
+                    website.SetIpAddress();
+                    website.Update();
+                    Interlocked.Increment(ref counter);
+                }
+                finally
+                {
+                    website.Dispose();
+                }
             });
 
             //Logs.Log.WriteLogInfo("service", "Updated IpAddress " + counter + "/" + websites.Count);
@@ -520,7 +577,7 @@ namespace landerist_library.Websites
             string query =
                 "SELECT * " +
                 "FROM " + WEBSITES + " " +
-                "WHERE [IpAddressUpdated] < @IpAddressUpdated ";
+                "WHERE [IpAddressUpdated] < @IpAddressUpdated OR [IpAddressUpdated] IS NULL";
 
             var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"IpAddressUpdated", ipAddressUpdated },
@@ -550,12 +607,20 @@ namespace landerist_library.Websites
             Parallel.ForEach(hosts.AsEnumerable(), host =>
             {
                 Website website = new(host);
-                if (website.GetNumPages() > 0)
+                try
                 {
-                    website.Delete();
+                    if (website.GetNumPages() > 0)
+                    {
+                        website.Delete();
+                    }
                 }
-                Interlocked.Increment(ref processed);
-                Console.WriteLine(processed + "/" + total);
+                finally
+                {
+                    website.Dispose();
+                }
+
+                int current = Interlocked.Increment(ref processed);
+                Console.WriteLine(current + "/" + total);
             });
         }
 
@@ -678,14 +743,26 @@ namespace landerist_library.Websites
             },
                 website =>
                 {
-                    if (website.Delete())
+                    try
                     {
-                        Interlocked.Increment(ref deleted);
+                        if (website.Delete())
+                        {
+                            Interlocked.Increment(ref deleted);
+                        }
+                    }
+                    finally
+                    {
+                        website.Dispose();
                     }
 
-                    Interlocked.Increment(ref processed);
-                    Console.WriteLine(processed + "/" + total + " Deleted: " + deleted);
+                    int current = Interlocked.Increment(ref processed);
+                    Console.WriteLine(current + "/" + total + " Deleted: " + deleted);
                 });
+        }
+
+        private static string GetWebsiteDisplayText(Website website)
+        {
+            return website.MainUri?.ToString() ?? website.Host;
         }
     }
 }

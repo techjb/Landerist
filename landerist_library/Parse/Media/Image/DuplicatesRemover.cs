@@ -9,6 +9,7 @@ namespace landerist_library.Parse.Media.Image
         public void RemoveDuplicatedImages()
         {
             FindDuplicates();
+
             foreach (var image in ImageParser.UnknowIsValidImages)
             {
                 if (!ImageParser.NotDuplicatedMats.ContainsKey(image.url))
@@ -16,15 +17,27 @@ namespace landerist_library.Parse.Media.Image
                     ImageParser.MediaToRemove.Add(image);
                 }
             }
+
             ImageParser.ProcessMediaToRemove(true);
         }
 
         private void FindDuplicates()
         {
-            foreach (var kvp in ImageParser.DictionaryMats)
+            // Avoid modifying DictionaryMats while enumerating it.
+            var histogramByUrl = new Dictionary<Uri, Mat>(ImageParser.DictionaryMats.Count);
+
+            foreach (var (url, mat) in ImageParser.DictionaryMats)
             {
-                ImageParser.DictionaryMats[kvp.Key] = CalculateHystogram(kvp.Value);
+                histogramByUrl[url] = CalculateHistogram(mat);
             }
+
+            ImageParser.DictionaryMats.Clear();
+
+            foreach (var (url, hist) in histogramByUrl)
+            {
+                ImageParser.DictionaryMats[url] = hist;
+            }
+
             foreach (var image in ImageParser.UnknowIsValidImages)
             {
                 GetDuplicates(image);
@@ -33,17 +46,20 @@ namespace landerist_library.Parse.Media.Image
 
         private void GetDuplicates(landerist_orels.Media image)
         {
-            if (!ImageParser.DictionaryMats.TryGetValue(image.url, out Mat? currentMat))
+            if (!ImageParser.DictionaryMats.TryGetValue(image.url, out Mat? currentMat) || currentMat is null)
             {
                 return;
             }
 
-            var existingImage = ImageParser.NotDuplicatedMats.FirstOrDefault(kvp => AreSimilar(kvp.Value, currentMat));
-            if (existingImage.Equals(default(KeyValuePair<Uri, Mat>)))
+            var existingImage = ImageParser.NotDuplicatedMats
+                .FirstOrDefault(kvp => kvp.Value is not null && AreSimilar(kvp.Value, currentMat));
+
+            if (existingImage.Key is null)
             {
                 ImageParser.NotDuplicatedMats[image.url] = currentMat;
                 return;
             }
+
             if (existingImage.Value.Width * existingImage.Value.Height < currentMat.Width * currentMat.Height)
             {
                 ImageParser.NotDuplicatedMats.Remove(existingImage.Key);
@@ -51,11 +67,10 @@ namespace landerist_library.Parse.Media.Image
             }
         }
 
-        private static Mat CalculateHystogram(Mat mat)
+        private static Mat CalculateHistogram(Mat mat)
         {
             Mat hist = new();
-            Cv2.CalcHist([mat], [0], null, hist, 1,
-                [256], new Rangef[] { new(0, 256) });
+            Cv2.CalcHist([mat], [0], null, hist, 1, [256], [new Rangef(0, 256)]);
             return hist;
         }
 

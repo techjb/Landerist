@@ -244,6 +244,7 @@ namespace landerist_library.Websites
             if (PageType == null || PageTypeCounter == null)
             {
                 NextUpdate = null;
+                return;
             }
 
             var addDays = PageType switch
@@ -251,7 +252,7 @@ namespace landerist_library.Websites
                 landerist_library.Websites.PageType.MainPage => Config.DEFAULT_DAYS_NEXT_UPDATE,
                 landerist_library.Websites.PageType.MayBeListing => Config.DEFAULT_DAYS_NEXT_UPDATE,
                 landerist_library.Websites.PageType.Listing => Config.DEFAULT_DAYS_NEXT_UPDATE_LISTING,
-                _ => (short)PageTypeCounter! * Config.DEFAULT_DAYS_NEXT_UPDATE,
+                _ => (short)(PageTypeCounter.Value * Config.DEFAULT_DAYS_NEXT_UPDATE),
             };
 
             if (IsListingStatusPublished())
@@ -260,7 +261,7 @@ namespace landerist_library.Websites
             }
 
             addDays = Math.Clamp(addDays, Config.MIN_DAYS_NEXT_UPDATE, Config.MAX_DAYS_NEXT_UPDATE);
-            NextUpdate = DateTime.Now!.AddDays(addDays);
+            NextUpdate = DateTime.Now.AddDays(addDays);
         }
 
         public bool UpdateNextUpdate()
@@ -618,14 +619,21 @@ namespace landerist_library.Websites
 
         public bool SetResponseBodyZipped()
         {
+            if (string.IsNullOrEmpty(ResponseBody))
+            {
+                ResponseBodyZipped = null;
+                return false;
+            }
+
             try
             {
-                byte[] byteArray = Encoding.UTF8.GetBytes(ResponseBody!);
+                byte[] byteArray = Encoding.UTF8.GetBytes(ResponseBody);
                 using var memoryStream = new MemoryStream();
                 using (var gzipStream = new GZipStream(memoryStream, CompressionMode.Compress))
                 {
                     gzipStream.Write(byteArray, 0, byteArray.Length);
                 }
+
                 ResponseBodyZipped = memoryStream.ToArray();
                 return true;
             }

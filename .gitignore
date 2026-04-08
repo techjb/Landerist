@@ -363,3 +363,10 @@ MigrationBackup/
 FodyWeavers.xsd
 /landerist_library/Configuration/PrivateConfig.cs
 /landerist_library/Configuration/GoogleApplicationCredentials.json
+
+
+**/bin/
+**/Bin/
+
+/Classifier/weights.zip
+/Classifier/real-estate-ad-classification-master.zip

@@ -29,25 +29,33 @@ namespace landerist_library.Index
 
         public static bool ContainsNotAllowed(Uri uri, LanguageCode allowedLanguage)
         {
-            string absolutePath = uri.AbsolutePath;
-            string[] pathComponents = absolutePath.Split('/');
-
-            if (pathComponents.Length.Equals(0))
+            if (uri is null)
             {
                 return false;
             }
-            var path = pathComponents[1];
-            return ContainsNotAllowed(path, allowedLanguage);
+
+            string absolutePath = uri.AbsolutePath;
+            string[] pathComponents = absolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+            if (pathComponents.Length == 0)
+            {
+                return false;
+            }
+
+            var firstSegment = pathComponents[0];
+            return ContainsNotAllowed(firstSegment, allowedLanguage);
         }
 
         protected static bool ContainsNotAllowed(string path, LanguageCode allowedLanguage)
         {
-            string[] pathItems = [path];
-            if (path.Contains('-'))
+            if (string.IsNullOrWhiteSpace(path))
             {
-                pathItems = path.Split('-');
+                return false;
             }
-            if (pathItems.Length > 3)
+
+            string[] pathItems = path.Split('-', StringSplitOptions.RemoveEmptyEntries);
+
+            if (pathItems.Length == 0 || pathItems.Length > 3)
             {
                 return false;
             }
@@ -58,39 +66,43 @@ namespace landerist_library.Index
                 {
                     continue;
                 }
+
                 if (Iso6391Codes.Contains(pathItem))
                 {
                     return true;
                 }
             }
+
             return false;
         }
 
         public static bool IsValidLanguageAndCountry(Website website, string hreflang)
         {
-            if (string.IsNullOrEmpty(hreflang))
+            if (website is null || string.IsNullOrWhiteSpace(hreflang))
             {
                 return false;
             }
 
-            var language = hreflang;
-            var country = string.Empty;
-            if (hreflang.Contains('-'))
+            var hrefLangParts = hreflang.Split('-', StringSplitOptions.RemoveEmptyEntries);
+            if (hrefLangParts.Length == 0 || hrefLangParts.Length > 2)
             {
-                var hrefLangParts = hreflang.Split('-');
-                language = hrefLangParts[0];
-                country = hrefLangParts[1];
+                return false;
             }
+
+            var language = hrefLangParts[0];
+            var country = hrefLangParts.Length == 2 ? hrefLangParts[1] : string.Empty;
+
             if (!string.Equals(language, website.LanguageCode.ToString(), StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
 
-            if (!country.Equals(string.Empty) &&
+            if (!string.IsNullOrEmpty(country) &&
                 !string.Equals(country, website.CountryCode.ToString(), StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
+
             return true;
         }
     }

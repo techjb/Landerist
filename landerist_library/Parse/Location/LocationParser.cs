@@ -115,25 +115,27 @@ namespace landerist_library.Parse.Location
         {
             try
             {
-                var lng = src[(src.IndexOf(key1) + key1.Length)..];
-                lng = lng[..lng.IndexOf('!')];
+                var value1 = src[(src.IndexOf(key1, StringComparison.Ordinal) + key1.Length)..];
+                value1 = value1[..value1.IndexOf('!')];
 
-                var lat = src[(src.IndexOf(key2) + key2.Length)..];
-                lat = lat[..lat.IndexOf('!')];
+                var value2 = src[(src.IndexOf(key2, StringComparison.Ordinal) + key2.Length)..];
+                value2 = value2[..value2.IndexOf('!')];
 
+                // Mapping fix:
+                // - default case (!2d = lng, !3d = lat): AddLatLng(lat, lng)
+                // - inverted case (legacy order): AddLatLng(value1, value2)
                 if (inverted)
                 {
-                    return AddLatLng(lat, lng, false);
+                    return AddLatLng(value1, value2, false);
                 }
-                else
-                {
-                    return AddLatLng(lng, lat, false);
-                }
+
+                return AddLatLng(value2, value1, false);
             }
             catch (Exception exception)
             {
                 Logs.Log.WriteError("LatLngParser AddframeGoogleMapsLatLng", src, exception);
             }
+
             return false;
         }
 

@@ -41,7 +41,7 @@ namespace landerist_library.Statistics
 
     public class StatisticsSnapshot
     {
-        private static readonly string TABLES_STATISTICS_SNAPSHOT = "[STATISTICS_SNAPSHOT]";
+        private const string TABLE_STATISTICS_SNAPSHOT = "[STATISTICS_SNAPSHOT]";
 
         public static void TakeSnapshots()
         {
@@ -135,9 +135,12 @@ namespace landerist_library.Statistics
             string query =
                 "SELECT COUNT(*) " +
                 "FROM " + landerist_library.Websites.Pages.PAGES + " " +
-                "WHERE [WaitingStatus] = '" + WaitingStatus.waiting_ai_request.ToString()+"'";
+                "WHERE [WaitingStatus] = @WaitingStatus";
 
-            InsertDaily(StatisticsKey.WaitingAIRequest, query);
+            InsertDaily(StatisticsKey.WaitingAIRequest, query, new Dictionary<string, object?>
+            {
+                { "WaitingStatus", WaitingStatus.waiting_ai_request.ToString() }
+            });
         }
 
         private static void UnknownPageType()
@@ -174,9 +177,12 @@ namespace landerist_library.Statistics
             string query =
                 "SELECT COUNT(*) " +
                 "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
-                "WHERE [listingStatus] = '" + listingStatus.ToString() + "'";
+                "WHERE [listingStatus] = @ListingStatus";
 
-            InsertDaily(statisticsKey, query);
+            InsertDaily(statisticsKey, query, new Dictionary<string, object?>
+            {
+                { "ListingStatus", listingStatus.ToString() }
+            });
         }
 
         private static void Media()
@@ -203,7 +209,9 @@ namespace landerist_library.Statistics
 
         public static void SnapshotHttpStatusCode(int days)
         {
-            DateTime date = DateTime.Now.AddDays(days);
+            DateTime date = DateTime.Today.AddDays(days);
+
+            DeleteByKeyPrefixAndDate(date, StatisticsKey.HttpStatusCode.ToString());
 
             string query =
                 "SELECT [HttpStatusCode], COUNT(*) AS [Counter] " +
@@ -211,20 +219,19 @@ namespace landerist_library.Statistics
                 "WHERE CAST([Updated] AS date) = CAST(@Date AS date) " +
                 "GROUP BY [HttpStatusCode] ";
 
-            var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>()
+            var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>
             {
-                {"Date", date}
+                { "Date", date }
             });
 
             foreach (DataRow dataRow in dataTable.Rows)
             {
                 short? httpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
                 int counter = (int)dataRow["Counter"];
-                string key = StatisticsKey.HttpStatusCode.ToString() + "_" + (httpStatusCode?.ToString() ?? "NULL");
+                string key = StatisticsKey.HttpStatusCode + "_" + (httpStatusCode?.ToString() ?? "NULL");
                 Insert(date, key, counter);
             }
         }
-
 
         public static List<string> GetHttpStatusCodeKeys()
         {
@@ -240,10 +247,13 @@ namespace landerist_library.Statistics
         {
             string query =
                 "SELECT DISTINCT [Key] " +
-                "FROM " + TABLES_STATISTICS_SNAPSHOT + " " +
-                "WHERE [Key] LIKE '" + key.ToString() + "%'";
+                "FROM " + TABLE_STATISTICS_SNAPSHOT + " " +
+                "WHERE [Key] LIKE @Key";
 
-            return new DataBase().QueryListString(query);
+            return new DataBase().QueryListString(query, new Dictionary<string, object?>
+            {
+                { "Key", key + "%" }
+            });
         }
 
         public static void PageType()
@@ -261,7 +271,9 @@ namespace landerist_library.Statistics
 
         public static void SnapshotPageType(int days)
         {
-            DateTime date = DateTime.Now.AddDays(days);
+            DateTime date = DateTime.Today.AddDays(days);
+
+            DeleteByKeyPrefixAndDate(date, StatisticsKey.PageType.ToString());
 
             string query =
                 "SELECT [PageType], COUNT(*) AS [Counter] " +
@@ -270,20 +282,19 @@ namespace landerist_library.Statistics
                 "AND [PageType] IS NOT NULL " +
                 "GROUP BY [PageType] ";
 
-            var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>()
+            var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>
             {
-                {"Date", date}
+                { "Date", date }
             });
 
             foreach (DataRow dataRow in dataTable.Rows)
             {
                 string pageType = (string)dataRow["PageType"];
                 int counter = (int)dataRow["Counter"];
-                string key = StatisticsKey.PageType.ToString() + "_" + pageType?.ToString();
+                string key = StatisticsKey.PageType + "_" + pageType;
                 Insert(date, key, counter);
             }
         }
-
 
         private static bool InsertDaily(StatisticsKey key, string queryInt)
         {
@@ -291,16 +302,43 @@ namespace landerist_library.Statistics
             return Insert(DateTime.Now, key.ToString(), counter);
         }
 
+        private static bool InsertDaily(StatisticsKey key, string queryInt, Dictionary<string, object?> parameters)
+        {
+            int counter = QueryInt(queryInt, parameters);
+            return Insert(DateTime.Now, key.ToString(), counter);
+        }
+
+        private static int QueryInt(string query, Dictionary<string, object?> parameters)
+        {
+            DataTable dataTable = new DataBase().QueryTable(query, parameters);
+            return Convert.ToInt32(dataTable.Rows[0][0]);
+        }
+
+        private static bool DeleteByKeyPrefixAndDate(DateTime date, string keyPrefix)
+        {
+            string query =
+                "DELETE FROM " + TABLE_STATISTICS_SNAPSHOT + " " +
+                "WHERE [Key] LIKE @KeyPrefix " +
+                "AND CAST([Date] AS date) = CAST(@Date AS date)";
+
+            return new DataBase().Query(query, new Dictionary<string, object?>
+            {
+                { "Date", date },
+                { "KeyPrefix", keyPrefix + "_%" }
+            });
+        }
+
         private static bool Insert(DateTime date, string key, int counter)
         {
             string query =
-                "DELETE FROM " + TABLES_STATISTICS_SNAPSHOT + " " +
-                "WHERE [Key] = @Key AND CAST([Date] AS date) = CAST(@Date AS date) " +
-                "INSERT INTO " + TABLES_STATISTICS_SNAPSHOT + " " +
-                "VALUES(@Date, @Key, @Counter) ";
+                "DELETE FROM " + TABLE_STATISTICS_SNAPSHOT + " " +
+                "WHERE [Key] = @Key AND CAST([Date] AS date) = CAST(@Date AS date); " +
+                "INSERT INTO " + TABLE_STATISTICS_SNAPSHOT + " ([Date], [Key], [Counter]) " +
+                "VALUES (@Date, @Key, @Counter);";
 
-            return new DataBase().Query(query, new Dictionary<string, object?> {
-                { "Date",date },
+            return new DataBase().Query(query, new Dictionary<string, object?>
+            {
+                { "Date", date },
                 { "Key", key },
                 { "Counter", counter }
             });
@@ -327,37 +365,37 @@ namespace landerist_library.Statistics
             {
                 return true;
             }
+
             string query =
-                "MERGE " + TABLES_STATISTICS_SNAPSHOT + " AS target " +
+                "MERGE " + TABLE_STATISTICS_SNAPSHOT + " AS target " +
                 "USING (" +
-                "   SELECT  " +
+                "   SELECT " +
                 "       CAST(@Date AS DATE) AS DateOnly, " +
                 "       @Key AS [Key], " +
-                "       @Counter AS [Counter]" +
+                "       @Counter AS [Counter] " +
                 "   ) AS source " +
                 "ON " +
-                "   CAST(target.[Date] AS DATE) = source.DateOnly  " +
+                "   CAST(target.[Date] AS DATE) = source.DateOnly " +
                 "   AND target.[Key] = source.[Key] " +
-                "WHEN MATCHED THEN" +
+                "WHEN MATCHED THEN " +
                 "   UPDATE SET target.[Counter] = target.[Counter] + source.[Counter] " +
-                "WHEN NOT MATCHED THEN" +
-                "   INSERT ([Date], [Key], [Counter])" +
+                "WHEN NOT MATCHED THEN " +
+                "   INSERT ([Date], [Key], [Counter]) " +
                 "   VALUES (source.DateOnly, source.[Key], source.[Counter]);";
 
-            return new DataBase().Query(query, new Dictionary<string, object?> {
+            return new DataBase().Query(query, new Dictionary<string, object?>
+            {
                 { "Date", DateTime.Now },
                 { "Key", key },
                 { "Counter", counter }
-
             });
         }
-
 
         public static DataSet GetStatistics(int lastMonths)
         {
             string query =
                 "SELECT DISTINCT [Key] " +
-                "FROM " + TABLES_STATISTICS_SNAPSHOT + " ";
+                "FROM " + TABLE_STATISTICS_SNAPSHOT + " ";
 
             DataTable dataTable = new DataBase().QueryTable(query);
 
@@ -368,6 +406,7 @@ namespace landerist_library.Statistics
                 var dataTableKey = GetStatistics(key, lastMonths);
                 dataSet.Tables.Add(dataTableKey);
             }
+
             return dataSet;
         }
 
@@ -375,12 +414,13 @@ namespace landerist_library.Statistics
         {
             string query =
                 "SELECT [Date], [Key], [Counter] " +
-                "FROM " + TABLES_STATISTICS_SNAPSHOT + " " +
+                "FROM " + TABLE_STATISTICS_SNAPSHOT + " " +
                 "WHERE [Key] = @Key AND " +
                 "[Date] > DATEADD(MONTH, @Months, GETDATE()) " +
                 "ORDER BY [Date] ASC";
 
-            return new DataBase().QueryTable(query, new Dictionary<string, object?> {
+            return new DataBase().QueryTable(query, new Dictionary<string, object?>
+            {
                 { "Key", key },
                 { "Months", months }
             });
@@ -389,13 +429,15 @@ namespace landerist_library.Statistics
         public static DataTable GetLatestStatistics(string statisticsKey, int top)
         {
             string query =
-                "SELECT TOP " + top + " [Date], [Counter] " +
-                "FROM " + TABLES_STATISTICS_SNAPSHOT + " " +
+                "SELECT TOP (@Top) [Date], [Counter] " +
+                "FROM " + TABLE_STATISTICS_SNAPSHOT + " " +
                 "WHERE [Key] = @Key " +
                 "ORDER BY [Date] DESC";
 
-            return new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                { "Key", statisticsKey}
+            return new DataBase().QueryTable(query, new Dictionary<string, object?>
+            {
+                { "Top", top },
+                { "Key", statisticsKey }
             });
         }
     }

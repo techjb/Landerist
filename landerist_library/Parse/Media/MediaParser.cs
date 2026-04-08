@@ -1,7 +1,5 @@
 ﻿using HtmlAgilityPack;
 using landerist_library.Parse.Media.Image;
-using landerist_library.Parse.Media.Other;
-using landerist_library.Parse.Media.Video;
 using landerist_library.Websites;
 using landerist_orels;
 using landerist_orels.ES;
@@ -12,18 +10,22 @@ namespace landerist_library.Parse.Media
     {
         public readonly Page Page;
 
-        private readonly SortedSet<landerist_orels.Media> Media = new(new MediaComparer());
+        private readonly SortedSet<landerist_orels.Media> _media = new(new MediaComparer());
 
-        public HtmlDocument? HtmlDocument { get; set; }
+        public HtmlDocument? HtmlDocument { get; private set; }
 
         public MediaParser(Page page)
         {
+            ArgumentNullException.ThrowIfNull(page);
+
             Page = page;
             InitHtmlDocument();
         }
 
         public void Add(landerist_orels.Media media)
         {
+            ArgumentNullException.ThrowIfNull(media);
+
             if (media.url == null)
             {
                 return;
@@ -33,58 +35,57 @@ namespace landerist_library.Parse.Media
             {
                 return;
             }
-            Media.Add(media);
+
+            _media.Add(media);
         }
 
         public void AddMedia(Listing listing)
         {
-            if (HtmlDocument == null)
-            {
-                return;
-            }
-            if (!Page.ContainsMetaRobotsNoImageIndex())
+            ArgumentNullException.ThrowIfNull(listing);
+
+            if (HtmlDocument != null && !Page.ContainsMetaRobotsNoImageIndex())
             {
                 new ImageParser(this).AddImages();
             }
+
             //new VideoParser(this).GetVideos();
             //new OtherParser(this).GetOthers();
-            listing.SetMedia(Media);
+            listing.SetMedia(_media);
         }
 
         public void AddMediaImages(Listing listing, string[]? list)
         {
-            if (list == null || list.Length.Equals(0))
-            {
-                return;
-            }
-            if (!Page.ContainsMetaRobotsNoImageIndex())
+            ArgumentNullException.ThrowIfNull(listing);
+
+            if (list != null && list.Length > 0 && !Page.ContainsMetaRobotsNoImageIndex())
             {
                 new ImageParserUrls(this).AddImagesFromUrls(list);
             }
-            listing.SetMedia(Media);
+
+            listing.SetMedia(_media);
         }
 
         public void AddMediaImages(Listing listing, List<(string url, string? title)>? list)
         {
-            if (list == null || list.Count.Equals(0))
-            {
-                return;
-            }
-            if (!Page.ContainsMetaRobotsNoImageIndex())
+            ArgumentNullException.ThrowIfNull(listing);
+
+            if (list != null && list.Count > 0 && !Page.ContainsMetaRobotsNoImageIndex())
             {
                 new ImageParserUrls(this).AddImagesFromUrls(list);
             }
-            listing.SetMedia(Media);
+
+            listing.SetMedia(_media);
         }
 
         private void InitHtmlDocument()
         {
             HtmlDocument = Page.GetHtmlDocument();
-            if (HtmlDocument == null || HtmlDocument.DocumentNode == null)
+            if (HtmlDocument?.DocumentNode == null)
             {
                 return;
             }
-            var xPath =
+
+            const string xPath =
                 "//nav | //footer | //style | " +
                 "//code | //canvas | //input | //option | " +
                 "//select | //progress | //svg | //textarea | //del";
@@ -104,21 +105,25 @@ namespace landerist_library.Parse.Media
                 // Handle exceptions if necessary
             }
 
-            if (nodesToRemove is not null)
+            if (nodesToRemove == null)
             {
-                foreach (var node in nodesToRemove)
-                {
-                    node.Remove();
-                }
+                return;
+            }
+
+            foreach (var node in nodesToRemove)
+            {
+                node.Remove();
             }
         }
 
         public static string GetTitle(HtmlNode imgNode)
         {
-            string title = imgNode.GetAttributeValue("alt", "");
-            if (string.IsNullOrEmpty(title))
+            ArgumentNullException.ThrowIfNull(imgNode);
+
+            var title = imgNode.GetAttributeValue("alt", "");
+            if (string.IsNullOrWhiteSpace(title))
             {
-                title = imgNode.GetAttributeValue("title", "");                
+                title = imgNode.GetAttributeValue("title", "");
             }
 
             return title;

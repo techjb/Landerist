@@ -5,6 +5,8 @@ namespace landerist_library.Parse.Media.Image
 {
     public class ImageDownloader(ImageParser imageParser)
     {
+        private static readonly HttpClient HttpClient = CreateHttpClient();
+
         private readonly ImageParser ImageParser = imageParser;
         private readonly object Sync1 = new();
         private readonly object Sync2 = new();
@@ -33,7 +35,6 @@ namespace landerist_library.Parse.Media.Image
 
         private void DownloadImage(landerist_orels.Media image)
         {
-
             if (!ImageParser.MediaParser.Page.Website.IsAllowedByRobotsTxt(image.url))
             {
                 return;
@@ -52,31 +53,33 @@ namespace landerist_library.Parse.Media.Image
         {
             try
             {
-                var stream = GetStream(uri);
-                using MemoryStream memoryStream = new();
-                stream.CopyTo(memoryStream);
-                Mat mat = Cv2.ImDecode(memoryStream.ToArray(), ImreadModes.Color);
+                var bytes = HttpClient.GetByteArrayAsync(uri).GetAwaiter().GetResult();
+                using var mat = Cv2.ImDecode(bytes, ImreadModes.Color);
+
+                if (mat.Empty())
+                {
+                    return false;
+                }
+
                 lock (Sync2)
                 {
-                    ImageParser.DictionaryMats.Add(uri, mat);
+                    // Avoid duplicate-key exceptions when the same URL appears multiple times.
+                    ImageParser.DictionaryMats[uri] = mat.Clone();
                 }
+
                 return true;
             }
             catch
             {
-
+                return false;
             }
-            return false;
         }
 
-        private static Stream GetStream(Uri uri)
+        private static HttpClient CreateHttpClient()
         {
-            using var client = new HttpClient();
+            var client = new HttpClient();
             client.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
-            var response = client.GetAsync(uri).Result;
-            response.EnsureSuccessStatusCode();
-            var responseContent = response.Content;
-            return responseContent.ReadAsStreamAsync().Result;
+            return client;
         }
     }
 }

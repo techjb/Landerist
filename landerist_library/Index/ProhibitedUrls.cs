@@ -1,4 +1,6 @@
-﻿using landerist_library.Websites;
+﻿using System.Globalization;
+using System.Text;
+using landerist_library.Websites;
 
 namespace landerist_library.Index
 {
@@ -108,27 +110,34 @@ namespace landerist_library.Index
             "whatsapp"
         };
 
+        private static readonly HashSet<string> ProhibitedEsNormalized =
+            Prohibited_ES.Select(NormalizeSegment).ToHashSet(StringComparer.Ordinal);
+
         public static bool IsProhibited(Uri uri, LanguageCode languageCode)
         {
-            var prohibitedContains = GetProhibitedContains(languageCode);
-            var absolutePath = uri.AbsolutePath.ToLower()
-                    .Replace("-", string.Empty)
-                    .Replace("_", string.Empty);
+            ArgumentNullException.ThrowIfNull(uri);
 
-            var directories = absolutePath.Split('/');
+            var prohibitedContains = GetProhibitedContains(languageCode);
+            if (prohibitedContains.Count == 0)
+            {
+                return false;
+            }
+
+            var directories = uri.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
             foreach (var directory in directories)
             {
-                if (string.IsNullOrEmpty(directory))
+                var normalizedDirectory = NormalizeSegment(directory);
+                if (normalizedDirectory.Length == 0)
                 {
                     continue;
                 }
 
-                if (prohibitedContains.Any(directory.Contains))
+                if (prohibitedContains.Any(normalizedDirectory.Contains))
                 {
                     return true;
                 }
-
             }
+
             return false;
         }
 
@@ -136,8 +145,8 @@ namespace landerist_library.Index
         {
             return languageCode switch
             {
-                LanguageCode.es => Prohibited_ES,
-                _ => [],
+                LanguageCode.es => ProhibitedEsNormalized,
+                _ => []
             };
         }
 
@@ -145,6 +154,7 @@ namespace landerist_library.Index
         {
             var urls = Pages.GetUris(false);
             var dictionary = ToDictionary(urls);
+
             foreach (var entry in dictionary)
             {
                 Console.WriteLine(entry.Key + " " + entry.Value);
@@ -154,6 +164,7 @@ namespace landerist_library.Index
         private static Dictionary<string, int> ToDictionary(List<string> urls)
         {
             Dictionary<string, int> dictionary = [];
+
             foreach (var url in urls)
             {
                 if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
@@ -174,52 +185,62 @@ namespace landerist_library.Index
                     }
                 }
             }
+
             var sortedDict = from entry in dictionary orderby entry.Value descending select entry;
-            dictionary = sortedDict.ToDictionary(x => x.Key, x => x.Value);
-            dictionary = dictionary.Take(300).ToDictionary(x => x.Key, x => x.Value);
+            dictionary = sortedDict.Take(300).ToDictionary(x => x.Key, x => x.Value);
+
             return dictionary;
         }
 
         private static List<string> GetDirectories(Uri uri)
         {
             var prohibitedContains = GetProhibitedContains(LanguageCode.es);
-            var absolutePath = uri.AbsolutePath.ToLower()
-                    .Replace("-", string.Empty)
-                    .Replace("_", string.Empty);
-
-            var directories = absolutePath.Split('/');
+            var directories = uri.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
 
             List<string> dirs = [];
+
             foreach (var directory in directories)
             {
-                if (string.IsNullOrEmpty(directory))
+                var normalizedDirectory = NormalizeSegment(directory);
+                if (normalizedDirectory.Length == 0)
                 {
                     continue;
                 }
 
-                bool isProhibited = prohibitedContains.Any(directory.Contains);
+                bool isProhibited = prohibitedContains.Any(normalizedDirectory.Contains);
                 if (!isProhibited)
                 {
-                    dirs.Add(directory);
+                    dirs.Add(normalizedDirectory);
                 }
-
             }
+
             return dirs;
         }
 
-        private static string GetDirectory(Uri uri)
+        private static string NormalizeSegment(string value)
         {
-            var directories = uri.AbsolutePath.ToLower().Split('/');
-            foreach (var directory in directories)
+            if (string.IsNullOrWhiteSpace(value))
             {
-                if (directory.Equals(string.Empty)
-                    || directory.Equals("es"))
-                {
-                    continue;
-                }
-                return directory;
+                return string.Empty;
             }
-            return string.Empty;
+
+            var cleaned = Uri.UnescapeDataString(value)
+                .ToLowerInvariant()
+                .Replace("-", string.Empty)
+                .Replace("_", string.Empty);
+
+            var normalized = cleaned.Normalize(NormalizationForm.FormD);
+            var sb = new StringBuilder(normalized.Length);
+
+            foreach (var c in normalized)
+            {
+                if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                {
+                    sb.Append(c);
+                }
+            }
+
+            return sb.ToString().Normalize(NormalizationForm.FormC);
         }
     }
 }

@@ -2,6 +2,7 @@
 using NetTopologySuite.IO;
 using Newtonsoft.Json;
 using System.Data;
+using System.Threading;
 
 namespace landerist_library.Parse.Location.Delimitations
 {
@@ -24,36 +25,46 @@ namespace landerist_library.Parse.Location.Delimitations
             int success = 0;
             int errors = 0;
 
-            var wKBWriter = new WKBWriter();
-            Parallel.ForEach(featureCollection.Cast<Feature>(),
+            Parallel.ForEach(
+                featureCollection.Cast<Feature>(),
                 new ParallelOptions()
                 {
                     //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM
                 },
                 feature =>
-            {
-                byte[] wkb = wKBWriter.Write(feature.Geometry);
-                string the_geom = WKBWriter.ToHex(wkb);
+                {
+                    // WKBWriter is not guaranteed to be thread-safe; use one per iteration/thread.
+                    var wkbWriter = new WKBWriter();
+                    byte[] wkb = wkbWriter.Write(feature.Geometry);
+                    string theGeom = WKBWriter.ToHex(wkb);
 
-                string inspireId = feature.Attributes["INSPIREID"].ToString()!.Trim();
-                string natCode = feature.Attributes["NATCODE"].ToString()!.Trim();
-                string nameUnit = feature.Attributes["NAMEUNIT"].ToString()!.Trim();
+                    if (!feature.Attributes.Exists("INSPIREID") ||
+                        !feature.Attributes.Exists("NATCODE") ||
+                        !feature.Attributes.Exists("NAMEUNIT"))
+                    {
+                        return;
+                    }
 
-                if (inspireId.Equals(string.Empty) ||
-                    nameUnit.Equals(string.Empty) ||
-                    natCode.Equals(string.Empty))
-                {
-                    return;
-                }
-                if (Database.CNIG.Insert(the_geom, inspireId, natCode, nameUnit))
-                {
-                    success++;
-                }
-                else
-                {
-                    errors++;
-                }
-            });
+                    string? inspireId = feature.Attributes["INSPIREID"]?.ToString()?.Trim();
+                    string? natCode = feature.Attributes["NATCODE"]?.ToString()?.Trim();
+                    string? nameUnit = feature.Attributes["NAMEUNIT"]?.ToString()?.Trim();
+
+                    if (string.IsNullOrWhiteSpace(inspireId) ||
+                        string.IsNullOrWhiteSpace(nameUnit) ||
+                        string.IsNullOrWhiteSpace(natCode))
+                    {
+                        return;
+                    }
+
+                    if (Database.CNIG.Insert(theGeom, inspireId, natCode, nameUnit))
+                    {
+                        Interlocked.Increment(ref success);
+                    }
+                    else
+                    {
+                        Interlocked.Increment(ref errors);
+                    }
+                });
 
             Database.CNIG.MakeValidAll();
             Database.CNIG.ReorientIfNeccesary();
@@ -72,8 +83,14 @@ namespace landerist_library.Parse.Location.Delimitations
             {
                 return null;
             }
-            string natCode = dataRow["natcode"].ToString()!;
-            string nameUnit = dataRow["nameunit"].ToString()!;
+
+            string natCode = dataRow["natcode"].ToString() ?? string.Empty;
+            string nameUnit = dataRow["nameunit"].ToString() ?? string.Empty;
+
+            if (natCode.Length <= 6 || string.IsNullOrWhiteSpace(nameUnit))
+            {
+                return null;
+            }
 
             natCode = natCode[6..]; // always natCode is 11 length
             return (natCode, nameUnit);

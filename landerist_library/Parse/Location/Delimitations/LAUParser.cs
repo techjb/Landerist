@@ -2,6 +2,7 @@
 using NetTopologySuite.IO;
 using Newtonsoft.Json;
 using System.Data;
+using System.Threading;
 
 namespace landerist_library.Parse.Location.Delimitations
 {
@@ -24,26 +25,28 @@ namespace landerist_library.Parse.Location.Delimitations
             int success = 0;
             int errors = 0;
 
-            var wKBWriter = new WKBWriter();
             Parallel.ForEach(featureCollection.Cast<Feature>(), feature =>
             {
-                byte[] wkb = wKBWriter.Write(feature.Geometry);
+                var wkbWriter = new WKBWriter();
+                byte[] wkb = wkbWriter.Write(feature.Geometry);
                 string the_geom = WKBWriter.ToHex(wkb);
-                string gisco_id = feature.Attributes["GISCO_ID"].ToString()!.Trim();
-                string lau_id = feature.Attributes["LAU_ID"].ToString()!.Trim();
-                string lau_name = feature.Attributes["LAU_NAME"].ToString()!.Trim();
 
-                if (lau_name.Equals(string.Empty) || lau_id.Equals(string.Empty))
+                string gisco_id = feature.Attributes["GISCO_ID"]?.ToString()?.Trim() ?? string.Empty;
+                string lau_id = feature.Attributes["LAU_ID"]?.ToString()?.Trim() ?? string.Empty;
+                string lau_name = feature.Attributes["LAU_NAME"]?.ToString()?.Trim() ?? string.Empty;
+
+                if (string.IsNullOrWhiteSpace(lau_name) || string.IsNullOrWhiteSpace(lau_id))
                 {
                     return;
                 }
+
                 if (Database.LAU.Insert(the_geom, gisco_id, lau_id, lau_name))
                 {
-                    success++;
+                    Interlocked.Increment(ref success);
                 }
                 else
                 {
-                    errors++;
+                    Interlocked.Increment(ref errors);
                 }
             });
 
@@ -58,12 +61,13 @@ namespace landerist_library.Parse.Location.Delimitations
             {
                 return null;
             }
-            
+
             DataRow? dataRow = Database.LAU.Get((double)listing.latitude, (double)listing.longitude);
             if (dataRow == null)
             {
                 return null;
             }
+
             string lau_id = dataRow["lau_id"].ToString()!;
             string lau_name = dataRow["lau_name"].ToString()!;
 

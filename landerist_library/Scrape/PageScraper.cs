@@ -9,38 +9,45 @@ using landerist_orels.ES;
 
 namespace landerist_library.Scrape
 {
-    public class PageScraper(Page page)
+    public class PageScraper
     {
-        private readonly Page Page = page;
+        private readonly Page _page;
+        private readonly Scraper? _scraper;
+        private readonly bool _useProxy;
 
-        private Listing? NewListing;
+        private Listing? _newListing;
+        private SingleDownloader? _singleDownloader;
 
-        private SingleDownloader? SingleDownloader;
-
-        private readonly Scraper? Scraper;
-
-        private readonly bool UseProxy = false;
-
+        public PageScraper(Page page)
+        {
+            ArgumentNullException.ThrowIfNull(page);
+            _page = page;
+        }
 
         public PageScraper(Page page, Scraper scraper, bool useProxy) : this(page)
         {
-            Scraper = scraper;
-            UseProxy = useProxy;
+            _scraper = scraper;
+            _useProxy = useProxy;
         }
 
         public bool Scrape()
         {
             if (!Download())
             {
-                //Console.WriteLine("PageScraper Download failed for: " + Page.Uri);
+                //Console.WriteLine("PageScraper Download failed for: " + _page.Uri);
                 return false;
             }
-            (var newPageType, var newListing, var waitingAIRequest) = new PageTypeParser(Page).GetPageType();
-            bool sucess = SetPageType(newPageType, newListing, waitingAIRequest);
-            IndexPages();
-            return sucess;
-        }
 
+            (var newPageType, var newListing, var waitingAIRequest) = new PageTypeParser(_page).GetPageType();
+            var success = SetPageType(newPageType, newListing, waitingAIRequest);
+
+            if (success)
+            {
+                IndexPages();
+            }
+
+            return success;
+        }
 
         private bool Download()
         {
@@ -48,51 +55,61 @@ namespace landerist_library.Scrape
             {
                 return DownloadMultipleDownloaders();
             }
+
             return DownloadSingleDownloader();
         }
 
         private bool DownloadMultipleDownloaders()
         {
-            if (Scraper is null)
+            if (_scraper is null)
             {
                 return false;
             }
-            SingleDownloader = MultipleDownloader.GetDownloader(UseProxy);
-            if (SingleDownloader is null)
+
+            _singleDownloader = MultipleDownloader.GetDownloader(_useProxy);
+            if (_singleDownloader is null)
             {
                 return false;
             }
-            return SingleDownloader.Download(Page);
+
+            return _singleDownloader.Download(_page);
         }
 
         private bool DownloadSingleDownloader()
         {
-            SingleDownloader = new(UseProxy);
-            if (!SingleDownloader.IsAvailable(UseProxy))
+            _singleDownloader = new SingleDownloader(_useProxy);
+            if (!_singleDownloader.IsAvailable(_useProxy))
             {
                 Logs.Log.WriteInfo("PageScraper DownloadPageSingleDownloader", "Downloader not available");
                 return false;
             }
-            SingleDownloader.Download(Page);
-            SingleDownloader.CloseBrowser();
-            return true;
+
+            try
+            {
+                return _singleDownloader.Download(_page);
+            }
+            finally
+            {
+                _singleDownloader.CloseBrowser();
+            }
         }
 
         public bool SetPageType(PageType? newPageType, Listing? newListing, bool waitingAIRequest)
         {
             if (waitingAIRequest)
             {
-                if (!Page.SetResponseBodyZipped())
+                if (!_page.SetResponseBodyZipped())
                 {
                     Logs.Log.WriteError("PageScraper SetPageType", "Failed to set response body zipped");
                     return false;
                 }
-                Page.SetWaitingStatusAIRequest();
+
+                _page.SetWaitingStatusAIRequest();
             }
 
             SetPageType(newPageType, newListing);
             var setNextUpdate = !waitingAIRequest;
-            return Page.Update(setNextUpdate);
+            return _page.Update(setNextUpdate);
         }
 
         public bool SetPageTypeAfterParsing(PageType newPageType, Listing? listing)
@@ -101,68 +118,70 @@ namespace landerist_library.Scrape
             {
                 return false;
             }
-            Page.RemoveWaitingStatus();
-            Page.SetResponseBodyFromZipped();
+
+            _page.RemoveWaitingStatus();
+            _page.SetResponseBodyFromZipped();
             SetPageType(newPageType, listing);
             //new TrainingData().Insert(Page);
-            Page.RemoveResponseBodyZipped();
-            return Page.Update(true);
+            _page.RemoveResponseBodyZipped();
+            return _page.Update(true);
         }
-
 
         public void SetPageType(PageType? newPageType, Listing? newListing)
         {
-            NewListing = newListing;
-            Page.SetPageType(newPageType);
+            _newListing = newListing;
+            _page.SetPageType(newPageType);
 
-            if (Page.IsListing())
+            if (_page.IsListing())
             {
-                HandleLPublishedListing();
+                HandlePublishedListing();
                 return;
             }
-            if (Page.IsNotListingByParser())
+
+            if (_page.IsNotListingByParser())
             {
-                Page.InsertNotListingResponseBodyText();
+                _page.InsertNotListingResponseBodyText();
             }
-            if (Page.HaveToUnpublishListing())
+
+            if (_page.HaveToUnpublishListing())
             {
                 HandleUnpublishedListing();
             }
-            if (Page.IsNotCanonicalListing() || Page.IsRedirectToAnotherUrlListing())
+
+            if (_page.IsNotCanonicalListing() || _page.IsRedirectToAnotherUrlListing())
             {
                 // todo: handle not canonical listing
             }
         }
 
-        
-        private void HandleLPublishedListing()
+        private void HandlePublishedListing()
         {
-            NewListing ??= Page.GetListing(true, true);
-            if (NewListing == null)
+            _newListing ??= _page.GetListing(true, true);
+            if (_newListing == null)
             {
-                Logs.Log.WriteError("PageScraper HandleLPublishedListing", "NewListing is null");
+                Logs.Log.WriteError("PageScraper HandlePublishedListing", "NewListing is null");
                 return;
             }
 
-            NewListing.SetPublished();
-            new LocationParser(Page, NewListing).SetLatLng();
-            new LauIdParser(Page.Website.CountryCode, NewListing).SetLauIdAndLauName();
-            ES_Listings.InsertUpdate(Page.Website, NewListing);
-            Page.SetListingStatusPublished();
+            _newListing.SetPublished();
+            new LocationParser(_page, _newListing).SetLatLng();
+            new LauIdParser(_page.Website.CountryCode, _newListing).SetLauIdAndLauName();
+            ES_Listings.InsertUpdate(_page.Website, _newListing);
+            _page.SetListingStatusPublished();
         }
 
         private void HandleUnpublishedListing()
         {
-            NewListing ??= Page.GetListing(true, true);
-            if (NewListing == null)
+            _newListing ??= _page.GetListing(true, true);
+            if (_newListing == null)
             {
                 Logs.Log.WriteError("PageScraper HandleUnpublishedListing", "NewListing is null");
                 return;
             }
 
-            NewListing.SetUnpublished();
-            ES_Listings.InsertUpdate(Page.Website, NewListing);
-            Page.SetListingStatusUnpublished();
+            _newListing.SetUnpublished();
+            ES_Listings.InsertUpdate(_page.Website, _newListing);
+            _page.SetListingStatusUnpublished();
         }
 
         private void IndexPages()
@@ -171,35 +190,41 @@ namespace landerist_library.Scrape
             {
                 return;
             }
-            if (Page.Website.AchievedMaxNumberOfPages())
+
+            if (_page.Website.AchievedMaxNumberOfPages())
             {
                 return;
             }
-            if (!string.IsNullOrEmpty(Page.RedirectUrl))
+
+            if (!string.IsNullOrEmpty(_page.RedirectUrl))
             {
-                new Indexer(Page).Insert(Page.RedirectUrl);
+                new Indexer(_page).Insert(_page.RedirectUrl);
                 return;
             }
-            if (Page.ContainsMetaRobotsNoFollow())
+
+            if (_page.ContainsMetaRobotsNoFollow())
             {
                 return;
             }
-            if (Page.PageType.Equals(PageType.IncorrectLanguage))
+
+            if (_page.PageType.Equals(PageType.IncorrectLanguage))
             {
-                new LinkAlternateIndexer(Page).Insert();
+                new LinkAlternateIndexer(_page).Insert();
                 return;
             }
-            if (Page.PageType.Equals(PageType.NotCanonical))
+
+            if (_page.PageType.Equals(PageType.NotCanonical))
             {
-                new CanonicalIndexer(Page).Insert();
+                new CanonicalIndexer(_page).Insert();
                 return;
             }
-            new HyperlinksIndexer(Page).Insert();
+
+            new HyperlinksIndexer(_page).Insert();
         }
 
         public Listing? GetListing()
         {
-            return NewListing;
+            return _newListing;
         }
     }
 }

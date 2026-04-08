@@ -8,7 +8,7 @@ using landerist_library.Statistics;
 
 namespace landerist_library.Tasks
 {
-    public class TasksService
+    public sealed class TasksService : IDisposable
     {
         private readonly Scraper Scraper;
         private readonly TaskLocalAIParsing TaskLocalAIParsing;
@@ -21,8 +21,8 @@ namespace landerist_library.Tasks
         private Timer? Timer4;
         private Timer? Timer5;
 
-        private bool RunningTimer1 = false;
-        private bool RunningTimer2 = false;
+        private int RunningTimer1;
+        private int RunningTimer2;
 
         private const int OneSecond = 1000;
         private const int TwoSeconds = 2000;
@@ -32,10 +32,11 @@ namespace landerist_library.Tasks
         private const int OneHour = 60 * OneMinute;
         private const int OneDay = 24 * OneHour;
 
-        private bool PerformDailyTasks = false;
-        private bool PerformTenMinutesTasks = false;
-        private bool PerformHourlyTasks = false;        
+        private volatile bool PerformDailyTasks;
+        private volatile bool PerformTenMinutesTasks;
+        private volatile bool PerformHourlyTasks;
 
+        private bool Disposed;
 
         public TasksService()
         {
@@ -45,25 +46,34 @@ namespace landerist_library.Tasks
 
         public void Start()
         {
-            if (Configuration.Config.IsLocalAIMachine()
-                || Configuration.Config.IsConfigurationLocal()
-                )
+            ObjectDisposedException.ThrowIf(Disposed, this);
+
+            if (Timer1 is not null
+                || Timer2 is not null
+                || Timer3 is not null
+                || Timer4 is not null
+                || Timer5 is not null)
             {
-                Timer1 = new Timer(LocalAIParsing!, null, OneSecond, TwoSeconds);
+                return;
             }
-            else
+
+            if (Configuration.Config.IsLocalAIMachine()
+                || Configuration.Config.IsConfigurationLocal())
             {
-                PuppeteerDownloader.UpdateChrome();
+                Timer1 = new Timer(LocalAIParsing, null, OneSecond, TwoSeconds);
+                return;
+            }
 
-                Timer1 = new Timer(Scrape!, null, OneSecond, TenSeconds);
-                Timer2 = new Timer(BlockingCollection!, null, OneSecond, OneSecond);
+            PuppeteerDownloader.UpdateChrome();
 
-                if (Configuration.Config.IsPrincipalMachine())
-                {
-                    Timer3 = new Timer(TenMinutesTasks!, null, 0, TenMinutes);
-                    Timer4 = new Timer(HourlyTasks!, null, OneHour, OneHour);
-                    Timer5 = new Timer(DailyTasks!, null, GetDueTime(), OneDay);
-                }
+            Timer1 = new Timer(Scrape, null, OneSecond, TenSeconds);
+            Timer2 = new Timer(BlockingCollection, null, OneSecond, OneSecond);
+
+            if (Configuration.Config.IsPrincipalMachine())
+            {
+                Timer3 = new Timer(QueueTenMinutesTasks, null, 0, TenMinutes);
+                Timer4 = new Timer(QueueHourlyTasks, null, OneHour, OneHour);
+                Timer5 = new Timer(QueueDailyTasks, null, GetDueTime(), OneDay);
             }
         }
 
@@ -71,10 +81,12 @@ namespace landerist_library.Tasks
         {
             DateTime now = DateTime.Now;
             DateTime twelveAM = new(now.Year, now.Month, now.Day, 0, 0, 30);
+
             if (now > twelveAM)
             {
                 twelveAM = twelveAM.AddDays(1);
             }
+
             return (int)(twelveAM - now).TotalMilliseconds;
         }
 
@@ -83,29 +95,29 @@ namespace landerist_library.Tasks
             Console.WriteLine("Daily task ..");
             PerformDailyTasks = true;
         }
-        private void DailyTasks(object state)
+
+        private void QueueDailyTasks(object? state)
         {
             PerformDailyTasks = true;
         }
 
-        private void TenMinutesTasks(object state)
+        private void QueueTenMinutesTasks(object? state)
         {
             PerformTenMinutesTasks = true;
         }
 
-        private void HourlyTasks(object state)
+        private void QueueHourlyTasks(object? state)
         {
             PerformHourlyTasks = true;
         }
 
-        private void Scrape(object state)
+        private void Scrape(object? state)
         {
-            if (RunningTimer1)
+            if (Interlocked.Exchange(ref RunningTimer1, 1) == 1)
             {
                 return;
             }
 
-            RunningTimer1 = true;
             try
             {
                 if (!PerformPendingTasks())
@@ -119,18 +131,17 @@ namespace landerist_library.Tasks
             }
             finally
             {
-                RunningTimer1 = false;
+                Interlocked.Exchange(ref RunningTimer1, 0);
             }
         }
 
-        private void LocalAIParsing(object state)
+        private void LocalAIParsing(object? state)
         {
-            if (RunningTimer1)
+            if (Interlocked.Exchange(ref RunningTimer1, 1) == 1)
             {
                 return;
             }
 
-            RunningTimer1 = true;
             try
             {
                 TaskLocalAIParsing.ProcessPages();
@@ -141,7 +152,7 @@ namespace landerist_library.Tasks
             }
             finally
             {
-                RunningTimer1 = false;
+                Interlocked.Exchange(ref RunningTimer1, 0);
             }
         }
 
@@ -152,27 +163,29 @@ namespace landerist_library.Tasks
                 TenMinutesTasks();
                 return true;
             }
+
             if (PerformHourlyTasks)
             {
                 HourlyTasks();
                 return true;
             }
+
             if (PerformDailyTasks)
             {
                 DailyTask();
                 return true;
             }
+
             return false;
         }
 
-        private void BlockingCollection(object state)
+        private void BlockingCollection(object? state)
         {
-            if (RunningTimer2)
+            if (Interlocked.Exchange(ref RunningTimer2, 1) == 1)
             {
                 return;
             }
 
-            RunningTimer2 = true;
             try
             {
                 Scraper.FinalizeBlockingCollection();
@@ -183,7 +196,7 @@ namespace landerist_library.Tasks
             }
             finally
             {
-                RunningTimer2 = false;
+                Interlocked.Exchange(ref RunningTimer2, 0);
             }
         }
 
@@ -235,13 +248,38 @@ namespace landerist_library.Tasks
 
         public void Stop()
         {
+            if (Disposed)
+            {
+                return;
+            }
+
             Console.WriteLine("Stopping ServiceTasks ..");
             Scraper.Stop();
-            Timer1?.Change(Timeout.Infinite, 0);
-            Timer2?.Change(Timeout.Infinite, 0);
-            Timer3?.Change(Timeout.Infinite, 0);
-            Timer4?.Change(Timeout.Infinite, 0);
-            Timer5?.Change(Timeout.Infinite, 0);
+
+            DisposeTimer(ref Timer1);
+            DisposeTimer(ref Timer2);
+            DisposeTimer(ref Timer3);
+            DisposeTimer(ref Timer4);
+            DisposeTimer(ref Timer5);
+        }
+
+        public void Dispose()
+        {
+            if (Disposed)
+            {
+                return;
+            }
+
+            Stop();
+            Disposed = true;
+            GC.SuppressFinalize(this);
+        }
+
+        private static void DisposeTimer(ref Timer? timer)
+        {
+            timer?.Change(Timeout.Infinite, Timeout.Infinite);
+            timer?.Dispose();
+            timer = null;
         }
     }
 }

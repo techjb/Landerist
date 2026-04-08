@@ -9,36 +9,49 @@ namespace landerist_library.Parse.Location.GoogleMaps
 {
     public class GoogleMapsApi
     {
+        private static readonly HttpClient httpClient = new()
+        {
+            Timeout = TimeSpan.FromSeconds(20),
+        };
+
         public (Tuple<double, double> latLng, bool isAccurate)? GetLatLng(string address, CountryCode countryCode = CountryCode.ES)
         {
+            if (string.IsNullOrWhiteSpace(address))
+            {
+                return null;
+            }
+
+            var normalizedAddress = address.Trim();
             var region = GetRegion(countryCode);
-            if (AddressLatLng.Select(address, region) is (double lat, double lng, bool isAccurate)
+
+            if (AddressLatLng.Select(normalizedAddress, region) is (double lat, double lng, bool isAccurate)
                 //&& Config.IsConfigurationProduction()
                 )
             {
                 return (Tuple.Create(lat, lng), isAccurate);
             }
 
-            var url = GetUrl(address, countryCode);
+            var url = GetUrl(normalizedAddress, countryCode);
             try
             {
-                using var httpClient = new HttpClient();
                 var response = httpClient.GetAsync(url).GetAwaiter().GetResult();
                 response.EnsureSuccessStatusCode();
+
                 var content = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                 if (!string.IsNullOrEmpty(content))
                 {
                     var geocodeData = JsonConvert.DeserializeObject<GeocodeData>(content);
                     var results = geocodeData?.results;
-                    if (results != null && results.Length.Equals(1)) // discarded multiple results
+                    if (results != null && results.Length > 0)
                     {
-                        var parsedCoordinates = GetLatLng(results[0]);
+                        var selectedResult = results.FirstOrDefault(IsAccurate) ?? results[0];
+                        var parsedCoordinates = GetLatLng(selectedResult);
                         if (parsedCoordinates.HasValue)
                         {
                             lat = parsedCoordinates.Value.latLng.Item1;
                             lng = parsedCoordinates.Value.latLng.Item2;
                             isAccurate = parsedCoordinates.Value.isAccurate;
-                            AddressLatLng.Insert(address, region, lat, lng, isAccurate);
+                            AddressLatLng.Insert(normalizedAddress, region, lat, lng, isAccurate);
                             return parsedCoordinates;
                         }
                     }
@@ -48,6 +61,7 @@ namespace landerist_library.Parse.Location.GoogleMaps
             {
                 Logs.Log.WriteError("GoogleMapsApi GetLatLng", exception);
             }
+
             return null;
         }
 
@@ -61,12 +75,13 @@ namespace landerist_library.Parse.Location.GoogleMaps
         private (Tuple<double, double> latLng, bool isAccurate)? GetLatLng(Result result)
         {
             (Tuple<double, double> latLng, bool isAccurate)? resultLatLng = null;
-            if (result.geometry?.location?.lat is double latitude && result.geometry.location.lng is double loongitude)
+            if (result.geometry?.location?.lat is double latitude && result.geometry.location.lng is double longitude)
             {
-                var latLng = Tuple.Create(latitude, loongitude);
+                var latLng = Tuple.Create(latitude, longitude);
                 var isAccurate = IsAccurate(result);
                 resultLatLng = (latLng, isAccurate);
             }
+
             return resultLatLng;
         }
 
@@ -76,6 +91,7 @@ namespace landerist_library.Parse.Location.GoogleMaps
             {
                 return false;
             }
+
             return result.geometry.location_type.Equals("ROOFTOP") &&
                    (result.types.Contains("street_address") ||
                     result.types.Contains("premise") ||
@@ -230,6 +246,9 @@ namespace landerist_library.Parse.Location.GoogleMaps
             {
                 return;
             }
+
+            var googleMapsApi = new GoogleMapsApi();
+
             int total = listings.Count;
             int processed = 0;
             int latLngFound = 0;
@@ -237,6 +256,7 @@ namespace landerist_library.Parse.Location.GoogleMaps
             int accurate = 0;
             int notAccurate = 0;
             int errors = 0;
+
             Parallel.ForEach(listings,
                 new ParallelOptions() { MaxDegreeOfParallelism = 10 },
                 listing =>
@@ -247,7 +267,7 @@ namespace landerist_library.Parse.Location.GoogleMaps
 
                 if (listing.address != null)
                 {
-                    var result = new GoogleMapsApi().GetLatLng(listing.address, CountryCode.ES);
+                    var result = googleMapsApi.GetLatLng(listing.address, CountryCode.ES);
                     if (result != null)
                     {
                         lat = result.Value.latLng.Item1;
@@ -256,21 +276,22 @@ namespace landerist_library.Parse.Location.GoogleMaps
                     }
                 }
 
-
                 if (!new ES_Listings().UpdateAddress(listing.guid, lat, lng, locationIsAccurate))
                 {
                     Interlocked.Increment(ref errors);
                 }
 
                 Interlocked.Increment(ref processed);
-                if (locationIsAccurate == true)
+
+                if (locationIsAccurate is true)
                 {
                     Interlocked.Increment(ref accurate);
                 }
-                else
+                else if (locationIsAccurate is false)
                 {
                     Interlocked.Increment(ref notAccurate);
                 }
+
                 if (lat is not null && lng is not null)
                 {
                     Interlocked.Increment(ref latLngFound);
@@ -291,7 +312,7 @@ namespace landerist_library.Parse.Location.GoogleMaps
                     $"latLngNotFound: {latLngNotFound} ({(int)latLngNotFoundPercentage}%) " +
                     $"Accurate: {accurate} ({(int)accuratePercentage}%) " +
                     $"NotAccurate: {notAccurate} ({(int)notAccuratePercentage}%) " +
-                    $"Errors: {errors}) "
+                    $"Errors: {errors} "
                     );
             });
         }

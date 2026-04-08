@@ -12,21 +12,27 @@ namespace landerist_library.Index
             {
                 return;
             }
+
             try
             {
-                var linkNodes = htmlDocument.DocumentNode.SelectNodes("//link[@rel='alternate']");
+                var linkNodes = htmlDocument.DocumentNode.SelectNodes("//link[@rel]");
                 if (linkNodes == null)
                 {
                     return;
                 }
+
                 foreach (var linkNode in linkNodes)
                 {
-                    Insert(linkNode);
+                    var rel = linkNode.GetAttributeValue("rel", string.Empty);
+                    if (rel.Contains("alternate", StringComparison.OrdinalIgnoreCase))
+                    {
+                        Insert(linkNode);
+                    }
                 }
             }
-            catch (Exception ecception)
+            catch (Exception exception)
             {
-                Logs.Log.WriteError("LinkAlternateIndexer InsertLinksAlternate", Page.Uri, ecception);
+                Logs.Log.WriteError("LinkAlternateIndexer InsertLinksAlternate", Page.Uri, exception);
             }
         }
 
@@ -36,16 +42,27 @@ namespace landerist_library.Index
             {
                 return;
             }
+
             try
             {
                 var hreflang = htmlNode.GetAttributeValue("hreflang", string.Empty);
-                if (LanguageValidator.IsValidLanguageAndCountry(Page.Website, hreflang))
+                if (!LanguageValidator.IsValidLanguageAndCountry(Page.Website, hreflang))
                 {
-                    var href = htmlNode.GetAttributeValue("href", string.Empty);
-                    Insert(href);
+                    return;
                 }
+
+                var href = htmlNode.GetAttributeValue("href", string.Empty);
+                if (string.IsNullOrWhiteSpace(href))
+                {
+                    return;
+                }
+
+                Insert(href);
             }
-            catch { }
+            catch (Exception exception)
+            {
+                Logs.Log.WriteError("LinkAlternateIndexer InsertLinkAlternateNode", Page.Uri, exception);
+            }
         }
     }
 }

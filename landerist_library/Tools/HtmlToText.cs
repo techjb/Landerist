@@ -5,6 +5,9 @@ namespace landerist_library.Tools
 {
     public class HtmlToText
     {
+        private const string UppercaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        private const string LowercaseLetters = "abcdefghijklmnopqrstuvwxyz";
+
         private static readonly HashSet<string> TagsToRemove =
         [
             "//head",
@@ -173,7 +176,6 @@ namespace landerist_library.Tools
             "analytics"
         ];
 
-
         private static readonly string XpathTagsToRemove = InitXpathTagsToRemove();
 
         private static readonly string XpathTagsToClearClassAndId = InitXpathTagsToClearClassAndId();
@@ -208,18 +210,20 @@ namespace landerist_library.Tools
 
         private static string InitXpathTextContains()
         {
-            string xpath = ToXpathContains(TextContains, ".");
-            return xpath.Replace("//*", "//*[text()") + "]";
+            var enumerable = TextContains.Select(word =>
+                $"contains(translate(., '{UppercaseLetters}', '{LowercaseLetters}'), '{word.ToLowerInvariant()}')");
+
+            return "//*[text() and (" + string.Join(" or ", enumerable) + ")]";
         }
 
         private static string InitXpathTextEquals()
         {
-            return "//*[" + string.Join(" or ", TextEquals.Select(word => $"translate(normalize-space(text()), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='{word.Trim()}'")) + "]";
+            return "//*[" + string.Join(" or ", TextEquals.Select(word => $"translate(normalize-space(text()), '{UppercaseLetters}', '{LowercaseLetters}')='{word.Trim()}'")) + "]";
         }
 
         private static string ToXpathContains(HashSet<string> list, string selector)
         {
-            var enumerable = list.Select(word => $"contains(translate({selector}, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '{word.ToLower()}')");
+            var enumerable = list.Select(word => $"contains(translate({selector}, '{UppercaseLetters}', '{LowercaseLetters}'), '{word.ToLowerInvariant()}')");
             return "//*[" + string.Join(" or ", enumerable) + "]";
         }
 
@@ -285,8 +289,8 @@ namespace landerist_library.Tools
                 List<HtmlNode> nodesToRemove = [.. htmlNodeCollection];
                 foreach (var node in nodesToRemove)
                 {
-                    var text = node.InnerText.ToLower();
-                    if (TextEquals.Contains(text))
+                    var text = node.InnerText.Trim();
+                    if (TextEquals.Contains(text, StringComparer.OrdinalIgnoreCase))
                     {
                         node.Remove();
                     }
@@ -298,8 +302,7 @@ namespace landerist_library.Tools
         {
             var visibleNodes = htmlDocument.DocumentNode.DescendantsAndSelf()
                 .Where(n => n.NodeType == HtmlNodeType.Text)
-                   .Where(n => !string.IsNullOrWhiteSpace(n.InnerHtml))
-                   ;            
+                .Where(n => !string.IsNullOrWhiteSpace(n.InnerHtml));
 
             return visibleNodes.Select(n => n.InnerHtml.Trim());
         }
@@ -311,21 +314,25 @@ namespace landerist_library.Tools
             {
                 return string.Empty;
             }
+
             foreach (var line in lines)
             {
                 if (string.IsNullOrEmpty(line))
                 {
                     continue;
                 }
+
                 string? decodedLine = HtmlEntity.DeEntitize(line)?.Trim();
                 if (string.IsNullOrEmpty(decodedLine))
                 {
                     continue;
                 }
+
                 if (IsSymbol(decodedLine))
                 {
                     continue;
                 }
+
                 if (TextEquals.Contains(decodedLine, StringComparer.OrdinalIgnoreCase))
                 {
                     continue;
@@ -338,6 +345,7 @@ namespace landerist_library.Tools
                     InsertWords(decodedLine);
                 }
             }
+
             string text = string.Join(" ", cleanedLines);
             return Strings.Clean(text);
         }
@@ -351,6 +359,7 @@ namespace landerist_library.Tools
                     return false;
                 }
             }
+
             return true;
         }
 
@@ -361,6 +370,7 @@ namespace landerist_library.Tools
             {
                 return;
             }
+
             if (Strings.IsNumeric(text))
             {
                 return;

@@ -5,6 +5,8 @@ using landerist_library.Logs;
 using landerist_library.Statistics;
 using landerist_orels.ES;
 using System.Data;
+using System.Globalization;
+using System.Text.Json;
 
 namespace landerist_library.Landerist_com
 {
@@ -43,16 +45,15 @@ namespace landerist_library.Landerist_com
                 ReponseBodyTextIsAnotherListingInHost();
                 WaitingAIRequest();
                 BatchReaded();
-                LocalAIParsing();                
+                LocalAIParsing();
                 ListingInsertUpdate();
                 PageType();
                 PublishedPageType();
                 UnPublishedPageType();
                 UnPublishedHttpStatusCode();
                 HttpStatusCode();
-                //ListingsPageType();
 
-                if (UpdateStatisctisPage())
+                if (UpdateStatisticsPage())
                 {
                     Log.WriteInfo("StatisticsPage", "Updated statistics page");
                 }
@@ -326,7 +327,8 @@ namespace landerist_library.Landerist_com
 
         private static void AddChart(string charType, string title, string data)
         {
-            string chart = charType + "('" + title + "', [" + data + "])";
+            var safeTitle = title.Replace("\\", "\\\\").Replace("'", "\\'");
+            string chart = $"{charType}('{safeTitle}', [{data}])";
             Charts.Add(chart);
         }
 
@@ -336,10 +338,11 @@ namespace landerist_library.Landerist_com
             foreach (var key in keys)
             {
                 var values = GetValues(key, yesterday, last15);
-                var json = "{\"label\": \"" + key + "\", \"values\":[" + string.Join(",", [.. values]) + "]}";
+                var json = $"{{\"label\": {JsonSerializer.Serialize(key)}, \"values\":[{string.Join(",", values)}]}}";
                 data.Add(json);
             }
-            return string.Join(",", [.. data]);
+
+            return string.Join(",", data);
         }
 
         private static List<string> GetValues(string statisticKey, bool yesterday, bool last15)
@@ -347,41 +350,55 @@ namespace landerist_library.Landerist_com
             int top = last15 ? 15 : 100;
             var dataTable = StatisticsSnapshot.GetLatestStatistics(statisticKey, top);
             List<string> values = [];
+
             foreach (DataRow dataRow in dataTable.Rows.Cast<DataRow>().Reverse())
             {
                 int counter = Convert.ToInt32(dataRow["Counter"]);
-                var date = ((DateTime)dataRow["Date"]);
+                var date = (DateTime)dataRow["Date"];
+
                 if (yesterday)
                 {
                     date = date.AddDays(-1);
                 }
-                var json = "{\"key\": \"" + date.ToShortDateString() + "\", \"value\": " + counter + "}";
+
+                var dateText = date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                var json = $"{{\"key\": {JsonSerializer.Serialize(dateText)}, \"value\": {counter.ToString(CultureInfo.InvariantCulture)}}}";
                 values.Add(json);
             }
+
             return values;
         }
 
         private static string GetLabelValues(string key, Dictionary<string, object?> dictionary)
         {
             var values = GetValues(dictionary);
-            return "{\"label\": \"" + key + "\", \"values\":[" + values + "]}";
+            return $"{{\"label\": {JsonSerializer.Serialize(key)}, \"values\":[{values}]}}";
         }
 
         private static string GetValues(Dictionary<string, object?> dictionary)
         {
             List<string> data = [];
+
             foreach (var keyValuePair in dictionary)
             {
-                var json = "{\"key\": \"" + keyValuePair.Key + "\", \"value\":" + keyValuePair.Value + "}";
+                string jsonValue = keyValuePair.Value switch
+                {
+                    null => "null",
+                    IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture) ?? "null",
+                    _ => JsonSerializer.Serialize(keyValuePair.Value)
+                };
+
+                var json = $"{{\"key\": {JsonSerializer.Serialize(keyValuePair.Key)}, \"value\": {jsonValue}}}";
                 data.Add(json);
             }
-            return string.Join(",", [.. data]);
+
+            return string.Join(",", data);
         }
 
-        private static bool UpdateStatisctisPage()
+        private static bool UpdateStatisticsPage()
         {
             var statisticsTemplate = File.ReadAllText(StatisticsTemplateHtmlFile);
-            var charts = string.Join("; " + Environment.NewLine, [.. Charts]);
+            var charts = string.Join("; " + Environment.NewLine, Charts);
             statisticsTemplate = statisticsTemplate.Replace("/*CHARTS*/", charts);
 
             File.WriteAllText(StatisticsHtmlFile, statisticsTemplate);

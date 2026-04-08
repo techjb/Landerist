@@ -1,14 +1,16 @@
-﻿using landerist_library.Configuration;
+﻿using System.IO;
+using landerist_library.Configuration;
 using landerist_library.Database;
+using landerist_library.Parse.ListingParser.OpenAI.Batch;
 using landerist_library.Parse.ListingParser.VertexAI.Batch;
 
-namespace landerist_library.Parse.ListingParser.OpenAI.Batch
+namespace landerist_library.Tasks
 {
-    public class TaskBatchCleaner
+    public static class TaskBatchCleaner
     {
         public static void Start()
         {
-            DeleteDownloadedBatches();            
+            DeleteDownloadedBatches();
             DeleteLocalFiles();
 
             VertexAIBatchCleaner.RemoveFiles();
@@ -18,21 +20,23 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
         private static void DeleteDownloadedBatches()
         {
             var batches = Batches.SelectDownloaded();
-            foreach(var batch in batches)
+            foreach (var batch in batches)
             {
                 Batches.Delete(batch.Id);
             }
-        }        
+        }
 
         private static void DeleteLocalFiles()
         {
-            if (Directory.Exists(Config.BATCH_DIRECTORY))
+            if (!Directory.Exists(Config.BATCH_DIRECTORY))
             {
-                var files = Directory.GetFiles(Config.BATCH_DIRECTORY);
-                foreach (var file in files)
-                {
-                    File.Delete(file);
-                }
+                return;
+            }
+
+            var files = Directory.GetFiles(Config.BATCH_DIRECTORY);
+            foreach (var file in files)
+            {
+                File.Delete(file);
             }
         }
     }

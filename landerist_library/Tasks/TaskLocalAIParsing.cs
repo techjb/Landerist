@@ -15,13 +15,13 @@ namespace landerist_library.Tasks
         private const int MAX_PAGES_PER_TASK = 100;
         private const int MAX_NUM_SEQS = 32;  // same as in localAI server
         private const int MAX_DEGREE_OF_PARALLELISM = MAX_NUM_SEQS + 20;
-        private const int COMPLETION_TOKENS = 5000;  // structured output and completion tokens aproximately        
+        private const int COMPLETION_TOKENS = 5000;  // structured output and completion tokens aproximately
         private readonly int MAX_TOKEN_COUNT;
 
-        private static int TotalProcessed = 0;
-        private static int TotalErrors = 0;
-        private static int TotalSucess = 0;
-        private BlockingCollection<Page> BlockingCollection = [];
+        private int TotalProcessed = 0;
+        private int TotalErrors = 0;
+        private int TotalSuccess = 0;
+        private BlockingCollection<Page> BlockingCollection = new();
         private const int MAX_SIZE_BLOCKINGCOLLECTION = MAX_PAGES_PER_TASK * 10;
         //private readonly DateTime StartDate = DateTime.UtcNow.ToLocalTime();
 
@@ -29,7 +29,7 @@ namespace landerist_library.Tasks
         public TaskLocalAIParsing()
         {
             Config.SetLLMProviderLocalAI();
-            Config.EnableLogsErrorsInConsole();            
+            Config.EnableLogsErrorsInConsole();
             if (Config.IsConfigurationProduction())
             {
                 Pages.UpdateWaitingStatus(WaitingStatus.readed_by_localai, WaitingStatus.waiting_ai_request);
@@ -47,12 +47,17 @@ namespace landerist_library.Tasks
 
         public void ProcessPages()
         {
+            TotalProcessed = 0;
+            TotalErrors = 0;
+            TotalSuccess = 0;
+
             InitializeBlockingCollection();
-            if (BlockingCollection.Count.Equals(0))
+            if (BlockingCollection.Count == 0)
             {
                 //Console.WriteLine("No pages to process.");
                 return;
             }
+
             var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
             Parallel.ForEach(orderablePartitioner,
                 new ParallelOptions()
@@ -63,7 +68,7 @@ namespace landerist_library.Tasks
                 {
                     if (ProcessPage(page))
                     {
-                        Interlocked.Increment(ref TotalSucess);
+                        Interlocked.Increment(ref TotalSuccess);
                         StatisticsSnapshot.InsertDailyCounter(StatisticsKey.LocalAIParsingSuccess);
                     }
                     else
@@ -71,11 +76,16 @@ namespace landerist_library.Tasks
                         Interlocked.Increment(ref TotalErrors);
                         StatisticsSnapshot.InsertDailyCounter(StatisticsKey.LocalAIParsingErrors);
                     }
-                    Interlocked.Increment(ref TotalProcessed);
-                    if (TotalProcessed % 10 == 0)
+
+                    int totalProcessed = Interlocked.Increment(ref TotalProcessed);
+                    if (totalProcessed % 10 == 0)
                     {
-                        double totalErrorPercentage = TotalProcessed == 0 ? 0 : (int)Math.Round((double)TotalErrors * 100 / TotalProcessed, 2);                        
-                        Log.WriteLocalAI("ProcessPages", $"Errors: {TotalErrors}/{TotalProcessed} ({totalErrorPercentage}%)");
+                        int totalErrors = Volatile.Read(ref TotalErrors);
+                        double totalErrorPercentage = totalProcessed == 0
+                            ? 0
+                            : Math.Round((double)totalErrors * 100 / totalProcessed, 2);
+
+                        Log.WriteLocalAI("ProcessPages", $"Errors: {totalErrors}/{totalProcessed} ({totalErrorPercentage}%)");
                     }
                 });
         }
@@ -105,7 +115,8 @@ namespace landerist_library.Tasks
                 BlockingCollection.CompleteAdding();
                 return;
             }
-            var producerTask = Task.Run(() =>
+
+            _ = Task.Run(() =>
             {
                 try
                 {
@@ -135,15 +146,23 @@ namespace landerist_library.Tasks
             {
                 return true;
             }
+
             var pages = Pages.SelectWaitingStatusAIRequest(MAX_PAGES_PER_TASK, WaitingStatus.readed_by_localai, MAX_TOKEN_COUNT, true);
-            if (pages.Count.Equals(0))
+            if (pages.Count == 0)
             {
                 return false;
             }
+
             foreach (var page in pages)
             {
+                if (BlockingCollection.IsAddingCompleted)
+                {
+                    return false;
+                }
+
                 BlockingCollection.Add(page);
             }
+
             return true;
         }
 
@@ -151,6 +170,7 @@ namespace landerist_library.Tasks
         private static bool ProcessPage(Page page)
         {
             bool success = false;
+
             try
             {
                 page.SetResponseBodyFromZipped();
@@ -158,7 +178,7 @@ namespace landerist_library.Tasks
                 if (string.IsNullOrEmpty(userInput))
                 {
                     Log.WriteError("TaskLocalAIParsing ProcessPage", "Error getting user input. Page: " + page.UriHash);
-                    success = ReturnPageToScrape(page);                    
+                    success = ReturnPageToScrape(page);
                 }
                 else
                 {
@@ -170,11 +190,23 @@ namespace landerist_library.Tasks
             {
                 Log.WriteError("TaskLocalAIParsing ProcessPage", exception);
             }
-            if (!success)
+            finally
             {
-                Pages.UpdateWaitingStatusAIRequest(page.UriHash);
+                try
+                {
+                    if (!success)
+                    {
+                        Pages.UpdateWaitingStatusAIRequest(page.UriHash);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    Log.WriteError("TaskLocalAIParsing ProcessPage UpdateWaitingStatusAIRequest", exception);
+                }
+
+                page.Dispose();
             }
-            page.Dispose();
+
             return success;
         }
 

@@ -1,26 +1,26 @@
 ﻿using HtmlAgilityPack;
 using landerist_orels.ES;
 using landerist_orels;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace landerist_library.Parse.Media.Video
 {
     public partial class VideoParser(MediaParser mediaParser)
     {
-        private readonly MediaParser MediaParser = mediaParser;
+        private readonly MediaParser _mediaParser = mediaParser;
+        private readonly HashSet<string> _addedVideoUrls = new(StringComparer.OrdinalIgnoreCase);
 
         public void GetVideos()
         {
-            if (MediaParser.HtmlDocument == null)
+            HtmlDocument? htmlDocument = _mediaParser.HtmlDocument;
+            if (htmlDocument == null)
             {
                 return;
             }
 
-            HtmlNodeCollection? linkNodes = MediaParser.HtmlDocument.DocumentNode.SelectNodes("//a[@href]");
-            GetYoutubeVideos(linkNodes, "href");
-
-            linkNodes = MediaParser.HtmlDocument.DocumentNode.SelectNodes("//iframe[@src]");
-            GetYoutubeVideos(linkNodes, "src");
+            GetYoutubeVideos(htmlDocument.DocumentNode.SelectNodes("//a[@href]"), "href");
+            GetYoutubeVideos(htmlDocument.DocumentNode.SelectNodes("//iframe[@src]"), "src");
         }
 
         private void GetYoutubeVideos(HtmlNodeCollection? linkNodes, string attributeName)
@@ -34,42 +34,61 @@ namespace landerist_library.Parse.Media.Video
             foreach (HtmlNode linkNode in linkNodes)
             {
                 string attributeValue = linkNode.GetAttributeValue(attributeName, string.Empty);
-                if (attributeValue == null)
+                if (string.IsNullOrWhiteSpace(attributeValue))
                 {
                     continue;
                 }
-                Match match = regex.Match(attributeValue);
-                if (!match.Success)
+
+                string normalizedUrl = NormalizeUrl(attributeValue);
+                if (!regex.IsMatch(normalizedUrl))
                 {
                     continue;
                 }
-                if (attributeValue.StartsWith("//"))
-                {
-                    attributeValue = "https:" + attributeValue;
-                }
-                AddVideo(attributeValue);
+
+                AddVideo(normalizedUrl);
             }
         }
 
         public void AddVideo(string url)
         {
-            if (!Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
+            if (string.IsNullOrWhiteSpace(url))
             {
                 return;
             }
-            if (uri == null)
+
+            string normalizedUrl = NormalizeUrl(url);
+            if (!Uri.TryCreate(normalizedUrl, UriKind.Absolute, out Uri? uri) || uri == null)
             {
                 return;
             }
+
+            if (!_addedVideoUrls.Add(uri.AbsoluteUri))
+            {
+                return;
+            }
+
             var media = new landerist_orels.Media()
             {
                 mediaType = MediaType.video,
                 url = uri
             };
-            MediaParser.Add(media);
+
+            _mediaParser.Add(media);
         }
 
-        [GeneratedRegex(@"(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:embed\/|watch\?v=)|youtu\.be\/)([\w\d_-]+)")]
+        private static string NormalizeUrl(string url)
+        {
+            string normalizedUrl = HtmlEntity.DeEntitize(url).Trim();
+
+            if (normalizedUrl.StartsWith("//", StringComparison.Ordinal))
+            {
+                normalizedUrl = "https:" + normalizedUrl;
+            }
+
+            return normalizedUrl;
+        }
+
+        [GeneratedRegex(@"^(?:https?:\/\/)?(?:www\.|m\.)?(?:youtube\.com\/(?:embed\/|watch\?(?:.*&)?v=|shorts\/|live\/)|youtube-nocookie\.com\/embed\/|youtu\.be\/)[\w-]+(?:[?&].*)?$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
         private static partial Regex RegexYoutube();
     }
 }

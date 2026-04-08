@@ -1,8 +1,10 @@
 ﻿using landerist_library.Database;
 using Newtonsoft.Json;
 using System;
-using System.Data;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Net.Http;
 
 namespace landerist_library.Parse.Location.Goolzoom
 {
@@ -15,6 +17,7 @@ namespace landerist_library.Parse.Location.Goolzoom
     public class GoolzoomApi
     {
         private const string BASE_URL = "https://api.goolzoom.com/v1/cadastre/";
+        private static readonly HttpClient SharedHttpClient = CreateHttpClient();
 
         public (bool requestSucess, double? lat, double? lng)? GetLatLng(string cadastralReference)
         {
@@ -22,6 +25,7 @@ namespace landerist_library.Parse.Location.Goolzoom
             {
                 return null;
             }
+
             string url = BASE_URL + "cadastralreference/" + cadastralReference + "/center";
 
             bool requestSucess = false;
@@ -32,8 +36,10 @@ namespace landerist_library.Parse.Location.Goolzoom
             {
                 var response = HttpClient.GetAsync(url).Result;
                 response.EnsureSuccessStatusCode();
+
                 var content = response.Content.ReadAsStringAsync().Result;
                 requestSucess = true;
+
                 if (!string.IsNullOrEmpty(content))
                 {
                     var goolzoomCenter = JsonConvert.DeserializeObject<GoolzoomCenter>(content);
@@ -48,6 +54,7 @@ namespace landerist_library.Parse.Location.Goolzoom
             {
                 Logs.Log.WriteError("GoolzoomApi GetLatLng", exception);
             }
+
             return (requestSucess, lat, lng);
         }
 
@@ -57,6 +64,7 @@ namespace landerist_library.Parse.Location.Goolzoom
             {
                 return null;
             }
+
             bool isCadastraReference = cadastralReference.Length.Equals(20);
             string url =
                 BASE_URL +
@@ -67,6 +75,7 @@ namespace landerist_library.Parse.Location.Goolzoom
             {
                 var response = HttpClient.GetAsync(url).Result;
                 response.EnsureSuccessStatusCode();
+
                 var content = response.Content.ReadAsStringAsync().Result;
                 if (!string.IsNullOrEmpty(content))
                 {
@@ -78,6 +87,7 @@ namespace landerist_library.Parse.Location.Goolzoom
             {
                 Logs.Log.WriteError("GoolzoomApi GetAddrees", exception);
             }
+
             return null;
         }
 
@@ -87,6 +97,7 @@ namespace landerist_library.Parse.Location.Goolzoom
             {
                 return null;
             }
+
             dynamic? registros = null;
             if (data.datos != null)
             {
@@ -96,16 +107,19 @@ namespace landerist_library.Parse.Location.Goolzoom
             {
                 registros = data.registros;
             }
+
             if (registros != null)
             {
-                List<string> addressParts =
+                List<string?> addressParts =
                 [
-                    (string)registros.finca.Dirección,
-                    (string)registros.finca.Municipio,
-                    (string)registros.finca.Provincia
+                    (string?)registros.finca.Dirección,
+                    (string?)registros.finca.Municipio,
+                    (string?)registros.finca.Provincia
                 ];
-                return string.Join(", ", addressParts.Where(part => !string.IsNullOrEmpty(part)));
+
+                return string.Join(", ", addressParts.Where(part => !string.IsNullOrWhiteSpace(part)));
             }
+
             return null;
         }
 
@@ -113,9 +127,10 @@ namespace landerist_library.Parse.Location.Goolzoom
         {
             string url =
                 BASE_URL + "radio/" +
-                ((double)latitude).ToString(CultureInfo.InvariantCulture) + "/" +
-                ((double)longitude).ToString(CultureInfo.InvariantCulture) + "/" +
+                latitude.ToString(CultureInfo.InvariantCulture) + "/" +
+                longitude.ToString(CultureInfo.InvariantCulture) + "/" +
                 radio + "/addresses";
+
             try
             {
                 var response = HttpClient.GetAsync(url).Result;
@@ -127,18 +142,18 @@ namespace landerist_library.Parse.Location.Goolzoom
                 Console.WriteLine($"Error in GoolzoomApi GetAddresses: {exception.Message} {url}");
                 Logs.Log.WriteError("GoolzoomApi GetAddresses", exception);
             }
+
             return null;
         }
 
-        private HttpClient HttpClient
+        private static HttpClient CreateHttpClient()
         {
-            get
-            {
-                HttpClient client = new();
-                client.DefaultRequestHeaders.Add("x-api-key", Configuration.PrivateConfig.GOOLZOOM_API);
-                return client;
-            }
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("x-api-key", Configuration.PrivateConfig.GOOLZOOM_API);
+            return client;
         }
+
+        private HttpClient HttpClient => SharedHttpClient;
 
         public static void UpdateLocationFromCadastralRef()
         {
@@ -147,15 +162,23 @@ namespace landerist_library.Parse.Location.Goolzoom
             int processed = 0;
             int updated = 0;
             int errors = 0;
+
+            var api = new GoolzoomApi();
+
             foreach (var listing in listings)
             {
                 processed++;
-                var latLng = new GoolzoomApi().GetLatLng(listing.cadastralReference);
-                if (latLng != null)
+
+                var latLng = api.GetLatLng(listing.cadastralReference);
+                if (latLng is { } result &&
+                    result.requestSucess &&
+                    result.lat.HasValue &&
+                    result.lng.HasValue)
                 {
-                    listing.latitude = latLng.Value.lat;
-                    listing.longitude = latLng.Value.lng;
+                    listing.latitude = result.lat.Value;
+                    listing.longitude = result.lng.Value;
                     listing.locationIsAccurate = true;
+
                     if (ES_Listings.Update(listing))
                     {
                         updated++;
@@ -165,6 +188,11 @@ namespace landerist_library.Parse.Location.Goolzoom
                         errors++;
                     }
                 }
+                else
+                {
+                    errors++;
+                }
+
                 Console.WriteLine($"Processed {processed}/{total}, Updated: {updated}, Errors: {errors}");
             }
         }
@@ -176,13 +204,18 @@ namespace landerist_library.Parse.Location.Goolzoom
             int processed = 0;
             int updated = 0;
             int errors = 0;
+
+            var api = new GoolzoomApi();
+
             foreach (var listing in listings)
             {
                 processed++;
-                var address = new GoolzoomApi().GetAddrees(listing.cadastralReference);
-                if (address != null)
+
+                var address = api.GetAddrees(listing.cadastralReference);
+                if (!string.IsNullOrWhiteSpace(address))
                 {
                     listing.address = address;
+
                     if (ES_Listings.Update(listing))
                     {
                         updated++;
@@ -192,6 +225,11 @@ namespace landerist_library.Parse.Location.Goolzoom
                         errors++;
                     }
                 }
+                else
+                {
+                    errors++;
+                }
+
                 Console.WriteLine($"Processed {processed}/{total}, Updated: {updated}, Errors: {errors}");
             }
         }

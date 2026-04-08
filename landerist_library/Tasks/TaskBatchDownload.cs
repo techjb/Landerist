@@ -8,12 +8,12 @@ using landerist_library.Scrape;
 using landerist_library.Statistics;
 using landerist_library.Websites;
 
-
 namespace landerist_library.Tasks
 {
     public class TaskBatchDownload
     {
         public readonly HashSet<string> DownloadedPagesUriHashes = [];
+
         public void Start()
         {
             var batches = Batches.SelectNonDownloaded();
@@ -33,7 +33,8 @@ namespace landerist_library.Tasks
                 return;
             }
 
-            if (!DownloadFile(batch, files.Value.fileSucess))
+            var (fileSuccess, _) = files.Value;
+            if (!DownloadAndReadFile(batch, fileSuccess))
             {
                 return;
             }
@@ -42,26 +43,42 @@ namespace landerist_library.Tasks
             Batches.UpdateToDownloaded(batch);
         }
 
-        private bool DownloadFile(Batch batch, string? file)
+        private bool DownloadAndReadFile(Batch batch, string? file)
         {
-            if (file == null)
+            if (string.IsNullOrWhiteSpace(file))
             {
                 return true;
             }
 
             //file = "input/batch_vertexai_20250620112155_input.json";
 
-            var filesPath = DownloadFile(batch.LLMProvider, file);
-            if (filesPath == null)
+            var filePath = DownloadBatchFile(batch.LLMProvider, file);
+            if (string.IsNullOrEmpty(filePath))
             {
                 return false;
             }
-            var sucess = ReadFile(batch, filesPath);
-            File.Delete(filesPath);
-            return sucess;
+
+            try
+            {
+                return ReadFile(batch, filePath);
+            }
+            finally
+            {
+                try
+                {
+                    if (File.Exists(filePath))
+                    {
+                        File.Delete(filePath);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    Log.WriteError("TaskBatchDownload DeleteFile", exception);
+                }
+            }
         }
 
-        private static (string? fileSucess, string? fileError)? GetFiles(Batch batch)
+        private static (string? fileSuccess, string? fileError)? GetFiles(Batch batch)
         {
             return batch.LLMProvider switch
             {
@@ -71,19 +88,21 @@ namespace landerist_library.Tasks
             };
         }
 
-        private static string? DownloadFile(LLMProvider lLMProvider, string file)
+        private static string? DownloadBatchFile(LLMProvider llmProvider, string file)
         {
-            if (string.IsNullOrEmpty(file))
+            if (string.IsNullOrWhiteSpace(file))
             {
                 return null;
             }
+
             Console.WriteLine($"TaskBatchDownload {file}");
-            switch (lLMProvider)
+
+            return llmProvider switch
             {
-                case LLMProvider.OpenAI: return OpenAIBatchClient.DownloadFile(file);
-                case LLMProvider.VertexAI: return VertexAIBatchDownload.DownloadFile(file);
-                default: return null;
-            }
+                LLMProvider.OpenAI => OpenAIBatchClient.DownloadFile(file),
+                LLMProvider.VertexAI => VertexAIBatchDownload.DownloadFile(file),
+                _ => null,
+            };
         }
 
         private bool ReadFile(Batch batch, string filePath)
@@ -91,10 +110,9 @@ namespace landerist_library.Tasks
             try
             {
                 var lines = File.ReadAllLines(filePath);
-                ReadSucessFile(batch, lines);
+                ReadSuccessFile(batch, lines);
                 return true;
             }
-
             catch (Exception exception)
             {
                 Log.WriteError("TaskBatchDownload ReadFile", exception);
@@ -102,19 +120,18 @@ namespace landerist_library.Tasks
             }
         }
 
-        private void ReadSucessFile(Batch batch, string[] lines)
+        private void ReadSuccessFile(Batch batch, string[] lines)
         {
-            int total = lines.Length;
-            int readed = 0;
+            int read = 0;
             int errors = 0;
 
             Parallel.ForEach(lines, Config.PARALLELOPTIONS1INLOCAL, line =>
             {
                 try
                 {
-                    if (ReadSuceesLine(batch, line))
+                    if (ReadSuccessLine(batch, line))
                     {
-                        Interlocked.Increment(ref readed);
+                        Interlocked.Increment(ref read);
                     }
                     else
                     {
@@ -123,28 +140,31 @@ namespace landerist_library.Tasks
                 }
                 catch (Exception exception)
                 {
-                    Log.WriteError("TaskBatchDownload ReadSucessFile", exception);
+                    Log.WriteError("TaskBatchDownload ReadSuccessFile", exception);
                     Interlocked.Increment(ref errors);
                 }
             });
 
-            Log.WriteBatch("TaskBatchDownload", $"ReadSucessFile {readed}/{lines.Length} errors: {errors}");
+            Log.WriteBatch("TaskBatchDownload", $"ReadSuccessFile {read}/{lines.Length} errors: {errors}");
 
-            StatisticsSnapshot.InsertDailyCounter(StatisticsKey.BatchReaded, readed);
+            StatisticsSnapshot.InsertDailyCounter(StatisticsKey.BatchReaded, read);
             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.BatchReadedErrors, errors);
         }
 
-        private bool ReadSuceesLine(Batch batch, string line)
+        private bool ReadSuccessLine(Batch batch, string line)
         {
-            (Page page, string? text)? result = GetPageAndText(batch, line);
+            var result = GetPageAndText(batch, line);
             if (result == null)
             {
                 return false;
             }
 
-            var page = result.Value.page;
-            var (newPageType, listing) = ParseListing.ParseResponse(page, result.Value.text);
+            using var page = result.Value.page;
+            var text = result.Value.text;
+
+            var (newPageType, listing) = ParseListing.ParseResponse(page, text);
             bool success = new PageScraper(page).SetPageTypeAfterParsing(newPageType, listing);
+
             if (success)
             {
                 lock (DownloadedPagesUriHashes)
@@ -153,7 +173,6 @@ namespace landerist_library.Tasks
                 }
             }
 
-            page.Dispose();
             return success;
         }
 
@@ -171,6 +190,7 @@ namespace landerist_library.Tasks
         {
             var difference = new HashSet<string>(batch.PagesUriHashes);
             difference.ExceptWith(DownloadedPagesUriHashes);
+
             if (difference.Count == 0)
             {
                 return;
@@ -180,17 +200,28 @@ namespace landerist_library.Tasks
 
             Parallel.ForEach(difference, Config.PARALLELOPTIONS1INLOCAL, uriHash =>
             {
-                var page = Pages.GetPage(uriHash);
-                if (page != null)
+                try
                 {
+                    using var page = Pages.GetPage(uriHash);
+                    if (page == null)
+                    {
+                        return;
+                    }
+
                     page.RemoveWaitingStatus();
                     page.RemoveResponseBodyZipped();
+
                     if (page.Update(false))
                     {
                         Interlocked.Increment(ref counter);
                     }
                 }
+                catch (Exception exception)
+                {
+                    Log.WriteError("TaskBatchDownload RemoveWaitingStatus", exception);
+                }
             });
+
             Log.WriteBatch("TaskBatchDownload", $"RemoveWaitingStatus {counter}/{difference.Count}");
         }
     }

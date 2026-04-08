@@ -1,53 +1,76 @@
 ﻿namespace landerist_library.Tools
 {
-    public class Uris
+    public static class Uris
     {
-
         public static Uri CleanUri(Uri uri)
         {
+            ArgumentNullException.ThrowIfNull(uri);
+
             string cleanedQuery = CleanQueryString(uri.Query);
             UriBuilder builder = new(uri)
             {
                 Query = cleanedQuery
             };
+
             return builder.Uri;
         }
 
         private static string CleanQueryString(string query)
         {
+            if (string.IsNullOrEmpty(query))
+            {
+                return string.Empty;
+            }
+
             if (query.StartsWith('?'))
             {
                 query = query[1..];
             }
 
-            string[] parameters = query.Split('&');
-            Dictionary<string, string> dictionary = [];
-            HashSet<string> hashSet = [];
-            foreach (string parameter in parameters)
+            if (query.Length == 0)
             {
-                string[] keyValue = parameter.Split('=');
-                if (keyValue.Length == 1)
-                {
-                    hashSet.Add(keyValue[0]);
-                }
-                if (keyValue.Length == 2)
-                {
-                    string key = keyValue[0];
-                    string value = keyValue[1];
-                    dictionary[key] = value;
-                }
+                return string.Empty;
             }
 
-            string newQuery = string.Join("&", dictionary.Select(p => $"{p.Key}={p.Value}"));
-            if (hashSet.Count > 0)
+            List<string> orderedKeys = [];
+            Dictionary<string, string?> keyedParameters = [];
+            HashSet<string> flagParameters = [];
+
+            foreach (string parameter in query.Split('&', StringSplitOptions.RemoveEmptyEntries))
             {
-                if (newQuery.Length > 0)
+                int separatorIndex = parameter.IndexOf('=');
+
+                if (separatorIndex < 0)
                 {
-                    newQuery += "&";
+                    if (!string.IsNullOrEmpty(parameter))
+                    {
+                        flagParameters.Add(parameter);
+                    }
+
+                    continue;
                 }
-                newQuery += string.Join("&", hashSet);
+
+                string key = parameter[..separatorIndex];
+                string value = parameter[(separatorIndex + 1)..];
+
+                if (!keyedParameters.ContainsKey(key))
+                {
+                    orderedKeys.Add(key);
+                }
+
+                keyedParameters[key] = value;
             }
-            return newQuery;
+
+            List<string> parts = [];
+
+            foreach (string key in orderedKeys)
+            {
+                parts.Add($"{key}={keyedParameters[key]}");
+            }
+
+            parts.AddRange(flagParameters);
+
+            return string.Join("&", parts);
         }
     }
 }

@@ -3,6 +3,7 @@ using landerist_library.Database;
 using landerist_library.Index;
 using landerist_library.Tools;
 using landerist_orels.ES;
+using System.Collections.Concurrent;
 using System.Data;
 
 namespace landerist_library.Websites
@@ -427,23 +428,26 @@ namespace landerist_library.Websites
             DataTable dataTable = new DataBase().QueryTable(query);
             int counter = 0;
             int total = dataTable.Rows.Count;
-            List<Page> pages = [];
+            var pages = new ConcurrentBag<Page>();
+
             Parallel.ForEach(dataTable.AsEnumerable(), dataRow =>
             {
                 string uriString = dataRow["Uri"].ToString()!;
                 var uri = new Uri(uriString);
                 var newUri = Uris.CleanUri(uri);
+                int current = Interlocked.Increment(ref counter);
+
                 if (newUri != uri)
                 {
                     Page page = new(uri);
-                    var newPage = new Page(newUri);
                     new Indexer(page).Insert(page.Uri);
                     pages.Add(page);
-                    Console.WriteLine(counter + "/" + total);
-                    Interlocked.Increment(ref counter);
                 }
+
+                Console.WriteLine(current + "/" + total);
             });
-            Delete(pages);
+
+            Delete([.. pages]);
         }
 
         public static void DeleteListingsHttpStatusCodeError()
@@ -581,7 +585,7 @@ namespace landerist_library.Websites
         public static bool RemoveResponseBodyTextHash(PageType pageType)
         {
             string query =
-                "UPDATE" + PAGES + " " +
+                "UPDATE " + PAGES + " " +
                 "SET [ResponseBodyTextHash] = NULL " +
                 "WHERE [PageType] = @PageType";
 
@@ -593,7 +597,7 @@ namespace landerist_library.Websites
         public static bool RemoveResponseBodyTextHashToAll()
         {
             string query =
-                "UPDATE" + PAGES + " " +
+                "UPDATE " + PAGES + " " +
                 "SET [ResponseBodyTextHash] = NULL";
 
             return new DataBase().Query(query);

@@ -32,6 +32,12 @@ namespace landerist_library.Parse.Media.Image
             "logo",
         };
 
+        private static readonly HashSet<string> SupportedImageExtensions = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ".jpg",
+            ".jpeg",
+        };
+
         public void AddImages()
         {
             AddImagesOpenGraph();
@@ -71,6 +77,7 @@ namespace landerist_library.Parse.Media.Image
             {
                 return;
             }
+
             foreach (var node in nodeCollection)
             {
                 AddImage(node, attributeValue);
@@ -80,18 +87,17 @@ namespace landerist_library.Parse.Media.Image
         private void AddImage(HtmlNode imgNode, string name)
         {
             string attributeValue = imgNode.GetAttributeValue(name, "");
-            if (string.IsNullOrEmpty(attributeValue))
-            {
-                return;
-            }
-
-            string extension = Path.GetExtension(attributeValue).ToLower();
-            if (!extension.StartsWith(".jpg") && !extension.StartsWith(".jpeg"))
+            if (string.IsNullOrWhiteSpace(attributeValue))
             {
                 return;
             }
 
             if (!Uri.TryCreate(MediaParser.Page.Uri, attributeValue, out Uri? uri))
+            {
+                return;
+            }
+
+            if (!IsSupportedImageExtension(uri))
             {
                 return;
             }
@@ -120,10 +126,14 @@ namespace landerist_library.Parse.Media.Image
             {
                 return true;
             }
+
+            filename = Uri.UnescapeDataString(filename);
+
             if (FileNameContainsProhibitedWord(filename))
             {
                 return false;
             }
+
             if (FileNameContainsSmallSize(filename))
             {
                 return false;
@@ -132,10 +142,17 @@ namespace landerist_library.Parse.Media.Image
             return true;
         }
 
+        private static bool IsSupportedImageExtension(Uri uri)
+        {
+            string extension = Path.GetExtension(uri.AbsolutePath);
+            return !string.IsNullOrEmpty(extension) && SupportedImageExtensions.Contains(extension);
+        }
+
         private static bool FileNameContainsProhibitedWord(string fileName)
         {
             string filenameParsed = fileName.Replace("_", "-");
-            var splitted = filenameParsed.Split('-');
+            var splitted = filenameParsed.Split('-', StringSplitOptions.RemoveEmptyEntries);
+
             foreach (var word in splitted)
             {
                 foreach (string prohibitedWord in ProhibitedWords)
@@ -146,6 +163,7 @@ namespace landerist_library.Parse.Media.Image
                     }
                 }
             }
+
             return false;
         }
 
@@ -158,7 +176,8 @@ namespace landerist_library.Parse.Media.Image
             {
                 return false;
             }
-            if (!match.Groups.Count.Equals(3))
+
+            if (match.Groups.Count != 3)
             {
                 return false;
             }
@@ -167,8 +186,7 @@ namespace landerist_library.Parse.Media.Image
             string heightString = match.Groups[2].Value;
 
             if (!int.TryParse(widthString, out int width) ||
-                !int.TryParse(heightString, out int height)
-                )
+                !int.TryParse(heightString, out int height))
             {
                 return false;
             }
@@ -178,19 +196,27 @@ namespace landerist_library.Parse.Media.Image
 
         private static bool ImageIsSmall(int width, int height)
         {
-            int size = width * height;
+            long size = (long)width * height;
             return size < MIN_IMAGE_SIZE;
         }
 
         private void RemoveImages()
         {
-            RemoveInvalidImages();
-            LoadUnknowIsValid();
-            new ImageDownloader(this).DownloadImages();
-            RemoveSmallImages();
-            new DuplicatesRemover(this).RemoveDuplicatedImages();
-            InsertValidImages();
+            try
+            {
+                RemoveInvalidImages();
+                LoadUnknowIsValid();
+                new ImageDownloader(this).DownloadImages();
+                RemoveSmallImages();
+                new DuplicatesRemover(this).RemoveDuplicatedImages();
+                InsertValidImages();
+            }
+            finally
+            {
+                DisposeLoadedMats();
+            }
         }
+
         public void ProcessMediaToRemove(bool addToDiscarded)
         {
             foreach (var image in MediaToRemove)
@@ -202,6 +228,7 @@ namespace landerist_library.Parse.Media.Image
                     ValidInvalidImages.InsertInvalid(image.url);
                 }
             }
+
             MediaToRemove.Clear();
         }
 
@@ -214,6 +241,7 @@ namespace landerist_library.Parse.Media.Image
                     MediaToRemove.Add(image);
                 }
             }
+
             ProcessMediaToRemove(false);
         }
 
@@ -236,11 +264,13 @@ namespace landerist_library.Parse.Media.Image
                 {
                     continue;
                 }
+
                 if (ImageIsSmall(mat.Width, mat.Height))
                 {
                     MediaToRemove.Add(image);
                 }
             }
+
             ProcessMediaToRemove(true);
         }
 
@@ -250,6 +280,29 @@ namespace landerist_library.Parse.Media.Image
             {
                 ValidInvalidImages.InsertValid(image.url);
             }
+        }
+
+        private void DisposeLoadedMats()
+        {
+            var mats = new HashSet<Mat>(ReferenceEqualityComparer.Instance);
+
+            foreach (var mat in DictionaryMats.Values)
+            {
+                mats.Add(mat);
+            }
+
+            foreach (var mat in NotDuplicatedMats.Values)
+            {
+                mats.Add(mat);
+            }
+
+            foreach (var mat in mats)
+            {
+                mat.Dispose();
+            }
+
+            DictionaryMats.Clear();
+            NotDuplicatedMats.Clear();
         }
 
         [GeneratedRegex(@"(\d+)x(\d+)")]

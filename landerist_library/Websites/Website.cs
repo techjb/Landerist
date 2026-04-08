@@ -47,15 +47,11 @@ namespace landerist_library.Websites
 
         public DateTime? ListingExampleNodeSetUpdated { get; set; }
 
-
         public Robots? Robots = null;
-
 
         public LanguageCode LanguageCode = LanguageCode.es;
 
-
         public CountryCode CountryCode = CountryCode.ES;
-
 
         private bool Disposed;
 
@@ -111,6 +107,7 @@ namespace landerist_library.Websites
             {
                 return dataTable.Rows[0];
             }
+
             return null;
         }
 
@@ -190,6 +187,11 @@ namespace landerist_library.Websites
 
         public bool SetMainUri(int iteration = 0)
         {
+            if (iteration >= 10)
+            {
+                return false;
+            }
+
             HttpClientHandler handler = new()
             {
                 AllowAutoRedirect = false
@@ -198,33 +200,35 @@ namespace landerist_library.Websites
             using var httpClient = new HttpClient(handler);
             httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
             httpClient.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
+
             try
             {
                 HttpRequestMessage request = new(HttpMethod.Head, MainUri);
                 var response = httpClient.SendAsync(request).GetAwaiter().GetResult();
-                if (response != null && response.Headers != null && response.Headers.Location != null)
+
+                if (response?.Headers?.Location != null)
                 {
                     var uriLocation = response.Headers.Location;
+
                     if (uriLocation.ToString().StartsWith('/'))
                     {
                         Uri.TryCreate(MainUri, uriLocation, out uriLocation);
                     }
+
                     if (uriLocation != null && !uriLocation.Equals(MainUri))
                     {
                         SetMainUri(uriLocation);
-                        iteration++;
-                        if (iteration < 10)
-                        {
-                            return SetMainUri(iteration++);
-                        }
+                        return SetMainUri(iteration + 1);
                     }
                 }
+
                 return true;
             }
             catch //(Exception exception)
             {
                 //Logs.Log.WriteLogErrors("Website SetMainUriAndStatusCode", MainUri, exception);
             }
+
             return false;
         }
 
@@ -233,43 +237,53 @@ namespace landerist_library.Websites
             RobotsTxtUpdated = DateTime.Now;
 
             var robotsTxtUrl = new Uri(MainUri, "/robots.txt");
+
             try
             {
-                var httpClient = new HttpClient();
+                using var httpClient = new HttpClient();
                 httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
+
                 var response = httpClient.GetAsync(robotsTxtUrl).GetAwaiter().GetResult();
                 RobotsTxt = null;
+                Robots = null;
+
                 if (response.IsSuccessStatusCode)
                 {
                     using var streamReader = new StreamReader(response.Content.ReadAsStreamAsync().GetAwaiter().GetResult(), Encoding.Default);
                     RobotsTxt = streamReader.ReadToEnd();
                 }
+
                 return true;
             }
             catch //(Exception exception)
             {
                 //Logs.Log.WriteLogErrors("Website SetRobotsTxt", robotsTxtUrl, exception);
             }
+
             return false;
         }
 
         public bool SetIpAddress()
         {
             IpAddressUpdated = DateTime.Now;
+
             try
             {
                 IPAddress[] ipAddresses = Dns.GetHostAddresses(Host);
                 IpAddress = null;
+
                 if (ipAddresses.Length > 0)
                 {
                     IpAddress = ipAddresses[0].ToString();
                 }
+
                 return true;
             }
             catch// (Exception exception)
             {
                 //Logs.Log.WriteLogErrors("Website SetIpAddress", Host, exception);
             }
+
             return false;
         }
 
@@ -282,9 +296,10 @@ namespace landerist_library.Websites
         {
             if (RobotsTxt != null)
             {
-                Robots ??= Robots.Load(RobotsTxt);
+                Robots ??= Com.Bekijkhet.RobotsTxt.Robots.Load(RobotsTxt);
                 return Robots.IsPathAllowed(Config.USER_AGENT, uri.PathAndQuery);
             }
+
             return true;
         }
 
@@ -292,12 +307,14 @@ namespace landerist_library.Websites
         {
             if (RobotsTxt != null)
             {
-                Robots ??= Robots.Load(RobotsTxt);
+                Robots ??= Com.Bekijkhet.RobotsTxt.Robots.Load(RobotsTxt);
+
                 if (Robots.Sitemaps != null)
                 {
                     return Robots.Sitemaps.Count;
                 }
             }
+
             return 0;
         }
 
@@ -305,9 +322,10 @@ namespace landerist_library.Websites
         {
             if (RobotsTxt != null)
             {
-                Robots ??= Robots.Load(RobotsTxt);
+                Robots ??= Com.Bekijkhet.RobotsTxt.Robots.Load(RobotsTxt);
                 return (int)Robots.CrawlDelay(Config.USER_AGENT) / 1000;
             }
+
             return 0;
         }
 
@@ -328,6 +346,7 @@ namespace landerist_library.Websites
         {
             int counter = 0;
             var pages = GetPages();
+
             foreach (var page in pages)
             {
                 if (page.DeleteListing())
@@ -335,12 +354,9 @@ namespace landerist_library.Websites
                     counter++;
                 }
             }
-            ;
 
             Console.WriteLine("Deleted " + counter + " listings");
         }
-
-
 
         private bool DeleteWebsite()
         {
@@ -367,6 +383,7 @@ namespace landerist_library.Websites
             {
                 return;
             }
+
             try
             {
                 var sitemaps = GetSiteMapsFromRobotsTxt();
@@ -375,6 +392,7 @@ namespace landerist_library.Websites
                     new SitemapIndexer(this).InsertSitemaps(sitemaps);
                     return;
                 }
+
                 var uri = GetDefaultSiteMap();
                 if (uri != null)
                 {
@@ -397,9 +415,10 @@ namespace landerist_library.Websites
         {
             if (RobotsTxt != null)
             {
-                Robots ??= Robots.Load(RobotsTxt);
+                Robots ??= Com.Bekijkhet.RobotsTxt.Robots.Load(RobotsTxt);
                 return Robots.Sitemaps;
             }
+
             return null;
         }
 
@@ -507,19 +526,20 @@ namespace landerist_library.Websites
             {
                 return true;
             }
+
             if (AchievedMaxNumberOfPages())
             {
                 return false;
             }
-            
+
             string query =
                 "SELECT [NumPages] " +
                 "FROM " + Websites.WEBSITES + " " +
                 "WHERE [Host] = @Host";
 
             NumPages = new DataBase().QueryInt(query, new Dictionary<string, object?> {
-                    {"Host", Host }
-                });
+                {"Host", Host }
+            });
 
             return NumPages < Config.MAX_PAGES_PER_WEBSITE;
         }
@@ -539,10 +559,12 @@ namespace landerist_library.Websites
         public bool DecreaseNumPages()
         {
             NumPages--;
+
             if (NumPages < 0)
             {
                 NumPages = 0;
             }
+
             return UpdateNumPages();
         }
 
@@ -579,10 +601,12 @@ namespace landerist_library.Websites
         public bool DecreaseNumListings()
         {
             NumListings--;
+
             if (NumListings < 0)
             {
                 NumListings = 0;
             }
+
             return UpdateNumListings();
         }
 

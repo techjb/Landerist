@@ -74,15 +74,20 @@ namespace landerist_library.Parse.ListingParser
 
         public static string? GetText(string responseBody, bool html)
         {
-            var HtmlDocument = new HtmlDocument();
-            HtmlDocument.LoadHtml(responseBody);
+            if (string.IsNullOrWhiteSpace(responseBody))
+            {
+                return null;
+            }
+
+            var htmlDocument = new HtmlDocument();
+            htmlDocument.LoadHtml(responseBody);
+
             if (html)
             {
-                return GetHtml(HtmlDocument);
+                return GetHtml(htmlDocument);
             }
-            
-            return GetText(HtmlDocument);
 
+            return GetText(htmlDocument);
         }
 
         public static string? GetText(Page page)
@@ -92,13 +97,15 @@ namespace landerist_library.Parse.ListingParser
                 var htmlDocument = page.GetHtmlDocument();
                 if (htmlDocument != null)
                 {
-                    return GetHtml(htmlDocument);
+                    // Method name is GetText, so return text content.
+                    return GetText(htmlDocument);
                 }
             }
-            catch// (Exception exception)
+            catch // (Exception exception)
             {
 
             }
+
             return null;
         }
 
@@ -113,6 +120,7 @@ namespace landerist_library.Parse.ListingParser
                 return text;
             }
             catch { }
+
             return text;
         }
 
@@ -126,8 +134,10 @@ namespace landerist_library.Parse.ListingParser
                 return Clean(text);
             }
             catch { }
+
             return null;
         }
+
         private static string GetVisibleText(HtmlDocument htmlDocument)
         {
             var stringBuilder = new StringBuilder();
@@ -142,6 +152,7 @@ namespace landerist_library.Parse.ListingParser
                     }
                 }
             }
+
             return stringBuilder.ToString();
         }
 
@@ -172,6 +183,7 @@ namespace landerist_library.Parse.ListingParser
                 {
                     node.Attributes.Remove(attribute);
                 }
+
                 foreach (var attribute in AttributesToRemove)
                 {
                     if (node.Attributes[attribute] != null)

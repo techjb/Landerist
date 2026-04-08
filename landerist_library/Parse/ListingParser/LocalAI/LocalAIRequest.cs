@@ -10,26 +10,47 @@ namespace landerist_library.Parse.ListingParser.LocalAI
 {
     public class LocalAIRequest
     {
-
         private const string SERVER_PORT = "8000";
         private const float TEMPERATURE = 0.0f;
         public const int MAX_CONTEXT_WINDOW = 65536;
-        private readonly string Url;
 
+        private static readonly HttpClient HttpClient = new()
+        {
+            Timeout = TimeSpan.FromMinutes(10)
+        };
+
+        private readonly string Url;
 
         public LocalAIRequest()
         {
             string ip = "localhost";
+
             if (Config.IsConfigurationLocal())
             {
-                var hostEntry = Dns.GetHostEntry(PrivateConfig.MACHINE_NAME_LANDERIST_03);
-                ip = hostEntry.AddressList.First(x => x.AddressFamily == AddressFamily.InterNetwork).ToString();
+                try
+                {
+                    var hostEntry = Dns.GetHostEntry(PrivateConfig.MACHINE_NAME_LANDERIST_03);
+                    ip = hostEntry.AddressList
+                        .FirstOrDefault(x => x.AddressFamily == AddressFamily.InterNetwork)?
+                        .ToString() ?? "localhost";
+                }
+                catch (Exception exception)
+                {
+                    Logs.Log.WriteError("LocalAIRequest ctor - DNS resolution", exception);
+                    ip = "localhost";
+                }
             }
+
             Url = $"http://{ip}:{SERVER_PORT}/v1/chat/completions";
         }
 
         public async Task<LocaAIResponse?> GetResponse(string text)
         {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return null;
+            }
+
             try
             {
                 var requestBody = GetRequestBody(text);
@@ -37,22 +58,27 @@ namespace landerist_library.Parse.ListingParser.LocalAI
                 using var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
 
                 DateTime dateStart = DateTime.Now;
-                using HttpClient client = new();
-                client.Timeout = TimeSpan.FromMinutes(10);
-                HttpResponseMessage response = await client.PostAsync(Url, httpContent);
+                HttpResponseMessage response = await HttpClient.PostAsync(Url, httpContent);
                 string result = await response.Content.ReadAsStringAsync();
                 Timers.Timer.SaveTimerLocalAI("LocalAIRequest", dateStart);
+
                 if (!response.IsSuccessStatusCode)
                 {
-                    throw new Exception($"LocalAIRequest GetResponse error: {response.StatusCode} - {result}");
+                    throw new HttpRequestException($"LocalAIRequest GetResponse error: {response.StatusCode} - {result}");
                 }
-                return JsonSerializer.Deserialize<LocaAIResponse>(result);
+
+                return JsonSerializer.Deserialize<LocaAIResponse>(
+                    result,
+                    new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
             }
             catch (Exception exception)
             {
                 Logs.Log.WriteError("LocalAIRequest GetResponse", exception);
-            }            
-            return null;
+                return null;
+            }
         }
 
         private object GetRequestBody(string text)
@@ -62,7 +88,7 @@ namespace landerist_library.Parse.ListingParser.LocalAI
                 temperature = TEMPERATURE,
                 messages = new[]
                 {
-                    new { role = "system", content = ParseListingSystem.GetSystemPrompt() },
+                    new { role = "system", content = GetExtendedSystemPrompt() },
                     new { role = "user", content = text }
                 },
                 response_format = new

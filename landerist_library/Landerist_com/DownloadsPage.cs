@@ -1,36 +1,36 @@
-﻿using landerist_library.Configuration;
+﻿using System.Globalization;
+using landerist_library.Configuration;
 using landerist_library.Export;
 using landerist_library.Logs;
 using landerist_library.Websites;
 
 namespace landerist_library.Landerist_com
 {
-
     public class DownloadsPage : Landerist_com
     {
         private static readonly string DownloadsTemplateHtmlFile =
-            Config.LANDERIST_COM_TEMPLATES + "downloads_template.html";
+            Path.Combine(Config.LANDERIST_COM_TEMPLATES!, "downloads_template.html");
 
         private static readonly string DownloadsHtmlFile =
-            Config.LANDERIST_COM_OUTPUT + "downloads.html";
+            Path.Combine(Config.LANDERIST_COM_OUTPUT!, "downloads.html");
 
         private static string DownloadsTemplate = string.Empty;
-
 
         public static void Update()
         {
             try
             {
                 DownloadsTemplate = File.ReadAllText(DownloadsTemplateHtmlFile);
+
                 foreach (ExportType exportType in Enum.GetValues(typeof(ExportType)))
                 {
                     UpdateDownloadsTemplate(CountryCode.ES, exportType);
                 }
+
                 if (UploadDownloadsFile())
                 {
                     Log.WriteInfo("DownloadsPage", "Updated downloads page");
                 }
-
             }
             catch (Exception exception)
             {
@@ -40,45 +40,47 @@ namespace landerist_library.Landerist_com
 
         private static void UpdateDownloadsTemplate(CountryCode countryCode, ExportType exportType)
         {
+            var s3 = new S3();
             string objectKey = GetObjectKey(countryCode, exportType, "zip");
-            var (lastModified, contentLength) = new S3().GetFileInfo(PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey);
+
+            var (lastModified, contentLength) = s3.GetFileInfo(PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey);
             if (lastModified is null || contentLength is null)
             {
                 return;
             }
 
-            var counter = new S3().GetMetadataValue(PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey, DownloadsUpdater.METADATA_KEY_COUNTER);
+            var counter = s3.GetMetadataValue(
+                PrivateConfig.AWS_S3_DOWNLOADS_BUCKET,
+                objectKey,
+                DownloadsUpdater.METADATA_KEY_COUNTER);
 
-            string commentCounter = Comment(countryCode, exportType, "Counter");            
-            Replace(commentCounter, counter);
+            Replace(Comment(countryCode, exportType, "Counter"), counter ?? "-");
 
-            string commentModified = Comment(countryCode, exportType, "Modified");            
-            string lastMofifiedString = ((DateTime)lastModified).ToShortDateString();
-            Replace(commentModified, lastMofifiedString);
+            string lastModifiedString = ((DateTime)lastModified).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+            Replace(Comment(countryCode, exportType, "Modified"), lastModifiedString);
 
-
-            string commentSize = Comment(countryCode, exportType, "Size");            
             string sizeString = FormatBytes((long)contentLength);
-            Replace(commentSize, sizeString);
+            Replace(Comment(countryCode, exportType, "Size"), sizeString);
 
-            string comentHyperlink = Comment(countryCode, exportType, "Hyperlink");
             var url = $"https://{PrivateConfig.AWS_S3_DOWNLOADS_BUCKET}.s3.amazonaws.com/{objectKey}";
             string fileName = GetFileName(countryCode, exportType, "zip");
-            var hyperlink = "<a title=\"" + fileName + "\" href=\"" + url + "\">" + fileName + "</a>";
-            Replace(comentHyperlink, hyperlink);
+            string hyperlink = $"<a title=\"{fileName}\" href=\"{url}\">{fileName}</a>";
+            Replace(Comment(countryCode, exportType, "Hyperlink"), hyperlink);
         }
 
         private static string Comment(CountryCode countryCode, ExportType exportType, string key)
         {
-            return "<!--" + countryCode + "_" + exportType + "_" + key + "-->";
+            return $"<!--{countryCode}_{exportType}_{key}-->";
         }
 
         private static void Replace(string comment, string? text)
         {
-            if (comment != null)
+            if (string.IsNullOrEmpty(comment))
             {
-                DownloadsTemplate = DownloadsTemplate.Replace(comment, text);
-            }            
+                return;
+            }
+
+            DownloadsTemplate = DownloadsTemplate.Replace(comment, text ?? string.Empty);
         }
 
         private static bool UploadDownloadsFile()
@@ -92,7 +94,9 @@ namespace landerist_library.Landerist_com
             string[] sizes = { "B", "KB", "MB", "GB", "TB", "PB", "EB" };
 
             if (bytes == 0)
+            {
                 return "0 B";
+            }
 
             int order = 0;
             double size = bytes;
@@ -102,6 +106,7 @@ namespace landerist_library.Landerist_com
                 order++;
                 size /= 1024;
             }
+
             return $"{size:0.##} {sizes[order]}";
         }
     }

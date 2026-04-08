@@ -5,14 +5,15 @@ namespace landerist_library.Scrape
 {
     public class PageSelector
     {
-        private static readonly List<Page> Pages = [];    
+        private static readonly List<Page> Pages = [];
 
         public static List<Page> Select()
         {
-            Console.WriteLine("Selecting pages");
+            //Console.WriteLine("Selecting pages");
             Init();
             SelectPages();
-            return Pages;
+            FilterMinPages();
+            return [.. Pages];
         }
 
         private static void Init()
@@ -23,11 +24,12 @@ namespace landerist_library.Scrape
 
         private static void SelectPages()
         {
-            AddUnknowPageType();
+            AddUnknownPageType();
             AddNextUpdate();
+            AddUnpublishedPages();
         }
 
-        private static void AddUnknowPageType()
+        private static void AddUnknownPageType()
         {
             var topRows = GetTopRows();
             var pages = Websites.Pages.GetUnknownPageType(topRows);
@@ -36,10 +38,11 @@ namespace landerist_library.Scrape
 
         private static void AddNextUpdate()
         {
-            if (ScrapperIsFull())
+            if (ScraperIsFull())
             {
                 return;
             }
+
             var topRows = GetTopRows();
             var pages = Websites.Pages.GetNextUpdate(topRows, false);
             AddPages(pages);
@@ -47,10 +50,11 @@ namespace landerist_library.Scrape
 
         private static void AddUnpublishedPages()
         {
-            if (ScrapperIsFull())
+            if (ScraperIsFull())
             {
                 return;
             }
+
             var topRows = GetTopRows();
             var pages = Websites.Pages.GetUnpublishedPages(topRows);
             AddPages(pages);
@@ -60,7 +64,6 @@ namespace landerist_library.Scrape
         {
             return Config.MAX_PAGES_PER_SCRAPE - Pages.Count;
         }
-
 
         private static List<Page> RemoveDuplicates(List<Page> pages)
         {
@@ -73,10 +76,11 @@ namespace landerist_library.Scrape
             pages = RemoveDuplicates(pages);
             foreach (var page in pages)
             {
-                if (ScrapperIsFull())
+                if (ScraperIsFull())
                 {
                     return;
                 }
+
                 AddPage(page);
             }
         }
@@ -101,7 +105,7 @@ namespace landerist_library.Scrape
             }
         }
 
-        private static bool ScrapperIsFull()
+        private static bool ScraperIsFull()
         {
             return Pages.Count >= Config.MAX_PAGES_PER_SCRAPE;
         }

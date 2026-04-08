@@ -26,8 +26,7 @@ namespace landerist_library.Parse.ListingParser
             NullValueHandling = NullValueHandling.Include,
         };
 
-        public static (PageType pageType, Listing? listing, bool waitingAIRequest)
-            Parse(Page page)
+        public static (PageType pageType, Listing? listing, bool waitingAIRequest) Parse(Page page)
         {
             if (Config.BATCH_ENABLED)
             {
@@ -35,105 +34,102 @@ namespace landerist_library.Parse.ListingParser
             }
 
             var text = page.GetParseListingUserInput();
-            if (!string.IsNullOrEmpty(text))
+            if (string.IsNullOrWhiteSpace(text))
             {
-                switch (Config.LLM_PROVIDER)
-                {
-                    case LLMProvider.OpenAI: return ParseOpenAI(page, text);
-                    case LLMProvider.VertexAI: return ParseVertextAI(page, text);
-                    case LLMProvider.LocalAI: return ParseLocalAI(page, text);
-                    default:
-                        break;
-
-                }
+                return (PageType.ResponseBodyTooShort, null, false);
             }
-            return (PageType.ResponseBodyTooShort, null, false);
+
+            return Config.LLM_PROVIDER switch
+            {
+                LLMProvider.OpenAI => ParseOpenAI(page, text),
+                LLMProvider.VertexAI => ParseVertexAI(page, text),
+                LLMProvider.LocalAI => ParseLocalAI(page, text),
+                _ => (PageType.ResponseBodyTooShort, null, false),
+            };
         }
 
-        private static (PageType pageType, Listing? listing, bool waitingAIRequest)
-            ParseOpenAI(Page page, string userInput)
+        private static (PageType pageType, Listing? listing, bool waitingAIRequest) ParseOpenAI(Page page, string userInput)
         {
             var response = OpenAIRequest.GetChatResponse(userInput);
-            if (response == null || response.FirstChoice == null)
+            if (response?.FirstChoice == null)
             {
                 return (PageType.MayBeListing, null, true);
             }
+
             var (pageType, listing) = ParseResponse(page, response.FirstChoice);
             return (pageType, listing, false);
         }
 
-
-        private static (PageType pageType, Listing? listing, bool waitingAIRequest)
-            ParseVertextAI(Page page, string text)
+        private static (PageType pageType, Listing? listing, bool waitingAIRequest) ParseVertexAI(Page page, string text)
         {
-            var generateContentResponse = VertexAIRequest.GetResponse(page, text).Result;
+            var generateContentResponse = VertexAIRequest.GetResponse(page, text).GetAwaiter().GetResult();
             if (generateContentResponse == null)
             {
                 return (PageType.MayBeListing, null, true);
             }
-            string? responseText = VertexAIResponse.GetResponseText(generateContentResponse);
+
+            var responseText = VertexAIResponse.GetResponseText(generateContentResponse);
             var (pageType, listing) = ParseResponse(page, responseText);
             return (pageType, listing, false);
         }
 
-        public static (PageType pageType, Listing? listing, bool waitingAIRequest)
-            ParseLocalAI(Page page, string text)
+        public static (PageType pageType, Listing? listing, bool waitingAIRequest) ParseLocalAI(Page page, string text)
         {
-            var response = new LocalAIRequest().GetResponse(text).Result;
+            var response = new LocalAIRequest().GetResponse(text).GetAwaiter().GetResult();
             if (response == null)
             {
                 Console.WriteLine("ParseListing ParseLocalAI response is null.");
                 return (PageType.MayBeListing, null, true);
             }
-            string? responseText = response.GetResponseText();
-            if (string.IsNullOrEmpty(responseText))
+
+            var responseText = response.GetResponseText();
+            if (string.IsNullOrWhiteSpace(responseText))
             {
                 Console.WriteLine("ParseListing ParseLocalAI responseText is null or empty. Finish Reason: " + response.GetFinishReason() + " TokenCount: " + page.TokenCount);
                 return (PageType.MayBeListing, null, true);
             }
+
             var (pageType, listing) = ParseResponse(page, responseText);
-            if (pageType.Equals(PageType.MayBeListing))
+            if (pageType == PageType.MayBeListing)
             {
                 Console.WriteLine("ParseListing ParseLocalAI pageType is MayBeListing. Finish Reason: " + response.GetFinishReason() + " TokenCount " + page.TokenCount);
             }
+
             return (pageType, listing, false);
         }
 
         public static (PageType pageType, Listing? listing) ParseResponse(Page page, string? text)
         {
-            if (string.IsNullOrEmpty(text))
+            if (string.IsNullOrWhiteSpace(text))
             {
                 return (PageType.MayBeListing, null);
             }
+
             try
             {
-                StructuredOutputEs? structuredOutputEs = null;
-                if (Config.LLM_PROVIDER.Equals(LLMProvider.VertexAI))
+                StructuredOutputEs? structuredOutputEs;
+                if (Config.LLM_PROVIDER == LLMProvider.VertexAI)
                 {
                     var structuredOutputVertexAIEs = JsonConvert.DeserializeObject<StructuredOutputVertexAIEs>(text, JsonSerializerSettings);
-                    if (structuredOutputVertexAIEs != null)
-                    {
-                        structuredOutputEs = structuredOutputVertexAIEs?.Parse();
-                    }
+                    structuredOutputEs = structuredOutputVertexAIEs?.Parse();
                 }
                 else
                 {
                     structuredOutputEs = JsonConvert.DeserializeObject<StructuredOutputEs>(text, JsonSerializerSettings);
                 }
-                if (structuredOutputEs != null)
-                {
-                    return new StructuredOutputEsParser(structuredOutputEs).Parse(page);
-                }
-                else
+
+                if (structuredOutputEs == null)
                 {
                     throw new Exception("StructuredOutputEs is null");
                 }
+
+                return new StructuredOutputEsParser(structuredOutputEs).Parse(page);
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteError("ParseListing ParseResponse", exception.Message);
+                Logs.Log.WriteError("ParseListing ParseResponse", exception.ToString());
+                return (PageType.MayBeListing, null);
             }
-            return (PageType.MayBeListing, null);
         }
     }
 }

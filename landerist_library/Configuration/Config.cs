@@ -10,7 +10,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "4.59";
+        public static readonly string VERSION = "4.63";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -145,7 +145,7 @@ namespace landerist_library.Configuration
 
         public readonly static string MACHINE_NAME = Environment.MachineName;
 
-        public const bool PROXY_ENABLED = true;
+        public const bool PROXY_ENABLED = false;        
 
         public const int MINIMUM_PAGE_TYPE_COUNTER_TO_UNPUBLISH_LISTING = 3;
 
@@ -157,7 +157,7 @@ namespace landerist_library.Configuration
 
         public const string LOCAL_AI_TOKENIZER = "o200k_harmony";
 
-        public const int LOCAL_AI_MAX_MODEL_LEN = 16000; // same as in localAI server
+        public const int LOCAL_AI_MAX_MODEL_LEN = 20000; // same as in localAI server
 
 
         public static bool IsConfigurationProduction()

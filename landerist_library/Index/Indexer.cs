@@ -5,15 +5,26 @@ namespace landerist_library.Index
 {
     public class Indexer(Page page)
     {
-        protected Page Page = page;
+        protected Page Page { get; } = page;
 
         private readonly HashSet<Uri> Inserted = [];
 
-        private static readonly string[] WebPageExtensions = [".htm", ".html", ".xhtml", ".asp", ".aspx", ".php", ".jsp", ".cshtml", ".vbhtml", "razor"];
+        private static readonly HashSet<string> WebPageExtensions =
+        [
+            ".htm",
+            ".html",
+            ".xhtml",
+            ".asp",
+            ".aspx",
+            ".php",
+            ".jsp",
+            ".cshtml",
+            ".vbhtml",
+            ".razor"
+        ];
 
         public Indexer(Website website) : this(new Page(website))
         {
-
         }
 
         public void Insert(List<string?> urls)
@@ -30,31 +41,33 @@ namespace landerist_library.Index
         public void Insert(string? url)
         {
             var uri = GetUri(url);
-            if (uri != null)
+            if (uri is not null)
             {
                 InsertUri(uri);
             }
-
         }
 
         public Uri? GetUri(string? url)
         {
-            if (string.IsNullOrEmpty(url))
+            if (string.IsNullOrWhiteSpace(url))
             {
                 return null;
             }
+
             if (!Uri.TryCreate(Page.Uri, url, out Uri? uri))
             {
                 return null;
             }
+
             if (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)
             {
                 return null;
             }
+
             // build without fragments #fragment1..
             UriBuilder uriBuilder = new(uri)
             {
-                Fragment = ""
+                Fragment = string.Empty
             };
 
             // build without parameters
@@ -75,10 +88,15 @@ namespace landerist_library.Index
             InsertUri(uri);
         }
 
-
         protected void InsertUri(Uri uri)
         {
-            if (Page.Website.AchievedMaxNumberOfPages())
+            var website = Page.Website;
+            if (website == null)
+            {
+                return;
+            }
+
+            if (website.AchievedMaxNumberOfPages())
             {
                 return;
             }
@@ -89,40 +107,43 @@ namespace landerist_library.Index
             {
                 return;
             }
-            if (ProhibitedUrls.IsProhibited(uri, Page.Website.LanguageCode))
-            {
-                return;
-            }
-            if (!IsWebPage(uri))
-            {
-                return;
-            }
-            if (LanguageValidator.ContainsNotAllowed(uri, Page.Website.LanguageCode))
-            {
-                return;
-            }
-            if (!uri.Host.Equals(Page.Host) || uri.Equals(Page.Uri))
-            {
-                return;
-            }
-            if (Page.Website == null)
-            {
-                return;
-            }
-            if (!Page.Website.IsAllowedByRobotsTxt(uri))
-            {
-                return;
-            }
-            if (Page.Website.MainUri.Equals(uri))
-            {
-                return;
-            }
-            if (!Page.Website.CanAddNewPages())
+
+            if (ProhibitedUrls.IsProhibited(uri, website.LanguageCode))
             {
                 return;
             }
 
-            Pages.Insert(Page.Website, uri);
+            if (!IsWebPage(uri))
+            {
+                return;
+            }
+
+            if (LanguageValidator.ContainsNotAllowed(uri, website.LanguageCode))
+            {
+                return;
+            }
+
+            if (!uri.Host.Equals(Page.Host, StringComparison.OrdinalIgnoreCase) || uri.Equals(Page.Uri))
+            {
+                return;
+            }
+
+            if (!website.IsAllowedByRobotsTxt(uri))
+            {
+                return;
+            }
+
+            if (website.MainUri.Equals(uri))
+            {
+                return;
+            }
+
+            if (!website.CanAddNewPages())
+            {
+                return;
+            }
+
+            Pages.Insert(website, uri);
             Inserted.Add(uri);
         }
 
@@ -136,8 +157,8 @@ namespace landerist_library.Index
 
         public static bool IsWebPage(Uri uri)
         {
-            string extension = Path.GetExtension(uri.AbsolutePath).Trim().ToLower();
-            return extension.Equals(string.Empty) || WebPageExtensions.Contains(extension);
+            string extension = Path.GetExtension(uri.AbsolutePath);
+            return string.IsNullOrEmpty(extension) || WebPageExtensions.Contains(extension);
         }
     }
 }

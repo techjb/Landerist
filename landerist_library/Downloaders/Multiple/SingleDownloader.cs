@@ -1,7 +1,6 @@
 ﻿using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Websites;
 
-
 namespace landerist_library.Downloaders.Multiple
 {
     public class SingleDownloader
@@ -11,7 +10,7 @@ namespace landerist_library.Downloaders.Multiple
         public int Id = 0;
         private int Chrashes = 0;
         private int Scraped = 0;
-        private readonly bool UseProxy = false;
+        private readonly bool UseProxy;
 
         public SingleDownloader(int id, bool useProxy) : this(useProxy)
         {
@@ -45,25 +44,48 @@ namespace landerist_library.Downloaders.Multiple
             return UseProxy;
         }
 
-        public bool Download(Page Page)
+        public bool Download(Page page)
         {
-            SetUnavailable();
-            Downloader.Download(Page);
-            Scraped++;
+            ArgumentNullException.ThrowIfNull(page);
 
-            if (BrowserHasChrashed())
+            var restartedBrowser = false;
+            SetUnavailable();
+
+            try
+            {
+                Downloader.Download(page);
+                Scraped++;
+
+                if (BrowserHasChrashed())
+                {
+                    Chrashes++;
+                    RestartBrowser();
+                    restartedBrowser = true;
+                    return false;
+                }
+
+                return true;
+            }
+            catch
             {
                 Chrashes++;
                 RestartBrowser();
+                restartedBrowser = true;
                 return false;
             }
-            SetAvailable();
-            return true;
-        }       
+            finally
+            {
+                if (!restartedBrowser)
+                {
+                    SetAvailable();
+                }
+            }
+        }
 
         public void CloseBrowser()
         {
             Downloader.CloseBrowser();
+            SetUnavailable();
         }
 
         public bool BrowserHasChrashed()

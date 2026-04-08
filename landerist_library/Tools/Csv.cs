@@ -9,6 +9,8 @@ namespace landerist_library.Tools
     {
         public static DataTable ToDataTable(string file)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(file);
+
             Console.WriteLine("Reading file " + file + " ..");
             using var streamReader = new StreamReader(file);
             var csvConfiguration = new CsvConfiguration(CultureInfo.CurrentCulture)
@@ -25,12 +27,15 @@ namespace landerist_library.Tools
 
         public static void Write(DataTable dataTable, string fileName, bool addHeaders)
         {
+            ArgumentNullException.ThrowIfNull(dataTable);
+            ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
+
             using StreamWriter streamWriter = new(fileName);
             var csvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 NewLine = Environment.NewLine,
                 TrimOptions = TrimOptions.Trim,
-                ShouldQuote = (field) => true,
+                ShouldQuote = _ => true,
             };
 
             using CsvWriter csvWriter = new(streamWriter, csvConfiguration);
@@ -38,25 +43,31 @@ namespace landerist_library.Tools
             {
                 AddHeader(dataTable, csvWriter);
             }
+
             AddRows(dataTable, csvWriter);
         }
 
         public static bool Write(HashSet<string> data, string filename)
         {
+            ArgumentNullException.ThrowIfNull(data);
+            ArgumentException.ThrowIfNullOrWhiteSpace(filename);
+
             try
             {
                 using var streamWriter = new StreamWriter(filename);
                 using var csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture);
+
                 foreach (var item in data)
                 {
                     csvWriter.WriteField(item);
                     csvWriter.NextRecord();
                 }
+
                 return true;
-            }   
+            }
             catch (Exception exception)
             {
-                Console.WriteLine("Error writting the file: " + exception.Message);
+                Console.WriteLine("Error writing the file: " + exception.Message);
                 return false;
             }
         }
@@ -67,6 +78,7 @@ namespace landerist_library.Tools
             {
                 csvWriter.WriteField(column.ColumnName);
             }
+
             csvWriter.NextRecord();
         }
 
@@ -76,9 +88,9 @@ namespace landerist_library.Tools
             {
                 for (var i = 0; i < dataTable.Columns.Count; i++)
                 {
-                    var field = row[i];
-                    csvWriter.WriteField(field);
+                    csvWriter.WriteField(row[i]);
                 }
+
                 csvWriter.NextRecord();
             }
         }

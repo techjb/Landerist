@@ -15,16 +15,16 @@ namespace landerist_library.Logs
         public const string LogKeyBatch = "batch";
         public const string LogKeyLocalAI = "localai";
 
-
         private static void Write(string logKey, string source, string text)
         {
-            if (text.Equals(string.Empty))
+            if (string.IsNullOrWhiteSpace(text))
             {
                 return;
             }
+
             if (Config.LOGS_ENABLED)
             {
-                WriteDB(logKey, source, text);
+                WriteDB(logKey, source ?? string.Empty, text);
             }
         }
 
@@ -33,6 +33,7 @@ namespace landerist_library.Logs
             DateTime date = DateTime.Now;
             System.Console.WriteLine($"{date:HH\\:mm\\:ss} {text}");
         }
+
         public static void Console(string source, string text)
         {
             DateTime date = DateTime.Now;
@@ -42,12 +43,12 @@ namespace landerist_library.Logs
         private static bool WriteDB(string logKey, string source, string text)
         {
             string query =
-                "INSERT INTO " + TABLE_LOGS + " " +
+                "INSERT INTO " + TABLE_LOGS + " ([Date], [MachineName], [LogKey], [Source], [Text]) " +
                 "VALUES(@Date, @MachineName, @LogKey, @Source, @Text)";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
-                { "Date", DateTime.Now},
-                { "MachineName", Config.MACHINE_NAME},
+                { "Date", DateTime.Now },
+                { "MachineName", Config.MACHINE_NAME },
                 { "LogKey", logKey },
                 { "Source", source },
                 { "Text", text.Trim() }
@@ -56,8 +57,10 @@ namespace landerist_library.Logs
 
         public static DataTable Read(string logKey, int top = 200)
         {
+            int safeTop = top <= 0 ? 200 : top;
+
             string query =
-                "SELECT TOP " + top + " * " +
+                "SELECT TOP " + safeTop + " * " +
                 "FROM " + TABLE_LOGS + " " +
                 "WHERE LogKey = @LogKey " +
                 "ORDER BY [Date] DESC";
@@ -72,6 +75,7 @@ namespace landerist_library.Logs
             string query =
                 "SELECT DISTINCT LogKey " +
                 "FROM " + TABLE_LOGS;
+
             return new DataBase().QueryListString(query);
         }
 
@@ -82,8 +86,8 @@ namespace landerist_library.Logs
                 "WHERE LogKey = @LogKey";
 
             new DataBase().Query(query, new Dictionary<string, object?> {
-                    { "LogKey", logKey }
-                });
+                { "LogKey", logKey }
+            });
         }
 
         private static string GetText(string text, Exception exception)
@@ -99,7 +103,6 @@ namespace landerist_library.Logs
                 "StackTrace: " + exception.StackTrace + "\r\n\r\n" +
                 "TargetSite: " + exception.TargetSite + "\r\n\r\n" +
                 "InnerException: " + exception.InnerException;
-
         }
 
         #region Write Logs
@@ -110,6 +113,7 @@ namespace landerist_library.Logs
             {
                 Console(source, text);
             }
+
             Write(LogKeyError, source, text);
         }
 
@@ -127,7 +131,7 @@ namespace landerist_library.Logs
 
         public static void WriteError(string source, Uri uri, Exception exception)
         {
-            source += " " + uri.ToString();
+            source += " " + uri;
             WriteError(source, exception);
         }
 
@@ -143,6 +147,7 @@ namespace landerist_library.Logs
             {
                 Console(source, text);
             }
+
             Write(LogKeyInfo, source, text);
         }
 
@@ -163,6 +168,7 @@ namespace landerist_library.Logs
             {
                 Console(source, text);
             }
+
             Write(LogKeyBatch, source, text);
         }
 
@@ -172,6 +178,7 @@ namespace landerist_library.Logs
             {
                 Console(source, text);
             }
+
             Write(LogKeyLocalAI, source, text);
         }
 
@@ -179,10 +186,18 @@ namespace landerist_library.Logs
 
         public static bool DeleteCurentMachineLogs()
         {
-            string query =
-                "DELETE FROM " + TABLE_LOGS + " WHERE [MachineName] = '" + Config.MACHINE_NAME + "'";
+            // Kept for backward compatibility
+            return DeleteCurrentMachineLogs();
+        }
 
-            return new DataBase().Query(query);
+        public static bool DeleteCurrentMachineLogs()
+        {
+            string query =
+                "DELETE FROM " + TABLE_LOGS + " WHERE [MachineName] = @MachineName";
+
+            return new DataBase().Query(query, new Dictionary<string, object?> {
+                { "MachineName", Config.MACHINE_NAME }
+            });
         }
 
         public static bool CleanTable()

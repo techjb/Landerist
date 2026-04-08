@@ -13,6 +13,7 @@ namespace landerist_library.Index
             {
                 return;
             }
+
             try
             {
                 //var nodes = Page.HtmlDocument.DocumentNode.SelectNodes("//a");
@@ -43,22 +44,38 @@ namespace landerist_library.Index
                 //}
 
                 // todo: select all nodes: Page.HtmlDocument.DocumentNode.SelectNodes("//a");
-                var urls = htmlDocument.DocumentNode.Descendants("a")
-                   .Where(a => !a.Attributes["rel"]?.Value.Contains("nofollow") ?? true)
-                   .Where(a => !IsHoneypotTrap(a))
-                   .Select(a => a.Attributes["href"]?.Value)
-                   .Where(href => !string.IsNullOrEmpty(href))
-                   .ToList();
+                var urls = htmlDocument.DocumentNode
+                    .Descendants("a")
+                    .Where(a => !HasNoFollow(a))
+                    .Where(a => !IsHoneypotTrap(a))
+                    .Select(a => a.GetAttributeValue("href", string.Empty))
+                    .Where(href => !string.IsNullOrWhiteSpace(href))
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .Cast<string?>()
+                    .ToList();
 
-                if (urls != null)
+                if (urls.Count > 0)
                 {
                     Insert(urls);
                 }
             }
-            catch (Exception ecception)
+            catch (Exception exception)
             {
-                Logs.Log.WriteError("HyperlinksIndexer Insert", Page.Uri, ecception);
+                Logs.Log.WriteError("HyperlinksIndexer Insert", Page.Uri, exception);
             }
+        }
+
+        private static bool HasNoFollow(HtmlNode link)
+        {
+            var rel = link.GetAttributeValue("rel", string.Empty);
+            if (string.IsNullOrWhiteSpace(rel))
+            {
+                return false;
+            }
+
+            return rel
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Any(token => token.Equals("nofollow", StringComparison.OrdinalIgnoreCase));
         }
 
         static bool IsHoneypotTrap(HtmlNode link)
