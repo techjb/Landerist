@@ -47,10 +47,6 @@ namespace landerist_library.Tasks
 
         public void ProcessPages()
         {
-            TotalProcessed = 0;
-            TotalErrors = 0;
-            TotalSuccess = 0;
-
             InitializeBlockingCollection();
             if (BlockingCollection.Count == 0)
             {
