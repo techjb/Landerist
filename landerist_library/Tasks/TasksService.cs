@@ -255,6 +255,7 @@ namespace landerist_library.Tasks
 
             Console.WriteLine("Stopping ServiceTasks ..");
             Scraper.Stop();
+            TaskLocalAIParsing.Stop();
 
             DisposeTimer(ref Timer1);
             DisposeTimer(ref Timer2);

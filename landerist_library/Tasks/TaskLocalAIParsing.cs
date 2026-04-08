@@ -21,7 +21,8 @@ namespace landerist_library.Tasks
         private int TotalProcessed = 0;
         private int TotalErrors = 0;
         private int TotalSuccess = 0;
-        private BlockingCollection<Page> BlockingCollection = new();
+        private readonly CancellationTokenSource StoppingCancellationTokenSource = new();
+        private BlockingCollection<Page> BlockingCollection = [];
         private const int MAX_SIZE_BLOCKINGCOLLECTION = MAX_PAGES_PER_TASK * 10;
         //private readonly DateTime StartDate = DateTime.UtcNow.ToLocalTime();
 
@@ -45,9 +46,12 @@ namespace landerist_library.Tasks
             return Config.LOCAL_AI_MAX_MODEL_LEN - systemTokens - COMPLETION_TOKENS;
         }
 
-        public void ProcessPages()
+        public void ProcessPages(CancellationToken cancellationToken = default)
         {
-            InitializeBlockingCollection();
+            using var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(StoppingCancellationTokenSource.Token, cancellationToken);
+            CancellationToken linkedCancellationToken = linkedCancellationTokenSource.Token;
+
+            InitializeBlockingCollection(linkedCancellationToken);
             if (BlockingCollection.Count == 0)
             {
                 //Console.WriteLine("No pages to process.");
@@ -55,35 +59,42 @@ namespace landerist_library.Tasks
             }
 
             var orderablePartitioner = Partitioner.Create(BlockingCollection.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
-            Parallel.ForEach(orderablePartitioner,
-                new ParallelOptions()
-                {
-                    MaxDegreeOfParallelism = Config.IsConfigurationLocal() ? 1 : MAX_DEGREE_OF_PARALLELISM
-                },
-                page =>
-                {
-                    if (ProcessPage(page))
+            try
+            {
+                Parallel.ForEach(orderablePartitioner,
+                    new ParallelOptions()
                     {
-                        Interlocked.Increment(ref TotalSuccess);
-                        StatisticsSnapshot.InsertDailyCounter(StatisticsKey.LocalAIParsingSuccess);
-                    }
-                    else
+                        MaxDegreeOfParallelism = Config.IsConfigurationLocal() ? 1 : MAX_DEGREE_OF_PARALLELISM
+                    },
+                    page =>
                     {
-                        Interlocked.Increment(ref TotalErrors);
-                        StatisticsSnapshot.InsertDailyCounter(StatisticsKey.LocalAIParsingErrors);
-                    }
+                        if (ProcessPage(page))
+                        {
+                            Interlocked.Increment(ref TotalSuccess);
+                            StatisticsSnapshot.InsertDailyCounter(StatisticsKey.LocalAIParsingSuccess);
+                        }
+                        else
+                        {
+                            Interlocked.Increment(ref TotalErrors);
+                            StatisticsSnapshot.InsertDailyCounter(StatisticsKey.LocalAIParsingErrors);
+                        }
 
-                    int totalProcessed = Interlocked.Increment(ref TotalProcessed);
-                    if (totalProcessed % 10 == 0)
-                    {
-                        int totalErrors = Volatile.Read(ref TotalErrors);
-                        double totalErrorPercentage = totalProcessed == 0
-                            ? 0
-                            : Math.Round((double)totalErrors * 100 / totalProcessed, 2);
+                        int totalProcessed = Interlocked.Increment(ref TotalProcessed);
+                        if (totalProcessed % 10 == 0)
+                        {
+                            int totalErrors = Volatile.Read(ref TotalErrors);
+                            double totalErrorPercentage = totalProcessed == 0
+                                ? 0
+                                : Math.Round((double)totalErrors * 100 / totalProcessed, 2);
 
-                        Log.WriteLocalAI("ProcessPages", $"Errors: {totalErrors}/{totalProcessed} ({totalErrorPercentage}%)");
-                    }
-                });
+                            Log.WriteLocalAI("ProcessPages", $"Errors: {totalErrors}/{totalProcessed} ({totalErrorPercentage}%)");
+                        }
+                    });
+            }
+            catch (OperationCanceledException)
+            {
+                Log.WriteLocalAI("ProcessPages", "Cancellation requested");
+            }
         }
 
         //private int DailyEstimate()
@@ -103,27 +114,45 @@ namespace landerist_library.Tasks
         //}
 
 
-        private void InitializeBlockingCollection()
+        public void Stop()
+        {
+            if (StoppingCancellationTokenSource.IsCancellationRequested)
+            {
+                return;
+            }
+
+            StoppingCancellationTokenSource.Cancel();
+
+            if (!BlockingCollection.IsAddingCompleted)
+            {
+                BlockingCollection.CompleteAdding();
+            }
+        }
+
+        private void InitializeBlockingCollection(CancellationToken cancellationToken)
         {
             BlockingCollection = new BlockingCollection<Page>(MAX_SIZE_BLOCKINGCOLLECTION);
-            if (!AddPagesToBlockingCollection())
+            if (!AddPagesToBlockingCollection(cancellationToken))
             {
                 BlockingCollection.CompleteAdding();
                 return;
             }
 
-            _ = Task.Run(() =>
+            _ = Task.Run(async () =>
             {
                 try
                 {
-                    while (true)
+                    while (!cancellationToken.IsCancellationRequested)
                     {
-                        Thread.Sleep(10000);
-                        if (!AddPagesToBlockingCollection())
+                        await Task.Delay(10000, cancellationToken);
+                        if (!AddPagesToBlockingCollection(cancellationToken))
                         {
                             break;
                         }
                     }
+                }
+                catch (OperationCanceledException)
+                {
                 }
                 catch (Exception exception)
                 {
@@ -133,11 +162,13 @@ namespace landerist_library.Tasks
                 {
                     BlockingCollection.CompleteAdding();
                 }
-            });
+            }, cancellationToken);
         }
 
-        private bool AddPagesToBlockingCollection()
+        private bool AddPagesToBlockingCollection(CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             if (MAX_SIZE_BLOCKINGCOLLECTION < BlockingCollection.Count + MAX_PAGES_PER_TASK)
             {
                 return true;
@@ -156,7 +187,7 @@ namespace landerist_library.Tasks
                     return false;
                 }
 
-                BlockingCollection.Add(page);
+                BlockingCollection.Add(page, cancellationToken);
             }
 
             return true;
