@@ -145,7 +145,7 @@ namespace landerist_library.Configuration
 
         public readonly static string MACHINE_NAME = Environment.MachineName;
 
-        public const bool PROXY_ENABLED = false;        
+        public const bool PROXY_ENABLED = false;
 
         public const int MINIMUM_PAGE_TYPE_COUNTER_TO_UNPUBLISH_LISTING = 3;
 
@@ -159,7 +159,7 @@ namespace landerist_library.Configuration
 
         public const int LOCAL_AI_MAX_MODEL_LEN = 20000; // same as in localAI server
 
-        public static bool HEADLESS_BROWSER  { get; set; }
+        public static bool HEADLESS_BROWSER { get; set; }
 
 
         public static bool IsConfigurationProduction()
@@ -185,7 +185,7 @@ namespace landerist_library.Configuration
         public static void SetToProduction()
         {
             Init(true);
-        }               
+        }
 
         public static void SetOnlyDatabaseToProduction()
         {
@@ -252,11 +252,12 @@ namespace landerist_library.Configuration
 
             DAYS_TO_REMOVE_BATCH_FILES = -30;
 
-            //MAX_DEGREE_OF_PARALLELISM_SCRAPER = ConfigurationProduction ?
-            //    Environment.ProcessorCount * 20 / 100 : // % of the processors
-            //    1;
+            MAX_DEGREE_OF_PARALLELISM_SCRAPER = ConfigurationProduction ?
+                //Environment.ProcessorCount * 20 / 100 : // % of the processors
+                5 :
+                1;
 
-            MAX_DEGREE_OF_PARALLELISM_SCRAPER = 5;
+            //MAX_DEGREE_OF_PARALLELISM_SCRAPER = 5;
 
             PARALLELOPTIONS1INLOCAL = ConfigurationProduction ?
                 new() :
@@ -271,7 +272,7 @@ namespace landerist_library.Configuration
         {
             DATASOURCE = configurationProduction ?
                 PrivateConfig.DATASOURCE_PRODUCTION :
-                PrivateConfig.DATASOURCE_LOCAL;            
+                PrivateConfig.DATASOURCE_LOCAL;
         }
 
         public static void SetLLMProviderLocalAI()
@@ -281,7 +282,7 @@ namespace landerist_library.Configuration
 
         public static void EnableLogsErrorsInConsole()
         {
-            LOGS_ERRORS_IN_CONSOLE = true;            
-        }   
+            LOGS_ERRORS_IN_CONSOLE = true;
+        }
     }
 }

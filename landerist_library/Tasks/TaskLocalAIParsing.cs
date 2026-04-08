@@ -43,7 +43,8 @@ namespace landerist_library.Tasks
         {
             var systemPrompt = ParseListingSystem.GetSystemPrompt();
             int systemTokens = GptEncoding.GetEncoding(Config.LOCAL_AI_TOKENIZER).CountTokens(systemPrompt);
-            return Config.LOCAL_AI_MAX_MODEL_LEN - systemTokens - COMPLETION_TOKENS;
+            var otherTokens = systemTokens + COMPLETION_TOKENS;
+            return Config.LOCAL_AI_MAX_MODEL_LEN - otherTokens;
         }
 
         public void ProcessPages(CancellationToken cancellationToken = default)
