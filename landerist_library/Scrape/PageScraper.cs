@@ -49,30 +49,9 @@ namespace landerist_library.Scrape
         {
             if (Config.MULTIPLE_DOWNLOADERS_ENABLED)
             {
-                return DownloadMultipleDownloaders();
+                return DownloadersPool.Download(_page, _useProxy);
             }
 
-            return DownloadSingleDownloader();
-        }
-
-        private bool DownloadMultipleDownloaders()
-        {
-            if (_scraper is null)
-            {
-                return false;
-            }
-
-            var singleDownloader = MultipleDownloader.GetDownloader(_useProxy);
-            if (singleDownloader is null)
-            {
-                return false;
-            }
-
-            return singleDownloader.Download(_page);            
-        }
-
-        private bool DownloadSingleDownloader()
-        {
             var singleDownloader = new SingleDownloader(_useProxy);
             if (!singleDownloader.IsAvailable(_useProxy))
             {
@@ -89,7 +68,7 @@ namespace landerist_library.Scrape
                 singleDownloader.CloseBrowser();
             }
         }
-        
+
 
         public bool ApplyClassificationResult(PageType? newPageType, Listing? newListing, bool waitingAIRequest)
         {
@@ -118,7 +97,7 @@ namespace landerist_library.Scrape
 
             _page.RemoveWaitingStatus();
             _page.SetResponseBodyFromZipped();
-            UpdatePageTypeAndListing(newPageType, listing);            
+            UpdatePageTypeAndListing(newPageType, listing);
             _page.RemoveResponseBodyZipped();
             return _page.Update(true);
         }

@@ -1,12 +1,29 @@
-﻿namespace landerist_library.Downloaders.Multiple
+﻿
+
+using landerist_library.Configuration;
+using landerist_library.Websites;
+
+namespace landerist_library.Downloaders.Multiple
 {
-    public class MultipleDownloader
+    public class DownloadersPool
     {
         private static readonly List<SingleDownloader> Downloaders = [];
 
-        private static readonly object Sync = new();
+        private static readonly Lock Sync = new();
 
-        public static SingleDownloader? GetDownloader(bool useProxy)
+        public static bool Download(Page page, bool useProxy = false)
+        {
+            ArgumentNullException.ThrowIfNull(page);
+            SingleDownloader? downloader = GetDownloader(useProxy);
+            if (downloader is null)
+            {
+                Logs.Log.WriteError("MultipleDownloader Download", "Downloader not found");
+                return false;
+            }
+            return downloader.Download(page);
+        }
+
+        private static SingleDownloader? GetDownloader(bool useProxy)
         {
             lock (Sync)
             {
@@ -16,6 +33,13 @@
                     var selected = availables[Random.Shared.Next(availables.Length)];
                     selected.SetUnavailable();
                     return selected;
+                }
+
+                if (Downloaders.Count >= Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER)
+                {
+                    Logs.Log.WriteInfo("MultipleDownloader GetDownloader",
+                        $"Max downloaders reached: {Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER}");
+                    return null;
                 }
 
                 int id = Downloaders.Count + 1;

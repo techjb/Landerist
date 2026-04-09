@@ -7,6 +7,7 @@
     <Nullable>enable</Nullable>
     <StartupObject>landerist_console.Program</StartupObject>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	  
   </PropertyGroup>
 
   <ItemGroup>

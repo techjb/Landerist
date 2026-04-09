@@ -63,7 +63,7 @@ namespace landerist_library.Scrape
         {
             ResetCancellationTokenSource();
             WebsitesBlocker.Clean();
-            MultipleDownloader.Clear();
+            DownloadersPool.Clear();
             _pageQueue = PageSelector.Select();
             Scrape();
         }
@@ -75,7 +75,7 @@ namespace landerist_library.Scrape
                 _cancellation.Cancel();
             }
 
-            MultipleDownloader.Clear();
+            DownloadersPool.Clear();
             Websites.Pages.CleanLockedBy();
             PuppeteerDownloader.KillChrome();
         }
@@ -132,7 +132,7 @@ namespace landerist_library.Scrape
             Log.WriteInfo("scraper", GetLogText());
             InsertStatistics();
 
-            MultipleDownloader.Clear();
+            DownloadersPool.Clear();
             PuppeteerDownloader.KillChrome();
             return true;
         }
