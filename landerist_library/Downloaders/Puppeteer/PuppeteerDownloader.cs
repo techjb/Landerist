@@ -217,6 +217,7 @@ namespace landerist_library.Downloaders.Puppeteer
         private readonly bool UseProxy = false;
         private readonly Credentials? ProxyCredentials;
         private bool FirstNavigationRequestReaded = false;
+        private string CurrentExecutionStep = "Idle";
 
         public PuppeteerDownloader(SingleDownloader singleDownloader) : this(singleDownloader.GetUseProxy())
         {
@@ -401,10 +402,10 @@ namespace landerist_library.Downloaders.Puppeteer
             //Logs.Log.WriteInfo("PuppeteerTest", "Starting test");
             //string? text = new PuppeteerDownloader(true).GetText(Page);
 
-            Websites.Page page1 = new("https://www.rualcasa.com/ficha/local-comercial/alicante/babel/1008/21300773/es/");            
+            Websites.Page page1 = new("https://www.rualcasa.com/ficha/local-comercial/alicante/babel/1008/21300773/es/");
             var puppeteerDownloader = new PuppeteerDownloader(false);
             //Console.WriteLine(puppeteerDownloader.GetText(page1));
-            
+
         }
 
         private string? GetText(Websites.Page page)
@@ -454,10 +455,13 @@ namespace landerist_library.Downloaders.Puppeteer
                 delay = 1000 * 1000;
             }
 
+            var stopwatch = Stopwatch.StartNew();
+            SetExecutionStep("Starting download");
+
             try
             {
                 var taskGetAsync = GetAsync();
-                var taskDelay = Task.Delay(delay);
+                var taskDelay = Task.Delay(delay + 1000);
                 var completedTask = Task.WhenAny(taskGetAsync, taskDelay).GetAwaiter().GetResult();
 
                 if (completedTask == taskGetAsync)
@@ -466,14 +470,14 @@ namespace landerist_library.Downloaders.Puppeteer
                 }
                 else
                 {
-                    BrowserChrashed = true;
+                    SetBrowserChrashed(BuildExecutionMessage("Timeout reached", taskGetAsync, delay, stopwatch.ElapsedMilliseconds));
                     ClosePage();
                 }
             }
             catch (Exception exception)
             {
-                BrowserChrashed = true;
-                Logs.Log.WriteError("PuppeteerDownloader SetContentAndScrenshot Exception", exception);
+                SetBrowserChrashed(BuildExecutionMessage("Exception occurred", null, delay, stopwatch.ElapsedMilliseconds, exception));
+                //Logs.Log.WriteError("PuppeteerDownloader SetContentAndScrenshot Exception", exception);
             }
         }
 
@@ -485,6 +489,7 @@ namespace landerist_library.Downloaders.Puppeteer
 
             try
             {
+                SetExecutionStep("Validating browser state");
                 if (!BrowserInitialized())
                 {
                     throw new Exception("Browser is not initialized.");
@@ -495,6 +500,7 @@ namespace landerist_library.Downloaders.Puppeteer
                     throw new Exception("Page is not initialized.");
                 }
 
+                SetExecutionStep("Initializing page");
                 await InitializePage();
                 if (!PageInitialized())
                 {
@@ -503,10 +509,12 @@ namespace landerist_library.Downloaders.Puppeteer
 
                 if (UseProxy && ProxyCredentials is not null)
                 {
+                    SetExecutionStep("Authenticating proxy");
                     await BrowserPage!.AuthenticateAsync(ProxyCredentials);
                 }
 
-                var response = await BrowserPage!.GoToAsync(Page.Uri.ToString(), NavigationOptions);
+                SetExecutionStep("Navigating");
+                var response = await NavigateWithTimeoutAsync(Page.Uri.ToString());
                 if (response == null)
                 {
                     throw new NavigationException("Response is null.");
@@ -519,6 +527,7 @@ namespace landerist_library.Downloaders.Puppeteer
 
                 try
                 {
+                    SetExecutionStep("Removing cookie banners");
                     await BrowserPage.EvaluateExpressionAsync(ExpressionRemoveCookies);
                 }
                 catch (Exception exception)
@@ -528,6 +537,7 @@ namespace landerist_library.Downloaders.Puppeteer
 
                 try
                 {
+                    SetExecutionStep("Removing invisible elements");
                     await BrowserPage.EvaluateFunctionAsync(ExpressionRemoveInvisibleElements);
                 }
                 catch (Exception exception)
@@ -537,10 +547,13 @@ namespace landerist_library.Downloaders.Puppeteer
 
                 if (Config.TAKE_SCREENSHOT)
                 {
+                    SetExecutionStep("Taking screenshot");
                     screenShot = await PuppeteerScreenshot.TakeScreenshot(BrowserPage, Page);
                 }
 
+                SetExecutionStep("Reading page content");
                 content = await BrowserPage.GetContentAsync();
+                SetExecutionStep("Completed");
                 return (content, screenShot);
             }
             //catch (NullReferenceException exception)
@@ -564,15 +577,15 @@ namespace landerist_library.Downloaders.Puppeteer
                            //$"ScrapedCounter:{SingleDownloader!.ScrapedCounter()} " +
                            $"{exception.Message} " +
                            $"{Page?.Uri}";
-                    
-                    //Console.WriteLine("NavigationException " + message);
-                    //Logs.Log.WriteError("PuppeterDownloader GetAsync NavigationException", message);    
-               
+
+                //Console.WriteLine("NavigationException " + message);
+                //Logs.Log.WriteError("PuppeterDownloader GetAsync NavigationException", message);    
+
 
             }
             catch (Exception exception)
             {
-                BrowserChrashed = true;
+                SetBrowserChrashed("Exception occurred: " + exception.Message);
                 var message =
                        $"HttpStatusCode: {HttpStatusCode} " +
                        $"UseProxy: {UseProxy} " +
@@ -585,6 +598,22 @@ namespace landerist_library.Downloaders.Puppeteer
             }
 
             return (content, screenShot);
+        }
+
+        private async Task<IResponse?> NavigateWithTimeoutAsync(string url)
+        {
+            var timeout = GetTimeout();
+            var navigationTask = BrowserPage!.GoToAsync(url, NavigationOptions);
+            var completedTask = await Task.WhenAny(navigationTask, Task.Delay(timeout));
+
+            if (completedTask == navigationTask)
+            {
+                return await navigationTask;
+            }
+
+            SetExecutionStep("Navigation timeout");
+            await ClosePageAsync();
+            throw new NavigationException($"Navigation timed out after {timeout} ms.");
         }
 
         private async Task InitializePage()
@@ -602,13 +631,16 @@ namespace landerist_library.Downloaders.Puppeteer
 
             try
             {
+                SetExecutionStep("Getting browser pages");
                 var pages = await Browser.PagesAsync();
                 if (pages.Length > 0)
                 {
+                    SetExecutionStep("Reusing browser page");
                     BrowserPage = pages[0];
                 }
                 else
                 {
+                    SetExecutionStep("Creating browser page");
                     BrowserPage = await Browser.NewPageAsync();
                 }
             }
@@ -624,6 +656,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
 
             BrowserPage.DefaultNavigationTimeout = GetTimeout();
+            SetExecutionStep("Configuring browser page");
             await SetAcceptLanguageAsync(BrowserPage, Page.Website.LanguageCode);
             await BrowserPage.SetUserAgentAsync(Config.USER_AGENT);
             await BrowserPage.SetCacheEnabledAsync(false);
@@ -745,6 +778,38 @@ namespace landerist_library.Downloaders.Puppeteer
         private static int GetTimeout()
         {
             return Config.HTTPCLIENT_SECONDS_TIMEOUT * 1000;
+        }
+
+        private void SetExecutionStep(string step)
+        {
+            CurrentExecutionStep = step;
+        }
+
+        private string BuildExecutionMessage(string prefix, Task? task = null, int? timeout = null, long? elapsedMilliseconds = null, Exception? exception = null)
+        {
+            var exceptionMessage = exception is null
+                ? string.Empty
+                : $" | Exception: {exception.GetType().Name}: {exception.Message}";
+
+            return
+                $"{prefix}. " +
+                // $"Url: {Page?.Uri} | " +
+                $"Step: {CurrentExecutionStep} | " +
+                $"TaskStatus: {task?.Status} | " +
+                // $"TimeoutMs: {timeout} | " +
+                //$"ElapsedMs: {elapsedMilliseconds} | " +
+                //$"BrowserInitialized: {BrowserInitialized()} | " +
+                //$"PageInitialized: {PageInitialized()} | " +
+                //$"HttpStatusCode: {HttpStatusCode} | " +
+                //$"RedirectUrl: {RedirectUrl} | " +
+                //$"UseProxy: {UseProxy}" +
+                exceptionMessage;
+        }
+
+        private void SetBrowserChrashed(string message)
+        {
+            Console.WriteLine(message);
+            BrowserChrashed = true;
         }
     }
 }
