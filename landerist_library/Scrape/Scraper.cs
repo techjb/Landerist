@@ -45,8 +45,6 @@ namespace landerist_library.Scrape
 
         }
 
-
-
         public void TestSinglePage()
         {
             Log.WriteInfo("service", "Starting test..");
@@ -130,7 +128,8 @@ namespace landerist_library.Scrape
                 _pageQueue.Clear();
             }
 
-            LogResults();
+            AccumulateTotals();
+            Log.WriteInfo("scraper", GetLogText());
             InsertStatistics();
 
             MultipleDownloader.Clear();
@@ -185,12 +184,8 @@ namespace landerist_library.Scrape
             Console.WriteLine(text);
         }
 
-        private void LogResults()
-        {
-            Log.WriteInfo("scraper", GetLogText());
-        }
 
-        private string GetLogText()
+        private void AccumulateTotals()
         {
             TotalCounter += Counter;
             TotalScraped += Scraped;
@@ -198,8 +193,10 @@ namespace landerist_library.Scrape
             TotalSuccess += Success;
             TotalCrashed += Crashed;
             TotalDownloadErrors += DownloadErrors;
-            
+        }
 
+        private string GetLogText()
+        {
             var scrappedPercentage = GetPercentage(TotalScraped, TotalCounter);
             var skippedPercentage = GetPercentage(TotalSkipped, TotalCounter);
             var successPercentage = GetPercentage(TotalSuccess, TotalScraped);
@@ -212,8 +209,7 @@ namespace landerist_library.Scrape
                 $"[Ok {Success} ({successPercentage}%) => " +
                 $"[DlErr {DownloadErrors}  ({downloadErrorsPercentage}%)] | " +
                 $"Crash {Crashed} ({crashedPercentage}%)] | " +
-                $"Skip {Skipped} ({skippedPercentage}%)]";
-           
+                $"Skip {Skipped} ({skippedPercentage}%)]";           
         }
 
         private static double GetPercentage(int value, int total)
@@ -232,10 +228,6 @@ namespace landerist_library.Scrape
             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ScrapedCrashed, Crashed);
             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ScrapedHttpStatusCodeNotOK, DownloadErrors);
         }      
-
-        public void FinalizeBlockingCollection()
-        {
-        }
 
         private void ResetCancellationTokenSource()
         {

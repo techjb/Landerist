@@ -71,7 +71,7 @@ namespace landerist_scraper
             RunningBlockingCollection = true;
             try
             {
-                Scraper.FinalizeBlockingCollection();
+                //Scraper.FinalizeBlockingCollection();
             }
             catch (Exception exception)
             {

@@ -188,7 +188,7 @@ namespace landerist_library.Tasks
 
             try
             {
-                Scraper.FinalizeBlockingCollection();
+                //Scraper.FinalizeBlockingCollection();
             }
             catch (Exception exception)
             {
