@@ -45,7 +45,7 @@ namespace landerist_library.Scrape
 
         private bool Download()
         {
-            if (Config.MULTIPLE_DOWNLOADERS_ENABLED)
+            if (Config.DOWNLOADERS_POOL_ENABLED)
             {
                 return DownloadersPool.Download(_page, _useProxy);
             }

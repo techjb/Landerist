@@ -28,7 +28,7 @@ namespace landerist_library.Configuration
 
         public static readonly int MAX_PAGES_PER_IP_PER_SCRAPE = 5;
 
-        public static readonly bool MULTIPLE_DOWNLOADERS_ENABLED = true;
+        public static readonly bool DOWNLOADERS_POOL_ENABLED = true;
 
         public static readonly int MAX_SITEMAPS_PER_WEBSITE = 50;
 
