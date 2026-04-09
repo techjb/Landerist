@@ -163,7 +163,7 @@ namespace landerist_library.Tasks
             var text = result.Value.text;
 
             var (newPageType, listing) = ParseListing.ParseResponse(page, text);
-            bool success = new PageScraper(page).SetPageTypeAfterParsing(newPageType, listing);
+            bool success = new PageScraper(page).ApplyParsedClassificationAfterParsing(newPageType, listing);
 
             if (success)
             {

@@ -22,7 +22,7 @@ namespace landerist_library.Configuration
 
         public static readonly int MIN_PAGES_PER_SCRAPE = 10;
 
-        public static readonly int MAX_PAGES_PER_SCRAPE = 1000;
+        public static readonly int MAX_PAGES_PER_SCRAPE = 2000;
 
         public static readonly int MAX_PAGES_PER_HOSTS_PER_SCRAPE = 5;
 
@@ -254,7 +254,7 @@ namespace landerist_library.Configuration
 
             MAX_DEGREE_OF_PARALLELISM_SCRAPER = ConfigurationProduction ?
                 //Environment.ProcessorCount * 20 / 100 : // % of the processors
-                10 :
+                20 :
                 1;
 
             //MAX_DEGREE_OF_PARALLELISM_SCRAPER = 5;

@@ -15,9 +15,6 @@ namespace landerist_library.Scrape
         private readonly Scraper? _scraper;
         private readonly bool _useProxy;
 
-        private Listing? _newListing;
-        private SingleDownloader? _singleDownloader;
-
         public PageScraper(Page page)
         {
             ArgumentNullException.ThrowIfNull(page);
@@ -34,21 +31,16 @@ namespace landerist_library.Scrape
         {
             if (!Download())
             {
-                //Console.WriteLine("PageScraper Download failed");
                 return false;
             }
 
             (var newPageType, var newListing, var waitingAIRequest) = new PageTypeParser(_page).GetPageType();
-            var success = SetPageType(newPageType, newListing, waitingAIRequest);
+            var success = ApplyClassificationResult(newPageType, newListing, waitingAIRequest);
 
             if (success)
             {
                 IndexPages();
             }
-            //else
-            //{
-            //    Console.WriteLine("PageScraper SetPageType failed");
-            //}
 
             return success;
         }
@@ -70,20 +62,19 @@ namespace landerist_library.Scrape
                 return false;
             }
 
-            _singleDownloader = MultipleDownloader.GetDownloader(_useProxy);
-            if (_singleDownloader is null)
+            var singleDownloader = MultipleDownloader.GetDownloader(_useProxy);
+            if (singleDownloader is null)
             {
-                //Console.WriteLine("PageScraper DownloadMultipleDownloaders failed to get downloader");
                 return false;
             }
 
-            return _singleDownloader.Download(_page);            
+            return singleDownloader.Download(_page);            
         }
 
         private bool DownloadSingleDownloader()
         {
-            _singleDownloader = new SingleDownloader(_useProxy);
-            if (!_singleDownloader.IsAvailable(_useProxy))
+            var singleDownloader = new SingleDownloader(_useProxy);
+            if (!singleDownloader.IsAvailable(_useProxy))
             {
                 Logs.Log.WriteInfo("PageScraper DownloadPageSingleDownloader", "Downloader not available");
                 return false;
@@ -91,15 +82,16 @@ namespace landerist_library.Scrape
 
             try
             {
-                return _singleDownloader.Download(_page);
+                return singleDownloader.Download(_page);
             }
             finally
             {
-                _singleDownloader.CloseBrowser();
+                singleDownloader.CloseBrowser();
             }
         }
+        
 
-        public bool SetPageType(PageType? newPageType, Listing? newListing, bool waitingAIRequest)
+        public bool ApplyClassificationResult(PageType? newPageType, Listing? newListing, bool waitingAIRequest)
         {
             if (waitingAIRequest)
             {
@@ -112,12 +104,12 @@ namespace landerist_library.Scrape
                 _page.SetWaitingStatusAIRequest();
             }
 
-            SetPageType(newPageType, newListing);
+            UpdatePageTypeAndListing(newPageType, newListing);
             var setNextUpdate = !waitingAIRequest;
             return _page.Update(setNextUpdate);
         }
 
-        public bool SetPageTypeAfterParsing(PageType newPageType, Listing? listing)
+        public bool ApplyParsedClassificationAfterParsing(PageType newPageType, Listing? listing)
         {
             if (newPageType.Equals(PageType.MayBeListing))
             {
@@ -126,20 +118,18 @@ namespace landerist_library.Scrape
 
             _page.RemoveWaitingStatus();
             _page.SetResponseBodyFromZipped();
-            SetPageType(newPageType, listing);
-            //new TrainingData().Insert(Page);
+            UpdatePageTypeAndListing(newPageType, listing);            
             _page.RemoveResponseBodyZipped();
             return _page.Update(true);
         }
 
-        public void SetPageType(PageType? newPageType, Listing? newListing)
+        private void UpdatePageTypeAndListing(PageType? newPageType, Listing? newListing)
         {
-            _newListing = newListing;
             _page.SetPageType(newPageType);
 
             if (_page.IsListing())
             {
-                HandlePublishedListing();
+                PublishListing(newListing);
                 return;
             }
 
@@ -150,7 +140,7 @@ namespace landerist_library.Scrape
 
             if (_page.HaveToUnpublishListing())
             {
-                HandleUnpublishedListing();
+                UnpublishListing(newListing);
             }
 
             if (_page.IsNotCanonicalListing() || _page.IsRedirectToAnotherUrlListing())
@@ -159,33 +149,34 @@ namespace landerist_library.Scrape
             }
         }
 
-        private void HandlePublishedListing()
+
+        private void PublishListing(Listing? newListing)
         {
-            _newListing ??= _page.GetListing(true, true);
-            if (_newListing == null)
+            newListing ??= _page.GetListing(true, true);
+            if (newListing == null)
             {
                 Logs.Log.WriteError("PageScraper HandlePublishedListing", "NewListing is null");
                 return;
             }
 
-            _newListing.SetPublished();
-            new LocationParser(_page, _newListing).SetLatLng();
-            new LauIdParser(_page.Website.CountryCode, _newListing).SetLauIdAndLauName();
-            ES_Listings.InsertUpdate(_page.Website, _newListing);
+            newListing.SetPublished();
+            new LocationParser(_page, newListing).SetLatLng();
+            new LauIdParser(_page.Website.CountryCode, newListing).SetLauIdAndLauName();
+            ES_Listings.InsertUpdate(_page.Website, newListing);
             _page.SetListingStatusPublished();
         }
 
-        private void HandleUnpublishedListing()
+        private void UnpublishListing(Listing? newListing)
         {
-            _newListing ??= _page.GetListing(true, true);
-            if (_newListing == null)
+            newListing ??= _page.GetListing(true, true);
+            if (newListing == null)
             {
                 Logs.Log.WriteError("PageScraper HandleUnpublishedListing", "NewListing is null");
                 return;
             }
 
-            _newListing.SetUnpublished();
-            ES_Listings.InsertUpdate(_page.Website, _newListing);
+            newListing.SetUnpublished();
+            ES_Listings.InsertUpdate(_page.Website, newListing);
             _page.SetListingStatusUnpublished();
         }
 
@@ -229,7 +220,7 @@ namespace landerist_library.Scrape
 
         public Listing? GetListing()
         {
-            return _newListing;
+            return _page.GetListing(true, true);
         }
     }
 }

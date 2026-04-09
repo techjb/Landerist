@@ -211,7 +211,7 @@ namespace landerist_library.Tasks
                 else
                 {
                     (PageType newPageType, Listing? listing, bool waitingAIRequest) = ParseListing.ParseLocalAI(page, userInput);
-                    success = new PageScraper(page).SetPageTypeAfterParsing(newPageType, listing);
+                    success = new PageScraper(page).ApplyParsedClassificationAfterParsing(newPageType, listing);
                 }
             }
             catch (Exception exception)

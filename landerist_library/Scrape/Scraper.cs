@@ -204,12 +204,12 @@ namespace landerist_library.Scrape
             var downloadErrorsPercentage = GetPercentage(TotalDownloadErrors, TotalSuccess);
 
             return
-                $"Total {TotalCounter} => " +
-                $"[Scraped {Scraped} ({scrappedPercentage}%) => " +
-                $"[Ok {Success} ({successPercentage}%) => " +
-                $"[DlErr {DownloadErrors}  ({downloadErrorsPercentage}%)] | " +
-                $"Crash {Crashed} ({crashedPercentage}%)] | " +
-                $"Skip {Skipped} ({skippedPercentage}%)]";           
+                $"{TotalCounter} => " +
+                $"[Scraped {TotalScraped} ({scrappedPercentage}%) => " +
+                $"[Ok {TotalSuccess} ({successPercentage}%) => " +
+                $"[DlErr {TotalDownloadErrors}  ({downloadErrorsPercentage}%)] | " +
+                $"Crash {TotalCrashed} ({crashedPercentage}%)] | " +
+                $"Skip {TotalSkipped} ({skippedPercentage}%)]";           
         }
 
         private static double GetPercentage(int value, int total)
