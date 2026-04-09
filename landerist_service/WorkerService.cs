@@ -18,7 +18,7 @@ namespace landerist_service
                 Log.DeleteCurentMachineLogs();
                 Log.WriteInfo("landerist_service", "Started. Version: " + Config.VERSION);
                 ServiceTasks.Start();
-                //Scraper.DoTest();
+                //Scraper.TestSinglePage();
 
                 await Task.Delay(Timeout.Infinite, stoppingToken);
             }

@@ -236,7 +236,7 @@ namespace landerist_tests
             //new landerist_library.Scrape.Scraper().Scrape("https://360mallorcaproperty.com/es/property-location/porto-petro-es/page/2/", false);// not listing
 
 
-            //new Scraper().DoTest();
+            //new Scraper().TestSinglePage();
             //landerist_library.Scrape.PageSelector.SelectTop1();
             //Console.WriteLine("Block: " + WebsitesBlocker.Block(page.Website));
             //Console.WriteLine("IsBlocked: " + WebsitesBlocker.IsBlocked(page.Website));
@@ -252,7 +252,7 @@ namespace landerist_tests
             //new HttpClientDownloader().Get(uriPage);
             //landerist_library.Downloaders.Puppeteer.PuppeteerDownloader.UpdateChrome();
             //PuppeteerDownloader.KillChrome();
-            //PuppeteerDownloader.DoTest();            
+            //PuppeteerDownloader.TestSinglePage();            
             //PuppeteerDownloader.UpdateChrome();
 
             #endregion

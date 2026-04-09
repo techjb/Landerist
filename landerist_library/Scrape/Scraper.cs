@@ -6,46 +6,48 @@ using landerist_library.Logs;
 using landerist_library.Statistics;
 using landerist_library.Websites;
 using landerist_orels.ES;
-using System.Collections.Concurrent;
 
 namespace landerist_library.Scrape
 {
     public class Scraper
     {
-        private static int TotalCounter = 0;
 
-        private static int Scraped = 0;
+        private int Counter = 0;
 
-        private static int Success = 0;
+        private int TotalCounter = 0;
 
-        private static int Crashed = 0;
+        private int Scraped = 0;
 
-        private static int DownloadErrors = 0;
+        private int TotalScraped = 0;
 
-        private static int ThreadCounter = 0;
+        private int Success = 0;
 
-        private static int Skipped = 0;
+        private int TotalSuccess = 0;
 
-        private BlockingCollection<Page> BlockingCollection = new();
+        private int Crashed = 0;
 
-        private CancellationTokenSource CancellationTokenSource = new();
+        private int TotalCrashed = 0;
 
-        private List<Page> Pages = [];
+        private int DownloadErrors = 0;
+
+        private int TotalDownloadErrors = 0;
+
+        private int Skipped = 0;
+
+        private int TotalSkipped = 0;
+
+        private CancellationTokenSource _cancellation = new();
+
+        private List<Page> _pageQueue = [];
 
         public Scraper()
         {
 
         }
 
-        public void FinalizeBlockingCollection()
-        {
-            if (!BlockingCollection.IsAddingCompleted)
-            {
-                BlockingCollection.CompleteAdding();
-            }
-        }
 
-        public void DoTest()
+
+        public void TestSinglePage()
         {
             Log.WriteInfo("service", "Starting test..");
             PuppeteerDownloader.UpdateChrome();
@@ -64,20 +66,15 @@ namespace landerist_library.Scrape
             ResetCancellationTokenSource();
             WebsitesBlocker.Clean();
             MultipleDownloader.Clear();
-            Pages = PageSelector.Select();
+            _pageQueue = PageSelector.Select();
             Scrape();
         }
 
         public void Stop()
         {
-            if (!CancellationTokenSource.IsCancellationRequested)
+            if (!_cancellation.IsCancellationRequested)
             {
-                CancellationTokenSource.Cancel();
-            }
-
-            if (!BlockingCollection.IsAddingCompleted)
-            {
-                BlockingCollection.CompleteAdding();
+                _cancellation.Cancel();
             }
 
             MultipleDownloader.Clear();
@@ -85,100 +82,52 @@ namespace landerist_library.Scrape
             PuppeteerDownloader.KillChrome();
         }
 
-        public void ScrapeUnknowPageType()
-        {
-            Pages = Websites.Pages.GetUnknownPageType();
-            if (!Scrape())
-            {
-                return;
-            }
-
-            ScrapeUnknowPageType();
-        }
-
-        public void ScrapeNonScrapped(Uri uri)
-        {
-            Website website = new(uri);
-            ScrapeNonScrapped(website);
-        }
-
-        public void ScrapeNonScrapped(Website website)
-        {
-            Pages = website.GetNonScrapedPages();
-            if (!Scrape())
-            {
-                return;
-            }
-
-            ScrapeNonScrapped(website);
-        }
-
-        public void ScrapeUnknowHttpStatusCode()
-        {
-            Pages = Websites.Pages.GetUnknowHttpStatusCode();
-            if (!Scrape())
-            {
-                return;
-            }
-
-            ScrapeUnknowHttpStatusCode();
-        }
-
         public bool Scrape(Website website)
         {
-            Pages = website.GetPages();
-            return Scrape();
-        }
-
-        public bool ScrapeUnknowPageType(Website website)
-        {
-            Pages = website.GetPagesUnknowPageType();
+            _pageQueue = website.GetPages();
             return Scrape();
         }
 
         private bool Scrape()
         {
             ResetCancellationTokenSource();
-            InitBlockingCollection();
-            if (BlockingCollection.Count.Equals(0))
+            if (_pageQueue.Count.Equals(0))
             {
                 return false;
             }
 
-            TotalCounter = BlockingCollection.Count;
+            var pageCount = _pageQueue.Count;
+
+            Counter = pageCount;
             Scraped = 0;
             Success = 0;
             Crashed = 0;
-            Skipped = 0;
             DownloadErrors = 0;
-            ThreadCounter = 0;
+            Skipped = 0;
 
-            Console.WriteLine("Scrapping " + TotalCounter + " pages ..");
-
-            var orderablePartitioner = Partitioner.Create(
-                BlockingCollection.GetConsumingEnumerable(),
-                EnumerablePartitionerOptions.NoBuffering);
+            Console.WriteLine("Scrapping " + Counter + " pages ..");
 
             try
             {
-                Parallel.ForEach(
-                    orderablePartitioner,
+                Parallel.ForEach(_pageQueue,
                     new ParallelOptions()
                     {
-                        //MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
-                        MaxDegreeOfParallelism = 10,
-                        CancellationToken = CancellationTokenSource.Token
+                        MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
+                        CancellationToken = _cancellation.Token
                     },
                     (page, state) =>
                     {
-                        StartThread();
                         ProcessThread(page);
                         WriteConsole(page);
-                        EndThread(page, state);
+                        page.Dispose();
                     });
             }
             catch (OperationCanceledException)
             {
+            }
+            finally
+            {
+                _pageQueue.Clear();
             }
 
             LogResults();
@@ -187,11 +136,6 @@ namespace landerist_library.Scrape
             MultipleDownloader.Clear();
             PuppeteerDownloader.KillChrome();
             return true;
-        }
-
-        private static void StartThread()
-        {
-            Interlocked.Increment(ref ThreadCounter);
         }
 
         private void ProcessThread(Page page)
@@ -222,7 +166,7 @@ namespace landerist_library.Scrape
             Interlocked.Increment(ref Scraped);
         }
 
-        private static void WriteConsole(Page page)
+        private void WriteConsole(Page page)
         {
             if (Config.IsConfigurationProduction())
             {
@@ -230,56 +174,46 @@ namespace landerist_library.Scrape
             }
 
             var crashedPercentage = GetPercentage(Crashed, Scraped);
-            var (downloadErrorsPercentage, downloadErrorsBasis) = GetDownloadErrorsMetrics();
+            var downloadErrorsPercentage = GetPercentage(DownloadErrors, Scraped);
+            
 
             var text =
                 $"Crashed: {Crashed} ({crashedPercentage}%) " +
-                $"DownloadErrors: {DownloadErrors} ({downloadErrorsPercentage}% of {downloadErrorsBasis}) " +
+                $"DownloadErrors: {DownloadErrors} ({downloadErrorsPercentage}%) " +
                 $"{page.PageType} " +
                 $"{page.Uri}";
             Console.WriteLine(text);
         }
 
-        private static void LogResults()
+        private void LogResults()
         {
             Log.WriteInfo("scraper", GetLogText());
         }
 
-        private static string GetLogText()
+        private string GetLogText()
         {
-            var scrappedPercentage = GetPercentage(Scraped, TotalCounter);
-            var skippedPercentage = GetPercentage(Skipped, TotalCounter);
-            var successPercentage = GetPercentage(Success, Scraped);
-            var crashedPercentage = GetPercentage(Crashed, Scraped);
-            var (downloadErrorsPercentage, downloadErrorsBasis) = GetDownloadErrorsMetrics();
+            TotalCounter += Counter;
+            TotalScraped += Scraped;
+            TotalSkipped += Skipped;
+            TotalSuccess += Success;
+            TotalCrashed += Crashed;
+            TotalDownloadErrors += DownloadErrors;
+            
+
+            var scrappedPercentage = GetPercentage(TotalScraped, TotalCounter);
+            var skippedPercentage = GetPercentage(TotalSkipped, TotalCounter);
+            var successPercentage = GetPercentage(TotalSuccess, TotalScraped);
+            var crashedPercentage = GetPercentage(TotalCrashed, TotalScraped);
+            var downloadErrorsPercentage = GetPercentage(TotalDownloadErrors, TotalSuccess);
 
             return
-             $"Scraped {Scraped}/{TotalCounter} ({scrappedPercentage}%) " +
-             $"Skip {Skipped} ({skippedPercentage}%) " +
-             $"Ok {Success} ({successPercentage}%) " +
-             $"Crash {Crashed} ({crashedPercentage}%) " +
-             $"DlErr {DownloadErrors} ({downloadErrorsPercentage}%/{downloadErrorsBasis})";
-            //$"Downloaders: {downloaders} " +
-            //$"MaxDownloads: {maxDownloads} " +
-            //$"MaxCrashes: {maxCrashes}"
-            ;
-        }
-
-        private static (double Percentage, string Basis) GetDownloadErrorsMetrics()
-        {
-            if (Success > 0)
-            {
-                var percentage = GetPercentage(DownloadErrors, Success);
-                return (percentage, nameof(Success));
-            }
-
-            if (Scraped > 0)
-            {
-                var percentage = GetPercentage(DownloadErrors, Scraped);
-                return (percentage, nameof(Scraped));
-            }
-
-            return (0, nameof(Scraped));
+                $"Total {TotalCounter} => " +
+                $"[Scraped {Scraped} ({scrappedPercentage}%) => " +
+                $"[Ok {Success} ({successPercentage}%) => " +
+                $"[DlErr {DownloadErrors}  ({downloadErrorsPercentage}%)] | " +
+                $"Crash {Crashed} ({crashedPercentage}%)] | " +
+                $"Skip {Skipped} ({skippedPercentage}%)]";
+           
         }
 
         private static double GetPercentage(int value, int total)
@@ -292,40 +226,26 @@ namespace landerist_library.Scrape
             return Math.Round((double)value * 100 / total, 0);
         }
 
-        private static void InsertStatistics()
+        private void InsertStatistics()
         {
             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ScrapedSuccess, Success);
             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ScrapedCrashed, Crashed);
             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ScrapedHttpStatusCodeNotOK, DownloadErrors);
-        }
+        }      
 
-        private void EndThread(Page page, ParallelLoopState parallelLoopState)
+        public void FinalizeBlockingCollection()
         {
-            page.Dispose();
-            Interlocked.Decrement(ref ThreadCounter);
-        }
-
-        private void InitBlockingCollection()
-        {
-            HashSet<Page> hashSet = new(Pages, new PageComparer());
-
-            BlockingCollection.Dispose();
-            BlockingCollection = new BlockingCollection<Page>(new ConcurrentQueue<Page>(hashSet));
-            BlockingCollection.CompleteAdding();
-
-            Pages.Clear();
-            hashSet.Clear();
         }
 
         private void ResetCancellationTokenSource()
         {
-            if (!CancellationTokenSource.IsCancellationRequested)
+            if (!_cancellation.IsCancellationRequested)
             {
                 return;
             }
 
-            CancellationTokenSource.Dispose();
-            CancellationTokenSource = new CancellationTokenSource();
+            _cancellation.Dispose();
+            _cancellation = new CancellationTokenSource();
         }
 
         public void Scrape(string url, bool useProxy)

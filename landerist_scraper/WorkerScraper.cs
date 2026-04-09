@@ -27,7 +27,7 @@ namespace landerist_scraper
                 Log.WriteInfo("landerist_scraper", "Started. Version: " + Config.VERSION);
                 PuppeteerDownloader.UpdateChrome();
                 SetTimers();
-                //Scraper.DoTest();
+                //Scraper.TestSinglePage();
 
                 await Task.Delay(Timeout.Infinite, stoppingToken);
             }
