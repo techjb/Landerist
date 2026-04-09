@@ -1,13 +1,12 @@
 ﻿using HtmlAgilityPack;
 using landerist_library.Configuration;
-using landerist_library.Downloaders.Multiple;
 using landerist_library.Websites;
 using PuppeteerSharp;
 using System.Diagnostics;
 
 namespace landerist_library.Downloaders.Puppeteer
 {
-    public class PuppeteerDownloader : IDownloader
+    public class PuppeteerDownloader : IDownloader, IDownloaderSession
     {
         public string? Content { get; set; } = null;
         public byte[]? Screenshot { get; set; } = null;
@@ -213,16 +212,10 @@ namespace landerist_library.Downloaders.Puppeteer
         };
 
         private bool BrowserChrashed = false;
-        private readonly SingleDownloader? SingleDownloader;
         private readonly bool UseProxy = false;
         private readonly Credentials? ProxyCredentials;
         private bool FirstNavigationRequestReaded = false;
         private string CurrentExecutionStep = "Idle";
-
-        public PuppeteerDownloader(SingleDownloader singleDownloader) : this(singleDownloader.GetUseProxy())
-        {
-            SingleDownloader = singleDownloader;
-        }
 
         public PuppeteerDownloader(bool useProxy)
         {

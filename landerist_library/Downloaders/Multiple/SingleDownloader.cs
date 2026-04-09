@@ -1,11 +1,13 @@
-﻿using landerist_library.Downloaders.Puppeteer;
+﻿using landerist_library.Downloaders;
+using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Websites;
 
 namespace landerist_library.Downloaders.Multiple
 {
     public class SingleDownloader
     {
-        private PuppeteerDownloader Downloader;
+        private readonly IDownloaderSessionFactory DownloaderSessionFactory;
+        private IDownloaderSession Downloader;
         private bool Available;
         public int Id = 0;
         private int Chrashes = 0;
@@ -17,26 +19,32 @@ namespace landerist_library.Downloaders.Multiple
             Id = id;
         }
 
-        public SingleDownloader(bool useProxy)
+        public SingleDownloader(bool useProxy) : this(useProxy, new PuppeteerDownloaderFactory())
+        {
+        }
+
+        public SingleDownloader(bool useProxy, IDownloaderSessionFactory downloaderSessionFactory)
         {
             UseProxy = useProxy;
-            Downloader = new(this);
+            DownloaderSessionFactory = downloaderSessionFactory;
+            Downloader = DownloaderSessionFactory.Create(UseProxy);
             Available = Downloader.BrowserInitialized();
         }
 
-        public void SetUnavailable()
+        public bool TryReserve(bool useProxy)
         {
+            if (!Available || useProxy != UseProxy)
+            {
+                return false;
+            }
+
             Available = false;
+            return true;
         }
 
-        public void SetAvailable()
+        private void Release()
         {
             Available = true;
-        }
-
-        public bool IsAvailable(bool useProxy)
-        {
-            return Available && useProxy == UseProxy;
         }
 
         public bool GetUseProxy()
@@ -49,7 +57,6 @@ namespace landerist_library.Downloaders.Multiple
             ArgumentNullException.ThrowIfNull(page);
 
             var restartedBrowser = false;
-            SetUnavailable();
 
             try
             {
@@ -77,7 +84,7 @@ namespace landerist_library.Downloaders.Multiple
             {
                 if (!restartedBrowser)
                 {
-                    SetAvailable();
+                    Release();
                 }
             }
         }
@@ -85,7 +92,7 @@ namespace landerist_library.Downloaders.Multiple
         public void CloseBrowser()
         {
             Downloader.CloseBrowser();
-            SetUnavailable();
+            Available = false;
         }
 
         public bool BrowserHasChrashed()
@@ -96,7 +103,7 @@ namespace landerist_library.Downloaders.Multiple
         public void RestartBrowser()
         {
             CloseBrowser();
-            Downloader = new(this);
+            Downloader = DownloaderSessionFactory.Create(UseProxy);
             Available = Downloader.BrowserInitialized();
         }
 

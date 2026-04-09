@@ -12,7 +12,6 @@ namespace landerist_library.Scrape
     public class PageScraper
     {
         private readonly Page _page;
-        private readonly Scraper? _scraper;
         private readonly bool _useProxy;
 
         public PageScraper(Page page)
@@ -21,9 +20,8 @@ namespace landerist_library.Scrape
             _page = page;
         }
 
-        public PageScraper(Page page, Scraper scraper, bool useProxy) : this(page)
+        public PageScraper(Page page, bool useProxy) : this(page)
         {
-            _scraper = scraper;
             _useProxy = useProxy;
         }
 
@@ -53,7 +51,7 @@ namespace landerist_library.Scrape
             }
 
             var singleDownloader = new SingleDownloader(_useProxy);
-            if (!singleDownloader.IsAvailable(_useProxy))
+            if (!singleDownloader.TryReserve(_useProxy))
             {
                 Logs.Log.WriteInfo("PageScraper DownloadPageSingleDownloader", "Downloader not available");
                 return false;

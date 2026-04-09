@@ -27,12 +27,12 @@ namespace landerist_library.Downloaders.Multiple
         {
             lock (Sync)
             {
-                var availables = Downloaders.Where(o => o.IsAvailable(useProxy)).ToArray();
-                if (availables.Length != 0)
+                foreach (var downloader in Downloaders.OrderBy(static _ => Random.Shared.Next()))
                 {
-                    var selected = availables[Random.Shared.Next(availables.Length)];
-                    selected.SetUnavailable();
-                    return selected;
+                    if (downloader.TryReserve(useProxy))
+                    {
+                        return downloader;
+                    }
                 }
 
                 if (Downloaders.Count >= Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER)
@@ -44,9 +44,8 @@ namespace landerist_library.Downloaders.Multiple
 
                 int id = Downloaders.Count + 1;
                 SingleDownloader newSingleDownloader = new(id, useProxy);
-                if (newSingleDownloader.IsAvailable(useProxy))
+                if (newSingleDownloader.TryReserve(useProxy))
                 {
-                    newSingleDownloader.SetUnavailable();
                     Downloaders.Add(newSingleDownloader);
                     return newSingleDownloader;
                 }

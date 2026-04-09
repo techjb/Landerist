@@ -249,7 +249,7 @@ namespace landerist_library.Scrape
         public void Scrape(Page page, bool useProxy)
         {
             WebsitesBlocker.Block(page.Website);
-            var pageScraper = new PageScraper(page, this, useProxy);
+            var pageScraper = new PageScraper(page, useProxy);
             if (pageScraper.Scrape())
             {
                 Interlocked.Increment(ref Success);
