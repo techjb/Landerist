@@ -15,11 +15,11 @@ namespace landerist_tests
             //landerist_library.Landerist_com.FilesUpdater.UpdateUnpublished();
             //landerist_library.Landerist_com.FilesUpdater.UpdateUpdates();
             //landerist_library.Landerist_com.FilesUpdater.UpdateWebsites();
-            //landerist_library.Landerist_com.Landerist_com.UpdateStatistics();
-            //landerist_library.Landerist_com.Landerist_com.UpdateDownloads();
+            //landerist_library.Landerist_com.Landerist_com.UpdateStatisticsPage();
+            //landerist_library.Landerist_com.Landerist_com.UpdateDownloadsPage();
             //landerist_library.Landerist_com.Landerist_com.UpdatePages();
             //landerist_library.Landerist_com.Landerist_com.UpdatePages();
-            //landerist_library.Landerist_com.StatisticsPage.Update();
+            //landerist_library.Landerist_com.StatisticsPage.Update();            
             //landerist_library.Landerist_com.Landerist_com.InvalidateCloudFront();
         }
     }

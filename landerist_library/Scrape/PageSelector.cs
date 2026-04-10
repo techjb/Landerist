@@ -26,7 +26,7 @@ namespace landerist_library.Scrape
         {
             AddUnknownPageType();
             AddNextUpdate();
-            AddUnpublishedPages();
+            //AddRecentlyUnpublishedListingsPages();
         }
 
         private static void AddUnknownPageType()
@@ -48,7 +48,7 @@ namespace landerist_library.Scrape
             AddPages(pages);
         }
 
-        private static void AddUnpublishedPages()
+        private static void AddRecentlyUnpublishedListingsPages()
         {
             if (ScraperIsFull())
             {
@@ -56,7 +56,7 @@ namespace landerist_library.Scrape
             }
 
             var topRows = GetTopRows();
-            var pages = Websites.Pages.GetUnpublishedPages(topRows);
+            var pages = Websites.Pages.GetRecentlyUnpublishedListingsPages(topRows);
             AddPages(pages);
         }
 

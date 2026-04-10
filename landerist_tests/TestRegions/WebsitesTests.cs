@@ -1,3 +1,5 @@
+using landerist_library.Websites;
+
 namespace landerist_tests
 {
     internal static class WebsitesTests
@@ -29,6 +31,13 @@ namespace landerist_tests
             //Websites.UpdateListingsExampleNodeSetNulls();
             //Websites.DeleteNullListingExampleHtml();
             //Websites.UpdateRobotsTxt();
+
+
+            //WebsitesCleanner.DeleteWebsitesWithLessThanTenPages();
+            //WebsitesCleanner.DeleteWebsitesWithoutListings();
+            //WebsitesCleanner.DeleteWebsitesWithoutPageTypeListing();
+
+
         }
     }
 }

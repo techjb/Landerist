@@ -358,27 +358,6 @@ namespace landerist_library.Downloaders.Puppeteer
             }
         }
 
-        public static void KillChrome()
-        {
-            if (!Config.IsConfigurationProduction())
-            {
-                return;
-            }
-
-            Process[] processes = Process.GetProcessesByName("chrome");
-            foreach (Process process in processes)
-            {
-                try
-                {
-                    process.Kill();
-                }
-                catch (Exception exception)
-                {
-                    Logs.Log.WriteError("PuppeteerDownloader", exception);
-                }
-            }
-        }
-
         public static void DoTest()
         {
             // working

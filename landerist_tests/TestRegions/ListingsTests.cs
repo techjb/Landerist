@@ -1,3 +1,5 @@
+using landerist_library.Database;
+
 namespace landerist_tests
 {
     internal static class ListingsTests
@@ -16,6 +18,8 @@ namespace landerist_tests
             //listing1.AddSource(source);
             //ES_Listings.InsertUpdate(page.Website, listing1);
             //ES_Sources.FixListingsWhitoutSource();
+
+            //ListingsCleanner.UnpublishListingsWithoutPage();
         }
     }
 }

@@ -23,8 +23,8 @@ namespace landerist_tests
             Console.Title = "Landerist Tests";
             Start();
             Run();
-            ExitSignal.Wait();
-            //End();
+            //ExitSignal.Wait();
+            End();
         }
 
         private static void Start()
@@ -118,23 +118,23 @@ namespace landerist_tests
         {
             Config.SetOnlyDatabaseToProduction();
 
-            //UrlsTests.Run();
-            //WebsitesTests.Run();
-            //PagesTests.Run();
-            //ScrapperTests.Run();
-            //DownloadersTests.Run();
-            //ListingParserTests.Run();
-            //LocalAITests.Run();
-            //LocationParserTests.Run();
-            //IndexTests.Run();
-            //BackupTests.Run();
-            //StatisticsTests.Run();
-            //ListingsTests.Run();
-            //InsertTests.Run();
-            //LanderistComTests.Run();
-            //DataBaseTests.Run();
-            //TasksTests.Run();
-            //LocalIsListingTests.Run();
+            UrlsTests.Run();
+            WebsitesTests.Run();
+            PagesTests.Run();
+            ScrapperTests.Run();
+            DownloadersTests.Run();
+            ListingParserTests.Run();
+            LocalAITests.Run();
+            LocationParserTests.Run();
+            IndexTests.Run();
+            BackupTests.Run();
+            StatisticsTests.Run();
+            ListingsTests.Run();
+            InsertTests.Run();
+            LanderistComTests.Run();
+            DataBaseTests.Run();
+            TasksTests.Run();
+            LocalIsListingTests.Run();
         }
     }
 }

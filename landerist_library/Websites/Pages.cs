@@ -87,12 +87,12 @@ namespace landerist_library.Websites
             return GetPages(topRows, where);
         }
 
-        public static List<Page> GetUnpublishedPages(int topRows)
+        public static List<Page> GetRecentlyUnpublishedListingsPages(int topRows)
         {
             string where =
                 "P.[UriHash] IN (" +
                 "   SELECT [Guid] FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
-                "   WHERE [ListingStatus] = 'unpublished' AND [UnlistingDate]>DATEADD(day, -2, getdate())" +
+                "   WHERE [ListingStatus] = 'unpublished' AND [UnlistingDate] > DATEADD(day, -2, getdate())" +
                 ")";
             return GetPages(topRows, where);
         }

@@ -1,3 +1,5 @@
+using landerist_library.Downloaders.Puppeteer;
+
 namespace landerist_tests
 {
     internal static class DownloadersTests
@@ -9,6 +11,7 @@ namespace landerist_tests
             //PuppeteerDownloader.KillChrome();
             //PuppeteerDownloader.TestSinglePage();
             //PuppeteerDownloader.UpdateChrome();
+            //PuppeteerDownloader.KillCromeByTaskKill();
         }
     }
 }

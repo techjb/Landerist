@@ -39,7 +39,7 @@ namespace landerist_library.Websites
 
         private int NumPages { get; set; } = 0;
 
-        private int NumListings { get; set; } = 0;
+        private int NumListings { get; set; } = 0; // NumListingsFound (published and unpublished)
 
         private Uri? ListingExampleUri { get; set; }
 
@@ -355,7 +355,7 @@ namespace landerist_library.Websites
                 }
             }
 
-            Console.WriteLine("Deleted " + counter + " listings");
+            //Console.WriteLine("Deleted " + counter + " listings");
         }
 
         private bool DeleteWebsite()

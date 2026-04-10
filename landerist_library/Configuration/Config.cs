@@ -1,8 +1,5 @@
-﻿using Amazon.Comprehend.Model.Internal.MarshallTransformations;
-using landerist_library.Parse.ListingParser;
+﻿using landerist_library.Parse.ListingParser;
 using PuppeteerSharp;
-using System.Net;
-using System.Net.Sockets;
 
 namespace landerist_library.Configuration
 {
@@ -10,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "4.69";
+        public static readonly string VERSION = "4.70";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -253,8 +250,8 @@ namespace landerist_library.Configuration
             DAYS_TO_REMOVE_BATCH_FILES = -30;
 
             MAX_DEGREE_OF_PARALLELISM_SCRAPER = ConfigurationProduction ?
-                //Environment.ProcessorCount * 20 / 100 : // % of the processors
-                20 :
+                //Environment.ProcessorCount * 70 / 100 : // % of the processors
+                30 :
                 1;
 
             //MAX_DEGREE_OF_PARALLELISM_SCRAPER = 5;

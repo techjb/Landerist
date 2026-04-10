@@ -55,13 +55,13 @@ namespace landerist_library.Landerist_com
             return prefix + "_" + datePart + "." + extension;
         }
 
-        public static void UpdateDownloads()
+        public static void UpdateDownloadsPage()
         {
             DownloadsPage.Update();
             InvalidateCloudFront();
         }
 
-        public static void UpdateStatistics()
+        public static void UpdateStatisticsPage()
         {
             StatisticsPage.Update();
             InvalidateCloudFront();
