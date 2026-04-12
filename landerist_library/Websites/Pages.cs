@@ -559,6 +559,11 @@ namespace landerist_library.Websites
 
         public static void UpdateNextUpdate()
         {
+            UpdatePagesNextUpdateWithCurrentAlgorithm();
+        }
+
+        public static void UpdatePagesNextUpdateWithCurrentAlgorithm()
+        {
             var pages = GetPages();
             int total = pages.Count;
             int updated = 0;
@@ -568,7 +573,9 @@ namespace landerist_library.Websites
             Parallel.ForEach(pages, page =>
             {
                 Interlocked.Increment(ref counter);
-                page.SetNextUpdate();
+                DateTime calculationDate = page.Updated ?? page.Inserted;
+                page.NextUpdate = PageNextUpdateCalculator.Calculate(page, calculationDate);
+
                 if (page.UpdateNextUpdate())
                 {
                     Interlocked.Increment(ref updated);
