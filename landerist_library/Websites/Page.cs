@@ -241,27 +241,7 @@ namespace landerist_library.Websites
 
         public void SetNextUpdate()
         {
-            if (PageType == null || PageTypeCounter == null)
-            {
-                NextUpdate = null;
-                return;
-            }
-
-            var addDays = PageType switch
-            {
-                landerist_library.Websites.PageType.MainPage => Config.DEFAULT_DAYS_NEXT_UPDATE,
-                landerist_library.Websites.PageType.MayBeListing => Config.DEFAULT_DAYS_NEXT_UPDATE,
-                landerist_library.Websites.PageType.Listing => Config.DEFAULT_DAYS_NEXT_UPDATE_LISTING,
-                _ => (short)(PageTypeCounter.Value * Config.DEFAULT_DAYS_NEXT_UPDATE),
-            };
-
-            if (IsListingStatusPublished())
-            {
-                addDays = Config.DEFAULT_DAYS_NEXT_UPDATE_LISTING;
-            }
-
-            addDays = Math.Clamp(addDays, Config.MIN_DAYS_NEXT_UPDATE, Config.MAX_DAYS_NEXT_UPDATE);
-            NextUpdate = DateTime.Now.AddDays(addDays);
+            NextUpdate = PageNextUpdateCalculator.Calculate(this, DateTime.Now);
         }
 
         public bool UpdateNextUpdate()
