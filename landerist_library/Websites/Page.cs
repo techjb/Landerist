@@ -3,7 +3,6 @@ using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Downloaders;
 using landerist_library.Index;
-using landerist_library.Parse.ListingParser;
 using landerist_library.Tools;
 using landerist_orels.ES;
 using System.Data;
@@ -46,6 +45,10 @@ namespace landerist_library.Websites
         public string? ResponseBodyText { get; set; }
 
         public string? ResponseBodyTextHash { get; set; }
+
+        public short? ResponseBodyTextNotChangedCounter { get; private set; }
+
+        public short? TransientErrorCounter { get; private set; }
 
         public byte[]? ResponseBodyZipped { get; private set; }
 
@@ -128,6 +131,12 @@ namespace landerist_library.Websites
             LockedBy = dataRow["LockedBy"] is DBNull ? null : dataRow["LockedBy"].ToString();
             WaitingStatus = dataRow["WaitingStatus"] is DBNull ? null : (WaitingStatus)Enum.Parse(typeof(WaitingStatus), dataRow["WaitingStatus"].ToString()!);
             ResponseBodyTextHash = dataRow["ResponseBodyTextHash"] is DBNull ? null : dataRow["ResponseBodyTextHash"].ToString();
+            ResponseBodyTextNotChangedCounter = dataRow.Table.Columns.Contains("ResponseBodyTextNotChangedCounter") && dataRow["ResponseBodyTextNotChangedCounter"] is not DBNull
+                ? (short)dataRow["ResponseBodyTextNotChangedCounter"]
+                : null;
+            TransientErrorCounter = dataRow.Table.Columns.Contains("TransientErrorCounter") && dataRow["TransientErrorCounter"] is not DBNull
+                ? (short)dataRow["TransientErrorCounter"]
+                : null;
             ResponseBodyZipped = dataRow["ResponseBodyZipped"] is DBNull ? null : (byte[])dataRow["ResponseBodyZipped"];
             TokenCount = dataRow["TokenCount"] is DBNull ? null : (int?)dataRow["TokenCount"];
         }
@@ -153,10 +162,13 @@ namespace landerist_library.Websites
         public bool Insert()
         {
             string query =
-                "INSERT INTO " + Pages.PAGES + " " +
+                "INSERT INTO " + Pages.PAGES + " (" +
+                "[Host], [Uri], [UriHash], [Inserted], [Updated], [NextUpdate], [HttpStatusCode], [PageType], " +
+                "[PageTypeCounter], [ListingStatus], [LockedBy], [WaitingStatus], [ResponseBodyTextHash], " +
+                "[ResponseBodyTextNotChangedCounter], [TransientErrorCounter], [ResponseBodyZipped], [TokenCount]) " +
                 "VALUES(@Host, @Uri, @UriHash, @Inserted, @Updated, @NextUpdate, @HttpStatusCode, @PageType, " +
                 "@PageTypeCounter, @ListingStatus, @LockedBy, @WaitingStatus, @ResponseBodyTextHash, " +
-                "CONVERT(varbinary(max), @ResponseBodyZipped), @TokenCount)";
+                "@ResponseBodyTextNotChangedCounter, @TransientErrorCounter, CONVERT(varbinary(max), @ResponseBodyZipped), @TokenCount)";
 
             bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
                 {"Host", Host },
@@ -172,13 +184,19 @@ namespace landerist_library.Websites
                 {"LockedBy", null },
                 {"WaitingStatus", null },
                 {"ResponseBodyTextHash", null },
+                {"ResponseBodyTextNotChangedCounter", null },
+                {"TransientErrorCounter", null },
                 {"ResponseBodyZipped", null  },
                 {"TokenCount", null  },
             });
             if (sucess)
             {
                 Website.IncreaseNumPages();
-            }            
+            }
+            //else
+            //{
+            //    Logs.Log.WriteError("Page Insert", "Failed to insert page: " + Uri);
+            //}
             return sucess;
         }
 
@@ -213,6 +231,8 @@ namespace landerist_library.Websites
                 "[LockedBy] = @LockedBy, " +
                 "[WaitingStatus] = @WaitingStatus, " +
                 "[ResponseBodyTextHash] = @ResponseBodyTextHash, " +
+                "[ResponseBodyTextNotChangedCounter] = @ResponseBodyTextNotChangedCounter, " +
+                "[TransientErrorCounter] = @TransientErrorCounter, " +
                 "[ResponseBodyZipped] = CASE WHEN @ResponseBodyZipped IS NULL THEN NULL ELSE CONVERT(varbinary(max), @ResponseBodyZipped) END," +
                 "[TokenCount] = @TokenCount " +
                 "WHERE [UriHash] = @UriHash";
@@ -227,6 +247,8 @@ namespace landerist_library.Websites
                 {"LockedBy", LockedBy?.ToString()},
                 {"WaitingStatus", WaitingStatus?.ToString()},
                 {"ResponseBodyTextHash", ResponseBodyTextHash},
+                {"ResponseBodyTextNotChangedCounter", ResponseBodyTextNotChangedCounter},
+                {"TransientErrorCounter", TransientErrorCounter},
                 {"ResponseBodyZipped", ResponseBodyZipped},
                 {"TokenCount", TokenCount},
                 {"UriHash", UriHash },
@@ -345,15 +367,24 @@ namespace landerist_library.Websites
             var htmlDocument = GetHtmlDocument();
             if (htmlDocument == null)
             {
+                ResponseBodyTextNotChanged = false;
+                ResponseBodyTextNotChangedCounter = null;
                 return;
             }
+
             ResponseBodyText = HtmlToText.GetText(htmlDocument);
             if (string.IsNullOrEmpty(ResponseBodyText))
             {
+                ResponseBodyTextNotChanged = false;
+                ResponseBodyTextNotChangedCounter = null;
                 return;
             }
+
             string hash = Strings.GetHash(ResponseBodyText);
             ResponseBodyTextNotChanged = hash == ResponseBodyTextHash;
+            ResponseBodyTextNotChangedCounter = ResponseBodyTextNotChanged
+                ? (short)Math.Min((ResponseBodyTextNotChangedCounter ?? 0) + 1, Config.MAX_PAGETYPE_COUNTER)
+                : (short)0;
             ResponseBodyTextHash = hash;
         }
 
@@ -534,6 +565,8 @@ namespace landerist_library.Websites
 
         public void SetPageType(PageType? newPageType)
         {
+            SetTransientErrorCounter(newPageType);
+
             if (PageType == newPageType)
             {
                 PageTypeCounter = (short)Math.Min((PageTypeCounter ?? 0) + 1, Config.MAX_PAGETYPE_COUNTER);
@@ -543,6 +576,18 @@ namespace landerist_library.Websites
                 PageTypeCounter = 1;
                 PageType = newPageType;
             }
+        }
+
+        private void SetTransientErrorCounter(PageType? newPageType)
+        {
+            if (newPageType == landerist_library.Websites.PageType.HttpStatusCodeNotOK ||
+                newPageType == landerist_library.Websites.PageType.ResponseBodyNullOrEmpty)
+            {
+                TransientErrorCounter = (short)Math.Min((TransientErrorCounter ?? 0) + 1, Config.MAX_PAGETYPE_COUNTER);
+                return;
+            }
+
+            TransientErrorCounter = 0;
         }
 
         public void Dispose()
@@ -684,6 +729,36 @@ namespace landerist_library.Websites
         public bool IsHttpStatusCodeNotOK()
         {
             return PageType == landerist_library.Websites.PageType.HttpStatusCodeNotOK;
+        }
+
+        public bool IsHttpStatusCodeNotFound()
+        {
+            return HttpStatusCode == 404;
+        }
+
+        public bool IsHttpStatusCodeTooManyRequests()
+        {
+            return HttpStatusCode == 429;
+        }
+
+        public bool IsHttpStatusCodeForbidden()
+        {
+            return HttpStatusCode == 403;
+        }
+
+        public bool IsHttpStatusCodeGone()
+        {
+            return HttpStatusCode == 410;
+        }
+
+        public bool IsHttpStatusCodeServerError()
+        {
+            return HttpStatusCode >= 500 && HttpStatusCode <= 599;
+        }
+
+        public bool IsHttpStatusCodeClientError()
+        {
+            return HttpStatusCode >= 400 && HttpStatusCode <= 499;
         }
 
         public bool IsResponseBodyNullOrEmpty()

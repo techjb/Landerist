@@ -123,6 +123,8 @@ namespace landerist_library.Websites
                     "INSERTED.[LockedBy], " +
                     "INSERTED.[WaitingStatus], " +
                     "INSERTED.[ResponseBodyTextHash], " +
+                    "INSERTED.[ResponseBodyTextNotChangedCounter], " +
+                    "INSERTED.[TransientErrorCounter], " +
                     "INSERTED.[ResponseBodyZipped], " +
                     "INSERTED.[TokenCount], " +
                     "W.[MainUri], " +
@@ -277,6 +279,8 @@ namespace landerist_library.Websites
                 pagesTableName + ".[LockedBy], " +
                 pagesTableName + ".[WaitingStatus], " +
                 pagesTableName + ".[ResponseBodyTextHash], " +
+                pagesTableName + ".[ResponseBodyTextNotChangedCounter], " +
+                pagesTableName + ".[TransientErrorCounter], " +
                 pagesTableName + ".[ResponseBodyZipped], " +
                 pagesTableName + ".[TokenCount], " +
                 Websites.WEBSITES + ".[MainUri], " +

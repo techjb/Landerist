@@ -362,3 +362,18 @@ USE [master]
 GO
 ALTER DATABASE [Landerist] SET  READ_WRITE 
 GO
+
+USE [Landerist]
+GO
+IF COL_LENGTH('dbo.PAGES', 'ResponseBodyTextNotChangedCounter') IS NULL
+BEGIN
+	ALTER TABLE [dbo].[PAGES]
+	ADD [ResponseBodyTextNotChangedCounter] [smallint] NULL
+END
+GO
+IF COL_LENGTH('dbo.PAGES', 'TransientErrorCounter') IS NULL
+BEGIN
+	ALTER TABLE [dbo].[PAGES]
+	ADD [TransientErrorCounter] [smallint] NULL
+END
+GO
