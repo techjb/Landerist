@@ -65,6 +65,7 @@
         private static bool IsTransientErrorPageType(PageType pageType)
         {
             return pageType == PageType.HttpStatusCodeNotOK ||
+                pageType == PageType.Timeout ||
                 pageType == PageType.ResponseBodyNullOrEmpty;
         }
 

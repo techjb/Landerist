@@ -17,6 +17,11 @@ namespace landerist_library.Parse.PageTypeParser
         public (PageType? pageType, landerist_orels.ES.Listing? listing, bool waitingAIRequest)
             GetPageType()
         {
+            if (Page.HttpStatusCode is null)
+            {
+                return (PageType.Timeout, null, false);
+            }
+
             if (Page.HttpStatusCode != 200)
             {
                 return (PageType.HttpStatusCodeNotOK, null, false);

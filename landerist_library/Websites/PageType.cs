@@ -2,6 +2,7 @@
 {
     public enum PageType
     {
+        Timeout,
         HttpStatusCodeNotOK,        
         IncorrectLanguage,
         BlockedByRobotsTxt,

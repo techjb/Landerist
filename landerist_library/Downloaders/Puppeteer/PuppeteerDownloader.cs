@@ -504,7 +504,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 }
                 catch (Exception exception)
                 {
-                    Logs.Log.WriteInfo("PuppeteerDownloader ExpressionRemoveCookies", exception.Message);
+                    //Logs.Log.WriteInfo("PuppeteerDownloader ExpressionRemoveCookies", exception.Message);
                 }
 
                 try
@@ -514,7 +514,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 }
                 catch (Exception exception)
                 {
-                    Logs.Log.WriteInfo("PuppeteerDownloader ExpressionRemoveInvisibleElements", exception.Message);
+                    //Logs.Log.WriteInfo("PuppeteerDownloader ExpressionRemoveInvisibleElements", exception.Message);
                 }
 
                 if (Config.TAKE_SCREENSHOT)
