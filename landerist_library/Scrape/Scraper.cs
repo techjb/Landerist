@@ -33,9 +33,17 @@ namespace landerist_library.Scrape
 
         private int TotalDownloadErrors = 0;
 
-        private int Skipped = 0;
+        private int SkippedByRobotsTxt = 0;
 
-        private int TotalSkipped = 0;
+        private int TotalSkippedByRobotsTxt = 0;
+
+        private int SkippedByCrawlDelay = 0;
+
+        private int TotalSkippedByCrawlDelay = 0;
+
+        private int SkippedByBlockedWebsite = 0;
+
+        private int TotalSkippedByBlockedWebsite = 0;
 
         private CancellationTokenSource _cancellation = new();
 
@@ -102,7 +110,9 @@ namespace landerist_library.Scrape
             Success = 0;
             Crashed = 0;
             DownloadErrors = 0;
-            Skipped = 0;
+            SkippedByRobotsTxt = 0;
+            SkippedByCrawlDelay = 0;
+            SkippedByBlockedWebsite = 0;
 
             Console.WriteLine("Scrapping " + Counter + " pages ..");
 
@@ -143,21 +153,21 @@ namespace landerist_library.Scrape
             if (!page.Website.IsAllowedByRobotsTxt(page.Uri))
             {
                 page.SetPageTypeAndNextUpdate(PageType.BlockedByRobotsTxt);
-                Interlocked.Increment(ref Skipped);
+                Interlocked.Increment(ref SkippedByRobotsTxt);
                 return;
             }
 
             if (page.Website.CrawlDelayTooBig())
             {
                 page.SetPageTypeAndNextUpdate(PageType.CrawlDelayTooBig);
-                Interlocked.Increment(ref Skipped);
+                Interlocked.Increment(ref SkippedByCrawlDelay);
                 return;
             }
 
             var isBlocked = WebsitesBlocker.IsBlocked(page.Website);
             if (isBlocked && !Config.PROXY_ENABLED)
             {
-                Interlocked.Increment(ref Skipped);
+                Interlocked.Increment(ref SkippedByBlockedWebsite);
                 return;
             }
 
@@ -190,7 +200,9 @@ namespace landerist_library.Scrape
         {
             TotalCounter += Counter;
             TotalScraped += Scraped;
-            TotalSkipped += Skipped;
+            TotalSkippedByRobotsTxt += SkippedByRobotsTxt;
+            TotalSkippedByCrawlDelay += SkippedByCrawlDelay;
+            TotalSkippedByBlockedWebsite += SkippedByBlockedWebsite;
             TotalSuccess += Success;
             TotalCrashed += Crashed;
             TotalDownloadErrors += DownloadErrors;
@@ -199,7 +211,11 @@ namespace landerist_library.Scrape
         private string GetLogText()
         {
             var scrappedPercentage = GetPercentage(TotalScraped, TotalCounter);
-            var skippedPercentage = GetPercentage(TotalSkipped, TotalCounter);
+            var totalSkipped = TotalSkippedByRobotsTxt + TotalSkippedByCrawlDelay + TotalSkippedByBlockedWebsite;
+            var skippedPercentage = GetPercentage(totalSkipped, TotalCounter);
+            var skippedByRobotsTxtPercentage = GetPercentage(TotalSkippedByRobotsTxt, TotalCounter);
+            var skippedByCrawlDelayPercentage = GetPercentage(TotalSkippedByCrawlDelay, TotalCounter);
+            var skippedByBlockedWebsitePercentage = GetPercentage(TotalSkippedByBlockedWebsite, TotalCounter);
             var successPercentage = GetPercentage(TotalSuccess, TotalScraped);
             var crashedPercentage = GetPercentage(TotalCrashed, TotalScraped);
             var downloadErrorsPercentage = GetPercentage(TotalDownloadErrors, TotalSuccess);
@@ -210,7 +226,11 @@ namespace landerist_library.Scrape
                 $"[Ok {TotalSuccess} ({successPercentage}%) => " +
                 $"[DlErr {TotalDownloadErrors}  ({downloadErrorsPercentage}%)] | " +
                 $"Crash {TotalCrashed} ({crashedPercentage}%)] | " +
-                $"Skip {TotalSkipped} ({skippedPercentage}%)]";           
+                $"Skip {totalSkipped} ({skippedPercentage}%) => " +
+                $"[RobotsTxt {TotalSkippedByRobotsTxt} ({skippedByRobotsTxtPercentage}%) | " +
+                $"CrawlDelay {TotalSkippedByCrawlDelay} ({skippedByCrawlDelayPercentage}%) | " +
+                $"Blocked {TotalSkippedByBlockedWebsite} ({skippedByBlockedWebsitePercentage}%)]" +
+                $"]";
         }
 
         private static double GetPercentage(int value, int total)

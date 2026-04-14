@@ -26,7 +26,7 @@ namespace landerist_tests
             //landerist_library.Scrape.PageSelector.SelectTop1();
             //Console.WriteLine("Block: " + WebsitesBlocker.Block(page.Website));
             //Console.WriteLine("IsBlocked: " + WebsitesBlocker.IsBlocked(page.Website));
-            //Scrapper.Start();
+            //new landerist_library.Scrape.Scraper().Start();
         }
     }
 }

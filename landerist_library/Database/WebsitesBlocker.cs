@@ -4,10 +4,6 @@ namespace landerist_library.Database
 {
     public class WebsitesBlocker
     {
-        private const int BlockMinSecconds = 2;
-
-        private const int BlockMaxSecconds = 5;
-
         private const string WEBSITES_BLOCKER = "[WEBSITES_BLOCKER]";
 
         public static bool IsBlocked(Website website)
@@ -20,34 +16,19 @@ namespace landerist_library.Database
                 "           ELSE 0 " +
                 "       END " +
                 "   AS BIT) AS IsBlocked " +
-                "FROM " + WEBSITES_BLOCKER +
-                "WHERE IpOrHost IN (@Ip, @Host)";
+                "FROM " + WEBSITES_BLOCKER + " " +
+                "WHERE IpOrHost = @Host";
 
             return new DataBase().QueryBool(query, new Dictionary<string, object?>()
             {
-                {"Ip", website.IpAddress},
                 {"Host", website.Host}
             });
         }
 
         public static bool Block(Website website)
         {
-            var ipBlockUntil = CalculateIpBlockUntil();
             var hostBlockUntil = CalculateHostBlockUntil(website);
             string query =
-                "IF EXISTS (" +
-                "   SELECT 1 " +
-                "   FROM " + WEBSITES_BLOCKER + " " +
-                "   WHERE IpOrHost = @Ip)" +
-                "BEGIN" +
-                "   UPDATE " + WEBSITES_BLOCKER + " " +
-                "   SET BlockUntil = @IpBlockUntil " +
-                "   WHERE IpOrHost = @Ip;" +
-                "END " +
-                "ELSE BEGIN " +
-                "   INSERT INTO " + WEBSITES_BLOCKER + " (IpOrHost, BlockUntil) " +
-                "   VALUES (@Ip, @IpBlockUntil) " +
-                "END " +
                 "IF EXISTS (" +
                "   SELECT 1 " +
                "   FROM " + WEBSITES_BLOCKER + " " +
@@ -64,8 +45,6 @@ namespace landerist_library.Database
 
             return new DataBase().Query(query, new Dictionary<string, object?>()
             {
-                {"Ip", website.IpAddress},
-                {"IpBlockUntil", ipBlockUntil},
                 {"Host", website.Host},
                 {"HostBlockUntil", hostBlockUntil},
             });
@@ -77,23 +56,12 @@ namespace landerist_library.Database
             return new DataBase().Query(query);
         }
 
-        private static DateTime CalculateIpBlockUntil()
-        {
-            int secconds = RandomSecconds();
-            return DateTime.Now.AddSeconds(secconds);
-        }
-
         private static DateTime CalculateHostBlockUntil(Website website)
         {
-            int randomSecconds = RandomSecconds();
-            int crawDelay = website.CrawlDelay();
-            int secconds = Math.Max(randomSecconds, crawDelay);
-            return DateTime.Now.AddSeconds(secconds);
-        }
-
-        private static int RandomSecconds()
-        {
-            return Random.Shared.Next(BlockMinSecconds, BlockMaxSecconds);
+            int randomMilliseconds = Random.Shared.Next(2000, 5000);
+            int crawlDelayMilliseconds = Math.Min(website.CrawlDelay(), Configuration.Config.MAX_CRAW_DELAY_SECONDS) * 1000;
+            int milliseconds = Math.Max(randomMilliseconds, crawlDelayMilliseconds);
+            return DateTime.Now.AddMilliseconds(milliseconds);
         }
     }
 }

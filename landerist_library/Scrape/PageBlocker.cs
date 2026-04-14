@@ -13,6 +13,8 @@ namespace landerist_library.Scrape
 
         private const int MaxSecconds = 6;
 
+        private const int MaxCrawlDelaySecconds = 60;
+
         private static readonly List<(Page page, DateTime blockUntil)> BlockedPages = [];
 
         public bool IsBlocked(Page page)
@@ -76,7 +78,7 @@ namespace landerist_library.Scrape
         private static DateTime CalculateHostBlockUntil(Website website)
         {
             int randomSecconds = RandomSecconds();
-            int crawDelay = website.CrawlDelay();
+            int crawDelay = Math.Min(website.CrawlDelay(), MaxCrawlDelaySecconds);
             int secconds = Math.Max(randomSecconds, crawDelay);
             return DateTime.Now.AddSeconds(secconds);
         }

@@ -20,11 +20,7 @@ namespace landerist_library.Configuration
         public static readonly int MIN_PAGES_PER_SCRAPE = 10;
 
         public static readonly int MAX_PAGES_PER_SCRAPE = 4000;
-
-        public static readonly int MAX_PAGES_PER_HOSTS_PER_SCRAPE = 5;
-
-        public static readonly int MAX_PAGES_PER_IP_PER_SCRAPE = 5;
-
+       
         public static readonly bool DOWNLOADERS_POOL_ENABLED = true;
 
         public static readonly int MAX_SITEMAPS_PER_WEBSITE = 50;
@@ -52,7 +48,7 @@ namespace landerist_library.Configuration
 
         public static readonly int HTTPCLIENT_SECONDS_TIMEOUT = 10;
 
-        public static readonly int MAX_CRAW_DELAY_SECONDS = 60 * 60;
+        public static readonly int MAX_CRAW_DELAY_SECONDS = 30;
 
         public static readonly double MINIMUM_PERCENTAGE_TO_BE_SIMILAR_PAGE = 0.85;
 
