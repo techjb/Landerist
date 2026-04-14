@@ -26,7 +26,7 @@ namespace landerist_library.Scrape
         {
             AddUnknownPageType();
             AddNextUpdate();
-            //AddRecentlyUnpublishedListingsPages();
+            AddRecentlyUnpublishedListingsPages();
         }
 
         private static void AddUnknownPageType()
