@@ -31,6 +31,7 @@ namespace landerist_tests
             //WebsitesCleanner.DeleteWebsitesWithLessThanTenPages();
             //WebsitesCleanner.DeleteWebsitesWithoutListings();
             //WebsitesCleanner.DeleteWebsitesWithoutPageTypeListing();
+            //WebsitesCleanner.DeleteWebsitesWithoutPublishedListings();
 
 
         }
