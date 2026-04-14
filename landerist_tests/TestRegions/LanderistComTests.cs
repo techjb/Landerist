@@ -20,6 +20,7 @@ namespace landerist_tests
             //landerist_library.Landerist_com.Landerist_com.UpdatePages();
             //landerist_library.Landerist_com.Landerist_com.UpdatePages();
             //landerist_library.Landerist_com.StatisticsPage.SetPageTypeAndNextUpdate();            
+
             //landerist_library.Landerist_com.Landerist_com.InvalidateCloudFront();
         }
     }
