@@ -11,6 +11,7 @@ namespace landerist_library.Websites
     public class Pages
     {
         public const string PAGES = "[PAGES]";
+        private const int GET_ALL_PAGES_BATCH_SIZE = 1000;
 
         public static Page? GetPage(string uriHash)
         {
@@ -31,8 +32,17 @@ namespace landerist_library.Websites
         public static List<Page> GetPages()
         {
             Console.WriteLine("Reading all pages");
-            string query = SelectQuery();
-            return GetPages(query);
+            List<Page> pages = [];
+            int batchNumber = 0;
+
+            foreach (var batch in GetPageBatches())
+            {
+                batchNumber++;
+                pages.AddRange(batch);
+                Console.WriteLine("Read batch " + batchNumber + ": " + batch.Count + " pages. Total: " + pages.Count);
+            }
+
+            return pages;
         }
 
         public static List<Page> GetPages(Website website)
@@ -257,6 +267,58 @@ namespace landerist_library.Websites
                 "FROM " + PAGES + " " +
                 "INNER JOIN " + Websites.WEBSITES +
                 " ON " + PAGES + ".[Host] = " + Websites.WEBSITES + ".[Host] ";
+        }
+
+        private static int CountPages()
+        {
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + PAGES;
+
+            return new DataBase().QueryInt(query);
+        }
+
+        private static IEnumerable<List<Page>> GetPageBatches(int batchSize = GET_ALL_PAGES_BATCH_SIZE)
+        {
+            string? lastUriHash = null;
+
+            while (true)
+            {
+                var batch = GetPagesBatch(lastUriHash, batchSize);
+                if (batch.Count == 0)
+                {
+                    yield break;
+                }
+
+                yield return batch;
+
+                if (batch.Count < batchSize)
+                {
+                    yield break;
+                }
+
+                lastUriHash = batch[^1].UriHash;
+            }
+        }
+
+        private static List<Page> GetPagesBatch(string? lastUriHash, int batchSize)
+        {
+            string where = lastUriHash == null
+                ? string.Empty
+                : "WHERE " + PAGES + ".[UriHash] > @LastUriHash ";
+
+            string query =
+                SelectQuery(batchSize) +
+                where +
+                "ORDER BY " + PAGES + ".[UriHash] ASC";
+
+            Dictionary<string, object?> dictionary = [];
+            if (lastUriHash != null)
+            {
+                dictionary.Add("LastUriHash", lastUriHash);
+            }
+
+            return GetPages(query, dictionary);
         }
 
         private static string SelectColumns(string pagesTableName = "")
@@ -563,33 +625,31 @@ namespace landerist_library.Websites
 
         public static void UpdateNextUpdate()
         {
-            UpdatePagesNextUpdateWithCurrentAlgorithm();
-        }
-
-        public static void UpdatePagesNextUpdateWithCurrentAlgorithm()
-        {
-            var pages = GetPages();
-            int total = pages.Count;
+            int total = CountPages();
             int updated = 0;
             int counter = 0;
             int errors = 0;
 
-            Parallel.ForEach(pages, page =>
+            foreach (var pages in GetPageBatches())
             {
-                Interlocked.Increment(ref counter);
-                DateTime calculationDate = page.Updated ?? page.Inserted;
-                page.NextUpdate = PageNextUpdateCalculator.Calculate(page, calculationDate);
+                Parallel.ForEach(pages, page =>
+                {
+                    Interlocked.Increment(ref counter);
+                    DateTime calculationDate = page.Updated ?? page.Inserted;
+                    page.NextUpdate = PageNextUpdateCalculator.Calculate(page, calculationDate);
 
-                if (page.UpdateNextUpdate())
-                {
-                    Interlocked.Increment(ref updated);
-                }
-                else
-                {
-                    Interlocked.Increment(ref errors);
-                }
-                Console.WriteLine(counter + "/" + total + " updated: " + updated + " errors: " + errors);
-            });
+                    if (page.UpdateNextUpdate())
+                    {
+                        Interlocked.Increment(ref updated);
+                    }
+                    else
+                    {
+                        Interlocked.Increment(ref errors);
+                    }
+                    Console.WriteLine(counter + "/" + total + " updated: " + updated + " errors: " + errors);
+                });
+            }
+
             Console.WriteLine(counter + "/" + total + " updated: " + updated + " errors: " + errors);
         }
 

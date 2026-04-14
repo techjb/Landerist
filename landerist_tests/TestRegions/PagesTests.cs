@@ -1,3 +1,5 @@
+using landerist_library.Websites;
+
 namespace landerist_tests
 {
     internal static class PagesTests
@@ -19,6 +21,8 @@ namespace landerist_tests
             //new Page("https://areagestio.com/propiedades/25974555/").Insert();
             //var page = new Page("https://inmobiliariascalifal.com/inmueble/venta/piso/cordoba/cordoba/cal04135/");
             //page.Insert();
+
+            Pages.UpdateNextUpdate();
         }
     }
 }
