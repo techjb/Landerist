@@ -44,6 +44,8 @@
             }
 
             addDays += GetDeterministicJitterDays(page);
+            double addDaysMultiplier = 2d;  // todo: remove have enough data to confirm the new schedule is working as expected
+            addDays *= addDaysMultiplier;
             addDays = Math.Max(1d, addDays);
             return now.AddDays(addDays);
         }

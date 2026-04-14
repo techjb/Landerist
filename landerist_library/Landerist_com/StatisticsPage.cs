@@ -22,7 +22,7 @@ namespace landerist_library.Landerist_com
 
         private static readonly List<string> Charts = [];
 
-        public static void Update()
+        public static void UpdateCharts()
         {
             try
             {
@@ -53,7 +53,7 @@ namespace landerist_library.Landerist_com
                 UnPublishedHttpStatusCode();
                 HttpStatusCode();
 
-                if (UpdateStatisticsPage())
+                if (UpdateStatisticsHtmlPage())
                 {
                     Log.WriteInfo("StatisticsPage", "Updated statistics page");
                 }
@@ -395,7 +395,7 @@ namespace landerist_library.Landerist_com
             return string.Join(",", data);
         }
 
-        private static bool UpdateStatisticsPage()
+        private static bool UpdateStatisticsHtmlPage()
         {
             var statisticsTemplate = File.ReadAllText(StatisticsTemplateHtmlFile);
             var charts = string.Join("; " + Environment.NewLine, Charts);

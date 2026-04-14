@@ -1,4 +1,4 @@
-using landerist_library.Websites;
+using landerist_library.Pages;
 
 namespace landerist_tests
 {
@@ -22,7 +22,7 @@ namespace landerist_tests
             //var page = new Page("https://inmobiliariascalifal.com/inmueble/venta/piso/cordoba/cordoba/cal04135/");
             //page.Insert();
 
-            //Pages.UpdateNextUpdate(); // 1h
+            //Pages.UpdateNextUpdate(); // 30 min
         }
     }
 }

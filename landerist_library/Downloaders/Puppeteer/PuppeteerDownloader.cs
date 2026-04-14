@@ -459,6 +459,10 @@ namespace landerist_library.Downloaders.Puppeteer
             string? content = null;
             byte[]? screenShot = null;
             BrowserChrashed = false;
+            if (BrowserPage is null)
+            {
+                return (null, null);
+            }
 
             try
             {
@@ -503,7 +507,7 @@ namespace landerist_library.Downloaders.Puppeteer
                     SetExecutionStep("Removing cookie banners");
                     await BrowserPage.EvaluateExpressionAsync(ExpressionRemoveCookies);
                 }
-                catch (Exception exception)
+                catch //(Exception exception)
                 {
                     //Logs.Log.WriteInfo("PuppeteerDownloader ExpressionRemoveCookies", exception.Message);
                 }
@@ -513,7 +517,7 @@ namespace landerist_library.Downloaders.Puppeteer
                     SetExecutionStep("Removing invisible elements");
                     await BrowserPage.EvaluateFunctionAsync(ExpressionRemoveInvisibleElements);
                 }
-                catch (Exception exception)
+                catch //(Exception exception)
                 {
                     //Logs.Log.WriteInfo("PuppeteerDownloader ExpressionRemoveInvisibleElements", exception.Message);
                 }

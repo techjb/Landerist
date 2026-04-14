@@ -63,13 +63,13 @@ namespace landerist_library.Landerist_com
 
         public static void UpdateStatisticsPage()
         {
-            StatisticsPage.Update();
+            StatisticsPage.UpdateCharts();
             InvalidateCloudFront();
         }
         public static void UpdatePages()
         {
             DownloadsPage.Update();
-            StatisticsPage.Update();
+            StatisticsPage.UpdateCharts();
             InvalidateCloudFront();
         }
 
