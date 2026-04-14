@@ -24,12 +24,7 @@ namespace landerist_tests
 
             //Websites.DeleteFromFile();
             //new Website("promoaguilera.com").DeleteCurentMachineLogs();
-            //new Website("inmobiliariainsignia.com").UpdateListingExample("https://inmobiliariainsignia.com/inmueble/preciosa-casa-reformada-a-capricho-en-la-localidad-urrugne/");
             //new Website("aransahomes.es").RemoveListingExample();
-            //Websites.UpdateListingExampleUriFromFile();
-            //Websites.TestListingExampleUri();
-            //Websites.UpdateListingsExampleNodeSetNulls();
-            //Websites.DeleteNullListingExampleHtml();
             //Websites.UpdateRobotsTxt();
 
 

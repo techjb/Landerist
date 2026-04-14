@@ -74,54 +74,10 @@ namespace landerist_library.Parse.PageTypeParser
 
         public static bool HtmlNotSimilarToListing(Page page)
         {
-            if (page?.Website?.ListingExampleNodeSet == null)
-            {
-                return false;
-            }
-
-            var htmlDocument = page.GetHtmlDocument();
-            if (htmlDocument?.DocumentNode == null)
-            {
-                return false;
-            }
-
-            try
-            {
-                var nodeSet1 = JsonConvert.DeserializeObject<HashSet<string>>(page.Website.ListingExampleNodeSet);
-                if (nodeSet1 != null)
-                {
-                    var nodeSet2 = GetNodeSet(htmlDocument);
-
-                    double similarity = JaccardCompare(nodeSet1, nodeSet2);
-                    return similarity < Configuration.Config.MINIMUM_PERCENTAGE_TO_BE_SIMILAR_PAGE;
-                }
-            }
-            catch (Exception exception)
-            {
-                Logs.Log.WriteError("ListingSimilarity HtmlNotSimilarToListing", exception);
-            }
-
             return false;
         }
 
-        //private static double JaccardCompare(HtmlDocument htmlDocument1, HtmlDocument htmlDocument2)
-        //{
-        //    HashSet<string> nodeSet1 = [];
-        //    HashSet<string> nodeSet2 = [];
-        //
-        //    BuildNodeSet(htmlDocument1.DocumentNode, nodeSet1);
-        //    BuildNodeSet(htmlDocument2.DocumentNode, nodeSet2);
-        //
-        //    return JaccardCompare(nodeSet1, nodeSet2);
-        //}
-
-        //private static double JaccardCompare(HashSet<string> nodeSet1, HtmlDocument htmlDocument)
-        //{
-        //    HashSet<string> nodeSet2 = [];
-        //
-        //    BuildNodeSet(htmlDocument.DocumentNode, nodeSet2);
-        //    return JaccardCompare(nodeSet1 , nodeSet2);
-        //}
+       
 
         private static double JaccardCompare(HashSet<string> nodeSet1, HashSet<string> nodeSet2)
         {

@@ -44,10 +44,6 @@ namespace landerist_library.Websites
 
         private Uri? ListingExampleUri { get; set; }
 
-        public string? ListingExampleNodeSet { get; set; }
-
-        public DateTime? ListingExampleNodeSetUpdated { get; set; }
-
         public Robots? Robots = null;
 
         public LanguageCode LanguageCode = LanguageCode.es;
@@ -127,8 +123,6 @@ namespace landerist_library.Websites
             NumPages = (int)dataRow["NumPages"];
             NumListings = (int)dataRow["NumListings"];
             ListingExampleUri = dataRow["ListingExampleUri"] is DBNull ? null : new Uri(dataRow["ListingExampleUri"].ToString()!);
-            ListingExampleNodeSet = dataRow["ListingExampleNodeSet"] is DBNull ? null : dataRow["ListingExampleNodeSet"].ToString();
-            ListingExampleNodeSetUpdated = dataRow["ListingExampleNodeSetUpdated"] is DBNull ? null : (DateTime)dataRow["ListingExampleNodeSetUpdated"];
         }
 
         public bool Insert()
@@ -137,7 +131,7 @@ namespace landerist_library.Websites
                 "INSERT INTO " + Websites.WEBSITES + " VALUES " +
                 "(@MainUri, @Host, @LanguageCode, @CountryCode, @RobotsTxt, @RobotsTxtUpdated, " +
                 "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @NumPages, @NumListings, " +
-                "@ListingExampleUri, @ListingExampleNodeSet, @ListingExampleNodeSetUpdated)";
+                "@ListingExampleUri)";
 
             var parameters = GetQueryParameters();
             return new DataBase().Query(query, parameters);
@@ -157,9 +151,7 @@ namespace landerist_library.Websites
                 "[IpAddressUpdated] = @IpAddressUpdated, " +
                 "[NumPages] = @NumPages, " +
                 "[NumListings] = @NumListings, " +
-                "[ListingExampleUri] = @ListingExampleUri, " +
-                "[ListingExampleNodeSet] = @ListingExampleNodeSet, " +
-                "[ListingExampleNodeSetUpdated] = @ListingExampleNodeSetUpdated " +
+                "[ListingExampleUri] = @ListingExampleUri " +
                 "WHERE [Host] = @Host";
 
             var parameters = GetQueryParameters();
@@ -181,8 +173,6 @@ namespace landerist_library.Websites
                 {"NumPages", NumPages },
                 {"NumListings", NumListings },
                 {"ListingExampleUri", ListingExampleUri?.ToString() },
-                {"ListingExampleNodeSet", ListingExampleNodeSet },
-                {"ListingExampleNodeSetUpdated", ListingExampleNodeSetUpdated },
             };
         }
 
@@ -423,75 +413,9 @@ namespace landerist_library.Websites
             return null;
         }
 
-        //public bool UpdateListingExample(string url)
-        //{
-        //    if (Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
-        //    {
-        //        return UpdateListingExample(uri);
-        //    }
-        //    return false;
-        //}
-
-        //public bool UpdateListingExample(Uri listingExampleUri)
-        //{
-        //    if (!listingExampleUri.Host.Equals(Host) ||
-        //        listingExampleUri.Equals(MainUri))
-        //    {
-        //        return false;
-        //    }
-        //    ListingExampleUri = listingExampleUri;
-        //    ListingExampleNodeSet = null;
-        //    ListingExampleNodeSetUpdated = null;
-        //    return UpdateListingExampleNodeSet();
-        //}
-
-        //public void SetListingExampleUri(Uri uri)
-        //{
-        //    ListingExampleUri = uri;
-        //    SetListingExampleNodeSet();
-        //}
-
-        //public bool UpdateListingExampleNodeSet()
-        //{
-        //    if (SetListingExampleNodeSet())
-        //    {
-        //        return SetPageTypeAndNextUpdate();
-        //    }
-        //    return false;
-        //}
-
-        //private bool SetListingExampleNodeSet()
-        //{
-        //    if (ListingExampleUri == null)
-        //    {
-        //        return false;
-        //    }
-
-        //    HttpClientDownloader httpClientDownloader = new();
-        //    try
-        //    {
-        //        httpClientDownloader.GetAsync(LanguageCode, ListingExampleUri);
-        //        if (httpClientDownloader.Content != null)
-        //        {
-        //            var htmlDocument = new HtmlDocument();
-        //            htmlDocument.LoadHtml(httpClientDownloader.Content);
-        //            ListingExampleNodeSet = ListingSimilarity.GetNodeSetSerialized(htmlDocument);
-        //            ListingExampleNodeSetUpdated = DateTime.Now;
-        //            return true;
-        //        }
-        //    }
-        //    catch (Exception exception)
-        //    {
-        //        Console.WriteLine(exception.Message);
-        //    }
-        //    return false;
-        //}
-
         public bool RemoveListingExample()
         {
             ListingExampleUri = null;
-            ListingExampleNodeSet = null;
-            ListingExampleNodeSetUpdated = null;
             return Update();
         }
 
@@ -632,8 +556,7 @@ namespace landerist_library.Websites
                 IpAddress = null;
                 Robots = null;
                 RobotsTxt = null;
-                ListingExampleUri = null;
-                ListingExampleNodeSet = null;
+                ListingExampleUri = null;                
             }
 
             Disposed = true;
