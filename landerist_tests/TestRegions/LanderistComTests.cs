@@ -9,8 +9,8 @@ namespace landerist_tests
             //landerist_library.Statistics.StatisticsSnapshot.SnapshotHttpStatusCode7Days();
             //landerist_library.Statistics.StatisticsSnapshot.SnapshotPageType7Days();
 
-            //DownloadFilesUpdater.Update();
-            //landerist_library.Landerist_com.FilesUpdater.Update();
+            //DownloadFilesUpdater.SetPageTypeAndNextUpdate();
+            //landerist_library.Landerist_com.FilesUpdater.SetPageTypeAndNextUpdate();
             //landerist_library.Landerist_com.FilesUpdater.UpdatePublished();
             //landerist_library.Landerist_com.FilesUpdater.UpdateUnpublished();
             //landerist_library.Landerist_com.FilesUpdater.UpdateUpdates();
@@ -19,7 +19,7 @@ namespace landerist_tests
             //landerist_library.Landerist_com.Landerist_com.UpdateDownloadsPage();
             //landerist_library.Landerist_com.Landerist_com.UpdatePages();
             //landerist_library.Landerist_com.Landerist_com.UpdatePages();
-            //landerist_library.Landerist_com.StatisticsPage.Update();            
+            //landerist_library.Landerist_com.StatisticsPage.SetPageTypeAndNextUpdate();            
             //landerist_library.Landerist_com.Landerist_com.InvalidateCloudFront();
         }
     }

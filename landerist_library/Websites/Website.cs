@@ -454,7 +454,7 @@ namespace landerist_library.Websites
         //{
         //    if (SetListingExampleNodeSet())
         //    {
-        //        return Update();
+        //        return SetPageTypeAndNextUpdate();
         //    }
         //    return false;
         //}

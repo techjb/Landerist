@@ -211,7 +211,7 @@ namespace landerist_library.Tasks
                     page.RemoveWaitingStatus();
                     page.RemoveResponseBodyZipped();
 
-                    if (page.Update(false))
+                    if (page.Update())
                     {
                         Interlocked.Increment(ref counter);
                     }

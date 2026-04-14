@@ -141,14 +141,14 @@ namespace landerist_library.Scrape
         {
             if (!page.Website.IsAllowedByRobotsTxt(page.Uri))
             {
-                page.Update(PageType.BlockedByRobotsTxt, true);
+                page.SetPageTypeAndNextUpdate(PageType.BlockedByRobotsTxt);
                 Interlocked.Increment(ref Skipped);
                 return;
             }
 
             if (page.Website.CrawlDelayTooBig())
             {
-                page.Update(PageType.CrawlDelayTooBig, true);
+                page.SetPageTypeAndNextUpdate(PageType.CrawlDelayTooBig);
                 Interlocked.Increment(ref Skipped);
                 return;
             }

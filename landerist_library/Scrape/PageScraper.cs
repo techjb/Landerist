@@ -82,8 +82,8 @@ namespace landerist_library.Scrape
             }
 
             UpdatePageTypeAndListing(newPageType, newListing);
-            var setNextUpdate = !waitingAIRequest;
-            return _page.Update(setNextUpdate);
+            _page.SetNextUpdate();            
+            return _page.Update();
         }
 
         public bool ApplyParsedClassificationAfterParsing(PageType newPageType, Listing? listing)
@@ -97,7 +97,7 @@ namespace landerist_library.Scrape
             _page.SetResponseBodyFromZipped();
             UpdatePageTypeAndListing(newPageType, listing);
             _page.RemoveResponseBodyZipped();
-            return _page.Update(true);
+            return _page.Update();
         }
 
         private void UpdatePageTypeAndListing(PageType? newPageType, Listing? newListing)

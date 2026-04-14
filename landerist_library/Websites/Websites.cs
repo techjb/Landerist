@@ -692,7 +692,7 @@ namespace landerist_library.Websites
                 //    //website.ListingExampleUri = null;
                 //    //website.ListingExampleHtml = null;
                 //    //website.ListingExampleHtmlUpdated = null;
-                //    //website.Update();
+                //    //website.SetPageTypeAndNextUpdate();
                 //    errors++;
                 //    Console.WriteLine(counter + "/" + total + " errors: " + errors);
                 //}

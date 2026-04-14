@@ -242,7 +242,7 @@ namespace landerist_library.Tasks
         {
             page.RemoveWaitingStatus();
             page.RemoveResponseBodyZipped();
-            return page.Update(false);
+            return page.Update();
         }
     }
 }

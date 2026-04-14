@@ -20,7 +20,7 @@ namespace landerist_tests
             //Websites.CountRobotsSiteMaps();
             //Websites.InsertMainPages();
             //Websites.UpdateNumPages();
-            //Websites.Update();
+            //Websites.SetPageTypeAndNextUpdate();
 
             //Websites.DeleteFromFile();
             //new Website("promoaguilera.com").DeleteCurentMachineLogs();

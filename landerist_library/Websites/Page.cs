@@ -201,24 +201,21 @@ namespace landerist_library.Websites
         }
 
 
-        public bool Update(PageType? pageType, bool setNextUpdate)
+        public bool SetPageTypeAndNextUpdate(PageType? pageType)
         {
             SetPageType(pageType);
-            return Update(setNextUpdate);
+            SetNextUpdate();
+            return Update();
         }
 
-        public bool Update(bool setNextUpdate)
+        public bool Update()
         {
             //if (Config.IsConfigurationLocal())
             //{
             //    return true;
             //}
 
-            Updated = DateTime.Now;
-            if (setNextUpdate)
-            {
-                SetNextUpdate();
-            }
+            Updated = DateTime.Now;            
 
             string query =
                 "UPDATE " + Pages.PAGES + " SET " +

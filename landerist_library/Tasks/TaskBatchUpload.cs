@@ -229,7 +229,7 @@ namespace landerist_library.Tasks
                 {
                     _invalidPages.Add(page.UriHash);
                     page.RemoveWaitingStatus();
-                    page.Update(false);
+                    page.Update();
                     return FileWriteResult.Error;
                 }
 
