@@ -1,5 +1,5 @@
 ﻿using landerist_library.Configuration;
-using landerist_library.Websites;
+using landerist_library.Pages;
 
 namespace landerist_library.Scrape
 {
@@ -19,7 +19,7 @@ namespace landerist_library.Scrape
         private static void Init()
         {
             Pages.Clear();
-            Websites.Pages.CleanLockedBy();
+            landerist_library.Pages.Pages.CleanLockedBy();
         }
 
         private static void SelectPages()
@@ -32,7 +32,7 @@ namespace landerist_library.Scrape
         private static void AddUnknownPageType()
         {
             var topRows = GetTopRows();
-            var pages = Websites.Pages.GetUnknownPageType(topRows);
+            var pages = landerist_library.Pages.Pages.GetUnknownPageType(topRows);
             AddPages(pages);
         }
 
@@ -44,7 +44,7 @@ namespace landerist_library.Scrape
             }
 
             var topRows = GetTopRows();
-            var pages = Websites.Pages.GetNextUpdate(topRows, false);
+            var pages = landerist_library.Pages.Pages.GetNextUpdate(topRows, false);
             AddPages(pages);
         }
 
@@ -56,7 +56,7 @@ namespace landerist_library.Scrape
             }
 
             var topRows = GetTopRows();
-            var pages = Websites.Pages.GetRecentlyUnpublishedListingsPages(topRows);
+            var pages = landerist_library.Pages.Pages.GetRecentlyUnpublishedListingsPages(topRows);
             AddPages(pages);
         }
 

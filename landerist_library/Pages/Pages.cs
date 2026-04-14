@@ -2,11 +2,12 @@
 using landerist_library.Database;
 using landerist_library.Index;
 using landerist_library.Tools;
+using landerist_library.Websites;
 using landerist_orels.ES;
 using System.Collections.Concurrent;
 using System.Data;
 
-namespace landerist_library.Websites
+namespace landerist_library.Pages
 {
     public class Pages
     {
@@ -113,7 +114,7 @@ namespace landerist_library.Websites
                 "WITH TopPages AS (" +
                 "   SELECT TOP " + topRows + " P.[UriHash] " +
                 "   FROM " + PAGES + " AS P " +
-                "   INNER JOIN " + Websites.WEBSITES + " AS W ON P.[Host] = W.[Host] " +
+                "   INNER JOIN " + Websites.Websites.WEBSITES + " AS W ON P.[Host] = W.[Host] " +
                 "   WHERE P.[LockedBy] IS NULL AND P.[WaitingStatus] IS NULL " + (string.IsNullOrEmpty(where) ? string.Empty : " AND " + where) + " " +
                 "   ORDER BY P.[NextUpdate] ASC" +
                 ") " +
@@ -151,7 +152,7 @@ namespace landerist_library.Websites
                     "W.[ListingExampleNodeSet], " +
                     "W.[ListingExampleNodeSetUpdated] " +
                 "FROM " + PAGES + " AS P " +
-                "INNER JOIN " + Websites.WEBSITES + " AS W ON P.[Host] = W.[Host] " +
+                "INNER JOIN " + Websites.Websites.WEBSITES + " AS W ON P.[Host] = W.[Host] " +
                 "INNER JOIN TopPages AS TP ON P.[UriHash] = TP.[UriHash]";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>(){
@@ -265,8 +266,8 @@ namespace landerist_library.Websites
                 "SELECT " + top + " " +
                 SelectColumns() + " " +
                 "FROM " + PAGES + " " +
-                "INNER JOIN " + Websites.WEBSITES +
-                " ON " + PAGES + ".[Host] = " + Websites.WEBSITES + ".[Host] ";
+                "INNER JOIN " + Websites.Websites.WEBSITES +
+                " ON " + PAGES + ".[Host] = " + Websites.Websites.WEBSITES + ".[Host] ";
         }
 
         private static int CountPages()
@@ -345,19 +346,19 @@ namespace landerist_library.Websites
                 pagesTableName + ".[TransientErrorCounter], " +
                 pagesTableName + ".[ResponseBodyZipped], " +
                 pagesTableName + ".[TokenCount], " +
-                Websites.WEBSITES + ".[MainUri], " +
-                Websites.WEBSITES + ".[LanguageCode], " +
-                Websites.WEBSITES + ".[CountryCode], " +
-                Websites.WEBSITES + ".[RobotsTxt], " +
-                Websites.WEBSITES + ".[RobotsTxtUpdated], " +
-                Websites.WEBSITES + ".[SitemapUpdated], " +
-                Websites.WEBSITES + ".[IpAddress], " +
-                Websites.WEBSITES + ".[IpAddressUpdated], " +
-                Websites.WEBSITES + ".[NumPages], " +
-                Websites.WEBSITES + ".[NumListings], " +
-                Websites.WEBSITES + ".[ListingExampleUri], " +
-                Websites.WEBSITES + ".[ListingExampleNodeSet], " +
-                Websites.WEBSITES + ".[ListingExampleNodeSetUpdated] ";
+                Websites.Websites.WEBSITES + ".[MainUri], " +
+                Websites.Websites.WEBSITES + ".[LanguageCode], " +
+                Websites.Websites.WEBSITES + ".[CountryCode], " +
+                Websites.Websites.WEBSITES + ".[RobotsTxt], " +
+                Websites.Websites.WEBSITES + ".[RobotsTxtUpdated], " +
+                Websites.Websites.WEBSITES + ".[SitemapUpdated], " +
+                Websites.Websites.WEBSITES + ".[IpAddress], " +
+                Websites.Websites.WEBSITES + ".[IpAddressUpdated], " +
+                Websites.Websites.WEBSITES + ".[NumPages], " +
+                Websites.Websites.WEBSITES + ".[NumListings], " +
+                Websites.Websites.WEBSITES + ".[ListingExampleUri], " +
+                Websites.Websites.WEBSITES + ".[ListingExampleNodeSet], " +
+                Websites.Websites.WEBSITES + ".[ListingExampleNodeSetUpdated] ";
         }
 
         public static List<Page> GetPages(string query)
@@ -764,7 +765,7 @@ namespace landerist_library.Websites
                 "SET [WaitingStatus] = @waitingStatusTo " +
                 "OUTPUT " + SelectColumns("INSERTED") + " " +
                 "FROM " + PAGES + " " +
-                "INNER JOIN " + Websites.WEBSITES + " ON " + PAGES + ".[Host] = " + Websites.WEBSITES + ".[Host] " +
+                "INNER JOIN " + Websites.Websites.WEBSITES + " ON " + PAGES + ".[Host] = " + Websites.Websites.WEBSITES + ".[Host] " +
                 "WHERE " + PAGES + ".[WaitingStatus] = @waitingStatusFrom AND [TokenCount] " + (isMaxTokenCount ? "<=" : ">") + " " + tokenCount + " ; " +
                 "COMMIT TRANSACTION;";
 

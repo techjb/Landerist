@@ -1,4 +1,5 @@
 ﻿using landerist_library.Database;
+using landerist_library.Pages;
 
 namespace landerist_library.Websites
 {
@@ -95,7 +96,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT 1 " +
-                "FROM " + Pages.PAGES + " " +
+                "FROM " + Pages.Pages.PAGES + " " +
                 "WHERE [Host] = @Host AND [PageType] = @PageType";
 
             return new DataBase().QueryExists(query, new Dictionary<string, object?> {

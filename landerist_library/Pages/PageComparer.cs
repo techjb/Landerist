@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace landerist_library.Websites
+namespace landerist_library.Pages
 {
     public class PageComparer : IEqualityComparer<Page>
     {

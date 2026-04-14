@@ -2,6 +2,7 @@
 using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Index;
+using landerist_library.Pages;
 using System.Data;
 using System.Net;
 using System.Text;
@@ -338,7 +339,7 @@ namespace landerist_library.Websites
         public bool Delete()
         {
             DeleteListings();
-            Pages.Delete(this);
+            Pages.Pages.Delete(this);
             return DeleteWebsite();
         }
 
@@ -496,17 +497,17 @@ namespace landerist_library.Websites
 
         public List<Page> GetPages()
         {
-            return Pages.GetPages(this);
+            return Pages.Pages.GetPages(this);
         }
 
         public List<Page> GetPagesUnknowPageType()
         {
-            return Pages.GetUnknowPageType(this);
+            return Pages.Pages.GetUnknowPageType(this);
         }
 
         public List<Page> GetNonScrapedPages()
         {
-            return Pages.GetNonScrapedPages(this);
+            return Pages.Pages.GetNonScrapedPages(this);
         }
 
         public int GetNumPages()

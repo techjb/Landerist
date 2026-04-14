@@ -1,7 +1,7 @@
 ﻿using Google.Cloud.AIPlatform.V1;
+using landerist_library.Pages;
 using landerist_library.Parse.ListingParser.OpenAI.Batch;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
-using landerist_library.Websites;
 using System.Text.Json;
 using static Google.Cloud.AIPlatform.V1.SafetySetting.Types;
 
@@ -105,7 +105,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
             {
                 return null;
             }
-            return Pages.GetPage(uriHash);
+            return Pages.Pages.GetPage(uriHash);
         }
     }
 }

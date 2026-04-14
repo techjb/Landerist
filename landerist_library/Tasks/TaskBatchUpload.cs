@@ -1,10 +1,10 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Logs;
+using landerist_library.Pages;
 using landerist_library.Parse.ListingParser;
 using landerist_library.Parse.ListingParser.OpenAI.Batch;
 using landerist_library.Parse.ListingParser.VertexAI.Batch;
-using landerist_library.Websites;
 
 namespace landerist_library.Tasks
 {
@@ -106,7 +106,7 @@ namespace landerist_library.Tasks
                     return;
                 }
 
-                Pages.UpdateWaitingStatus(WaitingStatus.readed_by_batch, WaitingStatus.waiting_ai_request);
+                Pages.Pages.UpdateWaitingStatus(WaitingStatus.readed_by_batch, WaitingStatus.waiting_ai_request);
                 _firstTime = false;
             }
         }
@@ -114,7 +114,7 @@ namespace landerist_library.Tasks
         private bool BatchUpload()
         {
             var tokenCount = TaskLocalAIParsing.GetMaxTokenCount();
-            _pages.AddRange(Pages.SelectWaitingStatusAIRequest(_maxPagesPerBatch, WaitingStatus.readed_by_batch, tokenCount, false));
+            _pages.AddRange(Pages.Pages.SelectWaitingStatusAIRequest(_maxPagesPerBatch, WaitingStatus.readed_by_batch, tokenCount, false));
 
             if (_pages.Count < Config.MIN_PAGES_PER_BATCH)
             {
@@ -320,7 +320,7 @@ namespace landerist_library.Tasks
             int counter = 0;
             Parallel.ForEach(_waitingAIResponse, Config.PARALLELOPTIONS1INLOCAL, uriHash =>
             {
-                if (Websites.Pages.UpdateWaitingStatusAIResponse(uriHash))
+                if (Pages.Pages.UpdateWaitingStatusAIResponse(uriHash))
                 {
                     Interlocked.Increment(ref counter);
                 }
@@ -343,7 +343,7 @@ namespace landerist_library.Tasks
             int counter = 0;
             Parallel.ForEach(pages, Config.PARALLELOPTIONS1INLOCAL, page =>
             {
-                if (Websites.Pages.UpdateWaitingStatusAIRequest(page.UriHash))
+                if (Pages.Pages.UpdateWaitingStatusAIRequest(page.UriHash))
                 {
                     Interlocked.Increment(ref counter);
                 }
@@ -366,7 +366,7 @@ namespace landerist_library.Tasks
             int counter = 0;
             Parallel.ForEach(pages, Config.PARALLELOPTIONS1INLOCAL, page =>
             {
-                if (Pages.UpdateWaitingStatusAIRequest(page.UriHash))
+                if (Pages.Pages.UpdateWaitingStatusAIRequest(page.UriHash))
                 {
                     Interlocked.Increment(ref counter);
                 }

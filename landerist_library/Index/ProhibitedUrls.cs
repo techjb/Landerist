@@ -152,7 +152,7 @@ namespace landerist_library.Index
 
         public static void FindNewProhibitedStartsWith()
         {
-            var urls = Pages.GetUris(false);
+            var urls = Pages.Pages.GetUris(false);
             var dictionary = ToDictionary(urls);
 
             foreach (var entry in dictionary)

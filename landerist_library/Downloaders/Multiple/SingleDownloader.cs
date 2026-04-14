@@ -1,6 +1,6 @@
 ﻿using landerist_library.Downloaders;
 using landerist_library.Downloaders.Puppeteer;
-using landerist_library.Websites;
+using landerist_library.Pages;
 
 namespace landerist_library.Downloaders.Multiple
 {

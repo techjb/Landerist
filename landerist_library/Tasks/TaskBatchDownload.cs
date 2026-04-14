@@ -1,12 +1,12 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Logs;
+using landerist_library.Pages;
 using landerist_library.Parse.ListingParser;
 using landerist_library.Parse.ListingParser.OpenAI.Batch;
 using landerist_library.Parse.ListingParser.VertexAI.Batch;
 using landerist_library.Scrape;
 using landerist_library.Statistics;
-using landerist_library.Websites;
 
 namespace landerist_library.Tasks
 {
@@ -202,7 +202,7 @@ namespace landerist_library.Tasks
             {
                 try
                 {
-                    using var page = Pages.GetPage(uriHash);
+                    using var page = Pages.Pages.GetPage(uriHash);
                     if (page == null)
                     {
                         return;

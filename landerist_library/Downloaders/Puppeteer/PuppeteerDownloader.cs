@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using landerist_library.Configuration;
+using landerist_library.Pages;
 using landerist_library.Websites;
 using PuppeteerSharp;
 using System.Diagnostics;
@@ -13,7 +14,7 @@ namespace landerist_library.Downloaders.Puppeteer
         public short? HttpStatusCode { get; set; } = null;
         public string? RedirectUrl { get; set; } = null;
 
-        private Websites.Page? Page;
+        private Pages.Page? Page;
 
         private const string ExpressionRemoveCookies =
             @"document.querySelectorAll('[class*=""cookie"" i], [id*=""cookie"" i]').forEach(el => el.remove());";
@@ -374,13 +375,13 @@ namespace landerist_library.Downloaders.Puppeteer
             //Logs.Log.WriteInfo("PuppeteerTest", "Starting test");
             //string? text = new PuppeteerDownloader(true).GetText(Page);
 
-            Websites.Page page1 = new("https://www.rualcasa.com/ficha/local-comercial/alicante/babel/1008/21300773/es/");
+            Pages.Page page1 = new("https://www.rualcasa.com/ficha/local-comercial/alicante/babel/1008/21300773/es/");
             var puppeteerDownloader = new PuppeteerDownloader(false);
             //Console.WriteLine(puppeteerDownloader.GetText(page1));
 
         }
 
-        private string? GetText(Websites.Page page)
+        private string? GetText(Pages.Page page)
         {
             SetContentAndScrenshot(page);
             if (Content != null)
@@ -400,7 +401,7 @@ namespace landerist_library.Downloaders.Puppeteer
             return null;
         }
 
-        public void Download(Websites.Page page)
+        public void Download(Pages.Page page)
         {
             ArgumentNullException.ThrowIfNull(page);
 
@@ -411,7 +412,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
         }
 
-        public void SetContentAndScrenshot(Websites.Page page)
+        public void SetContentAndScrenshot(Pages.Page page)
         {
             ArgumentNullException.ThrowIfNull(page);
 

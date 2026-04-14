@@ -1,9 +1,9 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Logs;
+using landerist_library.Pages;
 using landerist_library.Parse.ListingParser;
 using landerist_library.Scrape;
 using landerist_library.Statistics;
-using landerist_library.Websites;
 using landerist_orels.ES;
 using SharpToken;
 using System.Collections.Concurrent;
@@ -33,7 +33,7 @@ namespace landerist_library.Tasks
             Config.EnableLogsErrorsInConsole();
             if (Config.IsConfigurationProduction())
             {
-                Pages.UpdateWaitingStatus(WaitingStatus.readed_by_localai, WaitingStatus.waiting_ai_request);
+                Pages.Pages.UpdateWaitingStatus(WaitingStatus.readed_by_localai, WaitingStatus.waiting_ai_request);
             }
             MAX_TOKEN_COUNT = GetMaxTokenCount();
             Log.Console("TaskLocalAIParsing", "Started");
@@ -175,7 +175,7 @@ namespace landerist_library.Tasks
                 return true;
             }
 
-            var pages = Pages.SelectWaitingStatusAIRequest(MAX_PAGES_PER_TASK, WaitingStatus.readed_by_localai, MAX_TOKEN_COUNT, true);
+            var pages = Pages.Pages.SelectWaitingStatusAIRequest(MAX_PAGES_PER_TASK, WaitingStatus.readed_by_localai, MAX_TOKEN_COUNT, true);
             if (pages.Count == 0)
             {
                 return false;
@@ -224,7 +224,7 @@ namespace landerist_library.Tasks
                 {
                     if (!success)
                     {
-                        Pages.UpdateWaitingStatusAIRequest(page.UriHash);
+                        Pages.Pages.UpdateWaitingStatusAIRequest(page.UriHash);
                     }
                 }
                 catch (Exception exception)

@@ -1,4 +1,4 @@
-﻿namespace landerist_library.Websites
+﻿namespace landerist_library.Pages
 {
     public enum PageType
     {

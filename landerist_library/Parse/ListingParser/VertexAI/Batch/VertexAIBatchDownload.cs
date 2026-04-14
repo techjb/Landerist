@@ -2,8 +2,8 @@
 using landerist_library.Configuration;
 using System.Text.Json.Serialization;
 using System.Text.Json;
-using landerist_library.Websites;
 using landerist_library.Logs;
+using landerist_library.Pages;
 
 namespace landerist_library.Parse.ListingParser.VertexAI.Batch
 {
@@ -133,7 +133,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                 var labels = vertexAIBatchResponse.Request.labels;
                 if (labels.TryGetValue(VertexAIBatchUpload.LABEL_URIHASH, out string? uriHash))
                 {
-                    return Pages.GetPage(uriHash);
+                    return Pages.Pages.GetPage(uriHash);
                 }
             }
             return null;

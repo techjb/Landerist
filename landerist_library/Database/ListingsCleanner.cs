@@ -19,7 +19,7 @@ namespace landerist_library.Database
                 "WHERE L.[listingStatus] = @published AND " +
                 "NOT EXISTS (" +
                 "   SELECT 1 " +
-                "   FROM " + Pages.PAGES + " AS P " +
+                "   FROM " + Pages.Pages.PAGES + " AS P " +
                 "   WHERE P.[UriHash] = L.[guid]" +
                 ")",
                 parameters);
@@ -45,7 +45,7 @@ namespace landerist_library.Database
                 "WHERE L.[listingStatus] = @published AND " +
                 "NOT EXISTS (" +
                 "   SELECT 1 " +
-                "   FROM " + Pages.PAGES + " AS P " +
+                "   FROM " + Pages.Pages.PAGES + " AS P " +
                 "   WHERE P.[UriHash] = L.[guid]" +
                 ")",
                 updateParameters);

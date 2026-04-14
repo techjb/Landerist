@@ -2,7 +2,7 @@
 using Google.Protobuf;
 using Google.Protobuf.Collections;
 using landerist_library.Configuration;
-using landerist_library.Websites;
+using landerist_library.Pages;
 using static Google.Cloud.AIPlatform.V1.GenerationConfig.Types;
 using static Google.Cloud.AIPlatform.V1.SafetySetting.Types;
 

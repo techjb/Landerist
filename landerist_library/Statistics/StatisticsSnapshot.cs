@@ -1,5 +1,5 @@
 ﻿using landerist_library.Database;
-using landerist_library.Websites;
+using landerist_library.Pages;
 using landerist_orels.ES;
 using System.Data;
 
@@ -105,7 +105,7 @@ namespace landerist_library.Statistics
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + landerist_library.Websites.Pages.PAGES;
+                "FROM " + landerist_library.Pages.Pages.PAGES;
 
             InsertDaily(StatisticsKey.Pages, query);
         }
@@ -114,7 +114,7 @@ namespace landerist_library.Statistics
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + landerist_library.Websites.Pages.PAGES + " " +
+                "FROM " + landerist_library.Pages.Pages.PAGES + " " +
                 "WHERE CONVERT(date, [Updated]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
 
             InsertDaily(StatisticsKey.UpdatedPages, query);
@@ -124,7 +124,7 @@ namespace landerist_library.Statistics
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + landerist_library.Websites.Pages.PAGES + " " +
+                "FROM " + landerist_library.Pages.Pages.PAGES + " " +
                 "WHERE [NextUpdate] < GETDATE()";
 
             InsertDaily(StatisticsKey.NeedUpdate, query);
@@ -134,7 +134,7 @@ namespace landerist_library.Statistics
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + landerist_library.Websites.Pages.PAGES + " " +
+                "FROM " + landerist_library.Pages.Pages.PAGES + " " +
                 "WHERE [WaitingStatus] = @WaitingStatus";
 
             InsertDaily(StatisticsKey.WaitingAIRequest, query, new Dictionary<string, object?>
@@ -147,7 +147,7 @@ namespace landerist_library.Statistics
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + landerist_library.Websites.Pages.PAGES + " " +
+                "FROM " + landerist_library.Pages.Pages.PAGES + " " +
                 "WHERE [PageType] IS NULL";
 
             InsertDaily(StatisticsKey.UnknownPageType, query);
@@ -215,7 +215,7 @@ namespace landerist_library.Statistics
 
             string query =
                 "SELECT [HttpStatusCode], COUNT(*) AS [Counter] " +
-                "FROM " + landerist_library.Websites.Pages.PAGES + " " +
+                "FROM " + landerist_library.Pages.Pages.PAGES + " " +
                 "WHERE CAST([Updated] AS date) = CAST(@Date AS date) " +
                 "GROUP BY [HttpStatusCode] ";
 
@@ -277,7 +277,7 @@ namespace landerist_library.Statistics
 
             string query =
                 "SELECT [PageType], COUNT(*) AS [Counter] " +
-                "FROM " + landerist_library.Websites.Pages.PAGES + " " +
+                "FROM " + landerist_library.Pages.Pages.PAGES + " " +
                 "WHERE CAST([Updated] AS date) = CAST(@Date AS date) " +
                 "AND [PageType] IS NOT NULL " +
                 "GROUP BY [PageType] ";

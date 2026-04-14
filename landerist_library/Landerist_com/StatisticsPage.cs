@@ -96,7 +96,7 @@ namespace landerist_library.Landerist_com
 
         private static void NextUpdateDistribution()
         {
-            var dictionary = landerist_library.Websites.Pages.GroupByNextUpdate();
+            var dictionary = landerist_library.Pages.Pages.GroupByNextUpdate();
             BarChart("Next Update Distribution", "nextupdate", dictionary);
         }
 
@@ -190,14 +190,14 @@ namespace landerist_library.Landerist_com
 
         private static void PageType()
         {
-            var dictionary = landerist_library.Websites.Pages.GroupByPageType();
+            var dictionary = landerist_library.Pages.Pages.GroupByPageType();
             PieChart("PageType", dictionary);
         }
 
         private static void ListingsPageType()
         {
-            var dictionaryPublished = landerist_library.Websites.Pages.GroupByPageType(ListingStatus.published);
-            var dictionaryUnPublished = landerist_library.Websites.Pages.GroupByPageType(ListingStatus.unpublished);
+            var dictionaryPublished = landerist_library.Pages.Pages.GroupByPageType(ListingStatus.published);
+            var dictionaryUnPublished = landerist_library.Pages.Pages.GroupByPageType(ListingStatus.unpublished);
 
             var published = GetLabelValues("published", dictionaryPublished);
             var unpublished = GetLabelValues("unpublished", dictionaryUnPublished);
@@ -211,25 +211,25 @@ namespace landerist_library.Landerist_com
 
         private static void PublishedPageType()
         {
-            var dictionary = landerist_library.Websites.Pages.GroupByPageType(ListingStatus.published);
+            var dictionary = landerist_library.Pages.Pages.GroupByPageType(ListingStatus.published);
             BarChart("Published Listings PageType", "published", dictionary);
         }
 
         private static void UnPublishedPageType()
         {
-            var dictionary = landerist_library.Websites.Pages.GroupByPageType(ListingStatus.unpublished);
+            var dictionary = landerist_library.Pages.Pages.GroupByPageType(ListingStatus.unpublished);
             BarChart("Unpublished Listings PageType", "unpublished", dictionary);
         }
 
         private static void UnPublishedHttpStatusCode()
         {
-            var dictionary = landerist_library.Websites.Pages.GroupByHttpStatusCode(ListingStatus.unpublished);
+            var dictionary = landerist_library.Pages.Pages.GroupByHttpStatusCode(ListingStatus.unpublished);
             BarChart("Unpublished Listings HttpStatusCode", "unpublished", dictionary);
         }
 
         private static void HttpStatusCode()
         {
-            var dictionary = landerist_library.Websites.Pages.CountByHttpStatusCode();
+            var dictionary = landerist_library.Pages.Pages.CountByHttpStatusCode();
             PieChart("HttpStatusCode", dictionary);
         }
 

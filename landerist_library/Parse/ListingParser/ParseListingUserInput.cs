@@ -1,5 +1,5 @@
 ﻿using HtmlAgilityPack;
-using landerist_library.Websites;
+using landerist_library.Pages;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;

@@ -166,7 +166,7 @@ namespace landerist_library.Parse.PageTypeParser
 
         public static void FindProhibitedEndsSegments()
         {
-            var urls = Pages.GetUris();
+            var urls = Pages.Pages.GetUris();
             var dictionary = ToDictionary(urls);
             var count = dictionary.Count;
 

@@ -2,9 +2,9 @@
 using landerist_library.Database;
 using landerist_library.Downloaders.Multiple;
 using landerist_library.Index;
+using landerist_library.Pages;
 using landerist_library.Parse.Location;
 using landerist_library.Parse.PageTypeParser;
-using landerist_library.Websites;
 using landerist_orels.ES;
 
 namespace landerist_library.Scrape

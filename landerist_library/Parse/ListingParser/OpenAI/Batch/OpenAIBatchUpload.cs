@@ -1,4 +1,4 @@
-﻿using landerist_library.Websites;
+﻿using landerist_library.Pages;
 using System.Text.Json;
 
 namespace landerist_library.Parse.ListingParser.OpenAI.Batch

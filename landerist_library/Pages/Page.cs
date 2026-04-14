@@ -4,12 +4,13 @@ using landerist_library.Database;
 using landerist_library.Downloaders;
 using landerist_library.Index;
 using landerist_library.Tools;
+using landerist_library.Websites;
 using landerist_orels.ES;
 using System.Data;
 using System.IO.Compression;
 using System.Text;
 
-namespace landerist_library.Websites
+namespace landerist_library.Pages
 {
 
     public class Page : IDisposable
@@ -77,7 +78,7 @@ namespace landerist_library.Websites
 
         }
 
-        public Page(Uri uri) : this(Websites.GetWebsite(uri.Host), uri)
+        public Page(Uri uri) : this(Websites.Websites.GetWebsite(uri.Host), uri)
         {
 
         }
@@ -577,8 +578,8 @@ namespace landerist_library.Websites
 
         private void SetTransientErrorCounter(PageType? newPageType)
         {
-            if (newPageType == landerist_library.Websites.PageType.HttpStatusCodeNotOK ||
-                newPageType == landerist_library.Websites.PageType.ResponseBodyNullOrEmpty)
+            if (newPageType == landerist_library.Pages.PageType.HttpStatusCodeNotOK ||
+                newPageType == landerist_library.Pages.PageType.ResponseBodyNullOrEmpty)
             {
                 TransientErrorCounter = (short)Math.Min((TransientErrorCounter ?? 0) + 1, Config.MAX_PAGETYPE_COUNTER);
                 return;
@@ -616,7 +617,7 @@ namespace landerist_library.Websites
 
         public void SetWaitingStatusAIRequest()
         {
-            SetWaitingStatus(landerist_library.Websites.WaitingStatus.waiting_ai_request);
+            SetWaitingStatus(landerist_library.Pages.WaitingStatus.waiting_ai_request);
         }
       
         private void SetWaitingStatus(WaitingStatus waitingStatus)
@@ -720,12 +721,12 @@ namespace landerist_library.Websites
 
         public bool IsMayBeListing()
         {
-            return PageType == landerist_library.Websites.PageType.MayBeListing;
+            return PageType == landerist_library.Pages.PageType.MayBeListing;
         }
 
         public bool IsHttpStatusCodeNotOK()
         {
-            return PageType == landerist_library.Websites.PageType.HttpStatusCodeNotOK;
+            return PageType == landerist_library.Pages.PageType.HttpStatusCodeNotOK;
         }
 
         public bool IsHttpStatusCodeNotFound()
@@ -760,27 +761,27 @@ namespace landerist_library.Websites
 
         public bool IsResponseBodyNullOrEmpty()
         {
-            return PageType == landerist_library.Websites.PageType.ResponseBodyNullOrEmpty;
+            return PageType == landerist_library.Pages.PageType.ResponseBodyNullOrEmpty;
         }
 
         public bool IsListing()
         {
-            return PageType == landerist_library.Websites.PageType.Listing;
+            return PageType == landerist_library.Pages.PageType.Listing;
         }
 
         public bool IsNotListingByParser()
         {
-            return PageType == landerist_library.Websites.PageType.NotListingByParser;
+            return PageType == landerist_library.Pages.PageType.NotListingByParser;
         }
 
         public bool IsNotCanonical()
         {
-            return PageType == landerist_library.Websites.PageType.NotCanonical;
+            return PageType == landerist_library.Pages.PageType.NotCanonical;
         }
 
         public bool IsRedirectToAnotherUrl()
         {
-            return PageType == landerist_library.Websites.PageType.RedirectToAnotherUrl;
+            return PageType == landerist_library.Pages.PageType.RedirectToAnotherUrl;
         }
 
         public bool IsNotCanonicalListing()

@@ -1,5 +1,6 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Database;
+using landerist_library.Pages;
 using System.Data;
 
 namespace landerist_library.Websites
@@ -396,7 +397,7 @@ namespace landerist_library.Websites
         public static void DeleteAll()
         {
             Delete();
-            Pages.DeleteAll();
+            Pages.Pages.DeleteAll();
             DeleteAllListings();
         }
 
@@ -439,7 +440,7 @@ namespace landerist_library.Websites
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + Pages.PAGES + " " +
+                "FROM " + Pages.Pages.PAGES + " " +
                 "WHERE [Host] = @Host";
 
             return new DataBase().QueryInt(query, new Dictionary<string, object?>()

@@ -3,6 +3,7 @@ using landerist_library.Database;
 using landerist_library.Downloaders.Multiple;
 using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Logs;
+using landerist_library.Pages;
 using landerist_library.Statistics;
 using landerist_library.Websites;
 using landerist_orels.ES;
@@ -76,7 +77,7 @@ namespace landerist_library.Scrape
             }
 
             DownloadersPool.Clear();
-            Websites.Pages.CleanLockedBy();
+            Pages.Pages.CleanLockedBy();
             CromeKiller.KillChrome();
         }
 

@@ -1,5 +1,5 @@
 ﻿using HtmlAgilityPack;
-using landerist_library.Websites;
+using landerist_library.Pages;
 using Newtonsoft.Json;
 
 namespace landerist_library.Parse.PageTypeParser

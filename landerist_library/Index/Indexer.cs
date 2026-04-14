@@ -1,4 +1,5 @@
-﻿using landerist_library.Tools;
+﻿using landerist_library.Pages;
+using landerist_library.Tools;
 using landerist_library.Websites;
 
 namespace landerist_library.Index
@@ -143,7 +144,7 @@ namespace landerist_library.Index
                 return;
             }
 
-            Pages.Insert(website, uri);
+            Pages.Pages.Insert(website, uri);
             Inserted.Add(uri);
         }
 

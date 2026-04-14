@@ -9,7 +9,7 @@ namespace landerist_library.Downloaders.Puppeteer
 {
     public class PuppeteerScreenshot
     {
-        public static async Task<byte[]?> TakeScreenshot(IPage browserPage, Websites.Page page)
+        public static async Task<byte[]?> TakeScreenshot(IPage browserPage, Pages.Page page)
         {
             if (!Config.TAKE_SCREENSHOT)
             {
