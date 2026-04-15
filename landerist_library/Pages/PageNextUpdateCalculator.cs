@@ -76,6 +76,7 @@
             return pageType == PageType.IncorrectLanguage ||
                 pageType == PageType.BlockedByRobotsTxt ||
                 pageType == PageType.CrawlDelayTooBig ||
+                pageType == PageType.DiscardedByListingUrlRegex ||
                 pageType == PageType.NotIndexable ||
                 pageType == PageType.NotCanonical ||
                 pageType == PageType.RedirectToAnotherUrl ||
@@ -176,6 +177,7 @@
             {
                 PageType.BlockedByRobotsTxt => 90d,
                 PageType.CrawlDelayTooBig => 60d,
+                PageType.DiscardedByListingUrlRegex => 60d,
                 PageType.IncorrectLanguage => 60d,
                 PageType.ResponseBodyRepeatedInHost => 60d,
                 PageType.ResponseBodyTooLarge => 45d,

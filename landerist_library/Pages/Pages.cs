@@ -148,7 +148,8 @@ namespace landerist_library.Pages
                     "W.[IpAddressUpdated], " +
                     "W.[NumPages], " +
                     "W.[NumListings], " +
-                    "W.[ListingExampleUri] " +
+                    "W.[ListingExampleUri], " +
+                    "W.[ListingUrlRegex] " +
                 "FROM " + PAGES + " AS P " +
                 "INNER JOIN " + Websites.Websites.WEBSITES + " AS W ON P.[Host] = W.[Host] " +
                 "INNER JOIN TopPages AS TP ON P.[UriHash] = TP.[UriHash]";
@@ -354,7 +355,8 @@ namespace landerist_library.Pages
                 Websites.Websites.WEBSITES + ".[IpAddressUpdated], " +
                 Websites.Websites.WEBSITES + ".[NumPages], " +
                 Websites.Websites.WEBSITES + ".[NumListings], " +
-                Websites.Websites.WEBSITES + ".[ListingExampleUri] ";
+                Websites.Websites.WEBSITES + ".[ListingExampleUri], " +
+                Websites.Websites.WEBSITES + ".[ListingUrlRegex] ";
         }
 
         public static List<Page> GetPages(string query)

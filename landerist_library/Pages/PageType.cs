@@ -4,6 +4,7 @@
     {
         Timeout,
         HttpStatusCodeNotOK,        
+        DiscardedByListingUrlRegex,
         IncorrectLanguage,
         BlockedByRobotsTxt,
         CrawlDelayTooBig,

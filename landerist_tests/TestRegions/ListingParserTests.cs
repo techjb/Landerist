@@ -1,3 +1,5 @@
+using landerist_library.Tasks;
+
 namespace landerist_tests
 {
     internal static class ListingParserTests
@@ -28,6 +30,8 @@ namespace landerist_tests
             //landerist_library.GetLatLng.ListingParser.VertexAI.Batch.VertexAIBatch.GetResponse();
             //landerist_library.GetLatLng.ListingParser.VertexAI.Batch.VertexAIBatch.ListAllPredictionJobs();
             //VertexAIBatchCleaner.RemoveFiles();
+
+            new TaskLocalAIParsing().ProcessPages();
         }
     }
 }

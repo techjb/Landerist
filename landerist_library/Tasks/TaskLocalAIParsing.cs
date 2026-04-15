@@ -49,10 +49,12 @@ namespace landerist_library.Tasks
 
         public void ProcessPages(CancellationToken cancellationToken = default)
         {
+            //Log.Console("TaskLocalAIParsing", "Procesing pages..");
             using var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(StoppingCancellationTokenSource.Token, cancellationToken);
             CancellationToken linkedCancellationToken = linkedCancellationTokenSource.Token;
 
             InitializeBlockingCollection(linkedCancellationToken);
+            //Log.Console("TaskLocalAIParsing", "BlockingCollection.Count : " + BlockingCollection.Count);
             if (BlockingCollection.Count == 0)
             {
                 //Console.WriteLine("No pages to process.");

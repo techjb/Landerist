@@ -6,6 +6,7 @@ using landerist_library.Pages;
 using System.Data;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace landerist_library.Websites
 {
@@ -37,6 +38,8 @@ namespace landerist_library.Websites
         public string? IpAddress { get; set; }
 
         public DateTime? IpAddressUpdated { get; set; }
+
+        public string? ListingUrlRegex { get; set; }
 
         private int NumPages { get; set; } = 0;
 
@@ -120,6 +123,9 @@ namespace landerist_library.Websites
             SitemapUpdated = dataRow["SitemapUpdated"] is DBNull ? null : (DateTime)dataRow["SitemapUpdated"];
             IpAddress = dataRow["IpAddress"] is DBNull ? null : dataRow["IpAddress"].ToString();
             IpAddressUpdated = dataRow["IpAddressUpdated"] is DBNull ? null : (DateTime)dataRow["IpAddressUpdated"];
+            ListingUrlRegex = dataRow.Table.Columns.Contains("ListingUrlRegex") && dataRow["ListingUrlRegex"] is not DBNull
+                ? dataRow["ListingUrlRegex"].ToString()
+                : null;
             NumPages = (int)dataRow["NumPages"];
             NumListings = (int)dataRow["NumListings"];
             ListingExampleUri = dataRow["ListingExampleUri"] is DBNull ? null : new Uri(dataRow["ListingExampleUri"].ToString()!);
@@ -128,9 +134,12 @@ namespace landerist_library.Websites
         public bool Insert()
         {
             string query =
-                "INSERT INTO " + Websites.WEBSITES + " VALUES " +
-                "(@MainUri, @Host, @LanguageCode, @CountryCode, @RobotsTxt, @RobotsTxtUpdated, " +
-                "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @NumPages, @NumListings, " +
+                "INSERT INTO " + Websites.WEBSITES + " (" +
+                "[MainUri], [Host], [LanguageCode], [CountryCode], [RobotsTxt], [RobotsTxtUpdated], " +
+                "[SitemapUpdated], [IpAddress], [IpAddressUpdated], [ListingUrlRegex], [NumPages], [NumListings], " +
+                "[ListingExampleUri]) VALUES (" +
+                "@MainUri, @Host, @LanguageCode, @CountryCode, @RobotsTxt, @RobotsTxtUpdated, " +
+                "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @ListingUrlRegex, @NumPages, @NumListings, " +
                 "@ListingExampleUri)";
 
             var parameters = GetQueryParameters();
@@ -149,6 +158,7 @@ namespace landerist_library.Websites
                 "[SitemapUpdated] = @SitemapUpdated, " +
                 "[IpAddress] = @IpAddress, " +
                 "[IpAddressUpdated] = @IpAddressUpdated, " +
+                "[ListingUrlRegex] = @ListingUrlRegex, " +
                 "[NumPages] = @NumPages, " +
                 "[NumListings] = @NumListings, " +
                 "[ListingExampleUri] = @ListingExampleUri " +
@@ -170,10 +180,39 @@ namespace landerist_library.Websites
                 {"SitemapUpdated", SitemapUpdated},
                 {"IpAddress", IpAddress },
                 {"IpAddressUpdated", IpAddressUpdated},
+                {"ListingUrlRegex", ListingUrlRegex },
                 {"NumPages", NumPages },
                 {"NumListings", NumListings },
                 {"ListingExampleUri", ListingExampleUri?.ToString() },
             };
+        }
+
+        public bool IsDiscardedByListingUrlRegex(Uri uri)
+        {
+            ArgumentNullException.ThrowIfNull(uri);
+
+            if (string.IsNullOrWhiteSpace(ListingUrlRegex))
+            {
+                return false;
+            }
+
+            try
+            {
+                return !Regex.IsMatch(
+                    uri.AbsoluteUri,
+                    ListingUrlRegex,
+                    RegexOptions.IgnoreCase,
+                    TimeSpan.FromSeconds(1));
+            }
+            catch (ArgumentException exception)
+            {
+                Logs.Log.WriteError(
+                    "Website IsDiscardedByListingUrlRegex",
+                    $"{Host} {ListingUrlRegex}",
+                    exception);
+
+                return false;
+            }
         }
 
         public bool SetMainUri(int iteration = 0)

@@ -42,6 +42,11 @@ namespace landerist_library.Parse.PageTypeParser
                 return (PageType.MainPage, null, false);
             }
 
+            if (Page.Website.IsDiscardedByListingUrlRegex(Page.Uri))
+            {
+                return (PageType.DiscardedByListingUrlRegex, null, false);
+            }
+
             if (Page.ContainsMetaRobotsNoIndex())
             {
                 return (PageType.NotIndexable, null, false);
