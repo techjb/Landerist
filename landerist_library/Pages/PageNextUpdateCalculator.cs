@@ -51,10 +51,10 @@
 
         private static double GetAddDaysMultiplier(Page page)
         {
-            if (page.Website.ApplySpecialRules)
-            {
-                return 1d;
-            }
+            //if (page.Website.ApplySpecialRules)
+            //{
+            //    return 1d;
+            //}
             return 2d;  // todo: remove have enough data to confirm the new schedule is working as expected
         }
 

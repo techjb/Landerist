@@ -823,5 +823,49 @@ namespace landerist_library.Pages
                 { "LockedBy", Config.MACHINE_NAME }
             });
         }
+
+
+        public static DataTable GetHostPagesDataTable(Website website)
+        {
+            string query =
+                "SELECT " +
+                "[Host], " +
+                "[Uri], " +
+                "[UriHash], " +
+                "[Inserted], " +
+                "[Updated], " +
+                "[NextUpdate], " +
+                "[HttpStatusCode], " +
+                "[PageType], " +
+                "[PageTypeCounter], " +
+                "[ListingStatus], " +
+                "[LockedBy], " +
+                "[WaitingStatus], " +
+                "[ResponseBodyTextNotChangedCounter], " +
+                "[TransientErrorCounter], " +
+                "[TokenCount] " +
+                "FROM " + PAGES + " " +
+                "WHERE [Host] = @Host " +
+                "ORDER BY [Uri]";
+
+            return new DataBase().QueryTable(query, new Dictionary<string, object?>
+            {
+                { "Host", website.Host }
+            });
+        }
+
+        public static DataTable GetHostListingsDataTable(Website website)
+        {
+            string query =
+                "SELECT P.[Uri], L.* " +
+                "FROM " + ES_Listings.TABLE_ES_LISTINGS + " AS L " +
+                "INNER JOIN " + PAGES + " AS P ON L.[Guid] = P.[UriHash] " +
+                "WHERE P.[Host] = @Host";
+
+            return new DataBase().QueryTable(query, new Dictionary<string, object?>
+            {
+                { "Host", website.Host }
+            });
+        }
     }
 }

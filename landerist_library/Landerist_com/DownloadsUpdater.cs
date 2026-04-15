@@ -4,6 +4,7 @@ using landerist_library.Export;
 using landerist_library.Logs;
 using landerist_library.Websites;
 using landerist_orels.ES;
+using System.Data;
 using System.Globalization;
 
 namespace landerist_library.Landerist_com
@@ -14,6 +15,7 @@ namespace landerist_library.Landerist_com
         public const string METADATA_KEY_DATETO = "dateTo";
         public const string METADATA_KEY_COUNTER = "counter";
         private const string METADATA_DATE_FORMAT = "yyyy-MM-dd";
+        private const string HOSTS_SUBDIRECTORY = "ES\\Hosts";
 
         public static void Update()
         {
@@ -24,6 +26,7 @@ namespace landerist_library.Landerist_com
                 UpdatePublished();
                 UpdateUnpublished();
                 UpdateWebsites();
+                UpdateHosts();
             }
             catch (Exception exception)
             {
@@ -98,6 +101,108 @@ namespace landerist_library.Landerist_com
             }
 
             return Update(filePath, CountryCode.ES, ExportType.Websites, websites.Count);
+        }
+
+        public static bool UpdateHosts()
+        {
+            Console.WriteLine("Reading hosts with special rules ..");
+            var websites = Websites.Websites.GetAll()
+                .Where(website => website.ApplySpecialRules)
+                .OrderBy(website => website.Host, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            if (websites.Count == 0)
+            {
+                return true;
+            }
+
+            string directory = GetFilePath(HOSTS_SUBDIRECTORY);
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            foreach (var website in websites)
+            {
+                if (!UpdateHostPages(website) || !UpdateHostListings(website))
+                {
+                    Log.WriteError("filesupdater", "Error updating host files: " + website.Host);
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool UpdateHostPages(Website website)
+        {
+            var dataTable = Pages.Pages.GetHostPagesDataTable(website);
+            if (dataTable.Rows.Count == 0)
+            {
+                return true;
+            }
+
+            string fileName = GetHostFileName(website.Host, "pages", "csv");
+            string filePath = GetFilePath(HOSTS_SUBDIRECTORY, fileName);
+
+            try
+            {
+                Tools.Csv.Write(dataTable, filePath, true);
+            }
+            catch (Exception exception)
+            {
+                Log.WriteError("filesupdater", website.Host, exception);
+                return false;
+            }
+
+            return UploadHostFile(filePath, website.Host, "pages", dataTable.Rows.Count, "csv");
+        }
+
+        private static bool UpdateHostListings(Website website)
+        {
+            var dataTable = Pages.Pages.GetHostListingsDataTable(website);
+            if (dataTable.Rows.Count == 0)
+            {
+                return true;
+            }
+
+            string fileName = GetHostFileName(website.Host, "listings", "csv");
+            string filePath = GetFilePath(HOSTS_SUBDIRECTORY, fileName);
+
+            try
+            {
+                Tools.Csv.Write(dataTable, filePath, true);
+            }
+            catch (Exception exception)
+            {
+                Log.WriteError("filesupdater", website.Host, exception);
+                return false;
+            }
+
+            return UploadHostFile(filePath, website.Host, "listings", dataTable.Rows.Count, "csv");
+        }
+
+        
+
+
+        private static bool UploadHostFile(string filePath, string host, string suffix, int counter, string extension)
+        {
+            string fileName = GetHostFileName(host, suffix, extension);
+            string subdirectoryInBucket = HOSTS_SUBDIRECTORY.Replace("\\", "/");
+
+            var metadata = GetMetadata(counter, null, null);
+            if (!new S3().UploadToDownloadsBucket(filePath, fileName, subdirectoryInBucket, metadata))
+            {
+                return false;
+            }
+
+            Log.WriteInfo("filesupdater", fileName);
+            return true;
+        }
+
+        private static string GetHostFileName(string host, string suffix, string extension)
+        {
+            return host + "_" + suffix + "." + extension;
         }
 
         private static bool Update(SortedSet<Listing> listings, CountryCode countryCode, ExportType exportType, DateOnly? dateFrom, DateOnly? dateTo)

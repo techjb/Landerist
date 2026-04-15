@@ -10,16 +10,18 @@ namespace landerist_tests
             //landerist_library.Statistics.StatisticsSnapshot.SnapshotPageType7Days();
 
             //DownloadFilesUpdater.SetPageTypeAndNextUpdate();
-            //landerist_library.Landerist_com.FilesUpdater.SetPageTypeAndNextUpdate();
-            //landerist_library.Landerist_com.FilesUpdater.UpdatePublished();
-            //landerist_library.Landerist_com.FilesUpdater.UpdateUnpublished();
-            //landerist_library.Landerist_com.FilesUpdater.UpdateUpdates();
-            //landerist_library.Landerist_com.FilesUpdater.UpdateWebsites();
+            //landerist_library.Landerist_com.DownloadsUpdater.SetPageTypeAndNextUpdate();
+            //landerist_library.Landerist_com.DownloadsUpdater.UpdatePublished();
+            //landerist_library.Landerist_com.DownloadsUpdater.UpdateUnpublished();
+            //landerist_library.Landerist_com.DownloadsUpdater.UpdateUpdates();
+            //landerist_library.Landerist_com.DownloadsUpdater.UpdateWebsites();
+            landerist_library.Landerist_com.DownloadsUpdater.UpdateHosts();
+
             //landerist_library.Landerist_com.Landerist_com.UpdateStatisticsPage();
             //landerist_library.Landerist_com.Landerist_com.UpdateDownloadsPage();
             //landerist_library.Landerist_com.Landerist_com.UpdatePages();
             //landerist_library.Landerist_com.Landerist_com.UpdatePages();
-            landerist_library.Landerist_com.Landerist_com.UpdateHostsPage();
+            //landerist_library.Landerist_com.Landerist_com.UpdateHostsPage();
 
             //landerist_library.Landerist_com.Landerist_com.InvalidateCloudFront();
         }
