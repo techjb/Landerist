@@ -66,10 +66,18 @@ namespace landerist_library.Landerist_com
             StatisticsPage.UpdateCharts();
             InvalidateCloudFront();
         }
+
+        public static void UpdateHostsPage()
+        {
+            HostsPage.Update();
+            InvalidateCloudFront();
+        }
+
         public static void UpdatePages()
         {
             DownloadsPage.Update();
             StatisticsPage.UpdateCharts();
+            HostsPage.Update();
             InvalidateCloudFront();
         }
 
