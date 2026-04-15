@@ -12,6 +12,7 @@ namespace landerist_tests
             //Console.WriteLine(ParseListingSystem.GetSystemPrompt());
             //new landerist_library.Tasks.TaskLocalAIParsing();
             //new TaskLocalAIParsing().ProcessPages();
+            
         }
     }
 }
