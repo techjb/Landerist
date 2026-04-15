@@ -303,6 +303,7 @@ CREATE TABLE [dbo].[WEBSITES](
 	[CountryCode] [nvarchar](10) NOT NULL,
 	[RobotsTxt] [text] NULL,
 	[IpAddress] [nvarchar](50) NULL,
+   [ApplySpecialRules] [bit] NOT NULL,
 	[HttpStatusCode] [smallint] NULL,
  CONSTRAINT [PK_WEBSITES] PRIMARY KEY CLUSTERED 
 (
@@ -323,6 +324,11 @@ GO
 IF COL_LENGTH('dbo.WEBSITES', 'ListingUrlRegex') IS NULL
 BEGIN
 	ALTER TABLE [dbo].[WEBSITES] ADD [ListingUrlRegex] [nvarchar](max) NULL
+END
+GO
+IF COL_LENGTH('dbo.WEBSITES', 'ApplySpecialRules') IS NULL
+BEGIN
+	ALTER TABLE [dbo].[WEBSITES] ADD [ApplySpecialRules] [bit] NOT NULL CONSTRAINT [DF_WEBSITES_ApplySpecialRules] DEFAULT ((0))
 END
 GO
 SET ARITHABORT ON

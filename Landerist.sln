@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.1.11312.151 d18.0
+VisualStudioVersion = 18.1.11312.151
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "landerist_console", "landerist_console\landerist_console.csproj", "{AF6B51BE-C241-4ADE-AB98-DD1D9C4CB529}"
 EndProject
@@ -22,6 +22,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "landerist_website", "landerist_website", "{B0045D1A-422C-4327-8A3C-F90D55CFF0A8}"
 	ProjectSection(SolutionItems) = preProject
 		landerist_website\downloads_template.html = landerist_website\downloads_template.html
+		landerist_website\hosts_template.html = landerist_website\hosts_template.html
 		landerist_website\index.html = landerist_website\index.html
 		landerist_website\statistics_template.html = landerist_website\statistics_template.html
 	EndProjectSection

@@ -41,6 +41,8 @@ namespace landerist_library.Websites
 
         public string? ListingUrlRegex { get; set; }
 
+        public bool ApplySpecialRules { get; set; }
+
         private int NumPages { get; set; } = 0;
 
         private int NumListings { get; set; } = 0; // NumListingsFound (published and unpublished)
@@ -126,6 +128,9 @@ namespace landerist_library.Websites
             ListingUrlRegex = dataRow.Table.Columns.Contains("ListingUrlRegex") && dataRow["ListingUrlRegex"] is not DBNull
                 ? dataRow["ListingUrlRegex"].ToString()
                 : null;
+            ApplySpecialRules = dataRow.Table.Columns.Contains("ApplySpecialRules")
+                && dataRow["ApplySpecialRules"] is not DBNull
+                && (bool)dataRow["ApplySpecialRules"];
             NumPages = (int)dataRow["NumPages"];
             NumListings = (int)dataRow["NumListings"];
             ListingExampleUri = dataRow["ListingExampleUri"] is DBNull ? null : new Uri(dataRow["ListingExampleUri"].ToString()!);
@@ -136,10 +141,10 @@ namespace landerist_library.Websites
             string query =
                 "INSERT INTO " + Websites.WEBSITES + " (" +
                 "[MainUri], [Host], [LanguageCode], [CountryCode], [RobotsTxt], [RobotsTxtUpdated], " +
-                "[SitemapUpdated], [IpAddress], [IpAddressUpdated], [ListingUrlRegex], [NumPages], [NumListings], " +
+                "[SitemapUpdated], [IpAddress], [IpAddressUpdated], [ListingUrlRegex], [ApplySpecialRules], [NumPages], [NumListings], " +
                 "[ListingExampleUri]) VALUES (" +
                 "@MainUri, @Host, @LanguageCode, @CountryCode, @RobotsTxt, @RobotsTxtUpdated, " +
-                "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @ListingUrlRegex, @NumPages, @NumListings, " +
+                "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @ListingUrlRegex, @ApplySpecialRules, @NumPages, @NumListings, " +
                 "@ListingExampleUri)";
 
             var parameters = GetQueryParameters();
@@ -159,6 +164,7 @@ namespace landerist_library.Websites
                 "[IpAddress] = @IpAddress, " +
                 "[IpAddressUpdated] = @IpAddressUpdated, " +
                 "[ListingUrlRegex] = @ListingUrlRegex, " +
+                "[ApplySpecialRules] = @ApplySpecialRules, " +
                 "[NumPages] = @NumPages, " +
                 "[NumListings] = @NumListings, " +
                 "[ListingExampleUri] = @ListingExampleUri " +
@@ -181,6 +187,7 @@ namespace landerist_library.Websites
                 {"IpAddress", IpAddress },
                 {"IpAddressUpdated", IpAddressUpdated},
                 {"ListingUrlRegex", ListingUrlRegex },
+                {"ApplySpecialRules", ApplySpecialRules },
                 {"NumPages", NumPages },
                 {"NumListings", NumListings },
                 {"ListingExampleUri", ListingExampleUri?.ToString() },
@@ -595,7 +602,8 @@ namespace landerist_library.Websites
                 IpAddress = null;
                 Robots = null;
                 RobotsTxt = null;
-                ListingExampleUri = null;                
+                ListingExampleUri = null;
+                ApplySpecialRules = false;
             }
 
             Disposed = true;

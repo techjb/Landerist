@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "4.72";
+        public static readonly string VERSION = "4.74";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -19,7 +19,7 @@ namespace landerist_library.Configuration
 
         public static readonly int MIN_PAGES_PER_SCRAPE = 10;
 
-        public static readonly int MAX_PAGES_PER_SCRAPE = 4000;
+        public static readonly int MAX_PAGES_PER_SCRAPE = 5000;
        
         public static readonly bool DOWNLOADERS_POOL_ENABLED = true;
 
