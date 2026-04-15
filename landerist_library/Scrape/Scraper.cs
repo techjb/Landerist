@@ -17,13 +17,13 @@ namespace landerist_library.Scrape
 
         private int TotalCounter = 0;
 
-        private int Scraped = 0;
+        private int Processed = 0;
 
-        private int TotalScraped = 0;
+        private int TotalProcessed = 0;
 
-        private int Success = 0;
+        private int ScrapedSuccess = 0;
 
-        private int TotalSuccess = 0;
+        private int TotalScrapedSuccess = 0;
 
         private int Crashed = 0;
 
@@ -106,8 +106,8 @@ namespace landerist_library.Scrape
             var pageCount = _pageQueue.Count;
 
             Counter = pageCount;
-            Scraped = 0;
-            Success = 0;
+            Processed = 0;
+            ScrapedSuccess = 0;
             Crashed = 0;
             DownloadErrors = 0;
             SkippedByRobotsTxt = 0;
@@ -172,8 +172,7 @@ namespace landerist_library.Scrape
             }
 
             var useProxy = isBlocked;
-            Scrape(page, useProxy);
-            Interlocked.Increment(ref Scraped);
+            Scrape(page, useProxy);            
         }
 
         private void WriteConsole(Page page)
@@ -183,9 +182,9 @@ namespace landerist_library.Scrape
                 return;
             }
 
-            var crashedPercentage = GetPercentage(Crashed, Scraped);
-            var downloadErrorsPercentage = GetPercentage(DownloadErrors, Scraped);
-            
+            var crashedPercentage = GetPercentage(Crashed, Processed);
+            var downloadErrorsPercentage = GetPercentage(DownloadErrors, Processed);
+
 
             var text =
                 $"Crashed: {Crashed} ({crashedPercentage}%) " +
@@ -199,37 +198,44 @@ namespace landerist_library.Scrape
         private void AccumulateTotals()
         {
             TotalCounter += Counter;
-            TotalScraped += Scraped;
+            TotalProcessed += Processed;
             TotalSkippedByRobotsTxt += SkippedByRobotsTxt;
             TotalSkippedByCrawlDelay += SkippedByCrawlDelay;
             TotalSkippedByBlockedWebsite += SkippedByBlockedWebsite;
-            TotalSuccess += Success;
+            TotalScrapedSuccess += ScrapedSuccess;
             TotalCrashed += Crashed;
             TotalDownloadErrors += DownloadErrors;
         }
 
         private string GetLogText()
         {
-            var scrappedPercentage = GetPercentage(TotalScraped, TotalCounter);
+            var scrappedPercentage = GetPercentage(TotalProcessed, TotalCounter);
             var totalSkipped = TotalSkippedByRobotsTxt + TotalSkippedByCrawlDelay + TotalSkippedByBlockedWebsite;
             var skippedPercentage = GetPercentage(totalSkipped, TotalCounter);
             var skippedByRobotsTxtPercentage = GetPercentage(TotalSkippedByRobotsTxt, TotalCounter);
             var skippedByCrawlDelayPercentage = GetPercentage(TotalSkippedByCrawlDelay, TotalCounter);
             var skippedByBlockedWebsitePercentage = GetPercentage(TotalSkippedByBlockedWebsite, TotalCounter);
-            var successPercentage = GetPercentage(TotalSuccess, TotalScraped);
-            var crashedPercentage = GetPercentage(TotalCrashed, TotalScraped);
-            var downloadErrorsPercentage = GetPercentage(TotalDownloadErrors, TotalSuccess);
+            var successPercentage = GetPercentage(TotalScrapedSuccess, TotalProcessed);
+            var crashedPercentage = GetPercentage(TotalCrashed, TotalProcessed);
+            var downloadErrorsPercentage = GetPercentage(TotalDownloadErrors, TotalScrapedSuccess);
 
             return
                 $"{TotalCounter} => " +
-                $"[Scraped {TotalScraped} ({scrappedPercentage}%) => " +
-                $"[Ok {TotalSuccess} ({successPercentage}%) => " +
-                $"[DlErr {TotalDownloadErrors}  ({downloadErrorsPercentage}%)] | " +
-                $"Crash {TotalCrashed} ({crashedPercentage}%)] | " +
-                $"Skip {totalSkipped} ({skippedPercentage}%) => " +
-                $"[RobotsTxt {TotalSkippedByRobotsTxt} ({skippedByRobotsTxtPercentage}%) | " +
-                $"CrawlDelay {TotalSkippedByCrawlDelay} ({skippedByCrawlDelayPercentage}%) | " +
-                $"Blocked {TotalSkippedByBlockedWebsite} ({skippedByBlockedWebsitePercentage}%)]" +
+                $"[Processed {TotalProcessed} ({scrappedPercentage}%) => " +
+                //$"[Ok {TotalScrapedSuccess} ({successPercentage}%) => " +
+                $"[ScrapedSuccess {successPercentage}% => " +
+                //$"[DlErr {TotalDownloadErrors}  ({downloadErrorsPercentage}%)] | " +
+                $"[DlErr {downloadErrorsPercentage}%] | " +
+                //$"Crash {TotalCrashed} ({crashedPercentage}%)] | " +
+                $"Crash {crashedPercentage}%] | " +
+                //$"Skip {totalSkipped} ({skippedPercentage}%) => " +
+                $"Skip {skippedPercentage}% => " +
+                //$"[RobotsTxt {TotalSkippedByRobotsTxt} ({skippedByRobotsTxtPercentage}%) | " +
+                $"[RobotsTxt {skippedByRobotsTxtPercentage}% | " +
+                //$"CrawlDelay {TotalSkippedByCrawlDelay} ({skippedByCrawlDelayPercentage}%) | " +
+                $"CrawlDelay {skippedByCrawlDelayPercentage}% | " +
+                //$"Blocked {TotalSkippedByBlockedWebsite} ({skippedByBlockedWebsitePercentage}%)]" +
+                $"Blocked {skippedByBlockedWebsitePercentage}%]" +
                 $"]";
         }
 
@@ -245,10 +251,11 @@ namespace landerist_library.Scrape
 
         private void InsertStatistics()
         {
-            StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ScrapedSuccess, Success);
+            StatisticsSnapshot.InsertDailyCounter(StatisticsKey.Processed, Processed);
+            StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ScrapedSuccess, ScrapedSuccess);
             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ScrapedCrashed, Crashed);
             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ScrapedHttpStatusCodeNotOK, DownloadErrors);
-        }      
+        }
 
         private void ResetCancellationTokenSource()
         {
@@ -269,11 +276,13 @@ namespace landerist_library.Scrape
 
         public void Scrape(Page page, bool useProxy)
         {
-            WebsitesBlocker.Block(page.Website);
+            WebsitesBlocker.Block(page.Website);            
             var pageScraper = new PageScraper(page, useProxy);
+            
+            Interlocked.Increment(ref Processed);
             if (pageScraper.Scrape())
             {
-                Interlocked.Increment(ref Success);
+                Interlocked.Increment(ref ScrapedSuccess);
                 if (page.PageType.Equals(PageType.HttpStatusCodeNotOK))
                 {
                     Interlocked.Increment(ref DownloadErrors);

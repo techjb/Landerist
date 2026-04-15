@@ -25,6 +25,7 @@ namespace landerist_library.Statistics
         HttpStatusCode_NULL,
         HttpStatusCode_200,
         PageType,
+        Processed,
         ScrapedSuccess,
         ScrapedCrashed,
         ScrapedHttpStatusCodeNotOK,

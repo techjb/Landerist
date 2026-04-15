@@ -58,7 +58,7 @@ namespace landerist_library.Parse.Location.Delimitations
         //            ErrorsMainUri++;
         //        }
         //    }
-        //    Console.WriteLine("Success: " + success + " ErrorsMainUri: " + ErrorsMainUri);
+        //    Console.WriteLine("ScrapedSuccess: " + success + " ErrorsMainUri: " + ErrorsMainUri);
         //}
 
         /// <summary>

@@ -29,8 +29,8 @@ namespace landerist_tests
 
         private static void Start()
         {
-            RegisterExitEvents();
-            SetCtrlDListener();
+            //RegisterExitEvents();
+            //SetCtrlDListener();
 
             DateStart = DateTime.Now;            
             Log.DeleteCurentMachineLogs();

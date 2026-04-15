@@ -39,7 +39,8 @@ namespace landerist_library.Landerist_com
                 UpdatedHttpStatusCode200();
                 UpdatedHttpStatusCodeErrors();
                 UpdatedPageType();
-                ScrapedPages();
+                ScraperProcessedPages();
+                ScraperSuccessCrash();
                 NotListingsCache();
                 ResponseBodyTextAlreadyParsed();
                 ReponseBodyTextIsAnotherListingInHost();
@@ -127,15 +128,19 @@ namespace landerist_library.Landerist_com
             BarChart("Updated PageType", keys, false);
         }
 
-        private static void ScrapedPages()
+        private static void ScraperProcessedPages()
+        {
+            BarChart("Scraper Processed Pages", StatisticsKey.Processed, false);
+        }
+
+        private static void ScraperSuccessCrash()
         {
             List<StatisticsKey> statisticsKeys =
             [
                 StatisticsKey.ScrapedSuccess,
-                StatisticsKey.ScrapedHttpStatusCodeNotOK,
                 StatisticsKey.ScrapedCrashed,
             ];
-            BarChart("Scraped Pages", statisticsKeys, false);
+            BarChart("Scraper Success/Chrash", statisticsKeys, false);
         }
 
         private static void WaitingAIRequest()
