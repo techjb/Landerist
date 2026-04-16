@@ -614,55 +614,7 @@ namespace landerist_library.Websites
                 int current = Interlocked.Increment(ref processed);
                 Console.WriteLine(current + "/" + total);
             });
-        }
-
-        //public static void UpdateListingExampleUriFromFile()
-        //{
-        //    string file = PrivateConfig.INSERT_DIRECTORY + "HostMainUri.csv";
-        //    DataTable dataTable = Tools.Csv.ToDataTable(file);
-        //    int total = dataTable.Rows.Count;
-        //    int processed = 0;
-        //    int inserted = 0;
-        //    int deleted = 0;
-        //    int invalidHosts = 0;
-
-        //    foreach (DataRow row in dataTable.Rows)
-        //    {
-        //        string host = (string)row[0];
-        //        string listingUrl = ((string)row[2]).Trim();
-        //        if (listingUrl.Equals(string.Empty))
-        //        {
-        //            continue;
-        //        }
-        //        if (!Uri.TryCreate(listingUrl, UriKind.Absolute, out Uri? listingExampleUri))
-        //        {
-        //            continue;
-        //        }
-
-        //        if (!host.Equals(listingExampleUri.Host)
-        //            || false // !remove
-        //            )
-        //        {
-        //            invalidHosts++;
-        //            if (Insert.WebsitesInserter.InsertFromListingExampleUri(listingExampleUri))
-        //            {
-        //                inserted++;
-        //                Website website = new(host);
-        //                if (website.DeleteCurentMachineLogs())
-        //                {
-        //                    deleted++;
-        //                }
-        //            }
-        //        }
-        //        processed++;
-        //        Console.WriteLine(processed + "/" + total + " " +
-        //            "invalidHosts: " + invalidHosts + " " +
-        //            "inserted: " + inserted + " " +
-        //            "deleted: " + deleted + " " +
-        //            "");
-
-        //    }
-        //}
+        }       
 
         private static string GetWebsiteDisplayText(Website website)
         {
