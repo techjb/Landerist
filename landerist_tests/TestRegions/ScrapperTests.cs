@@ -16,7 +16,7 @@ namespace landerist_tests
             //new Scraper().ProcessPages();
             //new Scraper().Scrape(page, false);
 
-            new landerist_library.Scrape.Scraper().Scrape("https://www.engelvoelkers.com/es/es/gg-magazine", false);
+            //new landerist_library.Scrape.Scraper().Scrape("https://www.engelvoelkers.com/es/es/gg-magazine", false);
             //new landerist_library.Scrape.Scraper().Scrape("https://20punto20rb.com/propiedades/propiedad/luminoso-piso-en-don-ramon-de-la-cruz/", false);
 
             //new landerist_library.Scrape.Scraper().Scrape("https://1mast.com/es/pisos-en-coin/", false);// not listing

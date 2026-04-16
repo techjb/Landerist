@@ -19,7 +19,7 @@ namespace landerist_library.Configuration
 
         public static readonly int MIN_PAGES_PER_SCRAPE = 10;
 
-        public static readonly int MAX_PAGES_PER_SCRAPE = 5000;
+        public static readonly int MAX_PAGES_PER_SCRAPE = 2500;
        
         public static readonly bool DOWNLOADERS_POOL_ENABLED = true;
 

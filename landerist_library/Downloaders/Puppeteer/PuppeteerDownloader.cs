@@ -107,20 +107,6 @@ namespace landerist_library.Downloaders.Puppeteer
             "--disable-background-networking",
             "--disable-component-update",
             "--disable-blink-features=AutomationControlled"
-
-            //"--single-process",
-            //"--disable-web-security",
-            //"--disable-extensions",
-            //"--disable-plugins",
-            //"--disable-breakpad",
-            //"--disable-client-side-phishing-detection",
-            //"--disable-sync",
-            //"--disable-translate",
-            //"--disable-default-apps",
-            //"--mute-audio",
-            //"--disable-domain-reliability",
-            //"--autoplay-policy=user-gesture-required",
-            //"--disable-component-extensions-with-background-_pageQueue",
             ];
 
         private static readonly string[] LaunchOptionsProxy =
@@ -207,7 +193,6 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private static readonly NavigationOptions NavigationOptions = new()
         {
-            //WaitUntil = [WaitUntilNavigation.Networkidle2],
             WaitUntil = [WaitUntilNavigation.Networkidle2],
             Timeout = GetTimeout()
         };
@@ -375,8 +360,8 @@ namespace landerist_library.Downloaders.Puppeteer
             //Logs.Log.WriteInfo("PuppeteerTest", "Starting test");
             //string? text = new PuppeteerDownloader(true).GetText(Page);
 
-            Pages.Page page1 = new("https://www.rualcasa.com/ficha/local-comercial/alicante/babel/1008/21300773/es/");
-            var puppeteerDownloader = new PuppeteerDownloader(false);
+            //Pages.Page page1 = new("https://www.rualcasa.com/ficha/local-comercial/alicante/babel/1008/21300773/es/");
+            //var puppeteerDownloader = new PuppeteerDownloader(false);
             //Console.WriteLine(puppeteerDownloader.GetText(page1));
 
         }
@@ -450,7 +435,6 @@ namespace landerist_library.Downloaders.Puppeteer
             catch (Exception exception)
             {
                 SetBrowserChrashed(BuildExecutionMessage("Exception occurred", null, delay, stopwatch.ElapsedMilliseconds, exception));
-                //Logs.Log.WriteError("PuppeteerDownloader SetContentAndScrenshot Exception", exception);
             }
         }
 
@@ -533,32 +517,14 @@ namespace landerist_library.Downloaders.Puppeteer
                 SetExecutionStep("Completed");
                 return (content, screenShot);
             }
-            //catch (NullReferenceException exception)
-            //{
-            //    Logs.Log.WriteError("PuppeterDownloader GetAsync NullReferenceException", exception.Message);
-            //}
-            //catch (TargetClosedException exception)
-            //{
-            //    Logs.Log.WriteError("PuppeterDownloader GetAsync TargetClosedException", exception.Message);
-            //}
-            //catch (PuppeteerException exception)
-            //{
-            //    Logs.Log.WriteError("PuppeterDownloader GetAsync PuppeteerException", exception.Message);
-            //}
+           
             catch (NavigationException exception)
             {
                 var message =
                            $"{HttpStatusCode} " +
                            $"{UseProxy} " +
-                           //$"SingleDownloader Id:{SingleDownloader!.Id} " +
-                           //$"ScrapedCounter:{SingleDownloader!.ScrapedCounter()} " +
                            $"{exception.Message} " +
                            $"{Page?.Uri}";
-
-                //Console.WriteLine("NavigationException " + message);
-                //Logs.Log.WriteError("PuppeterDownloader GetAsync NavigationException", message);    
-
-
             }
             catch (Exception exception)
             {
@@ -566,12 +532,9 @@ namespace landerist_library.Downloaders.Puppeteer
                 var message =
                        $"HttpStatusCode: {HttpStatusCode} " +
                        $"UseProxy: {UseProxy} " +
-                       //$"SingleDownloader Id:{SingleDownloader!.Id} " +
-                       //$"ScrapedCounter:{SingleDownloader!.ScrapedCounter()} " +
                        $"Message: {exception.Message}";
 
                 Console.WriteLine("Exception " + message);
-                //Logs.Log.WriteError("PuppeterDownloader GetAsync Exception", message);
             }
 
             return (content, screenShot);
@@ -682,14 +645,12 @@ namespace landerist_library.Downloaders.Puppeteer
                     BlockDomains.Contains(requestHost) ||
                     BlockedExtensions.Any(url.EndsWith) ||
                     e.Request.IsNavigationRequest && e.Request.RedirectChain.Length != 0
-                    //|| response.Request.IsNavigationRequest && response.Request.Url != uri.ToString()) // problematic
                     )
                 {
                     await e.Request.AbortAsync();
                     return;
                 }
 
-                //Console.WriteLine(e.Request.Url);
                 await e.Request.ContinueAsync();
             }
             catch //(Exception exception)
@@ -729,27 +690,13 @@ namespace landerist_library.Downloaders.Puppeteer
 
                 if (redirectUri != null && redirectUri.IsAbsoluteUri && !currentPage.Uri.Equals(redirectUri))
                 {
-                    RedirectUrl = redirectUri.ToString();
-                    //new Database.RedirectUrl().Insert(Page!.Uri.ToString(), RedirectUrl);
+                    RedirectUrl = redirectUri.ToString();                    
                 }
             }
             catch (Exception exception)
             {
                 Logs.Log.WriteError("PuppeteerDownloader HandleResponseAsync", exception);
             }
-        }
-
-        private static void LogHttpError(IResponse response)
-        {
-            //string error = $"▶ Status: {response.Status} ({response.StatusText}) ▶ Headers: ";
-            //foreach (var kv in response.Headers)
-            //{
-            //    error+= $" {kv.Key}: {kv.Value} ";
-            //}
-            //error += $" ▶ URL: {response.Url}";
-            string error = $"▶ Status: {response.Status} ({response.StatusText}) ▶ URL: {response.Url}";
-
-            Logs.Log.WriteError("PuppeteerDownloader LogHttpError", error);
         }
 
         private static int GetTimeout()
