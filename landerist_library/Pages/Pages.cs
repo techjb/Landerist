@@ -115,7 +115,13 @@ namespace landerist_library.Pages
                 "   SELECT TOP " + topRows + " P.[UriHash] " +
                 "   FROM " + PAGES + " AS P " +
                 "   INNER JOIN " + Websites.Websites.WEBSITES + " AS W ON P.[Host] = W.[Host] " +
-                "   WHERE P.[LockedBy] IS NULL AND P.[WaitingStatus] IS NULL " + (string.IsNullOrEmpty(where) ? string.Empty : " AND " + where) + " " +
+                "   WHERE P.[LockedBy] IS NULL AND P.[WaitingStatus] IS NULL " +
+                "   AND NOT EXISTS (" +
+                "       SELECT 1 " +
+                "       FROM " + WebsitesBlocker.WEBSITES_BLOCKER + " AS WB " +
+                "       WHERE WB.[IpOrHost] = P.[Host] AND WB.[BlockUntil] > GETDATE()" +
+                "   ) " +
+                (string.IsNullOrEmpty(where) ? string.Empty : " AND " + where) + " " +
                 "   ORDER BY P.[NextUpdate] ASC" +
                 ") " +
                 "UPDATE P " +

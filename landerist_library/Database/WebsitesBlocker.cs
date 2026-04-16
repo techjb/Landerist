@@ -4,7 +4,7 @@ namespace landerist_library.Database
 {
     public class WebsitesBlocker
     {
-        private const string WEBSITES_BLOCKER = "[WEBSITES_BLOCKER]";
+        public const string WEBSITES_BLOCKER = "[WEBSITES_BLOCKER]";
 
         public static bool IsBlocked(Website website)
         {
@@ -28,6 +28,17 @@ namespace landerist_library.Database
         public static bool Block(Website website)
         {
             var hostBlockUntil = CalculateHostBlockUntil(website);
+            return Block(website, hostBlockUntil);
+        }
+
+        public static bool BlockForbidden(Website website, short? transientErrorCounter = null)
+        {
+            var hostBlockUntil = CalculateForbiddenBlockUntil(transientErrorCounter);
+            return Block(website, hostBlockUntil);
+        }
+
+        private static bool Block(Website website, DateTime hostBlockUntil)
+        {
             string query =
                 "IF EXISTS (" +
                "   SELECT 1 " +
@@ -62,6 +73,23 @@ namespace landerist_library.Database
             int crawlDelayMilliseconds = Math.Min(website.CrawlDelay(), Configuration.Config.MAX_CRAW_DELAY_SECONDS) * 1000;
             int milliseconds = Math.Max(randomMilliseconds, crawlDelayMilliseconds);
             return DateTime.Now.AddMilliseconds(milliseconds);
+        }
+
+        private static DateTime CalculateForbiddenBlockUntil(short? transientErrorCounter)
+        {
+            int attempts = Math.Max(1, (int)(transientErrorCounter ?? 1));
+            int blockMinutes = attempts switch
+            {
+                1 => 2,
+                2 => 5,
+                3 => 15,
+                4 => 30,
+                5 => 60,
+                _ => 180,
+            };
+
+            int jitterSeconds = Random.Shared.Next(0, Math.Max(30, blockMinutes * 30));
+            return DateTime.Now.AddMinutes(blockMinutes).AddSeconds(jitterSeconds);
         }
     }
 }
