@@ -126,13 +126,13 @@ namespace landerist_library.Landerist_com
         private static void UpdatedHttpStatusCode()
         {
             var keys = StatisticsSnapshot.GetHttpStatusCodeKeys();            
-            BarChart("Updated HttpStatusCode", keys, false);
+            BarChart("Updated by HttpStatusCode", keys, false);
         }
 
         private static void UpdatedPageType()
         {
             var keys = StatisticsSnapshot.GetPageTypeKeys();
-            BarChart("Updated PageType", keys, false);
+            BarChart("Updated by PageType", keys, false);
         }
 
         private static void ScraperProcessedPages()
