@@ -57,6 +57,8 @@ namespace landerist_library.Websites
 
         private bool Disposed;
 
+        private static readonly Lazy<bool> HasIndexUrlRegexColumn = new(DatabaseHasIndexUrlRegexColumn);
+
         public Website()
         {
             MainUri = new Uri("about:blank", UriKind.RelativeOrAbsolute);
