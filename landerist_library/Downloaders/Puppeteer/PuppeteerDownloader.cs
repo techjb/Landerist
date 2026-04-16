@@ -459,7 +459,7 @@ namespace landerist_library.Downloaders.Puppeteer
             string? content = null;
             byte[]? screenShot = null;
             BrowserChrashed = false;
-            if (BrowserPage is null)
+            if (Browser is null)
             {
                 return (null, null);
             }
