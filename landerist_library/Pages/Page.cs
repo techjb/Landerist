@@ -600,8 +600,6 @@ namespace landerist_library.Pages
                 ResponseBodyTextHash = null;
                 ResponseBodyZipped = null;
                 Screenshot = null;
-
-                Website.Dispose();
             }
 
             Disposed = true;
