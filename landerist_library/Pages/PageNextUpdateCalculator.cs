@@ -44,7 +44,7 @@
             }
 
             addDays += GetDeterministicJitterDays(page);
-            addDays *= GetAddDaysMultiplier(page);
+            //addDays *= GetAddDaysMultiplier(page);
             addDays = Math.Max(1d, addDays);
             return now.AddDays(addDays);
         }

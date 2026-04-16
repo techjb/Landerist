@@ -33,11 +33,11 @@ namespace landerist_library.Scrape
             }
 
             (var newPageType, var newListing, var waitingAIRequest) = new PageTypeParser(_page).GetPageType();
-            var success = ApplyClassificationResult(newPageType, newListing, waitingAIRequest);
+            var success = ApplyClassificationResultAfterDownload(newPageType, newListing, waitingAIRequest);
 
             if (success)
             {
-                IndexPages();
+                new Indexer(_page).IndexPages();
             }
 
             return success;
@@ -68,7 +68,7 @@ namespace landerist_library.Scrape
         }
 
 
-        public bool ApplyClassificationResult(PageType? newPageType, Listing? newListing, bool waitingAIRequest)
+        public bool ApplyClassificationResultAfterDownload(PageType? newPageType, Listing? newListing, bool waitingAIRequest)
         {
             if (waitingAIRequest)
             {
@@ -156,49 +156,6 @@ namespace landerist_library.Scrape
             //_page.Website.DecreaseNumListings();
             ES_Listings.InsertUpdate(_page.Website, newListing);
             _page.SetListingStatusUnpublished();
-        }
-
-        private void IndexPages()
-        {
-            if (!Config.INDEXER_ENABLED)
-            {
-                return;
-            }
-
-            if (_page.Website.AchievedMaxNumberOfPages())
-            {
-                return;
-            }
-
-            if (!string.IsNullOrEmpty(_page.RedirectUrl))
-            {
-                new Indexer(_page).Insert(_page.RedirectUrl);
-                return;
-            }
-
-            if (_page.ContainsMetaRobotsNoFollow())
-            {
-                return;
-            }
-
-            if (_page.PageType.Equals(PageType.IncorrectLanguage))
-            {
-                new LinkAlternateIndexer(_page).Insert();
-                return;
-            }
-
-            if (_page.PageType.Equals(PageType.NotCanonical))
-            {
-                new CanonicalIndexer(_page).Insert();
-                return;
-            }
-
-            new HyperlinksIndexer(_page).Insert();
-        }
-
-        public Listing? GetListing()
-        {
-            return _page.GetListing(true, true);
         }
     }
 }

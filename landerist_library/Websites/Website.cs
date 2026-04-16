@@ -359,7 +359,7 @@ namespace landerist_library.Websites
         {
             if (RobotsTxt != null)
             {
-                Robots ??= Com.Bekijkhet.RobotsTxt.Robots.Load(RobotsTxt);
+                Robots ??= Robots.Load(RobotsTxt);
                 return (int)Robots.CrawlDelay(Config.USER_AGENT) / 1000;
             }
 

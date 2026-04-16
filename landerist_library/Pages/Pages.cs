@@ -12,7 +12,7 @@ namespace landerist_library.Pages
     public class Pages
     {
         public const string PAGES = "[PAGES]";
-        private const int GET_ALL_PAGES_BATCH_SIZE = 2000;
+        private const int GET_ALL_PAGES_BATCH_SIZE = 3000;
 
         public static Page? GetPage(string uriHash)
         {

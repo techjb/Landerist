@@ -35,9 +35,10 @@ namespace landerist_library.Landerist_com
                 NeedUpdate();
                 NextUpdateDistribution();
                 UnknownPageType();
-                UpdatedHttpStatusCodeNull();
-                UpdatedHttpStatusCode200();
-                UpdatedHttpStatusCodeErrors();
+                //UpdatedHttpStatusCodeNull();
+                //UpdatedHttpStatusCode200();
+                //UpdatedHttpStatusCodeErrors();
+                UpdatedHttpStatusCode();
                 UpdatedPageType();
                 ScraperProcessedPages();
                 ScraperSuccessCrash();
@@ -106,20 +107,26 @@ namespace landerist_library.Landerist_com
             AreaChart("Unknown PageType", StatisticsKey.UnknownPageType, true);
         }
 
-        private static void UpdatedHttpStatusCodeNull()
-        {
-            LineChart("Updated HttpStatusCode null", StatisticsKey.HttpStatusCode_NULL, true);
-        }
+        //private static void UpdatedHttpStatusCodeNull()
+        //{
+        //    LineChart("Updated HttpStatusCode null", StatisticsKey.HttpStatusCode_NULL, true);
+        //}
 
-        private static void UpdatedHttpStatusCode200()
+        //private static void UpdatedHttpStatusCode200()
+        //{
+        //    LineChart("Updated HttpStatusCode 200", StatisticsKey.HttpStatusCode_200, true);
+        //}
+        //private static void UpdatedHttpStatusCodeErrors()
+        //{
+        //    var keys = StatisticsSnapshot.GetHttpStatusCodeKeys();
+        //    keys.RemoveAll(code => code == StatisticsKey.HttpStatusCode_NULL.ToString() || code == StatisticsKey.HttpStatusCode_200.ToString());
+        //    BarChart("Updated HttpStatusCode errors", keys, false);
+        //}
+
+        private static void UpdatedHttpStatusCode()
         {
-            LineChart("Updated HttpStatusCode 200", StatisticsKey.HttpStatusCode_200, true);
-        }
-        private static void UpdatedHttpStatusCodeErrors()
-        {
-            var keys = StatisticsSnapshot.GetHttpStatusCodeKeys();
-            keys.RemoveAll(code => code == StatisticsKey.HttpStatusCode_NULL.ToString() || code == StatisticsKey.HttpStatusCode_200.ToString());
-            BarChart("Updated HttpStatusCode errors", keys, false);
+            var keys = StatisticsSnapshot.GetHttpStatusCodeKeys();            
+            BarChart("Updated HttpStatusCode", keys, false);
         }
 
         private static void UpdatedPageType()

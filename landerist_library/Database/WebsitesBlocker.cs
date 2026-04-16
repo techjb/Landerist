@@ -58,7 +58,7 @@ namespace landerist_library.Database
 
         private static DateTime CalculateHostBlockUntil(Website website)
         {
-            int randomMilliseconds = Random.Shared.Next(2000, 5000);
+            int randomMilliseconds = Random.Shared.Next(3000, 6000);
             int crawlDelayMilliseconds = Math.Min(website.CrawlDelay(), Configuration.Config.MAX_CRAW_DELAY_SECONDS) * 1000;
             int milliseconds = Math.Max(randomMilliseconds, crawlDelayMilliseconds);
             return DateTime.Now.AddMilliseconds(milliseconds);

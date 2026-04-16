@@ -62,7 +62,7 @@ namespace landerist_library.Scrape
             var pageScraper = new PageScraper(page);
             pageScraper.Scrape();
             Log.WriteInfo("service", "PageType: " + page.PageType.ToString());
-            var listing = pageScraper.GetListing();
+            var listing =  page.GetListing(true, true);
             string json = new Schema(listing).Serialize();
             Log.WriteInfo("service", "Listing: " + json);
             Stop();

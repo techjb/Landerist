@@ -1,4 +1,5 @@
-﻿using landerist_library.Pages;
+﻿using landerist_library.Configuration;
+using landerist_library.Pages;
 using landerist_library.Tools;
 using landerist_library.Websites;
 
@@ -26,6 +27,44 @@ namespace landerist_library.Index
 
         public Indexer(Website website) : this(new Page(website))
         {
+        }
+
+        public void IndexPages()
+        {
+            if (!Config.INDEXER_ENABLED)
+            {
+                return;
+            }
+
+            if (Page.Website.AchievedMaxNumberOfPages())
+            {
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(Page.RedirectUrl))
+            {
+                Insert(Page.RedirectUrl);
+                return;
+            }
+
+            if (Page.ContainsMetaRobotsNoFollow())
+            {
+                return;
+            }
+
+            if (Page.PageType.Equals(PageType.IncorrectLanguage))
+            {
+                new LinkAlternateIndexer(Page).Insert();
+                return;
+            }
+
+            if (Page.PageType.Equals(PageType.NotCanonical))
+            {
+                new CanonicalIndexer(Page).Insert();
+                return;
+            }
+
+            new HyperlinksIndexer(Page).Insert();
         }
 
         public void Insert(List<string?> urls)

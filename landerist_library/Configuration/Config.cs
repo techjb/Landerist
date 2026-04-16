@@ -48,7 +48,7 @@ namespace landerist_library.Configuration
 
         public static readonly int HTTPCLIENT_SECONDS_TIMEOUT = 10;
 
-        public static readonly int MAX_CRAW_DELAY_SECONDS = 30;
+        public static readonly int MAX_CRAW_DELAY_SECONDS = 300;
 
         public static readonly double MINIMUM_PERCENTAGE_TO_BE_SIMILAR_PAGE = 0.85;
 
