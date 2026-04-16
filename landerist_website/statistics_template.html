@@ -6,38 +6,37 @@
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@techjb" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            line-height: 1.4;
-            font-size: 16px;
-            padding: 0 10px;
-            margin: 50px auto;
-            max-width: 650px;
-        }
-
-        #maincontent {
-            max-width: 42em;
-            margin-top: 70px;
-        }
-
-        canvas {
-            margin: 20px 0px;
-        }
-    </style>
+    <link rel="stylesheet" href="/styles.css" />
     <title>Statistics</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
-    <div id="maincontent">
-        <a href="../">< Home</a>
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo">Landerist</a>
+            <ul class="nav-links">
+                <!--<li><a href="/downloads">Downloads</a></li>-->
+                <li><a href="/statistics">Statistics</a></li>
+                <li><a href="https://github.com/techjb/Landerist">GitHub</a></li>
+            </ul>
+        </div>
+    </nav>
 
-        <h2>
-            Statistics
-        </h2>
+    <div class="page-container">
+        <div class="page-header">
+            <a href="../" class="back-link">← Home</a>
+            <h1>Statistics</h1>
+        </div>
 
-        <div id="Statistics">
+        <div class="section">
+            <div id="Statistics">
 
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; Landerist</p>
         </div>
     </div>
 
@@ -59,7 +58,12 @@
                 },
                 title: {
                     display: true,
-                    text: title
+                    text: title,
+                    font: {
+                        size: 16,
+                        weight: 600
+                    },
+                    color: '#171717'
                 }
             };
         }
@@ -72,7 +76,9 @@
                         display: false
                     },
                     ticks: {
-                        display: ticks
+                        display: ticks,
+                        color: '#666666',
+                        font: { size: 12 }
                     },
                     border: {
                         display: ticks
@@ -85,7 +91,9 @@
                         display: false
                     },
                     ticks: {
-                        display: ticks
+                        display: ticks,
+                        color: '#666666',
+                        font: { size: 12 }
                     },
                     border: {
                         display: ticks

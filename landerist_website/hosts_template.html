@@ -6,63 +6,52 @@
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@techjb" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            line-height: 1.4;
-            font-size: 16px;
-            padding: 0 10px;
-            margin: 50px auto;
-            max-width: 650px;
-        }
-
-        #maincontent {
-            max-width: 42em;
-            margin-top: 70px;
-        }
-
-        ul {
-            margin-top: 0;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        table, th, td {
-            border: 1px solid black;
-            padding: 3px;
-            text-align: left;
-        }
-    </style>
+    <link rel="stylesheet" href="/styles.css" />
     <title>Hosts</title>
 </head>
 
 <body>
-    <div id="maincontent">
-        <a href="../">< Home</a>
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo">Landerist</a>
+            <ul class="nav-links">
+                <!--<li><a href="/downloads">Downloads</a></li>-->
+                <li><a href="/statistics">Statistics</a></li>
+                <li><a href="https://github.com/techjb/Landerist">GitHub</a></li>
+            </ul>
+        </div>
+    </nav>
 
-        <h2>
-            Host
-        </h2>
+    <div class="page-container">
+        <div class="page-header">
+            <a href="../" class="back-link">← Home</a>
+            <h1>Hosts</h1>
+            <p>List of pages and listings by Host</p>
+        </div>
 
-        List of pages and listings by Host
+        <div class="section">
+            <h2 class="section-subtitle">Spain</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Host</th>
+                            <th>Pages</th>
+                            <th>Listings</th>
+                            <th>Date</th>
+                            <th>Downloads</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        /*CHARTS*/
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Host</th>
-                    <th>Pages</th>
-                    <th>Listings</th>
-                    <th>Date</th>
-                    <th>Downloads</th>
-                </tr>
-            </thead>
-            <tbody>
-                /*CHARTS*/
-            </tbody>
-        </table>
+        <div class="footer">
+            <p>&copy; Landerist</p>
+        </div>
     </div>
 </body>
 </html>

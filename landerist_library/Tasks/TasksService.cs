@@ -229,7 +229,7 @@ namespace landerist_library.Tasks
             {
                 StatisticsSnapshot.TakeSnapshots();
                 DownloadsUpdater.Update();
-                Landerist_com.Landerist_com.UpdatePages();
+                Landerist_com.Landerist_com.UpdateAllPages();
                 CleanDatabase();
                 Backup.Update();
             }

@@ -26,6 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "landerist_website", "lander
 		landerist_website\hosts_template.html = landerist_website\hosts_template.html
 		landerist_website\index.html = landerist_website\index.html
 		landerist_website\statistics_template.html = landerist_website\statistics_template.html
+		landerist_website\styles.css = landerist_website\styles.css
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "landerist_service", "landerist_service\landerist_service.csproj", "{8D90C19B-543F-45AF-A0E3-F9DD12979200}"
