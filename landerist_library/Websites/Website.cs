@@ -485,12 +485,14 @@ namespace landerist_library.Websites
             return NumPages;
         }
 
-        public bool AchievedMaxNumberOfPages()
+        private int GetMaxPagesPerWebsite()
         {
-            return Config.IsConfigurationProduction() &&
-                NumPages >= Config.MAX_PAGES_PER_WEBSITE;
+            return ApplySpecialRules
+                ? Config.MAX_PAGES_PER_WEBSITE * 10
+                : Config.MAX_PAGES_PER_WEBSITE;
         }
 
+        
         public bool CanAddNewPages()
         {
             if (Config.IsConfigurationLocal())
@@ -512,8 +514,15 @@ namespace landerist_library.Websites
                 {"Host", Host }
             });
 
-            return NumPages < Config.MAX_PAGES_PER_WEBSITE;
+            return NumPages < GetMaxPagesPerWebsite();
         }
+
+        public bool AchievedMaxNumberOfPages()
+        {
+            return Config.IsConfigurationProduction() &&
+                NumPages >= GetMaxPagesPerWebsite();
+        }
+
 
         public bool SetNumPagesToZero()
         {
