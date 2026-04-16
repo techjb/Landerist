@@ -168,6 +168,11 @@ namespace landerist_library.Index
                 return;
             }
 
+            if (website.IsDiscardedByIndexUrlRegex(uri))
+            {
+                return;
+            }
+
             if (!website.IsAllowedByRobotsTxt(uri))
             {
                 return;

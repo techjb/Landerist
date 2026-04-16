@@ -39,6 +39,8 @@ namespace landerist_library.Websites
 
         public DateTime? IpAddressUpdated { get; set; }
 
+        public string? IndexUrlRegex { get; set; }
+
         public string? ListingUrlRegex { get; set; }
 
         public bool ApplySpecialRules { get; set; }
@@ -56,8 +58,6 @@ namespace landerist_library.Websites
         public CountryCode CountryCode = CountryCode.ES;
 
         private bool Disposed;
-
-        private static readonly Lazy<bool> HasIndexUrlRegexColumn = new(DatabaseHasIndexUrlRegexColumn);
 
         public Website()
         {
@@ -127,6 +127,7 @@ namespace landerist_library.Websites
             SitemapUpdated = dataRow["SitemapUpdated"] is DBNull ? null : (DateTime)dataRow["SitemapUpdated"];
             IpAddress = dataRow["IpAddress"] is DBNull ? null : dataRow["IpAddress"].ToString();
             IpAddressUpdated = dataRow["IpAddressUpdated"] is DBNull ? null : (DateTime)dataRow["IpAddressUpdated"];
+            IndexUrlRegex = dataRow["IndexUrlRegex"] is DBNull ? null : dataRow["IndexUrlRegex"].ToString();
             ListingUrlRegex = dataRow.Table.Columns.Contains("ListingUrlRegex") && dataRow["ListingUrlRegex"] is not DBNull
                 ? dataRow["ListingUrlRegex"].ToString()
                 : null;
@@ -143,10 +144,10 @@ namespace landerist_library.Websites
             string query =
                 "INSERT INTO " + Websites.WEBSITES + " (" +
                 "[MainUri], [Host], [LanguageCode], [CountryCode], [RobotsTxt], [RobotsTxtUpdated], " +
-                "[SitemapUpdated], [IpAddress], [IpAddressUpdated], [ListingUrlRegex], [ApplySpecialRules], [NumPages], [NumListings], " +
+                "[SitemapUpdated], [IpAddress], [IpAddressUpdated], [IndexUrlRegex], [ListingUrlRegex], [ApplySpecialRules], [NumPages], [NumListings], " +
                 "[ListingExampleUri]) VALUES (" +
                 "@MainUri, @Host, @LanguageCode, @CountryCode, @RobotsTxt, @RobotsTxtUpdated, " +
-                "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @ListingUrlRegex, @ApplySpecialRules, @NumPages, @NumListings, " +
+                "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @IndexUrlRegex, @ListingUrlRegex, @ApplySpecialRules, @NumPages, @NumListings, " +
                 "@ListingExampleUri)";
 
             var parameters = GetQueryParameters();
@@ -165,6 +166,7 @@ namespace landerist_library.Websites
                 "[SitemapUpdated] = @SitemapUpdated, " +
                 "[IpAddress] = @IpAddress, " +
                 "[IpAddressUpdated] = @IpAddressUpdated, " +
+                "[IndexUrlRegex] = @IndexUrlRegex, " +
                 "[ListingUrlRegex] = @ListingUrlRegex, " +
                 "[ApplySpecialRules] = @ApplySpecialRules, " +
                 "[NumPages] = @NumPages, " +
@@ -188,6 +190,7 @@ namespace landerist_library.Websites
                 {"SitemapUpdated", SitemapUpdated},
                 {"IpAddress", IpAddress },
                 {"IpAddressUpdated", IpAddressUpdated},
+                {"IndexUrlRegex", IndexUrlRegex },
                 {"ListingUrlRegex", ListingUrlRegex },
                 {"ApplySpecialRules", ApplySpecialRules },
                 {"NumPages", NumPages },
@@ -196,11 +199,21 @@ namespace landerist_library.Websites
             };
         }
 
+        public bool IsDiscardedByIndexUrlRegex(Uri uri)
+        {
+            return IsDiscardedByRegex(uri, IndexUrlRegex, "IndexUrlRegex");
+        }
+
         public bool IsDiscardedByListingUrlRegex(Uri uri)
+        {
+            return IsDiscardedByRegex(uri, ListingUrlRegex, "ListingUrlRegex");
+        }
+
+        private bool IsDiscardedByRegex(Uri uri, string? regexPattern, string regexFieldName)
         {
             ArgumentNullException.ThrowIfNull(uri);
 
-            if (string.IsNullOrWhiteSpace(ListingUrlRegex))
+            if (string.IsNullOrWhiteSpace(regexPattern))
             {
                 return false;
             }
@@ -209,15 +222,15 @@ namespace landerist_library.Websites
             {
                 return !Regex.IsMatch(
                     uri.AbsoluteUri,
-                    ListingUrlRegex,
+                    regexPattern,
                     RegexOptions.IgnoreCase,
                     TimeSpan.FromSeconds(1));
             }
             catch (ArgumentException exception)
             {
                 Logs.Log.WriteError(
-                    "Website IsDiscardedByListingUrlRegex",
-                    $"{Host} {ListingUrlRegex}",
+                    "Website IsDiscardedByRegex",
+                    $"{Host} {regexFieldName} {regexPattern}",
                     exception);
 
                 return false;
@@ -613,6 +626,7 @@ namespace landerist_library.Websites
                 IpAddress = null;
                 Robots = null;
                 RobotsTxt = null;
+                IndexUrlRegex = null;
                 ListingExampleUri = null;
                 ApplySpecialRules = false;
             }
