@@ -713,10 +713,7 @@ namespace landerist_library.Pages
 
         public bool HaveToUnpublishListing()
         {
-            return IsListingStatusPublished() &&
-                !IsMayBeListing() &&
-                !IsListing() &&
-                PageTypeCounter >= Config.MINIMUM_PAGE_TYPE_COUNTER_TO_UNPUBLISH_LISTING;
+            return new ListingUnpublishEvaluator(this).ShouldUnpublish();
         }
 
         public bool IsMayBeListing()
