@@ -6,6 +6,77 @@ namespace landerist_library.Websites
 {
     public class WebsitesCleanner
     {
+        private const string EngelVoelkersHost = "www.engelvoelkers.com";
+
+        public static void DeleteEngelVoelkersPagesDiscardedByIndexUrlRegex()
+        {
+            DeletePagesDiscardedByIndexUrlRegex(EngelVoelkersHost);
+        }
+
+        public static void DeletePagesDiscardedByIndexUrlRegex(string host)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(host);
+
+            Website website = new(host);
+            try
+            {
+                if (string.IsNullOrWhiteSpace(website.IndexUrlRegex))
+                {
+                    throw new InvalidOperationException("IndexUrlRegex is empty for host: " + host);
+                }
+
+                List<Page> pages = website.GetPages();
+                int total = pages.Count;
+                int processed = 0;
+                int deleted = 0;
+                int errors = 0;
+                int skipped = 0;
+
+                foreach (Page page in pages)
+                {
+                    try
+                    {
+                        if (!website.IsDiscardedByIndexUrlRegex(page.Uri))
+                        {
+                            skipped++;
+                            continue;
+                        }
+
+                        if (page.Delete())
+                        {
+                            deleted++;
+                        }
+                        else
+                        {
+                            errors++;
+                        }
+                    }
+                    finally
+                    {
+                        processed++;
+                        Console.WriteLine(
+                            "Processed: " + processed + "/" + total + " " +
+                            "Deleted: " + deleted + " " +
+                            "Errors: " + errors + " " +
+                            "Skipped: " + skipped + " " +
+                            page.Uri);
+
+                       
+                    }
+                }
+
+                Console.WriteLine(
+                    "Finished deleting pages discarded by IndexUrlRegex. " +
+                    "Host: " + host + " " +
+                    "Deleted: " + deleted + " " +
+                    "Errors: " + errors + " " +
+                    "Skipped: " + skipped);
+            }
+            finally
+            {
+                website.Dispose();
+            }
+        }
        
         public static void DeleteWebsitesWithoutListings()
         {

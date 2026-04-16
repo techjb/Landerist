@@ -32,6 +32,7 @@ namespace landerist_tests
             //WebsitesCleanner.DeleteWebsitesWithoutListings();
             //WebsitesCleanner.DeleteWebsitesWithoutPageTypeListing();
             //WebsitesCleanner.DeleteWebsitesWithoutPublishedListings();
+            //WebsitesCleanner.DeletePagesDiscardedByIndexUrlRegex("www.engelvoelkers.com");
 
 
         }
