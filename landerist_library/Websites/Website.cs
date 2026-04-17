@@ -503,7 +503,7 @@ namespace landerist_library.Websites
         private int GetMaxPagesPerWebsite()
         {
             return ApplySpecialRules
-                ? Config.MAX_PAGES_PER_WEBSITE * 10
+                ? Config.MAX_PAGES_PER_WEBSITE_SPECIAL_RULES
                 : Config.MAX_PAGES_PER_WEBSITE;
         }
 
