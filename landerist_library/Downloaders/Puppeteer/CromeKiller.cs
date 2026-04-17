@@ -13,7 +13,10 @@ namespace landerist_library.Downloaders.Puppeteer
             }
 
             KillCromeProcess();
-            KillCromeByTaskKill();
+            if (Config.IsPrincipalMachine())
+            {
+                KillCromeByTaskKill();
+            }             
         }
 
         public static void KillCromeProcess()
