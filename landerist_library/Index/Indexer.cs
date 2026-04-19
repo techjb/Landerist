@@ -141,6 +141,11 @@ namespace landerist_library.Index
                 return;
             }
 
+            if (website.IsDiscardedByIndexUrlRegex(uri))
+            {
+                return;
+            }
+
             uri = Uris.CleanUri(uri);
 
             if (Processed.Contains(uri))
@@ -168,10 +173,7 @@ namespace landerist_library.Index
                 return;
             }
 
-            if (website.IsDiscardedByIndexUrlRegex(uri))
-            {
-                return;
-            }
+            
 
             if (!website.IsAllowedByRobotsTxt(uri))
             {

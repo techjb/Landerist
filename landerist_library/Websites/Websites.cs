@@ -426,7 +426,8 @@ namespace landerist_library.Websites
                 {"Host", website.Host},
                 {"NumPages",numPages }
             });
-        }
+        }        
+
 
         private static int CalculateNumPages(Website website)
         {
@@ -520,14 +521,18 @@ namespace landerist_library.Websites
         private static HashSet<Website> GetNeedToUpdateSitemaps()
         {
             DateTime sitemapUpdated = DateTime.Now.AddDays(-Config.DAYS_TO_UPDATE_SITEMAP);
+            DateTime sitemapUpdatedSpecialRules = DateTime.Now.AddDays(-1);
 
             string query =
                 "SELECT * " +
                 "FROM " + WEBSITES + " " +
-                "WHERE [SitemapUpdated] < @SitemapUpdated OR [SitemapUpdated] IS NULL";
+                "WHERE [SitemapUpdated] IS NULL " +
+                "OR ([ApplySpecialRules] = 1 AND [SitemapUpdated] < @SitemapUpdatedSpecialRules) " +
+                "OR (([ApplySpecialRules] = 0 OR [ApplySpecialRules] IS NULL) AND [SitemapUpdated] < @SitemapUpdated)";
 
             var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"SitemapUpdated", sitemapUpdated },
+                {"SitemapUpdatedSpecialRules", sitemapUpdatedSpecialRules },
             });
 
             return GetWebsites(dataTable);

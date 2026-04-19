@@ -8,8 +8,10 @@ namespace landerist_tests
         public static void Run()
         {
 
+            //var Website = new Website(new Uri("https://www.tecnocasa.es/"));
+            var Website = new Website(new Uri("https://www.engelvoelkers.com/es/es"));
             
-            var Website = new Website(new Uri("https://www.tecnocasa.es/"));
+            //Websites.UpdateNumPages(Website);   
             Website.SetSitemap();
         }
     }
