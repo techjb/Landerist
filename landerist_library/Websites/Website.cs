@@ -467,7 +467,7 @@ namespace landerist_library.Websites
         {
             if (RobotsTxt != null)
             {
-                Robots ??= Com.Bekijkhet.RobotsTxt.Robots.Load(RobotsTxt);
+                Robots ??= Robots.Load(RobotsTxt);
                 return Robots.Sitemaps;
             }
 
