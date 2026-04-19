@@ -9,7 +9,7 @@ namespace landerist_library.Index
     {
         protected Page Page { get; } = page;
 
-        private readonly HashSet<Uri> Inserted = [];
+        private readonly HashSet<Uri> Processed = [];
 
         private static readonly HashSet<string> WebPageExtensions =
         [
@@ -143,7 +143,7 @@ namespace landerist_library.Index
 
             uri = Uris.CleanUri(uri);
 
-            if (Inserted.Contains(uri))
+            if (Processed.Contains(uri))
             {
                 return;
             }
@@ -189,7 +189,7 @@ namespace landerist_library.Index
             }
 
             Pages.Pages.Insert(website, uri);
-            Inserted.Add(uri);
+            Processed.Add(uri);
         }
 
         //private static bool IsMultimediaPage(Uri uri)

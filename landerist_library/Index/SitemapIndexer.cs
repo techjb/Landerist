@@ -1,10 +1,12 @@
-﻿using landerist_library.Websites;
+using landerist_library.Websites;
 using Louw.SitemapParser;
 
 namespace landerist_library.Index
 {
     public class SitemapIndexer(Website website) : Indexer(website)
     {
+        private static readonly ISitemapFetcher SitemapFetcher = new GzipAwareSitemapFetcher();
+        private static readonly ISitemapParser SitemapParser = new SitemapParser();
         private readonly HashSet<string> SitemapsIndexes = new(StringComparer.OrdinalIgnoreCase);
 
         public void InsertSitemaps(List<Com.Bekijkhet.RobotsTxt.Sitemap> sitemaps)
@@ -103,7 +105,7 @@ namespace landerist_library.Index
             try
             {
                 // can return null.
-                return siteMap.LoadAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+                return siteMap.LoadAsync(SitemapFetcher, SitemapParser).ConfigureAwait(false).GetAwaiter().GetResult();
             }
             catch
             {
