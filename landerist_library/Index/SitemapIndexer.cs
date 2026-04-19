@@ -16,11 +16,20 @@ namespace landerist_library.Index
                 return;
             }
 
-            sitemaps = [.. sitemaps.Take(Configuration.Config.MAX_SITEMAPS_PER_WEBSITE)];
+            sitemaps = [.. sitemaps.Take(GetMaxSiteMapsPerWebsite())];
             foreach (var sitemap in sitemaps)
             {
                 InsertSitemap(sitemap.Url);
             }
+        }
+
+        private int GetMaxSiteMapsPerWebsite()
+        {
+            if (website.ApplySpecialRules)
+            {
+                return 100;
+            }
+            return 10;
         }
 
         public void InsertSitemap(Uri uri)
@@ -82,7 +91,7 @@ namespace landerist_library.Index
 
         private bool CanAddMoreSitemaps()
         {
-            return SitemapsIndexes.Count < Configuration.Config.MAX_SITEMAPS_PER_WEBSITE;
+            return SitemapsIndexes.Count < GetMaxSiteMapsPerWebsite();
         }
 
         private bool TryRegisterSitemap(Uri location)
