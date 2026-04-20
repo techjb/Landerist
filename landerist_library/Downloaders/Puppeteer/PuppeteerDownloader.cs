@@ -676,8 +676,7 @@ namespace landerist_library.Downloaders.Puppeteer
 
                 FirstNavigationRequestReaded = true;
 
-                Uri? redirectUri = null;
-                Uri.TryCreate(e.Response.Url, UriKind.Absolute, out redirectUri);
+                Uri.TryCreate(e.Response.Url, UriKind.Absolute, out Uri? redirectUri);
 
                 HttpStatusCode = (short)e.Response.Status;
                 if (e.Response.Headers.TryGetValue("Location", out string? location))

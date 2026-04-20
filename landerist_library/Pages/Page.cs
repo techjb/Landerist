@@ -769,6 +769,11 @@ namespace landerist_library.Pages
             return PageType == landerist_library.Pages.PageType.RedirectToAnotherUrl;
         }
 
+        public bool IsDiscardedByListingUrlRegex()
+        {
+            return PageType == landerist_library.Pages.PageType.DiscardedByListingUrlRegex;
+        }
+
         public bool IsNotCanonicalListing()
         {
             return IsNotCanonical() && ContainsListingStatus();

@@ -37,7 +37,9 @@ namespace landerist_library.Pages
             return IsStrongUnpublishEvidence() ||
                 _page.IsNotListingByParser() ||
                 _page.IsNotCanonical() ||
-                _page.IsRedirectToAnotherUrl();
+                _page.IsRedirectToAnotherUrl() ||
+                _page.IsDiscardedByListingUrlRegex()
+                ;
         }
 
         private bool IsStrongUnpublishEvidence()
