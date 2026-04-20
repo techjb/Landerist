@@ -192,9 +192,10 @@ namespace landerist_library.Landerist_com
         {
             string fileName = GetHostFileName(host, suffix, extension);
             string subdirectoryInBucket = HOSTS_SUBDIRECTORY.Replace("\\", "/");
+            string contentDisposition = $"attachment; filename=\"{fileName}\"";
 
             var metadata = GetMetadata(counter, null, null);
-            if (!new S3().UploadToDownloadsBucket(filePath, fileName, subdirectoryInBucket, metadata))
+            if (!new S3().UploadToDownloadsBucket(filePath, fileName, subdirectoryInBucket, metadata, contentDisposition))
             {
                 return false;
             }

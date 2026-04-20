@@ -18,9 +18,14 @@ namespace landerist_library.Export
         }
 
 
-        public bool UploadToDownloadsBucket(string file, string key, string subdirectoryInBucket, List<(string, string)>? metadata = null)
+        public bool UploadToDownloadsBucket(
+            string file,
+            string key,
+            string subdirectoryInBucket,
+            List<(string, string)>? metadata = null,
+            string? contentDisposition = null)
         {
-            return UploadFile(file, key, PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, subdirectoryInBucket, metadata);
+            return UploadFile(file, key, PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, subdirectoryInBucket, metadata, contentDisposition);
         }
 
         public bool UploadToWebsiteBucket(string file, string key, string subdirectoryInBucket)
@@ -34,7 +39,13 @@ namespace landerist_library.Export
         }
 
 
-        public bool UploadFile(string file, string key, string bucketName, string subdirectoryInBucket, List<(string, string)>? metadata = null)
+        public bool UploadFile(
+            string file,
+            string key,
+            string bucketName,
+            string subdirectoryInBucket,
+            List<(string, string)>? metadata = null,
+            string? contentDisposition = null)
         {
             bool success = false;
             if (!File.Exists(file))
@@ -53,6 +64,11 @@ namespace landerist_library.Export
                 Key = key,
                 FilePath = file,
             };
+
+            if (!string.IsNullOrWhiteSpace(contentDisposition))
+            {
+                transferUtilityUploadRequest.Headers.ContentDisposition = contentDisposition;
+            }
 
             if (metadata != null && metadata.Count > 0)
             {

@@ -72,64 +72,55 @@ namespace landerist_library.Landerist_com
             int publishedListingsCount,
             int unpublishedListingsCount)
         {
-            var pagesDownload = GetDownloadInfo(website.Host, "pages", "Pages");
-            var listingsDownload = GetDownloadInfo(website.Host, "listings", "Listings");
-
             return
                 "                <tr>" + Environment.NewLine +
                 $"                    <td>{WebUtility.HtmlEncode(website.Host)}</td>" + Environment.NewLine +
-                $"                    <td>{pagesCount.ToString(CultureInfo.InvariantCulture)}</td>" + Environment.NewLine +
-                $"                    <td>{listingsCount.ToString(CultureInfo.InvariantCulture)}</td>" + Environment.NewLine +
-                $"                    <td>{publishedListingsCount.ToString(CultureInfo.InvariantCulture)}</td>" + Environment.NewLine +
-                $"                    <td>{unpublishedListingsCount.ToString(CultureInfo.InvariantCulture)}</td>" + Environment.NewLine +
-                $"                    <td>{GetDownloadsText(pagesDownload.Hyperlink, listingsDownload.Hyperlink)}</td>" + Environment.NewLine +
+                $"                    <td>{GetDownloadCellText(website.Host, "pages", "csv", pagesCount)}</td>" + Environment.NewLine +
+                $"                    <td>{GetDownloadCellText(website.Host, "listings", "json", listingsCount)}</td>" + Environment.NewLine +
+                $"                    <td>{GetDownloadCellText(website.Host, "listings_published", "json", publishedListingsCount)}</td>" + Environment.NewLine +
+                $"                    <td>{GetDownloadCellText(website.Host, "listings_unpublished", "json", unpublishedListingsCount)}</td>" + Environment.NewLine +
                 "                </tr>";
         }
 
-        private static HostDownloadInfo GetDownloadInfo(string host, string downloadType, string linkText)
+        private static string GetDownloadCellText(string host, string downloadType, string extension, int counter)
         {
-            string objectKey = GetObjectKey(host, downloadType);
-            string fileName = GetFileName(host, downloadType);
-            var s3 = new S3();
-            var (lastModified, contentLength) = s3.GetFileInfo(PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey);
+            string counterText = counter.ToString(CultureInfo.InvariantCulture);
+            if (counter <= 0)
+            {
+                return counterText;
+            }
+
+            string? url = GetDownloadUrl(host, downloadType, extension);
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return counterText;
+            }
+
+            string fileName = GetFileName(host, downloadType, extension);
+            return $"<a title=\"Download\" href=\"{WebUtility.HtmlEncode(url)}\" download=\"{WebUtility.HtmlEncode(fileName)}\">{counterText}</a>";
+        }
+
+        private static string? GetDownloadUrl(string host, string downloadType, string extension)
+        {
+            string objectKey = GetObjectKey(host, downloadType, extension);
+            var (lastModified, contentLength) = new S3().GetFileInfo(PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey);
 
             if (lastModified is null || contentLength is null)
             {
-                return new HostDownloadInfo(null, null, EmptyValue);
+                return null;
             }
 
-            string url = $"https://{PrivateConfig.AWS_S3_DOWNLOADS_BUCKET}.s3.amazonaws.com/{objectKey}";
-            string hyperlink = $"<a title=\"{WebUtility.HtmlEncode(fileName)}\" href=\"{url}\">{WebUtility.HtmlEncode(linkText)}</a>";
-            return new HostDownloadInfo(lastModified, contentLength, hyperlink);
+            return $"https://{PrivateConfig.AWS_S3_DOWNLOADS_BUCKET}.s3.amazonaws.com/{objectKey}";
         }
 
-        private static string GetObjectKey(string host, string downloadType)
+        private static string GetObjectKey(string host, string downloadType, string extension)
         {
-            return $"ES/Hosts/{GetFileName(host, downloadType)}";
+            return $"ES/Hosts/{GetFileName(host, downloadType, extension)}";
         }
 
-        private static string GetFileName(string host, string downloadType)
+        private static string GetFileName(string host, string downloadType, string extension)
         {
-            return $"{host}_{downloadType}.csv";
-        }
-
-        private static string GetDownloadsText(string pagesLink, string listingsLink)
-        {
-            List<string> links = [];
-
-            if (!string.IsNullOrWhiteSpace(pagesLink) && !string.Equals(pagesLink, EmptyValue, StringComparison.Ordinal))
-            {
-                links.Add(pagesLink);
-            }
-
-            if (!string.IsNullOrWhiteSpace(listingsLink) && !string.Equals(listingsLink, EmptyValue, StringComparison.Ordinal))
-            {
-                links.Add(listingsLink);
-            }
-
-            return links.Count == 0
-                ? EmptyValue
-                : string.Join(" / ", links);
+            return $"{host}_{downloadType}.{extension}";
         }
 
         private static bool UploadHostsFile()
@@ -137,7 +128,5 @@ namespace landerist_library.Landerist_com
             File.WriteAllText(HostsHtmlFile, HostsTemplate);
             return new S3().UploadToWebsiteBucket(HostsHtmlFile, "index.html", "hosts");
         }
-
-        private readonly record struct HostDownloadInfo(DateTime? LastModified, long? ContentLength, string Hyperlink);
     }
 }
