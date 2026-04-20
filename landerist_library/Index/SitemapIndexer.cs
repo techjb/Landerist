@@ -27,7 +27,7 @@ namespace landerist_library.Index
         {
             if (website.ApplySpecialRules)
             {
-                return 100;
+                return 1000;
             }
             return 10;
         }
@@ -53,7 +53,7 @@ namespace landerist_library.Index
                 return;
             }
 
-            if (!TryRegisterSitemap(sitemap.SitemapLocation))
+            if (!RegisterSitemap(sitemap.SitemapLocation))
             {
                 return;
             }
@@ -94,7 +94,7 @@ namespace landerist_library.Index
             return SitemapsIndexes.Count < GetMaxSiteMapsPerWebsite();
         }
 
-        private bool TryRegisterSitemap(Uri location)
+        private bool RegisterSitemap(Uri location)
         {
             if (location == null || !CanAddMoreSitemaps())
             {
