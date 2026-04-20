@@ -11,7 +11,7 @@ namespace landerist_library.Insert.IdAgencies
             string file = PrivateConfig.INSERT_DIRECTORY + @"IdAgencies\Entrega.csv";
             DataTable dataTable = Csv.ToDataTable(file);
             var uris = ToList(dataTable, "ListingExample");
-            Insert(uris, true);
+            Insert(uris);
         }
     }
 }

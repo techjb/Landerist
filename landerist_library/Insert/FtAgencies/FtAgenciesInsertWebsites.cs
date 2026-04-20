@@ -13,7 +13,7 @@ namespace landerist_library.Insert.FtAgencies
             DataTable dataTable = Csv.ToDataTable(file);
             dataTable.Columns[0].ColumnName = "ListingExample";
             var uris = ToList(dataTable, "ListingExample");
-            Insert(uris, true);
+            Insert(uris);
         }
     }
 }
