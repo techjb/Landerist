@@ -124,7 +124,10 @@ namespace landerist_library.Landerist_com
 
             foreach (var website in websites)
             {
-                if (!UpdateHostPages(website) || !UpdateHostListings(website))
+                if (!UpdateHostPages(website) ||
+                    !UpdateHostListings(website) ||
+                    !UpdateHostListings(website, ListingStatus.published, "listings_published") ||
+                    !UpdateHostListings(website, ListingStatus.unpublished, "listings_unpublished"))
                 {
                     Log.WriteError("filesupdater", "Error updating host files: " + website.Host);
                     return false;
@@ -160,26 +163,26 @@ namespace landerist_library.Landerist_com
 
         private static bool UpdateHostListings(Website website)
         {
-            var dataTable = Pages.Pages.GetHostListingsDataTable(website);
-            if (dataTable.Rows.Count == 0)
+            return UpdateHostListings(website, null, "listings");
+        }
+
+        private static bool UpdateHostListings(Website website, ListingStatus? listingStatus, string suffix)
+        {
+            var listings = ES_Listings.GetListings(website.Host, listingStatus);
+            if (listings.Count == 0)
             {
                 return true;
             }
 
-            string fileName = GetHostFileName(website.Host, "listings", "csv");
+            string fileName = GetHostFileName(website.Host, suffix, "json");
             string filePath = GetFilePath(HOSTS_SUBDIRECTORY, fileName);
 
-            try
+            if (!Json.ExportListings(listings, filePath))
             {
-                Tools.Csv.Write(dataTable, filePath, true);
-            }
-            catch (Exception exception)
-            {
-                Log.WriteError("filesupdater", website.Host, exception);
                 return false;
             }
 
-            return UploadHostFile(filePath, website.Host, "listings", dataTable.Rows.Count, "csv");
+            return UploadHostFile(filePath, website.Host, suffix, listings.Count, "json");
         }
 
         

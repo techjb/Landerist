@@ -264,6 +264,23 @@ namespace landerist_library.Database
             });
             return GetAll(dataTable, true, true);
         }
+
+        public static SortedSet<Listing> GetListings(string host, ListingStatus? listingStatus = null)
+        {
+            string query =
+                "SELECT * " +
+                "FROM " + TABLE_ES_LISTINGS + " " +
+                "WHERE [Host] = @Host " +
+                (listingStatus is null ? string.Empty : "AND [ListingStatus] = @ListingStatus");
+
+            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>
+            {
+                { "Host", host },
+                { "ListingStatus", listingStatus?.ToString() }
+            });
+            return GetAll(dataTable, true, true);
+        }
+
         public static SortedSet<Listing> GetListingWithCatastralReference()
         {
             string query =
