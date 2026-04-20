@@ -84,6 +84,11 @@ namespace landerist_library.Index
             {
                 foreach (var item in sitemap.Items)
                 {
+                    if (website.IsDiscardedBySitemapUrlRegex(item.Location))
+                    {
+                        continue;
+                    }
+
                     InsertUri(item.Location);
                 }
             }
