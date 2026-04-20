@@ -62,11 +62,12 @@ namespace landerist_library.Database
                 "@nonFurnished, @heating, @airConditioning, @petsAllowed, @securitySystems, @host " +
                 ")";
 
-            var queryParameters = GetQueryParameters(listing, host);
+            var queryParameters = GetQueryParameters(listing);
+            queryParameters.Add("host", host);
             return new DataBase().Query(query, queryParameters);
         }
 
-        private static Dictionary<string, object?> GetQueryParameters(Listing listing, string? host)
+        private static Dictionary<string, object?> GetQueryParameters(Listing listing)
         {
             return new Dictionary<string, object?> {
                 {"guid", listing.guid },
@@ -115,7 +116,6 @@ namespace landerist_library.Database
                 {"airConditioning", listing.airConditioning },
                 {"petsAllowed", listing.petsAllowed },
                 {"securitySystems", listing.securitySystems },
-                {"host", host },
             };
         }
 
@@ -199,11 +199,10 @@ namespace landerist_library.Database
                 "[heating] = @heating, " +
                 "[airConditioning] = @airConditioning, " +
                 "[petsAllowed] = @petsAllowed, " +
-                "[securitySystems] = @securitySystems " +
-                //"[host] = @host " +
+                "[securitySystems] = @securitySystems " +                
                 "WHERE [guid] = @guid";
 
-            var queryParameters = GetQueryParameters(listing, null);
+            var queryParameters = GetQueryParameters(listing);
             return new DataBase().Query(query, queryParameters);
         }
 
@@ -531,48 +530,6 @@ namespace landerist_library.Database
                 {"longitude", longitude },
                 {"locationIsAccurate", locationIsAccurate }
             });
-        }
-
-        public static bool EnsureHostColumn()
-        {
-            string query =
-                "IF COL_LENGTH('ES_LISTINGS', 'host') IS NULL " +
-                "BEGIN " +
-                "   ALTER TABLE " + TABLE_ES_LISTINGS + " ADD [host] NVARCHAR(255) NULL " +
-                "END; " +
-                "UPDATE L " +
-                "SET L.[host] = P.[Host] " +
-                "FROM " + TABLE_ES_LISTINGS + " AS L " +
-                "INNER JOIN " + Pages.Pages.PAGES + " AS P ON P.[UriHash] = L.[guid] " +
-                "WHERE L.[host] IS NULL OR LTRIM(RTRIM(L.[host])) = ''; " +
-                "UPDATE L " +
-                "SET L.[host] = S.[sourceName] " +
-                "FROM " + TABLE_ES_LISTINGS + " AS L " +
-                "INNER JOIN [ES_SOURCES] AS S ON S.[listingGuid] = L.[guid] " +
-                "WHERE (L.[host] IS NULL OR LTRIM(RTRIM(L.[host])) = '') " +
-                "AND S.[sourceName] IS NOT NULL " +
-                "AND LTRIM(RTRIM(S.[sourceName])) <> ''";
-
-            return new DataBase().Query(query);
-        }
-
-        private static string? GetHost(string guid)
-        {
-            string query =
-                "SELECT [host] " +
-                "FROM " + TABLE_ES_LISTINGS + " " +
-                "WHERE [guid] = @guid";
-
-            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"guid", guid }
-            });
-
-            if (dataTable.Rows.Count == 0 || dataTable.Rows[0]["host"] is DBNull)
-            {
-                return null;
-            }
-
-            return (string)dataTable.Rows[0]["host"];
         }
     }
 }
