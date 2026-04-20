@@ -9,10 +9,10 @@ namespace landerist_tests
         {
 
             //var Website = new Website(new Uri("https://www.tecnocasa.es/"));
-            //var Website = new Website(new Uri("https://www.engelvoelkers.com/es/es"));
+            var Website = new Website(new Uri("https://www.engelvoelkers.com/es/es"));
             
             //Websites.UpdateNumPages(Website);   
-            //Website.SetSitemap();
+            Website.SetSitemap();
         }
     }
 }

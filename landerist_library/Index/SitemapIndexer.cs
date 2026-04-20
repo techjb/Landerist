@@ -19,6 +19,11 @@ namespace landerist_library.Index
             sitemaps = [.. sitemaps.Take(GetMaxSiteMapsPerWebsite())];
             foreach (var sitemap in sitemaps)
             {
+                if (website.IsDiscardedBySitemapUrlRegex(sitemap.Url))
+                {
+                    continue;
+                }
+
                 InsertSitemap(sitemap.Url);
             }
         }
@@ -76,6 +81,10 @@ namespace landerist_library.Index
                     {
                         break;
                     }
+                    if (website.IsDiscardedBySitemapUrlRegex(sitemapIndex.SitemapLocation))
+                    {
+                        continue;
+                    }
 
                     InsertSitemap(sitemapIndex);
                 }
@@ -84,11 +93,6 @@ namespace landerist_library.Index
             {
                 foreach (var item in sitemap.Items)
                 {
-                    if (website.IsDiscardedBySitemapUrlRegex(item.Location))
-                    {
-                        continue;
-                    }
-
                     InsertUri(item.Location);
                 }
             }
