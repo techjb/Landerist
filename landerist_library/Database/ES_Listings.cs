@@ -8,7 +8,6 @@ namespace landerist_library.Database
 {
     public class ES_Listings
     {
-
         public const string TABLE_ES_LISTINGS = "[ES_LISTINGS]";
 
         public static void InsertUpdate(Website website, Listing newListing)
@@ -35,7 +34,7 @@ namespace landerist_library.Database
 
         private static bool Insert(Website website, Listing listing)
         {
-            if (Insert(listing))
+            if (Insert(listing, website.Host))
             {
                 website.IncreaseNumListings();
                 ES_Media.Insert(listing);
@@ -49,7 +48,7 @@ namespace landerist_library.Database
             }
         }
 
-        private static bool Insert(Listing listing)
+        private static bool Insert(Listing listing, string host)
         {
             string query =
                 "INSERT INTO " + TABLE_ES_LISTINGS + " " +
@@ -60,14 +59,14 @@ namespace landerist_library.Database
                 "@locationIsAccurate, @cadastralReference, @propertySize, @landSize, @constructionYear, " +
                 "@constructionStatus, @floors, @floor, @bedrooms, @bathrooms, @parkings, @terrace, @garden, " +
                 "@garage, @motorbikeGarage, @pool, @lift, @disabledAccess, @storageRoom, @furnished, " +
-                "@nonFurnished, @heating, @airConditioning, @petsAllowed, @securitySystems " +
+                "@nonFurnished, @heating, @airConditioning, @petsAllowed, @securitySystems, @host " +
                 ")";
 
-            var queryParameters = GetQueryParameters(listing);
+            var queryParameters = GetQueryParameters(listing, host);
             return new DataBase().Query(query, queryParameters);
         }
 
-        private static Dictionary<string, object?> GetQueryParameters(Listing listing)
+        private static Dictionary<string, object?> GetQueryParameters(Listing listing, string? host)
         {
             return new Dictionary<string, object?> {
                 {"guid", listing.guid },
@@ -116,6 +115,7 @@ namespace landerist_library.Database
                 {"airConditioning", listing.airConditioning },
                 {"petsAllowed", listing.petsAllowed },
                 {"securitySystems", listing.securitySystems },
+                {"host", host },
             };
         }
 
@@ -200,9 +200,10 @@ namespace landerist_library.Database
                 "[airConditioning] = @airConditioning, " +
                 "[petsAllowed] = @petsAllowed, " +
                 "[securitySystems] = @securitySystems " +
+                //"[host] = @host " +
                 "WHERE [guid] = @guid";
 
-            var queryParameters = GetQueryParameters(listing);
+            var queryParameters = GetQueryParameters(listing, null);
             return new DataBase().Query(query, queryParameters);
         }
 
@@ -530,6 +531,48 @@ namespace landerist_library.Database
                 {"longitude", longitude },
                 {"locationIsAccurate", locationIsAccurate }
             });
+        }
+
+        public static bool EnsureHostColumn()
+        {
+            string query =
+                "IF COL_LENGTH('ES_LISTINGS', 'host') IS NULL " +
+                "BEGIN " +
+                "   ALTER TABLE " + TABLE_ES_LISTINGS + " ADD [host] NVARCHAR(255) NULL " +
+                "END; " +
+                "UPDATE L " +
+                "SET L.[host] = P.[Host] " +
+                "FROM " + TABLE_ES_LISTINGS + " AS L " +
+                "INNER JOIN " + Pages.Pages.PAGES + " AS P ON P.[UriHash] = L.[guid] " +
+                "WHERE L.[host] IS NULL OR LTRIM(RTRIM(L.[host])) = ''; " +
+                "UPDATE L " +
+                "SET L.[host] = S.[sourceName] " +
+                "FROM " + TABLE_ES_LISTINGS + " AS L " +
+                "INNER JOIN [ES_SOURCES] AS S ON S.[listingGuid] = L.[guid] " +
+                "WHERE (L.[host] IS NULL OR LTRIM(RTRIM(L.[host])) = '') " +
+                "AND S.[sourceName] IS NOT NULL " +
+                "AND LTRIM(RTRIM(S.[sourceName])) <> ''";
+
+            return new DataBase().Query(query);
+        }
+
+        private static string? GetHost(string guid)
+        {
+            string query =
+                "SELECT [host] " +
+                "FROM " + TABLE_ES_LISTINGS + " " +
+                "WHERE [guid] = @guid";
+
+            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+                {"guid", guid }
+            });
+
+            if (dataTable.Rows.Count == 0 || dataTable.Rows[0]["host"] is DBNull)
+            {
+                return null;
+            }
+
+            return (string)dataTable.Rows[0]["host"];
         }
     }
 }
