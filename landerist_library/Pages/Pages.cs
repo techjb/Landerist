@@ -822,7 +822,7 @@ namespace landerist_library.Pages
                 "SELECT P.[Uri], L.* " +
                 "FROM " + ES_Listings.TABLE_ES_LISTINGS + " AS L " +
                 "INNER JOIN " + PAGES + " AS P ON L.[Guid] = P.[UriHash] " +
-                "WHERE P.[Host] = @Host";
+                "WHERE L.[Host] = @Host";
 
             return new DataBase().QueryTable(query, new Dictionary<string, object?>
             {

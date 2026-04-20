@@ -518,7 +518,7 @@ namespace landerist_library.Websites
 
         public int GetNumListings()
         {
-            return ES_Listings.CountByHost(Host);
+            return ES_Listings.Count(Host);
         }
 
         public void Dispose()

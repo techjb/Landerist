@@ -66,7 +66,7 @@ namespace landerist_library.Database
             return new DataBase().Query(query, queryParameters);
         }
 
-        public static int CountByHost(string host)
+        public static int Count(string host)
         {
             string query =
                 "SELECT COUNT(*) " +
