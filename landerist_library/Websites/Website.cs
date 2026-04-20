@@ -359,7 +359,7 @@ namespace landerist_library.Websites
         {
             if (RobotsTxt != null)
             {
-                Robots ??= Com.Bekijkhet.RobotsTxt.Robots.Load(RobotsTxt);
+                Robots ??= Robots.Load(RobotsTxt);
 
                 if (Robots.Sitemaps != null)
                 {
@@ -406,8 +406,6 @@ namespace landerist_library.Websites
                     counter++;
                 }
             }
-
-            //Console.WriteLine("Deleted " + counter + " listings");
         }
 
         private bool DeleteWebsite()
