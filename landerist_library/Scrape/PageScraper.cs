@@ -153,8 +153,7 @@ namespace landerist_library.Scrape
             }
 
             newListing.SetUnpublished();
-            //_page.Website.DecreaseNumListings();
-            ES_Listings.InsertUpdate(_page.Website, newListing);
+                    ES_Listings.InsertUpdate(_page.Website, newListing);
             _page.SetListingStatusUnpublished();
         }
     }

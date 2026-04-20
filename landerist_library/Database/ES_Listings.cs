@@ -36,7 +36,6 @@ namespace landerist_library.Database
         {
             if (Insert(listing, website.Host))
             {
-                website.IncreaseNumListings();
                 ES_Media.Insert(listing);
                 ES_Sources.Insert(listing);
                 return true;
@@ -65,6 +64,19 @@ namespace landerist_library.Database
             var queryParameters = GetQueryParameters(listing);
             queryParameters.Add("host", host);
             return new DataBase().Query(query, queryParameters);
+        }
+
+        public static int CountByHost(string host)
+        {
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + TABLE_ES_LISTINGS + " " +
+                "WHERE [host] = @Host";
+
+            return new DataBase().QueryInt(query, new Dictionary<string, object?>
+            {
+                { "Host", host }
+            });
         }
 
         private static Dictionary<string, object?> GetQueryParameters(Listing listing)

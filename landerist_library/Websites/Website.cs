@@ -47,8 +47,6 @@ namespace landerist_library.Websites
 
         public bool ApplySpecialRules { get; set; }
 
-        private int NumListings { get; set; } = 0; // NumListingsFound (published and unpublished)
-
         public Robots? Robots = null;
 
         public LanguageCode LanguageCode = LanguageCode.es;
@@ -135,7 +133,6 @@ namespace landerist_library.Websites
             ApplySpecialRules = dataRow.Table.Columns.Contains("ApplySpecialRules")
                 && dataRow["ApplySpecialRules"] is not DBNull
                 && (bool)dataRow["ApplySpecialRules"];
-            NumListings = (int)dataRow["NumListings"];
         }
 
         public bool Insert()
@@ -143,9 +140,9 @@ namespace landerist_library.Websites
             string query =
                 "INSERT INTO " + Websites.WEBSITES + " (" +
                 "[MainUri], [Host], [LanguageCode], [CountryCode], [RobotsTxt], [RobotsTxtUpdated], " +
-                "[SitemapUpdated], [IpAddress], [IpAddressUpdated], [IndexUrlRegex], [SitemapUrlRegex], [ListingUrlRegex], [ApplySpecialRules], [NumListings]) VALUES (" +
+                "[SitemapUpdated], [IpAddress], [IpAddressUpdated], [IndexUrlRegex], [SitemapUrlRegex], [ListingUrlRegex], [ApplySpecialRules]) VALUES (" +
                 "@MainUri, @Host, @LanguageCode, @CountryCode, @RobotsTxt, @RobotsTxtUpdated, " +
-                "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @IndexUrlRegex, @SitemapUrlRegex, @ListingUrlRegex, @ApplySpecialRules, @NumListings)";
+                "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @IndexUrlRegex, @SitemapUrlRegex, @ListingUrlRegex, @ApplySpecialRules)";
 
             var parameters = GetQueryParameters();
             return new DataBase().Query(query, parameters);
@@ -166,8 +163,7 @@ namespace landerist_library.Websites
                 "[IndexUrlRegex] = @IndexUrlRegex, " +
                 "[SitemapUrlRegex] = @SitemapUrlRegex, " +
                 "[ListingUrlRegex] = @ListingUrlRegex, " +
-                "[ApplySpecialRules] = @ApplySpecialRules, " +
-                "[NumListings] = @NumListings " +
+                "[ApplySpecialRules] = @ApplySpecialRules " +
                 "WHERE [Host] = @Host";
 
             var parameters = GetQueryParameters();
@@ -190,7 +186,6 @@ namespace landerist_library.Websites
                 {"SitemapUrlRegex", SitemapUrlRegex },
                 {"ListingUrlRegex", ListingUrlRegex },
                 {"ApplySpecialRules", ApplySpecialRules },
-                {"NumListings", NumListings },
             };
         }
 
@@ -515,44 +510,7 @@ namespace landerist_library.Websites
 
         public int GetNumListings()
         {
-            return NumListings;
-        }
-
-        public bool SetNumListingsToZero()
-        {
-            NumListings = 0;
-            return UpdateNumListings();
-        }
-
-        public bool IncreaseNumListings()
-        {
-            NumListings++;
-            return UpdateNumListings();
-        }
-
-        public bool DecreaseNumListings()
-        {
-            NumListings--;
-
-            if (NumListings < 0)
-            {
-                NumListings = 0;
-            }
-
-            return UpdateNumListings();
-        }
-
-        public bool UpdateNumListings()
-        {
-            string query =
-                "UPDATE " + Websites.WEBSITES + " " +
-                "SET [NumListings] = @NumListings " +
-                "WHERE [Host] = @Host";
-
-            return new DataBase().Query(query, new Dictionary<string, object?> {
-                {"Host", Host },
-                {"NumListings", NumListings }
-            });
+            return ES_Listings.CountByHost(Host);
         }
 
         public void Dispose()

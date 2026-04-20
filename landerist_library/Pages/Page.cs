@@ -293,7 +293,6 @@ namespace landerist_library.Pages
                 {
                     ES_Media.Delete(listing);
                     ES_Sources.Delete(listing);
-                    Website.DecreaseNumListings();
                     return true;
                 }
             }

@@ -154,7 +154,6 @@ namespace landerist_library.Pages
                     "W.[IpAddressUpdated], " +
                     "W.[IndexUrlRegex], " +
                     "W.[SitemapUrlRegex], " +
-                    "W.[NumListings], " +
                     "W.[ListingUrlRegex]," +
                     "W.[ApplySpecialRules] " +
                 "FROM " + PAGES + " AS P " +
@@ -362,7 +361,6 @@ namespace landerist_library.Pages
                 Websites.Websites.WEBSITES + ".[IpAddressUpdated], " +
                 Websites.Websites.WEBSITES + ".[IndexUrlRegex], " +
                 Websites.Websites.WEBSITES + ".[SitemapUrlRegex], " +
-                Websites.Websites.WEBSITES + ".[NumListings], " +
                 Websites.Websites.WEBSITES + ".[ListingUrlRegex], " +
                 Websites.Websites.WEBSITES + ".[ApplySpecialRules] ";
         }
