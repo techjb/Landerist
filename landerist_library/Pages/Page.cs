@@ -190,14 +190,6 @@ namespace landerist_library.Pages
                 {"ResponseBodyZipped", null  },
                 {"TokenCount", null  },
             });
-            if (sucess)
-            {
-                Website.IncreaseNumPages();
-            }
-            //else
-            //{
-            //    Logs.Log.WriteError("Page Insert", "Failed to insert page: " + Uri);
-            //}
             return sucess;
         }
 
@@ -287,7 +279,6 @@ namespace landerist_library.Pages
                 {"UriHash", UriHash }
             });
             return sucess &&
-                Website.DecreaseNumPages() &&
                 ES_Listings.Delete(UriHash) &&
                 ES_Media.Delete(UriHash) &&
                 ES_Sources.Delete(UriHash);

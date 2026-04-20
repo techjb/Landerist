@@ -185,7 +185,7 @@ namespace landerist_library.Index
                 return;
             }
 
-            if (!website.CanAddNewPages())
+            if (website.AchievedMaxNumberOfPages())
             {
                 return;
             }

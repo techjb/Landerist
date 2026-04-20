@@ -47,8 +47,6 @@ namespace landerist_library.Websites
 
         public bool ApplySpecialRules { get; set; }
 
-        private int NumPages { get; set; } = 0;
-
         private int NumListings { get; set; } = 0; // NumListingsFound (published and unpublished)
 
         private Uri? ListingExampleUri { get; set; }
@@ -139,7 +137,6 @@ namespace landerist_library.Websites
             ApplySpecialRules = dataRow.Table.Columns.Contains("ApplySpecialRules")
                 && dataRow["ApplySpecialRules"] is not DBNull
                 && (bool)dataRow["ApplySpecialRules"];
-            NumPages = (int)dataRow["NumPages"];
             NumListings = (int)dataRow["NumListings"];
             ListingExampleUri = dataRow["ListingExampleUri"] is DBNull ? null : new Uri(dataRow["ListingExampleUri"].ToString()!);
         }
@@ -149,10 +146,10 @@ namespace landerist_library.Websites
             string query =
                 "INSERT INTO " + Websites.WEBSITES + " (" +
                 "[MainUri], [Host], [LanguageCode], [CountryCode], [RobotsTxt], [RobotsTxtUpdated], " +
-                "[SitemapUpdated], [IpAddress], [IpAddressUpdated], [IndexUrlRegex], [SitemapUrlRegex], [ListingUrlRegex], [ApplySpecialRules], [NumPages], [NumListings], " +
+                "[SitemapUpdated], [IpAddress], [IpAddressUpdated], [IndexUrlRegex], [SitemapUrlRegex], [ListingUrlRegex], [ApplySpecialRules], [NumListings], " +
                 "[ListingExampleUri]) VALUES (" +
                 "@MainUri, @Host, @LanguageCode, @CountryCode, @RobotsTxt, @RobotsTxtUpdated, " +
-                "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @IndexUrlRegex, @SitemapUrlRegex, @ListingUrlRegex, @ApplySpecialRules, @NumPages, @NumListings, " +
+                "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @IndexUrlRegex, @SitemapUrlRegex, @ListingUrlRegex, @ApplySpecialRules, @NumListings, " +
                 "@ListingExampleUri)";
 
             var parameters = GetQueryParameters();
@@ -175,7 +172,6 @@ namespace landerist_library.Websites
                 "[SitemapUrlRegex] = @SitemapUrlRegex, " +
                 "[ListingUrlRegex] = @ListingUrlRegex, " +
                 "[ApplySpecialRules] = @ApplySpecialRules, " +
-                "[NumPages] = @NumPages, " +
                 "[NumListings] = @NumListings, " +
                 "[ListingExampleUri] = @ListingExampleUri " +
                 "WHERE [Host] = @Host";
@@ -200,7 +196,6 @@ namespace landerist_library.Websites
                 {"SitemapUrlRegex", SitemapUrlRegex },
                 {"ListingUrlRegex", ListingUrlRegex },
                 {"ApplySpecialRules", ApplySpecialRules },
-                {"NumPages", NumPages },
                 {"NumListings", NumListings },
                 {"ListingExampleUri", ListingExampleUri?.ToString() },
             };
@@ -509,7 +504,21 @@ namespace landerist_library.Websites
 
         public int GetNumPages()
         {
-            return NumPages;
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + Pages.Pages.PAGES + " " +
+                "WHERE [Host] = @Host";
+
+            return new DataBase().QueryInt(query, new Dictionary<string, object?> {
+                {"Host", Host }
+            });
+        }       
+
+        public bool AchievedMaxNumberOfPages()
+        {
+            return 
+                //Config.IsConfigurationProduction() &&
+                GetNumPages() >= GetMaxPagesPerWebsite();
         }
 
         private int GetMaxPagesPerWebsite()
@@ -517,75 +526,6 @@ namespace landerist_library.Websites
             return ApplySpecialRules
                 ? Config.MAX_PAGES_PER_WEBSITE_SPECIAL_RULES
                 : Config.MAX_PAGES_PER_WEBSITE;
-        }
-
-        
-        public bool CanAddNewPages()
-        {
-            if (Config.IsConfigurationLocal())
-            {
-                return true;
-            }
-
-            if (AchievedMaxNumberOfPages())
-            {
-                return false;
-            }
-
-            string query =
-                "SELECT [NumPages] " +
-                "FROM " + Websites.WEBSITES + " " +
-                "WHERE [Host] = @Host";
-
-            NumPages = new DataBase().QueryInt(query, new Dictionary<string, object?> {
-                {"Host", Host }
-            });
-
-            return NumPages < GetMaxPagesPerWebsite();
-        }
-
-        public bool AchievedMaxNumberOfPages()
-        {
-            return Config.IsConfigurationProduction() &&
-                NumPages >= GetMaxPagesPerWebsite();
-        }
-
-
-        public bool SetNumPagesToZero()
-        {
-            NumPages = 0;
-            return UpdateNumPages();
-        }
-
-        public bool IncreaseNumPages()
-        {
-            NumPages++;
-            return UpdateNumPages();
-        }
-
-        public bool DecreaseNumPages()
-        {
-            NumPages--;
-
-            if (NumPages < 0)
-            {
-                NumPages = 0;
-            }
-
-            return UpdateNumPages();
-        }
-
-        public bool UpdateNumPages()
-        {
-            string query =
-                "UPDATE " + Websites.WEBSITES + " " +
-                "SET [NumPages] = @NumPages " +
-                "WHERE [Host] = @Host";
-
-            return new DataBase().Query(query, new Dictionary<string, object?> {
-                {"Host", Host },
-                {"NumPages", NumPages }
-            });
         }
 
         public int GetNumListings()

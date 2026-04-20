@@ -154,7 +154,6 @@ namespace landerist_library.Pages
                     "W.[IpAddressUpdated], " +
                     "W.[IndexUrlRegex], " +
                     "W.[SitemapUrlRegex], " +
-                    "W.[NumPages], " +
                     "W.[NumListings], " +
                     "W.[ListingExampleUri], " +
                     "W.[ListingUrlRegex]," +
@@ -364,7 +363,6 @@ namespace landerist_library.Pages
                 Websites.Websites.WEBSITES + ".[IpAddressUpdated], " +
                 Websites.Websites.WEBSITES + ".[IndexUrlRegex], " +
                 Websites.Websites.WEBSITES + ".[SitemapUrlRegex], " +
-                Websites.Websites.WEBSITES + ".[NumPages], " +
                 Websites.Websites.WEBSITES + ".[NumListings], " +
                 Websites.Websites.WEBSITES + ".[ListingExampleUri], " +
                 Websites.Websites.WEBSITES + ".[ListingUrlRegex], " +
@@ -414,10 +412,6 @@ namespace landerist_library.Pages
             bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
                 {"Host", website.Host }
             });
-            if (sucess)
-            {
-                website.SetNumPagesToZero();
-            }
             return sucess;
         }
 

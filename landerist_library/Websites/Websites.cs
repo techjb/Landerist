@@ -398,49 +398,7 @@ namespace landerist_library.Websites
             ES_Media.Delete();
             ES_Sources.Delete();
         }
-
-        public static void UpdateNumPages()
-        {
-            var websites = GetAll();
-            int total = websites.Count;
-            int counter = 0;
-            Parallel.ForEach(websites, website =>
-            {
-                int current = Interlocked.Increment(ref counter);
-                Console.WriteLine(current + "/" + total);
-                UpdateNumPages(website);
-            });
-        }
-
-        public static bool UpdateNumPages(Website website)
-        {
-            int numPages = CalculateNumPages(website);
-            string query =
-                "UPDATE " + WEBSITES + " " +
-                "SET [NumPages] = @NumPages " +
-                "WHERE [Host] = @Host";
-
-            return new DataBase().Query(query, new Dictionary<string, object?>()
-            {
-                {"Host", website.Host},
-                {"NumPages",numPages }
-            });
-        }        
-
-
-        private static int CalculateNumPages(Website website)
-        {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + Pages.Pages.PAGES + " " +
-                "WHERE [Host] = @Host";
-
-            return new DataBase().QueryInt(query, new Dictionary<string, object?>()
-            {
-                {"Host", website.Host}
-            });
-        }
-
+       
         public static void UpdateRobotsTxt()
         {
             var websites = GetNeedToUpdateRobotsTxt();
