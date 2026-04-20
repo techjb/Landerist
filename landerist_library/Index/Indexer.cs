@@ -47,6 +47,11 @@ namespace landerist_library.Index
                 return;
             }
 
+            if (!Page.Website.HtmlIndexingEnabled)
+            {
+                return;
+            }
+
             if (Page.ContainsMetaRobotsNoFollow())
             {
                 return;

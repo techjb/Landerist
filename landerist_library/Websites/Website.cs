@@ -47,6 +47,8 @@ namespace landerist_library.Websites
 
         public bool ApplySpecialRules { get; set; }
 
+        public bool HtmlIndexingEnabled { get; set; } = true;
+
         public Robots? Robots = null;
 
         public LanguageCode LanguageCode = LanguageCode.es;
@@ -133,6 +135,10 @@ namespace landerist_library.Websites
             ApplySpecialRules = dataRow.Table.Columns.Contains("ApplySpecialRules")
                 && dataRow["ApplySpecialRules"] is not DBNull
                 && (bool)dataRow["ApplySpecialRules"];
+            HtmlIndexingEnabled = dataRow.Table.Columns.Contains("HtmlIndexingEnabled")
+                && dataRow["HtmlIndexingEnabled"] is not DBNull
+                ? (bool)dataRow["HtmlIndexingEnabled"]
+                : !ApplySpecialRules;
         }
 
         public bool Insert()
@@ -140,9 +146,9 @@ namespace landerist_library.Websites
             string query =
                 "INSERT INTO " + Websites.WEBSITES + " (" +
                 "[MainUri], [Host], [LanguageCode], [CountryCode], [RobotsTxt], [RobotsTxtUpdated], " +
-                "[SitemapUpdated], [IpAddress], [IpAddressUpdated], [IndexUrlRegex], [SitemapUrlRegex], [ListingUrlRegex], [ApplySpecialRules]) VALUES (" +
+                "[SitemapUpdated], [IpAddress], [IpAddressUpdated], [IndexUrlRegex], [SitemapUrlRegex], [ListingUrlRegex], [ApplySpecialRules], [HtmlIndexingEnabled]) VALUES (" +
                 "@MainUri, @Host, @LanguageCode, @CountryCode, @RobotsTxt, @RobotsTxtUpdated, " +
-                "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @IndexUrlRegex, @SitemapUrlRegex, @ListingUrlRegex, @ApplySpecialRules)";
+                "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @IndexUrlRegex, @SitemapUrlRegex, @ListingUrlRegex, @ApplySpecialRules, @HtmlIndexingEnabled)";
 
             var parameters = GetQueryParameters();
             return new DataBase().Query(query, parameters);
@@ -163,7 +169,8 @@ namespace landerist_library.Websites
                 "[IndexUrlRegex] = @IndexUrlRegex, " +
                 "[SitemapUrlRegex] = @SitemapUrlRegex, " +
                 "[ListingUrlRegex] = @ListingUrlRegex, " +
-                "[ApplySpecialRules] = @ApplySpecialRules " +
+                "[ApplySpecialRules] = @ApplySpecialRules, " +
+                "[HtmlIndexingEnabled] = @HtmlIndexingEnabled " +
                 "WHERE [Host] = @Host";
 
             var parameters = GetQueryParameters();
@@ -186,6 +193,7 @@ namespace landerist_library.Websites
                 {"SitemapUrlRegex", SitemapUrlRegex },
                 {"ListingUrlRegex", ListingUrlRegex },
                 {"ApplySpecialRules", ApplySpecialRules },
+                {"HtmlIndexingEnabled", HtmlIndexingEnabled },
             };
         }
 
@@ -524,6 +532,7 @@ namespace landerist_library.Websites
                 IndexUrlRegex = null;
                 SitemapUrlRegex = null;
                 ApplySpecialRules = false;
+                HtmlIndexingEnabled = false;
             }
 
             Disposed = true;
