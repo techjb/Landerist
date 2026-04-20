@@ -3,6 +3,7 @@ using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Index;
 using landerist_library.Pages;
+using landerist_orels.ES;
 using System.Data;
 using System.Net;
 using System.Text;
@@ -519,6 +520,16 @@ namespace landerist_library.Websites
         public int GetNumListings()
         {
             return ES_Listings.Count(Host);
+        }
+
+        public int GetNumPublishedListings()
+        {
+            return ES_Listings.Count(Host, ListingStatus.published);
+        }
+
+        public int GetNumUnpublishedListings()
+        {
+            return ES_Listings.Count(Host, ListingStatus.unpublished);
         }
 
         public void Dispose()

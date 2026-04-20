@@ -79,6 +79,20 @@ namespace landerist_library.Database
             });
         }
 
+        public static int Count(string host, ListingStatus listingStatus)
+        {
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + TABLE_ES_LISTINGS + " " +
+                "WHERE [host] = @Host AND [listingStatus] = @ListingStatus";
+
+            return new DataBase().QueryInt(query, new Dictionary<string, object?>
+            {
+                { "Host", host },
+                { "ListingStatus", listingStatus.ToString() }
+            });
+        }
+
         private static Dictionary<string, object?> GetQueryParameters(Listing listing)
         {
             return new Dictionary<string, object?> {

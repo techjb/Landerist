@@ -1,4 +1,4 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Configuration;
 using landerist_library.Export;
 using landerist_library.Logs;
 using landerist_library.Websites;
@@ -41,19 +41,36 @@ namespace landerist_library.Landerist_com
 
         private static void UpdateHostsTemplate()
         {
+            string updatedAtText = DateTime.Now.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
             StringBuilder rows = new();
 
             foreach (var website in Websites.Websites.GetAll()
                 .Where(website => website.ApplySpecialRules)
                 .OrderBy(website => website.Host, StringComparer.OrdinalIgnoreCase))
             {
-                rows.AppendLine(GetTableRow(website));
+                int pagesCount = website.GetNumPages();
+                int listingsCount = website.GetNumListings();
+                int publishedListingsCount = website.GetNumPublishedListings();
+                int unpublishedListingsCount = website.GetNumUnpublishedListings();
+
+                rows.AppendLine(GetTableRow(
+                    website,
+                    pagesCount,
+                    listingsCount,
+                    publishedListingsCount,
+                    unpublishedListingsCount));
             }
 
+            HostsTemplate = HostsTemplate.Replace("/*UPDATED_AT*/", updatedAtText);
             HostsTemplate = HostsTemplate.Replace("/*CHARTS*/", rows.ToString());
         }
 
-        private static string GetTableRow(Website website)
+        private static string GetTableRow(
+            Website website,
+            int pagesCount,
+            int listingsCount,
+            int publishedListingsCount,
+            int unpublishedListingsCount)
         {
             var pagesDownload = GetDownloadInfo(website.Host, "pages", "Pages");
             var listingsDownload = GetDownloadInfo(website.Host, "listings", "Listings");
@@ -61,9 +78,10 @@ namespace landerist_library.Landerist_com
             return
                 "                <tr>" + Environment.NewLine +
                 $"                    <td>{WebUtility.HtmlEncode(website.Host)}</td>" + Environment.NewLine +
-                $"                    <td>{website.GetNumPages().ToString(CultureInfo.InvariantCulture)}</td>" + Environment.NewLine +
-                $"                    <td>{website.GetNumListings().ToString(CultureInfo.InvariantCulture)}</td>" + Environment.NewLine +
-                $"                    <td>{GetDateText(pagesDownload.LastModified, listingsDownload.LastModified)}</td>" + Environment.NewLine +
+                $"                    <td>{pagesCount.ToString(CultureInfo.InvariantCulture)}</td>" + Environment.NewLine +
+                $"                    <td>{listingsCount.ToString(CultureInfo.InvariantCulture)}</td>" + Environment.NewLine +
+                $"                    <td>{publishedListingsCount.ToString(CultureInfo.InvariantCulture)}</td>" + Environment.NewLine +
+                $"                    <td>{unpublishedListingsCount.ToString(CultureInfo.InvariantCulture)}</td>" + Environment.NewLine +
                 $"                    <td>{GetDownloadsText(pagesDownload.Hyperlink, listingsDownload.Hyperlink)}</td>" + Environment.NewLine +
                 "                </tr>";
         }
@@ -93,28 +111,6 @@ namespace landerist_library.Landerist_com
         private static string GetFileName(string host, string downloadType)
         {
             return $"{host}_{downloadType}.csv";
-        }
-
-        private static string GetDateText(DateTime? pagesLastModified, DateTime? listingsLastModified)
-        {
-            return GetCombinedText(
-                pagesLastModified?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
-                listingsLastModified?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
-        }
-
-        private static string GetCombinedText(string? pagesText, string? listingsText)
-        {
-            if (string.IsNullOrWhiteSpace(pagesText) && string.IsNullOrWhiteSpace(listingsText))
-            {
-                return EmptyValue;
-            }
-
-            if (string.Equals(pagesText, listingsText, StringComparison.Ordinal))
-            {
-                return pagesText ?? listingsText ?? EmptyValue;
-            }
-
-            return $"P: {pagesText ?? EmptyValue} / L: {listingsText ?? EmptyValue}";
         }
 
         private static string GetDownloadsText(string pagesLink, string listingsLink)
