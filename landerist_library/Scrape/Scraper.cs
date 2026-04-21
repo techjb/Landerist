@@ -181,16 +181,13 @@ namespace landerist_library.Scrape
 
         private bool TryApplyPreClassificationBeforeDownload(Page page)
         {
-            Interlocked.Increment(ref Processed);
-
             var success = new PageScraper(page).TryApplyPreClassificationBeforeDownload();
             if (success)
             {
+                Interlocked.Increment(ref Processed);
                 Interlocked.Increment(ref ScrapedSuccess);
                 return true;
             }
-
-            Interlocked.Decrement(ref Processed);
             return false;
         }
 
