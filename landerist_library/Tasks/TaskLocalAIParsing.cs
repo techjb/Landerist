@@ -21,6 +21,9 @@ namespace landerist_library.Tasks
         private int TotalProcessed = 0;
         private int TotalErrors = 0;
         private int TotalSuccess = 0;
+        private int TotalMayBeListing = 0;
+        private int TotalListing = 0;
+        private int TotalNotListingByParser = 0;
         private readonly CancellationTokenSource StoppingCancellationTokenSource = new();
         private BlockingCollection<Page> BlockingCollection = [];
         private const int MAX_SIZE_BLOCKINGCOLLECTION = MAX_PAGES_PER_TASK * 10;
@@ -68,7 +71,10 @@ namespace landerist_library.Tasks
                     },
                     page =>
                     {
-                        if (ProcessPage(page))
+                        var processPageResult = ProcessPage(page);
+                        IncrementPageTypeCounter(processPageResult.PageType);
+
+                        if (processPageResult.Success)
                         {
                             Interlocked.Increment(ref TotalSuccess);
                             StatisticsSnapshot.InsertDailyCounter(StatisticsKey.LocalAIParsingSuccess);
@@ -83,11 +89,17 @@ namespace landerist_library.Tasks
                         if (totalProcessed % 10 == 0)
                         {
                             int totalErrors = Volatile.Read(ref TotalErrors);
+                            int totalMayBeListing = Volatile.Read(ref TotalMayBeListing);
+                            int totalListing = Volatile.Read(ref TotalListing);
+                            int totalNotListingByParser = Volatile.Read(ref TotalNotListingByParser);
                             double totalErrorPercentage = totalProcessed == 0
                                 ? 0
                                 : Math.Round((double)totalErrors * 100 / totalProcessed, 2);
 
-                            Log.WriteLocalAI("ProcessPages", $"Errors: {totalErrors}/{totalProcessed} ({totalErrorPercentage}%)");
+                            Log.WriteLocalAI(
+                                "ProcessPages",
+                                $"Errors: {totalErrors}/{totalProcessed} ({totalErrorPercentage}%). " +
+                                $"PageType: MayBeListing={totalMayBeListing}, Listing={totalListing}, NotListingByParser={totalNotListingByParser}");
                         }
                     });
             }
@@ -177,9 +189,26 @@ namespace landerist_library.Tasks
         }
 
 
-        private static bool ProcessPage(Page page)
+        private void IncrementPageTypeCounter(PageType? pageType)
+        {
+            switch (pageType)
+            {
+                case PageType.MayBeListing:
+                    Interlocked.Increment(ref TotalMayBeListing);
+                    break;
+                case PageType.Listing:
+                    Interlocked.Increment(ref TotalListing);
+                    break;
+                case PageType.NotListingByParser:
+                    Interlocked.Increment(ref TotalNotListingByParser);
+                    break;
+            }
+        }
+
+        private (bool Success, PageType? PageType) ProcessPage(Page page)
         {
             bool success = false;
+            PageType? newPageType = null;
 
             try
             {
@@ -192,8 +221,9 @@ namespace landerist_library.Tasks
                 }
                 else
                 {
-                    (PageType newPageType, Listing? listing, bool waitingAIRequest) = ParseListing.ParseLocalAI(page, userInput);
-                    success = new PageScraper(page).ApplyParsedClassificationAfterParsing(newPageType, listing);
+                    var parseResult = ParseListing.ParseLocalAI(page, userInput);
+                    newPageType = parseResult.pageType;
+                    success = new PageScraper(page).ApplyParsedClassificationAfterParsing(parseResult.pageType, parseResult.listing);
                 }
             }
             catch (Exception exception)
@@ -217,7 +247,7 @@ namespace landerist_library.Tasks
                 page.Dispose();
             }
 
-            return success;
+            return (success, newPageType);
         }
 
         private static bool ReturnPageToScrape(Page page)
