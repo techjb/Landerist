@@ -723,12 +723,18 @@ namespace landerist_library.Pages
         {
             string query =
                 "BEGIN TRANSACTION; " +
-                "UPDATE TOP (" + topRows + ") " + PAGES + " " +
+                "WITH PagesToUpdate AS ( " +
+                "SELECT TOP (" + topRows + ") " + PAGES + ".[UriHash] " +
+                "FROM " + PAGES + " " +
+                "INNER JOIN " + Websites.Websites.WEBSITES + " ON " + PAGES + ".[Host] = " + Websites.Websites.WEBSITES + ".[Host] " +
+                "WHERE " + PAGES + ".[WaitingStatus] = @waitingStatusFrom AND [TokenCount] " + (isMaxTokenCount ? "<=" : ">") + " " + tokenCount + " " +
+                "ORDER BY " + PAGES + ".[Updated] ASC ) " +
+                "UPDATE " + PAGES + " " +
                 "SET [WaitingStatus] = @waitingStatusTo " +
                 "OUTPUT " + SelectColumns("INSERTED") + " " +
                 "FROM " + PAGES + " " +
+                "INNER JOIN PagesToUpdate ON " + PAGES + ".[UriHash] = PagesToUpdate.[UriHash] " +
                 "INNER JOIN " + Websites.Websites.WEBSITES + " ON " + PAGES + ".[Host] = " + Websites.Websites.WEBSITES + ".[Host] " +
-                "WHERE " + PAGES + ".[WaitingStatus] = @waitingStatusFrom AND [TokenCount] " + (isMaxTokenCount ? "<=" : ">") + " " + tokenCount + " ; " +
                 "COMMIT TRANSACTION;";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
