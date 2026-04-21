@@ -49,15 +49,12 @@ namespace landerist_library.Tasks
 
         public void ProcessPages(CancellationToken cancellationToken = default)
         {
-            //Log.Console("TaskLocalAIParsing", "Procesing pages..");
             using var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(StoppingCancellationTokenSource.Token, cancellationToken);
             CancellationToken linkedCancellationToken = linkedCancellationTokenSource.Token;
 
             InitializeBlockingCollection(linkedCancellationToken);
-            //Log.Console("TaskLocalAIParsing", "BlockingCollection.Count : " + BlockingCollection.Count);
             if (BlockingCollection.Count == 0)
             {
-                //Console.WriteLine("No pages to process.");
                 return;
             }
 
@@ -99,23 +96,6 @@ namespace landerist_library.Tasks
                 Log.WriteLocalAI("ProcessPages", "Cancellation requested");
             }
         }
-
-        //private int DailyEstimate()
-        //{
-        //    if (TotalProcessed <= 0)
-        //    {
-        //        return 0;
-        //    }
-        //    TimeSpan timeSpan = DateTime.Now - StartDate;
-        //    double days = timeSpan.TotalDays;
-        //    if (days <= 0)
-        //    {
-        //        days = TimeSpan.FromHours(1).TotalDays;
-        //    }
-
-        //    return (int)Math.Round(TotalProcessed / days);
-        //}
-
 
         public void Stop()
         {
