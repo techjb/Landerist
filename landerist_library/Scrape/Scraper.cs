@@ -164,6 +164,11 @@ namespace landerist_library.Scrape
                 return;
             }
 
+            if (TryApplyPreClassificationBeforeDownload(page))
+            {
+                return;
+            }
+
             var isBlocked = WebsitesBlocker.IsBlocked(page.Website);
             if (isBlocked && !Config.PROXY_ENABLED)
             {
@@ -172,6 +177,21 @@ namespace landerist_library.Scrape
             }
 
             Scrape(page, false);
+        }
+
+        private bool TryApplyPreClassificationBeforeDownload(Page page)
+        {
+            Interlocked.Increment(ref Processed);
+
+            var success = new PageScraper(page).TryApplyPreClassificationBeforeDownload();
+            if (success)
+            {
+                Interlocked.Increment(ref ScrapedSuccess);
+                return true;
+            }
+
+            Interlocked.Decrement(ref Processed);
+            return false;
         }
 
         private void WriteConsole(Page page)
@@ -300,8 +320,8 @@ namespace landerist_library.Scrape
 
         private static bool ScrapeAttempt(Page page, bool useProxy)
         {
+            var pageScraper = new PageScraper(page, useProxy);            
             WebsitesBlocker.Block(page.Website);
-            var pageScraper = new PageScraper(page, useProxy);
             return pageScraper.Scrape();
         }
     }

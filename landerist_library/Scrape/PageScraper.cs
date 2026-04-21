@@ -43,6 +43,34 @@ namespace landerist_library.Scrape
             return success;
         }
 
+        public bool TryApplyPreClassificationBeforeDownload()
+        {
+            if (_page.Website.HtmlIndexingEnabled && Config.INDEXER_ENABLED)
+            {
+                return false;
+            }
+
+            PageType? pageType = null;
+
+            if (_page.IsMainPage())
+            {
+                pageType = PageType.MainPage;
+            }
+            else if (_page.Website.IsDiscardedByListingUrlRegex(_page.Uri))
+            {
+                pageType = PageType.DiscardedByListingUrlRegex;
+            }
+
+            if (pageType is null)
+            {
+                return false;
+            }
+
+            UpdatePageTypeAndListing(pageType, null);
+            _page.SetNextUpdate();
+            return _page.Update();
+        }
+
         private bool Download()
         {
             if (Config.DOWNLOADERS_POOL_ENABLED)
@@ -82,7 +110,7 @@ namespace landerist_library.Scrape
             }
 
             UpdatePageTypeAndListing(newPageType, newListing);
-            _page.SetNextUpdate();            
+            _page.SetNextUpdate();
             return _page.Update();
         }
 
