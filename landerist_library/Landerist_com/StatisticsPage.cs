@@ -28,9 +28,10 @@ namespace landerist_library.Landerist_com
             {
                 Charts.Clear();
 
-                Listings();
                 Websites();
                 Pages();
+                Listings();
+                ProcessedPages();
                 UpdatedPages();
                 NeedUpdate();
                 NextUpdateDistribution();
@@ -39,8 +40,7 @@ namespace landerist_library.Landerist_com
                 //UpdatedHttpStatusCode200();
                 //UpdatedHttpStatusCodeErrors();
                 UpdatedHttpStatusCode();
-                UpdatedPageType();
-                ScraperProcessedPages();
+                UpdatedPageType();                
                 ScraperSuccessCrash();
                 NotListingsCache();
                 ResponseBodyTextAlreadyParsed();
@@ -88,7 +88,7 @@ namespace landerist_library.Landerist_com
 
         private static void UpdatedPages()
         {
-            LineChart("Updated Pages", StatisticsKey.UpdatedPages, false);
+            BarChart("Updated Pages", StatisticsKey.UpdatedPages, false);
         }
 
         private static void NeedUpdate()
@@ -104,7 +104,7 @@ namespace landerist_library.Landerist_com
 
         private static void UnknownPageType()
         {
-            AreaChart("Unknown PageType", StatisticsKey.UnknownPageType, true);
+            BarChart("Unknown PageType", StatisticsKey.UnknownPageType, true);
         }
 
         //private static void UpdatedHttpStatusCodeNull()
@@ -135,9 +135,9 @@ namespace landerist_library.Landerist_com
             BarChart("Updated by PageType", keys, false);
         }
 
-        private static void ScraperProcessedPages()
+        private static void ProcessedPages()
         {
-            BarChart("Scraper Processed Pages", StatisticsKey.Processed, false);
+            BarChart("Processed Pages", StatisticsKey.Processed, false);
         }
 
         private static void ScraperSuccessCrash()
@@ -152,7 +152,7 @@ namespace landerist_library.Landerist_com
 
         private static void WaitingAIRequest()
         {
-            BarChart("Waiting AI Request", StatisticsKey.WaitingAIRequest, false);
+            AreaChart("Waiting AI Request", StatisticsKey.WaitingAIRequest, false);
         }
 
         private static void BatchReaded()
@@ -260,7 +260,7 @@ namespace landerist_library.Landerist_com
 
         private static void AreaChart(string title, List<string> keys, bool yesterday)
         {
-            var dataString = GetDataString(keys, yesterday, false);
+            var dataString = GetDataString(keys, yesterday);
             AreaChart(title, dataString);
         }
 
@@ -284,7 +284,7 @@ namespace landerist_library.Landerist_com
 
         private static void LineChart(string title, List<string> keys, bool yesterday)
         {
-            var data = GetDataString(keys, yesterday, false);
+            var data = GetDataString(keys, yesterday);
             LineChart(title, data);
         }
 
@@ -301,7 +301,7 @@ namespace landerist_library.Landerist_com
         }
         private static void BarChart(string title, List<string> keys, bool yesterday)
         {
-            var data = GetDataString(keys, yesterday, true);
+            var data = GetDataString(keys, yesterday);
             BarChart(title, data);
         }
 
@@ -344,12 +344,12 @@ namespace landerist_library.Landerist_com
             Charts.Add(chart);
         }
 
-        private static string GetDataString(List<string> keys, bool yesterday, bool last15)
+        private static string GetDataString(List<string> keys, bool yesterday)
         {
             List<string> data = [];
             foreach (var key in keys)
             {
-                var values = GetValues(key, yesterday, last15);
+                var values = GetValues(key, yesterday);
                 var json = $"{{\"label\": {JsonSerializer.Serialize(key)}, \"values\":[{string.Join(",", values)}]}}";
                 data.Add(json);
             }
@@ -357,10 +357,10 @@ namespace landerist_library.Landerist_com
             return string.Join(",", data);
         }
 
-        private static List<string> GetValues(string statisticKey, bool yesterday, bool last15)
+        private static List<string> GetValues(string statisticKey, bool yesterday)
         {
-            int top = last15 ? 15 : 100;
-            var dataTable = StatisticsSnapshot.GetLatestStatistics(statisticKey, top);
+            
+            var dataTable = StatisticsSnapshot.GetLatestStatistics(statisticKey, 15);
             List<string> values = [];
 
             foreach (DataRow dataRow in dataTable.Rows.Cast<DataRow>().Reverse())
