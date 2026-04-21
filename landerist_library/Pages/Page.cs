@@ -391,9 +391,7 @@ namespace landerist_library.Pages
             return
                 ResponseBodyText.StartsWith("Not found", StringComparison.OrdinalIgnoreCase) ||
                 ResponseBodyText.StartsWith("Error", StringComparison.OrdinalIgnoreCase) ||
-                ResponseBodyText.StartsWith("404", StringComparison.OrdinalIgnoreCase) ||
-                ResponseBodyText.Contains("no encontrada", StringComparison.OrdinalIgnoreCase) ||
-                ResponseBodyText.Contains("no existe", StringComparison.OrdinalIgnoreCase) ||
+                ResponseBodyText.StartsWith("404", StringComparison.OrdinalIgnoreCase) ||                                
                 ResponseBodyText.Contains("algo salió mal", StringComparison.OrdinalIgnoreCase) ||
                 ResponseBodyText.Contains("Page Not found", StringComparison.OrdinalIgnoreCase)
                 ;

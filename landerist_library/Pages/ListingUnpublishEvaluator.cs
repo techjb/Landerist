@@ -37,14 +37,15 @@ namespace landerist_library.Pages
             return IsStrongUnpublishEvidence() ||
                 _page.IsNotListingByParser() ||
                 _page.IsNotCanonical() ||
-                _page.IsRedirectToAnotherUrl() ||
-                _page.IsDiscardedByListingUrlRegex()
+                _page.IsRedirectToAnotherUrl()               
                 ;
         }
 
         private bool IsStrongUnpublishEvidence()
         {
-            return _page.IsHttpStatusCodeNotFound() || _page.IsHttpStatusCodeGone();
+            return _page.IsHttpStatusCodeNotFound() 
+                || _page.IsHttpStatusCodeGone() 
+                || _page.IsDiscardedByListingUrlRegex();
         }
 
         private int GetRequiredCounter()
