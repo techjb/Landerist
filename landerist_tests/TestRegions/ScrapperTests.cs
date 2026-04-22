@@ -16,8 +16,8 @@ namespace landerist_tests
             //new Scraper().ProcessPages();
             //new Scraper().Scrape(page, false);
 
-            //new landerist_library.Scrape.Scraper().Scrape("https://www.engelvoelkers.com/es/es/exposes/74729fbb-f7af-54c9-8553-a44d414fb475", false);
-            
+            //new landerist_library.Scrape.Scraper().Scrape("https://sempre.es/producto/terreno-rustico-en-brion/", false);
+
             //new Scraper().TestSinglePage();
             //landerist_library.Scrape.PageSelector.SelectTop1();
             //Console.WriteLine("Block: " + WebsitesBlocker.Block(page.Website));
