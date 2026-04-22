@@ -16,12 +16,8 @@ namespace landerist_tests
             //new Scraper().ProcessPages();
             //new Scraper().Scrape(page, false);
 
-            //new landerist_library.Scrape.Scraper().Scrape("https://www.tecnocasa.es/venta/casa/sevilla/pilas/616023.html", false);
-            //new landerist_library.Scrape.Scraper().Scrape("https://20punto20rb.com/propiedades/propiedad/luminoso-piso-en-don-ramon-de-la-cruz/", false);
-
-            //new landerist_library.Scrape.Scraper().Scrape("https://1mast.com/es/pisos-en-coin/", false);// not listing
-            //new landerist_library.Scrape.Scraper().Scrape("https://360mallorcaproperty.com/es/property-location/porto-petro-es/page/2/", false);// not listing
-
+            //new landerist_library.Scrape.Scraper().Scrape("https://www.engelvoelkers.com/es/es/exposes/74729fbb-f7af-54c9-8553-a44d414fb475", false);
+            
             //new Scraper().TestSinglePage();
             //landerist_library.Scrape.PageSelector.SelectTop1();
             //Console.WriteLine("Block: " + WebsitesBlocker.Block(page.Website));
