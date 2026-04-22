@@ -377,7 +377,7 @@ namespace landerist_library.Pages
         }
 
 
-        public bool ResponseBodyTextAlreadyParsed()
+        public bool HasNotChanged()
         {
             return ResponseBodyTextNotChanged && (IsListing() || IsNotListingByParser());
         }

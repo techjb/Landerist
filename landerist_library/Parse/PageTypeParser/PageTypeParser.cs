@@ -87,7 +87,7 @@ namespace landerist_library.Parse.PageTypeParser
                 return (PageType.NotListingByParser, null, false);
             }
 
-            if (Page.ResponseBodyTextAlreadyParsed() && isProduction)
+            if (Page.HasNotChanged() && isProduction)
             {
                 StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ResponseBodyTextAlreadyParsed);
                 return (Page.PageType, null, false);
