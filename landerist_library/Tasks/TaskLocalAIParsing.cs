@@ -21,7 +21,6 @@ namespace landerist_library.Tasks
         private int TotalProcessed = 0;
         private int TotalErrors = 0;
         private int TotalSuccess = 0;
-        private int TotalMayBeListing = 0;
         private int TotalListing = 0;
         private int TotalNotListingByParser = 0;
         private readonly CancellationTokenSource StoppingCancellationTokenSource = new();
@@ -89,15 +88,11 @@ namespace landerist_library.Tasks
                         if (totalProcessed % 10 == 0)
                         {
                             int totalErrors = Volatile.Read(ref TotalErrors);
-                            int totalMayBeListing = Volatile.Read(ref TotalMayBeListing);
                             int totalListing = Volatile.Read(ref TotalListing);
                             int totalNotListingByParser = Volatile.Read(ref TotalNotListingByParser);
                             double totalErrorPercentage = totalProcessed == 0
                                 ? 0
                                 : Math.Round((double)totalErrors * 100 / totalProcessed, 2);
-                            double totalMayBeListingPercentage = totalProcessed == 0
-                                ? 0
-                                : Math.Round((double)totalMayBeListing * 100 / totalProcessed, 2);
                             double totalListingPercentage = totalProcessed == 0
                                 ? 0
                                 : Math.Round((double)totalListing * 100 / totalProcessed, 2);
@@ -108,7 +103,7 @@ namespace landerist_library.Tasks
                             Log.WriteLocalAI(
                                 "ProcessPages",
                                 $"Errors: {totalErrors}/{totalProcessed} ({totalErrorPercentage}%) " +
-                                $"MayBeListing: {totalMayBeListingPercentage}% Listing: {totalListingPercentage}% NotListingByParser:{totalNotListingByParserPercentage}%");
+                                $"Listing: {totalListingPercentage}% NotListing: {totalNotListingByParserPercentage}%");
                         }
                     });
             }
@@ -202,9 +197,6 @@ namespace landerist_library.Tasks
         {
             switch (pageType)
             {
-                case PageType.MayBeListing:
-                    Interlocked.Increment(ref TotalMayBeListing);
-                    break;
                 case PageType.Listing:
                     Interlocked.Increment(ref TotalListing);
                     break;
