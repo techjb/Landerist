@@ -38,6 +38,7 @@ namespace landerist_library.Statistics
         NotListingCache,
         ResponseBodyTextAlreadyParsed,
         ReponseBodyTextIsAnotherListingInHost,
+        EtagHasNotChanged,
     }
 
     public class StatisticsSnapshot

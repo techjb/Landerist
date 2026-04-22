@@ -17,6 +17,9 @@ namespace landerist_library.Parse.PageTypeParser
         public (PageType? pageType, landerist_orels.ES.Listing? listing, bool waitingAIRequest)
             GetPageType()
         {
+
+            var isProduction = Configuration.Config.IsConfigurationProduction();
+
             if (Page.HttpStatusCode is null)
             {
                 return (PageType.Timeout, null, false);
@@ -30,6 +33,12 @@ namespace landerist_library.Parse.PageTypeParser
             if (Page.RedirectToAnotherUrl())
             {
                 return (PageType.RedirectToAnotherUrl, null, false);
+            }
+
+            if (Page.PageType.HasValue && Page.EtagHasNotChanged())
+            {
+                StatisticsSnapshot.InsertDailyCounter(StatisticsKey.EtagHasNotChanged);
+                return (Page.PageType, null, false);
             }
 
             if (Page.ResponseBodyIsNullOrEmpty())
@@ -79,15 +88,13 @@ namespace landerist_library.Parse.PageTypeParser
                 return (PageType.ResponseBodyIsError, null, false);
             }
 
-            var isProduction = Configuration.Config.IsConfigurationProduction();
-
             if (Page.IsNotListingCache() && isProduction)
             {
                 StatisticsSnapshot.InsertDailyCounter(StatisticsKey.NotListingCache);
                 return (PageType.NotListingByParser, null, false);
             }
 
-            if (Page.HasNotChanged() && isProduction)
+            if (Page.ResponseBodyTextHasNotChanged() && isProduction)
             {
                 StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ResponseBodyTextAlreadyParsed);
                 return (Page.PageType, null, false);

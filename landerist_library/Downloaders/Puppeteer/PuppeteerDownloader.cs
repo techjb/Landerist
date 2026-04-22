@@ -13,6 +13,7 @@ namespace landerist_library.Downloaders.Puppeteer
         public byte[]? Screenshot { get; set; } = null;
         public short? HttpStatusCode { get; set; } = null;
         public string? RedirectUrl { get; set; } = null;
+        public string? Etag { get; set; } = null;
 
         private Pages.Page? Page;
 
@@ -405,6 +406,7 @@ namespace landerist_library.Downloaders.Puppeteer
             Screenshot = null;
             HttpStatusCode = null;
             RedirectUrl = null;
+            Etag = null;
             Page = page;
 
             var delay = GetTimeout();
@@ -679,6 +681,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 Uri.TryCreate(e.Response.Url, UriKind.Absolute, out Uri? redirectUri);
 
                 HttpStatusCode = (short)e.Response.Status;
+                Etag = GetHeaderValue(e.Response.Headers, "ETag");
                 if (e.Response.Headers.TryGetValue("Location", out string? location))
                 {
                     if (!Uri.TryCreate(location, UriKind.Absolute, out redirectUri))
@@ -696,6 +699,19 @@ namespace landerist_library.Downloaders.Puppeteer
             {
                 Logs.Log.WriteError("PuppeteerDownloader HandleResponseAsync", exception);
             }
+        }
+
+        private static string? GetHeaderValue(Dictionary<string, string> headers, string headerName)
+        {
+            foreach (var header in headers)
+            {
+                if (header.Key.Equals(headerName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return string.IsNullOrWhiteSpace(header.Value) ? null : header.Value.Trim();
+                }
+            }
+
+            return null;
         }
 
         private static int GetTimeout()

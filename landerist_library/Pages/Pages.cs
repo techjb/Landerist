@@ -134,6 +134,7 @@ namespace landerist_library.Pages
                     "INSERTED.[Updated], " +
                     "INSERTED.[NextUpdate], " +
                     "INSERTED.[HttpStatusCode], " +
+                    "INSERTED.[Etag], " +
                     "INSERTED.[PageType], " +
                     "INSERTED.[PageTypeCounter], " +
                     "INSERTED.[ListingStatus], " +
@@ -342,6 +343,7 @@ namespace landerist_library.Pages
                 pagesTableName + ".[Updated], " +
                 pagesTableName + ".[NextUpdate], " +
                 pagesTableName + ".[HttpStatusCode], " +
+                pagesTableName + ".[Etag], " +
                 pagesTableName + ".[PageType], " +
                 pagesTableName + ".[PageTypeCounter], " +
                 pagesTableName + ".[ListingStatus], " +
@@ -804,6 +806,7 @@ namespace landerist_library.Pages
                 "[Updated], " +
                 "[NextUpdate], " +
                 "[HttpStatusCode], " +
+                "[Etag], " +
                 "[PageType], " +
                 "[PageTypeCounter], " +
                 "[ListingStatus], " +

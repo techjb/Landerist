@@ -10,15 +10,23 @@ namespace landerist_library.Downloaders.HttpClient
         public string? Content { get; set; } = null;
         public byte[]? Screenshot { get; set; } = null;
         public string? RedirectUrl { get; set; } = null;
+        public string? Etag { get; set; } = null;
 
         private HttpResponseMessage? HttpResponseMessage;
 
         public void Download(Page page)
         {
+            HttpStatusCode = null;
+            Content = null;
+            Screenshot = null;
+            RedirectUrl = null;
+            Etag = null;
+
             GetAsync(page.Website.LanguageCode, page.Uri);
             if (HttpResponseMessage != null)
             {
                 HttpStatusCode = (short)HttpResponseMessage.StatusCode;
+                Etag = HttpResponseMessage.Headers.ETag?.ToString();
             }
             page.SetDownloadedData(this);
         }

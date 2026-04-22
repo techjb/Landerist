@@ -43,6 +43,7 @@ namespace landerist_library.Landerist_com
                 UpdatedPageType();                
                 ScraperSuccessCrash();
                 NotListingsCache();
+                EtagHasNotChanged();
                 ResponseBodyTextAlreadyParsed();
                 ReponseBodyTextIsAnotherListingInHost();
                 WaitingAIRequest();
@@ -183,6 +184,11 @@ namespace landerist_library.Landerist_com
         private static void ResponseBodyTextAlreadyParsed()
         {
             BarChart("ResponseBodyText already parsed", StatisticsKey.ResponseBodyTextAlreadyParsed, false);
+        }
+
+        private static void EtagHasNotChanged()
+        {
+            BarChart("Etag not changed", StatisticsKey.EtagHasNotChanged, false);
         }
 
         private static void ReponseBodyTextIsAnotherListingInHost()

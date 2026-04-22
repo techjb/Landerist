@@ -16,7 +16,7 @@ namespace landerist_tests
             //new Scraper().ProcessPages();
             //new Scraper().Scrape(page, false);
 
-            //new landerist_library.Scrape.Scraper().Scrape("https://sempre.es/producto/terreno-rustico-en-brion/", false);
+            //new landerist_library.Scrape.Scraper().Scrape("https://almeriapropertyinvestments.com/es/property/atico-exclusivo-con-amplias-terrazas-en-las-buganvillas-en-vera-playa/", false);
 
             //new Scraper().TestSinglePage();
             //landerist_library.Scrape.PageSelector.SelectTop1();

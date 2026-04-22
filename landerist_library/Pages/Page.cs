@@ -31,6 +31,8 @@ namespace landerist_library.Pages
 
         public string? RedirectUrl { get; set; } = null;
 
+        public string? Etag { get; set; } = null;
+
         public PageType? PageType { get; private set; }
 
         public short? PageTypeCounter { get; private set; }
@@ -58,6 +60,10 @@ namespace landerist_library.Pages
         public bool ResponseBodyTextNotChanged { get; set; } = false;
 
         public byte[]? Screenshot { get; set; }
+
+        private bool EtagNotChanged { get; set; } = false;
+
+        private bool HasComparableEtag { get; set; } = false;
 
 
         private HtmlDocument? HtmlDocument = null;
@@ -126,6 +132,9 @@ namespace landerist_library.Pages
             Updated = dataRow["Updated"] is DBNull ? null : (DateTime)dataRow["Updated"];
             NextUpdate = dataRow["NextUpdate"] is DBNull ? null : (DateTime)dataRow["NextUpdate"];
             HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
+            Etag = dataRow.Table.Columns.Contains("Etag") && dataRow["Etag"] is not DBNull
+                ? dataRow["Etag"].ToString()
+                : null;
             PageType = dataRow["PageType"] is DBNull ? null : (PageType)Enum.Parse(typeof(PageType), dataRow["PageType"].ToString()!);
             PageTypeCounter = dataRow["PageTypeCounter"] is DBNull ? null : (short)dataRow["PageTypeCounter"];
             ListingStatus = dataRow["ListingStatus"] is DBNull ? null : (ListingStatus)Enum.Parse(typeof(ListingStatus), dataRow["ListingStatus"].ToString()!);
@@ -164,10 +173,10 @@ namespace landerist_library.Pages
         {
             string query =
                 "INSERT INTO " + Pages.PAGES + " (" +
-                "[Host], [Uri], [UriHash], [Inserted], [Updated], [NextUpdate], [HttpStatusCode], [PageType], " +
+                "[Host], [Uri], [UriHash], [Inserted], [Updated], [NextUpdate], [HttpStatusCode], [Etag], [PageType], " +
                 "[PageTypeCounter], [ListingStatus], [LockedBy], [WaitingStatus], [ResponseBodyTextHash], " +
                 "[ResponseBodyTextNotChangedCounter], [TransientErrorCounter], [ResponseBodyZipped], [TokenCount]) " +
-                "VALUES(@Host, @Uri, @UriHash, @Inserted, @Updated, @NextUpdate, @HttpStatusCode, @PageType, " +
+                "VALUES(@Host, @Uri, @UriHash, @Inserted, @Updated, @NextUpdate, @HttpStatusCode, @Etag, @PageType, " +
                 "@PageTypeCounter, @ListingStatus, @LockedBy, @WaitingStatus, @ResponseBodyTextHash, " +
                 "@ResponseBodyTextNotChangedCounter, @TransientErrorCounter, CONVERT(varbinary(max), @ResponseBodyZipped), @TokenCount)";
 
@@ -179,6 +188,7 @@ namespace landerist_library.Pages
                 {"Updated", null },
                 {"NextUpdate", null },
                 {"HttpStatusCode", null },
+                {"Etag", null },
                 {"PageType", null },
                 {"PageTypeCounter", null },
                 {"ListingStatus", null },
@@ -208,13 +218,14 @@ namespace landerist_library.Pages
             //    return true;
             //}
 
-            Updated = DateTime.Now;            
+            Updated = DateTime.Now;
 
             string query =
                 "UPDATE " + Pages.PAGES + " SET " +
                 "[Updated] = @Updated, " +
                 "[NextUpdate] = @NextUpdate, " +
                 "[HttpStatusCode] = @HttpStatusCode, " +
+                "[Etag] = @Etag, " +
                 "[PageType] = @PageType, " +
                 "[PageTypeCounter] = @PageTypeCounter, " +
                 "[ListingStatus] = @ListingStatus, " +
@@ -231,6 +242,7 @@ namespace landerist_library.Pages
                 {"Updated", Updated },
                 {"NextUpdate", NextUpdate },
                 {"HttpStatusCode", HttpStatusCode},
+                {"Etag", Etag},
                 {"PageType", PageType?.ToString()},
                 {"PageTypeCounter", PageTypeCounter},
                 {"ListingStatus", ListingStatus?.ToString()},
@@ -247,7 +259,7 @@ namespace landerist_library.Pages
             if (!sucess)
             {
                 Logs.Log.WriteError("Page Update", "Failed to update page: " + Uri);
-            }            
+            }
             return sucess;
         }
 
@@ -343,11 +355,18 @@ namespace landerist_library.Pages
 
         public void SetDownloadedData(IDownloader downloader)
         {
+            var previousEtag = NormalizeEtag(Etag);
+            var downloadedEtag = NormalizeEtag(downloader.Etag);
+
+            HasComparableEtag = !string.IsNullOrEmpty(previousEtag) && !string.IsNullOrEmpty(downloadedEtag);
+            EtagNotChanged = HasComparableEtag && string.Equals(previousEtag, downloadedEtag, StringComparison.Ordinal);
+
             ResponseBody = downloader.Content;
             ResponseBodyText = null;
             Screenshot = downloader.Screenshot;
             HttpStatusCode = downloader.HttpStatusCode;
             RedirectUrl = downloader.RedirectUrl;
+            Etag = downloadedEtag;
         }
 
         public void SetResponseBodyText()
@@ -375,11 +394,25 @@ namespace landerist_library.Pages
                 : (short)0;
             ResponseBodyTextHash = hash;
         }
+        public bool EtagHasNotChanged()
+        {
+            if (HasComparableEtag)
+            {
+                return EtagNotChanged;
+            }
+            return false;
+        }
 
 
-        public bool HasNotChanged()
+        public bool ResponseBodyTextHasNotChanged()
         {
             return ResponseBodyTextNotChanged && (IsListing() || IsNotListingByParser());
+        }
+
+
+        private static string? NormalizeEtag(string? etag)
+        {
+            return string.IsNullOrWhiteSpace(etag) ? null : etag.Trim();
         }
 
         public bool ResponseBodyTextIsError()
@@ -391,7 +424,7 @@ namespace landerist_library.Pages
             return
                 ResponseBodyText.StartsWith("Not found", StringComparison.OrdinalIgnoreCase) ||
                 ResponseBodyText.StartsWith("Error", StringComparison.OrdinalIgnoreCase) ||
-                ResponseBodyText.StartsWith("404", StringComparison.OrdinalIgnoreCase) ||                                
+                ResponseBodyText.StartsWith("404", StringComparison.OrdinalIgnoreCase) ||
                 ResponseBodyText.Contains("algo salió mal", StringComparison.OrdinalIgnoreCase) ||
                 ResponseBodyText.Contains("Page Not found", StringComparison.OrdinalIgnoreCase)
                 ;
@@ -586,6 +619,7 @@ namespace landerist_library.Pages
                 ResponseBody = null;
                 ResponseBodyText = null;
                 ResponseBodyTextHash = null;
+                Etag = null;
                 ResponseBodyZipped = null;
                 Screenshot = null;
             }
@@ -605,7 +639,7 @@ namespace landerist_library.Pages
         {
             SetWaitingStatus(landerist_library.Pages.WaitingStatus.waiting_ai_request);
         }
-      
+
         private void SetWaitingStatus(WaitingStatus waitingStatus)
         {
             WaitingStatus = waitingStatus;

@@ -12,6 +12,8 @@ namespace landerist_library.Downloaders
 
         public string? RedirectUrl { get; set; }
 
+        public string? Etag { get; set; }
+
         public void Download(Page page);
 
     }
