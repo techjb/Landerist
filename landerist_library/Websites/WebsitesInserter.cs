@@ -1,9 +1,9 @@
-﻿using landerist_library.Logs;
-using landerist_library.Websites;
+﻿using landerist_library.Insert;
+using landerist_library.Logs;
 using System.Data;
 
 
-namespace landerist_library.Insert
+namespace landerist_library.Websites
 {
     public class WebsitesInserter
     {
@@ -28,7 +28,7 @@ namespace landerist_library.Insert
 
         private static void Init()
         {
-            var urls = Websites.Websites.GetUrls();
+            var urls = Websites.GetUrls();
             foreach (var url in urls)
             {
                 Uri uri = new(url);
@@ -177,7 +177,7 @@ namespace landerist_library.Insert
                 return false;
             }
 
-            if (Websites.Websites.Exists(uri.Host))
+            if (Websites.Exists(uri.Host))
             {
                 return false;
             }
