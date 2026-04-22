@@ -95,11 +95,20 @@ namespace landerist_library.Tasks
                             double totalErrorPercentage = totalProcessed == 0
                                 ? 0
                                 : Math.Round((double)totalErrors * 100 / totalProcessed, 2);
+                            double totalMayBeListingPercentage = totalProcessed == 0
+                                ? 0
+                                : Math.Round((double)totalMayBeListing * 100 / totalProcessed, 2);
+                            double totalListingPercentage = totalProcessed == 0
+                                ? 0
+                                : Math.Round((double)totalListing * 100 / totalProcessed, 2);
+                            double totalNotListingByParserPercentage = totalProcessed == 0
+                                ? 0
+                                : Math.Round((double)totalNotListingByParser * 100 / totalProcessed, 2);
 
                             Log.WriteLocalAI(
                                 "ProcessPages",
-                                $"Errors: {totalErrors}/{totalProcessed} ({totalErrorPercentage}%). " +
-                                $"PageType: MayBeListing={totalMayBeListing}, Listing={totalListing}, NotListingByParser={totalNotListingByParser}");
+                                $"Errors: {totalErrors}/{totalProcessed} ({totalErrorPercentage}%) " +
+                                $"MayBeListing: {totalMayBeListingPercentage}% Listing: {totalListingPercentage}% NotListingByParser:{totalNotListingByParserPercentage}%");
                         }
                     });
             }
