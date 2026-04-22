@@ -102,8 +102,10 @@ namespace landerist_library.Tasks
 
                             Log.WriteLocalAI(
                                 "ProcessPages",
-                                $"Errors: {totalErrors}/{totalProcessed} ({totalErrorPercentage}%) " +
-                                $"Listing: {totalListingPercentage}% NotListing: {totalNotListingByParserPercentage}%");
+                                $"Processed: {totalProcessed} " +
+                                $"Errors: {totalErrorPercentage}% " +
+                                $"Listing: {totalListingPercentage}% " +
+                                $"NotListing: {totalNotListingByParserPercentage}%");
                         }
                     });
             }
