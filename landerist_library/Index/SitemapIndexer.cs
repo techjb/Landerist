@@ -3,11 +3,15 @@ using Louw.SitemapParser;
 
 namespace landerist_library.Index
 {
-    public class SitemapIndexer(Website website) : Indexer(website)
+    public class SitemapIndexer : Indexer
     {
         private static readonly ISitemapFetcher SitemapFetcher = new GzipAwareSitemapFetcher();
         private static readonly ISitemapParser SitemapParser = new SitemapParser();
         private readonly HashSet<string> SitemapsIndexes = new(StringComparer.OrdinalIgnoreCase);
+
+        public SitemapIndexer(Website website) : base(website)
+        {
+        }
 
         public void InsertSitemaps(List<Com.Bekijkhet.RobotsTxt.Sitemap> sitemaps)
         {
@@ -19,7 +23,7 @@ namespace landerist_library.Index
             sitemaps = [.. sitemaps.Take(GetMaxSiteMapsPerWebsite())];
             foreach (var sitemap in sitemaps)
             {
-                if (website.IsDiscardedBySitemapUrlRegex(sitemap.Url))
+                if (Page.Website.IsDiscardedBySitemapUrlRegex(sitemap.Url))
                 {
                     continue;
                 }
@@ -30,7 +34,7 @@ namespace landerist_library.Index
 
         private int GetMaxSiteMapsPerWebsite()
         {
-            if (website.ApplySpecialRules)
+            if (Page.Website.ApplySpecialRules)
             {
                 return 1000;
             }
@@ -81,7 +85,7 @@ namespace landerist_library.Index
                     {
                         break;
                     }
-                    if (website.IsDiscardedBySitemapUrlRegex(sitemapIndex.SitemapLocation))
+                    if (Page.Website.IsDiscardedBySitemapUrlRegex(sitemapIndex.SitemapLocation))
                     {
                         continue;
                     }

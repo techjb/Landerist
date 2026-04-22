@@ -489,7 +489,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 try
                 {
                     SetExecutionStep("Removing cookie banners");
-                    await BrowserPage.EvaluateExpressionAsync(ExpressionRemoveCookies);
+                    await BrowserPage!.EvaluateExpressionAsync(ExpressionRemoveCookies);
                 }
                 catch //(Exception exception)
                 {
@@ -499,7 +499,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 try
                 {
                     SetExecutionStep("Removing invisible elements");
-                    await BrowserPage.EvaluateFunctionAsync(ExpressionRemoveInvisibleElements);
+                    await BrowserPage!.EvaluateFunctionAsync(ExpressionRemoveInvisibleElements);
                 }
                 catch //(Exception exception)
                 {
@@ -509,11 +509,11 @@ namespace landerist_library.Downloaders.Puppeteer
                 if (Config.TAKE_SCREENSHOT)
                 {
                     SetExecutionStep("Taking screenshot");
-                    screenShot = await PuppeteerScreenshot.TakeScreenshot(BrowserPage, Page);
+                    screenShot = await PuppeteerScreenshot.TakeScreenshot(BrowserPage!, Page);
                 }
 
                 SetExecutionStep("Reading page content");
-                content = await BrowserPage.GetContentAsync();
+                content = await BrowserPage!.GetContentAsync();
                 SetExecutionStep("Completed");
                 return (content, screenShot);
             }
