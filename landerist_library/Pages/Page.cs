@@ -406,7 +406,7 @@ namespace landerist_library.Pages
 
         public bool ResponseBodyTextHasNotChanged()
         {
-            return ResponseBodyTextNotChanged && (IsListing() || IsNotListingByParser());
+            return ResponseBodyTextNotChanged && (IsListing() || IsNotListingByParser() || IsNotListingByCache());
         }
 
 
@@ -479,7 +479,7 @@ namespace landerist_library.Pages
             return NotListingsCache.IsNotListing(ResponseBodyTextHash);
         }
 
-        public bool InsertNotListingResponseBodyText()
+        public bool InsertToNotListingCache()
         {
             return (ResponseBodyTextHash != null) && NotListingsCache.Insert(ResponseBodyTextHash);
         }
@@ -789,6 +789,11 @@ namespace landerist_library.Pages
         public bool IsNotListingByParser()
         {
             return PageType == landerist_library.Pages.PageType.NotListingByParser;
+        }
+
+        public bool IsNotListingByCache()
+        {
+            return PageType == landerist_library.Pages.PageType.NotListingByCache;
         }
 
         public bool IsNotCanonical()

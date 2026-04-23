@@ -21,6 +21,7 @@
         MayBeListing,
         Listing,
         NotListingByParser,
+        NotListingByCache
     };
 
     public enum WaitingStatus

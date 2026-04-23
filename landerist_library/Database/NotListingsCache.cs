@@ -7,6 +7,10 @@
 
         public static bool Insert(string responseBodyTextHash)
         {
+            if (string.IsNullOrEmpty(responseBodyTextHash))
+            {
+                return false;
+            }
             string query =
                 "INSERT INTO " + TableName + " " +
                 "VALUES (GETDATE(), @ResponseBodyTextHash)";
@@ -52,7 +56,7 @@
         {
             string query =
                 "DELETE FROM " + TableName + " " +
-                "WHERE [Inserted] < DATEADD(DAY, -90, GETDATE())";
+                "WHERE [Inserted] < DATEADD(DAY, -30, GETDATE())";
             return new DataBase().Query(query);
         }
     }

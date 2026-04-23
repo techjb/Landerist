@@ -18,7 +18,7 @@ namespace landerist_library.Parse.PageTypeParser
             GetPageType()
         {
 
-            var isProduction = Configuration.Config.IsConfigurationProduction();
+            var isProduction = Configuration.Config.IsConfigurationProduction();            
 
             if (Page.HttpStatusCode is null)
             {
@@ -91,7 +91,7 @@ namespace landerist_library.Parse.PageTypeParser
             if (Page.IsNotListingCache() && isProduction)
             {
                 StatisticsSnapshot.InsertDailyCounter(StatisticsKey.NotListingCache);
-                return (PageType.NotListingByParser, null, false);
+                return (PageType.NotListingByCache, null, false);
             }
 
             if (Page.ResponseBodyTextHasNotChanged() && isProduction)

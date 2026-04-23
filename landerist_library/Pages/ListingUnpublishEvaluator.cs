@@ -1,5 +1,3 @@
-using landerist_library.Configuration;
-
 namespace landerist_library.Pages
 {
     public class ListingUnpublishEvaluator
@@ -36,6 +34,7 @@ namespace landerist_library.Pages
         {
             return IsStrongUnpublishEvidence() ||
                 _page.IsNotListingByParser() ||
+                _page.IsNotListingByCache() ||
                 _page.IsNotCanonical() ||
                 _page.IsRedirectToAnotherUrl()               
                 ;

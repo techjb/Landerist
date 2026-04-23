@@ -140,7 +140,7 @@ namespace landerist_library.Scrape
 
             if (_page.IsNotListingByParser())
             {
-                _page.InsertNotListingResponseBodyText();
+                _page.InsertToNotListingCache();
             }
 
             if (_page.HaveToUnpublishListing())

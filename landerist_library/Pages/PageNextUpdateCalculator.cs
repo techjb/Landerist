@@ -66,6 +66,7 @@
                 PageType.MayBeListing => 3d,
                 PageType.Listing => 3d,
                 PageType.NotListingByParser => 21d,
+                PageType.NotListingByCache => 21d,
                 PageType.ResponseBodyIsError => 7d,
                 PageType.ResponseBodyTooShort => 7d,
                 _ => 7d,
