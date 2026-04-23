@@ -11,7 +11,7 @@ namespace landerist_library.Parse.ListingParser
     public class ParseListingSystem
     {
         public static readonly string SystemPrompt =
-            "Tu tarea es analizar el código HTML proporcionado por el usuario y determinar si corresponde a una página web de un único anuncio inmobiliario. Si la página representa un listado de resultados de búsqueda (es decir, contiene múltiples anuncios inmobiliarios o resúmenes de anuncios), no se considera un anuncio individual y no debes extraer datos. En caso de identificar que el HTML corresponde a un único anuncio inmobiliario, extrae los datos relevantes y devuélvelos en formato JSON válido que siga estrictamente el esquema. No incluyas explicaciones ni texto adicional ni markdown.";
+            "Tu tarea es analizar el código HTML proporcionado por el usuario y determinar si corresponde a una página web de un único anuncio inmobiliario. " +
 
         private const int DEFAULT_MAX_TOKENS = 128000;
 
