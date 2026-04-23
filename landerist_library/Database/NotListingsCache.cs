@@ -1,46 +1,58 @@
-﻿namespace landerist_library.Database
+namespace landerist_library.Database
 {
     public class NotListingsCache
     {
         public const string TableName = "NOT_LISTINGS_CACHE";
 
-
-        public static bool Insert(string responseBodyTextHash)
+        public static bool Insert(string host, string responseBodyTextHash)
         {
-            if (string.IsNullOrEmpty(responseBodyTextHash))
+            if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(responseBodyTextHash))
             {
                 return false;
             }
+
             string query =
                 "INSERT INTO " + TableName + " " +
-                "VALUES (GETDATE(), @ResponseBodyTextHash)";
+                "([Inserted], [Host], [ResponseBodyTextHash]) " +
+                "VALUES (GETDATE(), @Host, @ResponseBodyTextHash)";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
+                {"Host", host },
                 {"ResponseBodyTextHash", responseBodyTextHash }
             });
         }
 
-        public static bool IsNotListing(string responseBodyTextHash)
+        public static bool IsNotListing(string host, string responseBodyTextHash)
         {
-            if (string.IsNullOrEmpty(responseBodyTextHash))
+            if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(responseBodyTextHash))
             {
                 return false;
             }
+
             string query =
                 "SELECT 1 " +
                 "FROM " + TableName + " " +
-                "WHERE ResponseBodyTextHash = @ResponseBodyTextHash";
+                "WHERE [Host] = @Host AND " +
+                "[ResponseBodyTextHash] = @ResponseBodyTextHash";
             return new DataBase().QueryExists(query, new Dictionary<string, object?> {
+                {"Host", host },
                 {"ResponseBodyTextHash", responseBodyTextHash }
             });
         }
 
-        public static bool Delete(string responseBodyTextHash)
+        public static bool Delete(string host, string responseBodyTextHash)
         {
+            if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(responseBodyTextHash))
+            {
+                return false;
+            }
+
             string query =
                 "DELETE FROM " + TableName + " " +
-                "WHERE ResponseBodyTextHash = @ResponseBodyTextHash";
+                "WHERE [Host] = @Host AND " +
+                "[ResponseBodyTextHash] = @ResponseBodyTextHash";
             return new DataBase().Query(query, new Dictionary<string, object?> {
+                {"Host", host },
                 {"ResponseBodyTextHash", responseBodyTextHash }
             });
         }

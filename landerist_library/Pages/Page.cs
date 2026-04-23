@@ -476,12 +476,12 @@ namespace landerist_library.Pages
             {
                 return false;
             }
-            return NotListingsCache.IsNotListing(ResponseBodyTextHash);
+            return NotListingsCache.IsNotListing(Host, ResponseBodyTextHash);
         }
 
         public bool InsertToNotListingCache()
         {
-            return (ResponseBodyTextHash != null) && NotListingsCache.Insert(ResponseBodyTextHash);
+            return (ResponseBodyTextHash != null) && NotListingsCache.Insert(Host, ResponseBodyTextHash);
         }
 
         public Listing? GetListing(bool loadMedia, bool loadSources)
