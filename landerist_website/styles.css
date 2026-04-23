@@ -1,4 +1,7 @@
 /* Landerist Design System — Vercel-inspired Light Theme */
+/*
+    https://getdesign.md/design-md/vercel/preview
+*/
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
@@ -324,69 +327,6 @@ tbody tr:hover {
     align-items: end;
 }
 
-.host-stats-page .page-container {
-    max-width: 1200px;
-}
-
-.host-stats-page .nav-inner {
-    max-width: 1200px;
-}
-
-.host-stats-page .page-header {
-    padding: 72px 0 20px;
-}
-
-.host-stats-header {
-    position: relative;
-}
-
-.host-stats-header::before {
-    content: "";
-    position: absolute;
-    inset: -24px auto auto 0;
-    width: 220px;
-    height: 220px;
-    background: radial-gradient(circle, rgba(10, 114, 239, 0.08) 0%, rgba(10, 114, 239, 0) 72%);
-    pointer-events: none;
-}
-
-.host-stats-kicker {
-    display: inline-flex;
-    align-items: center;
-    min-height: 24px;
-    padding: 0 10px;
-    border-radius: 9999px;
-    background: #ebf5ff;
-    color: #0068d6;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-    box-shadow: var(--shadow-ring);
-}
-
-.host-stats-page .page-header h1 {
-    max-width: 720px;
-    margin-top: 20px;
-}
-
-.host-stats-page .page-header p {
-    max-width: 760px;
-    font-size: 18px;
-    line-height: 1.56;
-}
-
-.host-stats-page .section {
-    padding: 56px 0;
-}
-
-.host-stats-page .section + .section {
-    border-top: 1px solid var(--color-text);
-}
-
-.host-overview-card {
-    padding: 24px;
-}
 
 .select-group {
     flex: 0 1 360px;
