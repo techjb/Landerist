@@ -11,7 +11,7 @@ namespace landerist_library.Parse.ListingParser.LocalAI
     public class LocalAIRequest
     {
         private const string SERVER_PORT = "8000";
-        private const float TEMPERATURE = 0.0f;
+        private const float TEMPERATURE = 0.0f; // 0.02f?
         public const int MAX_CONTEXT_WINDOW = 65536;
 
         private static readonly HttpClient HttpClient = new()
