@@ -398,3 +398,24 @@ BEGIN
 	ADD [TransientErrorCounter] [smallint] NULL
 END
 GO
+IF OBJECT_ID('dbo.HOST_STATISTICS_SNAPSHOT', 'U') IS NULL
+BEGIN
+	CREATE TABLE [dbo].[HOST_STATISTICS_SNAPSHOT](
+		[Date] [datetime] NOT NULL,
+		[Host] [nvarchar](200) NOT NULL,
+		[Key] [nvarchar](200) NOT NULL,
+		[Counter] [int] NOT NULL
+	) ON [PRIMARY]
+END
+GO
+IF NOT EXISTS (
+	SELECT 1
+	FROM sys.indexes
+	WHERE [name] = 'IX_HOST_STATISTICS_SNAPSHOT_Host_Key_Date'
+	AND [object_id] = OBJECT_ID('dbo.HOST_STATISTICS_SNAPSHOT')
+)
+BEGIN
+	CREATE NONCLUSTERED INDEX [IX_HOST_STATISTICS_SNAPSHOT_Host_Key_Date]
+	ON [dbo].[HOST_STATISTICS_SNAPSHOT] ([Host] ASC, [Key] ASC, [Date] DESC)
+END
+GO

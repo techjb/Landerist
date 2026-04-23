@@ -44,8 +44,7 @@ namespace landerist_library.Landerist_com
             string updatedAtText = DateTime.Now.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
             StringBuilder rows = new();
 
-            foreach (var website in Websites.Websites.GetAll()
-                .Where(website => website.ApplySpecialRules)
+            foreach (var website in Websites.Websites.GetApplySpecialRules()
                 .OrderBy(website => website.Host, StringComparer.OrdinalIgnoreCase))
             {
                 int pagesCount = website.GetNumPages();

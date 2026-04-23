@@ -1,0 +1,206 @@
+using landerist_library.Configuration;
+using landerist_library.Export;
+using landerist_library.Logs;
+using landerist_library.Statistics;
+using System.Data;
+using System.Globalization;
+using System.Net;
+using System.Text.Json;
+
+namespace landerist_library.Landerist_com
+{
+    public class HostStatisticsPage : Landerist_com
+    {
+        private static readonly string HostStatisticsTemplateHtmlFile =
+            Path.Combine(Config.LANDERIST_COM_TEMPLATES!, "host_statistics_template.html");
+
+        private static readonly string HostStatisticsHtmlFile =
+            Path.Combine(Config.LANDERIST_COM_OUTPUT!, "host_statistics.html");
+
+        private static readonly JsonSerializerOptions JsonSerializerOptions = new()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+
+        public static void Update()
+        {
+            try
+            {
+                var template = File.ReadAllText(HostStatisticsTemplateHtmlFile);
+                var websites = Websites.Websites.GetApplySpecialRules()
+                    .OrderBy(website => website.Host, StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+
+                template = template.Replace("/*UPDATED_AT*/", DateTime.Now.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture));
+                template = template.Replace("/*HOST_OPTIONS*/", GetHostOptions(websites));
+                template = template.Replace("/*HOST_STATISTICS_DATA*/", JsonSerializer.Serialize(GetHostStatistics(websites), JsonSerializerOptions));
+
+                File.WriteAllText(HostStatisticsHtmlFile, template);
+
+                if (new S3().UploadToWebsiteBucket(HostStatisticsHtmlFile, "index.html", "host-statistics"))
+                {
+                    Log.WriteInfo("HostStatisticsPage", "Updated host statistics page");
+                }
+            }
+            catch (Exception exception)
+            {
+                Log.WriteError("HostStatisticsPage Update", exception);
+            }
+        }
+
+        private static string GetHostOptions(IEnumerable<Websites.Website> websites)
+        {
+            return string.Join(
+                Environment.NewLine,
+                websites.Select(website =>
+                    $"                        <option value=\"{WebUtility.HtmlEncode(website.Host)}\">{WebUtility.HtmlEncode(website.Host)}</option>"));
+        }
+
+        private static Dictionary<string, HostStatisticsModel> GetHostStatistics(IEnumerable<Websites.Website> websites)
+        {
+            Dictionary<string, HostStatisticsModel> dictionary = new(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var website in websites)
+            {
+                dictionary[website.Host] = GetHostStatistics(website);
+            }
+
+            return dictionary;
+        }
+
+        private static HostStatisticsModel GetHostStatistics(Websites.Website website)
+        {
+            return new HostStatisticsModel
+            {
+                MainUri = website.MainUri.AbsoluteUri,
+                UpdatedAt = HostStatisticsSnapshot.GetLatestDate(website.Host)?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+                Charts = new HostStatisticsCharts
+                {
+                    Pages = GetTimeSeries(website.Host, HostStatisticsKey.Pages, "Pages"),
+                    Listings = GetTimeSeries(website.Host, HostStatisticsKey.Listings, "Listings"),
+                    ListingStatus = GetListingStatusSeries(website.Host),
+                    PageType = GetHistoricalDistribution(website.Host, HostStatisticsKey.PageType),
+                    HttpStatusCode = GetHistoricalDistribution(website.Host, HostStatisticsKey.HttpStatusCode),
+                }
+            };
+        }
+
+        private static List<ChartSeriesModel> GetListingStatusSeries(string host)
+        {
+            return
+            [
+                .. GetTimeSeries(host, HostStatisticsKey.PublishedListings, "Published"),
+                .. GetTimeSeries(host, HostStatisticsKey.UnpublishedListings, "Unpublished")
+            ];
+        }
+
+        private static List<ChartSeriesModel> GetTimeSeries(string host, HostStatisticsKey key, string label)
+        {
+            var dataTable = HostStatisticsSnapshot.GetLatestStatistics(host, key.ToString(), 15);
+            List<ChartPointModel> values = [];
+
+            foreach (DataRow dataRow in dataTable.Rows.Cast<DataRow>().Reverse())
+            {
+                values.Add(new ChartPointModel
+                {
+                    Key = ((DateTime)dataRow["Date"]).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+                    Value = Convert.ToInt32(dataRow["Counter"])
+                });
+            }
+
+            return values.Count == 0
+                ? []
+                : [new ChartSeriesModel { Label = label, Values = values }];
+        }
+
+        private static List<ChartSeriesModel> GetLatestDistribution(string host, HostStatisticsKey keyPrefix, string label)
+        {
+            var dataTable = HostStatisticsSnapshot.GetLatestStatisticsByPrefix(host, keyPrefix.ToString());
+            List<ChartPointModel> values = [];
+
+            foreach (DataRow dataRow in dataTable.Rows)
+            {
+                values.Add(new ChartPointModel
+                {
+                    Key = RemovePrefix((string)dataRow["Key"], keyPrefix),
+                    Value = Convert.ToInt32(dataRow["Counter"])
+                });
+            }
+
+            return values.Count == 0
+                ? []
+                : [new ChartSeriesModel { Label = label, Values = values }];
+        }
+
+        private static List<ChartSeriesModel> GetHistoricalDistribution(string host, HostStatisticsKey keyPrefix)
+        {
+            List<ChartSeriesModel> series = [];
+
+            foreach (var key in HostStatisticsSnapshot.GetKeysLike(host, keyPrefix))
+            {
+                var values = GetTimeSeries(host, key, RemovePrefix(key, keyPrefix));
+                if (values.Count > 0)
+                {
+                    series.AddRange(values);
+                }
+            }
+
+            return series;
+        }
+
+        private static List<ChartSeriesModel> GetTimeSeries(string host, string key, string label)
+        {
+            var dataTable = HostStatisticsSnapshot.GetLatestStatistics(host, key, 15);
+            List<ChartPointModel> values = [];
+
+            foreach (DataRow dataRow in dataTable.Rows.Cast<DataRow>().Reverse())
+            {
+                values.Add(new ChartPointModel
+                {
+                    Key = ((DateTime)dataRow["Date"]).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+                    Value = Convert.ToInt32(dataRow["Counter"])
+                });
+            }
+
+            return values.Count == 0
+                ? []
+                : [new ChartSeriesModel { Label = label, Values = values }];
+        }
+
+        private static string RemovePrefix(string key, HostStatisticsKey keyPrefix)
+        {
+            string prefix = keyPrefix + "_";
+            return key.StartsWith(prefix, StringComparison.Ordinal)
+                ? key[prefix.Length..]
+                : key;
+        }
+
+        private sealed class HostStatisticsModel
+        {
+            public required string MainUri { get; init; }
+            public string? UpdatedAt { get; init; }
+            public required HostStatisticsCharts Charts { get; init; }
+        }
+
+        private sealed class HostStatisticsCharts
+        {
+            public required List<ChartSeriesModel> Pages { get; init; }
+            public required List<ChartSeriesModel> Listings { get; init; }
+            public required List<ChartSeriesModel> ListingStatus { get; init; }
+            public required List<ChartSeriesModel> PageType { get; init; }
+            public required List<ChartSeriesModel> HttpStatusCode { get; init; }
+        }
+
+        private sealed class ChartSeriesModel
+        {
+            public required string Label { get; init; }
+            public required List<ChartPointModel> Values { get; init; }
+        }
+
+        private sealed class ChartPointModel
+        {
+            public required string Key { get; init; }
+            public required int Value { get; init; }
+        }
+    }
+}

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Landerist Host Statistics" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@techjb" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles.css" />
+    <title>Host Statistics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="host-stats-page">
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo">Landerist</a>
+            <ul class="nav-links">
+                <!--<li><a href="/downloads">Downloads</a></li>-->
+                <li><a href="/statistics">Statistics</a></li>
+                <!--<li><a href="/host-statistics">Host Statistics</a></li>-->
+                <li><a href="https://github.com/techjb/Landerist">GitHub</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="page-container">
+        <div class="page-header host-stats-header">
+            <h1>Host Statistics</h1>
+            <p>
+                Historical daily snapshots for hosts.
+            </p>
+            <p>
+                <select id="HostSelect" class="select-input">
+                    /*HOST_OPTIONS*/
+                </select>
+            </p>            
+        </div>
+
+        <div class="section">
+            <div id="Statistics" class="chart-grid"></div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; Landerist</p>
+        </div>
+    </div>
+
+    <script>const palette = [
+            "rgb(75, 192, 192)",
+            "rgb(255, 99, 132)",
+            "rgb(54, 162, 235)",
+            "rgb(255, 205, 86)",
+            "rgb(153, 102, 255)",
+            "rgb(201, 203, 207)"
+        ];
+
+        const hostStatisticsData = /*HOST_STATISTICS_DATA*/;
+        const chartInstances = [];
+
+        function GetObjectProperty(obj, camelName, pascalName) {
+            if (!obj) {
+                return undefined;
+            }
+
+            if (Object.prototype.hasOwnProperty.call(obj, camelName)) {
+                return obj[camelName];
+            }
+
+            if (Object.prototype.hasOwnProperty.call(obj, pascalName)) {
+                return obj[pascalName];
+            }
+
+            return undefined;
+        }
+
+        function NormalizePoint(point) {
+            return {
+                key: GetObjectProperty(point, 'key', 'Key'),
+                value: GetObjectProperty(point, 'value', 'Value')
+            };
+        }
+
+        function NormalizeSeries(series) {
+            const rawValues = GetObjectProperty(series, 'values', 'Values') || [];
+            return {
+                label: GetObjectProperty(series, 'label', 'Label'),
+                values: rawValues.map(NormalizePoint)
+            };
+        }
+
+        function NormalizeCharts(charts) {
+            return {
+                pages: (GetObjectProperty(charts, 'pages', 'Pages') || []).map(NormalizeSeries),
+                listings: (GetObjectProperty(charts, 'listings', 'Listings') || []).map(NormalizeSeries),
+                listingStatus: (GetObjectProperty(charts, 'listingStatus', 'ListingStatus') || []).map(NormalizeSeries),
+                pageType: (GetObjectProperty(charts, 'pageType', 'PageType') || []).map(NormalizeSeries),
+                httpStatusCode: (GetObjectProperty(charts, 'httpStatusCode', 'HttpStatusCode') || []).map(NormalizeSeries)
+            };
+        }
+
+        function NormalizeHostData(hostData) {
+            return {
+                mainUri: GetObjectProperty(hostData, 'mainUri', 'MainUri'),
+                updatedAt: GetObjectProperty(hostData, 'updatedAt', 'UpdatedAt'),
+                charts: NormalizeCharts(GetObjectProperty(hostData, 'charts', 'Charts') || {})
+            };
+        }
+
+        function GetPlugins(title) {
+            return {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: title,
+                    font: {
+                        size: 16,
+                    },
+                    color: '#4d4d4d'
+                }
+            };
+        }
+
+        function GetScales(stacked) {
+            return {
+                x: {
+                    stacked: stacked,
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#666666',
+                        font: { size: 12 }
+                    }
+                },
+                y: {
+                    stacked: stacked,
+                    beginAtZero: true,
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#666666',
+                        font: { size: 12 }
+                    }
+                }
+            };
+        }
+
+        function GetOptions(title, stacked) {
+            return {
+                responsive: true,
+                plugins: GetPlugins(title),
+                scales: GetScales(stacked)
+            };
+        }
+
+        function AreaChart(title, values) {
+            const data = {
+                labels: values[0].values.map(row => row.key),
+                datasets: values.map((serie, idx) => {
+                    return {
+                        label: serie.label,
+                        data: serie.values.map(row => row.value),
+                        fill: true,
+                        borderColor: palette[idx % palette.length],
+                        backgroundColor: palette[idx % palette.length],
+                        tension: 0.1,
+                        stack: 'stack1'
+                    };
+                })
+            };
+
+            CreateChart('line', data, GetOptions(title, true));
+        }
+
+        function BarChart(title, values) {
+            const data = {
+                labels: values[0].values.map(row => row.key),
+                datasets: values.map((serie, idx) => {
+                    return {
+                        label: serie.label,
+                        data: serie.values.map(row => row.value),
+                        borderColor: palette[idx % palette.length],
+                        backgroundColor: palette[idx % palette.length]
+                    };
+                })
+            };
+
+            CreateChart('bar', data, GetOptions(title, false));
+        }
+
+        function CreateChart(type, data, options) {
+            const canvas = document.createElement('canvas');
+            document.getElementById("Statistics").appendChild(canvas);
+
+            chartInstances.push(new Chart(canvas, {
+                type: type,
+                data: data,
+                options: options,
+            }));
+        }
+
+        function DestroyCharts() {
+            while (chartInstances.length > 0) {
+                chartInstances.pop().destroy();
+            }
+        }
+
+        function HasSeries(values) {
+            return Array.isArray(values) && values.length > 0 && values[0].values.length > 0;
+        }
+
+        function GetLatestValue(values) {
+            if (!HasSeries(values)) {
+                return 0;
+            }
+
+            const points = values[0].values;
+            return points[points.length - 1].value;
+        }
+
+        function FormatNumber(value) {
+            return Number(value || 0).toLocaleString('en-US');
+        }
+
+        function RenderEmptyState(message) {
+            const container = document.getElementById('Statistics');
+            container.innerHTML = `<div class="empty-state">${message}</div>`;
+        }
+
+        function RenderHost(host) {
+            const rawHostData = hostStatisticsData[host];
+            const container = document.getElementById('Statistics');
+
+            DestroyCharts();
+            container.innerHTML = '';
+
+            if (!rawHostData) {
+                RenderEmptyState('No statistics available for this host yet.');
+                return;
+            }
+
+            const hostData = NormalizeHostData(rawHostData);
+
+            const chartDefinitions = [
+                { title: 'Pages', values: hostData.charts.pages, type: AreaChart },
+                { title: 'Listings', values: hostData.charts.listings, type: AreaChart },
+                { title: 'Published vs Unpublished Listings', values: hostData.charts.listingStatus, type: AreaChart },
+                { title: 'Pages by PageType', values: hostData.charts.pageType, type: BarChart },
+                { title: 'Pages by HttpStatusCode', values: hostData.charts.httpStatusCode, type: BarChart }
+            ];
+
+            let renderedCharts = 0;
+
+            chartDefinitions.forEach(chart => {
+                if (!HasSeries(chart.values)) {
+                    return;
+                }
+
+                chart.type(chart.title, chart.values);
+                renderedCharts++;
+            });
+
+            if (renderedCharts === 0) {
+                RenderEmptyState('No statistics available for this host yet.');
+            }
+        }
+
+        function GetInitialHost() {
+            const hosts = Object.keys(hostStatisticsData);
+            if (hosts.length === 0) {
+                return '';
+            }
+
+            const hash = decodeURIComponent(window.location.hash.replace(/^#/, ''));
+            return hostStatisticsData[hash] ? hash : hosts[0];
+        }
+
+        const hostSelect = document.getElementById('HostSelect');
+        const initialHost = GetInitialHost();
+
+        if (initialHost) {
+            hostSelect.value = initialHost;
+            RenderHost(initialHost);
+            window.location.hash = encodeURIComponent(initialHost);
+        } else {
+            RenderEmptyState('No hosts with special rules are available.');
+        }
+
+        hostSelect.addEventListener('change', event => {
+            const host = event.target.value;
+            RenderHost(host);
+            window.location.hash = encodeURIComponent(host);
+        });</script>
+</body>
+</html>

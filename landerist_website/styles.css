@@ -317,6 +317,270 @@ tbody tr:hover {
     background: var(--color-gray-50);
 }
 
+.controls-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: end;
+}
+
+.host-stats-page .page-container {
+    max-width: 1200px;
+}
+
+.host-stats-page .nav-inner {
+    max-width: 1200px;
+}
+
+.host-stats-page .page-header {
+    padding: 72px 0 20px;
+}
+
+.host-stats-header {
+    position: relative;
+}
+
+.host-stats-header::before {
+    content: "";
+    position: absolute;
+    inset: -24px auto auto 0;
+    width: 220px;
+    height: 220px;
+    background: radial-gradient(circle, rgba(10, 114, 239, 0.08) 0%, rgba(10, 114, 239, 0) 72%);
+    pointer-events: none;
+}
+
+.host-stats-kicker {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 0 10px;
+    border-radius: 9999px;
+    background: #ebf5ff;
+    color: #0068d6;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    box-shadow: var(--shadow-ring);
+}
+
+.host-stats-page .page-header h1 {
+    max-width: 720px;
+    margin-top: 20px;
+}
+
+.host-stats-page .page-header p {
+    max-width: 760px;
+    font-size: 18px;
+    line-height: 1.56;
+}
+
+.host-stats-page .section {
+    padding: 56px 0;
+}
+
+.host-stats-page .section + .section {
+    border-top: 1px solid var(--color-text);
+}
+
+.host-overview-card {
+    padding: 24px;
+}
+
+.select-group {
+    flex: 0 1 360px;
+}
+
+.form-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.select-shell {
+    position: relative;
+    width: 100%;
+    max-width: 360px;
+}
+
+.select-input {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 100%;
+    min-height: 40px;
+    padding: 10px 40px 10px 14px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.43;
+    letter-spacing: normal;
+    box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.08), inset 0px 0px 0px 1px #fafafa;
+    transition: box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.select-input:focus {
+    outline: 2px solid hsla(212, 100%, 48%, 1);
+    outline-offset: 1px;
+}
+
+.select-input:hover {
+    background: var(--color-gray-50);
+}
+
+.select-chevron {
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    width: 10px;
+    height: 10px;
+    pointer-events: none;
+    transform: translateY(-50%);
+}
+
+.select-chevron::before,
+.select-chevron::after {
+    content: "";
+    position: absolute;
+    top: 4px;
+    width: 6px;
+    height: 1.5px;
+    background: var(--color-text-muted);
+    border-radius: 9999px;
+}
+
+.select-chevron::before {
+    left: 0;
+    transform: rotate(45deg);
+}
+
+.select-chevron::after {
+    right: 0;
+    transform: rotate(-45deg);
+}
+
+.host-meta {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    flex: 1 1 520px;
+}
+
+.meta-text {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+}
+
+.host-meta-block {
+    min-height: 76px;
+    padding: 16px;
+    border-radius: var(--radius-md);
+    background: var(--color-bg);
+    box-shadow: var(--shadow-card);
+}
+
+.host-meta-label {
+    margin-bottom: 8px;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.host-uri-text {
+    word-break: break-all;
+}
+
+.host-uri-text a {
+    font-family: var(--font-mono);
+    font-size: 13px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.stat-card {
+    min-height: 152px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.stat-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    font-size: 48px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -2.4px;
+    color: var(--color-text);
+}
+
+.chart-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.empty-state {
+    padding: 24px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-ring);
+    color: var(--color-text-secondary);
+    background: var(--color-gray-50);
+}
+
+.chart-card {
+    min-height: 320px;
+    padding: 20px;
+}
+
+.host-section-heading {
+    max-width: 760px;
+    margin-bottom: 24px;
+}
+
+.host-section-kicker {
+    margin-bottom: 10px;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.host-section-copy {
+    color: var(--color-text-secondary);
+    font-size: 16px;
+    line-height: 1.56;
+}
+
+.host-stats-page .section-title {
+    margin-bottom: 12px;
+}
+
 /* Team */
 .team-member {
     display: flex;
@@ -350,6 +614,12 @@ tbody tr:hover {
     display: flex;
     flex-direction: column;
     gap: 32px;
+}
+
+.host-stats-page #Statistics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
 }
 
 #Statistics canvas {
@@ -387,11 +657,54 @@ tbody tr:hover {
         letter-spacing: -0.8px;
     }
 
+    .host-stats-page .page-header {
+        padding: 48px 0 8px;
+    }
+
+    .host-stats-page .page-header h1 {
+        font-size: 40px;
+        letter-spacing: -2.4px;
+    }
+
     .nav-links {
         gap: 16px;
     }
 
     thead th, tbody td {
         padding: 8px 12px;
+    }
+
+    .host-meta,
+    .stats-grid,
+    .chart-grid,
+    .host-stats-page #Statistics {
+        grid-template-columns: 1fr;
+    }
+
+    .host-meta-block,
+    .chart-card,
+    .host-overview-card {
+        padding: 18px;
+    }
+
+    .stat-value {
+        font-size: 40px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .host-stats-page .page-container,
+    .host-stats-page .nav-inner {
+        max-width: 860px;
+    }
+
+    .host-meta {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .stats-grid,
+    .chart-grid,
+    .host-stats-page #Statistics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
