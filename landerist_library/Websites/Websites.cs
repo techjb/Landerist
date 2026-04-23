@@ -442,14 +442,18 @@ namespace landerist_library.Websites
         private static HashSet<Website> GetNeedToUpdateRobotsTxt()
         {
             DateTime robotsTxtUpdated = DateTime.Now.AddDays(-Config.DAYS_TO_UPDATE_ROBOTS_TXT);
+            DateTime robotsTxtUpdatedSpecialRules = DateTime.Now.AddDays(-1);
 
             string query =
                 "SELECT * " +
                 "FROM " + WEBSITES + " " +
-                "WHERE [RobotsTxtUpdated] < @RobotsTxtUpdated OR [RobotsTxtUpdated] IS NULL";
+                "WHERE [RobotsTxtUpdated] IS NULL " +
+                "OR ([ApplySpecialRules] = 1 AND [RobotsTxtUpdated] < @RobotsTxtUpdatedSpecialRules) " +
+                "OR (([ApplySpecialRules] = 0 OR [ApplySpecialRules] IS NULL) AND [RobotsTxtUpdated] < @RobotsTxtUpdated)";
 
             var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"RobotsTxtUpdated", robotsTxtUpdated },
+                {"RobotsTxtUpdatedSpecialRules", robotsTxtUpdatedSpecialRules },
             });
 
             return GetWebsites(dataTable);
