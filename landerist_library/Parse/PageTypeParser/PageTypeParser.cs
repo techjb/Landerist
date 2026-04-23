@@ -18,8 +18,8 @@ namespace landerist_library.Parse.PageTypeParser
             GetPageType()
         {
 
-            //var isProduction = Configuration.Config.IsConfigurationProduction();            
-            var isProduction = true;
+            var isProduction = Configuration.Config.IsConfigurationProduction();            
+            //var isProduction = true;
 
             if (Page.HttpStatusCode is null)
             {
