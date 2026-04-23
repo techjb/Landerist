@@ -7,6 +7,8 @@ namespace landerist_library.Statistics
     public enum HostStatisticsKey
     {
         Pages,
+        Inserted,
+        Updated,
         Listings,
         PublishedListings,
         UnpublishedListings,
@@ -38,6 +40,8 @@ namespace landerist_library.Statistics
             ArgumentException.ThrowIfNullOrWhiteSpace(host);
 
             Pages(host);
+            Inserted(host);
+            Updated(host);
             Listings(host);
             PublishedListings(host);
             UnpublishedListings(host);
@@ -53,6 +57,28 @@ namespace landerist_library.Statistics
                 "WHERE [Host] = @Host";
 
             InsertDaily(host, HostStatisticsKey.Pages, query);
+        }
+
+        private static void Inserted(string host)
+        {
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + landerist_library.Pages.Pages.PAGES + " " +
+                "WHERE [Host] = @Host " +
+                "AND CONVERT(date, [Inserted]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
+
+            InsertDaily(host, HostStatisticsKey.Inserted, query);
+        }
+
+        private static void Updated(string host)
+        {
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + landerist_library.Pages.Pages.PAGES + " " +
+                "WHERE [Host] = @Host " +
+                "AND CONVERT(date, [Updated]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
+
+            InsertDaily(host, HostStatisticsKey.Updated, query);
         }
 
         private static void Listings(string host)

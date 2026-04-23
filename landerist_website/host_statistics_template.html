@@ -46,7 +46,8 @@
         </div>
     </div>
 
-    <script>const palette = [
+    <script>
+const palette = [
             "rgb(75, 192, 192)",
             "rgb(255, 99, 132)",
             "rgb(54, 162, 235)",
@@ -92,6 +93,8 @@
         function NormalizeCharts(charts) {
             return {
                 pages: (GetObjectProperty(charts, 'pages', 'Pages') || []).map(NormalizeSeries),
+                inserted: (GetObjectProperty(charts, 'inserted', 'Inserted') || []).map(NormalizeSeries),
+                updated: (GetObjectProperty(charts, 'updated', 'Updated') || []).map(NormalizeSeries),
                 listings: (GetObjectProperty(charts, 'listings', 'Listings') || []).map(NormalizeSeries),
                 listingStatus: (GetObjectProperty(charts, 'listingStatus', 'ListingStatus') || []).map(NormalizeSeries),
                 pageType: (GetObjectProperty(charts, 'pageType', 'PageType') || []).map(NormalizeSeries),
@@ -247,6 +250,8 @@
 
             const chartDefinitions = [
                 { title: 'Pages', values: hostData.charts.pages, type: AreaChart },
+                { title: 'Inserted Pages', values: hostData.charts.inserted, type: AreaChart },
+                { title: 'Updated Pages', values: hostData.charts.updated, type: AreaChart },
                 { title: 'Listings', values: hostData.charts.listings, type: AreaChart },
                 { title: 'Published vs Unpublished Listings', values: hostData.charts.listingStatus, type: AreaChart },
                 { title: 'Pages by PageType', values: hostData.charts.pageType, type: BarChart },

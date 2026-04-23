@@ -77,6 +77,8 @@ namespace landerist_library.Landerist_com
                 Charts = new HostStatisticsCharts
                 {
                     Pages = GetTimeSeries(website.Host, HostStatisticsKey.Pages, "Pages"),
+                    Inserted = GetTimeSeries(website.Host, HostStatisticsKey.Inserted, "Inserted Pages"),
+                    Updated = GetTimeSeries(website.Host, HostStatisticsKey.Updated, "Updated Pages"),
                     Listings = GetTimeSeries(website.Host, HostStatisticsKey.Listings, "Listings"),
                     ListingStatus = GetListingStatusSeries(website.Host),
                     PageType = GetHistoricalDistribution(website.Host, HostStatisticsKey.PageType),
@@ -185,6 +187,8 @@ namespace landerist_library.Landerist_com
         private sealed class HostStatisticsCharts
         {
             public required List<ChartSeriesModel> Pages { get; init; }
+            public required List<ChartSeriesModel> Inserted { get; init; }
+            public required List<ChartSeriesModel> Updated { get; init; }
             public required List<ChartSeriesModel> Listings { get; init; }
             public required List<ChartSeriesModel> ListingStatus { get; init; }
             public required List<ChartSeriesModel> PageType { get; init; }
