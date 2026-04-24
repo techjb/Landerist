@@ -14,6 +14,9 @@ namespace landerist_library.Statistics
         UnpublishedListings,
         HttpStatusCode,
         PageType,
+        NotListingCache,
+        ResponseBodyTextAlreadyParsed,
+        ReponseBodyTextIsAnotherListingInHost,
     }
 
     public static class HostStatistics
@@ -211,6 +214,59 @@ namespace landerist_library.Statistics
             return new DataBase().Query(query, new Dictionary<string, object?>
             {
                 { "Date", date },
+                { "Host", host },
+                { "Key", key },
+                { "Counter", counter }
+            });
+        }
+
+        public static bool InsertDailyCounter(string host, HostStatisticsKey key)
+        {
+            return InsertDailyCounter(host, key.ToString());
+        }
+
+        public static bool InsertDailyCounter(string host, string key)
+        {
+            return InsertDailyCounter(host, key, 1);
+        }
+
+        public static bool InsertDailyCounter(string host, HostStatisticsKey key, int counter)
+        {
+            return InsertDailyCounter(host, key.ToString(), counter);
+        }
+
+        public static bool InsertDailyCounter(string host, string key, int counter)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(host);
+            ArgumentException.ThrowIfNullOrWhiteSpace(key);
+
+            if (Configuration.Config.IsConfigurationLocal())
+            {
+                return true;
+            }
+
+            string query =
+                "MERGE " + HOST_STATISTICS + " AS target " +
+                "USING (" +
+                "   SELECT " +
+                "       CAST(@Date AS DATE) AS DateOnly, " +
+                "       @Host AS [Host], " +
+                "       @Key AS [Key], " +
+                "       @Counter AS [Counter] " +
+                "   ) AS source " +
+                "ON " +
+                "   CAST(target.[Date] AS DATE) = source.DateOnly " +
+                "   AND target.[Host] = source.[Host] " +
+                "   AND target.[Key] = source.[Key] " +
+                "WHEN MATCHED THEN " +
+                "   UPDATE SET target.[Counter] = target.[Counter] + source.[Counter] " +
+                "WHEN NOT MATCHED THEN " +
+                "   INSERT ([Date], [Host], [Key], [Counter]) " +
+                "   VALUES (source.DateOnly, source.[Host], source.[Key], source.[Counter]);";
+
+            return new DataBase().Query(query, new Dictionary<string, object?>
+            {
+                { "Date", DateTime.Now },
                 { "Host", host },
                 { "Key", key },
                 { "Counter", counter }

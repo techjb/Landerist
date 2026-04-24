@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -97,6 +97,9 @@ const palette = [
                 updated: (GetObjectProperty(charts, 'updated', 'Updated') || []).map(NormalizeSeries),
                 listings: (GetObjectProperty(charts, 'listings', 'Listings') || []).map(NormalizeSeries),
                 listingStatus: (GetObjectProperty(charts, 'listingStatus', 'ListingStatus') || []).map(NormalizeSeries),
+                notListingCache: (GetObjectProperty(charts, 'notListingCache', 'NotListingCache') || []).map(NormalizeSeries),
+                responseBodyTextAlreadyParsed: (GetObjectProperty(charts, 'responseBodyTextAlreadyParsed', 'ResponseBodyTextAlreadyParsed') || []).map(NormalizeSeries),
+                reponseBodyTextIsAnotherListingInHost: (GetObjectProperty(charts, 'reponseBodyTextIsAnotherListingInHost', 'ReponseBodyTextIsAnotherListingInHost') || []).map(NormalizeSeries),
                 pageType: (GetObjectProperty(charts, 'pageType', 'PageType') || []).map(NormalizeSeries),
                 httpStatusCode: (GetObjectProperty(charts, 'httpStatusCode', 'HttpStatusCode') || []).map(NormalizeSeries)
             };
@@ -259,6 +262,9 @@ const palette = [
                 { title: 'Updated Pages', values: hostData.charts.updated, type: AreaChart },
                 { title: 'Listings', values: hostData.charts.listings, type: AreaChart },
                 { title: 'Published vs Unpublished Listings', values: hostData.charts.listingStatus, type: AreaChart },
+                { title: 'Not Listing By Cache', values: hostData.charts.notListingCache, type: AreaChart },
+                { title: 'ResponseBodyText Already Parsed', values: hostData.charts.responseBodyTextAlreadyParsed, type: AreaChart },
+                { title: 'ResponseBodyText Is Another Listing In Host', values: hostData.charts.reponseBodyTextIsAnotherListingInHost, type: AreaChart },
                 { title: 'Pages by PageType', values: hostData.charts.pageType, type: StackedBarChart },
                 { title: 'Pages by HttpStatusCode', values: hostData.charts.httpStatusCode, type: StackedBarChart }
             ];
@@ -307,3 +313,4 @@ const palette = [
         });</script>
 </body>
 </html>
+

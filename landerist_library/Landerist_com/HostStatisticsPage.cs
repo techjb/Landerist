@@ -81,6 +81,9 @@ namespace landerist_library.Landerist_com
                     Updated = GetTimeSeries(website.Host, HostStatisticsKey.Updated, "Updated Pages"),
                     Listings = GetTimeSeries(website.Host, HostStatisticsKey.Listings, "Listings"),
                     ListingStatus = GetListingStatusSeries(website.Host),
+                    NotListingCache = GetTimeSeries(website.Host, HostStatisticsKey.NotListingCache, "Not listing by cache"),
+                    ResponseBodyTextAlreadyParsed = GetTimeSeries(website.Host, HostStatisticsKey.ResponseBodyTextAlreadyParsed, "ResponseBodyText already parsed"),
+                    ReponseBodyTextIsAnotherListingInHost = GetTimeSeries(website.Host, HostStatisticsKey.ReponseBodyTextIsAnotherListingInHost, "ResponseBodyText is another listing in host"),
                     PageType = GetHistoricalDistribution(website.Host, HostStatisticsKey.PageType),
                     HttpStatusCode = GetHistoricalDistribution(website.Host, HostStatisticsKey.HttpStatusCode),
                 }
@@ -191,6 +194,9 @@ namespace landerist_library.Landerist_com
             public required List<ChartSeriesModel> Updated { get; init; }
             public required List<ChartSeriesModel> Listings { get; init; }
             public required List<ChartSeriesModel> ListingStatus { get; init; }
+            public required List<ChartSeriesModel> NotListingCache { get; init; }
+            public required List<ChartSeriesModel> ResponseBodyTextAlreadyParsed { get; init; }
+            public required List<ChartSeriesModel> ReponseBodyTextIsAnotherListingInHost { get; init; }
             public required List<ChartSeriesModel> PageType { get; init; }
             public required List<ChartSeriesModel> HttpStatusCode { get; init; }
         }

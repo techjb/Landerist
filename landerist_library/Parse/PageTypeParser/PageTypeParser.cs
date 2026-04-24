@@ -92,18 +92,21 @@ namespace landerist_library.Parse.PageTypeParser
             if (Page.IsNotListingCache() && isProduction)
             {
                 GlobalStatistics.InsertDailyCounter(StatisticsKey.NotListingCache);
+                HostStatistics.InsertDailyCounter(Page.Host, HostStatisticsKey.NotListingCache);
                 return (PageType.NotListingByCache, null, false);
             }
 
             if (Page.ResponseBodyTextHasNotChanged() && isProduction)
             {
                 GlobalStatistics.InsertDailyCounter(StatisticsKey.ResponseBodyTextAlreadyParsed);
+                HostStatistics.InsertDailyCounter(Page.Host, HostStatisticsKey.ResponseBodyTextAlreadyParsed);
                 return (Page.PageType, null, false);
             }
 
             if (Page.ReponseBodyTextIsAnotherListingInHost())
             {
                 GlobalStatistics.InsertDailyCounter(StatisticsKey.ReponseBodyTextIsAnotherListingInHost);
+                HostStatistics.InsertDailyCounter(Page.Host, HostStatisticsKey.ReponseBodyTextIsAnotherListingInHost);
                 return (PageType.ResponseBodyRepeatedInHost, null, false);
             }
 
