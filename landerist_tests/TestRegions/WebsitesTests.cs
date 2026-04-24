@@ -24,8 +24,7 @@ namespace landerist_tests
 
             //Websites.DeleteFromFile();
             //new Website("promoaguilera.com").DeleteCurentMachineLogs();
-            //new Website("aransahomes.es").RemoveListingExample();
-            //Websites.UpdateRobotsTxt();
+            //new Website("www.servihabitat.com").ReadSitemap();
 
 
             //WebsitesCleanner.DeleteWebsitesWithLessThanTenPages();
@@ -33,8 +32,6 @@ namespace landerist_tests
             //WebsitesCleanner.DeleteWebsitesWithoutPageTypeListing();
             //WebsitesCleanner.DeleteWebsitesWithoutPublishedListings();
             //WebsitesCleanner.DeletePagesDiscardedByIndexUrlRegex("www.engelvoelkers.com");
-
-
         }
     }
 }

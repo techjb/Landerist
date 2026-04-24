@@ -221,7 +221,7 @@ namespace landerist_library.Websites
             try
             {
                 website.InsertMainPage();
-                website.SetSitemap();
+                website.ReadSitemap();
             }
             catch (Exception exception)
             {

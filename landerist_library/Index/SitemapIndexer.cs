@@ -13,7 +13,7 @@ namespace landerist_library.Index
         {
         }
 
-        public void InsertSitemaps(List<Com.Bekijkhet.RobotsTxt.Sitemap> sitemaps)
+        public void IndexNewPages(List<Com.Bekijkhet.RobotsTxt.Sitemap> sitemaps)
         {
             if (sitemaps == null || sitemaps.Count == 0)
             {
@@ -28,7 +28,7 @@ namespace landerist_library.Index
                     continue;
                 }
 
-                InsertSitemap(sitemap.Url);
+                IndexNewPages(sitemap.Url);
             }
         }
 
@@ -41,17 +41,17 @@ namespace landerist_library.Index
             return 10;
         }
 
-        public void InsertSitemap(Uri uri)
+        public void IndexNewPages(Uri uri)
         {
             if (uri == null)
             {
                 return;
             }
 
-            InsertSitemap(new Sitemap(uri));
+            IndexNewPages(new Sitemap(uri));
         }
 
-        private void InsertSitemap(Sitemap? sitemap)
+        private void IndexNewPages(Sitemap? sitemap)
         {
             if (sitemap == null)
             {
@@ -90,7 +90,7 @@ namespace landerist_library.Index
                         continue;
                     }
 
-                    InsertSitemap(sitemapIndex);
+                    IndexNewPages(sitemapIndex);
                 }
             }
             else if (sitemap.SitemapType == SitemapType.Items)

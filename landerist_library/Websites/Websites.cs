@@ -476,8 +476,7 @@ namespace landerist_library.Websites
             {
                 try
                 {
-                    website.SetSitemap();
-                    website.Update();
+                    website.ReadSitemap();                    
                     Interlocked.Increment(ref counter);
                 }
                 finally

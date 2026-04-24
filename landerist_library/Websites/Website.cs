@@ -429,34 +429,34 @@ namespace landerist_library.Websites
             return page.Insert();
         }
 
-        public void SetSitemap()
+        public void ReadSitemap()
         {
             SitemapUpdated = DateTime.Now;
 
-            if (!Config.INDEXER_ENABLED)
+            if (Config.INDEXER_ENABLED)
             {
-                return;
-            }
-
-            try
-            {
-                var sitemaps = GetSiteMapsFromRobotsTxt();
-                if (sitemaps != null && sitemaps.Count > 0)
+                try
                 {
-                    new SitemapIndexer(this).InsertSitemaps(sitemaps);
-                    return;
-                }
+                    var sitemaps = GetSiteMapsFromRobotsTxt();
+                    if (sitemaps != null && sitemaps.Count > 0)
+                    {
+                        new SitemapIndexer(this).IndexNewPages(sitemaps);
+                        return;
+                    }
 
-                var uri = GetDefaultSiteMap();
-                if (uri != null)
+                    var uri = GetDefaultSiteMap();
+                    if (uri != null)
+                    {
+                        new SitemapIndexer(this).IndexNewPages(uri);
+                    }
+                }
+                catch (Exception exception)
                 {
-                    new SitemapIndexer(this).InsertSitemap(uri);
+                    Logs.Log.WriteError("Website InsertPagesFromSiteMap", Host, exception);
                 }
             }
-            catch (Exception exception)
-            {
-                Logs.Log.WriteError("Website InsertPagesFromSiteMap", Host, exception);
-            }
+            
+            Update();
         }
 
         private Uri? GetDefaultSiteMap()
