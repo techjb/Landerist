@@ -179,7 +179,7 @@ const palette = [
             CreateChart('line', data, GetOptions(title, true));
         }
 
-        function BarChart(title, values) {
+        function BarChart(title, values, stacked = false) {
             const data = {
                 labels: values[0].values.map(row => row.key),
                 datasets: values.map((serie, idx) => {
@@ -187,12 +187,17 @@ const palette = [
                         label: serie.label,
                         data: serie.values.map(row => row.value),
                         borderColor: palette[idx % palette.length],
-                        backgroundColor: palette[idx % palette.length]
+                        backgroundColor: palette[idx % palette.length],
+                        stack: stacked ? 'stack1' : undefined
                     };
                 })
             };
 
-            CreateChart('bar', data, GetOptions(title, false));
+            CreateChart('bar', data, GetOptions(title, stacked));
+        }
+
+        function StackedBarChart(title, values) {
+            BarChart(title, values, true);
         }
 
         function CreateChart(type, data, options) {
@@ -254,8 +259,8 @@ const palette = [
                 { title: 'Updated Pages', values: hostData.charts.updated, type: AreaChart },
                 { title: 'Listings', values: hostData.charts.listings, type: AreaChart },
                 { title: 'Published vs Unpublished Listings', values: hostData.charts.listingStatus, type: AreaChart },
-                { title: 'Pages by PageType', values: hostData.charts.pageType, type: BarChart },
-                { title: 'Pages by HttpStatusCode', values: hostData.charts.httpStatusCode, type: BarChart }
+                { title: 'Pages by PageType', values: hostData.charts.pageType, type: StackedBarChart },
+                { title: 'Pages by HttpStatusCode', values: hostData.charts.httpStatusCode, type: StackedBarChart }
             ];
 
             let renderedCharts = 0;
