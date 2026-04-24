@@ -133,68 +133,69 @@ namespace landerist_library.Index
             InsertUri(uri);
         }
 
-        protected void InsertUri(Uri uri)
+        protected bool InsertUri(Uri uri)
         {
             var website = Page.Website;
             if (website == null)
             {
-                return;
+                return false;
             }
 
             if (website.AchievedMaxNumberOfPages())
             {
-                return;
+                return false;
             }
 
             if (website.IsDiscardedByIndexUrlRegex(uri))
             {
-                return;
+                return false;
             }
 
             uri = Uris.CleanUri(uri);
 
             if (Processed.Contains(uri))
             {
-                return;
+                return false;
             }
 
             if (ProhibitedUrls.IsProhibited(uri, website.LanguageCode))
             {
-                return;
+                return false;
             }
 
             if (!IsWebPage(uri))
             {
-                return;
+                return false;
             }
 
             if (LanguageValidator.ContainsNotAllowed(uri, website.LanguageCode))
             {
-                return;
+                return false;
             }
 
             if (!uri.Host.Equals(Page.Host, StringComparison.OrdinalIgnoreCase) || uri.Equals(Page.Uri))
             {
-                return;
+                return false;
             }
 
             if (!website.IsAllowedByRobotsTxt(uri))
             {
-                return;
+                return false;
             }
 
             if (website.MainUri.Equals(uri))
             {
-                return;
+                return false;
             }
 
             if (website.AchievedMaxNumberOfPages())
             {
-                return;
+                return false;
             }
 
-            Pages.Pages.Insert(website, uri);
+            bool inserted = Pages.Pages.Insert(website, uri);
             Processed.Add(uri);
+            return inserted;
         }
 
         //private static bool IsMultimediaPage(Uri uri)

@@ -433,30 +433,36 @@ namespace landerist_library.Websites
         {
             SitemapUpdated = DateTime.Now;
 
-            if (Config.INDEXER_ENABLED)
+            try
             {
-                try
+                if (Config.INDEXER_ENABLED)
                 {
+                    bool indexedFromRobotsTxt = false;
+                    var sitemapIndexer = new SitemapIndexer(this);
                     var sitemaps = GetSiteMapsFromRobotsTxt();
                     if (sitemaps != null && sitemaps.Count > 0)
                     {
-                        new SitemapIndexer(this).IndexNewPages(sitemaps);
-                        return;
+                        indexedFromRobotsTxt = sitemapIndexer.IndexNewPages(sitemaps);
                     }
 
-                    var uri = GetDefaultSiteMap();
-                    if (uri != null)
+                    if (!indexedFromRobotsTxt)
                     {
-                        new SitemapIndexer(this).IndexNewPages(uri);
+                        var uri = GetDefaultSiteMap();
+                        if (uri != null)
+                        {
+                            sitemapIndexer.IndexNewPages(uri);
+                        }
                     }
                 }
-                catch (Exception exception)
-                {
-                    Logs.Log.WriteError("Website InsertPagesFromSiteMap", Host, exception);
-                }
             }
-            
-            Update();
+            catch (Exception exception)
+            {
+                Logs.Log.WriteError("Website InsertPagesFromSiteMap", Host, exception);
+            }
+            finally
+            {
+                Update();
+            }
         }
 
         private Uri? GetDefaultSiteMap()
