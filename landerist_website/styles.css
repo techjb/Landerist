@@ -327,11 +327,6 @@ tbody tr:hover {
     align-items: end;
 }
 
-
-.select-group {
-    flex: 0 1 360px;
-}
-
 .form-label {
     display: block;
     font-size: 12px;
