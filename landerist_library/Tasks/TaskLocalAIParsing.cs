@@ -13,9 +13,9 @@ namespace landerist_library.Tasks
     public class TaskLocalAIParsing
     {
         private const int MAX_PAGES_PER_TASK = 100;
-        private const int MAX_NUM_SEQS = 32;  // same as in localAI server
+        private const int MAX_NUM_SEQS = 8;  // same as in localAI server
         private const int MAX_DEGREE_OF_PARALLELISM = MAX_NUM_SEQS + 20;
-        private const int COMPLETION_TOKENS = 5000;  // structured output and completion tokens aproximately
+        private const int COMPLETION_TOKENS = 7000;  // structured output and completion tokens aproximately
         private readonly int MAX_TOKEN_COUNT;
 
         private int TotalProcessed = 0;
