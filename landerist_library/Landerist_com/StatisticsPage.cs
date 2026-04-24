@@ -119,20 +119,20 @@ namespace landerist_library.Landerist_com
         //}
         //private static void UpdatedHttpStatusCodeErrors()
         //{
-        //    var keys = StatisticsSnapshot.GetHttpStatusCodeKeys();
+        //    var keys = GlobalStatistics.GetHttpStatusCodeKeys();
         //    keys.RemoveAll(code => code == StatisticsKey.HttpStatusCode_NULL.ToString() || code == StatisticsKey.HttpStatusCode_200.ToString());
         //    BarChart("Updated HttpStatusCode errors", keys, false);
         //}
 
         private static void UpdatedHttpStatusCode()
         {
-            var keys = StatisticsSnapshot.GetHttpStatusCodeKeys();            
+            var keys = GlobalStatistics.GetHttpStatusCodeKeys();            
             BarChart("Updated by HttpStatusCode", keys, false);
         }
 
         private static void UpdatedPageType()
         {
-            var keys = StatisticsSnapshot.GetPageTypeKeys();
+            var keys = GlobalStatistics.GetPageTypeKeys();
             BarChart("Updated by PageType", keys, false);
         }
 
@@ -366,7 +366,7 @@ namespace landerist_library.Landerist_com
         private static List<string> GetValues(string statisticKey, bool yesterday)
         {
             
-            var dataTable = StatisticsSnapshot.GetLatestStatistics(statisticKey, 15);
+            var dataTable = GlobalStatistics.GetLatestStatistics(statisticKey, 15);
             List<string> values = [];
 
             foreach (DataRow dataRow in dataTable.Rows.Cast<DataRow>().Reverse())

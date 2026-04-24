@@ -267,10 +267,10 @@ namespace landerist_library.Scrape
 
         private void InsertStatistics()
         {
-            StatisticsSnapshot.InsertDailyCounter(StatisticsKey.Processed, Processed);
-            StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ScrapedSuccess, ScrapedSuccess);
-            StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ScrapedCrashed, Crashed);
-            StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ScrapedHttpStatusCodeNotOK, DownloadErrors);
+            GlobalStatistics.InsertDailyCounter(StatisticsKey.Processed, Processed);
+            GlobalStatistics.InsertDailyCounter(StatisticsKey.ScrapedSuccess, ScrapedSuccess);
+            GlobalStatistics.InsertDailyCounter(StatisticsKey.ScrapedCrashed, Crashed);
+            GlobalStatistics.InsertDailyCounter(StatisticsKey.ScrapedHttpStatusCodeNotOK, DownloadErrors);
         }
 
         private void ResetCancellationTokenSource()

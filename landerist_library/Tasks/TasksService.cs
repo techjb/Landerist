@@ -227,7 +227,7 @@ namespace landerist_library.Tasks
 
             try
             {
-                StatisticsSnapshot.TakeSnapshots();
+                GlobalStatistics.TakeSnapshots();
                 HostStatistics.TakeSnapshots();
                 DownloadsUpdater.Update();
                 Landerist_com.Landerist_com.UpdateAllPages();

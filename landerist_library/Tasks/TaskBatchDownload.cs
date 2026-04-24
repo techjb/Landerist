@@ -147,8 +147,8 @@ namespace landerist_library.Tasks
 
             Log.WriteBatch("TaskBatchDownload", $"ReadSuccessFile {read}/{lines.Length} errors: {errors}");
 
-            StatisticsSnapshot.InsertDailyCounter(StatisticsKey.BatchReaded, read);
-            StatisticsSnapshot.InsertDailyCounter(StatisticsKey.BatchReadedErrors, errors);
+            GlobalStatistics.InsertDailyCounter(StatisticsKey.BatchReaded, read);
+            GlobalStatistics.InsertDailyCounter(StatisticsKey.BatchReadedErrors, errors);
         }
 
         private bool ReadSuccessLine(Batch batch, string line)

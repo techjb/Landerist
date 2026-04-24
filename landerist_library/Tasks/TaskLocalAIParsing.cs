@@ -76,12 +76,12 @@ namespace landerist_library.Tasks
                         if (processPageResult.Success)
                         {
                             Interlocked.Increment(ref TotalSuccess);
-                            StatisticsSnapshot.InsertDailyCounter(StatisticsKey.LocalAIParsingSuccess);
+                            GlobalStatistics.InsertDailyCounter(StatisticsKey.LocalAIParsingSuccess);
                         }
                         else
                         {
                             Interlocked.Increment(ref TotalErrors);
-                            StatisticsSnapshot.InsertDailyCounter(StatisticsKey.LocalAIParsingErrors);
+                            GlobalStatistics.InsertDailyCounter(StatisticsKey.LocalAIParsingErrors);
                         }
 
                         int totalProcessed = Interlocked.Increment(ref TotalProcessed);

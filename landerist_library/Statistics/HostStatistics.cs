@@ -18,7 +18,7 @@ namespace landerist_library.Statistics
 
     public static class HostStatistics
     {
-        public const string TABLE_HOST_STATISTICS_SNAPSHOT = "[HOST_STATISTICS]";
+        public const string HOST_STATISTICS = "[HOST_STATISTICS]";
 
         public static void TakeSnapshots()
         {
@@ -185,7 +185,7 @@ namespace landerist_library.Statistics
         private static bool DeleteByHostKeyPrefixAndDate(DateTime date, string host, string keyPrefix)
         {
             string query =
-                "DELETE FROM " + TABLE_HOST_STATISTICS_SNAPSHOT + " " +
+                "DELETE FROM " + HOST_STATISTICS + " " +
                 "WHERE [Host] = @Host " +
                 "AND [Key] LIKE @KeyPrefix " +
                 "AND CAST([Date] AS date) = CAST(@Date AS date)";
@@ -201,11 +201,11 @@ namespace landerist_library.Statistics
         private static bool Insert(DateTime date, string host, string key, int counter)
         {
             string query =
-                "DELETE FROM " + TABLE_HOST_STATISTICS_SNAPSHOT + " " +
+                "DELETE FROM " + HOST_STATISTICS + " " +
                 "WHERE [Host] = @Host " +
                 "AND [Key] = @Key " +
                 "AND CAST([Date] AS date) = CAST(@Date AS date); " +
-                "INSERT INTO " + TABLE_HOST_STATISTICS_SNAPSHOT + " ([Date], [Host], [Key], [Counter]) " +
+                "INSERT INTO " + HOST_STATISTICS + " ([Date], [Host], [Key], [Counter]) " +
                 "VALUES (@Date, @Host, @Key, @Counter);";
 
             return new DataBase().Query(query, new Dictionary<string, object?>
@@ -221,7 +221,7 @@ namespace landerist_library.Statistics
         {
             string query =
                 "SELECT TOP (@Top) [Date], [Counter] " +
-                "FROM " + TABLE_HOST_STATISTICS_SNAPSHOT + " " +
+                "FROM " + HOST_STATISTICS + " " +
                 "WHERE [Host] = @Host AND [Key] = @Key " +
                 "ORDER BY [Date] DESC";
 
@@ -237,12 +237,12 @@ namespace landerist_library.Statistics
         {
             string query =
                 "SELECT [Key], [Counter] " +
-                "FROM " + TABLE_HOST_STATISTICS_SNAPSHOT + " " +
+                "FROM " + HOST_STATISTICS + " " +
                 "WHERE [Host] = @Host " +
                 "AND [Key] LIKE @KeyPrefix " +
                 "AND CAST([Date] AS date) = (" +
                 "   SELECT MAX(CAST([Date] AS date)) " +
-                "   FROM " + TABLE_HOST_STATISTICS_SNAPSHOT + " " +
+                "   FROM " + HOST_STATISTICS + " " +
                 "   WHERE [Host] = @Host AND [Key] LIKE @KeyPrefix" +
                 ") " +
                 "ORDER BY [Counter] DESC, [Key] ASC";
@@ -258,7 +258,7 @@ namespace landerist_library.Statistics
         {
             string query =
                 "SELECT DISTINCT [Key] " +
-                "FROM " + TABLE_HOST_STATISTICS_SNAPSHOT + " " +
+                "FROM " + HOST_STATISTICS + " " +
                 "WHERE [Host] = @Host " +
                 "AND [Key] LIKE @Key " +
                 "ORDER BY [Key] ASC";
@@ -274,7 +274,7 @@ namespace landerist_library.Statistics
         {
             string query =
                 "SELECT MAX([Date]) " +
-                "FROM " + TABLE_HOST_STATISTICS_SNAPSHOT + " " +
+                "FROM " + HOST_STATISTICS + " " +
                 "WHERE [Host] = @Host";
 
             var value = new DataBase().QueryTable(query, new Dictionary<string, object?>

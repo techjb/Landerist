@@ -38,7 +38,7 @@ namespace landerist_library.Parse.PageTypeParser
 
             if (Page.PageType.HasValue && Page.EtagHasNotChanged())
             {
-                StatisticsSnapshot.InsertDailyCounter(StatisticsKey.EtagHasNotChanged);
+                GlobalStatistics.InsertDailyCounter(StatisticsKey.EtagHasNotChanged);
                 return (Page.PageType, null, false);
             }
 
@@ -91,19 +91,19 @@ namespace landerist_library.Parse.PageTypeParser
 
             if (Page.IsNotListingCache() && isProduction)
             {
-                StatisticsSnapshot.InsertDailyCounter(StatisticsKey.NotListingCache);
+                GlobalStatistics.InsertDailyCounter(StatisticsKey.NotListingCache);
                 return (PageType.NotListingByCache, null, false);
             }
 
             if (Page.ResponseBodyTextHasNotChanged() && isProduction)
             {
-                StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ResponseBodyTextAlreadyParsed);
+                GlobalStatistics.InsertDailyCounter(StatisticsKey.ResponseBodyTextAlreadyParsed);
                 return (Page.PageType, null, false);
             }
 
             if (Page.ReponseBodyTextIsAnotherListingInHost())
             {
-                StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ReponseBodyTextIsAnotherListingInHost);
+                GlobalStatistics.InsertDailyCounter(StatisticsKey.ReponseBodyTextIsAnotherListingInHost);
                 return (PageType.ResponseBodyRepeatedInHost, null, false);
             }
 

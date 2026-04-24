@@ -30,7 +30,7 @@ namespace landerist_library.Parse.CadastralReference
 
             try
             {
-                StatisticsSnapshot.InsertDailyCounter("AddressToCadastralReferenceRequest");
+                GlobalStatistics.InsertDailyCounter("AddressToCadastralReferenceRequest");
                 int radio = firstTry ? 50 : 100;
                 var content = new GoolzoomApi().GetAddresses(latitude.Value, longitude.Value, radio);
                 if (!string.IsNullOrEmpty(content))

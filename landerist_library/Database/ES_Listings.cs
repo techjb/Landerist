@@ -19,7 +19,7 @@ namespace landerist_library.Database
                 {
                     if (Update(oldListing, newListing))
                     {
-                        StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ListingUpdate);
+                        GlobalStatistics.InsertDailyCounter(StatisticsKey.ListingUpdate);
                     }
                 }
             }
@@ -27,7 +27,7 @@ namespace landerist_library.Database
             {
                 if (Insert(website, newListing))
                 {
-                    StatisticsSnapshot.InsertDailyCounter(StatisticsKey.ListingInsert);
+                    GlobalStatistics.InsertDailyCounter(StatisticsKey.ListingInsert);
                 }
             }
         }

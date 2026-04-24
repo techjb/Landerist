@@ -41,9 +41,9 @@ namespace landerist_library.Statistics
         EtagHasNotChanged,
     }
 
-    public class StatisticsSnapshot
+    public class GlobalStatistics
     {
-        private const string TABLE_STATISTICS_SNAPSHOT = "[STATISTICS_SNAPSHOT]";
+        private const string GLOBAL_STATISTICS = "[GLOBAL_STATISTICS]";
 
         public static void TakeSnapshots()
         {
@@ -249,7 +249,7 @@ namespace landerist_library.Statistics
         {
             string query =
                 "SELECT DISTINCT [Key] " +
-                "FROM " + TABLE_STATISTICS_SNAPSHOT + " " +
+                "FROM " + GLOBAL_STATISTICS + " " +
                 "WHERE [Key] LIKE @Key";
 
             return new DataBase().QueryListString(query, new Dictionary<string, object?>
@@ -319,7 +319,7 @@ namespace landerist_library.Statistics
         private static bool DeleteByKeyPrefixAndDate(DateTime date, string keyPrefix)
         {
             string query =
-                "DELETE FROM " + TABLE_STATISTICS_SNAPSHOT + " " +
+                "DELETE FROM " + GLOBAL_STATISTICS + " " +
                 "WHERE [Key] LIKE @KeyPrefix " +
                 "AND CAST([Date] AS date) = CAST(@Date AS date)";
 
@@ -333,9 +333,9 @@ namespace landerist_library.Statistics
         private static bool Insert(DateTime date, string key, int counter)
         {
             string query =
-                "DELETE FROM " + TABLE_STATISTICS_SNAPSHOT + " " +
+                "DELETE FROM " + GLOBAL_STATISTICS + " " +
                 "WHERE [Key] = @Key AND CAST([Date] AS date) = CAST(@Date AS date); " +
-                "INSERT INTO " + TABLE_STATISTICS_SNAPSHOT + " ([Date], [Key], [Counter]) " +
+                "INSERT INTO " + GLOBAL_STATISTICS + " ([Date], [Key], [Counter]) " +
                 "VALUES (@Date, @Key, @Counter);";
 
             return new DataBase().Query(query, new Dictionary<string, object?>
@@ -369,7 +369,7 @@ namespace landerist_library.Statistics
             }
 
             string query =
-                "MERGE " + TABLE_STATISTICS_SNAPSHOT + " AS target " +
+                "MERGE " + GLOBAL_STATISTICS + " AS target " +
                 "USING (" +
                 "   SELECT " +
                 "       CAST(@Date AS DATE) AS DateOnly, " +
@@ -397,7 +397,7 @@ namespace landerist_library.Statistics
         {
             string query =
                 "SELECT DISTINCT [Key] " +
-                "FROM " + TABLE_STATISTICS_SNAPSHOT + " ";
+                "FROM " + GLOBAL_STATISTICS + " ";
 
             DataTable dataTable = new DataBase().QueryTable(query);
 
@@ -416,7 +416,7 @@ namespace landerist_library.Statistics
         {
             string query =
                 "SELECT [Date], [Key], [Counter] " +
-                "FROM " + TABLE_STATISTICS_SNAPSHOT + " " +
+                "FROM " + GLOBAL_STATISTICS + " " +
                 "WHERE [Key] = @Key AND " +
                 "[Date] > DATEADD(MONTH, @Months, GETDATE()) " +
                 "ORDER BY [Date] ASC";
@@ -432,7 +432,7 @@ namespace landerist_library.Statistics
         {
             string query =
                 "SELECT TOP (@Top) [Date], [Counter] " +
-                "FROM " + TABLE_STATISTICS_SNAPSHOT + " " +
+                "FROM " + GLOBAL_STATISTICS + " " +
                 "WHERE [Key] = @Key " +
                 "ORDER BY [Date] DESC";
 

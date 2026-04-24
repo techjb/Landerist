@@ -4,10 +4,10 @@ namespace landerist_tests
     {
         public static void Run()
         {
-            //landerist_library.Statistics.StatisticsSnapshot.TakeSnapshots();
-            //landerist_library.Statistics.StatisticsSnapshot.HttpStatusCode();
-            //landerist_library.Statistics.StatisticsSnapshot.SnapshotHttpStatusCode7Days();
-            //landerist_library.Statistics.StatisticsSnapshot.SnapshotPageType7Days();
+            //landerist_library.Statistics.GlobalStatistics.TakeSnapshots();
+            //landerist_library.Statistics.GlobalStatistics.HttpStatusCode();
+            //landerist_library.Statistics.GlobalStatistics.SnapshotHttpStatusCode7Days();
+            //landerist_library.Statistics.GlobalStatistics.SnapshotPageType7Days();
 
             //DownloadFilesUpdater.SetPageTypeAndNextUpdate();
             //landerist_library.Landerist_com.DownloadsUpdater.SetPageTypeAndNextUpdate();
