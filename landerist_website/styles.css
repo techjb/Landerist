@@ -21,6 +21,16 @@
     --color-border-shadow: rgba(0, 0, 0, 0.08);
     --color-gray-50: #fafafa;
     --color-gray-100: #ebebeb;
+    --black: #171717;
+    --white: #ffffff;
+    --gray-50: #fafafa;
+    --gray-100: #ebebeb;
+    --gray-400: #808080;
+    --gray-500: #666666;
+    --gray-600: #4d4d4d;
+    --link-blue: #0072f5;
+    --focus-blue: hsl(212,100%,48%);
+    --ship-red: #ff5b4f;
     --shadow-ring: 0px 0px 0px 1px rgba(0, 0, 0, 0.08);
     --shadow-card: 0px 0px 0px 1px rgba(0, 0, 0, 0.08), 0px 2px 2px rgba(0, 0, 0, 0.04), 0px 8px 8px -8px rgba(0, 0, 0, 0.04), inset 0px 0px 0px 1px #fafafa;
     --radius-sm: 6px;
@@ -29,6 +39,7 @@
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-mono: ui-monospace, SFMono-Regular, 'Roboto Mono', Menlo, Monaco, 'Liberation Mono', monospace;
 }
+
 
 html {
     font-feature-settings: "liga";
@@ -327,48 +338,73 @@ tbody tr:hover {
     align-items: end;
 }
 
+/* FORMS */
+.form-group {
+    margin-bottom: 20px;
+    max-width: 400px;
+}
+
 .form-label {
     display: block;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 500;
-    color: var(--color-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 8px;
+    color: var(--black);
+    margin-bottom: 6px;
 }
+
+.form-input {
+    width: 100%;
+    background: var(--white);
+    color: var(--black);
+    border: none;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    outline: none;
+    box-shadow: var(--shadow-ring);
+    transition: box-shadow 0.15s;
+}
+
+    .form-input:focus {
+        box-shadow: 0 0 0 2px var(--focus-blue);
+    }
+
+.form-input--focus {
+    box-shadow: 0 0 0 2px var(--focus-blue);
+}
+
+.form-input--error {
+    box-shadow: 0 0 0 2px var(--ship-red);
+}
+
+.form-textarea {
+    width: 100%;
+    min-height: 80px;
+    background: var(--white);
+    color: var(--black);
+    border: none;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    resize: vertical;
+    outline: none;
+    box-shadow: var(--shadow-ring);
+}
+
+.form-state-label {
+    font-size: 11px;
+    color: var(--gray-400);
+    margin-top: 4px;
+}
+
 
 .select-shell {
     position: relative;
     width: 100%;
     max-width: 360px;
 }
-
-.select-input {
-    -moz-appearance: none;
-    width: 100%;
-    min-height: 40px;
-    padding: 10px 40px 10px 14px;
-    border: none;
-    border-radius: var(--radius-sm);
-    background: var(--color-bg);
-    color: var(--color-text);
-    font-family: var(--font-sans);
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 1.43;
-    letter-spacing: normal;
-    box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.08), inset 0px 0px 0px 1px #fafafa;
-    transition: box-shadow 0.15s ease, background-color 0.15s ease;
-}
-
-    .select-input:focus {
-        outline: 2px solid hsla(212, 100%, 48%, 1);
-        outline-offset: 1px;
-    }
-
-    .select-input:hover {
-        background: var(--color-gray-50);
-    }
 
 .meta-text {
     font-size: 14px;
