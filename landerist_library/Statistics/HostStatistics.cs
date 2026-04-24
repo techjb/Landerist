@@ -16,9 +16,9 @@ namespace landerist_library.Statistics
         PageType,
     }
 
-    public static class HostStatisticsSnapshot
+    public static class HostStatistics
     {
-        public const string TABLE_HOST_STATISTICS_SNAPSHOT = "[HOST_STATISTICS_SNAPSHOT]";
+        public const string TABLE_HOST_STATISTICS_SNAPSHOT = "[HOST_STATISTICS]";
 
         public static void TakeSnapshots()
         {

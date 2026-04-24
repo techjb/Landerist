@@ -73,7 +73,7 @@ namespace landerist_library.Landerist_com
             return new HostStatisticsModel
             {
                 MainUri = website.MainUri.AbsoluteUri,
-                UpdatedAt = HostStatisticsSnapshot.GetLatestDate(website.Host)?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+                UpdatedAt = HostStatistics.GetLatestDate(website.Host)?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
                 Charts = new HostStatisticsCharts
                 {
                     Pages = GetTimeSeries(website.Host, HostStatisticsKey.Pages, "Pages"),
@@ -98,7 +98,7 @@ namespace landerist_library.Landerist_com
 
         private static List<ChartSeriesModel> GetTimeSeries(string host, HostStatisticsKey key, string label)
         {
-            var dataTable = HostStatisticsSnapshot.GetLatestStatistics(host, key.ToString(), 15);
+            var dataTable = HostStatistics.GetLatestStatistics(host, key.ToString(), 15);
             List<ChartPointModel> values = [];
 
             foreach (DataRow dataRow in dataTable.Rows.Cast<DataRow>().Reverse())
@@ -117,7 +117,7 @@ namespace landerist_library.Landerist_com
 
         private static List<ChartSeriesModel> GetLatestDistribution(string host, HostStatisticsKey keyPrefix, string label)
         {
-            var dataTable = HostStatisticsSnapshot.GetLatestStatisticsByPrefix(host, keyPrefix.ToString());
+            var dataTable = HostStatistics.GetLatestStatisticsByPrefix(host, keyPrefix.ToString());
             List<ChartPointModel> values = [];
 
             foreach (DataRow dataRow in dataTable.Rows)
@@ -138,7 +138,7 @@ namespace landerist_library.Landerist_com
         {
             List<ChartSeriesModel> series = [];
 
-            foreach (var key in HostStatisticsSnapshot.GetKeysLike(host, keyPrefix))
+            foreach (var key in HostStatistics.GetKeysLike(host, keyPrefix))
             {
                 var values = GetTimeSeries(host, key, RemovePrefix(key, keyPrefix));
                 if (values.Count > 0)
@@ -152,7 +152,7 @@ namespace landerist_library.Landerist_com
 
         private static List<ChartSeriesModel> GetTimeSeries(string host, string key, string label)
         {
-            var dataTable = HostStatisticsSnapshot.GetLatestStatistics(host, key, 15);
+            var dataTable = HostStatistics.GetLatestStatistics(host, key, 15);
             List<ChartPointModel> values = [];
 
             foreach (DataRow dataRow in dataTable.Rows.Cast<DataRow>().Reverse())
