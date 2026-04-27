@@ -100,7 +100,9 @@ const palette = [
                 reponseBodyTextIsAnotherListingInHost: (GetObjectProperty(charts, 'reponseBodyTextIsAnotherListingInHost', 'ReponseBodyTextIsAnotherListingInHost') || []).map(NormalizeSeries),
                 nextUpdateDistribution: (GetObjectProperty(charts, 'nextUpdateDistribution', 'NextUpdateDistribution') || []).map(NormalizeSeries),
                 pageType: (GetObjectProperty(charts, 'pageType', 'PageType') || []).map(NormalizeSeries),
-                httpStatusCode: (GetObjectProperty(charts, 'httpStatusCode', 'HttpStatusCode') || []).map(NormalizeSeries)
+                httpStatusCode: (GetObjectProperty(charts, 'httpStatusCode', 'HttpStatusCode') || []).map(NormalizeSeries),
+                publishedListingsByOperation: (GetObjectProperty(charts, 'publishedListingsByOperation', 'PublishedListingsByOperation') || []).map(NormalizeSeries),
+                publishedListingsByPropertyType: (GetObjectProperty(charts, 'publishedListingsByPropertyType', 'PublishedListingsByPropertyType') || []).map(NormalizeSeries)
             };
         }
 
@@ -340,7 +342,9 @@ const palette = [
                 { title: 'ResponseBodyText Is Another Listing In Host', values: hostData.charts.reponseBodyTextIsAnotherListingInHost, type: AreaChart },
                 { title: 'Next Update Distribution', values: hostData.charts.nextUpdateDistribution, type: BarChart },
                 { title: 'Pages by PageType', values: hostData.charts.pageType, type: PieChart },
-                { title: 'Pages by HttpStatusCode', values: hostData.charts.httpStatusCode, type: PieChart }
+                { title: 'Pages by HttpStatusCode', values: hostData.charts.httpStatusCode, type: PieChart },
+                { title: 'Published Listings by Operation', values: hostData.charts.publishedListingsByOperation, type: PieChart },
+                { title: 'Published Listings by PropertyType', values: hostData.charts.publishedListingsByPropertyType, type: PieChart }
             ];
 
             let renderedCharts = 0;

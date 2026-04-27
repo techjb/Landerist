@@ -94,6 +94,8 @@ namespace landerist_library.Landerist_com
                     NextUpdateDistribution = GetDistribution(HostStatistics.GetPagesByNextUpdate(website.Host), "nextupdate"),
                     PageType = GetDistribution(HostStatistics.GetPagesByPageType(website.Host), "PageType"),
                     HttpStatusCode = GetDistribution(HostStatistics.GetPagesByHttpStatusCode(website.Host), "HttpStatusCode"),
+                    PublishedListingsByOperation = GetDistribution(HostStatistics.GetPublishedListingsByOperation(website.Host), "Operation"),
+                    PublishedListingsByPropertyType = GetDistribution(HostStatistics.GetPublishedListingsByPropertyType(website.Host), "PropertyType"),
                 }
             };
         }
@@ -226,6 +228,8 @@ namespace landerist_library.Landerist_com
             public required List<ChartSeriesModel> NextUpdateDistribution { get; init; }
             public required List<ChartSeriesModel> PageType { get; init; }
             public required List<ChartSeriesModel> HttpStatusCode { get; init; }
+            public required List<ChartSeriesModel> PublishedListingsByOperation { get; init; }
+            public required List<ChartSeriesModel> PublishedListingsByPropertyType { get; init; }
         }
 
         private sealed class ChartSeriesModel

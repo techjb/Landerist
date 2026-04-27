@@ -356,6 +356,40 @@ namespace landerist_library.Statistics
             });
         }
 
+        public static DataTable GetPublishedListingsByOperation(string host)
+        {
+            string query =
+                "SELECT COALESCE([operation], 'NULL') AS [Key], COUNT(*) AS [Counter] " +
+                "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+                "WHERE [Host] = @Host " +
+                "AND [listingStatus] = @ListingStatus " +
+                "GROUP BY [operation] " +
+                "ORDER BY [Counter] DESC, [Key] ASC";
+
+            return new DataBase().QueryTable(query, new Dictionary<string, object?>
+            {
+                { "Host", host },
+                { "ListingStatus", ListingStatus.published.ToString() }
+            });
+        }
+
+        public static DataTable GetPublishedListingsByPropertyType(string host)
+        {
+            string query =
+                "SELECT COALESCE([propertyType], 'NULL') AS [Key], COUNT(*) AS [Counter] " +
+                "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+                "WHERE [Host] = @Host " +
+                "AND [listingStatus] = @ListingStatus " +
+                "GROUP BY [propertyType] " +
+                "ORDER BY [Counter] DESC, [Key] ASC";
+
+            return new DataBase().QueryTable(query, new Dictionary<string, object?>
+            {
+                { "Host", host },
+                { "ListingStatus", ListingStatus.published.ToString() }
+            });
+        }
+
         public static List<string> GetKeysLike(string host, HostStatisticsKey key)
         {
             string query =
