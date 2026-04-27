@@ -81,6 +81,7 @@ namespace landerist_library.Landerist_com
                     PublishedListings = website.GetNumPublishedListings(),
                     PublishedListingsWithAddress = website.GetNumPublishedListingsWithAddress(),
                     PublishedListingsWithCoordinates = website.GetNumPublishedListingsWithCoordinates(),
+                    PublishedListingsWithImages = website.GetNumPublishedListingsWithImages(),
                     UnpublishedListings = website.GetNumUnpublishedListings()
                 },
                 Charts = new HostStatisticsCharts
@@ -211,6 +212,7 @@ namespace landerist_library.Landerist_com
             public required int PublishedListings { get; init; }
             public required int PublishedListingsWithAddress { get; init; }
             public required int PublishedListingsWithCoordinates { get; init; }
+            public required int PublishedListingsWithImages { get; init; }
             public required int UnpublishedListings { get; init; }
         }
 

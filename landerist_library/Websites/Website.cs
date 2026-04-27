@@ -543,6 +543,11 @@ namespace landerist_library.Websites
             return ES_Listings.CountWithCoordinates(Host, ListingStatus.published);
         }
 
+        public int GetNumPublishedListingsWithImages()
+        {
+            return ES_Listings.CountWithImages(Host, ListingStatus.published);
+        }
+
         public int GetNumUnpublishedListings()
         {
             return ES_Listings.Count(Host, ListingStatus.unpublished);

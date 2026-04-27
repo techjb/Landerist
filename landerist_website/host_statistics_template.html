@@ -111,6 +111,7 @@ const palette = [
                 publishedListings: GetObjectProperty(summary, 'publishedListings', 'PublishedListings') || 0,
                 publishedListingsWithAddress: GetObjectProperty(summary, 'publishedListingsWithAddress', 'PublishedListingsWithAddress') || 0,
                 publishedListingsWithCoordinates: GetObjectProperty(summary, 'publishedListingsWithCoordinates', 'PublishedListingsWithCoordinates') || 0,
+                publishedListingsWithImages: GetObjectProperty(summary, 'publishedListingsWithImages', 'PublishedListingsWithImages') || 0,
                 unpublishedListings: GetObjectProperty(summary, 'unpublishedListings', 'UnpublishedListings') || 0
             };
         }
@@ -282,6 +283,7 @@ const palette = [
                 { label: 'Published Listings', value: hostData.summary.publishedListings },
                 { label: 'Published Listings With Address', value: hostData.summary.publishedListingsWithAddress },
                 { label: 'Published Listings With Coordinates', value: hostData.summary.publishedListingsWithCoordinates },
+                { label: 'Published Listings With Images', value: hostData.summary.publishedListingsWithImages },
                 { label: 'Unpublished Listings', value: hostData.summary.unpublishedListings }
             ];
 

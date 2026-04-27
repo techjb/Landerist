@@ -126,6 +126,28 @@ namespace landerist_library.Database
             });
         }
 
+        public static int CountWithImages(string host, ListingStatus listingStatus)
+        {
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + TABLE_ES_LISTINGS + " AS L " +
+                "WHERE L.[host] = @Host " +
+                "AND L.[listingStatus] = @ListingStatus " +
+                "AND EXISTS (" +
+                "   SELECT 1 " +
+                "   FROM " + ES_Media.TABLE_ES_MEDIA + " AS M " +
+                "   WHERE M.[listingGuid] = L.[guid] " +
+                "   AND M.[mediaType] = @MediaType" +
+                ")";
+
+            return new DataBase().QueryInt(query, new Dictionary<string, object?>
+            {
+                { "Host", host },
+                { "ListingStatus", listingStatus.ToString() },
+                { "MediaType", landerist_orels.MediaType.image.ToString() }
+            });
+        }
+
         private static Dictionary<string, object?> GetQueryParameters(Listing listing)
         {
             return new Dictionary<string, object?> {
