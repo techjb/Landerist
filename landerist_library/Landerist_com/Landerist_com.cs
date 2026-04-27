@@ -75,7 +75,7 @@ namespace landerist_library.Landerist_com
 
         public static void UpdateHostsPage()
         {
-            HostsPage.Update();
+            DownloadsPage.Update();
             InvalidateCloudFront();
         }
 
@@ -84,7 +84,6 @@ namespace landerist_library.Landerist_com
             DownloadsPage.Update();
             StatisticsPage.UpdateCharts();
             HostStatisticsPage.Update();
-            HostsPage.Update();
             InvalidateCloudFront();
         }
 

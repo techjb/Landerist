@@ -1,4 +1,6 @@
 ﻿using System.Globalization;
+using System.Net;
+using System.Text;
 using landerist_library.Configuration;
 using landerist_library.Export;
 using landerist_library.Logs;
@@ -26,6 +28,8 @@ namespace landerist_library.Landerist_com
                 {
                     UpdateDownloadsTemplate(CountryCode.ES, exportType);
                 }
+
+                UpdateHostsTemplate();
 
                 if (UploadDownloadsFile())
                 {
@@ -66,6 +70,88 @@ namespace landerist_library.Landerist_com
             string fileName = GetFileName(countryCode, exportType, "zip");
             string hyperlink = $"<a title=\"{fileName}\" href=\"{url}\">zip</a>";
             Replace(Comment(countryCode, exportType, "Hyperlink"), hyperlink);
+        }
+
+        private static void UpdateHostsTemplate()
+        {
+            Replace("/*HOSTS*/", GetHostsTableRows());
+        }
+
+        private static string GetHostsTableRows()
+        {
+            StringBuilder rows = new();
+
+            foreach (var website in Websites.Websites.GetApplySpecialRules()
+                .OrderBy(website => website.Host, StringComparer.OrdinalIgnoreCase))
+            {
+                int listingsCount = website.GetNumListings();
+                int publishedListingsCount = website.GetNumPublishedListings();
+                int unpublishedListingsCount = website.GetNumUnpublishedListings();
+
+                rows.AppendLine(GetHostTableRow(
+                    website,
+                    listingsCount,
+                    publishedListingsCount,
+                    unpublishedListingsCount));
+            }
+
+            return rows.ToString();
+        }
+
+        private static string GetHostTableRow(
+            Website website,
+            int listingsCount,
+            int publishedListingsCount,
+            int unpublishedListingsCount)
+        {
+            return
+                "                <tr>" + Environment.NewLine +
+                $"                    <td>{WebUtility.HtmlEncode(website.Host)}</td>" + Environment.NewLine +
+                $"                    <td>{GetHostDownloadCellText(website.Host, "listings", "json", listingsCount)}</td>" + Environment.NewLine +
+                $"                    <td>{GetHostDownloadCellText(website.Host, "listings_published", "json", publishedListingsCount)}</td>" + Environment.NewLine +
+                $"                    <td>{GetHostDownloadCellText(website.Host, "listings_unpublished", "json", unpublishedListingsCount)}</td>" + Environment.NewLine +
+                "                </tr>";
+        }
+
+        private static string GetHostDownloadCellText(string host, string downloadType, string extension, int counter)
+        {
+            string counterText = counter.ToString(CultureInfo.InvariantCulture);
+            if (counter <= 0)
+            {
+                return counterText;
+            }
+
+            string? url = GetHostDownloadUrl(host, downloadType, extension);
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return counterText;
+            }
+
+            string fileName = GetHostFileName(host, downloadType, extension);
+            return $"<a title=\"Download\" href=\"{WebUtility.HtmlEncode(url)}\" download=\"{WebUtility.HtmlEncode(fileName)}\">{counterText}</a>";
+        }
+
+        private static string? GetHostDownloadUrl(string host, string downloadType, string extension)
+        {
+            string objectKey = GetHostObjectKey(host, downloadType, extension);
+            var (lastModified, contentLength) = new S3().GetFileInfo(PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey);
+
+            if (lastModified is null || contentLength is null)
+            {
+                return null;
+            }
+
+            return $"https://{PrivateConfig.AWS_S3_DOWNLOADS_BUCKET}.s3.amazonaws.com/{objectKey}";
+        }
+
+        private static string GetHostObjectKey(string host, string downloadType, string extension)
+        {
+            return $"ES/Hosts/{GetHostFileName(host, downloadType, extension)}";
+        }
+
+        private static string GetHostFileName(string host, string downloadType, string extension)
+        {
+            return $"{host}_{downloadType}.{extension}";
         }
 
         private static string Comment(CountryCode countryCode, ExportType exportType, string key)

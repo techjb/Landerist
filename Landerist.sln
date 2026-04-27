@@ -21,7 +21,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "landerist_website", "lander
 	ProjectSection(SolutionItems) = preProject
 		landerist_website\DESIGN.md = landerist_website\DESIGN.md
 		landerist_website\downloads_template.html = landerist_website\downloads_template.html
-		landerist_website\hosts_template.html = landerist_website\hosts_template.html
 		landerist_website\host_statistics_template.html = landerist_website\host_statistics_template.html
 		landerist_website\index.html = landerist_website\index.html
 		landerist_website\statistics_template.html = landerist_website\statistics_template.html
