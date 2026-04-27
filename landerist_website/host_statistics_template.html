@@ -269,6 +269,14 @@ const palette = [
             return Number(value || 0).toLocaleString('en-US');
         }
 
+        function FormatPercentage(value, total) {
+            if (!total) {
+                return '';
+            }
+
+            return `${((value / total) * 100).toFixed(2)}%`;
+        }
+
         function RenderEmptyState(message) {
             document.getElementById('HostSummary').innerHTML = '';
 
@@ -277,14 +285,15 @@ const palette = [
         }
 
         function RenderHostSummary(hostData) {
+            const summary = hostData.summary;
             const rows = [
-                { label: 'Total Pages', value: hostData.summary.totalPages },
-                { label: 'Total Listings', value: hostData.summary.totalListings },
-                { label: 'Published Listings', value: hostData.summary.publishedListings },
-                { label: 'Published Listings With Address', value: hostData.summary.publishedListingsWithAddress },
-                { label: 'Published Listings With Coordinates', value: hostData.summary.publishedListingsWithCoordinates },
-                { label: 'Published Listings With Images', value: hostData.summary.publishedListingsWithImages },
-                { label: 'Unpublished Listings', value: hostData.summary.unpublishedListings }
+                { label: 'Total Pages', value: summary.totalPages, percentage: '' },
+                { label: 'Total Listings', value: summary.totalListings, percentage: FormatPercentage(summary.totalListings, summary.totalPages) },
+                { label: 'Published Listings', value: summary.publishedListings, percentage: FormatPercentage(summary.publishedListings, summary.totalListings) },
+                { label: 'Published Listings With Address', value: summary.publishedListingsWithAddress, percentage: FormatPercentage(summary.publishedListingsWithAddress, summary.publishedListings) },
+                { label: 'Published Listings With Coordinates', value: summary.publishedListingsWithCoordinates, percentage: FormatPercentage(summary.publishedListingsWithCoordinates, summary.publishedListings) },
+                { label: 'Published Listings With Images', value: summary.publishedListingsWithImages, percentage: FormatPercentage(summary.publishedListingsWithImages, summary.publishedListings) },
+                { label: 'Unpublished Listings', value: summary.unpublishedListings, percentage: FormatPercentage(summary.unpublishedListings, summary.totalListings) }
             ];
 
             document.getElementById('HostSummary').innerHTML = `
@@ -293,6 +302,7 @@ const palette = [
                         <tr>
                             <th>Data Type</th>
                             <th>Value</th>
+                            <th>Percentage</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -300,6 +310,7 @@ const palette = [
                             <tr>
                                 <td>${row.label}</td>
                                 <td>${FormatNumber(row.value)}</td>
+                                <td>${row.percentage}</td>
                             </tr>
                         `).join('')}
                     </tbody>
