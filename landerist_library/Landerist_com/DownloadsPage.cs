@@ -64,7 +64,7 @@ namespace landerist_library.Landerist_com
 
             var url = $"https://{PrivateConfig.AWS_S3_DOWNLOADS_BUCKET}.s3.amazonaws.com/{objectKey}";
             string fileName = GetFileName(countryCode, exportType, "zip");
-            string hyperlink = $"<a title=\"{fileName}\" href=\"{url}\">{fileName}</a>";
+            string hyperlink = $"<a title=\"{fileName}\" href=\"{url}\">zip</a>";
             Replace(Comment(countryCode, exportType, "Hyperlink"), hyperlink);
         }
 
