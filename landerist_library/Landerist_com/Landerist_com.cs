@@ -73,12 +73,6 @@ namespace landerist_library.Landerist_com
             InvalidateCloudFront();
         }
 
-        public static void UpdateHostsPage()
-        {
-            DownloadsPage.Update();
-            InvalidateCloudFront();
-        }
-
         public static void UpdateAllPages()
         {
             DownloadsPage.Update();
