@@ -533,6 +533,16 @@ namespace landerist_library.Websites
             return ES_Listings.Count(Host, ListingStatus.published);
         }
 
+        public int GetNumPublishedListingsWithAddress()
+        {
+            return ES_Listings.CountWithAddress(Host, ListingStatus.published);
+        }
+
+        public int GetNumPublishedListingsWithCoordinates()
+        {
+            return ES_Listings.CountWithCoordinates(Host, ListingStatus.published);
+        }
+
         public int GetNumUnpublishedListings()
         {
             return ES_Listings.Count(Host, ListingStatus.unpublished);

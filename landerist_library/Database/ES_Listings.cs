@@ -93,6 +93,39 @@ namespace landerist_library.Database
             });
         }
 
+        public static int CountWithAddress(string host, ListingStatus listingStatus)
+        {
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + TABLE_ES_LISTINGS + " " +
+                "WHERE [host] = @Host " +
+                "AND [listingStatus] = @ListingStatus " +
+                "AND NULLIF(LTRIM(RTRIM([address])), '') IS NOT NULL";
+
+            return new DataBase().QueryInt(query, new Dictionary<string, object?>
+            {
+                { "Host", host },
+                { "ListingStatus", listingStatus.ToString() }
+            });
+        }
+
+        public static int CountWithCoordinates(string host, ListingStatus listingStatus)
+        {
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + TABLE_ES_LISTINGS + " " +
+                "WHERE [host] = @Host " +
+                "AND [listingStatus] = @ListingStatus " +
+                "AND [latitude] IS NOT NULL " +
+                "AND [longitude] IS NOT NULL";
+
+            return new DataBase().QueryInt(query, new Dictionary<string, object?>
+            {
+                { "Host", host },
+                { "ListingStatus", listingStatus.ToString() }
+            });
+        }
+
         private static Dictionary<string, object?> GetQueryParameters(Listing listing)
         {
             return new Dictionary<string, object?> {

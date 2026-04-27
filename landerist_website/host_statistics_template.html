@@ -109,6 +109,8 @@ const palette = [
                 totalPages: GetObjectProperty(summary, 'totalPages', 'TotalPages') || 0,
                 totalListings: GetObjectProperty(summary, 'totalListings', 'TotalListings') || 0,
                 publishedListings: GetObjectProperty(summary, 'publishedListings', 'PublishedListings') || 0,
+                publishedListingsWithAddress: GetObjectProperty(summary, 'publishedListingsWithAddress', 'PublishedListingsWithAddress') || 0,
+                publishedListingsWithCoordinates: GetObjectProperty(summary, 'publishedListingsWithCoordinates', 'PublishedListingsWithCoordinates') || 0,
                 unpublishedListings: GetObjectProperty(summary, 'unpublishedListings', 'UnpublishedListings') || 0
             };
         }
@@ -278,6 +280,8 @@ const palette = [
                 { label: 'Total Pages', value: hostData.summary.totalPages },
                 { label: 'Total Listings', value: hostData.summary.totalListings },
                 { label: 'Published Listings', value: hostData.summary.publishedListings },
+                { label: 'Published Listings With Address', value: hostData.summary.publishedListingsWithAddress },
+                { label: 'Published Listings With Coordinates', value: hostData.summary.publishedListingsWithCoordinates },
                 { label: 'Unpublished Listings', value: hostData.summary.unpublishedListings }
             ];
 
