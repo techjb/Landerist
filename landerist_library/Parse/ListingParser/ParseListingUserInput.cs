@@ -10,28 +10,18 @@ namespace landerist_library.Parse.ListingParser
     {
         private static readonly HashSet<string> TagsToRemove =
         [
-            //"//head",
             "//script",
             "//style",
             "//link",
-            //"//header",
-            //"//nav",
-            //"//footer",
-            //"//aside",
-            //"//a",
             "//code",
             "//canvas",
-            //"//meta",
             "//option",
             "//select",
             "//progress",
             "//svg",
             "//textarea",
-            //"//del",
             "//button",
-            //"//form",
             "//input",
-            //"//img",
             "//iframe",
             "//audio",
             "//video",
@@ -72,6 +62,11 @@ namespace landerist_library.Parse.ListingParser
             return string.Join(" | ", TagsToRemove2.ToList());
         }
 
+        public static string? GetHtml(string responseBody)
+        {
+            return GetText(responseBody, true);
+        }
+
         public static string? GetText(string responseBody, bool html)
         {
             if (string.IsNullOrWhiteSpace(responseBody))
@@ -97,15 +92,30 @@ namespace landerist_library.Parse.ListingParser
                 var htmlDocument = page.GetHtmlDocument();
                 if (htmlDocument != null)
                 {
-                    // Method name is GetText, so return text content.
                     return GetText(htmlDocument);
                 }
             }
-            catch // (Exception exception)
+            catch
             {
 
             }
 
+            return null;
+        }
+
+        public static string? GetHtml(Page page)
+        {
+            try
+            {
+                var htmlDocument = page.GetHtmlDocument();
+                if (htmlDocument != null)
+                {
+                    return GetHtml(htmlDocument);
+                }
+            }
+            catch
+            {
+            }
             return null;
         }
 
@@ -209,9 +219,5 @@ namespace landerist_library.Parse.ListingParser
 
         [GeneratedRegex(@"\s+")]
         private static partial Regex RegexSpace();
-        //[GeneratedRegex(@"\s*>")]
-        //private static partial Regex Regex1();
-        //[GeneratedRegex(@"<\s*")]
-        //private static partial Regex Regex2();
     }
 }

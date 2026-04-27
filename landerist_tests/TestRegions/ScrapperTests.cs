@@ -16,7 +16,7 @@ namespace landerist_tests
             //new Scraper().ProcessPages();
             //new Scraper().Scrape(page, false);
 
-            //new landerist_library.Scrape.Scraper().Scrape("https://www.engelvoelkers.com/es/es/exposes/2d4baf06-3a91-5fe2-a1f0-a9969170b57b", false);
+            new landerist_library.Scrape.Scraper().Scrape("https://www.tecnocasa.es/venta/boxplaza-de-garaje/barcelona/barcelona/618797.html", false);
             //new Scraper().TestSinglePage();
             //landerist_library.Scrape.PageSelector.SelectTop1();
             //Console.WriteLine("Block: " + WebsitesThrottle.Block(page.Website));
