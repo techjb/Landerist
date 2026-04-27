@@ -100,6 +100,7 @@ const palette = [
                 notListingCache: (GetObjectProperty(charts, 'notListingCache', 'NotListingCache') || []).map(NormalizeSeries),
                 responseBodyTextAlreadyParsed: (GetObjectProperty(charts, 'responseBodyTextAlreadyParsed', 'ResponseBodyTextAlreadyParsed') || []).map(NormalizeSeries),
                 reponseBodyTextIsAnotherListingInHost: (GetObjectProperty(charts, 'reponseBodyTextIsAnotherListingInHost', 'ReponseBodyTextIsAnotherListingInHost') || []).map(NormalizeSeries),
+                nextUpdateDistribution: (GetObjectProperty(charts, 'nextUpdateDistribution', 'NextUpdateDistribution') || []).map(NormalizeSeries),
                 pageType: (GetObjectProperty(charts, 'pageType', 'PageType') || []).map(NormalizeSeries),
                 httpStatusCode: (GetObjectProperty(charts, 'httpStatusCode', 'HttpStatusCode') || []).map(NormalizeSeries)
             };
@@ -294,6 +295,7 @@ const palette = [
                 { title: 'Not Listing By Cache', values: hostData.charts.notListingCache, type: AreaChart },
                 { title: 'ResponseBodyText Already Parsed', values: hostData.charts.responseBodyTextAlreadyParsed, type: AreaChart },
                 { title: 'ResponseBodyText Is Another Listing In Host', values: hostData.charts.reponseBodyTextIsAnotherListingInHost, type: AreaChart },
+                { title: 'Next Update Distribution', values: hostData.charts.nextUpdateDistribution, type: BarChart },
                 { title: 'Pages by PageType', values: hostData.charts.pageType, type: PieChart },
                 { title: 'Pages by HttpStatusCode', values: hostData.charts.httpStatusCode, type: PieChart }
             ];

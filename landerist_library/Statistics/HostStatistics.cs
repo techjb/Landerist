@@ -341,6 +341,21 @@ namespace landerist_library.Statistics
             });
         }
 
+        public static DataTable GetPagesByNextUpdate(string host)
+        {
+            string query =
+                "SELECT COALESCE(CONVERT(VARCHAR, [NextUpdate], 23), 'NULL') AS [Key], COUNT(*) AS [Counter] " +
+                "FROM " + landerist_library.Pages.Pages.PAGES + " " +
+                "WHERE [Host] = @Host " +
+                "GROUP BY CONVERT(VARCHAR, [NextUpdate], 23) " +
+                "ORDER BY [Key] ASC";
+
+            return new DataBase().QueryTable(query, new Dictionary<string, object?>
+            {
+                { "Host", host }
+            });
+        }
+
         public static List<string> GetKeysLike(string host, HostStatisticsKey key)
         {
             string query =
