@@ -74,12 +74,17 @@ namespace landerist_library.Landerist_com
             {
                 MainUri = website.MainUri.AbsoluteUri,
                 UpdatedAt = HostStatistics.GetLatestDate(website.Host)?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+                Summary = new HostStatisticsSummary
+                {
+                    TotalPages = website.GetNumPages(),
+                    TotalListings = website.GetNumListings(),
+                    PublishedListings = website.GetNumPublishedListings(),
+                    UnpublishedListings = website.GetNumUnpublishedListings()
+                },
                 Charts = new HostStatisticsCharts
                 {
-                    Pages = GetTimeSeries(website.Host, HostStatisticsKey.Pages, "Pages"),
                     Inserted = GetTimeSeries(website.Host, HostStatisticsKey.Inserted, "Inserted Pages"),
                     Updated = GetTimeSeries(website.Host, HostStatisticsKey.Updated, "Updated Pages"),
-                    Listings = GetTimeSeries(website.Host, HostStatisticsKey.Listings, "Listings"),
                     ListingStatus = GetListingStatusSeries(website.Host),
                     NotListingCache = GetTimeSeries(website.Host, HostStatisticsKey.NotListingCache, "Not listing by cache"),
                     ResponseBodyTextAlreadyParsed = GetTimeSeries(website.Host, HostStatisticsKey.ResponseBodyTextAlreadyParsed, "ResponseBodyText already parsed"),
@@ -203,15 +208,22 @@ namespace landerist_library.Landerist_com
         {
             public required string MainUri { get; init; }
             public string? UpdatedAt { get; init; }
+            public required HostStatisticsSummary Summary { get; init; }
             public required HostStatisticsCharts Charts { get; init; }
+        }
+
+        private sealed class HostStatisticsSummary
+        {
+            public required int TotalPages { get; init; }
+            public required int TotalListings { get; init; }
+            public required int PublishedListings { get; init; }
+            public required int UnpublishedListings { get; init; }
         }
 
         private sealed class HostStatisticsCharts
         {
-            public required List<ChartSeriesModel> Pages { get; init; }
             public required List<ChartSeriesModel> Inserted { get; init; }
             public required List<ChartSeriesModel> Updated { get; init; }
-            public required List<ChartSeriesModel> Listings { get; init; }
             public required List<ChartSeriesModel> ListingStatus { get; init; }
             public required List<ChartSeriesModel> NotListingCache { get; init; }
             public required List<ChartSeriesModel> ResponseBodyTextAlreadyParsed { get; init; }

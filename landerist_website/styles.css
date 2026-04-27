@@ -289,6 +289,7 @@ a {
 .table-wrapper {
     overflow-x: auto;
     margin-top: 16px;
+    margin-bottom: 24px;
 }
 
 table {

@@ -38,6 +38,7 @@
                     /*HOST_OPTIONS*/
                 </select>
             </div>
+            <div id="HostSummary" class="table-wrapper"></div>
             <div id="Statistics" class="chart-grid"></div>
         </div>
 
@@ -92,10 +93,8 @@ const palette = [
 
         function NormalizeCharts(charts) {
             return {
-                pages: (GetObjectProperty(charts, 'pages', 'Pages') || []).map(NormalizeSeries),
                 inserted: (GetObjectProperty(charts, 'inserted', 'Inserted') || []).map(NormalizeSeries),
                 updated: (GetObjectProperty(charts, 'updated', 'Updated') || []).map(NormalizeSeries),
-                listings: (GetObjectProperty(charts, 'listings', 'Listings') || []).map(NormalizeSeries),
                 listingStatus: (GetObjectProperty(charts, 'listingStatus', 'ListingStatus') || []).map(NormalizeSeries),
                 notListingCache: (GetObjectProperty(charts, 'notListingCache', 'NotListingCache') || []).map(NormalizeSeries),
                 responseBodyTextAlreadyParsed: (GetObjectProperty(charts, 'responseBodyTextAlreadyParsed', 'ResponseBodyTextAlreadyParsed') || []).map(NormalizeSeries),
@@ -106,10 +105,20 @@ const palette = [
             };
         }
 
+        function NormalizeSummary(summary) {
+            return {
+                totalPages: GetObjectProperty(summary, 'totalPages', 'TotalPages') || 0,
+                totalListings: GetObjectProperty(summary, 'totalListings', 'TotalListings') || 0,
+                publishedListings: GetObjectProperty(summary, 'publishedListings', 'PublishedListings') || 0,
+                unpublishedListings: GetObjectProperty(summary, 'unpublishedListings', 'UnpublishedListings') || 0
+            };
+        }
+
         function NormalizeHostData(hostData) {
             return {
                 mainUri: GetObjectProperty(hostData, 'mainUri', 'MainUri'),
                 updatedAt: GetObjectProperty(hostData, 'updatedAt', 'UpdatedAt'),
+                summary: NormalizeSummary(GetObjectProperty(hostData, 'summary', 'Summary') || {}),
                 charts: NormalizeCharts(GetObjectProperty(hostData, 'charts', 'Charts') || {})
             };
         }
@@ -254,22 +263,42 @@ const palette = [
             return Array.isArray(values) && values.length > 0 && values[0].values.length > 0;
         }
 
-        function GetLatestValue(values) {
-            if (!HasSeries(values)) {
-                return 0;
-            }
-
-            const points = values[0].values;
-            return points[points.length - 1].value;
-        }
-
         function FormatNumber(value) {
             return Number(value || 0).toLocaleString('en-US');
         }
 
         function RenderEmptyState(message) {
+            document.getElementById('HostSummary').innerHTML = '';
+
             const container = document.getElementById('Statistics');
             container.innerHTML = `<div class="empty-state">${message}</div>`;
+        }
+
+        function RenderHostSummary(hostData) {
+            const rows = [
+                { label: 'Total Pages', value: hostData.summary.totalPages },
+                { label: 'Total Listings', value: hostData.summary.totalListings },
+                { label: 'Published Listings', value: hostData.summary.publishedListings },
+                { label: 'Unpublished Listings', value: hostData.summary.unpublishedListings }
+            ];
+
+            document.getElementById('HostSummary').innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data Type</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rows.map(row => `
+                            <tr>
+                                <td>${row.label}</td>
+                                <td>${FormatNumber(row.value)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>`;
         }
 
         function RenderHost(host) {
@@ -285,12 +314,11 @@ const palette = [
             }
 
             const hostData = NormalizeHostData(rawHostData);
+            RenderHostSummary(hostData);
 
             const chartDefinitions = [
-                { title: 'Pages', values: hostData.charts.pages, type: AreaChart },
                 { title: 'Inserted Pages', values: hostData.charts.inserted, type: AreaChart },
                 { title: 'Updated Pages', values: hostData.charts.updated, type: AreaChart },
-                { title: 'Listings', values: hostData.charts.listings, type: AreaChart },
                 { title: 'Published vs Unpublished Listings', values: hostData.charts.listingStatus, type: AreaChart },
                 { title: 'Not Listing By Cache', values: hostData.charts.notListingCache, type: AreaChart },
                 { title: 'ResponseBodyText Already Parsed', values: hostData.charts.responseBodyTextAlreadyParsed, type: AreaChart },
