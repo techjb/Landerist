@@ -303,6 +303,10 @@ namespace landerist_library.Scrape
                 {
                     WebsitesBlocker.BlockForbidden(page.Website, page.TransientErrorCounter);
                 }
+                else if (!page.IsHttpStatusCodeNotOK() && !page.IsResponseBodyNullOrEmpty())
+                {
+                    WebsitesBlocker.ReportSuccess(page.Website);
+                }
 
                 if (page.PageType.Equals(PageType.HttpStatusCodeNotOK))
                 {
