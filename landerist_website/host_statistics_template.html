@@ -95,7 +95,6 @@ const palette = [
             return {
                 inserted: (GetObjectProperty(charts, 'inserted', 'Inserted') || []).map(NormalizeSeries),
                 updated: (GetObjectProperty(charts, 'updated', 'Updated') || []).map(NormalizeSeries),
-                listingStatus: (GetObjectProperty(charts, 'listingStatus', 'ListingStatus') || []).map(NormalizeSeries),
                 notListingCache: (GetObjectProperty(charts, 'notListingCache', 'NotListingCache') || []).map(NormalizeSeries),
                 responseBodyTextAlreadyParsed: (GetObjectProperty(charts, 'responseBodyTextAlreadyParsed', 'ResponseBodyTextAlreadyParsed') || []).map(NormalizeSeries),
                 reponseBodyTextIsAnotherListingInHost: (GetObjectProperty(charts, 'reponseBodyTextIsAnotherListingInHost', 'ReponseBodyTextIsAnotherListingInHost') || []).map(NormalizeSeries),
@@ -319,7 +318,6 @@ const palette = [
             const chartDefinitions = [
                 { title: 'Inserted Pages', values: hostData.charts.inserted, type: AreaChart },
                 { title: 'Updated Pages', values: hostData.charts.updated, type: AreaChart },
-                { title: 'Published vs Unpublished Listings', values: hostData.charts.listingStatus, type: AreaChart },
                 { title: 'Not Listing By Cache', values: hostData.charts.notListingCache, type: AreaChart },
                 { title: 'ResponseBodyText Already Parsed', values: hostData.charts.responseBodyTextAlreadyParsed, type: AreaChart },
                 { title: 'ResponseBodyText Is Another Listing In Host', values: hostData.charts.reponseBodyTextIsAnotherListingInHost, type: AreaChart },

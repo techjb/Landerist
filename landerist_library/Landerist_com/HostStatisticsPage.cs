@@ -85,7 +85,6 @@ namespace landerist_library.Landerist_com
                 {
                     Inserted = GetTimeSeries(website.Host, HostStatisticsKey.Inserted, "Inserted Pages"),
                     Updated = GetTimeSeries(website.Host, HostStatisticsKey.Updated, "Updated Pages"),
-                    ListingStatus = GetListingStatusSeries(website.Host),
                     NotListingCache = GetTimeSeries(website.Host, HostStatisticsKey.NotListingCache, "Not listing by cache"),
                     ResponseBodyTextAlreadyParsed = GetTimeSeries(website.Host, HostStatisticsKey.ResponseBodyTextAlreadyParsed, "ResponseBodyText already parsed"),
                     ReponseBodyTextIsAnotherListingInHost = GetTimeSeries(website.Host, HostStatisticsKey.ReponseBodyTextIsAnotherListingInHost, "ResponseBodyText is another listing in host"),
@@ -94,15 +93,6 @@ namespace landerist_library.Landerist_com
                     HttpStatusCode = GetDistribution(HostStatistics.GetPagesByHttpStatusCode(website.Host), "HttpStatusCode"),
                 }
             };
-        }
-
-        private static List<ChartSeriesModel> GetListingStatusSeries(string host)
-        {
-            return
-            [
-                .. GetTimeSeries(host, HostStatisticsKey.PublishedListings, "Published"),
-                .. GetTimeSeries(host, HostStatisticsKey.UnpublishedListings, "Unpublished")
-            ];
         }
 
         private static List<ChartSeriesModel> GetTimeSeries(string host, HostStatisticsKey key, string label)
@@ -224,7 +214,6 @@ namespace landerist_library.Landerist_com
         {
             public required List<ChartSeriesModel> Inserted { get; init; }
             public required List<ChartSeriesModel> Updated { get; init; }
-            public required List<ChartSeriesModel> ListingStatus { get; init; }
             public required List<ChartSeriesModel> NotListingCache { get; init; }
             public required List<ChartSeriesModel> ResponseBodyTextAlreadyParsed { get; init; }
             public required List<ChartSeriesModel> ReponseBodyTextIsAnotherListingInHost { get; init; }
