@@ -65,15 +65,14 @@ namespace landerist_library.Landerist_com
                 objectKey,
                 DownloadsUpdater.METADATA_KEY_COUNTER);
 
-            Replace(Comment(countryCode, exportType, "Counter"), counter ?? "-");
-
             string sizeString = FormatBytes((long)contentLength);
             Replace(Comment(countryCode, exportType, "Size"), sizeString);
 
             var url = $"https://{PrivateConfig.AWS_S3_DOWNLOADS_BUCKET}.s3.amazonaws.com/{objectKey}";
             string fileName = GetFileName(countryCode, exportType, "zip");
-            string hyperlink = $"<a title=\"{fileName}\" href=\"{url}\">zip</a>";
-            Replace(Comment(countryCode, exportType, "Hyperlink"), hyperlink);
+            string counterText = counter ?? "-";
+            string counterHyperlink = $"<a title=\"Donwload\" href=\"{WebUtility.HtmlEncode(url)}\">{WebUtility.HtmlEncode(counterText)}</a>";
+            Replace(Comment(countryCode, exportType, "Counter"), counterHyperlink);
         }
 
         private static void UpdateHostsTemplate()
@@ -132,7 +131,7 @@ namespace landerist_library.Landerist_com
             }
 
             string fileName = GetHostFileName(host, downloadType, extension);
-            return $"<a title=\"Download\" href=\"{WebUtility.HtmlEncode(url)}\" download=\"{WebUtility.HtmlEncode(fileName)}\">{counterText}</a>";
+            return $"<a title=\"Donwload\" href=\"{WebUtility.HtmlEncode(url)}\" download=\"{WebUtility.HtmlEncode(fileName)}\">{counterText}</a>";
         }
 
         private static string? GetHostDownloadUrl(string host, string downloadType, string extension)
