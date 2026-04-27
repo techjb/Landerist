@@ -71,7 +71,7 @@ namespace landerist_library.Scrape
         public void Start()
         {
             ResetCancellationTokenSource();
-            WebsitesBlocker.Clean();
+            WebsitesThrottle.Clean();
             DownloadersPool.Clear();
             _pageQueue = PageSelector.Select();
             Scrape();
@@ -169,7 +169,7 @@ namespace landerist_library.Scrape
                 return;
             }
 
-            var isBlocked = WebsitesBlocker.IsBlocked(page.Website);
+            var isBlocked = WebsitesThrottle.IsBlocked(page.Website);
             if (isBlocked && !Config.PROXY_ENABLED)
             {
                 Interlocked.Increment(ref SkippedByBlockedWebsite);
@@ -301,11 +301,11 @@ namespace landerist_library.Scrape
 
                 if (page.IsHttpStatusCodeForbidden())
                 {
-                    WebsitesBlocker.BlockForbidden(page.Website, page.TransientErrorCounter);
+                    WebsitesThrottle.BlockForbidden(page.Website, page.TransientErrorCounter);
                 }
                 else if (!page.IsHttpStatusCodeNotOK() && !page.IsResponseBodyNullOrEmpty())
                 {
-                    WebsitesBlocker.ReportSuccess(page.Website);
+                    WebsitesThrottle.ReportSuccess(page.Website);
                 }
 
                 if (page.PageType.Equals(PageType.HttpStatusCodeNotOK))
@@ -322,7 +322,7 @@ namespace landerist_library.Scrape
         private static bool ScrapeAttempt(Page page, bool useProxy)
         {
             var pageScraper = new PageScraper(page, useProxy);            
-            WebsitesBlocker.Block(page.Website);
+            WebsitesThrottle.Block(page.Website);
             return pageScraper.Scrape();
         }
     }

@@ -118,7 +118,7 @@ namespace landerist_library.Pages
                 "   WHERE P.[LockedBy] IS NULL AND P.[WaitingStatus] IS NULL " +
                 "   AND NOT EXISTS (" +
                 "       SELECT 1 " +
-                "       FROM " + WebsitesBlocker.WEBSITES_BLOCKER + " AS WB " +
+                "       FROM " + WebsitesThrottle.WEBSITES_THROTTLE + " AS WB " +
                 "       WHERE WB.[IpOrHost] = P.[Host] AND WB.[BlockUntil] > GETDATE()" +
                 "   ) " +
                 (string.IsNullOrEmpty(where) ? string.Empty : " AND " + where) + " " +

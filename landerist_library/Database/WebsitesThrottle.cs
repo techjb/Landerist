@@ -2,9 +2,9 @@
 
 namespace landerist_library.Database
 {
-    public class WebsitesBlocker
+    public class WebsitesThrottle
     {
-        public const string WEBSITES_BLOCKER = "[WEBSITES_BLOCKER]";
+        public const string WEBSITES_THROTTLE = "[WEBSITES_THROTTLE]";
         private const short MAX_FORBIDDEN_BACKOFF_LEVEL = 17;
         private const int SUCCESSES_TO_DECREASE_FORBIDDEN_BACKOFF = 3;
 
@@ -18,7 +18,7 @@ namespace landerist_library.Database
                 "           ELSE 0 " +
                 "       END " +
                 "   AS BIT) AS IsBlocked " +
-                "FROM " + WEBSITES_BLOCKER + " " +
+                "FROM " + WEBSITES_THROTTLE + " " +
                 "WHERE IpOrHost = @Host";
 
             return new DataBase().QueryBool(query, new Dictionary<string, object?>()
@@ -48,7 +48,7 @@ namespace landerist_library.Database
                 "DECLARE @HostBlockUntil datetime; " +
                 "IF EXISTS (" +
                 "   SELECT 1 " +
-                "   FROM " + WEBSITES_BLOCKER + " WITH (UPDLOCK, HOLDLOCK) " +
+                "   FROM " + WEBSITES_THROTTLE + " WITH (UPDLOCK, HOLDLOCK) " +
                 "   WHERE IpOrHost = @Host) " +
                 "BEGIN " +
                 "   SELECT @NewForbiddenBackoffLevel = " +
@@ -56,7 +56,7 @@ namespace landerist_library.Database
                 "           WHEN ISNULL(ForbiddenBackoffLevel, 0) >= @MaxForbiddenBackoffLevel THEN @MaxForbiddenBackoffLevel " +
                 "           ELSE ISNULL(ForbiddenBackoffLevel, 0) + 1 " +
                 "       END " +
-                "   FROM " + WEBSITES_BLOCKER + " " +
+                "   FROM " + WEBSITES_THROTTLE + " " +
                 "   WHERE IpOrHost = @Host; " +
                 "END " +
                 "ELSE BEGIN " +
@@ -64,7 +64,7 @@ namespace landerist_library.Database
                 "END " +
                 "SET @ForbiddenRetryDelaySeconds = " + GetForbiddenDelaySecondsSql("@NewForbiddenBackoffLevel") + "; " +
                 "SET @HostBlockUntil = DATEADD(second, @ForbiddenRetryDelaySeconds + @JitterSeconds, @Now); " +
-                "UPDATE " + WEBSITES_BLOCKER + " " +
+                "UPDATE " + WEBSITES_THROTTLE + " " +
                 "SET " +
                 "   BlockUntil = CASE WHEN BlockUntil > @HostBlockUntil THEN BlockUntil ELSE @HostBlockUntil END, " +
                 "   ForbiddenBackoffLevel = @NewForbiddenBackoffLevel, " +
@@ -76,7 +76,7 @@ namespace landerist_library.Database
                 "WHERE IpOrHost = @Host; " +
                 "IF @@ROWCOUNT = 0 " +
                 "BEGIN " +
-                "   INSERT INTO " + WEBSITES_BLOCKER + " " +
+                "   INSERT INTO " + WEBSITES_THROTTLE + " " +
                 "       (IpOrHost, BlockUntil, ForbiddenBackoffLevel, ForbiddenRetryDelaySeconds, ForbiddenCounter, SuccessCounterAfterForbidden, LastForbiddenAt, Updated) " +
                 "   VALUES " +
                 "       (@Host, @HostBlockUntil, @NewForbiddenBackoffLevel, @ForbiddenRetryDelaySeconds, 1, 0, @Now, @Now); " +
@@ -100,7 +100,7 @@ namespace landerist_library.Database
                 "SELECT " +
                 "   @CurrentForbiddenBackoffLevel = ISNULL(ForbiddenBackoffLevel, 0), " +
                 "   @NewSuccessCounterAfterForbidden = ISNULL(SuccessCounterAfterForbidden, 0) + 1 " +
-                "FROM " + WEBSITES_BLOCKER + " WITH (UPDLOCK, HOLDLOCK) " +
+                "FROM " + WEBSITES_THROTTLE + " WITH (UPDLOCK, HOLDLOCK) " +
                 "WHERE IpOrHost = @Host; " +
                 "IF @CurrentForbiddenBackoffLevel IS NOT NULL AND @CurrentForbiddenBackoffLevel > 0 " +
                 "BEGIN " +
@@ -109,7 +109,7 @@ namespace landerist_library.Database
                 "           WHEN @NewSuccessCounterAfterForbidden >= @SuccessesToDecreaseForbiddenBackoff THEN @CurrentForbiddenBackoffLevel - 1 " +
                 "           ELSE @CurrentForbiddenBackoffLevel " +
                 "       END; " +
-                "   UPDATE " + WEBSITES_BLOCKER + " " +
+                "   UPDATE " + WEBSITES_THROTTLE + " " +
                 "   SET " +
                 "       ForbiddenBackoffLevel = @NewForbiddenBackoffLevel, " +
                 "       ForbiddenRetryDelaySeconds = " + GetForbiddenDelaySecondsSql("@NewForbiddenBackoffLevel") + ", " +
@@ -135,17 +135,17 @@ namespace landerist_library.Database
             string query =
                 "IF EXISTS (" +
                "   SELECT 1 " +
-               "   FROM " + WEBSITES_BLOCKER + " " +
+               "   FROM " + WEBSITES_THROTTLE + " " +
                "   WHERE IpOrHost = @Host) " +
                "BEGIN " +
-               "   UPDATE " + WEBSITES_BLOCKER + " " +
+               "   UPDATE " + WEBSITES_THROTTLE + " " +
                "   SET " +
                "       BlockUntil = CASE WHEN BlockUntil > @HostBlockUntil THEN BlockUntil ELSE @HostBlockUntil END, " +
                "       Updated = GETDATE() " +
                "   WHERE IpOrHost = @Host " +
                "END " +
                "ELSE BEGIN " +
-               "   INSERT INTO " + WEBSITES_BLOCKER + " (IpOrHost, BlockUntil, Updated) " +
+               "   INSERT INTO " + WEBSITES_THROTTLE + " (IpOrHost, BlockUntil, Updated) " +
                "   VALUES (@Host, @HostBlockUntil, GETDATE()) " +
                "END";
 
@@ -159,7 +159,7 @@ namespace landerist_library.Database
         public static bool Clean()
         {
             string query =
-                "DELETE FROM " + WEBSITES_BLOCKER + " " +
+                "DELETE FROM " + WEBSITES_THROTTLE + " " +
                 "WHERE BlockUntil < GETDATE() " +
                 "AND ISNULL(ForbiddenBackoffLevel, 0) = 0 " +
                 "AND ISNULL(ForbiddenCounter, 0) = 0";

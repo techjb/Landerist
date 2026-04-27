@@ -20,8 +20,8 @@ namespace landerist_tests
 
             //new Scraper().TestSinglePage();
             //landerist_library.Scrape.PageSelector.SelectTop1();
-            //Console.WriteLine("Block: " + WebsitesBlocker.Block(page.Website));
-            //Console.WriteLine("IsBlocked: " + WebsitesBlocker.IsBlocked(page.Website));
+            //Console.WriteLine("Block: " + WebsitesThrottle.Block(page.Website));
+            //Console.WriteLine("IsBlocked: " + WebsitesThrottle.IsBlocked(page.Website));
             //new landerist_library.Scrape.Scraper().Start();
         }
     }
