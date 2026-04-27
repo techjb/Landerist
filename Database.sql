@@ -386,65 +386,65 @@ GO
 
 USE [Landerist]
 GO
-IF OBJECT_ID('dbo.WEBSITES_BLOCKER', 'U') IS NULL
+IF OBJECT_ID('dbo.WEBSITES_THROTTLE', 'U') IS NULL
 BEGIN
-	CREATE TABLE [dbo].[WEBSITES_BLOCKER](
+	CREATE TABLE [dbo].[WEBSITES_THROTTLE](
 		[IpOrHost] [nvarchar](200) NOT NULL,
 		[BlockUntil] [datetime] NOT NULL,
-		[ForbiddenBackoffLevel] [smallint] NOT NULL CONSTRAINT [DF_WEBSITES_BLOCKER_ForbiddenBackoffLevel] DEFAULT ((0)),
-		[ForbiddenRetryDelaySeconds] [int] NOT NULL CONSTRAINT [DF_WEBSITES_BLOCKER_ForbiddenRetryDelaySeconds] DEFAULT ((0)),
-		[ForbiddenCounter] [int] NOT NULL CONSTRAINT [DF_WEBSITES_BLOCKER_ForbiddenCounter] DEFAULT ((0)),
-		[SuccessCounterAfterForbidden] [int] NOT NULL CONSTRAINT [DF_WEBSITES_BLOCKER_SuccessCounterAfterForbidden] DEFAULT ((0)),
+		[ForbiddenBackoffLevel] [smallint] NOT NULL CONSTRAINT [DF_WEBSITES_THROTTLE_ForbiddenBackoffLevel] DEFAULT ((0)),
+		[ForbiddenRetryDelaySeconds] [int] NOT NULL CONSTRAINT [DF_WEBSITES_THROTTLE_ForbiddenRetryDelaySeconds] DEFAULT ((0)),
+		[ForbiddenCounter] [int] NOT NULL CONSTRAINT [DF_WEBSITES_THROTTLE_ForbiddenCounter] DEFAULT ((0)),
+		[SuccessCounterAfterForbidden] [int] NOT NULL CONSTRAINT [DF_WEBSITES_THROTTLE_SuccessCounterAfterForbidden] DEFAULT ((0)),
 		[LastForbiddenAt] [datetime] NULL,
 		[LastSuccessAt] [datetime] NULL,
-		[Updated] [datetime] NOT NULL CONSTRAINT [DF_WEBSITES_BLOCKER_Updated] DEFAULT (GETDATE()),
-	 CONSTRAINT [PK_WEBSITES_BLOCKER] PRIMARY KEY CLUSTERED 
+		[Updated] [datetime] NOT NULL CONSTRAINT [DF_WEBSITES_THROTTLE_Updated] DEFAULT (GETDATE()),
+	 CONSTRAINT [PK_WEBSITES_THROTTLE] PRIMARY KEY CLUSTERED 
 	(
 		[IpOrHost] ASC
 	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 	) ON [PRIMARY]
 END
 GO
-IF COL_LENGTH('dbo.WEBSITES_BLOCKER', 'ForbiddenBackoffLevel') IS NULL
+IF COL_LENGTH('dbo.WEBSITES_THROTTLE', 'ForbiddenBackoffLevel') IS NULL
 BEGIN
-	ALTER TABLE [dbo].[WEBSITES_BLOCKER]
-	ADD [ForbiddenBackoffLevel] [smallint] NOT NULL CONSTRAINT [DF_WEBSITES_BLOCKER_ForbiddenBackoffLevel] DEFAULT ((0))
+	ALTER TABLE [dbo].[WEBSITES_THROTTLE]
+	ADD [ForbiddenBackoffLevel] [smallint] NOT NULL CONSTRAINT [DF_WEBSITES_THROTTLE_ForbiddenBackoffLevel] DEFAULT ((0))
 END
 GO
-IF COL_LENGTH('dbo.WEBSITES_BLOCKER', 'ForbiddenRetryDelaySeconds') IS NULL
+IF COL_LENGTH('dbo.WEBSITES_THROTTLE', 'ForbiddenRetryDelaySeconds') IS NULL
 BEGIN
-	ALTER TABLE [dbo].[WEBSITES_BLOCKER]
-	ADD [ForbiddenRetryDelaySeconds] [int] NOT NULL CONSTRAINT [DF_WEBSITES_BLOCKER_ForbiddenRetryDelaySeconds] DEFAULT ((0))
+	ALTER TABLE [dbo].[WEBSITES_THROTTLE]
+	ADD [ForbiddenRetryDelaySeconds] [int] NOT NULL CONSTRAINT [DF_WEBSITES_THROTTLE_ForbiddenRetryDelaySeconds] DEFAULT ((0))
 END
 GO
-IF COL_LENGTH('dbo.WEBSITES_BLOCKER', 'ForbiddenCounter') IS NULL
+IF COL_LENGTH('dbo.WEBSITES_THROTTLE', 'ForbiddenCounter') IS NULL
 BEGIN
-	ALTER TABLE [dbo].[WEBSITES_BLOCKER]
-	ADD [ForbiddenCounter] [int] NOT NULL CONSTRAINT [DF_WEBSITES_BLOCKER_ForbiddenCounter] DEFAULT ((0))
+	ALTER TABLE [dbo].[WEBSITES_THROTTLE]
+	ADD [ForbiddenCounter] [int] NOT NULL CONSTRAINT [DF_WEBSITES_THROTTLE_ForbiddenCounter] DEFAULT ((0))
 END
 GO
-IF COL_LENGTH('dbo.WEBSITES_BLOCKER', 'SuccessCounterAfterForbidden') IS NULL
+IF COL_LENGTH('dbo.WEBSITES_THROTTLE', 'SuccessCounterAfterForbidden') IS NULL
 BEGIN
-	ALTER TABLE [dbo].[WEBSITES_BLOCKER]
-	ADD [SuccessCounterAfterForbidden] [int] NOT NULL CONSTRAINT [DF_WEBSITES_BLOCKER_SuccessCounterAfterForbidden] DEFAULT ((0))
+	ALTER TABLE [dbo].[WEBSITES_THROTTLE]
+	ADD [SuccessCounterAfterForbidden] [int] NOT NULL CONSTRAINT [DF_WEBSITES_THROTTLE_SuccessCounterAfterForbidden] DEFAULT ((0))
 END
 GO
-IF COL_LENGTH('dbo.WEBSITES_BLOCKER', 'LastForbiddenAt') IS NULL
+IF COL_LENGTH('dbo.WEBSITES_THROTTLE', 'LastForbiddenAt') IS NULL
 BEGIN
-	ALTER TABLE [dbo].[WEBSITES_BLOCKER]
+	ALTER TABLE [dbo].[WEBSITES_THROTTLE]
 	ADD [LastForbiddenAt] [datetime] NULL
 END
 GO
-IF COL_LENGTH('dbo.WEBSITES_BLOCKER', 'LastSuccessAt') IS NULL
+IF COL_LENGTH('dbo.WEBSITES_THROTTLE', 'LastSuccessAt') IS NULL
 BEGIN
-	ALTER TABLE [dbo].[WEBSITES_BLOCKER]
+	ALTER TABLE [dbo].[WEBSITES_THROTTLE]
 	ADD [LastSuccessAt] [datetime] NULL
 END
 GO
-IF COL_LENGTH('dbo.WEBSITES_BLOCKER', 'Updated') IS NULL
+IF COL_LENGTH('dbo.WEBSITES_THROTTLE', 'Updated') IS NULL
 BEGIN
-	ALTER TABLE [dbo].[WEBSITES_BLOCKER]
-	ADD [Updated] [datetime] NOT NULL CONSTRAINT [DF_WEBSITES_BLOCKER_Updated] DEFAULT (GETDATE())
+	ALTER TABLE [dbo].[WEBSITES_THROTTLE]
+	ADD [Updated] [datetime] NOT NULL CONSTRAINT [DF_WEBSITES_THROTTLE_Updated] DEFAULT (GETDATE())
 END
 GO
 IF COL_LENGTH('dbo.PAGES', 'ResponseBodyTextNotChangedCounter') IS NULL

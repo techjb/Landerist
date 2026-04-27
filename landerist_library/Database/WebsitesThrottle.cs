@@ -1,12 +1,22 @@
-﻿using landerist_library.Websites;
+using landerist_library.Websites;
+using System.Text;
 
 namespace landerist_library.Database
 {
     public class WebsitesThrottle
     {
         public const string WEBSITES_THROTTLE = "[WEBSITES_THROTTLE]";
-        private const short MAX_FORBIDDEN_BACKOFF_LEVEL = 17;
+
+        private static readonly int[] ForbiddenRetryDelaySecondsByLevel =
+        [
+            0, 30, 60, 90, 120, 180, 240, 300, 450, 600, 900, 1200, 1800, 2700, 3600, 5400, 7200, 10800
+        ];
+
+        private static readonly short MAX_FORBIDDEN_BACKOFF_LEVEL = (short)(ForbiddenRetryDelaySecondsByLevel.Length - 1);
         private const int SUCCESSES_TO_DECREASE_FORBIDDEN_BACKOFF = 3;
+        private const int MIN_SECONDS_BETWEEN_FORBIDDEN_BACKOFF_DECREASES = 300;
+        private const int MAX_FORBIDDEN_JITTER_SECONDS = 300;
+        private const double FORBIDDEN_JITTER_RATIO = 0.2d;
 
         public static bool IsBlocked(Website website)
         {
@@ -33,38 +43,47 @@ namespace landerist_library.Database
             return Block(website, hostBlockUntil);
         }
 
-        public static bool BlockForbidden(Website website, short? transientErrorCounter = null)
+        public static bool BlockForbidden(Website website)
         {
             return ReportForbidden(website);
         }
 
         public static bool ReportForbidden(Website website)
         {
-            int jitterSeconds = Random.Shared.Next(0, 90);
             string query =
+                "SET XACT_ABORT ON; " +
+                "BEGIN TRANSACTION; " +
                 "DECLARE @Now datetime = GETDATE(); " +
                 "DECLARE @NewForbiddenBackoffLevel smallint; " +
                 "DECLARE @ForbiddenRetryDelaySeconds int; " +
+                "DECLARE @MaxJitterSeconds int; " +
+                "DECLARE @JitterSeconds int; " +
                 "DECLARE @HostBlockUntil datetime; " +
-                "IF EXISTS (" +
-                "   SELECT 1 " +
-                "   FROM " + WEBSITES_THROTTLE + " WITH (UPDLOCK, HOLDLOCK) " +
-                "   WHERE IpOrHost = @Host) " +
-                "BEGIN " +
-                "   SELECT @NewForbiddenBackoffLevel = " +
+                "SELECT @NewForbiddenBackoffLevel = " +
                 "       CASE " +
                 "           WHEN ISNULL(ForbiddenBackoffLevel, 0) >= @MaxForbiddenBackoffLevel THEN @MaxForbiddenBackoffLevel " +
                 "           ELSE ISNULL(ForbiddenBackoffLevel, 0) + 1 " +
                 "       END " +
-                "   FROM " + WEBSITES_THROTTLE + " " +
-                "   WHERE IpOrHost = @Host; " +
-                "END " +
-                "ELSE BEGIN " +
+                "FROM " + WEBSITES_THROTTLE + " WITH (UPDLOCK, HOLDLOCK) " +
+                "WHERE IpOrHost = @Host; " +
+                "IF @NewForbiddenBackoffLevel IS NULL " +
+                "BEGIN " +
                 "   SET @NewForbiddenBackoffLevel = 1; " +
-                "END " +
+                "END; " +
                 "SET @ForbiddenRetryDelaySeconds = " + GetForbiddenDelaySecondsSql("@NewForbiddenBackoffLevel") + "; " +
+                "SET @MaxJitterSeconds = " +
+                "   CASE " +
+                "       WHEN @ForbiddenRetryDelaySeconds <= 0 THEN 0 " +
+                "       WHEN CAST(@ForbiddenRetryDelaySeconds * @ForbiddenJitterRatio AS int) > @MaxForbiddenJitterSeconds THEN @MaxForbiddenJitterSeconds " +
+                "       ELSE CAST(@ForbiddenRetryDelaySeconds * @ForbiddenJitterRatio AS int) " +
+                "   END; " +
+                "SET @JitterSeconds = " +
+                "   CASE " +
+                "       WHEN @MaxJitterSeconds <= 0 THEN 0 " +
+                "       ELSE ABS(CHECKSUM(NEWID()) % (@MaxJitterSeconds + 1)) " +
+                "   END; " +
                 "SET @HostBlockUntil = DATEADD(second, @ForbiddenRetryDelaySeconds + @JitterSeconds, @Now); " +
-                "UPDATE " + WEBSITES_THROTTLE + " " +
+                "UPDATE " + WEBSITES_THROTTLE + " WITH (UPDLOCK, HOLDLOCK) " +
                 "SET " +
                 "   BlockUntil = CASE WHEN BlockUntil > @HostBlockUntil THEN BlockUntil ELSE @HostBlockUntil END, " +
                 "   ForbiddenBackoffLevel = @NewForbiddenBackoffLevel, " +
@@ -80,33 +99,43 @@ namespace landerist_library.Database
                 "       (IpOrHost, BlockUntil, ForbiddenBackoffLevel, ForbiddenRetryDelaySeconds, ForbiddenCounter, SuccessCounterAfterForbidden, LastForbiddenAt, Updated) " +
                 "   VALUES " +
                 "       (@Host, @HostBlockUntil, @NewForbiddenBackoffLevel, @ForbiddenRetryDelaySeconds, 1, 0, @Now, @Now); " +
-                "END";
+                "END; " +
+                "COMMIT TRANSACTION";
 
             return new DataBase().Query(query, new Dictionary<string, object?>()
             {
                 {"Host", website.Host},
                 {"MaxForbiddenBackoffLevel", MAX_FORBIDDEN_BACKOFF_LEVEL},
-                {"JitterSeconds", jitterSeconds},
+                {"ForbiddenJitterRatio", FORBIDDEN_JITTER_RATIO},
+                {"MaxForbiddenJitterSeconds", MAX_FORBIDDEN_JITTER_SECONDS},
             });
         }
 
         public static bool ReportSuccess(Website website)
         {
             string query =
+                "SET XACT_ABORT ON; " +
+                "BEGIN TRANSACTION; " +
                 "DECLARE @Now datetime = GETDATE(); " +
                 "DECLARE @CurrentForbiddenBackoffLevel smallint; " +
                 "DECLARE @NewForbiddenBackoffLevel smallint; " +
                 "DECLARE @NewSuccessCounterAfterForbidden int; " +
+                "DECLARE @LastBackoffEventAt datetime; " +
                 "SELECT " +
                 "   @CurrentForbiddenBackoffLevel = ISNULL(ForbiddenBackoffLevel, 0), " +
-                "   @NewSuccessCounterAfterForbidden = ISNULL(SuccessCounterAfterForbidden, 0) + 1 " +
+                "   @NewSuccessCounterAfterForbidden = ISNULL(SuccessCounterAfterForbidden, 0) + 1, " +
+                "   @LastBackoffEventAt = COALESCE(LastSuccessAt, LastForbiddenAt) " +
                 "FROM " + WEBSITES_THROTTLE + " WITH (UPDLOCK, HOLDLOCK) " +
                 "WHERE IpOrHost = @Host; " +
                 "IF @CurrentForbiddenBackoffLevel IS NOT NULL AND @CurrentForbiddenBackoffLevel > 0 " +
                 "BEGIN " +
                 "   SET @NewForbiddenBackoffLevel = " +
                 "       CASE " +
-                "           WHEN @NewSuccessCounterAfterForbidden >= @SuccessesToDecreaseForbiddenBackoff THEN @CurrentForbiddenBackoffLevel - 1 " +
+                "           WHEN @NewSuccessCounterAfterForbidden >= @SuccessesToDecreaseForbiddenBackoff " +
+                "               AND (" +
+                "                   @LastBackoffEventAt IS NULL " +
+                "                   OR DATEDIFF(second, @LastBackoffEventAt, @Now) >= @MinSecondsBetweenForbiddenBackoffDecreases " +
+                "               ) THEN @CurrentForbiddenBackoffLevel - 1 " +
                 "           ELSE @CurrentForbiddenBackoffLevel " +
                 "       END; " +
                 "   UPDATE " + WEBSITES_THROTTLE + " " +
@@ -115,39 +144,40 @@ namespace landerist_library.Database
                 "       ForbiddenRetryDelaySeconds = " + GetForbiddenDelaySecondsSql("@NewForbiddenBackoffLevel") + ", " +
                 "       SuccessCounterAfterForbidden = " +
                 "           CASE " +
-                "               WHEN @NewSuccessCounterAfterForbidden >= @SuccessesToDecreaseForbiddenBackoff THEN 0 " +
+                "               WHEN @NewForbiddenBackoffLevel < @CurrentForbiddenBackoffLevel THEN 0 " +
                 "               ELSE @NewSuccessCounterAfterForbidden " +
                 "           END, " +
-                "       LastSuccessAt = @Now, " +
+                "       LastSuccessAt = CASE WHEN @NewForbiddenBackoffLevel < @CurrentForbiddenBackoffLevel THEN @Now ELSE LastSuccessAt END, " +
                 "       Updated = @Now " +
                 "   WHERE IpOrHost = @Host; " +
-                "END";
+                "END; " +
+                "COMMIT TRANSACTION";
 
             return new DataBase().Query(query, new Dictionary<string, object?>()
             {
                 {"Host", website.Host},
                 {"SuccessesToDecreaseForbiddenBackoff", SUCCESSES_TO_DECREASE_FORBIDDEN_BACKOFF},
+                {"MinSecondsBetweenForbiddenBackoffDecreases", MIN_SECONDS_BETWEEN_FORBIDDEN_BACKOFF_DECREASES},
             });
         }
 
         private static bool Block(Website website, DateTime hostBlockUntil)
         {
             string query =
-                "IF EXISTS (" +
-               "   SELECT 1 " +
-               "   FROM " + WEBSITES_THROTTLE + " " +
-               "   WHERE IpOrHost = @Host) " +
-               "BEGIN " +
-               "   UPDATE " + WEBSITES_THROTTLE + " " +
-               "   SET " +
-               "       BlockUntil = CASE WHEN BlockUntil > @HostBlockUntil THEN BlockUntil ELSE @HostBlockUntil END, " +
-               "       Updated = GETDATE() " +
-               "   WHERE IpOrHost = @Host " +
-               "END " +
-               "ELSE BEGIN " +
-               "   INSERT INTO " + WEBSITES_THROTTLE + " (IpOrHost, BlockUntil, Updated) " +
-               "   VALUES (@Host, @HostBlockUntil, GETDATE()) " +
-               "END";
+                "SET XACT_ABORT ON; " +
+                "BEGIN TRANSACTION; " +
+                "DECLARE @Now datetime = GETDATE(); " +
+                "UPDATE " + WEBSITES_THROTTLE + " WITH (UPDLOCK, HOLDLOCK) " +
+                "SET " +
+                "   BlockUntil = CASE WHEN BlockUntil > @HostBlockUntil THEN BlockUntil ELSE @HostBlockUntil END, " +
+                "   Updated = @Now " +
+                "WHERE IpOrHost = @Host; " +
+                "IF @@ROWCOUNT = 0 " +
+                "BEGIN " +
+                "   INSERT INTO " + WEBSITES_THROTTLE + " (IpOrHost, BlockUntil, Updated) " +
+                "   VALUES (@Host, @HostBlockUntil, @Now); " +
+                "END; " +
+                "COMMIT TRANSACTION";
 
             return new DataBase().Query(query, new Dictionary<string, object?>()
             {
@@ -176,27 +206,25 @@ namespace landerist_library.Database
 
         private static string GetForbiddenDelaySecondsSql(string forbiddenBackoffLevelExpression)
         {
-            return
-                "CASE " +
-                "   WHEN " + forbiddenBackoffLevelExpression + " <= 0 THEN 0 " +
-                "   WHEN " + forbiddenBackoffLevelExpression + " = 1 THEN 30 " +
-                "   WHEN " + forbiddenBackoffLevelExpression + " = 2 THEN 60 " +
-                "   WHEN " + forbiddenBackoffLevelExpression + " = 3 THEN 90 " +
-                "   WHEN " + forbiddenBackoffLevelExpression + " = 4 THEN 120 " +
-                "   WHEN " + forbiddenBackoffLevelExpression + " = 5 THEN 180 " +
-                "   WHEN " + forbiddenBackoffLevelExpression + " = 6 THEN 240 " +
-                "   WHEN " + forbiddenBackoffLevelExpression + " = 7 THEN 300 " +
-                "   WHEN " + forbiddenBackoffLevelExpression + " = 8 THEN 450 " +
-                "   WHEN " + forbiddenBackoffLevelExpression + " = 9 THEN 600 " +
-                "   WHEN " + forbiddenBackoffLevelExpression + " = 10 THEN 900 " +
-                "   WHEN " + forbiddenBackoffLevelExpression + " = 11 THEN 1200 " +
-                "   WHEN " + forbiddenBackoffLevelExpression + " = 12 THEN 1800 " +
-                "   WHEN " + forbiddenBackoffLevelExpression + " = 13 THEN 2700 " +
-                "   WHEN " + forbiddenBackoffLevelExpression + " = 14 THEN 3600 " +
-                "   WHEN " + forbiddenBackoffLevelExpression + " = 15 THEN 5400 " +
-                "   WHEN " + forbiddenBackoffLevelExpression + " = 16 THEN 7200 " +
-                "   ELSE 10800 " +
-                "END";
+            var caseExpression = new StringBuilder("CASE ");
+            for (int level = 0; level < ForbiddenRetryDelaySecondsByLevel.Length - 1; level++)
+            {
+                caseExpression
+                    .Append("WHEN ")
+                    .Append(forbiddenBackoffLevelExpression)
+                    .Append(" = ")
+                    .Append(level)
+                    .Append(" THEN ")
+                    .Append(ForbiddenRetryDelaySecondsByLevel[level])
+                    .Append(' ');
+            }
+
+            caseExpression
+                .Append("ELSE ")
+                .Append(ForbiddenRetryDelaySecondsByLevel[^1])
+                .Append(" END");
+
+            return caseExpression.ToString();
         }
     }
 }
