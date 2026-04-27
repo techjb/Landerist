@@ -67,9 +67,6 @@ namespace landerist_library.Landerist_com
 
             Replace(Comment(countryCode, exportType, "Counter"), counter ?? "-");
 
-            string lastModifiedString = ((DateTime)lastModified).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-            Replace(Comment(countryCode, exportType, "Modified"), lastModifiedString);
-
             string sizeString = FormatBytes((long)contentLength);
             Replace(Comment(countryCode, exportType, "Size"), sizeString);
 
