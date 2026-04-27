@@ -301,7 +301,7 @@ namespace landerist_library.Scrape
 
                 if (page.IsHttpStatusCodeForbidden())
                 {
-                    WebsitesThrottle.BlockForbidden(page.Website);
+                    WebsitesThrottle.ReportForbidden(page.Website);
                 }
                 else if (!page.IsHttpStatusCodeNotOK() && !page.IsResponseBodyNullOrEmpty())
                 {

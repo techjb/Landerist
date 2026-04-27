@@ -1,3 +1,4 @@
+using landerist_library.Database;
 using landerist_library.Pages;
 
 namespace landerist_tests
@@ -19,9 +20,10 @@ namespace landerist_tests
             //Pages.DeleteUrisLikePrint();
             //Pages.DeleteProhibitedUris();
             //new Page("https://areagestio.com/propiedades/25974555/").Insert();
-            //var page = new Page("https://inmobiliariascalifal.com/inmueble/venta/piso/cordoba/cordoba/cal04135/");
+            //var page = new Page("https://www.servihabitat.com/es/venta/vivienda-casa/tarragona-baixcamp-reus/60455486");
             //page.Insert();
 
+            //Console.WriteLine(WebsitesThrottle.IsBlocked(page.Website));
             //Pages.UpdateNextUpdate(); // 30 min (mienstras se ejecuta, hay que parar el scraper)
         }
     }

@@ -43,11 +43,6 @@ namespace landerist_library.Database
             return Block(website, hostBlockUntil);
         }
 
-        public static bool BlockForbidden(Website website)
-        {
-            return ReportForbidden(website);
-        }
-
         public static bool ReportForbidden(Website website)
         {
             string query =
