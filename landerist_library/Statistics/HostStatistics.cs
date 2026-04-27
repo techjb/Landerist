@@ -310,6 +310,37 @@ namespace landerist_library.Statistics
             });
         }
 
+        public static DataTable GetPagesByPageType(string host)
+        {
+            string query =
+                "SELECT CONVERT(NVARCHAR(100), [PageType]) AS [Key], COUNT(*) AS [Counter] " +
+                "FROM " + landerist_library.Pages.Pages.PAGES + " " +
+                "WHERE [Host] = @Host " +
+                "AND [PageType] IS NOT NULL " +
+                "GROUP BY [PageType] " +
+                "ORDER BY [Counter] DESC, [Key] ASC";
+
+            return new DataBase().QueryTable(query, new Dictionary<string, object?>
+            {
+                { "Host", host }
+            });
+        }
+
+        public static DataTable GetPagesByHttpStatusCode(string host)
+        {
+            string query =
+                "SELECT COALESCE(CONVERT(NVARCHAR(10), [HttpStatusCode]), 'NULL') AS [Key], COUNT(*) AS [Counter] " +
+                "FROM " + landerist_library.Pages.Pages.PAGES + " " +
+                "WHERE [Host] = @Host " +
+                "GROUP BY [HttpStatusCode] " +
+                "ORDER BY [Counter] DESC, [Key] ASC";
+
+            return new DataBase().QueryTable(query, new Dictionary<string, object?>
+            {
+                { "Host", host }
+            });
+        }
+
         public static List<string> GetKeysLike(string host, HostStatisticsKey key)
         {
             string query =

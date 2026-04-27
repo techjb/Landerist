@@ -84,8 +84,8 @@ namespace landerist_library.Landerist_com
                     NotListingCache = GetTimeSeries(website.Host, HostStatisticsKey.NotListingCache, "Not listing by cache"),
                     ResponseBodyTextAlreadyParsed = GetTimeSeries(website.Host, HostStatisticsKey.ResponseBodyTextAlreadyParsed, "ResponseBodyText already parsed"),
                     ReponseBodyTextIsAnotherListingInHost = GetTimeSeries(website.Host, HostStatisticsKey.ReponseBodyTextIsAnotherListingInHost, "ResponseBodyText is another listing in host"),
-                    PageType = GetHistoricalDistribution(website.Host, HostStatisticsKey.PageType),
-                    HttpStatusCode = GetHistoricalDistribution(website.Host, HostStatisticsKey.HttpStatusCode),
+                    PageType = GetDistribution(HostStatistics.GetPagesByPageType(website.Host), "PageType"),
+                    HttpStatusCode = GetDistribution(HostStatistics.GetPagesByHttpStatusCode(website.Host), "HttpStatusCode"),
                 }
             };
         }
@@ -128,6 +128,24 @@ namespace landerist_library.Landerist_com
                 values.Add(new ChartPointModel
                 {
                     Key = RemovePrefix((string)dataRow["Key"], keyPrefix),
+                    Value = Convert.ToInt32(dataRow["Counter"])
+                });
+            }
+
+            return values.Count == 0
+                ? []
+                : [new ChartSeriesModel { Label = label, Values = values }];
+        }
+
+        private static List<ChartSeriesModel> GetDistribution(DataTable dataTable, string label)
+        {
+            List<ChartPointModel> values = [];
+
+            foreach (DataRow dataRow in dataTable.Rows)
+            {
+                values.Add(new ChartPointModel
+                {
+                    Key = (string)dataRow["Key"],
                     Value = Convert.ToInt32(dataRow["Counter"])
                 });
             }

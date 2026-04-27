@@ -163,6 +163,19 @@ const palette = [
             };
         }
 
+        function GetPieOptions(title) {
+            return {
+                responsive: true,
+                plugins: {
+                    ...GetPlugins(title),
+                    legend: {
+                        display: true,
+                        position: 'right'
+                    }
+                }
+            };
+        }
+
         function AreaChart(title, values) {
             const data = {
                 labels: values[0].values.map(row => row.key),
@@ -201,6 +214,22 @@ const palette = [
 
         function StackedBarChart(title, values) {
             BarChart(title, values, true);
+        }
+
+        function PieChart(title, values) {
+            const points = values[0].values;
+            const data = {
+                labels: points.map(row => row.key),
+                datasets: [{
+                    label: values[0].label,
+                    data: points.map(row => row.value),
+                    backgroundColor: points.map((row, idx) => palette[idx % palette.length]),
+                    borderColor: '#ffffff',
+                    borderWidth: 1
+                }]
+            };
+
+            CreateChart('pie', data, GetPieOptions(title));
         }
 
         function CreateChart(type, data, options) {
@@ -265,8 +294,8 @@ const palette = [
                 { title: 'Not Listing By Cache', values: hostData.charts.notListingCache, type: AreaChart },
                 { title: 'ResponseBodyText Already Parsed', values: hostData.charts.responseBodyTextAlreadyParsed, type: AreaChart },
                 { title: 'ResponseBodyText Is Another Listing In Host', values: hostData.charts.reponseBodyTextIsAnotherListingInHost, type: AreaChart },
-                { title: 'Pages by PageType', values: hostData.charts.pageType, type: StackedBarChart },
-                { title: 'Pages by HttpStatusCode', values: hostData.charts.httpStatusCode, type: StackedBarChart }
+                { title: 'Pages by PageType', values: hostData.charts.pageType, type: PieChart },
+                { title: 'Pages by HttpStatusCode', values: hostData.charts.httpStatusCode, type: PieChart }
             ];
 
             let renderedCharts = 0;
