@@ -39,8 +39,8 @@ namespace landerist_library.Database
 
         public static bool Block(Website website)
         {
-            var hostBlockUntil = CalculateHostBlockUntil(website);
-            return Block(website, hostBlockUntil);
+            var hostBlockDelayMilliseconds = CalculateHostBlockDelayMilliseconds(website);
+            return Block(website, hostBlockDelayMilliseconds);
         }
 
         public static bool ReportForbidden(Website website)
@@ -156,28 +156,42 @@ namespace landerist_library.Database
             });
         }
 
-        private static bool Block(Website website, DateTime hostBlockUntil)
+        private static bool Block(Website website, int hostBlockDelayMilliseconds)
         {
             string query =
                 "SET XACT_ABORT ON; " +
+                "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE; " +
                 "BEGIN TRANSACTION; " +
                 "DECLARE @Now datetime = GETDATE(); " +
+                "DECLARE @Acquired bit = 0; " +
+                "DECLARE @HostBlockUntil datetime = DATEADD(millisecond, @HostBlockDelayMilliseconds, @Now); " +
                 "UPDATE " + WEBSITES_THROTTLE + " WITH (UPDLOCK, HOLDLOCK) " +
                 "SET " +
                 "   BlockUntil = CASE WHEN BlockUntil > @HostBlockUntil THEN BlockUntil ELSE @HostBlockUntil END, " +
                 "   Updated = @Now " +
-                "WHERE IpOrHost = @Host; " +
-                "IF @@ROWCOUNT = 0 " +
+                "WHERE IpOrHost = @Host " +
+                "AND BlockUntil <= @Now; " +
+                "IF @@ROWCOUNT > 0 " +
+                "BEGIN " +
+                "   SET @Acquired = 1; " +
+                "END " +
+                "ELSE IF NOT EXISTS (" +
+                "   SELECT 1 " +
+                "   FROM " + WEBSITES_THROTTLE + " WITH (UPDLOCK, HOLDLOCK) " +
+                "   WHERE IpOrHost = @Host" +
+                ") " +
                 "BEGIN " +
                 "   INSERT INTO " + WEBSITES_THROTTLE + " (IpOrHost, BlockUntil, Updated) " +
                 "   VALUES (@Host, @HostBlockUntil, @Now); " +
+                "   SET @Acquired = 1; " +
                 "END; " +
-                "COMMIT TRANSACTION";
+                "COMMIT TRANSACTION; " +
+                "SELECT @Acquired";
 
-            return new DataBase().Query(query, new Dictionary<string, object?>()
+            return new DataBase().QueryBool(query, new Dictionary<string, object?>()
             {
                 {"Host", website.Host},
-                {"HostBlockUntil", hostBlockUntil},
+                {"HostBlockDelayMilliseconds", hostBlockDelayMilliseconds},
             });
         }
 
@@ -191,12 +205,11 @@ namespace landerist_library.Database
             return new DataBase().Query(query);
         }
 
-        private static DateTime CalculateHostBlockUntil(Website website)
+        private static int CalculateHostBlockDelayMilliseconds(Website website)
         {
             int randomMilliseconds = Random.Shared.Next(3000, 6000);
             int crawlDelayMilliseconds = Math.Min(website.CrawlDelay(), Configuration.Config.MAX_CRAW_DELAY_SECONDS) * 1000;
-            int milliseconds = Math.Max(randomMilliseconds, crawlDelayMilliseconds);
-            return DateTime.Now.AddMilliseconds(milliseconds);
+            return Math.Max(randomMilliseconds, crawlDelayMilliseconds);
         }
 
         private static string GetForbiddenDelaySecondsSql(string forbiddenBackoffLevelExpression)

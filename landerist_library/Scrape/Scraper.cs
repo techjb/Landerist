@@ -12,6 +12,12 @@ namespace landerist_library.Scrape
 {
     public class Scraper
     {
+        private enum ScrapeAttemptResult
+        {
+            Blocked,
+            Crashed,
+            Success
+        }
 
         private int Counter = 0;
 
@@ -292,10 +298,17 @@ namespace landerist_library.Scrape
 
         public void Scrape(Page page, bool useProxy)
         {
-            Interlocked.Increment(ref Processed);
-            var success = ScrapeAttempt(page, useProxy);
+            var result = ScrapeAttempt(page, useProxy);
 
-            if (success)
+            if (result.Equals(ScrapeAttemptResult.Blocked))
+            {
+                Interlocked.Increment(ref SkippedByBlockedWebsite);
+                return;
+            }
+
+            Interlocked.Increment(ref Processed);
+
+            if (result.Equals(ScrapeAttemptResult.Success))
             {
                 Interlocked.Increment(ref ScrapedSuccess);
 
@@ -319,11 +332,18 @@ namespace landerist_library.Scrape
             }
         }
 
-        private static bool ScrapeAttempt(Page page, bool useProxy)
+        private static ScrapeAttemptResult ScrapeAttempt(Page page, bool useProxy)
         {
-            var pageScraper = new PageScraper(page, useProxy);            
-            WebsitesThrottle.Block(page.Website);
-            return pageScraper.Scrape();
+            var acquired = WebsitesThrottle.Block(page.Website);
+            if (!acquired && !useProxy)
+            {
+                return ScrapeAttemptResult.Blocked;
+            }
+
+            var pageScraper = new PageScraper(page, useProxy);
+            return pageScraper.Scrape()
+                ? ScrapeAttemptResult.Success
+                : ScrapeAttemptResult.Crashed;
         }
     }
 }
