@@ -50,52 +50,80 @@ namespace landerist_library.Parse.ListingParser
 
         private static (PageType pageType, Listing? listing, bool waitingAIRequest) ParseOpenAI(Page page, string userInput)
         {
-            var response = OpenAIRequest.GetChatResponse(userInput);
-            if (response?.FirstChoice == null)
+            return ParseWithRetry(page, () =>
             {
-                return (PageType.MayBeListing, null, true);
-            }
+                var response = OpenAIRequest.GetChatResponse(userInput);
+                if (response?.FirstChoice == null)
+                {
+                    return (PageType.MayBeListing, null, true);
+                }
 
-            var (pageType, listing) = ParseResponse(page, response.FirstChoice);
-            return (pageType, listing, false);
+                var (pageType, listing) = ParseResponse(page, response.FirstChoice);
+                return (pageType, listing, false);
+            });
         }
 
         private static (PageType pageType, Listing? listing, bool waitingAIRequest) ParseVertexAI(Page page, string text)
         {
-            var generateContentResponse = VertexAIRequest.GetResponse(page, text).GetAwaiter().GetResult();
-            if (generateContentResponse == null)
+            return ParseWithRetry(page, () =>
             {
-                return (PageType.MayBeListing, null, true);
-            }
+                var generateContentResponse = VertexAIRequest.GetResponse(page, text).GetAwaiter().GetResult();
+                if (generateContentResponse == null)
+                {
+                    return (PageType.MayBeListing, null, true);
+                }
 
-            var responseText = VertexAIResponse.GetResponseText(generateContentResponse);
-            var (pageType, listing) = ParseResponse(page, responseText);
-            return (pageType, listing, false);
+                var responseText = VertexAIResponse.GetResponseText(generateContentResponse);
+                var (pageType, listing) = ParseResponse(page, responseText);
+                return (pageType, listing, false);
+            });
         }
 
         public static (PageType pageType, Listing? listing, bool waitingAIRequest) ParseLocalAI(Page page, string text)
         {
-            var response = new LocalAIRequest().GetResponse(text).GetAwaiter().GetResult();
-            if (response == null)
+            return ParseWithRetry(page, () =>
             {
-                Console.WriteLine("ParseListing ParseLocalAI response is null.");
-                return (PageType.MayBeListing, null, true);
+                var response = new LocalAIRequest().GetResponse(text).GetAwaiter().GetResult();
+                if (response == null)
+                {
+                    Console.WriteLine("ParseListing ParseLocalAI response is null.");
+                    return (PageType.MayBeListing, null, true);
+                }
+
+                var responseText = response.GetResponseText();
+                if (string.IsNullOrWhiteSpace(responseText))
+                {
+                    Console.WriteLine("ParseListing ParseLocalAI responseText is null or empty. Finish Reason: " + response.GetFinishReason() + " TokenCount: " + page.TokenCount);
+                    return (PageType.MayBeListing, null, true);
+                }
+
+                var (pageType, listing) = ParseResponse(page, responseText);
+                if (pageType == PageType.MayBeListing)
+                {
+                    Console.WriteLine("ParseListing ParseLocalAI pageType is MayBeListing. Finish Reason: " + response.GetFinishReason() + " TokenCount " + page.TokenCount + " Uri: " + page.Uri);
+                }
+
+                return (pageType, listing, false);
+            });
+        }
+
+        private static (PageType pageType, Listing? listing, bool waitingAIRequest) ParseWithRetry(
+            Page page,
+            Func<(PageType pageType, Listing? listing, bool waitingAIRequest)> parse)
+        {
+            var result = parse();
+            if (!ShouldRetryNotListing(page, result.pageType))
+            {
+                return result;
             }
 
-            var responseText = response.GetResponseText();
-            if (string.IsNullOrWhiteSpace(responseText))
-            {
-                Console.WriteLine("ParseListing ParseLocalAI responseText is null or empty. Finish Reason: " + response.GetFinishReason() + " TokenCount: " + page.TokenCount);
-                return (PageType.MayBeListing, null, true);
-            }
+            return parse();
+        }
 
-            var (pageType, listing) = ParseResponse(page, responseText);
-            if (pageType == PageType.MayBeListing)
-            {
-                Console.WriteLine("ParseListing ParseLocalAI pageType is MayBeListing. Finish Reason: " + response.GetFinishReason() + " TokenCount " + page.TokenCount + " Uri: " + page.Uri);
-            }
-
-            return (pageType, listing, false);
+        private static bool ShouldRetryNotListing(Page page, PageType pageType)
+        {
+            return pageType == PageType.NotListingByParser
+                && page.Website.MatchesListingUrlRegex(page.Uri);
         }
 
         public static (PageType pageType, Listing? listing) ParseResponse(Page page, string? text)

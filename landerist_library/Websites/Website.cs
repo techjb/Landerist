@@ -208,6 +208,11 @@ namespace landerist_library.Websites
             return IsDiscardedByRegex(uri, ListingUrlRegex, "ListingUrlRegex");
         }
 
+        public bool MatchesListingUrlRegex(Uri uri)
+        {
+            return MatchesRegex(uri, ListingUrlRegex, "ListingUrlRegex");
+        }
+
         public bool IsDiscardedBySitemapUrlRegex(Uri uri)
         {
             return IsDiscardedByRegex(uri, SitemapUrlRegex, "SitemapUrlRegex");
@@ -222,9 +227,21 @@ namespace landerist_library.Websites
                 return false;
             }
 
+            return !MatchesRegex(uri, regexPattern, regexFieldName);
+        }
+
+        private bool MatchesRegex(Uri uri, string? regexPattern, string regexFieldName)
+        {
+            ArgumentNullException.ThrowIfNull(uri);
+
+            if (string.IsNullOrWhiteSpace(regexPattern))
+            {
+                return false;
+            }
+
             try
             {
-                return !Regex.IsMatch(
+                return Regex.IsMatch(
                     uri.AbsoluteUri,
                     regexPattern,
                     RegexOptions.IgnoreCase,
