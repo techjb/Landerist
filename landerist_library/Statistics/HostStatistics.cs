@@ -17,6 +17,7 @@ namespace landerist_library.Statistics
         NotListingCache,
         ResponseBodyTextAlreadyParsed,
         ReponseBodyTextIsAnotherListingInHost,
+        ParseListingRetryNotListing,
     }
 
     public static class HostStatistics

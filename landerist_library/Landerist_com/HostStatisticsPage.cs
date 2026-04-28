@@ -91,6 +91,7 @@ namespace landerist_library.Landerist_com
                     NotListingCache = GetTimeSeries(website.Host, HostStatisticsKey.NotListingCache, "Not listing by cache"),
                     ResponseBodyTextAlreadyParsed = GetTimeSeries(website.Host, HostStatisticsKey.ResponseBodyTextAlreadyParsed, "ResponseBodyText already parsed"),
                     ReponseBodyTextIsAnotherListingInHost = GetTimeSeries(website.Host, HostStatisticsKey.ReponseBodyTextIsAnotherListingInHost, "ResponseBodyText is another listing in host"),
+                    ParseListingRetryNotListing = GetTimeSeries(website.Host, HostStatisticsKey.ParseListingRetryNotListing, "Parse listing retry not listing"),
                     NextUpdateDistribution = GetDistribution(HostStatistics.GetPagesByNextUpdate(website.Host), "nextupdate"),
                     PageType = GetDistribution(HostStatistics.GetPagesByPageType(website.Host), "PageType"),
                     HttpStatusCode = GetDistribution(HostStatistics.GetPagesByHttpStatusCode(website.Host), "HttpStatusCode"),
@@ -225,6 +226,7 @@ namespace landerist_library.Landerist_com
             public required List<ChartSeriesModel> NotListingCache { get; init; }
             public required List<ChartSeriesModel> ResponseBodyTextAlreadyParsed { get; init; }
             public required List<ChartSeriesModel> ReponseBodyTextIsAnotherListingInHost { get; init; }
+            public required List<ChartSeriesModel> ParseListingRetryNotListing { get; init; }
             public required List<ChartSeriesModel> NextUpdateDistribution { get; init; }
             public required List<ChartSeriesModel> PageType { get; init; }
             public required List<ChartSeriesModel> HttpStatusCode { get; init; }

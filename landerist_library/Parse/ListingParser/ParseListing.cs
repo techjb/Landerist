@@ -4,6 +4,7 @@ using landerist_library.Parse.ListingParser.LocalAI;
 using landerist_library.Parse.ListingParser.OpenAI;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
 using landerist_library.Parse.ListingParser.VertexAI;
+using landerist_library.Statistics;
 using landerist_orels.ES;
 using Newtonsoft.Json;
 
@@ -117,6 +118,7 @@ namespace landerist_library.Parse.ListingParser
                 return result;
             }
 
+            HostStatistics.InsertDailyCounter(page.Website.Host, HostStatisticsKey.ParseListingRetryNotListing);
             return parse();
         }
 

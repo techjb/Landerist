@@ -222,9 +222,9 @@ namespace landerist_library.Tasks
                 }
                 else
                 {
-                    var parseResult = ParseListing.ParseLocalAI(page, userInput);
-                    newPageType = parseResult.pageType;
-                    success = new PageScraper(page).ApplyParsedClassificationAfterParsing(parseResult.pageType, parseResult.listing);
+                    var (pageType, listing, waitingAIRequest) = ParseListing.ParseLocalAI(page, userInput);
+                    newPageType = pageType;
+                    success = new PageScraper(page).ApplyParsedClassificationAfterParsing(pageType, listing);
                 }
             }
             catch (Exception exception)
