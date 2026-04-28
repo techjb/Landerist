@@ -11,7 +11,7 @@ namespace landerist_library.Parse.ListingParser.LocalAI
     public class LocalAIRequest
     {
         private const string SERVER_PORT = "8000";
-        private const float TEMPERATURE = 0.0f; // 0.02f?
+        private const float TEMPERATURE = 0.0f;
         public const int MAX_CONTEXT_WINDOW = 65536;
 
         private static readonly HttpClient HttpClient = new()
@@ -101,7 +101,7 @@ namespace landerist_library.Parse.ListingParser.LocalAI
 
         private static string GetExtendedSystemPrompt()
         {
-            return ParseListingSystem.SystemPrompt + " " +
+            return SytemPrompt.Text + " " +
                 "Responde SIEMPRE y ÚNICAMENTE con un objeto JSON. No añadas texto antes ni después del JSON. " +
                 "El objeto JSON debe tener la siguiente estructura exacta: " + OpenAIRequest.OpenAIJsonSchema + " " +
                 "Si no encuentras algún dato, usa 'null'. No incluyas texto adicional fuera del JSON.";

@@ -110,7 +110,7 @@ namespace landerist_library.Parse.PageTypeParser
                 return (PageType.ResponseBodyRepeatedInHost, null, false);
             }
 
-            if (ParseListingSystem.TooManyTokens(Page))
+            if (Tokenizer.TooManyTokens(Page))
             {
                 return (PageType.ResponseBodyTooManyTokens, null, false);
             }

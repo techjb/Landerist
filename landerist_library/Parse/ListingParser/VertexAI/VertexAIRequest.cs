@@ -9,7 +9,7 @@ using static Google.Cloud.AIPlatform.V1.SafetySetting.Types;
 
 namespace landerist_library.Parse.ListingParser.VertexAI
 {
-    public class VertexAIRequest : ParseListingSystem
+    public class VertexAIRequest : SytemPrompt
     {
 
         public const int MAX_CONTEXT_WINDOW = 128000;
@@ -119,7 +119,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                     {
                         new Part
                         {
-                            Text = SystemPrompt
+                            Text = Text
                         }
                     }
                 },
@@ -191,7 +191,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                     {
                         new Part
                         {
-                            Text = SystemPrompt
+                            Text = Text
                         }
                     }
                 }

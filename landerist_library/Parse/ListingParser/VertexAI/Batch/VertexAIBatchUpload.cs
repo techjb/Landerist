@@ -41,7 +41,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                         [
                             new Part
                             {
-                                text = ParseListingSystem.GetSystemPrompt()
+                                text = SytemPrompt.Text
                             }
                         ]
                     },

@@ -828,8 +828,12 @@ namespace landerist_library.Pages
                 return ParseListingUserInput;
             }
 
-            //ParseListingUserInput = Parse.ListingParser.UserInput.ParseListingUserInput.GetText(this);
-            ParseListingUserInput = Parse.ListingParser.UserInput.ParseListingUserInput.GetHtml(this);
+            ParseListingUserInput = Website.ApplySpecialRules ?
+                Parse.ListingParser.UserInput.ParseListingUserInput.GetHtml(this) :
+                Parse.ListingParser.UserInput.ParseListingUserInput.GetText(this);
+
+            //ParseListingUserInput = Parse.ListingParser.UserInput.ParseListingUserInput.GetHtml(this);
+
             return ParseListingUserInput;
         }
     }

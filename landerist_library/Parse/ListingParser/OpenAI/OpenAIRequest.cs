@@ -8,7 +8,7 @@ using System.Text.Json.Nodes;
 
 namespace landerist_library.Parse.ListingParser.OpenAI
 {
-    public class OpenAIRequest : ParseListingSystem
+    public class OpenAIRequest : SytemPrompt
     {
         //public static readonly string SystemMessage =
         //   "Un anuncio completo de oferta inmobiliaria debe contener la siguiente información:\r\n\r\n" +
@@ -38,7 +38,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI
         {
             var messages = new List<Message>
             {
-                new(Role.System, SystemPrompt),
+                new(Role.System, Text),
                 new(Role.User, userInput),                
             };
 

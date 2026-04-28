@@ -393,7 +393,17 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
                 return;
             }
             MediaParser mediaParser = new(page);
-            var list = Anuncio!.ImagenesDelAnuncio?.Select(img => (img.Url, img.Titulo)).ToList();
+            var list = new List<(string url, string? title)>();
+            foreach (var img in Anuncio!.ImagenesDelAnuncio)
+            {
+                if (img is null || string.IsNullOrWhiteSpace(img.Url))
+                {
+                    continue;
+                }
+
+                list.Add((img.Url, img.Titulo));
+            }
+
             mediaParser.AddMediaImages(listing, list);
         }
 

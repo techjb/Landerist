@@ -92,7 +92,7 @@ namespace landerist_library.Parse.ListingParser
             var (pageType, listing) = ParseResponse(page, responseText);
             if (pageType == PageType.MayBeListing)
             {
-                Console.WriteLine("ParseListing ParseLocalAI pageType is MayBeListing. Finish Reason: " + response.GetFinishReason() + " TokenCount " + page.TokenCount);
+                Console.WriteLine("ParseListing ParseLocalAI pageType is MayBeListing. Finish Reason: " + response.GetFinishReason() + " TokenCount " + page.TokenCount + " Uri: " + page.Uri);
             }
 
             return (pageType, listing, false);

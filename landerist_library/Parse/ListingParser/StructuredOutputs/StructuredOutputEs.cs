@@ -266,7 +266,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
     {
         [JsonProperty(nameof(StructuredOutputEsJson.url_de_la_imagen), Required = Required.Always)]
         [System.ComponentModel.Description(StructuredOutputEsJson.UrlDeLaImagen)]
-        public string Url { get; set; }
+        public string? Url { get; set; }
 
 
         [JsonProperty(nameof(StructuredOutputEsJson.título_de_la_imagen), Required = Required.Default)]

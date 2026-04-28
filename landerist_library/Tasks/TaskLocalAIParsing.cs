@@ -13,8 +13,8 @@ namespace landerist_library.Tasks
     public class TaskLocalAIParsing
     {
         private const int MAX_PAGES_PER_TASK = 100;
-        private const int MAX_NUM_SEQS = 8;  // same as in localAI server
-        private const int MAX_DEGREE_OF_PARALLELISM = MAX_NUM_SEQS + 20;
+        private const int MAX_NUM_SEQS = 6;
+        private const int MAX_DEGREE_OF_PARALLELISM = MAX_NUM_SEQS + 10;
         private const int COMPLETION_TOKENS = 7000;  // structured output and completion tokens aproximately
         private readonly int MAX_TOKEN_COUNT;
 
@@ -25,8 +25,7 @@ namespace landerist_library.Tasks
         private int TotalNotListingByParser = 0;
         private readonly CancellationTokenSource StoppingCancellationTokenSource = new();
         private BlockingCollection<Page> BlockingCollection = [];
-        private const int MAX_SIZE_BLOCKINGCOLLECTION = MAX_PAGES_PER_TASK * 10;
-        //private readonly DateTime StartDate = DateTime.UtcNow.ToLocalTime();
+        private const int MAX_SIZE_BLOCKINGCOLLECTION = MAX_PAGES_PER_TASK * 10; 
 
 
         public TaskLocalAIParsing()
@@ -43,8 +42,7 @@ namespace landerist_library.Tasks
 
         public static int GetMaxTokenCount()
         {
-            var systemPrompt = ParseListingSystem.GetSystemPrompt();
-            int systemTokens = GptEncoding.GetEncoding(Config.LOCAL_AI_TOKENIZER).CountTokens(systemPrompt);
+            int systemTokens = Tokenizer.CountSystemTokens();
             var otherTokens = systemTokens + COMPLETION_TOKENS;
             return Config.LOCAL_AI_MAX_MODEL_LEN - otherTokens;
         }
