@@ -16,7 +16,7 @@ namespace landerist_tests
             //new Scraper().ProcessPages();
             //new Scraper().Scrape(page, false);
 
-            //new landerist_library.Scrape.Scraper().Scrape("https://tectumproperty.com/property/alquiler-larga-temporada-caldera-del-rey/?lang=es", false);
+            new landerist_library.Scrape.Scraper().Scrape("https://www.tecnocasa.es/venta/local-comercial/madrid/madrid/655798.html", false);
             //new Scraper().TestSinglePage();
             //landerist_library.Scrape.PageSelector.SelectTop1();
             //Console.WriteLine("Block: " + WebsitesThrottle.Block(page.Website));

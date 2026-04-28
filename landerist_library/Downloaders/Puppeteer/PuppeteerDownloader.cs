@@ -519,7 +519,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 SetExecutionStep("Completed");
                 return (content, screenShot);
             }
-           
+
             catch (NavigationException exception)
             {
                 var message =
@@ -665,8 +665,7 @@ namespace landerist_library.Downloaders.Puppeteer
         {
             try
             {
-                var currentPage = Page;
-                if (currentPage is null)
+                if (Page is null)
                 {
                     return;
                 }
@@ -678,21 +677,23 @@ namespace landerist_library.Downloaders.Puppeteer
 
                 FirstNavigationRequestReaded = true;
 
-                Uri.TryCreate(e.Response.Url, UriKind.Absolute, out Uri? redirectUri);
+                Uri.TryCreate(e.Response.Url, UriKind.Absolute, out Uri? responseUri);
+                Uri? redirectUri = responseUri;
 
                 HttpStatusCode = (short)e.Response.Status;
                 Etag = GetHeaderValue(e.Response.Headers, "ETag");
-                if (e.Response.Headers.TryGetValue("Location", out string? location))
+                var location = GetHeaderValue(e.Response.Headers, "Location");
+                if (!string.IsNullOrWhiteSpace(location))
                 {
                     if (!Uri.TryCreate(location, UriKind.Absolute, out redirectUri))
                     {
-                        Uri.TryCreate(currentPage.Uri, location, out redirectUri);
+                        Uri.TryCreate(responseUri ?? Page.Uri, location, out redirectUri);
                     }
                 }
 
-                if (redirectUri != null && redirectUri.IsAbsoluteUri && !currentPage.Uri.Equals(redirectUri))
+                if (redirectUri != null && redirectUri.IsAbsoluteUri && !Page.Uri.Equals(redirectUri))
                 {
-                    RedirectUrl = redirectUri.ToString();                    
+                    RedirectUrl = redirectUri.ToString();
                 }
             }
             catch (Exception exception)
