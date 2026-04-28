@@ -9,14 +9,14 @@ namespace landerist_library.Parse.Listing.IsListingTest
         private const string IMStudioUrl = "http://localhost:1234/v1/chat/completions";
 
         public static readonly string SystemMessage =
-            "Un anuncio completo de oferta inmobiliaria debe contener la siguiente información: " +
+            "Un anuncio completo de oferta inmobiliaria debe contener la siguiente informaci�n: " +
             "1. Tipo de propiedad (por ejemplo, casa, apartamento, terreno, etc.). " +
-            "2. Ubicación (puede ser la ciudad, barrio o dirección exacta). " +
+            "2. Ubicaci�n (puede ser la ciudad, barrio o direcci�n exacta). " +
             "3. Precio de venta o alquiler. " +
-            "4. Descripción detallada de la propiedad (número de habitaciones, baños, tamaño en metros cuadrados, etc.). " +
-            "Evalúa el texto introducido por el usuario y determina si contiene todos los datos completos de un anuncio de oferta inmobiliaria. " +
-            "Asegúrate de identificar la presencia de cada uno de los puntos anteriores en el texto. " +
-            "Response sólo con 'si' o 'no'. No des ninguna explicación."
+            "4. Descripci�n detallada de la propiedad (n�mero de habitaciones, ba�os, tama�o en metros cuadrados, etc.). " +
+            "Eval�a el texto introducido por el usuario y determina si contiene todos los datos completos de un anuncio de oferta inmobiliaria. " +
+            "Aseg�rate de identificar la presencia de cada uno de los puntos anteriores en el texto. " +
+            "Response s�lo con 'si' o 'no'. No des ninguna explicaci�n."
             ;
         public static void Start()
         {
@@ -53,7 +53,7 @@ namespace landerist_library.Parse.Listing.IsListingTest
 
         private static bool? Test(DataRow row)
         {
-            string text = (string)row["ResponseBodyText"];
+            string text = (string)row["ListingParserInput"];
             int label = (int)row["label"];
             bool? isListing = IsListing(text).GetAwaiter().GetResult();
             if (isListing is null)

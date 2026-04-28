@@ -30,11 +30,11 @@ namespace landerist_library.Parse.Listing.MLModel.TrainingTests
         }
 
         // List of categories: https://cloud.google.com/natural-language/docs/categories?hl=es-419
-        public override bool? PredictIsListing(string responseBodyText)
+        public override bool? PredictIsListing(string listingParserInput)
         {
             var document = new Document
             {
-                Content = responseBodyText,
+                Content = listingParserInput,
                 Type = Document.Types.Type.PlainText,
                 //Language = "es",
             };

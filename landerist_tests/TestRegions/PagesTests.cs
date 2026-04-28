@@ -1,4 +1,4 @@
-using landerist_library.Database;
+﻿using landerist_library.Database;
 using landerist_library.Pages;
 
 namespace landerist_tests
@@ -14,8 +14,8 @@ namespace landerist_tests
             //Pages.DeleteListingsResponseBodyRepeated();
             //Pages.UpdateInvalidCadastastralReferences();
             //Pages.UpdateNextUpdate();
-            //Pages.RemoveResponseBodyTextHashToAll();
-            //Pages.RemoveResponseBodyTextHash(PageType.NotListingByLastSegment);
+            //Pages.RemoveListingParserInputHashToAll();
+            //Pages.RemoveListingParserInputHash(PageType.NotListingByLastSegment);
             //Pages.DeleteUnpublishedListings();
             //Pages.DeleteUrisLikePrint();
             //Pages.DeleteProhibitedUris();

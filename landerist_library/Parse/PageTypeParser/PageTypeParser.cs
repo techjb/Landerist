@@ -72,19 +72,19 @@ namespace landerist_library.Parse.PageTypeParser
                 return (PageType.IncorrectLanguage, null, false);
             }
 
-            Page.SetResponseBodyText();
+            Page.SetListingParserInput();
 
-            if (Page.ResponseBodyTextIsTooShort())
+            if (Page.ListingParserInputIsTooShort())
             {
                 return (PageType.ResponseBodyTooShort, null, false);
             }
 
-            if (Page.ResponseBodyTextIsTooLarge())
+            if (Page.ListingParserInputIsTooLarge())
             {
                 return (PageType.ResponseBodyTooLarge, null, false);
             }
 
-            if (Page.ResponseBodyTextIsError())
+            if (Page.ListingParserInputIsError())
             {
                 return (PageType.ResponseBodyIsError, null, false);
             }
@@ -96,17 +96,17 @@ namespace landerist_library.Parse.PageTypeParser
                 return (PageType.NotListingByCache, null, false);
             }
 
-            if (Page.ResponseBodyTextHasNotChanged() && isProduction)
+            if (Page.ListingParserInputHasNotChanged() && isProduction)
             {
-                GlobalStatistics.InsertDailyCounter(StatisticsKey.ResponseBodyTextAlreadyParsed);
-                HostStatistics.InsertDailyCounter(Page.Host, HostStatisticsKey.ResponseBodyTextAlreadyParsed);
+                GlobalStatistics.InsertDailyCounter(StatisticsKey.ListingParserInputAlreadyParsed);
+                HostStatistics.InsertDailyCounter(Page.Host, HostStatisticsKey.ListingParserInputAlreadyParsed);
                 return (Page.PageType, null, false);
             }
 
-            if (Page.ReponseBodyTextIsAnotherListingInHost())
+            if (Page.ListingParserInputIsAnotherListingInHost())
             {
-                GlobalStatistics.InsertDailyCounter(StatisticsKey.ReponseBodyTextIsAnotherListingInHost);
-                HostStatistics.InsertDailyCounter(Page.Host, HostStatisticsKey.ReponseBodyTextIsAnotherListingInHost);
+                GlobalStatistics.InsertDailyCounter(StatisticsKey.ListingParserInputIsAnotherListingInHost);
+                HostStatistics.InsertDailyCounter(Page.Host, HostStatisticsKey.ListingParserInputIsAnotherListingInHost);
                 return (PageType.ResponseBodyRepeatedInHost, null, false);
             }
 

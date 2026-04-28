@@ -14,11 +14,11 @@ namespace landerist_library.Parse.Listing.MLModel.TrainingTests
             StartTestsIsListing();
         }
 
-        public override bool? PredictIsListing(string responseBodyText)
+        public override bool? PredictIsListing(string listingParserInput)
         {
             var classifyDocumentRequest = new ClassifyDocumentRequest()
             {
-                Text = responseBodyText,
+                Text = listingParserInput,
                 EndpointArn = "arn:aws:comprehend:eu-west-1:568228643093:document-classifier-endpoint/IsListing"
             };
 

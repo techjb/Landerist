@@ -11,14 +11,14 @@ namespace landerist_library.Parse.Listing.MLModel
 
         public static void TestData()
         {
-            DataTable dataTable = Pages.GetListingsResponseBodyText();
+            DataTable dataTable = Pages.GetListingsListingParserInput();
             int charCounter = 0;
             foreach (DataRow row in dataTable.Rows)
             {
-                string responseBodyText = (string)row["ResponseBodyText"];
+                string listingParserInput = (string)row["ListingParserInput"];
                 bool isListing = (bool)row["IsListing"];
 
-                charCounter += responseBodyText.Length + isListing.ToString().Length;
+                charCounter += listingParserInput.Length + isListing.ToString().Length;
             }
             Console.WriteLine("Total chars: " + charCounter);
         }
@@ -32,8 +32,8 @@ namespace landerist_library.Parse.Listing.MLModel
         public static void CreateIsListing(int rows)
         {
             Console.WriteLine("Reading IsListing ..");
-            DataTable dataTableIsListing = Pages.GetIsListingResponseBodyText(rows, true, false);
-            DataTable dataTableIsNotListing = Pages.GetIsListingResponseBodyText(rows, false, false);
+            DataTable dataTableIsListing = Pages.GetIsListingListingParserInput(rows, true, false);
+            DataTable dataTableIsNotListing = Pages.GetIsListingListingParserInput(rows, false, false);
 
             DataTable dataTableAll = dataTableIsListing.Copy();
             dataTableAll.Merge(dataTableIsNotListing);
@@ -45,7 +45,7 @@ namespace landerist_library.Parse.Listing.MLModel
         public static void CreateIsListing()
         {
             Console.WriteLine("Reading IsListing ..");
-            DataTable dataTable = Pages.GetListingsResponseBodyText();
+            DataTable dataTable = Pages.GetListingsListingParserInput();
             string file = Config.MLMODEL_TRAINING_DATA_DIRECTORY + "IsListing.csv";
             CreateFile(dataTable, file);
         }
@@ -58,11 +58,11 @@ namespace landerist_library.Parse.Listing.MLModel
             CreateFile(dataTable, file);
         }
 
-        public static void CreateUriResponseBodyText()
+        public static void CreateUriListingParserInput()
         {
             Console.WriteLine("Reading IsListing ..");
-            DataTable dataTable = Pages.GetUriResponseBodyText();
-            string file = Config.MLMODEL_TRAINING_DATA_DIRECTORY + "UriResponseBodyText.csv";
+            DataTable dataTable = Pages.GetUriListingParserInput();
+            string file = Config.MLMODEL_TRAINING_DATA_DIRECTORY + "UriListingParserInput.csv";
             CreateFile(dataTable, file);
         }
 

@@ -44,8 +44,8 @@ namespace landerist_library.Landerist_com
                 ScraperSuccessCrash();
                 NotListingsCache();
                 EtagHasNotChanged();
-                ResponseBodyTextAlreadyParsed();
-                ReponseBodyTextIsAnotherListingInHost();
+                ListingParserInputAlreadyParsed();
+                ListingParserInputIsAnotherListingInHost();
                 WaitingAIRequest();
                 BatchReaded();
                 LocalAIParsing();
@@ -181,9 +181,9 @@ namespace landerist_library.Landerist_com
             BarChart("Hit Not Listing Cache", StatisticsKey.NotListingCache, false);
         }
 
-        private static void ResponseBodyTextAlreadyParsed()
+        private static void ListingParserInputAlreadyParsed()
         {
-            BarChart("ResponseBodyText already parsed", StatisticsKey.ResponseBodyTextAlreadyParsed, false);
+            BarChart("ListingParserInput already parsed", StatisticsKey.ListingParserInputAlreadyParsed, false);
         }
 
         private static void EtagHasNotChanged()
@@ -191,9 +191,9 @@ namespace landerist_library.Landerist_com
             BarChart("Etag not changed", StatisticsKey.EtagHasNotChanged, false);
         }
 
-        private static void ReponseBodyTextIsAnotherListingInHost()
+        private static void ListingParserInputIsAnotherListingInHost()
         {
-            BarChart("ResponseBodyText is another listing in host", StatisticsKey.ReponseBodyTextIsAnotherListingInHost, false);
+            BarChart("ListingParserInput is another listing in host", StatisticsKey.ListingParserInputIsAnotherListingInHost, false);
         }
 
         private static void ListingInsertUpdate()

@@ -140,8 +140,8 @@ namespace landerist_library.Pages
                     "INSERTED.[ListingStatus], " +
                     "INSERTED.[LockedBy], " +
                     "INSERTED.[WaitingStatus], " +
-                    "INSERTED.[ResponseBodyTextHash], " +
-                    "INSERTED.[ResponseBodyTextNotChangedCounter], " +
+                    "INSERTED.[ListingParserInputHash], " +
+                    "INSERTED.[ListingParserInputNotChangedCounter], " +
                     "INSERTED.[TransientErrorCounter], " +
                     "INSERTED.[ResponseBodyZipped], " +
                     "INSERTED.[TokenCount], " +
@@ -350,8 +350,8 @@ namespace landerist_library.Pages
                 pagesTableName + ".[ListingStatus], " +
                 pagesTableName + ".[LockedBy], " +
                 pagesTableName + ".[WaitingStatus], " +
-                pagesTableName + ".[ResponseBodyTextHash], " +
-                pagesTableName + ".[ResponseBodyTextNotChangedCounter], " +
+                pagesTableName + ".[ListingParserInputHash], " +
+                pagesTableName + ".[ListingParserInputNotChangedCounter], " +
                 pagesTableName + ".[TransientErrorCounter], " +
                 pagesTableName + ".[ResponseBodyZipped], " +
                 pagesTableName + ".[TokenCount], " +
@@ -537,18 +537,18 @@ namespace landerist_library.Pages
         {
             string query =
                SelectQuery() +
-               "WHERE [PageType] = 'Listing' AND [ResponseBodyTextHash] IS NOT NULL";
+               "WHERE [PageType] = 'Listing' AND [ListingParserInputHash] IS NOT NULL";
 
             var pages = GetPages(query);
             HashSet<string> hashSet = [];
             List<Page> repeated = [];
             foreach (var page in pages)
             {
-                if (page.ResponseBodyTextHash == null)
+                if (page.ListingParserInputHash == null)
                 {
                     continue;
                 }
-                if (!hashSet.Add(page.ResponseBodyTextHash))
+                if (!hashSet.Add(page.ListingParserInputHash))
                 {
                     repeated.Add(page);
                 }
@@ -660,11 +660,11 @@ namespace landerist_library.Pages
             Console.WriteLine(counter + "/" + total + " updated: " + updated + " errors: " + errors);
         }
 
-        public static bool RemoveResponseBodyTextHash(PageType pageType)
+        public static bool RemoveListingParserInputHash(PageType pageType)
         {
             string query =
                 "UPDATE " + PAGES + " " +
-                "SET [ResponseBodyTextHash] = NULL " +
+                "SET [ListingParserInputHash] = NULL " +
                 "WHERE [PageType] = @PageType";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
@@ -672,11 +672,11 @@ namespace landerist_library.Pages
             });
         }
 
-        public static bool RemoveResponseBodyTextHashToAll()
+        public static bool RemoveListingParserInputHashToAll()
         {
             string query =
                 "UPDATE " + PAGES + " " +
-                "SET [ResponseBodyTextHash] = NULL";
+                "SET [ListingParserInputHash] = NULL";
 
             return new DataBase().Query(query);
         }       
@@ -814,7 +814,7 @@ namespace landerist_library.Pages
                 "[ListingStatus], " +
                 "[LockedBy], " +
                 "[WaitingStatus], " +
-                "[ResponseBodyTextNotChangedCounter], " +
+                "[ListingParserInputNotChangedCounter], " +
                 "[TransientErrorCounter], " +
                 "[TokenCount] " +
                 "FROM " + PAGES + " " +

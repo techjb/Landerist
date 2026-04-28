@@ -1,4 +1,4 @@
-using landerist_library.Database;
+﻿using landerist_library.Database;
 using landerist_orels.ES;
 using System.Data;
 
@@ -15,8 +15,8 @@ namespace landerist_library.Statistics
         HttpStatusCode,
         PageType,
         NotListingCache,
-        ResponseBodyTextAlreadyParsed,
-        ReponseBodyTextIsAnotherListingInHost,
+        ListingParserInputAlreadyParsed,
+        ListingParserInputIsAnotherListingInHost,
         ParseListingRetryNotListing,
     }
 

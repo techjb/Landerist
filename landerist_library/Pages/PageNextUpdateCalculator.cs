@@ -29,9 +29,9 @@
             {
                 addDays = GetLowValuePageTypeDays(pageType);
             }
-            else if (page.ResponseBodyTextNotChanged)
+            else if (page.ListingParserInputNotChanged)
             {
-                addDays = addDays * GetStabilityMultiplier(page.ResponseBodyTextNotChangedCounter);
+                addDays = addDays * GetStabilityMultiplier(page.ListingParserInputNotChangedCounter);
             }
 
             if (page.IsListingStatusPublished())
@@ -195,9 +195,9 @@
             };
         }
 
-        private static double GetStabilityMultiplier(short? responseBodyTextNotChangedCounter)
+        private static double GetStabilityMultiplier(short? listingParserInputNotChangedCounter)
         {
-            int stableHits = Math.Max(1, (int)(responseBodyTextNotChangedCounter ?? 1));
+            int stableHits = Math.Max(1, (int)(listingParserInputNotChangedCounter ?? 1));
             return 1d + (Math.Min(Math.Log2(stableHits + 1d), 3d) * 0.5d);
         }
 

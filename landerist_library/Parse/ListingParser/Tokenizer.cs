@@ -24,7 +24,7 @@ namespace landerist_library.Parse.ListingParser
         {
             var encoding = GptEncoding.GetEncoding(LOCAL_AI_TOKENIZER);
 
-            string? userInput = page.GetParseListingUserInput();
+            string? userInput = page.GetListingParserInput();
             int systemTokens = encoding.CountTokens(SytemPrompt.Text);
             int pageTokens = 0;
             if (!string.IsNullOrWhiteSpace(userInput))

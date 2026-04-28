@@ -10,11 +10,11 @@ namespace landerist_library.Parse.Listing.MLModel.TrainingTests
             StartTestsIsListing();
         }
 
-        public override bool? PredictIsListing(string responseBodyText)
+        public override bool? PredictIsListing(string listingParserInput)
         {
             try
             {
-                var prediction = PredictIsListingAsync(responseBodyText).Result;
+                var prediction = PredictIsListingAsync(listingParserInput).Result;
                 return prediction.Equals("1");
             }
             catch (Exception ex)

@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "4.98";
+        public static readonly string VERSION = "4.99";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -31,9 +31,9 @@ namespace landerist_library.Configuration
 
         public static readonly int DAYS_TO_UPDATE_IP_ADDRESS = 3;
 
-        public static readonly int MIN_RESPONSEBODYTEXT_LENGTH = 50;
+        public static readonly int MIN_LISTINGPARSERINPUT_LENGTH = 50;
 
-        public static readonly int MAX_RESPONSEBODYTEXT_LENGTH = 100000;
+        public static readonly int MAX_LISTINGPARSERINPUT_LENGTH = 100000;
 
         public static readonly int MAX_PAGETYPE_COUNTER = 1000;
 

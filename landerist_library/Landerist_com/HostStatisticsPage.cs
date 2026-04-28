@@ -1,4 +1,4 @@
-using landerist_library.Configuration;
+﻿using landerist_library.Configuration;
 using landerist_library.Export;
 using landerist_library.Logs;
 using landerist_library.Statistics;
@@ -89,8 +89,8 @@ namespace landerist_library.Landerist_com
                     Inserted = GetTimeSeries(website.Host, HostStatisticsKey.Inserted, "Inserted Pages"),
                     Updated = GetTimeSeries(website.Host, HostStatisticsKey.Updated, "Updated Pages"),
                     NotListingCache = GetTimeSeries(website.Host, HostStatisticsKey.NotListingCache, "Not listing by cache"),
-                    ResponseBodyTextAlreadyParsed = GetTimeSeries(website.Host, HostStatisticsKey.ResponseBodyTextAlreadyParsed, "ResponseBodyText already parsed"),
-                    ReponseBodyTextIsAnotherListingInHost = GetTimeSeries(website.Host, HostStatisticsKey.ReponseBodyTextIsAnotherListingInHost, "ResponseBodyText is another listing in host"),
+                    ListingParserInputAlreadyParsed = GetTimeSeries(website.Host, HostStatisticsKey.ListingParserInputAlreadyParsed, "ListingParserInput already parsed"),
+                    ListingParserInputIsAnotherListingInHost = GetTimeSeries(website.Host, HostStatisticsKey.ListingParserInputIsAnotherListingInHost, "ListingParserInput is another listing in host"),
                     ParseListingRetryNotListing = GetTimeSeries(website.Host, HostStatisticsKey.ParseListingRetryNotListing, "Parse listing retry not listing"),
                     NextUpdateDistribution = GetDistribution(HostStatistics.GetPagesByNextUpdate(website.Host), "nextupdate"),
                     PageType = GetDistribution(HostStatistics.GetPagesByPageType(website.Host), "PageType"),
@@ -224,8 +224,8 @@ namespace landerist_library.Landerist_com
             public required List<ChartSeriesModel> Inserted { get; init; }
             public required List<ChartSeriesModel> Updated { get; init; }
             public required List<ChartSeriesModel> NotListingCache { get; init; }
-            public required List<ChartSeriesModel> ResponseBodyTextAlreadyParsed { get; init; }
-            public required List<ChartSeriesModel> ReponseBodyTextIsAnotherListingInHost { get; init; }
+            public required List<ChartSeriesModel> ListingParserInputAlreadyParsed { get; init; }
+            public required List<ChartSeriesModel> ListingParserInputIsAnotherListingInHost { get; init; }
             public required List<ChartSeriesModel> ParseListingRetryNotListing { get; init; }
             public required List<ChartSeriesModel> NextUpdateDistribution { get; init; }
             public required List<ChartSeriesModel> PageType { get; init; }

@@ -252,7 +252,6 @@ CREATE TABLE [dbo].[PAGES](
 	[Inserted] [datetime] NOT NULL,
 	[Updated] [datetime] NULL,
 	[HttpStatusCode] [smallint] NULL,
-	[ResponseBodyText] [nvarchar](max) NULL,
 	[IsListing] [bit] NULL,
  CONSTRAINT [PK_PAGES] PRIMARY KEY CLUSTERED 
 (
@@ -452,10 +451,37 @@ BEGIN
 	ADD [Updated] [datetime] NOT NULL CONSTRAINT [DF_WEBSITES_THROTTLE_Updated] DEFAULT (GETDATE())
 END
 GO
-IF COL_LENGTH('dbo.PAGES', 'ResponseBodyTextNotChangedCounter') IS NULL
+IF COL_LENGTH('dbo.PAGES', 'ResponseBodyTextHash') IS NOT NULL AND COL_LENGTH('dbo.PAGES', 'ListingParserInputHash') IS NULL
+BEGIN
+	EXEC sp_rename 'dbo.PAGES.ResponseBodyTextHash', 'ListingParserInputHash', 'COLUMN'
+END
+GO
+IF COL_LENGTH('dbo.PAGES', 'ListingParserInputHash') IS NULL
 BEGIN
 	ALTER TABLE [dbo].[PAGES]
-	ADD [ResponseBodyTextNotChangedCounter] [smallint] NULL
+	ADD [ListingParserInputHash] [char](64) NULL
+END
+GO
+IF COL_LENGTH('dbo.PAGES', 'ResponseBodyTextNotChangedCounter') IS NOT NULL AND COL_LENGTH('dbo.PAGES', 'ListingParserInputNotChangedCounter') IS NULL
+BEGIN
+	EXEC sp_rename 'dbo.PAGES.ResponseBodyTextNotChangedCounter', 'ListingParserInputNotChangedCounter', 'COLUMN'
+END
+GO
+IF COL_LENGTH('dbo.PAGES', 'ListingParserInputNotChangedCounter') IS NULL
+BEGIN
+	ALTER TABLE [dbo].[PAGES]
+	ADD [ListingParserInputNotChangedCounter] [smallint] NULL
+END
+GO
+IF OBJECT_ID('dbo.NOT_LISTINGS_CACHE', 'U') IS NOT NULL AND COL_LENGTH('dbo.NOT_LISTINGS_CACHE', 'ResponseBodyTextHash') IS NOT NULL AND COL_LENGTH('dbo.NOT_LISTINGS_CACHE', 'ListingParserInputHash') IS NULL
+BEGIN
+	EXEC sp_rename 'dbo.NOT_LISTINGS_CACHE.ResponseBodyTextHash', 'ListingParserInputHash', 'COLUMN'
+END
+GO
+IF OBJECT_ID('dbo.NOT_LISTINGS_CACHE', 'U') IS NOT NULL AND COL_LENGTH('dbo.NOT_LISTINGS_CACHE', 'ListingParserInputHash') IS NULL
+BEGIN
+	ALTER TABLE [dbo].[NOT_LISTINGS_CACHE]
+	ADD [ListingParserInputHash] [char](64) NULL
 END
 GO
 IF COL_LENGTH('dbo.PAGES', 'TransientErrorCounter') IS NULL

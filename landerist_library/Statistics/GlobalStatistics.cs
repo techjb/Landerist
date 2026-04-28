@@ -36,8 +36,8 @@ namespace landerist_library.Statistics
         LocalAIParsingErrors,
         LocalAIParsingSuccess,
         NotListingCache,
-        ResponseBodyTextAlreadyParsed,
-        ReponseBodyTextIsAnotherListingInHost,
+        ListingParserInputAlreadyParsed,
+        ListingParserInputIsAnotherListingInHost,
         EtagHasNotChanged,
     }
 

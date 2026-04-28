@@ -17,8 +17,8 @@ namespace landerist_library.Parse.Listing.MLModel.TrainingTests
         {
             const int rows = 200;
 
-            DataTable dataTableIsListing = Pages.GetIsListingResponseBodyText(rows, true, true);
-            DataTable dataTableIsNotListing = Pages.GetIsListingResponseBodyText(0, false, true);
+            DataTable dataTableIsListing = Pages.GetIsListingListingParserInput(rows, true, true);
+            DataTable dataTableIsNotListing = Pages.GetIsListingListingParserInput(0, false, true);
 
             DataTable dataTableAll = dataTableIsListing.Copy();
             dataTableAll.Merge(dataTableIsNotListing);
@@ -41,11 +41,11 @@ namespace landerist_library.Parse.Listing.MLModel.TrainingTests
 
         private void PredictIsListing(DataRow dataRow)
         {
-            string responseBodyText = (string)dataRow["ResponseBodyText"];
+            string listingParserInput = (string)dataRow["ListingParserInput"];
             bool isListing = (bool)dataRow["IsListing"];
 
             var stopwatch = Stopwatch.StartNew();
-            bool? predictedIdListing = PredictIsListing(responseBodyText);
+            bool? predictedIdListing = PredictIsListing(listingParserInput);
             stopwatch.Stop();
             Times.Add(stopwatch.ElapsedMilliseconds);
 
@@ -78,7 +78,7 @@ namespace landerist_library.Parse.Listing.MLModel.TrainingTests
             );
         }
 
-        public virtual bool? PredictIsListing(string responseBodyText)
+        public virtual bool? PredictIsListing(string listingParserInput)
         {
             return null;
         }

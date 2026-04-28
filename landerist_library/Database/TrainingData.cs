@@ -22,10 +22,10 @@ namespace landerist_library.Database
 
             string query =
                 "INSERT INTO " + TRAINING_DATA + " " +
-                "VALUES (@UriHash, @ResponseBodyTextHash, CONVERT(varbinary(max), @ResponseBodyZipped),  @IsListing)";
+                "VALUES (@UriHash, @ListingParserInputHash, CONVERT(varbinary(max), @ResponseBodyZipped),  @IsListing)";
             return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"UriHash", page.UriHash},
-                {"ResponseBodyTextHash", page.ResponseBodyTextHash},
+                {"ListingParserInputHash", page.ListingParserInputHash},
                 {"ResponseBodyZipped", page.ResponseBodyZipped },
                 {"IsListing", page.PageType.Equals(PageType.Listing) },
             });

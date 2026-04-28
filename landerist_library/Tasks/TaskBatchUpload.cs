@@ -253,7 +253,7 @@ namespace landerist_library.Tasks
         public static string? GetJson(Page page)
         {
             page.SetResponseBodyFromZipped();
-            var text = page.GetParseListingUserInput();
+            var text = page.GetListingParserInput();
             page.RemoveResponseBody();
 
             if (string.IsNullOrEmpty(text))

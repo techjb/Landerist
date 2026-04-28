@@ -60,17 +60,15 @@ const palette = [
         const hostStatisticsData = /*HOST_STATISTICS_DATA*/;
         const chartInstances = [];
 
-        function GetObjectProperty(obj, camelName, pascalName) {
+        function GetObjectProperty(obj, ...propertyNames) {
             if (!obj) {
                 return undefined;
             }
 
-            if (Object.prototype.hasOwnProperty.call(obj, camelName)) {
-                return obj[camelName];
-            }
-
-            if (Object.prototype.hasOwnProperty.call(obj, pascalName)) {
-                return obj[pascalName];
+            for (const propertyName of propertyNames) {
+                if (Object.prototype.hasOwnProperty.call(obj, propertyName)) {
+                    return obj[propertyName];
+                }
             }
 
             return undefined;
@@ -96,8 +94,8 @@ const palette = [
                 inserted: (GetObjectProperty(charts, 'inserted', 'Inserted') || []).map(NormalizeSeries),
                 updated: (GetObjectProperty(charts, 'updated', 'Updated') || []).map(NormalizeSeries),
                 notListingCache: (GetObjectProperty(charts, 'notListingCache', 'NotListingCache') || []).map(NormalizeSeries),
-                responseBodyTextAlreadyParsed: (GetObjectProperty(charts, 'responseBodyTextAlreadyParsed', 'ResponseBodyTextAlreadyParsed') || []).map(NormalizeSeries),
-                reponseBodyTextIsAnotherListingInHost: (GetObjectProperty(charts, 'reponseBodyTextIsAnotherListingInHost', 'ReponseBodyTextIsAnotherListingInHost') || []).map(NormalizeSeries),
+                listingParserInputAlreadyParsed: (GetObjectProperty(charts, 'listingParserInputAlreadyParsed', 'ListingParserInputAlreadyParsed', 'responseBodyTextAlreadyParsed', 'ResponseBodyTextAlreadyParsed') || []).map(NormalizeSeries),
+                listingParserInputIsAnotherListingInHost: (GetObjectProperty(charts, 'listingParserInputIsAnotherListingInHost', 'ListingParserInputIsAnotherListingInHost', 'reponseBodyTextIsAnotherListingInHost', 'ReponseBodyTextIsAnotherListingInHost') || []).map(NormalizeSeries),
                 parseListingRetryNotListing: (GetObjectProperty(charts, 'parseListingRetryNotListing', 'ParseListingRetryNotListing') || []).map(NormalizeSeries),
                 nextUpdateDistribution: (GetObjectProperty(charts, 'nextUpdateDistribution', 'NextUpdateDistribution') || []).map(NormalizeSeries),
                 pageType: (GetObjectProperty(charts, 'pageType', 'PageType') || []).map(NormalizeSeries),
@@ -339,8 +337,8 @@ const palette = [
                 { title: 'Inserted Pages', values: hostData.charts.inserted, type: AreaChart },
                 { title: 'Updated Pages', values: hostData.charts.updated, type: AreaChart },
                 { title: 'Not Listing By Cache', values: hostData.charts.notListingCache, type: AreaChart },
-                { title: 'ResponseBodyText Already Parsed', values: hostData.charts.responseBodyTextAlreadyParsed, type: AreaChart },
-                { title: 'ResponseBodyText Is Another Listing In Host', values: hostData.charts.reponseBodyTextIsAnotherListingInHost, type: AreaChart },
+                { title: 'ListingParserInput Already Parsed', values: hostData.charts.listingParserInputAlreadyParsed, type: AreaChart },
+                { title: 'ListingParserInput Is Another Listing In Host', values: hostData.charts.listingParserInputIsAnotherListingInHost, type: AreaChart },
                 { title: 'Parse Listing Retry Not Listing', values: hostData.charts.parseListingRetryNotListing, type: AreaChart },
                 { title: 'Next Update Distribution', values: hostData.charts.nextUpdateDistribution, type: BarChart },
                 { title: 'Pages by PageType', values: hostData.charts.pageType, type: PieChart },

@@ -34,7 +34,7 @@ namespace landerist_library.Parse.ListingParser
                 return (PageType.MayBeListing, null, true);
             }
 
-            var text = page.GetParseListingUserInput();
+            var text = page.GetListingParserInput();
             if (string.IsNullOrWhiteSpace(text))
             {
                 return (PageType.ResponseBodyTooShort, null, false);

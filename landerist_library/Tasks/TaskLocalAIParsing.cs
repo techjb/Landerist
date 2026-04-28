@@ -214,7 +214,7 @@ namespace landerist_library.Tasks
             try
             {
                 page.SetResponseBodyFromZipped();
-                var userInput = page.GetParseListingUserInput();
+                var userInput = page.GetListingParserInput();
                 if (string.IsNullOrEmpty(userInput))
                 {
                     Log.WriteError("TaskLocalAIParsing ProcessPage", "Error getting user input. Page: " + page.UriHash);

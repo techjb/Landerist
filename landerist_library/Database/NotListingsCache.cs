@@ -1,30 +1,30 @@
-namespace landerist_library.Database
+﻿namespace landerist_library.Database
 {
     public class NotListingsCache
     {
         public const string TableName = "NOT_LISTINGS_CACHE";
 
-        public static bool Insert(string host, string responseBodyTextHash)
+        public static bool Insert(string host, string listingParserInputHash)
         {
-            if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(responseBodyTextHash))
+            if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(listingParserInputHash))
             {
                 return false;
             }
 
             string query =
                 "INSERT INTO " + TableName + " " +
-                "([Inserted], [Host], [ResponseBodyTextHash]) " +
-                "VALUES (GETDATE(), @Host, @ResponseBodyTextHash)";
+                "([Inserted], [Host], [ListingParserInputHash]) " +
+                "VALUES (GETDATE(), @Host, @ListingParserInputHash)";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"Host", host },
-                {"ResponseBodyTextHash", responseBodyTextHash }
+                {"ListingParserInputHash", listingParserInputHash }
             });
         }
 
-        public static bool IsNotListing(string host, string responseBodyTextHash)
+        public static bool IsNotListing(string host, string listingParserInputHash)
         {
-            if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(responseBodyTextHash))
+            if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(listingParserInputHash))
             {
                 return false;
             }
@@ -33,16 +33,16 @@ namespace landerist_library.Database
                 "SELECT 1 " +
                 "FROM " + TableName + " " +
                 "WHERE [Host] = @Host AND " +
-                "[ResponseBodyTextHash] = @ResponseBodyTextHash";
+                "[ListingParserInputHash] = @ListingParserInputHash";
             return new DataBase().QueryExists(query, new Dictionary<string, object?> {
                 {"Host", host },
-                {"ResponseBodyTextHash", responseBodyTextHash }
+                {"ListingParserInputHash", listingParserInputHash }
             });
         }
 
-        public static bool Delete(string host, string responseBodyTextHash)
+        public static bool Delete(string host, string listingParserInputHash)
         {
-            if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(responseBodyTextHash))
+            if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(listingParserInputHash))
             {
                 return false;
             }
@@ -50,10 +50,10 @@ namespace landerist_library.Database
             string query =
                 "DELETE FROM " + TableName + " " +
                 "WHERE [Host] = @Host AND " +
-                "[ResponseBodyTextHash] = @ResponseBodyTextHash";
+                "[ListingParserInputHash] = @ListingParserInputHash";
             return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"Host", host },
-                {"ResponseBodyTextHash", responseBodyTextHash }
+                {"ListingParserInputHash", listingParserInputHash }
             });
         }
 

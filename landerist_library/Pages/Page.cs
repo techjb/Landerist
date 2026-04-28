@@ -45,11 +45,11 @@ namespace landerist_library.Pages
 
         private string? ResponseBody { get; set; }
 
-        public string? ResponseBodyText { get; set; }
+        public string? ListingParserInput { get; set; }
 
-        public string? ResponseBodyTextHash { get; set; }
+        public string? ListingParserInputHash { get; set; }
 
-        public short? ResponseBodyTextNotChangedCounter { get; private set; }
+        public short? ListingParserInputNotChangedCounter { get; private set; }
 
         public short? TransientErrorCounter { get; private set; }
 
@@ -57,7 +57,7 @@ namespace landerist_library.Pages
 
         public int? TokenCount { get; set; } = null;
 
-        public bool ResponseBodyTextNotChanged { get; set; } = false;
+        public bool ListingParserInputNotChanged { get; set; } = false;
 
         public byte[]? Screenshot { get; set; }
 
@@ -70,9 +70,6 @@ namespace landerist_library.Pages
 
 
         private string? OriginalOuterHtml = null;
-
-        private string? ParseListingUserInput = null;
-
 
         public Website Website = new();
 
@@ -140,9 +137,9 @@ namespace landerist_library.Pages
             ListingStatus = dataRow["ListingStatus"] is DBNull ? null : (ListingStatus)Enum.Parse(typeof(ListingStatus), dataRow["ListingStatus"].ToString()!);
             LockedBy = dataRow["LockedBy"] is DBNull ? null : dataRow["LockedBy"].ToString();
             WaitingStatus = dataRow["WaitingStatus"] is DBNull ? null : (WaitingStatus)Enum.Parse(typeof(WaitingStatus), dataRow["WaitingStatus"].ToString()!);
-            ResponseBodyTextHash = dataRow["ResponseBodyTextHash"] is DBNull ? null : dataRow["ResponseBodyTextHash"].ToString();
-            ResponseBodyTextNotChangedCounter = dataRow.Table.Columns.Contains("ResponseBodyTextNotChangedCounter") && dataRow["ResponseBodyTextNotChangedCounter"] is not DBNull
-                ? (short)dataRow["ResponseBodyTextNotChangedCounter"]
+            ListingParserInputHash = dataRow["ListingParserInputHash"] is DBNull ? null : dataRow["ListingParserInputHash"].ToString();
+            ListingParserInputNotChangedCounter = dataRow.Table.Columns.Contains("ListingParserInputNotChangedCounter") && dataRow["ListingParserInputNotChangedCounter"] is not DBNull
+                ? (short)dataRow["ListingParserInputNotChangedCounter"]
                 : null;
             TransientErrorCounter = dataRow.Table.Columns.Contains("TransientErrorCounter") && dataRow["TransientErrorCounter"] is not DBNull
                 ? (short)dataRow["TransientErrorCounter"]
@@ -174,11 +171,11 @@ namespace landerist_library.Pages
             string query =
                 "INSERT INTO " + Pages.PAGES + " (" +
                 "[Host], [Uri], [UriHash], [Inserted], [Updated], [NextUpdate], [HttpStatusCode], [Etag], [PageType], " +
-                "[PageTypeCounter], [ListingStatus], [LockedBy], [WaitingStatus], [ResponseBodyTextHash], " +
-                "[ResponseBodyTextNotChangedCounter], [TransientErrorCounter], [ResponseBodyZipped], [TokenCount]) " +
+                "[PageTypeCounter], [ListingStatus], [LockedBy], [WaitingStatus], [ListingParserInputHash], " +
+                "[ListingParserInputNotChangedCounter], [TransientErrorCounter], [ResponseBodyZipped], [TokenCount]) " +
                 "VALUES(@Host, @Uri, @UriHash, @Inserted, @Updated, @NextUpdate, @HttpStatusCode, @Etag, @PageType, " +
-                "@PageTypeCounter, @ListingStatus, @LockedBy, @WaitingStatus, @ResponseBodyTextHash, " +
-                "@ResponseBodyTextNotChangedCounter, @TransientErrorCounter, CONVERT(varbinary(max), @ResponseBodyZipped), @TokenCount)";
+                "@PageTypeCounter, @ListingStatus, @LockedBy, @WaitingStatus, @ListingParserInputHash, " +
+                "@ListingParserInputNotChangedCounter, @TransientErrorCounter, CONVERT(varbinary(max), @ResponseBodyZipped), @TokenCount)";
 
             bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
                 {"Host", Host },
@@ -194,8 +191,8 @@ namespace landerist_library.Pages
                 {"ListingStatus", null },
                 {"LockedBy", null },
                 {"WaitingStatus", null },
-                {"ResponseBodyTextHash", null },
-                {"ResponseBodyTextNotChangedCounter", null },
+                {"ListingParserInputHash", null },
+                {"ListingParserInputNotChangedCounter", null },
                 {"TransientErrorCounter", null },
                 {"ResponseBodyZipped", null  },
                 {"TokenCount", null  },
@@ -231,8 +228,8 @@ namespace landerist_library.Pages
                 "[ListingStatus] = @ListingStatus, " +
                 "[LockedBy] = @LockedBy, " +
                 "[WaitingStatus] = @WaitingStatus, " +
-                "[ResponseBodyTextHash] = @ResponseBodyTextHash, " +
-                "[ResponseBodyTextNotChangedCounter] = @ResponseBodyTextNotChangedCounter, " +
+                "[ListingParserInputHash] = @ListingParserInputHash, " +
+                "[ListingParserInputNotChangedCounter] = @ListingParserInputNotChangedCounter, " +
                 "[TransientErrorCounter] = @TransientErrorCounter, " +
                 "[ResponseBodyZipped] = CASE WHEN @ResponseBodyZipped IS NULL THEN NULL ELSE CONVERT(varbinary(max), @ResponseBodyZipped) END," +
                 "[TokenCount] = @TokenCount " +
@@ -248,8 +245,8 @@ namespace landerist_library.Pages
                 {"ListingStatus", ListingStatus?.ToString()},
                 {"LockedBy", LockedBy?.ToString()},
                 {"WaitingStatus", WaitingStatus?.ToString()},
-                {"ResponseBodyTextHash", ResponseBodyTextHash},
-                {"ResponseBodyTextNotChangedCounter", ResponseBodyTextNotChangedCounter},
+                {"ListingParserInputHash", ListingParserInputHash},
+                {"ListingParserInputNotChangedCounter", ListingParserInputNotChangedCounter},
                 {"TransientErrorCounter", TransientErrorCounter},
                 {"ResponseBodyZipped", ResponseBodyZipped},
                 {"TokenCount", TokenCount},
@@ -362,37 +359,37 @@ namespace landerist_library.Pages
             EtagNotChanged = HasComparableEtag && string.Equals(previousEtag, downloadedEtag, StringComparison.Ordinal);
 
             ResponseBody = downloader.Content;
-            ResponseBodyText = null;
+            ResetResponseBodyDerivedData();
             Screenshot = downloader.Screenshot;
             HttpStatusCode = downloader.HttpStatusCode;
             RedirectUrl = downloader.RedirectUrl;
             Etag = downloadedEtag;
         }
 
-        public void SetResponseBodyText()
+        public void SetListingParserInput()
         {
             var htmlDocument = GetHtmlDocument();
             if (htmlDocument == null)
             {
-                ResponseBodyTextNotChanged = false;
-                ResponseBodyTextNotChangedCounter = null;
+                ListingParserInputNotChanged = false;
+                ListingParserInputNotChangedCounter = null;
                 return;
             }
 
-            ResponseBodyText = HtmlToText.GetText(htmlDocument);
-            if (string.IsNullOrEmpty(ResponseBodyText))
+            ListingParserInput = GetListingParserInput();
+            if (string.IsNullOrEmpty(ListingParserInput))
             {
-                ResponseBodyTextNotChanged = false;
-                ResponseBodyTextNotChangedCounter = null;
+                ListingParserInputNotChanged = false;
+                ListingParserInputNotChangedCounter = null;
                 return;
             }
 
-            string hash = Strings.GetHash(ResponseBodyText);
-            ResponseBodyTextNotChanged = hash == ResponseBodyTextHash;
-            ResponseBodyTextNotChangedCounter = ResponseBodyTextNotChanged
-                ? (short)Math.Min((ResponseBodyTextNotChangedCounter ?? 0) + 1, Config.MAX_PAGETYPE_COUNTER)
+            string hash = Strings.GetHash(ListingParserInput);
+            ListingParserInputNotChanged = hash == ListingParserInputHash;
+            ListingParserInputNotChangedCounter = ListingParserInputNotChanged
+                ? (short)Math.Min((ListingParserInputNotChangedCounter ?? 0) + 1, Config.MAX_PAGETYPE_COUNTER)
                 : (short)0;
-            ResponseBodyTextHash = hash;
+            ListingParserInputHash = hash;
         }
         public bool EtagHasNotChanged()
         {
@@ -404,9 +401,9 @@ namespace landerist_library.Pages
         }
 
 
-        public bool ResponseBodyTextHasNotChanged()
+        public bool ListingParserInputHasNotChanged()
         {
-            return ResponseBodyTextNotChanged && (IsListing() || IsNotListingByParser() || IsNotListingByCache());
+            return ListingParserInputNotChanged && (IsListing() || IsNotListingByParser() || IsNotListingByCache());
         }
 
 
@@ -415,42 +412,42 @@ namespace landerist_library.Pages
             return string.IsNullOrWhiteSpace(etag) ? null : etag.Trim();
         }
 
-        public bool ResponseBodyTextIsError()
+        public bool ListingParserInputIsError()
         {
-            if (ResponseBodyText == null)
+            if (ListingParserInput == null)
             {
                 return false;
             }
             return
-                ResponseBodyText.StartsWith("Not found", StringComparison.OrdinalIgnoreCase) ||
-                ResponseBodyText.StartsWith("Error", StringComparison.OrdinalIgnoreCase) ||
-                ResponseBodyText.StartsWith("404", StringComparison.OrdinalIgnoreCase) ||
-                ResponseBodyText.Contains("algo salió mal", StringComparison.OrdinalIgnoreCase) ||
-                ResponseBodyText.Contains("Page Not found", StringComparison.OrdinalIgnoreCase)
+                ListingParserInput.StartsWith("Not found", StringComparison.OrdinalIgnoreCase) ||
+                ListingParserInput.StartsWith("Error", StringComparison.OrdinalIgnoreCase) ||
+                ListingParserInput.StartsWith("404", StringComparison.OrdinalIgnoreCase) ||
+                ListingParserInput.Contains("algo salió mal", StringComparison.OrdinalIgnoreCase) ||
+                ListingParserInput.Contains("Page Not found", StringComparison.OrdinalIgnoreCase)
                 ;
         }
 
-        public bool ResponseBodyTextIsTooLarge()
+        public bool ListingParserInputIsTooLarge()
         {
-            if (ResponseBodyText is null)
+            if (ListingParserInput is null)
             {
                 return false;
             }
-            return ResponseBodyText.Length > Config.MAX_RESPONSEBODYTEXT_LENGTH;
+            return ListingParserInput.Length > Config.MAX_LISTINGPARSERINPUT_LENGTH;
         }
 
-        public bool ResponseBodyTextIsTooShort()
+        public bool ListingParserInputIsTooShort()
         {
-            if (string.IsNullOrEmpty(ResponseBodyText))
+            if (string.IsNullOrEmpty(ListingParserInput))
             {
                 return true;
             }
-            return ResponseBodyText.Length < Config.MIN_RESPONSEBODYTEXT_LENGTH;
+            return ListingParserInput.Length < Config.MIN_LISTINGPARSERINPUT_LENGTH;
         }
 
-        public bool ReponseBodyTextIsAnotherListingInHost()
+        public bool ListingParserInputIsAnotherListingInHost()
         {
-            if (string.IsNullOrEmpty(ResponseBodyText))
+            if (string.IsNullOrEmpty(ListingParserInput))
             {
                 return false;
             }
@@ -460,28 +457,28 @@ namespace landerist_library.Pages
                 "FROM " + Pages.PAGES + " " +
                 "WHERE [HOST] = @Host AND " +
                 "[UriHash] <> @UriHash AND " +
-                "[ResponseBodyTextHash] = @ResponseBodyTextHash AND " +
+                "[ListingParserInputHash] = @ListingParserInputHash AND " +
                 "[ListingStatus] IS NOT NULL";
 
             return new DataBase().QueryExists(query, new Dictionary<string, object?> {
                 {"Host", Host},
                 {"UriHash", UriHash },
-                {"ResponseBodyTextHash", ResponseBodyTextHash },
+                {"ListingParserInputHash", ListingParserInputHash },
             });
         }
 
         public bool IsNotListingCache()
         {
-            if (string.IsNullOrEmpty(ResponseBodyTextHash))
+            if (string.IsNullOrEmpty(ListingParserInputHash))
             {
                 return false;
             }
-            return NotListingsCache.IsNotListing(Host, ResponseBodyTextHash);
+            return NotListingsCache.IsNotListing(Host, ListingParserInputHash);
         }
 
         public bool InsertToNotListingCache()
         {
-            return (ResponseBodyTextHash != null) && NotListingsCache.Insert(Host, ResponseBodyTextHash);
+            return (ListingParserInputHash != null) && NotListingsCache.Insert(Host, ListingParserInputHash);
         }
 
         public Listing? GetListing(bool loadMedia, bool loadSources)
@@ -617,8 +614,8 @@ namespace landerist_library.Pages
                 UriHash = string.Empty;
                 HtmlDocument = null;
                 ResponseBody = null;
-                ResponseBodyText = null;
-                ResponseBodyTextHash = null;
+                ListingParserInput = null;
+                ListingParserInputHash = null;
                 Etag = null;
                 ResponseBodyZipped = null;
                 Screenshot = null;
@@ -658,6 +655,7 @@ namespace landerist_library.Pages
         public void RemoveResponseBody()
         {
             ResponseBody = null;
+            ResetResponseBodyDerivedData();
         }
 
         public bool SetResponseBodyZipped()
@@ -699,11 +697,19 @@ namespace landerist_library.Pages
                 using var gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress);
                 using var streamReader = new StreamReader(gzipStream);
                 ResponseBody = streamReader.ReadToEnd();
+                ResetResponseBodyDerivedData();
             }
             catch (Exception exception)
             {
                 Logs.Log.WriteError("Page SetResponseBodyFromZipped", exception);
             }
+        }
+
+        private void ResetResponseBodyDerivedData()
+        {
+            ListingParserInput = null;
+            HtmlDocument = null;
+            OriginalOuterHtml = null;
         }
 
         public void SetListingStatusPublished()
@@ -821,20 +827,20 @@ namespace landerist_library.Pages
             return IsRedirectToAnotherUrl() && ContainsListingStatus();
         }
 
-        public string? GetParseListingUserInput()
+        public string? GetListingParserInput()
         {
-            if (!string.IsNullOrEmpty(ParseListingUserInput))
+            if (!string.IsNullOrEmpty(ListingParserInput))
             {
-                return ParseListingUserInput;
+                return ListingParserInput;
             }
 
-            ParseListingUserInput = Website.ApplySpecialRules ?
+            ListingParserInput = Website.ApplySpecialRules ?
                 Parse.ListingParser.UserInput.ParseListingUserInput.GetHtml(this) :
                 Parse.ListingParser.UserInput.ParseListingUserInput.GetText(this);
 
-            //ParseListingUserInput = Parse.ListingParser.UserInput.ParseListingUserInput.GetHtml(this);
+            //ListingParserInput = Parse.ListingParser.UserInput.ParseListingUserInput.GetHtml(this);
             //var text = this.GetHtmlDocument().Text;
-            return ParseListingUserInput;
+            return ListingParserInput;
         }
     }
 }
