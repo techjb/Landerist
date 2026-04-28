@@ -10,18 +10,6 @@ namespace landerist_library.Parse.ListingParser.OpenAI
 {
     public class OpenAIRequest : SytemPrompt
     {
-        //public static readonly string SystemMessage =
-        //   "Un anuncio completo de oferta inmobiliaria debe contener la siguiente información:\r\n\r\n" +
-        //   "1. Tipo de propiedad (por ejemplo, casa, apartamento, terreno, etc.).\r\n" +
-        //   "2. Ubicación (puede ser la ciudad, barrio o dirección exacta).\r\n" +
-        //   "3. Precio de venta o alquiler.\r\n" +
-        //   "4. Descripción detallada de la propiedad (número de habitaciones, baños, tamaño en metros cuadrados, etc.).\r\n\r\n" +
-        //   "Evalúa el texto introducido por el usuario y determina si contiene todos los datos completos de un anuncio de oferta inmobiliaria. " +
-        //   "Asegúrate de identificar la presencia de cada uno de los puntos anteriores en el texto. " +
-        //   "Si encuentras títulos de otros anuncios en el texto, ignóralos a menos que vengan acompañados de toda la información requerida.\r\n\r\n" +
-        //   "Response sólo con \"si\" o \"no\" en formato Json"
-        //   ;       
-
         public static readonly int MAX_CONTEXT_WINDOW = 128000;
 
         public static readonly string MODEL_NAME = "gpt-5-mini-2025-08-07";

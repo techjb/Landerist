@@ -36,6 +36,17 @@ namespace landerist_library.Parse.ListingParser
 
         public static bool TooManyTokens(Page page)
         {
+            var (pageTokens, systemTokens) = CountPageAndSystemTokens(page);
+            page.TokenCount = pageTokens;
+
+            int totalTokens = systemTokens + page.TokenCount.Value;
+            int maxContextWindow = GetMaxContextWindow();
+
+            return totalTokens > maxContextWindow;
+        }
+
+        private static int GetMaxContextWindow()
+        {
             var maxContextWindow = DEFAULT_MAX_TOKENS;
 
             switch (Config.LLM_PROVIDER)
@@ -55,12 +66,7 @@ namespace landerist_library.Parse.ListingParser
             {
                 maxContextWindow = DEFAULT_MAX_TOKENS;
             }
-
-            var (pageTokens, systemTokens) = CountPageAndSystemTokens(page);
-            page.TokenCount = pageTokens;
-            int totalTokens = systemTokens + page.TokenCount.Value;
-
-            return totalTokens > maxContextWindow;
+            return maxContextWindow;
         }
     }
 }
