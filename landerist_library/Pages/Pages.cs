@@ -677,7 +677,7 @@ namespace landerist_library.Pages
                 "SET [ResponseBodyTextHash] = NULL";
 
             return new DataBase().Query(query);
-        }
+        }       
 
         public static void DeleteUnpublishedListings()
         {
