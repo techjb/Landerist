@@ -156,6 +156,7 @@ namespace landerist_library.Pages
                     "W.[IndexUrlRegex], " +
                     "W.[SitemapUrlRegex], " +
                     "W.[ListingUrlRegex]," +
+                    "W.[ListingHtmlRemoveXPath], " +
                     "W.[ApplySpecialRules], " +
                     "W.[HtmlIndexingEnabled] " +
                 "FROM " + PAGES + " AS P " +
@@ -365,6 +366,7 @@ namespace landerist_library.Pages
                 Websites.Websites.WEBSITES + ".[IndexUrlRegex], " +
                 Websites.Websites.WEBSITES + ".[SitemapUrlRegex], " +
                 Websites.Websites.WEBSITES + ".[ListingUrlRegex], " +
+                Websites.Websites.WEBSITES + ".[ListingHtmlRemoveXPath], " +
                 Websites.Websites.WEBSITES + ".[ApplySpecialRules], " +
                 Websites.Websites.WEBSITES + ".[HtmlIndexingEnabled] ";
         }

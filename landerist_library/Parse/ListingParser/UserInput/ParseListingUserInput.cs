@@ -1,5 +1,6 @@
 using HtmlAgilityPack;
 using landerist_library.Pages;
+using landerist_library.Websites;
 
 namespace landerist_library.Parse.ListingParser.UserInput
 {
@@ -22,10 +23,10 @@ namespace landerist_library.Parse.ListingParser.UserInput
 
             if (html)
             {
-                return GetHtml(htmlDocument);
+                return GetHtml(htmlDocument, null);
             }
 
-            return GetText(htmlDocument);
+            return GetText(htmlDocument, null, null);
         }
 
         public static string? GetText(Page page)
@@ -35,7 +36,7 @@ namespace landerist_library.Parse.ListingParser.UserInput
                 var htmlDocument = page.GetHtmlDocument();
                 if (htmlDocument != null)
                 {
-                    return GetText(htmlDocument, page.Uri?.ToString());
+                    return GetText(htmlDocument, page.Website, page.Uri?.ToString());
                 }
             }
             catch (Exception exception)
@@ -53,7 +54,7 @@ namespace landerist_library.Parse.ListingParser.UserInput
                 var htmlDocument = page.GetHtmlDocument();
                 if (htmlDocument != null)
                 {
-                    return GetHtml(htmlDocument, page.Uri?.ToString());
+                    return GetHtml(htmlDocument, page.Website, page.Uri?.ToString());
                 }
             }
             catch (Exception exception)
@@ -64,7 +65,7 @@ namespace landerist_library.Parse.ListingParser.UserInput
             return null;
         }
 
-        private static string? GetHtml(HtmlDocument htmlDocument, string? context = null)
+        private static string? GetHtml(HtmlDocument htmlDocument, Website? website, string? context = null)
         {
             string? text = null;
             try
@@ -73,6 +74,7 @@ namespace landerist_library.Parse.ListingParser.UserInput
                 string? structuredData = ListingStructuredDataExtractor.Extract(workingDocument);
                 ListingHtmlNodeRemover.RemoveBaseNoise(workingDocument);
                 ListingHtmlNoiseRemover.Remove(workingDocument);
+                ListingWebsiteHtmlNodeRemover.Remove(workingDocument, website, context);
                 ListingHiddenContentRemover.Remove(workingDocument, preserveMediaNodes: true);
                 ListingStructuredDataInjector.Prepend(workingDocument, structuredData);
                 ListingHtmlAttributeCleaner.Clean(workingDocument);
@@ -90,10 +92,10 @@ namespace landerist_library.Parse.ListingParser.UserInput
 
         public static string? GetText(HtmlDocument htmlDocument)
         {
-            return GetText(htmlDocument, null);
+            return GetText(htmlDocument, null, null);
         }
 
-        private static string? GetText(HtmlDocument htmlDocument, string? context)
+        private static string? GetText(HtmlDocument htmlDocument, Website? website, string? context)
         {
             try
             {
@@ -101,6 +103,7 @@ namespace landerist_library.Parse.ListingParser.UserInput
                 string? structuredData = ListingStructuredDataExtractor.Extract(workingDocument);
                 ListingHtmlNodeRemover.RemoveBaseNoise(workingDocument);
                 ListingHtmlNoiseRemover.RemoveTags(workingDocument);
+                ListingWebsiteHtmlNodeRemover.Remove(workingDocument, website, context);
                 ListingHiddenContentRemover.Remove(workingDocument, preserveMediaNodes: false);
 
                 string text = ListingVisibleTextExtractor.GetText(workingDocument);

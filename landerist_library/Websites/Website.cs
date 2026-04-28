@@ -46,6 +46,8 @@ namespace landerist_library.Websites
 
         public string? ListingUrlRegex { get; set; }
 
+        public string? ListingHtmlRemoveXPath { get; set; }
+
         public bool ApplySpecialRules { get; set; }
 
         public bool HtmlIndexingEnabled { get; set; } = true;
@@ -133,6 +135,9 @@ namespace landerist_library.Websites
             ListingUrlRegex = dataRow.Table.Columns.Contains("ListingUrlRegex") && dataRow["ListingUrlRegex"] is not DBNull
                 ? dataRow["ListingUrlRegex"].ToString()
                 : null;
+            ListingHtmlRemoveXPath = dataRow.Table.Columns.Contains("ListingHtmlRemoveXPath") && dataRow["ListingHtmlRemoveXPath"] is not DBNull
+                ? dataRow["ListingHtmlRemoveXPath"].ToString()
+                : null;
             ApplySpecialRules = dataRow.Table.Columns.Contains("ApplySpecialRules")
                 && dataRow["ApplySpecialRules"] is not DBNull
                 && (bool)dataRow["ApplySpecialRules"];
@@ -147,9 +152,9 @@ namespace landerist_library.Websites
             string query =
                 "INSERT INTO " + Websites.WEBSITES + " (" +
                 "[MainUri], [Host], [LanguageCode], [CountryCode], [RobotsTxt], [RobotsTxtUpdated], " +
-                "[SitemapUpdated], [IpAddress], [IpAddressUpdated], [IndexUrlRegex], [SitemapUrlRegex], [ListingUrlRegex], [ApplySpecialRules], [HtmlIndexingEnabled]) VALUES (" +
+                "[SitemapUpdated], [IpAddress], [IpAddressUpdated], [IndexUrlRegex], [SitemapUrlRegex], [ListingUrlRegex], [ListingHtmlRemoveXPath], [ApplySpecialRules], [HtmlIndexingEnabled]) VALUES (" +
                 "@MainUri, @Host, @LanguageCode, @CountryCode, @RobotsTxt, @RobotsTxtUpdated, " +
-                "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @IndexUrlRegex, @SitemapUrlRegex, @ListingUrlRegex, @ApplySpecialRules, @HtmlIndexingEnabled)";
+                "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @IndexUrlRegex, @SitemapUrlRegex, @ListingUrlRegex, @ListingHtmlRemoveXPath, @ApplySpecialRules, @HtmlIndexingEnabled)";
 
             var parameters = GetQueryParameters();
             return new DataBase().Query(query, parameters);
@@ -170,6 +175,7 @@ namespace landerist_library.Websites
                 "[IndexUrlRegex] = @IndexUrlRegex, " +
                 "[SitemapUrlRegex] = @SitemapUrlRegex, " +
                 "[ListingUrlRegex] = @ListingUrlRegex, " +
+                "[ListingHtmlRemoveXPath] = @ListingHtmlRemoveXPath, " +
                 "[ApplySpecialRules] = @ApplySpecialRules, " +
                 "[HtmlIndexingEnabled] = @HtmlIndexingEnabled " +
                 "WHERE [Host] = @Host";
@@ -193,6 +199,7 @@ namespace landerist_library.Websites
                 {"IndexUrlRegex", IndexUrlRegex },
                 {"SitemapUrlRegex", SitemapUrlRegex },
                 {"ListingUrlRegex", ListingUrlRegex },
+                {"ListingHtmlRemoveXPath", ListingHtmlRemoveXPath },
                 {"ApplySpecialRules", ApplySpecialRules },
                 {"HtmlIndexingEnabled", HtmlIndexingEnabled },
             };
@@ -580,6 +587,7 @@ namespace landerist_library.Websites
                 RobotsTxt = null;
                 IndexUrlRegex = null;
                 SitemapUrlRegex = null;
+                ListingHtmlRemoveXPath = null;
                 ApplySpecialRules = false;
                 HtmlIndexingEnabled = false;
             }

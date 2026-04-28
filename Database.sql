@@ -326,6 +326,11 @@ BEGIN
 	ALTER TABLE [dbo].[WEBSITES] ADD [ListingUrlRegex] [nvarchar](max) NULL
 END
 GO
+IF COL_LENGTH('dbo.WEBSITES', 'ListingHtmlRemoveXPath') IS NULL
+BEGIN
+	ALTER TABLE [dbo].[WEBSITES] ADD [ListingHtmlRemoveXPath] [nvarchar](max) NULL
+END
+GO
 IF COL_LENGTH('dbo.WEBSITES', 'ApplySpecialRules') IS NULL
 BEGIN
 	ALTER TABLE [dbo].[WEBSITES] ADD [ApplySpecialRules] [bit] NOT NULL CONSTRAINT [DF_WEBSITES_ApplySpecialRules] DEFAULT ((0))
