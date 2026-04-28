@@ -335,7 +335,7 @@ namespace landerist_library.Scrape
         private static ScrapeAttemptResult ScrapeAttempt(Page page, bool useProxy)
         {
             var acquired = WebsitesThrottle.Block(page.Website);
-            if (!acquired && !useProxy)
+            if (!acquired && !useProxy && Config.IsConfigurationProduction())
             {
                 return ScrapeAttemptResult.Blocked;
             }

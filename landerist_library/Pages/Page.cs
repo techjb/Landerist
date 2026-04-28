@@ -833,7 +833,7 @@ namespace landerist_library.Pages
                 Parse.ListingParser.UserInput.ParseListingUserInput.GetText(this);
 
             //ParseListingUserInput = Parse.ListingParser.UserInput.ParseListingUserInput.GetHtml(this);
-
+            //var text = this.GetHtmlDocument().Text;
             return ParseListingUserInput;
         }
     }

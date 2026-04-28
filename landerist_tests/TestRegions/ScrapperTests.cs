@@ -16,7 +16,7 @@ namespace landerist_tests
             //new Scraper().ProcessPages();
             //new Scraper().Scrape(page, false);
 
-            new landerist_library.Scrape.Scraper().Scrape("https://www.tecnocasa.es/venta/terrenos/granada/vegas-del-genil/598051.html", false);
+            //new landerist_library.Scrape.Scraper().Scrape("https://www.engelvoelkers.com/es/es/exposes/e743b703-0ac2-5381-a806-e01e5141f33e", false);
             //new Scraper().TestSinglePage();
             //landerist_library.Scrape.PageSelector.SelectTop1();
             //Console.WriteLine("Block: " + WebsitesThrottle.Block(page.Website));
