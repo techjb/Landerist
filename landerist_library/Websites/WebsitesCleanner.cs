@@ -91,7 +91,7 @@ namespace landerist_library.Websites
             {
                 try
                 {
-                    if (website.GetNumListings() > 0)
+                    if (website.GetNumListings() > 0 || website.ApplySpecialRules)
                     {
                         Interlocked.Increment(ref skipped);
                         return;
@@ -130,7 +130,7 @@ namespace landerist_library.Websites
             {
                 try
                 {
-                    if (HasPublishedListings(website))
+                    if (HasPublishedListings(website) || website.ApplySpecialRules)
                     {
                         Interlocked.Increment(ref skipped);
                         return;
@@ -176,7 +176,7 @@ namespace landerist_library.Websites
             {
                 try
                 {
-                    if (HasPageTypeListing(website))
+                    if (HasPageTypeListing(website) || website.ApplySpecialRules)
                     {
                         Interlocked.Increment(ref skipped);
                         return;
