@@ -34,14 +34,14 @@ namespace landerist_tests
 
 
             //string mainUri = "https://www.remax.es/";
-            string hostUri = "www.remax.es";
+            //string hostUri = "www.remax.es";
             //string listingUrlRegex = @"^https:\/\/www\.remax\.es\/buscador-de-inmuebles\/(?:venta|alquiler)\/[^\/]+\/[^\/]+\/[^\/]+\/[^\/]+\/[^\/]+\/$";
             //string indexUrlRegex = listingUrlRegex;
             //string sitemapUrlRegex = @"^https:\/\/www\.remax\.es\/(?:sitemap-general\.xml|sitemaps\/sitemap-fichas-[va].*\.xml)$";
 
             //WebsitesInserter.InsertSpecialWebsite(mainUri, hostUri, listingUrlRegex, indexUrlRegex, sitemapUrlRegex);
 
-            //Website website = new (hostUri);
+            //Website website = new(hostUri);
             //website.ReadSitemap();
 
         }

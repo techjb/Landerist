@@ -168,10 +168,10 @@ namespace landerist_library.Index
                 return false;
             }
 
-            if (LanguageValidator.ContainsNotAllowed(uri, website.LanguageCode))
-            {
-                return false;
-            }
+            //if (LanguageValidator.ContainsNotAllowed(uri, website.LanguageCode))
+            //{
+            //    return false;
+            //}
 
             if (!uri.Host.Equals(Page.Host, StringComparison.OrdinalIgnoreCase) || uri.Equals(Page.Uri))
             {
