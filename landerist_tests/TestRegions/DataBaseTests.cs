@@ -9,7 +9,7 @@ namespace landerist_tests
 
             //var h = landerist_library.Database.CountrySpain.Contains(-3.6886920000, 40.4199410000); // false
             //Console.WriteLine(h);
-            //landerist_library.Database.RedirectUrl.Insert("test1", "test2");
+            //landerist_library.Database.RedirectUrl.InsertSpecialWebsite("test1", "test2");
         }
     }
 }

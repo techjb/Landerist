@@ -5,7 +5,7 @@ namespace landerist_tests
         public static void Run()
         {
             //var page = new Page("https://dosagui.com/es/property/15746");
-            //new landerist_library.Database.TrainingData().Insert(page);
+            //new landerist_library.Database.TrainingData().InsertSpecialWebsite(page);
             //landerist_library.Database.TrainingData.CreateCsv(false);
         }
     }

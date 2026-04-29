@@ -94,6 +94,52 @@ namespace landerist_library.Websites
             return InsertWebsite(uri);
         }
 
+        public static bool InsertSpecialWebsite(
+            string mainUri,
+            string host,
+            string? listingUrlRegex,
+            string? indexUrlRegex,
+            string? sitemapUrlRegex)
+        {
+            if (!Uri.TryCreate(mainUri, UriKind.Absolute, out Uri? uri))
+            {
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(host))
+            {
+                return false;
+            }
+
+            Website website = new()
+            {
+                MainUri = uri,
+                Host = host.Trim(),
+                ListingUrlRegex = NullIfWhiteSpace(listingUrlRegex),
+                IndexUrlRegex = NullIfWhiteSpace(indexUrlRegex),
+                SitemapUrlRegex = NullIfWhiteSpace(sitemapUrlRegex),
+                ApplySpecialRules = true,
+                HtmlIndexingEnabled = false,
+            };
+
+
+            if (!website.SetRobotsTxt())
+            {
+                Console.WriteLine("Error setting robots.txt for " + website.MainUri);
+            }
+            if (!website.SetIpAddress())
+            {
+                Console.WriteLine("Error setting IP address for " + website.MainUri);
+            }
+            if (!website.Insert())
+            {
+                Console.WriteLine("Error inserting website " + website.MainUri);
+                return false;
+            }
+            return true;
+
+        }
+
         public static void Insert(List<Uri> uris)
         {
             HashSet<Uri> hashSet = [.. uris];
@@ -182,6 +228,11 @@ namespace landerist_library.Websites
                 return false;
             }
             return true;
+        }
+
+        private static string? NullIfWhiteSpace(string? value)
+        {
+            return string.IsNullOrWhiteSpace(value) ? null : value;
         }
 
         private static bool InsertWebsite(Website website)

@@ -26,12 +26,24 @@ namespace landerist_tests
             //new Website("promoaguilera.com").DeleteCurentMachineLogs();
             //new Website("www.servihabitat.com").ReadSitemap();
 
-
             //WebsitesCleanner.DeleteWebsitesWithLessThanTenPages();
             //WebsitesCleanner.DeleteWebsitesWithoutListings();
             //WebsitesCleanner.DeleteWebsitesWithoutPageTypeListing();
             //WebsitesCleanner.DeleteWebsitesWithoutPublishedListings();
             //WebsitesCleanner.DeletePagesDiscardedByIndexUrlRegex("www.engelvoelkers.com");
+
+
+            //string mainUri = "https://www.remax.es/";
+            string hostUri = "www.remax.es";
+            //string listingUrlRegex = @"^https:\/\/www\.remax\.es\/buscador-de-inmuebles\/(?:venta|alquiler)\/[^\/]+\/[^\/]+\/[^\/]+\/[^\/]+\/[^\/]+\/$";
+            //string indexUrlRegex = listingUrlRegex;
+            //string sitemapUrlRegex = @"^https:\/\/www\.remax\.es\/(?:sitemap-general\.xml|sitemaps\/sitemap-fichas-[va].*\.xml)$";
+
+            //WebsitesInserter.InsertSpecialWebsite(mainUri, hostUri, listingUrlRegex, indexUrlRegex, sitemapUrlRegex);
+
+            //Website website = new (hostUri);
+            //website.ReadSitemap();
+
         }
     }
 }

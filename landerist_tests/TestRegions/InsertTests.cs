@@ -10,15 +10,15 @@ namespace landerist_tests
             //GetAgenciesUrls.ProcessPages();
             //ExportAgenciesUrls.ProcessPages();
 
-            //landerist_library.Insert.FtAgencies.InsertFtUrls.GetProvincesList();
-            //landerist_library.Insert.FtAgencies.FtAgenciesInsertUrls.ProcessPages();
-            //landerist_library.Insert.FtAgencies.FtAgenciesSetAgenciesUrls.ProcessPages();
-            //landerist_library.Insert.FtAgencies.FtAgenciesExport.ProcessPages();
-            //landerist_library.Insert.FtAgencies.FtAgenciesInsertWebsites.ProcessPages();
+            //landerist_library.InsertSpecialWebsite.FtAgencies.InsertFtUrls.GetProvincesList();
+            //landerist_library.InsertSpecialWebsite.FtAgencies.FtAgenciesInsertUrls.ProcessPages();
+            //landerist_library.InsertSpecialWebsite.FtAgencies.FtAgenciesSetAgenciesUrls.ProcessPages();
+            //landerist_library.InsertSpecialWebsite.FtAgencies.FtAgenciesExport.ProcessPages();
+            //landerist_library.InsertSpecialWebsite.FtAgencies.FtAgenciesInsertWebsites.ProcessPages();
 
-            //landerist_library.Insert.BancoDeDatos.InsertBancoDeDatos.ProcessPages();
-            //landerist_library.Insert.BaseDeDatosEmpresas.InsertBaseDeDatosEmpresas.ProcessPages();
-            //landerist_library.Insert.IdAgencies.IdAgenciesInsertWebsites.ProcessPages();
+            //landerist_library.InsertSpecialWebsite.BancoDeDatos.InsertBancoDeDatos.ProcessPages();
+            //landerist_library.InsertSpecialWebsite.BaseDeDatosEmpresas.InsertBaseDeDatosEmpresas.ProcessPages();
+            //landerist_library.InsertSpecialWebsite.IdAgencies.IdAgenciesInsertWebsites.ProcessPages();
 
             //WebsitesInserter.DeleteAndInsert(uri);return;
             //new WebsitesInserter(false).DeleteAndInsert(uri); return;
