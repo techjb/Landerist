@@ -16,7 +16,7 @@ namespace landerist_tests
             //new Scraper().ProcessPages();
             //new Scraper().Scrape(page, false);
 
-            new landerist_library.Scrape.Scraper().Scrape("https://www.remax.es/buscador-de-inmuebles/venta/chalet-pareado/madrid/las-rozas-de-madrid/todos/3367-04513/", false);
+            //new landerist_library.Scrape.Scraper().Scrape("https://www.remax.es/buscador-de-inmuebles/venta/suelo/valencia-valencia/godelleta/todos/3424-07038/", false);
             //new Scraper().TestSinglePage();
             //landerist_library.Scrape.PageSelector.SelectTop1();
             //Console.WriteLine("Block: " + WebsitesThrottle.Block(page.Website));

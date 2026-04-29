@@ -65,6 +65,8 @@ namespace landerist_library.Pages
 
         private bool HasComparableEtag { get; set; } = false;
 
+        private const string RemaxInvalidCanonicalPath = "/buscador-de-inmuebles/todos/todos/todos/todos/todos/todos";
+
 
         private HtmlDocument? HtmlDocument = null;
 
@@ -548,10 +550,29 @@ namespace landerist_library.Pages
                 if (node != null)
                 {
                     var contentAttribute = node.GetAttributeValue("href", "");
-                    return new Indexer(this).GetUri(contentAttribute);
+                    var canonicalUri = new Indexer(this).GetUri(contentAttribute);
+                    return IsIgnoredCanonicalUri(canonicalUri) ? null : canonicalUri;
                 }
             }
             return null;
+        }
+
+        private bool IsIgnoredCanonicalUri(Uri? canonicalUri)
+        {
+            if (canonicalUri is null)
+            {
+                return false;
+            }
+
+            return IsRemaxHost(Host) &&
+                IsRemaxHost(canonicalUri.Host) &&
+                canonicalUri.AbsolutePath.TrimEnd('/').Equals(RemaxInvalidCanonicalPath, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsRemaxHost(string host)
+        {
+            return host.Equals("remax.es", StringComparison.OrdinalIgnoreCase) ||
+                host.Equals("www.remax.es", StringComparison.OrdinalIgnoreCase);
         }
 
         private bool ContainsMetaRobots(string content)

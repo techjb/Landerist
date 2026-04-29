@@ -67,6 +67,16 @@ namespace landerist_library.Downloaders.Puppeteer
             ResourceType.Media,
         ];
 
+        private static readonly HashSet<ResourceType> ImageResourceTypes =
+        [
+            ResourceType.Image,
+            ResourceType.ImageSet,
+            ResourceType.Img,
+        ];
+
+        private static readonly byte[] TransparentGifBytes =
+            Convert.FromBase64String("R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==");
+
         private static readonly string IDontCareAboutCookies = Config.CHROME_EXTENSIONS_DIRECTORY
             + "IDontCareAboutCookies\\1.0.1_0\\";
 
@@ -642,11 +652,26 @@ namespace landerist_library.Downloaders.Puppeteer
                 }
 
                 var url = e.Request.Url.ToLowerInvariant();
-                if (BlockResources.Contains(e.Request.ResourceType) ||
-                    BlockDomains.Contains(requestHost) ||
+                if (BlockResources.Contains(e.Request.ResourceType))
+                {
+                    if (ImageResourceTypes.Contains(e.Request.ResourceType))
+                    {
+                        await e.Request.RespondAsync(new ResponseData
+                        {
+                            Status = System.Net.HttpStatusCode.OK,
+                            ContentType = "image/gif",
+                            BodyData = TransparentGifBytes
+                        });
+                        return;
+                    }
+
+                    await e.Request.AbortAsync();
+                    return;
+                }
+
+                if (BlockDomains.Contains(requestHost) ||
                     BlockedExtensions.Any(url.EndsWith) ||
-                    e.Request.IsNavigationRequest && e.Request.RedirectChain.Length != 0
-                    )
+                    e.Request.IsNavigationRequest && e.Request.RedirectChain.Length != 0)
                 {
                     await e.Request.AbortAsync();
                     return;
