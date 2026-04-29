@@ -13,8 +13,7 @@ namespace landerist_library.Tasks
     public class TaskLocalAIParsing
     {
         private const int MAX_PAGES_PER_TASK = 100;
-        private const int MAX_NUM_SEQS = 6;
-        private const int MAX_DEGREE_OF_PARALLELISM = MAX_NUM_SEQS + 10;
+        private const int MAX_NUM_SEQS = 4; // same as un vllm        
         private const int COMPLETION_TOKENS = 7000;  // structured output and completion tokens aproximately
         private readonly int MAX_TOKEN_COUNT;
 
@@ -64,7 +63,7 @@ namespace landerist_library.Tasks
                 Parallel.ForEach(orderablePartitioner,
                     new ParallelOptions()
                     {
-                        MaxDegreeOfParallelism = Config.IsConfigurationLocal() ? 1 : MAX_DEGREE_OF_PARALLELISM
+                        MaxDegreeOfParallelism = Config.IsConfigurationLocal() ? 1 : MAX_NUM_SEQS
                     },
                     page =>
                     {
