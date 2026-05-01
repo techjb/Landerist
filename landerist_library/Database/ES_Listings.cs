@@ -430,6 +430,26 @@ namespace landerist_library.Database
             return GetAll(dataTable, loadMedia, loadSources);
         }
 
+        public static SortedSet<Listing> GetListings(ListingStatus listingStatus, bool loadMedia, bool loadSources, DateOnly dateFrom, DateOnly dateTo)
+        {
+            string query =
+                "SELECT * " +
+                "FROM " + TABLE_ES_LISTINGS + " " +
+                "WHERE " +
+                "   [listingStatus] = @ListingStatus AND " +
+                "   CAST([updated] AS DATE) >= CAST(@DateFrom AS DATE) AND " +
+                "   CAST([updated] AS DATE) <= CAST(@DateTo AS DATE)";
+
+            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>()
+            {
+                { "ListingStatus", listingStatus.ToString() },
+                { "DateFrom", dateFrom },
+                { "DateTo", dateTo },
+            });
+
+            return GetAll(dataTable, loadMedia, loadSources);
+        }
+
         private static SortedSet<Listing> ParseListings(DataTable dataTable, bool loadMedia, bool loadSources)
         {
             SortedSet<Listing> listings = new(new ListingComparer());

@@ -12,7 +12,9 @@ namespace landerist_library.Landerist_com
         Listings,
         Updates,
         Published,
-        Unpublished,        
+        Unpublished,
+        PublishedUpdates,
+        UnpublishedUpdates,
         Websites
     }
 

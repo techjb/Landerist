@@ -25,7 +25,7 @@ namespace landerist_library.Landerist_com
                 DownloadsTemplate = File.ReadAllText(DownloadsTemplateHtmlFile);
                 UpdateUpdatedAt();
 
-                foreach (ExportType exportType in Enum.GetValues(typeof(ExportType)))
+                foreach (ExportType exportType in GetDownloadsExportTypes())
                 {
                     UpdateDownloadsTemplate(CountryCode.ES, exportType);
                 }
@@ -47,6 +47,18 @@ namespace landerist_library.Landerist_com
         {
             string updatedAtText = DateTime.Now.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
             Replace("/*UPDATED_AT*/", updatedAtText);
+        }
+
+        private static ExportType[] GetDownloadsExportTypes()
+        {
+            return
+            [
+                ExportType.Published,
+                ExportType.Unpublished,
+                ExportType.PublishedUpdates,
+                ExportType.UnpublishedUpdates,
+                ExportType.Websites
+            ];
         }
 
         private static void UpdateDownloadsTemplate(CountryCode countryCode, ExportType exportType)

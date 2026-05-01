@@ -5,6 +5,7 @@ using Amazon.S3.Transfer;
 using Grpc.Core;
 using landerist_library.Configuration;
 using landerist_library.Logs;
+using System.Net;
 
 namespace landerist_library.Export
 {
@@ -157,7 +158,7 @@ namespace landerist_library.Export
         {
             try
             {
-                var metadataResponse = AmazonS3Client.GetObjectMetadataAsync(bucketName, objectKey).Result;
+                var metadataResponse = AmazonS3Client.GetObjectMetadataAsync(bucketName, objectKey).GetAwaiter().GetResult();
                 var lastModified = metadataResponse.LastModified;
                 var contentLength = metadataResponse.ContentLength; // Tamaño en bytes                
 
@@ -165,6 +166,11 @@ namespace landerist_library.Export
             }
             catch (AmazonS3Exception e)
             {
+                if (IsObjectNotFound(e))
+                {
+                    return (null, null);
+                }
+
                 Log.WriteError("S3 GetFileInfo", e);
             }
             return (null, null);
@@ -175,7 +181,7 @@ namespace landerist_library.Export
             metaDataKey = "x-amz-meta-" + metaDataKey;
             try
             {
-                var metadataResponse = AmazonS3Client.GetObjectMetadataAsync(bucketName, objectKey).Result;
+                var metadataResponse = AmazonS3Client.GetObjectMetadataAsync(bucketName, objectKey).GetAwaiter().GetResult();
                 if (metadataResponse.Metadata.Keys.Any(k => k.Equals(metaDataKey, StringComparison.OrdinalIgnoreCase)))
                 {
                     return metadataResponse.Metadata[metaDataKey];
@@ -183,9 +189,22 @@ namespace landerist_library.Export
             }
             catch (AmazonS3Exception e)
             {
+                if (IsObjectNotFound(e))
+                {
+                    return null;
+                }
+
                 Log.WriteError("S3 GetFileInfo", e);
             }
             return null;
+        }
+
+        private static bool IsObjectNotFound(AmazonS3Exception exception)
+        {
+            return
+                exception.StatusCode == HttpStatusCode.NotFound ||
+                string.Equals(exception.ErrorCode, "NotFound", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(exception.ErrorCode, "NoSuchKey", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

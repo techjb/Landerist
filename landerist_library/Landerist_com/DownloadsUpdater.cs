@@ -21,10 +21,9 @@ namespace landerist_library.Landerist_com
         {
             try
             {
-                UpdateListings();
                 UpdateUpdates();
-                UpdatePublished();
-                UpdateUnpublished();
+                UpdateListings(ListingStatus.published);
+                UpdateListings(ListingStatus.unpublished);
                 UpdateWebsites();
                 UpdateHosts();
             }
@@ -46,33 +45,35 @@ namespace landerist_library.Landerist_com
 
         public static void UpdateUpdates()
         {
-            Console.WriteLine("Reading Updates ..");
-            DateOnly dateFrom = GetDateFrom();
+            Console.WriteLine("Reading updates ..");
+            DateOnly dateFrom = GetDateFrom(ExportType.PublishedUpdates, ExportType.UnpublishedUpdates);
             DateOnly dateTo = Yesterday();
-            var listings = ES_Listings.GetListings(true, true, dateFrom, dateTo);
-            if (!Update(listings, CountryCode.ES, ExportType.Updates, dateFrom, dateTo))
+
+            var publishedListings = ES_Listings.GetListings(ListingStatus.published, true, true, dateFrom, dateTo);
+            if (!Update(publishedListings, CountryCode.ES, ExportType.PublishedUpdates, dateFrom, dateTo))
             {
-                Log.WriteError("filesupdater", "Error updating Updates");
+                Log.WriteError("filesupdater", "Error updating PublishedUpdates");
+            }
+
+            var unpublishedListings = ES_Listings.GetListings(ListingStatus.unpublished, true, true, dateFrom, dateTo);
+            if (!Update(unpublishedListings, CountryCode.ES, ExportType.UnpublishedUpdates, dateFrom, dateTo))
+            {
+                Log.WriteError("filesupdater", "Error updating UnpublishedUpdates");
             }
         }
 
-        public static void UpdatePublished()
+        public static void UpdateListings(ListingStatus listingStatus)
         {
-            Console.WriteLine("Reading published ..");
-            var listings = ES_Listings.GetPublished();
-            if (!Update(listings, CountryCode.ES, ExportType.Published, null, null))
-            {
-                Log.WriteError("filesupdater", "Error updating Published");
-            }
-        }
+            Console.WriteLine("Reading " + listingStatus + " ..");
 
-        public static void UpdateUnpublished()
-        {
-            Console.WriteLine("Reading unpublished ..");
-            var listings = ES_Listings.GetUnPublished();
-            if (!Update(listings, CountryCode.ES, ExportType.Unpublished, null, null))
+            var exportType = listingStatus == ListingStatus.published
+                ? ExportType.Published
+                : ExportType.Unpublished;
+
+            var listings = ES_Listings.GetListings(listingStatus);
+            if (!Update(listings, CountryCode.ES, exportType, null, null))
             {
-                Log.WriteError("filesupdater", "Error updating Unpublished");
+                Log.WriteError("filesupdater", "Error updating " + exportType);
             }
         }
 
@@ -309,19 +310,24 @@ namespace landerist_library.Landerist_com
             }
         }
 
-        private static DateOnly GetDateFrom()
+        private static DateOnly GetDateFrom(params ExportType[] exportTypes)
         {
             var dateFrom = Yesterday();
-            var objectKey = GetObjectKey(CountryCode.ES, ExportType.Updates, "zip");
-            var metaDataValue = new S3().GetMetadataValue(PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey, METADATA_KEY_DATETO);
+            var s3 = new S3();
 
-            if (metaDataValue != null)
+            foreach (var exportType in exportTypes)
             {
-                if (DateOnly.TryParseExact(metaDataValue, METADATA_DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly dateTo))
+                var objectKey = GetObjectKey(CountryCode.ES, exportType, "zip");
+                var metaDataValue = s3.GetMetadataValue(PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey, METADATA_KEY_DATETO);
+
+                if (metaDataValue != null)
                 {
-                    if (dateTo.AddDays(1) < dateFrom)
+                    if (DateOnly.TryParseExact(metaDataValue, METADATA_DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly dateTo))
                     {
-                        dateFrom = dateTo.AddDays(1);
+                        if (dateTo.AddDays(1) < dateFrom)
+                        {
+                            dateFrom = dateTo.AddDays(1);
+                        }
                     }
                 }
             }
