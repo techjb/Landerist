@@ -54,7 +54,8 @@
             <form>
                 <label for="select">Schema</label>
                 <select id="select" name="select" required>
-                    <option value="" selected>ES/1.0</option>
+                    <option value="https://raw.githubusercontent.com/techjb/Open-Real-Estate-Listings-Schema/master/ES/1.0.json">ES/1.0</option>
+                    <option value="https://raw.githubusercontent.com/techjb/Open-Real-Estate-Listings-Schema/master/ES/1.1.json" selected>ES/1.1</option>
                 </select>
                 <label for="json-file">
                     Select or dragg JSON file
@@ -76,6 +77,7 @@
 
     <script type="text/javascript">
         let schema;
+        let schemaSelect = document.getElementById("select");
         let jsonFile = document.getElementById("json-file");
         let validationError = document.getElementById("validation-error");
         let sectionListings = document.getElementById("section-listings");
@@ -100,7 +102,7 @@
                 xhr.send();
             };
 
-            let url = 'https://raw.githubusercontent.com/techjb/Open-Real-Estate-Listings-Schema/master/ES/1.0.json';
+            let url = schemaSelect.value;
 
             getJSON(url, function (err, data) {
                 if (err !== null) {
@@ -121,6 +123,11 @@
             Reset();
             const file = e.target.files[0];
             ReadFile(file);
+        });
+
+        schemaSelect.addEventListener("change", () => {
+            PreloadSchema();
+            Reset();
         });
 
         function showDropZone() {
