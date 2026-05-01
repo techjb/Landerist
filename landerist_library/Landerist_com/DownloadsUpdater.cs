@@ -36,7 +36,7 @@ namespace landerist_library.Landerist_com
         public static void UpdateListings()
         {
             Console.WriteLine("Reading all listings ..");
-            var listings = ES_Listings.GetAll(true, true);
+            var listings = ES_Listings.GetAllApplySpecialRules(true, true);
             if (!Update(listings, CountryCode.ES, ExportType.Listings, null, null))
             {
                 Log.WriteError("filesupdater", "Error updating all listings");
@@ -49,13 +49,13 @@ namespace landerist_library.Landerist_com
             DateOnly dateFrom = GetDateFrom(ExportType.PublishedUpdates, ExportType.UnpublishedUpdates);
             DateOnly dateTo = Yesterday();
 
-            var publishedListings = ES_Listings.GetListings(ListingStatus.published, true, true, dateFrom, dateTo);
+            var publishedListings = ES_Listings.GetListingsApplySpecialRules(ListingStatus.published, true, true, dateFrom, dateTo);
             if (!Update(publishedListings, CountryCode.ES, ExportType.PublishedUpdates, dateFrom, dateTo))
             {
                 Log.WriteError("filesupdater", "Error updating PublishedUpdates");
             }
 
-            var unpublishedListings = ES_Listings.GetListings(ListingStatus.unpublished, true, true, dateFrom, dateTo);
+            var unpublishedListings = ES_Listings.GetListingsApplySpecialRules(ListingStatus.unpublished, true, true, dateFrom, dateTo);
             if (!Update(unpublishedListings, CountryCode.ES, ExportType.UnpublishedUpdates, dateFrom, dateTo))
             {
                 Log.WriteError("filesupdater", "Error updating UnpublishedUpdates");
@@ -70,7 +70,7 @@ namespace landerist_library.Landerist_com
                 ? ExportType.Published
                 : ExportType.Unpublished;
 
-            var listings = ES_Listings.GetListings(listingStatus);
+            var listings = ES_Listings.GetListingsApplySpecialRules(listingStatus);
             if (!Update(listings, CountryCode.ES, exportType, null, null))
             {
                 Log.WriteError("filesupdater", "Error updating " + exportType);
@@ -80,7 +80,7 @@ namespace landerist_library.Landerist_com
         public static bool UpdateWebsites()
         {
             Console.WriteLine("Reading Websites ..");
-            var websites = Websites.Websites.GetHosts();
+            var websites = Websites.Websites.GetHostsApplySpecialRules();
             if (websites.Count.Equals(0))
             {
                 return true;
@@ -125,8 +125,7 @@ namespace landerist_library.Landerist_com
 
             foreach (var website in websites)
             {
-                if (!UpdateHostPages(website) ||
-                    !UpdateHostListings(website, ListingStatus.published, "listings_published") ||
+                if (!UpdateHostListings(website, ListingStatus.published, "listings_published") ||
                     !UpdateHostListings(website, ListingStatus.unpublished, "listings_unpublished"))
                 {
                     Log.WriteError("filesupdater", "Error updating host files: " + website.Host);
@@ -135,30 +134,6 @@ namespace landerist_library.Landerist_com
             }
 
             return true;
-        }
-
-        private static bool UpdateHostPages(Website website)
-        {
-            var dataTable = Pages.Pages.GetHostPagesDataTable(website);
-            if (dataTable.Rows.Count == 0)
-            {
-                return true;
-            }
-
-            string fileName = GetHostFileName(website.Host, "pages", "csv");
-            string filePath = GetFilePath(HOSTS_SUBDIRECTORY, fileName);
-
-            try
-            {
-                Tools.Csv.Write(dataTable, filePath, true);
-            }
-            catch (Exception exception)
-            {
-                Log.WriteError("filesupdater", website.Host, exception);
-                return false;
-            }
-
-            return UploadHostFile(filePath, website.Host, "pages", dataTable.Rows.Count, "csv");
         }
 
         private static bool UpdateHostListings(Website website, ListingStatus? listingStatus, string suffix)

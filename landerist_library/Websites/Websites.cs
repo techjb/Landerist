@@ -23,6 +23,15 @@ namespace landerist_library.Websites
             return new DataBase().QueryHashSet(query);
         }
 
+        public static HashSet<string> GetHostsApplySpecialRules()
+        {
+            string query =
+                "SELECT [Host] " +
+                "FROM " + WEBSITES + " " +
+                "WHERE [ApplySpecialRules] = 1";
+            return new DataBase().QueryHashSet(query);
+        }
+
         public static Dictionary<string, Website> GetDicionaryStatusCodeOk()
         {
             Dictionary<string, Website> dictionary = new(StringComparer.OrdinalIgnoreCase);

@@ -297,6 +297,18 @@ namespace landerist_library.Database
             return GetAll(dataTable, loadMedia, loadSources);
         }
 
+        public static SortedSet<Listing> GetAllApplySpecialRules(bool loadMedia, bool loadSources)
+        {
+            string query =
+                "SELECT L.* " +
+                "FROM " + TABLE_ES_LISTINGS + " AS L " +
+                "INNER JOIN " + Websites.Websites.WEBSITES + " AS W ON W.[Host] = L.[Host] " +
+                "WHERE W.[ApplySpecialRules] = 1";
+
+            DataTable dataTable = new DataBase().QueryTable(query);
+            return GetAll(dataTable, loadMedia, loadSources);
+        }
+
         public static SortedSet<Listing> GetPublished()
         {
             return GetListings(ListingStatus.published);
@@ -313,6 +325,21 @@ namespace landerist_library.Database
                 "SELECT * " +
                 "FROM " + TABLE_ES_LISTINGS + " " +
                 "WHERE [listingStatus] = @listingStatus";
+
+            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+                {"listingStatus", listingStatus.ToString() },
+            });
+            return GetAll(dataTable, true, true);
+        }
+
+        public static SortedSet<Listing> GetListingsApplySpecialRules(ListingStatus listingStatus)
+        {
+            string query =
+                "SELECT L.* " +
+                "FROM " + TABLE_ES_LISTINGS + " AS L " +
+                "INNER JOIN " + Websites.Websites.WEBSITES + " AS W ON W.[Host] = L.[Host] " +
+                "WHERE W.[ApplySpecialRules] = 1 AND " +
+                "L.[listingStatus] = @listingStatus";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"listingStatus", listingStatus.ToString() },
@@ -439,6 +466,28 @@ namespace landerist_library.Database
                 "   [listingStatus] = @ListingStatus AND " +
                 "   CAST([updated] AS DATE) >= CAST(@DateFrom AS DATE) AND " +
                 "   CAST([updated] AS DATE) <= CAST(@DateTo AS DATE)";
+
+            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>()
+            {
+                { "ListingStatus", listingStatus.ToString() },
+                { "DateFrom", dateFrom },
+                { "DateTo", dateTo },
+            });
+
+            return GetAll(dataTable, loadMedia, loadSources);
+        }
+
+        public static SortedSet<Listing> GetListingsApplySpecialRules(ListingStatus listingStatus, bool loadMedia, bool loadSources, DateOnly dateFrom, DateOnly dateTo)
+        {
+            string query =
+                "SELECT L.* " +
+                "FROM " + TABLE_ES_LISTINGS + " AS L " +
+                "INNER JOIN " + Websites.Websites.WEBSITES + " AS W ON W.[Host] = L.[Host] " +
+                "WHERE " +
+                "   W.[ApplySpecialRules] = 1 AND " +
+                "   L.[listingStatus] = @ListingStatus AND " +
+                "   CAST(L.[updated] AS DATE) >= CAST(@DateFrom AS DATE) AND " +
+                "   CAST(L.[updated] AS DATE) <= CAST(@DateTo AS DATE)";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>()
             {
