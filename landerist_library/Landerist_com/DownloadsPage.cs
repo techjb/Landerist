@@ -87,13 +87,11 @@ namespace landerist_library.Landerist_com
             foreach (var website in Websites.Websites.GetApplySpecialRules()
                 .OrderBy(website => website.Host, StringComparer.OrdinalIgnoreCase))
             {
-                int listingsCount = website.GetNumListings();
                 int publishedListingsCount = website.GetNumPublishedListings();
                 int unpublishedListingsCount = website.GetNumUnpublishedListings();
 
                 rows.AppendLine(GetHostTableRow(
                     website,
-                    listingsCount,
                     publishedListingsCount,
                     unpublishedListingsCount));
             }
@@ -103,14 +101,12 @@ namespace landerist_library.Landerist_com
 
         private static string GetHostTableRow(
             Website website,
-            int listingsCount,
             int publishedListingsCount,
             int unpublishedListingsCount)
         {
             return
                 "                <tr>" + Environment.NewLine +
                 $"                    <td>{WebUtility.HtmlEncode(website.Host)}</td>" + Environment.NewLine +
-                $"                    <td>{GetHostDownloadCellText(website.Host, "listings", "json", listingsCount)}</td>" + Environment.NewLine +
                 $"                    <td>{GetHostDownloadCellText(website.Host, "listings_published", "json", publishedListingsCount)}</td>" + Environment.NewLine +
                 $"                    <td>{GetHostDownloadCellText(website.Host, "listings_unpublished", "json", unpublishedListingsCount)}</td>" + Environment.NewLine +
                 "                </tr>";

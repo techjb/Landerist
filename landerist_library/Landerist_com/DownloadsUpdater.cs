@@ -125,7 +125,6 @@ namespace landerist_library.Landerist_com
             foreach (var website in websites)
             {
                 if (!UpdateHostPages(website) ||
-                    !UpdateHostListings(website) ||
                     !UpdateHostListings(website, ListingStatus.published, "listings_published") ||
                     !UpdateHostListings(website, ListingStatus.unpublished, "listings_unpublished"))
                 {
@@ -159,11 +158,6 @@ namespace landerist_library.Landerist_com
             }
 
             return UploadHostFile(filePath, website.Host, "pages", dataTable.Rows.Count, "csv");
-        }
-
-        private static bool UpdateHostListings(Website website)
-        {
-            return UpdateHostListings(website, null, "listings");
         }
 
         private static bool UpdateHostListings(Website website, ListingStatus? listingStatus, string suffix)
