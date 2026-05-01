@@ -108,9 +108,28 @@
                 if (err !== null) {
                     alert('Something went wrong: ' + err);
                 } else {
-                    schema = data;
+                    schema = NormalizeSchema(data);
                 }
             });
+        }
+
+        function NormalizeSchema(schemaNode) {
+            if (Array.isArray(schemaNode)) {
+                schemaNode.forEach(NormalizeSchema);
+                return schemaNode;
+            }
+
+            if (!schemaNode || typeof schemaNode !== "object") {
+                return schemaNode;
+            }
+
+            if (Object.hasOwn(schemaNode, "const") && !Object.hasOwn(schemaNode, "enum")) {
+                schemaNode.enum = [schemaNode.const];
+                delete schemaNode.const;
+            }
+
+            Object.keys(schemaNode).forEach((key) => NormalizeSchema(schemaNode[key]));
+            return schemaNode;
         }
 
         function Reset() {

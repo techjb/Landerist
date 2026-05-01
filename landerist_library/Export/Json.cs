@@ -17,7 +17,10 @@ namespace landerist_library.Export
                 var serializer = new JsonSerializer
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                    MaxDepth = 5
+                    MaxDepth = 5,
+                    NullValueHandling = NullValueHandling.Ignore,
+                    DateFormatString = "yyyy-MM-ddTHH:mm:ssK",
+                    DateTimeZoneHandling = DateTimeZoneHandling.Local
                 };
                 serializer.Converters.Add(new StringEnumConverter());
                 serializer.Serialize(writer, schema);
