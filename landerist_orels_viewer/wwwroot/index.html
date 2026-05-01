@@ -109,6 +109,7 @@
                     alert('Something went wrong: ' + err);
                 } else {
                     schema = NormalizeSchema(data);
+                    NormalizePropertySubtypeSchema(schema);
                 }
             });
         }
@@ -130,6 +131,51 @@
 
             Object.keys(schemaNode).forEach((key) => NormalizeSchema(schemaNode[key]));
             return schemaNode;
+        }
+
+        function NormalizePropertySubtypeSchema(schema) {
+            const listingSchema = schema?.properties?.listings?.items;
+            const propertySubtypeSchema = listingSchema?.properties?.propertySubtype;
+            const homeSubtypes = propertySubtypeSchema?.then?.enum;
+            const landSubtypes = propertySubtypeSchema?.else?.then?.enum;
+
+            if (!listingSchema || !propertySubtypeSchema || !homeSubtypes || !landSubtypes) {
+                return;
+            }
+
+            delete propertySubtypeSchema.if;
+            delete propertySubtypeSchema.then;
+            delete propertySubtypeSchema.else;
+
+            listingSchema.allOf = listingSchema.allOf || [];
+            listingSchema.allOf.push(
+                {
+                    if: {
+                        properties: {
+                            propertyType: { enum: ["home"] }
+                        },
+                        required: ["propertyType"]
+                    },
+                    then: {
+                        properties: {
+                            propertySubtype: { enum: homeSubtypes }
+                        }
+                    }
+                },
+                {
+                    if: {
+                        properties: {
+                            propertyType: { enum: ["land"] }
+                        },
+                        required: ["propertyType"]
+                    },
+                    then: {
+                        properties: {
+                            propertySubtype: { enum: landSubtypes }
+                        }
+                    }
+                }
+            );
         }
 
         function Reset() {
