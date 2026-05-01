@@ -9,7 +9,7 @@ namespace landerist_tests
             //landerist_library.Statistics.GlobalStatistics.SnapshotHttpStatusCode7Days();
             //landerist_library.Statistics.GlobalStatistics.SnapshotPageType7Days();
 
-            landerist_library.Landerist_com.DownloadsUpdater.Update();
+            //landerist_library.Landerist_com.DownloadsUpdater.Update();
             //landerist_library.Landerist_com.DownloadsUpdater.SetPageTypeAndNextUpdate();
             //landerist_library.Landerist_com.DownloadsUpdater.UpdatePublished();
             //landerist_library.Landerist_com.DownloadsUpdater.UpdateUnpublished();
@@ -18,7 +18,7 @@ namespace landerist_tests
             //landerist_library.Landerist_com.DownloadsUpdater.UpdateHosts();
 
             //landerist_library.Landerist_com.Landerist_com.UpdateStatisticsPage();
-            landerist_library.Landerist_com.Landerist_com.UpdateDownloadsPage();            
+            //landerist_library.Landerist_com.Landerist_com.UpdateDownloadsPage();            
             //landerist_library.Landerist_com.Landerist_com.UpdateHostStatisticsPage();
             //landerist_library.Landerist_com.Landerist_com.UpdateAllPages();
 
