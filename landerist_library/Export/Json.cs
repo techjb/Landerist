@@ -1,6 +1,6 @@
 ﻿using landerist_orels.ES;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Schema;
+using Newtonsoft.Json.Converters;
 
 namespace landerist_library.Export
 {
@@ -19,6 +19,7 @@ namespace landerist_library.Export
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                     MaxDepth = 5
                 };
+                serializer.Converters.Add(new StringEnumConverter());
                 serializer.Serialize(writer, schema);
                 return true;
             }

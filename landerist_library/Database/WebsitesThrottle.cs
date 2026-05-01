@@ -9,7 +9,7 @@ namespace landerist_library.Database
 
         private static readonly int[] ForbiddenRetryDelaySecondsByLevel =
         [
-            0, 30, 60, 90, 120, 180, 240, 300, 450, 600, 900, 1200, 1800, 2700, 3600, 5400, 7200, 10800, 14400, 21600
+            0, 30, 60, 90, 120, 180, 240, 300, 450, 600, 900, 1200, 1800, 2700, 3600, 5400, 7200, 10800, 14400, 21600, 28800, 43200, 86400
         ];
 
         private static readonly short MAX_FORBIDDEN_BACKOFF_LEVEL = (short)(ForbiddenRetryDelaySecondsByLevel.Length - 1);
