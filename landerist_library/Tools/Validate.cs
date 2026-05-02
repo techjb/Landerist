@@ -61,38 +61,5 @@ namespace landerist_library.Tools
 
         [GeneratedRegex(@"^[0-9]{7}[A-Z]{2}[0-9]{4}[A-Z]([0-9]{4}[A-Z]{2})?$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
         private static partial Regex RegexCadastralReference();
-
-
-        //public static void RemoveInvalidCatastralReferences()
-        //{
-        //    var listings = ES_Listings.GetListingWithCatastralReference();
-        //    int total = listings.Count;
-        //    int validCount = 0;
-        //    int invalidCount = 0;
-        //    foreach (var listing in listings)
-        //    {
-        //        RemoveInvalidCatastralReference(listing);
-        //    }
-        //    Console.WriteLine($"Total: {total}, Valid: {validCount}, Invalid: {invalidCount}");
-        //}
-
-        //private static void RemoveInvalidCatastralReference(Listing listing)
-        //{
-        //    if (string.IsNullOrEmpty(listing.cadastralReference))
-        //    {
-        //        return;
-        //    }
-        //    var isValid = CadastralReference(listing.cadastralReference);
-        //    if (!isValid)
-        //    {
-        //        string query =
-        //            "UPDATE " + ES_Listings.TABLE_ES_LISTINGS + " " +
-        //            "SET [CadastralReference] = NULL " +
-        //            "WHERE [Guid] = @Guid";
-        //        new DataBase().Query(query, new Dictionary<string, object?> {
-        //            { "Guid" , listing.guid }
-        //        });
-        //    }
-        //}
     }
 }
