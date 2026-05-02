@@ -13,7 +13,10 @@ namespace landerist_library.Export
                 var schema = new Schema(listings);
                 File.Delete(filePath);
                 using var file = File.CreateText(filePath);
-                using var writer = new JsonTextWriter(file);
+                using var writer = new JsonTextWriter(file)
+                {
+                    Formatting = Formatting.Indented
+                };
                 var serializer = new JsonSerializer
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,

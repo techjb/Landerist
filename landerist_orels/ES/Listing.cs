@@ -32,7 +32,7 @@ namespace landerist_orels.ES
     public enum PropertySubtype
     {
         flat,
-        appartment,
+        apartment,
         penthouse,
         bungalow,
         duplex,

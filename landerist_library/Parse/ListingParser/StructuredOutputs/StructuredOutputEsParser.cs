@@ -161,7 +161,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             return Anuncio!.SubtipoDeInmueble switch
             {
                 SubtiposDeInmueble.piso => (PropertySubtype?)PropertySubtype.flat,
-                SubtiposDeInmueble.apartamento => (PropertySubtype?)PropertySubtype.appartment,
+                SubtiposDeInmueble.apartamento => (PropertySubtype?)PropertySubtype.apartment,
                 SubtiposDeInmueble.ático => (PropertySubtype?)PropertySubtype.penthouse,
                 SubtiposDeInmueble.bungalow => (PropertySubtype?)PropertySubtype.bungalow,
                 SubtiposDeInmueble.duplex => (PropertySubtype?)PropertySubtype.duplex,

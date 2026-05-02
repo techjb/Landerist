@@ -10,9 +10,6 @@ namespace landerist_tests
             //landerist_library.Statistics.GlobalStatistics.SnapshotPageType7Days();
 
             //landerist_library.Landerist_com.DownloadsUpdater.Update();
-            //landerist_library.Landerist_com.DownloadsUpdater.SetPageTypeAndNextUpdate();
-            //landerist_library.Landerist_com.DownloadsUpdater.UpdatePublished();
-            //landerist_library.Landerist_com.DownloadsUpdater.UpdateUnpublished();
             //landerist_library.Landerist_com.DownloadsUpdater.UpdateUpdates();
             //landerist_library.Landerist_com.DownloadsUpdater.UpdateWebsites();
             //landerist_library.Landerist_com.DownloadsUpdater.UpdateHosts();
