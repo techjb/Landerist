@@ -16,7 +16,7 @@ namespace landerist_tests
             //new Scraper().ProcessPages();
             //new Scraper().Scrape(page, false);
 
-            //new landerist_library.Scrape.Scraper().Scrape("https://www.servihabitat.com/es/venta/terreno-urbanonoconsolidado/huelva-cuencamineradehuelva-minasderiotinto/60448054", true);
+            new landerist_library.Scrape.Scraper().Scrape("https://www.servihabitat.com/es/venta/terreno-urbanonoconsolidado/huelva-cuencamineradehuelva-minasderiotinto/60448054", true);
             //new Scraper().TestSinglePage();
             //landerist_library.Scrape.PageSelector.SelectTop1();
             //Console.WriteLine("Block: " + WebsitesThrottle.Block(page.Website));

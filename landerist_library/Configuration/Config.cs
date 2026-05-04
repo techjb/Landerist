@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "5.05";
+        public static readonly string VERSION = "5.06";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -129,8 +129,6 @@ namespace landerist_library.Configuration
         public static ParallelOptions PARALLELOPTIONS1INLOCAL = new() { };
 
         public readonly static string MACHINE_NAME = Environment.MachineName;
-
-        public const bool PROXY_ENABLED = false;
 
         public static readonly string VERTEXT_AI_MODEL_NAME_GEMINI_PRO = "gemini-2.5-pro";
 

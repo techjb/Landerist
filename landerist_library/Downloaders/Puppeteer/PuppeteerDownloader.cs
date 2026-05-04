@@ -120,11 +120,6 @@ namespace landerist_library.Downloaders.Puppeteer
             "--disable-blink-features=AutomationControlled"
             ];
 
-        private static readonly string[] LaunchOptionsProxy =
-        [
-            "--proxy-server=" + PrivateConfig.PROXY_HOST + ":" + PrivateConfig.PROXY_PORT + ""
-        ];
-
         private static readonly string[] LaunchOptionsScreenShot =
         [
             "--disable-extensions-except=" + IDontCareAboutCookies,
@@ -137,7 +132,7 @@ namespace landerist_library.Downloaders.Puppeteer
             Headless = Config.HEADLESS_BROWSER,
             Devtools = false,
             //IgnoreHTTPSErrors = true,
-            Args = Config.TAKE_SCREENSHOT ? [.. LaunchOptionsArgs, .. LaunchOptionsScreenShot] : LaunchOptionsArgs,
+            Args = BuildLaunchOptionsArgs(false),
         };
 
         private static readonly HashSet<string> BlockDomains = new(StringComparer.OrdinalIgnoreCase)
@@ -202,6 +197,8 @@ namespace landerist_library.Downloaders.Puppeteer
         private IBrowser? Browser;
         private IPage? BrowserPage;
 
+        private const short ProxyAuthenticationRequiredStatusCode = 407;
+
         private readonly bool UseProxy = false;
 
         
@@ -222,10 +219,35 @@ namespace landerist_library.Downloaders.Puppeteer
                     Username = PrivateConfig.PROXY_USERNAME,
                     Password = PrivateConfig.PROXY_PASSWORD
                 };
-                launchOptions.Args = [.. LaunchOptionsArgs, .. LaunchOptionsProxy];
+                launchOptions.Args = BuildLaunchOptionsArgs(true);
             }
 
             Browser = LaunchAsync().GetAwaiter().GetResult();
+        }
+
+        private static string[] BuildLaunchOptionsArgs(bool useProxy)
+        {
+            var args = Config.TAKE_SCREENSHOT ? [.. LaunchOptionsArgs, .. LaunchOptionsScreenShot] : LaunchOptionsArgs;
+
+            return useProxy ? [.. args, BuildProxyServerArgument()] : args;
+        }
+
+        private static string BuildProxyServerArgument()
+        {
+            return "--proxy-server=" + PrivateConfig.PROXY_HOST + ":" + GetProxyPort();
+        }
+
+        private static string GetProxyPort()
+        {
+            if (!PrivateConfig.PROXY_RANDOMIZE_STICKY_PORTS ||
+                PrivateConfig.PROXY_STICKY_PORT_MIN > PrivateConfig.PROXY_STICKY_PORT_MAX)
+            {
+                return PrivateConfig.PROXY_PORT;
+            }
+
+            return Random.Shared
+                .Next(PrivateConfig.PROXY_STICKY_PORT_MIN, PrivateConfig.PROXY_STICKY_PORT_MAX + 1)
+                .ToString();
         }
 
         public bool BrowserInitialized()
@@ -533,6 +555,14 @@ namespace landerist_library.Downloaders.Puppeteer
                            $"{UseProxy} " +
                            $"{exception.Message} " +
                            $"{Page?.Uri}";
+
+                if (UseProxy && HttpStatusCode == ProxyAuthenticationRequiredStatusCode)
+                {
+                    SetBrowserChrashed("Proxy authentication failed: " + message);
+                    return (content, screenShot);
+                }
+
+                Logs.Log.WriteInfo("PuppeteerDownloader NavigationException", message);
             }
             catch (Exception exception)
             {

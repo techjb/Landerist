@@ -176,13 +176,16 @@ namespace landerist_library.Scrape
             }
 
             var isBlocked = WebsitesThrottle.IsBlocked(page.Website);
-            if (isBlocked && !Config.PROXY_ENABLED)
+            
+
+            if (isBlocked)
             {
                 Interlocked.Increment(ref SkippedByBlockedWebsite);
                 return;
             }
 
-            Scrape(page, false);
+            bool useProxy = page.Website.Host.Equals("www.servihabitat.com");
+            Scrape(page, useProxy);
         }
 
         private bool TryApplyPreClassificationBeforeDownload(Page page)
