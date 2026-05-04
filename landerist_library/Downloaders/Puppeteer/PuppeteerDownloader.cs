@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+﻿using Amazon.S3;
+using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Pages;
 using landerist_library.Websites;
@@ -201,14 +202,12 @@ namespace landerist_library.Downloaders.Puppeteer
         private IBrowser? Browser;
         private IPage? BrowserPage;
 
-        private static readonly NavigationOptions NavigationOptions = new()
-        {
-            WaitUntil = [WaitUntilNavigation.Networkidle2],
-            Timeout = GetTimeout()
-        };
+        private readonly bool UseProxy = false;
+
+        
 
         private bool BrowserChrashed = false;
-        private readonly bool UseProxy = false;
+        
         private readonly Credentials? ProxyCredentials;
         private bool FirstNavigationRequestReaded = false;
         private string CurrentExecutionStep = "Idle";
@@ -218,11 +217,9 @@ namespace landerist_library.Downloaders.Puppeteer
             UseProxy = useProxy;
             if (UseProxy)
             {
-                var sessionId = Random.Shared.Next(1, 1_000_000);
                 ProxyCredentials = new Credentials
                 {
-                    Username = $"{PrivateConfig.PROXY_USERNAME}-session-{sessionId}",
-                    //Username = $"{PrivateConfig.PROXY_USERNAME}",
+                    Username = PrivateConfig.PROXY_USERNAME,
                     Password = PrivateConfig.PROXY_PASSWORD
                 };
                 launchOptions.Args = [.. LaunchOptionsArgs, .. LaunchOptionsProxy];
@@ -418,7 +415,7 @@ namespace landerist_library.Downloaders.Puppeteer
             Etag = null;
             Page = page;
 
-            var delay = GetTimeout();
+            var delay = GetTimeout(UseProxy);
             if (Config.IsConfigurationLocal())
             {
                 delay = 1000 * 1000;
@@ -553,7 +550,14 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private async Task<IResponse?> NavigateWithTimeoutAsync(string url)
         {
-            var timeout = GetTimeout();
+            var timeout = GetTimeout(UseProxy);
+
+            NavigationOptions NavigationOptions = new()
+            {
+                WaitUntil = [WaitUntilNavigation.Networkidle2],
+                Timeout = timeout
+            };
+
             var navigationTask = BrowserPage!.GoToAsync(url, NavigationOptions);
             var completedTask = await Task.WhenAny(navigationTask, Task.Delay(timeout));
 
@@ -606,7 +610,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 return;
             }
 
-            BrowserPage.DefaultNavigationTimeout = GetTimeout();
+            BrowserPage.DefaultNavigationTimeout = GetTimeout(UseProxy);
             SetExecutionStep("Configuring browser page");
             await SetAcceptLanguageAsync(BrowserPage, Page.Website.LanguageCode);
             await BrowserPage.SetUserAgentAsync(Config.USER_AGENT);
@@ -739,9 +743,14 @@ namespace landerist_library.Downloaders.Puppeteer
             return null;
         }
 
-        private static int GetTimeout()
+        private static int GetTimeout(bool useProxy)
         {
-            return Config.HTTPCLIENT_SECONDS_TIMEOUT * 1000;
+            var timeout =  Config.HTTPCLIENT_SECONDS_TIMEOUT * 1000;
+            if(useProxy)
+            {
+                timeout *= 2;
+            }
+            return timeout;
         }
 
         private void SetExecutionStep(string step)
