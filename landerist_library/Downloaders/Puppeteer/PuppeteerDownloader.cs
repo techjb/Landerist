@@ -65,7 +65,7 @@ namespace landerist_library.Downloaders.Puppeteer
             ResourceType.ImageSet,
             ResourceType.Img,
             ResourceType.Font,
-            ResourceType.Media,            
+            ResourceType.Media,
         ];
 
         private static readonly HashSet<ResourceType> ImageResourceTypes =
@@ -79,6 +79,16 @@ namespace landerist_library.Downloaders.Puppeteer
         [
             ResourceType.StyleSheet,
             ResourceType.Script,
+        ];
+
+        private static readonly HashSet<ResourceType> ScriptResources =
+        [
+            ResourceType.Script,
+        ];
+
+        private static readonly HashSet<ResourceType> StylesResources =
+        [
+            ResourceType.StyleSheet,
         ];
 
         private static readonly byte[] TransparentGifBytes =
@@ -103,7 +113,7 @@ namespace landerist_library.Downloaders.Puppeteer
             "--disable-gpu",
             "--disable-dev-shm-usage",
             "--disable-background-timer-throttling",
-            "--disable-renderer-backgrounding",            
+            "--disable-renderer-backgrounding",
             "--disable-dev-profile",
             "--aggressive-cache-discard",
             "--disable-cache",
@@ -211,10 +221,10 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private readonly bool UseProxy = false;
 
-        
+
 
         private bool BrowserChrashed = false;
-        
+
         private readonly Credentials? ProxyCredentials;
         private bool FirstNavigationRequestReaded = false;
         private string CurrentExecutionStep = "Idle";
@@ -713,7 +723,7 @@ namespace landerist_library.Downloaders.Puppeteer
                     return;
                 }
 
-                if (Page!.IsServihabitat())
+                if (Page!.Website.IsServihabitat())
                 {
                     if (StylesAndScriptResources.Contains(e.Request.ResourceType))
                     {
@@ -721,6 +731,24 @@ namespace landerist_library.Downloaders.Puppeteer
                         return;
                     }
                 }
+
+                if (Page!.Website.IsEngelsAnVolgers())
+                {
+                    if (StylesResources.Contains(e.Request.ResourceType))
+                    {
+                        await e.Request.AbortAsync();
+                        return;
+                    }
+                }
+
+                //if (Page!.Website.IsRemax() && false)
+                //{
+                //    if (ScriptResources.Contains(e.Request.ResourceType))
+                //    {
+                //        await e.Request.AbortAsync();
+                //        return;
+                //    }
+                //} 
 
                 if (BlockDomains.Contains(requestHost) ||
                     BlockedExtensions.Any(url.EndsWith) ||
@@ -794,8 +822,8 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private static int GetTimeout(bool useProxy)
         {
-            var timeout =  Config.HTTPCLIENT_SECONDS_TIMEOUT * 1000;
-            if(useProxy)
+            var timeout = Config.HTTPCLIENT_SECONDS_TIMEOUT * 1000;
+            if (useProxy)
             {
                 timeout *= 2;
             }

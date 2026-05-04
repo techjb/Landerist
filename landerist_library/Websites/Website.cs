@@ -577,6 +577,31 @@ namespace landerist_library.Websites
             return ES_Listings.Count(Host, ListingStatus.unpublished);
         }
 
+        public bool UseProxy()
+        {
+            return IsServihabitat();
+        }
+
+        public bool IsServihabitat()
+        {
+            return Host.Equals("www.servihabitat.com");
+        }
+
+        public bool IsEngelsAnVolgers()
+        {
+            return Equals("www.engelvoelkers.com");
+        }
+
+        public bool IsRemax()
+        {
+            return Equals("www.remax.es");
+        }
+
+        public bool IsTecnocasa()
+        {
+            return Host.Equals("www.tecnocasa.es");
+        }
+
         public void Dispose()
         {
             if (!Disposed)
