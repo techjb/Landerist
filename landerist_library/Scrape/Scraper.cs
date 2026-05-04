@@ -347,8 +347,6 @@ namespace landerist_library.Scrape
             return pageScraper.Scrape()
                 ? ScrapeAttemptResult.Success
                 : ScrapeAttemptResult.Crashed;
-        }
-
-        
+        }        
     }
 }
