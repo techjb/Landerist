@@ -24,6 +24,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             SetSchemaVersion(jSChema);
             //SetAllOf(jSChema); // problems in vllm
             ParsePropertyType(jSChema);
+            ParsePropertySubtype(jSChema);
             SetAdditionalPropertiesFalse(jSChema);
             return jSChema.ToString(SchemaVersion.Draft7);
         }
@@ -72,6 +73,95 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
                 propertyTypeSchema.Enum.Clear();
                 propertyTypeSchema.Type = null;
             }
+        }
+
+        private static void ParsePropertySubtype(JSchema jSchema)
+        {
+            if (!jSchema.Properties.TryGetValue(StructuredOutputEsJson.FunctionNameListing, out var listingSchema))
+            {
+                return;
+            }
+
+            if (!listingSchema.Properties.TryGetValue(nameof(StructuredOutputEsJson.subtipo_de_inmueble), out var propertySubtypeSchema))
+            {
+                return;
+            }
+
+            propertySubtypeSchema.Enum.Clear();
+
+            listingSchema.AllOf.Add(CreatePropertySubtypeCondition(
+                TiposDeInmueble.vivienda,
+                [
+                    SubtiposDeInmueble.piso,
+                    SubtiposDeInmueble.apartamento,
+                    SubtiposDeInmueble.ático,
+                    SubtiposDeInmueble.bungalow,
+                    SubtiposDeInmueble.duplex,
+                    SubtiposDeInmueble.chalet_independiente,
+                    SubtiposDeInmueble.chalet_pareado,
+                    SubtiposDeInmueble.chalet_adosado,
+                ]));
+
+            listingSchema.AllOf.Add(CreatePropertySubtypeCondition(
+                TiposDeInmueble.parcela,
+                [
+                    SubtiposDeInmueble.parcela_urbana,
+                    SubtiposDeInmueble.parcela_urbanizable,
+                    SubtiposDeInmueble.parcela_no_urbanizable,
+                ]));
+
+            listingSchema.AllOf.Add(CreatePropertySubtypeCondition(
+                [
+                    TiposDeInmueble.dormitorio,
+                    TiposDeInmueble.local_comercial,
+                    TiposDeInmueble.nave_industrial,
+                    TiposDeInmueble.garaje,
+                    TiposDeInmueble.trastero,
+                    TiposDeInmueble.oficina,
+                    TiposDeInmueble.edificio,
+                ],
+                []));
+        }
+
+        private static JSchema CreatePropertySubtypeCondition(TiposDeInmueble propertyType, SubtiposDeInmueble[] validPropertySubtypes)
+        {
+            return CreatePropertySubtypeCondition([propertyType], validPropertySubtypes);
+        }
+
+        private static JSchema CreatePropertySubtypeCondition(TiposDeInmueble[] propertyTypes, SubtiposDeInmueble[] validPropertySubtypes)
+        {
+            var propertyTypeSchema = new JSchema();
+            foreach (var propertyType in propertyTypes)
+            {
+                propertyTypeSchema.Enum.Add(new JValue(propertyType.ToString()));
+            }
+
+            var propertySubtypeSchema = new JSchema();
+            foreach (var propertySubtype in validPropertySubtypes)
+            {
+                propertySubtypeSchema.Enum.Add(new JValue(propertySubtype.ToString()));
+            }
+
+            propertySubtypeSchema.Enum.Add(JValue.CreateNull());
+
+            return new JSchema
+            {
+                If = new JSchema
+                {
+                    Required = { nameof(StructuredOutputEsJson.tipo_de_inmueble) },
+                    Properties =
+                    {
+                        [nameof(StructuredOutputEsJson.tipo_de_inmueble)] = propertyTypeSchema
+                    }
+                },
+                Then = new JSchema
+                {
+                    Properties =
+                    {
+                        [nameof(StructuredOutputEsJson.subtipo_de_inmueble)] = propertySubtypeSchema
+                    }
+                }
+            };
         }
 
         private static void SetSchemaVersion(JSchema jSchema)

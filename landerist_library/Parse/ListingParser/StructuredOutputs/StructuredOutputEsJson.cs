@@ -50,7 +50,12 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public string? tipo_de_inmueble { get; set; } = null;
 
 
-        public const string SubtipoDeInmuebleDescription = "subtipo de inmueble";
+        public const string SubtipoDeInmuebleDescription =
+            "subtipo de inmueble. " +
+            "Solo se permite cuando tipo_de_inmueble es vivienda o parcela. " +
+            "Para vivienda: piso, apartamento, ático, bungalow, duplex, chalet_independiente, chalet_pareado, chalet_adosado. " +
+            "Para parcela: parcela_urbana, parcela_urbanizable, parcela_no_urbanizable. " +
+            "Para cualquier otro tipo_de_inmueble debe ser null";
 
         [Description(SubtipoDeInmuebleDescription)]
         public string? subtipo_de_inmueble { get; set; } = null;

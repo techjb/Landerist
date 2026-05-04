@@ -21,11 +21,6 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
 
             try
             {
-                //if (!IsValidResponse())
-                //{
-                //    return (PageType.MayBeListing, null);
-                //}
-
                 var listing = new Listing
                 {
                     guid = page.UriHash,
@@ -109,12 +104,6 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             return now;
         }
 
-        //private bool IsValidDescription()
-        //{
-        //    var description = GetDescription();
-        //    return !string.IsNullOrEmpty(description);
-        //}
-
         private string GetDescription()
         {
             if (Anuncio == null || string.IsNullOrEmpty(Anuncio.DescripciónDelAnuncio))
@@ -158,19 +147,21 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
                 return null;
             }
 
-            return Anuncio!.SubtipoDeInmueble switch
+            var propertyType = GetPropertyType();
+
+            return (propertyType, Anuncio!.SubtipoDeInmueble) switch
             {
-                SubtiposDeInmueble.piso => (PropertySubtype?)PropertySubtype.flat,
-                SubtiposDeInmueble.apartamento => (PropertySubtype?)PropertySubtype.apartment,
-                SubtiposDeInmueble.ático => (PropertySubtype?)PropertySubtype.penthouse,
-                SubtiposDeInmueble.bungalow => (PropertySubtype?)PropertySubtype.bungalow,
-                SubtiposDeInmueble.duplex => (PropertySubtype?)PropertySubtype.duplex,
-                SubtiposDeInmueble.chalet_independiente => (PropertySubtype?)PropertySubtype.detached,
-                SubtiposDeInmueble.chalet_pareado => (PropertySubtype?)PropertySubtype.semi_detached,
-                SubtiposDeInmueble.chalet_adosado => (PropertySubtype?)PropertySubtype.terraced,
-                SubtiposDeInmueble.parcela_urbana => (PropertySubtype?)PropertySubtype.developed,
-                SubtiposDeInmueble.parcela_urbanizable => (PropertySubtype?)PropertySubtype.buildable,
-                SubtiposDeInmueble.parcela_no_urbanizable => (PropertySubtype?)PropertySubtype.non_building,
+                (PropertyType.home, SubtiposDeInmueble.piso) => (PropertySubtype?)PropertySubtype.flat,
+                (PropertyType.home, SubtiposDeInmueble.apartamento) => (PropertySubtype?)PropertySubtype.apartment,
+                (PropertyType.home, SubtiposDeInmueble.ático) => (PropertySubtype?)PropertySubtype.penthouse,
+                (PropertyType.home, SubtiposDeInmueble.bungalow) => (PropertySubtype?)PropertySubtype.bungalow,
+                (PropertyType.home, SubtiposDeInmueble.duplex) => (PropertySubtype?)PropertySubtype.duplex,
+                (PropertyType.home, SubtiposDeInmueble.chalet_independiente) => (PropertySubtype?)PropertySubtype.detached,
+                (PropertyType.home, SubtiposDeInmueble.chalet_pareado) => (PropertySubtype?)PropertySubtype.semi_detached,
+                (PropertyType.home, SubtiposDeInmueble.chalet_adosado) => (PropertySubtype?)PropertySubtype.terraced,
+                (PropertyType.land, SubtiposDeInmueble.parcela_urbana) => (PropertySubtype?)PropertySubtype.developed,
+                (PropertyType.land, SubtiposDeInmueble.parcela_urbanizable) => (PropertySubtype?)PropertySubtype.buildable,
+                (PropertyType.land, SubtiposDeInmueble.parcela_no_urbanizable) => (PropertySubtype?)PropertySubtype.non_building,
                 _ => null,
             };
         }
