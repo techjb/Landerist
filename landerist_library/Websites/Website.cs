@@ -327,7 +327,7 @@ namespace landerist_library.Websites
 
             try
             {
-                using var httpClient = new HttpClient();
+                using var httpClient = GetRobotsTxtHttpClient();
                 httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
 
                 var response = httpClient.GetAsync(robotsTxtUrl).GetAwaiter().GetResult();
@@ -348,6 +348,40 @@ namespace landerist_library.Websites
             }
 
             return false;
+        }
+
+        private HttpClient GetRobotsTxtHttpClient()
+        {
+            if (!UseProxy)
+            {
+                return new HttpClient();
+            }
+
+            HttpClientHandler handler = new()
+            {
+                UseProxy = true,
+                Proxy = new WebProxy(PrivateConfig.PROXY_HOST, GetProxyPort())
+                {
+                    Credentials = new NetworkCredential(
+                        PrivateConfig.PROXY_USERNAME,
+                        PrivateConfig.PROXY_PASSWORD)
+                }
+            };
+
+            return new HttpClient(handler);
+        }
+
+        private static int GetProxyPort()
+        {
+            if (!PrivateConfig.PROXY_RANDOMIZE_STICKY_PORTS ||
+                PrivateConfig.PROXY_STICKY_PORT_MIN > PrivateConfig.PROXY_STICKY_PORT_MAX)
+            {
+                return int.Parse(PrivateConfig.PROXY_PORT);
+            }
+
+            return Random.Shared.Next(
+                PrivateConfig.PROXY_STICKY_PORT_MIN,
+                PrivateConfig.PROXY_STICKY_PORT_MAX + 1);
         }
 
         public bool SetIpAddress()
@@ -383,7 +417,7 @@ namespace landerist_library.Websites
         {
             if (RobotsTxt != null)
             {
-                Robots ??= Com.Bekijkhet.RobotsTxt.Robots.Load(RobotsTxt);
+                Robots ??= Robots.Load(RobotsTxt);
                 return Robots.IsPathAllowed(Config.USER_AGENT, uri.PathAndQuery);
             }
 

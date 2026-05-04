@@ -23,6 +23,15 @@ namespace landerist_tests
             //Websites.SetPageTypeAndNextUpdate();
 
             //Websites.DeleteFromFile();
+
+            //var website = new Website("www.servihabitat.com");
+
+            //if (website.SetRobotsTxt())
+            //{
+            //    website.Update();
+            //}
+            //website.ReadSitemap();
+
             //new Website("promoaguilera.com").DeleteCurentMachineLogs();
             //new Website("www.servihabitat.com").ReadSitemap();
 

@@ -7,10 +7,14 @@ namespace landerist_library.Index
     {
         private static readonly ISitemapFetcher SitemapFetcher = new GzipAwareSitemapFetcher();
         private static readonly ISitemapParser SitemapParser = new SitemapParser();
+        private readonly ISitemapFetcher WebsiteSitemapFetcher;
         private readonly HashSet<string> SitemapsIndexes = new(StringComparer.OrdinalIgnoreCase);
 
         public SitemapIndexer(Website website) : base(website)
         {
+            WebsiteSitemapFetcher = website.UseProxy
+                ? new GzipAwareSitemapFetcher(useProxy: true)
+                : SitemapFetcher;
         }
 
         public bool IndexNewPages(List<Com.Bekijkhet.RobotsTxt.Sitemap> sitemaps)
@@ -127,7 +131,7 @@ namespace landerist_library.Index
             return SitemapsIndexes.Add(location.ToString());
         }
 
-        private static Sitemap? DownloadSitemap(Sitemap siteMap)
+        private Sitemap? DownloadSitemap(Sitemap siteMap)
         {
             if (siteMap == null)
             {
@@ -137,7 +141,7 @@ namespace landerist_library.Index
             try
             {
                 // can return null.
-                return siteMap.LoadAsync(SitemapFetcher, SitemapParser).ConfigureAwait(false).GetAwaiter().GetResult();
+                return siteMap.LoadAsync(WebsiteSitemapFetcher, SitemapParser).ConfigureAwait(false).GetAwaiter().GetResult();
             }
             catch
             {
