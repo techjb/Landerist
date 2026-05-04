@@ -121,7 +121,7 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private static readonly string[] LaunchOptionsProxy =
         [
-            "--proxy-server=" + PrivateConfig.BRIGTHDATA_HOST + ":" + PrivateConfig.BRIGTHDATA_PORT + ""
+            "--proxy-server=" + PrivateConfig.PROXY_HOST + ":" + PrivateConfig.PROXY_PORT + ""
         ];
 
         private static readonly string[] LaunchOptionsScreenShot =
@@ -221,9 +221,9 @@ namespace landerist_library.Downloaders.Puppeteer
                 var sessionId = Random.Shared.Next(1, 1_000_000);
                 ProxyCredentials = new Credentials
                 {
-                    Username = $"{PrivateConfig.BRIGTHDATA_USERNAME}-session-{sessionId}",
-                    //Username = $"{PrivateConfig.BRIGTHDATA_USERNAME}",
-                    Password = PrivateConfig.BRIGTHDATA_PASSWORD
+                    Username = $"{PrivateConfig.PROXY_USERNAME}-session-{sessionId}",
+                    //Username = $"{PrivateConfig.PROXY_USERNAME}",
+                    Password = PrivateConfig.PROXY_PASSWORD
                 };
                 launchOptions.Args = [.. LaunchOptionsArgs, .. LaunchOptionsProxy];
             }
