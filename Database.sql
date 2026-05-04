@@ -303,6 +303,7 @@ CREATE TABLE [dbo].[WEBSITES](
 	[RobotsTxt] [text] NULL,
 	[IpAddress] [nvarchar](50) NULL,
    [ApplySpecialRules] [bit] NOT NULL,
+   [UseProxy] [bit] NOT NULL CONSTRAINT [DF_WEBSITES_UseProxy] DEFAULT ((0)),
 	[HttpStatusCode] [smallint] NULL,
  CONSTRAINT [PK_WEBSITES] PRIMARY KEY CLUSTERED 
 (
@@ -333,6 +334,11 @@ GO
 IF COL_LENGTH('dbo.WEBSITES', 'ApplySpecialRules') IS NULL
 BEGIN
 	ALTER TABLE [dbo].[WEBSITES] ADD [ApplySpecialRules] [bit] NOT NULL CONSTRAINT [DF_WEBSITES_ApplySpecialRules] DEFAULT ((0))
+END
+GO
+IF COL_LENGTH('dbo.WEBSITES', 'UseProxy') IS NULL
+BEGIN
+	ALTER TABLE [dbo].[WEBSITES] ADD [UseProxy] [bit] NOT NULL CONSTRAINT [DF_WEBSITES_UseProxy] DEFAULT ((0))
 END
 GO
 SET ARITHABORT ON

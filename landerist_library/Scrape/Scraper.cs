@@ -184,7 +184,7 @@ namespace landerist_library.Scrape
                 return;
             }
 
-            bool useProxy = page.Website.UseProxy();
+            bool useProxy = page.Website.UseProxy;
             Scrape(page, useProxy);
         }
 
