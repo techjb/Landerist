@@ -222,6 +222,12 @@ body {
         color: var(--color-text-secondary);
     }
 
+        .styled-list li:has(.list-content) {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
         .styled-list li:last-child {
             border-bottom: none;
         }
@@ -235,6 +241,11 @@ body {
             background: var(--color-gray-100);
             margin-right: 12px;
             vertical-align: middle;
+        }
+
+        .styled-list li:has(.list-content)::before {
+            flex-shrink: 0;
+            margin: 9px 0 0;
         }
 
 .ordered-list {
@@ -251,7 +262,7 @@ body {
         color: var(--color-text-secondary);
         counter-increment: step-counter;
         display: flex;
-        align-items: baseline;
+        align-items: flex-start;
         gap: 12px;
     }
 
@@ -273,6 +284,20 @@ body {
             font-size: 12px;
             font-weight: 600;
         }
+
+.list-content {
+    display: grid;
+    gap: 4px;
+}
+
+    .list-content strong {
+        color: var(--color-text);
+        font-weight: 600;
+    }
+
+    .list-content p {
+        color: var(--color-text-secondary);
+    }
 
 /* Links */
 a {
