@@ -24,7 +24,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             SetSchemaVersion(jSChema);
             //SetAllOf(jSChema); // problems in vllm
             ParsePropertyType(jSChema);
-            ParsePropertySubtype(jSChema);
+            //ParsePropertySubtype(jSChema);
             SetAdditionalPropertiesFalse(jSChema);
             return jSChema.ToString(SchemaVersion.Draft7);
         }
