@@ -65,7 +65,7 @@ namespace landerist_library.Downloaders.Puppeteer
             ResourceType.ImageSet,
             ResourceType.Img,
             ResourceType.Font,
-            ResourceType.Media,
+            ResourceType.Media,            
         ];
 
         private static readonly HashSet<ResourceType> ImageResourceTypes =
@@ -73,6 +73,12 @@ namespace landerist_library.Downloaders.Puppeteer
             ResourceType.Image,
             ResourceType.ImageSet,
             ResourceType.Img,
+        ];
+
+        private static readonly HashSet<ResourceType> StylesAndScriptResources =
+        [
+            ResourceType.StyleSheet,
+            ResourceType.Script,
         ];
 
         private static readonly byte[] TransparentGifBytes =
@@ -187,6 +193,10 @@ namespace landerist_library.Downloaders.Puppeteer
             "bing.com",
             "pippio.com",
             "static.addtoany.com",
+            "cercalia.com",
+            "content-autofill.googleapis.com",
+            "android.clients.google.com",
+            "accounts.google.com"
         };
 
         private static readonly HashSet<string> BlockedExtensions = new(StringComparer.OrdinalIgnoreCase)
@@ -562,7 +572,7 @@ namespace landerist_library.Downloaders.Puppeteer
                     return (content, screenShot);
                 }
 
-                Logs.Log.WriteInfo("PuppeteerDownloader NavigationException", message);
+                //Logs.Log.WriteInfo("PuppeteerDownloader NavigationException", message);
             }
             catch (Exception exception)
             {
@@ -701,6 +711,15 @@ namespace landerist_library.Downloaders.Puppeteer
 
                     await e.Request.AbortAsync();
                     return;
+                }
+
+                if (Page!.IsServihabitat())
+                {
+                    if (StylesAndScriptResources.Contains(e.Request.ResourceType))
+                    {
+                        await e.Request.AbortAsync();
+                        return;
+                    }
                 }
 
                 if (BlockDomains.Contains(requestHost) ||

@@ -863,5 +863,10 @@ namespace landerist_library.Pages
             //var text = this.GetHtmlDocument().Text;
             return ListingParserInput;
         }
+
+        public bool IsServihabitat()
+        {
+            return this.Website.Host.Equals("www.servihabitat.com");
+        }
     }
 }

@@ -184,7 +184,7 @@ namespace landerist_library.Scrape
                 return;
             }
 
-            bool useProxy = page.Website.Host.Equals("www.servihabitat.com");
+            bool useProxy = page.IsServihabitat();
             Scrape(page, useProxy);
         }
 
@@ -338,7 +338,7 @@ namespace landerist_library.Scrape
         private static ScrapeAttemptResult ScrapeAttempt(Page page, bool useProxy)
         {
             var acquired = WebsitesThrottle.Block(page.Website);
-            if (!acquired && !useProxy && Config.IsConfigurationProduction())
+            if (!acquired && Config.IsConfigurationProduction())
             {
                 return ScrapeAttemptResult.Blocked;
             }
@@ -348,5 +348,7 @@ namespace landerist_library.Scrape
                 ? ScrapeAttemptResult.Success
                 : ScrapeAttemptResult.Crashed;
         }
+
+        
     }
 }
