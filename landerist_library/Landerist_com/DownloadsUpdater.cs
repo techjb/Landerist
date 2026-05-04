@@ -16,6 +16,7 @@ namespace landerist_library.Landerist_com
         public const string METADATA_KEY_COUNTER = "counter";
         private const string METADATA_DATE_FORMAT = "yyyy-MM-dd";
         private const string HOSTS_SUBDIRECTORY = "ES\\Hosts";
+        private const string LISTINGS_BY_OPERATION_PROPERTY_TYPE_SUBDIRECTORY = "ES\\OperationPropertyTypes";
 
         public static void Update()
         {
