@@ -2,14 +2,18 @@
 using System.Net;
 using System.Text;
 using landerist_library.Configuration;
+using landerist_library.Database;
 using landerist_library.Export;
 using landerist_library.Logs;
 using landerist_library.Websites;
+using landerist_orels.ES;
 
 namespace landerist_library.Landerist_com
 {
     public class DownloadsPage : Landerist_com
     {
+        private const string LISTINGS_BY_OPERATION_PROPERTY_TYPE_SUBDIRECTORY = "ES/OperationPropertyTypes";
+
         private static readonly string DownloadsTemplateHtmlFile =
             Path.Combine(Config.LANDERIST_COM_TEMPLATES!, "downloads_template.html");
 
@@ -30,6 +34,7 @@ namespace landerist_library.Landerist_com
                     UpdateDownloadsTemplate(CountryCode.ES, exportType);
                 }
 
+                UpdateListingsByOperationPropertyTypeTemplate();
                 UpdateHostsTemplate();
 
                 if (UploadDownloadsFile())
@@ -90,6 +95,112 @@ namespace landerist_library.Landerist_com
         private static void UpdateHostsTemplate()
         {
             Replace("/*HOSTS*/", GetHostsTableRows());
+        }
+
+        private static void UpdateListingsByOperationPropertyTypeTemplate()
+        {
+            Replace("/*LISTINGS_BY_OPERATION_PROPERTY_TYPE*/", GetListingsByOperationPropertyTypeTableRows());
+        }
+
+        private static string GetListingsByOperationPropertyTypeTableRows()
+        {
+            StringBuilder rows = new();
+
+            foreach (Operation operation in Enum.GetValues<Operation>())
+            {
+                foreach (PropertyType propertyType in Enum.GetValues<PropertyType>())
+                {
+                    int publishedListingsCount = ES_Listings.CountApplySpecialRules(
+                        ListingStatus.published,
+                        operation,
+                        propertyType);
+
+                    int unpublishedListingsCount = ES_Listings.CountApplySpecialRules(
+                        ListingStatus.unpublished,
+                        operation,
+                        propertyType);
+
+                    rows.AppendLine(GetListingsByOperationPropertyTypeTableRow(
+                        operation,
+                        propertyType,
+                        publishedListingsCount,
+                        unpublishedListingsCount));
+                }
+            }
+
+            return rows.ToString();
+        }
+
+        private static string GetListingsByOperationPropertyTypeTableRow(
+            Operation operation,
+            PropertyType propertyType,
+            int publishedListingsCount,
+            int unpublishedListingsCount)
+        {
+            string label = $"{operation} {propertyType}";
+
+            return
+                "                <tr>" + Environment.NewLine +
+                $"                    <td>{WebUtility.HtmlEncode(label)}</td>" + Environment.NewLine +
+                $"                    <td>{GetListingsByOperationPropertyTypeDownloadCellText(operation, propertyType, ListingStatus.published, publishedListingsCount)}</td>" + Environment.NewLine +
+                $"                    <td>{GetListingsByOperationPropertyTypeDownloadCellText(operation, propertyType, ListingStatus.unpublished, unpublishedListingsCount)}</td>" + Environment.NewLine +
+                "                </tr>";
+        }
+
+        private static string GetListingsByOperationPropertyTypeDownloadCellText(
+            Operation operation,
+            PropertyType propertyType,
+            ListingStatus listingStatus,
+            int counter)
+        {
+            string counterText = counter.ToString(CultureInfo.InvariantCulture);
+            if (counter <= 0)
+            {
+                return counterText;
+            }
+
+            string? url = GetListingsByOperationPropertyTypeDownloadUrl(operation, propertyType, listingStatus);
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return counterText;
+            }
+
+            string fileName = GetListingsByOperationPropertyTypeFileName(operation, propertyType, listingStatus, "json");
+            return $"<a title=\"Donwload\" href=\"{WebUtility.HtmlEncode(url)}\" download=\"{WebUtility.HtmlEncode(fileName)}\">{counterText}</a>";
+        }
+
+        private static string? GetListingsByOperationPropertyTypeDownloadUrl(
+            Operation operation,
+            PropertyType propertyType,
+            ListingStatus listingStatus)
+        {
+            string objectKey = GetListingsByOperationPropertyTypeObjectKey(operation, propertyType, listingStatus, "json");
+            var (lastModified, contentLength) = new S3().GetFileInfo(PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey);
+
+            if (lastModified is null || contentLength is null)
+            {
+                return null;
+            }
+
+            return $"https://{PrivateConfig.AWS_S3_DOWNLOADS_BUCKET}.s3.amazonaws.com/{objectKey}";
+        }
+
+        private static string GetListingsByOperationPropertyTypeObjectKey(
+            Operation operation,
+            PropertyType propertyType,
+            ListingStatus listingStatus,
+            string extension)
+        {
+            return $"{LISTINGS_BY_OPERATION_PROPERTY_TYPE_SUBDIRECTORY}/{GetListingsByOperationPropertyTypeFileName(operation, propertyType, listingStatus, extension)}";
+        }
+
+        private static string GetListingsByOperationPropertyTypeFileName(
+            Operation operation,
+            PropertyType propertyType,
+            ListingStatus listingStatus,
+            string extension)
+        {
+            return $"{operation}_{propertyType}_listings_{listingStatus}.{extension}";
         }
 
         private static string GetHostsTableRows()

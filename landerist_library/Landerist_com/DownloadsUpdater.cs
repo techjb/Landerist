@@ -22,11 +22,12 @@ namespace landerist_library.Landerist_com
         {
             try
             {
-                UpdateUpdates();
-                UpdateListings(ListingStatus.published);
-                UpdateListings(ListingStatus.unpublished);
                 UpdateWebsites();
-                UpdateHosts();
+                UpdateFullDataSet(ListingStatus.published);
+                UpdateFullDataSet(ListingStatus.unpublished);
+                UpdateListingsUpdates();                
+                UpdateListingsByOperationPropertyType();
+                UpdateListingsByWebsite();
             }
             catch (Exception exception)
             {
@@ -44,7 +45,7 @@ namespace landerist_library.Landerist_com
             }
         }
 
-        public static void UpdateUpdates()
+        public static void UpdateListingsUpdates()
         {
             Console.WriteLine("Reading updates ..");
             DateOnly dateFrom = GetDateFrom(ExportType.PublishedUpdates, ExportType.UnpublishedUpdates);
@@ -63,7 +64,7 @@ namespace landerist_library.Landerist_com
             }
         }
 
-        public static void UpdateListings(ListingStatus listingStatus)
+        public static void UpdateFullDataSet(ListingStatus listingStatus)
         {
             Console.WriteLine("Reading " + listingStatus + " ..");
 
@@ -105,7 +106,7 @@ namespace landerist_library.Landerist_com
             return Update(filePath, CountryCode.ES, ExportType.Websites, websites.Count);
         }
 
-        public static bool UpdateHosts()
+        public static bool UpdateListingsByWebsite()
         {
             Console.WriteLine("Reading hosts with special rules ..");
             var websites = Websites.Websites.GetAll()
@@ -137,6 +138,60 @@ namespace landerist_library.Landerist_com
             return true;
         }
 
+        public static bool UpdateListingsByOperationPropertyType()
+        {
+            Console.WriteLine("Reading listings by operation and property type ..");
+
+            string directory = GetFilePath(LISTINGS_BY_OPERATION_PROPERTY_TYPE_SUBDIRECTORY);
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            foreach (Operation operation in Enum.GetValues<Operation>())
+            {
+                foreach (PropertyType propertyType in Enum.GetValues<PropertyType>())
+                {
+                    if (!UpdateListingsByOperationPropertyType(operation, propertyType, ListingStatus.published) ||
+                        !UpdateListingsByOperationPropertyType(operation, propertyType, ListingStatus.unpublished))
+                    {
+                        Log.WriteError("filesupdater", $"Error updating operation/property type files: {operation} {propertyType}");
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        private static bool UpdateListingsByOperationPropertyType(
+            Operation operation,
+            PropertyType propertyType,
+            ListingStatus listingStatus)
+        {
+            var listings = ES_Listings.GetListingsApplySpecialRules(
+                listingStatus,
+                operation,
+                propertyType,
+                true,
+                true);
+
+            if (listings.Count == 0)
+            {
+                return true;
+            }
+
+            string fileName = GetListingsByOperationPropertyTypeFileName(operation, propertyType, listingStatus, "json");
+            string filePath = GetFilePath(LISTINGS_BY_OPERATION_PROPERTY_TYPE_SUBDIRECTORY, fileName);
+
+            if (!Json.ExportListings(listings, filePath))
+            {
+                return false;
+            }
+
+            return UploadListingsByOperationPropertyTypeFile(filePath, operation, propertyType, listingStatus, listings.Count, "json");
+        }
+
         private static bool UpdateHostListings(Website website, ListingStatus? listingStatus, string suffix)
         {
             var listings = ES_Listings.GetListings(website.Host, listingStatus);
@@ -156,8 +211,27 @@ namespace landerist_library.Landerist_com
             return UploadHostFile(filePath, website.Host, suffix, listings.Count, "json");
         }
 
-        
+        private static bool UploadListingsByOperationPropertyTypeFile(
+            string filePath,
+            Operation operation,
+            PropertyType propertyType,
+            ListingStatus listingStatus,
+            int counter,
+            string extension)
+        {
+            string fileName = GetListingsByOperationPropertyTypeFileName(operation, propertyType, listingStatus, extension);
+            string subdirectoryInBucket = LISTINGS_BY_OPERATION_PROPERTY_TYPE_SUBDIRECTORY.Replace("\\", "/");
+            string contentDisposition = $"attachment; filename=\"{fileName}\"";
 
+            var metadata = GetMetadata(counter, null, null);
+            if (!new S3().UploadToDownloadsBucket(filePath, fileName, subdirectoryInBucket, metadata, contentDisposition))
+            {
+                return false;
+            }
+
+            Log.WriteInfo("filesupdater", fileName);
+            return true;
+        }
 
         private static bool UploadHostFile(string filePath, string host, string suffix, int counter, string extension)
         {
@@ -178,6 +252,15 @@ namespace landerist_library.Landerist_com
         private static string GetHostFileName(string host, string suffix, string extension)
         {
             return host + "_" + suffix + "." + extension;
+        }
+
+        private static string GetListingsByOperationPropertyTypeFileName(
+            Operation operation,
+            PropertyType propertyType,
+            ListingStatus listingStatus,
+            string extension)
+        {
+            return $"{operation}_{propertyType}_listings_{listingStatus}.{extension}";
         }
 
         private static bool Update(SortedSet<Listing> listings, CountryCode countryCode, ExportType exportType, DateOnly? dateFrom, DateOnly? dateTo)

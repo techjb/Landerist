@@ -148,6 +148,28 @@ namespace landerist_library.Database
             });
         }
 
+        public static int CountApplySpecialRules(
+            ListingStatus listingStatus,
+            Operation operation,
+            PropertyType propertyType)
+        {
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + TABLE_ES_LISTINGS + " AS L " +
+                "INNER JOIN " + Websites.Websites.WEBSITES + " AS W ON W.[Host] = L.[Host] " +
+                "WHERE W.[ApplySpecialRules] = 1 AND " +
+                "L.[listingStatus] = @ListingStatus AND " +
+                "L.[operation] = @Operation AND " +
+                "L.[propertyType] = @PropertyType";
+
+            return new DataBase().QueryInt(query, new Dictionary<string, object?>
+            {
+                { "ListingStatus", listingStatus.ToString() },
+                { "Operation", operation.ToString() },
+                { "PropertyType", propertyType.ToString() }
+            });
+        }
+
         private static Dictionary<string, object?> GetQueryParameters(Listing listing)
         {
             return new Dictionary<string, object?> {
@@ -345,6 +367,30 @@ namespace landerist_library.Database
                 {"listingStatus", listingStatus.ToString() },
             });
             return GetAll(dataTable, true, true);
+        }
+
+        public static SortedSet<Listing> GetListingsApplySpecialRules(
+            ListingStatus listingStatus,
+            Operation operation,
+            PropertyType propertyType,
+            bool loadMedia,
+            bool loadSources)
+        {
+            string query =
+                "SELECT L.* " +
+                "FROM " + TABLE_ES_LISTINGS + " AS L " +
+                "INNER JOIN " + Websites.Websites.WEBSITES + " AS W ON W.[Host] = L.[Host] " +
+                "WHERE W.[ApplySpecialRules] = 1 AND " +
+                "L.[listingStatus] = @listingStatus AND " +
+                "L.[operation] = @operation AND " +
+                "L.[propertyType] = @propertyType";
+
+            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+                {"listingStatus", listingStatus.ToString() },
+                {"operation", operation.ToString() },
+                {"propertyType", propertyType.ToString() },
+            });
+            return GetAll(dataTable, loadMedia, loadSources);
         }
 
         public static SortedSet<Listing> GetListings(string host, ListingStatus? listingStatus = null)
