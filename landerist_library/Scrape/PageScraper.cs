@@ -143,15 +143,50 @@ namespace landerist_library.Scrape
                 _page.InsertToNotListingCache();
             }
 
+            if (_page.IsNotCanonicalListing() || _page.IsRedirectToAnotherUrlListing())
+            {
+                HandleMovedListing(newListing);
+            }
+
             if (_page.HaveToUnpublishListing())
             {
                 UnpublishListing(newListing);
             }
+        }
 
-            if (_page.IsNotCanonicalListing() || _page.IsRedirectToAnotherUrlListing())
+        private void HandleMovedListing(Listing? newListing)
+        {
+            var destinationUri = GetListingDestinationUri();
+            if (destinationUri is null)
             {
-                // todo: handle not canonical listing
+                Logs.Log.WriteError("PageScraper HandleMovedListing", "Destination uri is null");
+                return;
             }
+
+            new Indexer(_page).Insert(destinationUri);
+
+            using var destinationPage = new Page(_page.Website, destinationUri);
+            if (!destinationPage.IsListingStatusPublished())
+            {
+                return;
+            }
+
+            UnpublishListing(newListing);
+        }
+
+        private Uri? GetListingDestinationUri()
+        {
+            if (_page.IsRedirectToAnotherUrl())
+            {
+                return new Indexer(_page).GetUri(_page.RedirectUrl);
+            }
+
+            if (_page.IsNotCanonical())
+            {
+                return _page.GetCanonicalUri();
+            }
+
+            return null;
         }
 
 
