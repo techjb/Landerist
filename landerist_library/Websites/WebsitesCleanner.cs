@@ -156,10 +156,7 @@ namespace landerist_library.Websites
             Console.WriteLine("Total websites borrados: " + deleted);
         }
 
-        public static void DeleteWebsitesWithLessThanTenPages()
-        {
-            DeleteWebsitesWithLessThanPages(10);
-        }
+       
 
         public static void DeleteWebsitesWithoutPageTypeListing()
         {
@@ -249,7 +246,7 @@ namespace landerist_library.Websites
             {
                 try
                 {
-                    if (website.GetNumPages() >= minimumPages || website.GetNumListings() > 0)
+                    if (website.GetNumPages() >= minimumPages || website.GetNumListings() > 0 || website.ApplySpecialRules)
                     {
                         Interlocked.Increment(ref skipped);
                         return;

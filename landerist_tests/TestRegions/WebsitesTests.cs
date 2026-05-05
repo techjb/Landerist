@@ -35,7 +35,7 @@ namespace landerist_tests
             //new Website("promoaguilera.com").DeleteCurentMachineLogs();
             //new Website("www.servihabitat.com").ReadSitemap();
 
-            //WebsitesCleanner.DeleteWebsitesWithLessThanTenPages();
+            //WebsitesCleanner.DeleteWebsitesWithLessThanPages(100);
             //WebsitesCleanner.DeleteWebsitesWithoutListings();
             //WebsitesCleanner.DeleteWebsitesWithoutPageTypeListing();
             //WebsitesCleanner.DeleteWebsitesWithoutPublishedListings();
