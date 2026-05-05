@@ -2,11 +2,9 @@
 using landerist_library.Database;
 using landerist_library.Downloaders.Multiple;
 using landerist_library.Downloaders.Puppeteer;
-using landerist_library.Logs;
 using landerist_library.Pages;
 using landerist_library.Statistics;
 using landerist_library.Websites;
-using landerist_orels.ES;
 
 namespace landerist_library.Scrape
 {
@@ -62,15 +60,14 @@ namespace landerist_library.Scrape
 
         public void TestSinglePage()
         {
-            Log.WriteInfo("service", "Starting test..");
+            ScraperLog.WriteTestStart();
             PuppeteerDownloader.UpdateChrome();
             var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
             var pageScraper = new PageScraper(page);
             pageScraper.Scrape();
-            Log.WriteInfo("service", "PageType: " + page.PageType.ToString());
+            ScraperLog.WriteTestPageType(page);
             var listing =  page.GetListing(true, true);
-            string json = new Schema(listing).Serialize();
-            Log.WriteInfo("service", "Listing: " + json);
+            ScraperLog.WriteTestListing(listing);
             Stop();
         }
 
@@ -120,7 +117,7 @@ namespace landerist_library.Scrape
             SkippedByCrawlDelay = 0;
             SkippedByBlockedWebsite = 0;
 
-            Console.WriteLine("Scrapping " + Counter + " pages ..");
+            ScraperLog.WriteStart(Counter);
 
             try
             {
@@ -133,7 +130,7 @@ namespace landerist_library.Scrape
                     (page, state) =>
                     {
                         ProcessThread(page);
-                        WriteConsole(page);
+                        ScraperLog.WritePage(GetCurrentCounters(), page);
                         page.Dispose();
                     });
             }
@@ -146,7 +143,7 @@ namespace landerist_library.Scrape
             }
 
             AccumulateTotals();
-            Log.WriteInfo("scraper", GetLogText());
+            ScraperLog.WriteTotals(GetTotalCounters());
             InsertStatistics();
 
             DownloadersPool.Clear();
@@ -200,26 +197,6 @@ namespace landerist_library.Scrape
             return false;
         }
 
-        private void WriteConsole(Page page)
-        {
-            if (Config.IsConfigurationProduction())
-            {
-                return;
-            }
-
-            var crashedPercentage = GetPercentage(Crashed, Processed);
-            var downloadErrorsPercentage = GetPercentage(DownloadErrors, Processed);
-
-
-            var text =
-                $"Crashed: {Crashed} ({crashedPercentage}%) " +
-                $"DownloadErrors: {DownloadErrors} ({downloadErrorsPercentage}%) " +
-                $"{page.PageType} " +
-                $"{page.Uri}";
-            Console.WriteLine(text);
-        }
-
-
         private void AccumulateTotals()
         {
             TotalCounter += Counter;
@@ -232,46 +209,34 @@ namespace landerist_library.Scrape
             TotalDownloadErrors += DownloadErrors;
         }
 
-        private string GetLogText()
+        private ScraperLogCounters GetCurrentCounters()
         {
-            var scrappedPercentage = GetPercentage(TotalProcessed, TotalCounter);
-            var totalSkipped = TotalSkippedByRobotsTxt + TotalSkippedByCrawlDelay + TotalSkippedByBlockedWebsite;
-            var skippedPercentage = GetPercentage(totalSkipped, TotalCounter);
-            var skippedByRobotsTxtPercentage = GetPercentage(TotalSkippedByRobotsTxt, TotalCounter);
-            var skippedByCrawlDelayPercentage = GetPercentage(TotalSkippedByCrawlDelay, TotalCounter);
-            var skippedByBlockedWebsitePercentage = GetPercentage(TotalSkippedByBlockedWebsite, TotalCounter);
-            var successPercentage = GetPercentage(TotalScrapedSuccess, TotalProcessed);
-            var crashedPercentage = GetPercentage(TotalCrashed, TotalProcessed);
-            var downloadErrorsPercentage = GetPercentage(TotalDownloadErrors, TotalScrapedSuccess);
-
-            return
-                $"{TotalCounter} => " +
-                $"[Processed {TotalProcessed} ({scrappedPercentage}%) => " +
-                //$"[Ok {TotalScrapedSuccess} ({successPercentage}%) => " +
-                $"[ScrapedSuccess {successPercentage}% => " +
-                //$"[DlErr {TotalDownloadErrors}  ({downloadErrorsPercentage}%)] | " +
-                $"[DlErr {downloadErrorsPercentage}%] | " +
-                //$"Crash {TotalCrashed} ({crashedPercentage}%)] | " +
-                $"Crash {crashedPercentage}%] | " +
-                //$"Skip {totalSkipped} ({skippedPercentage}%) => " +
-                $"Skip {skippedPercentage}% => " +
-                //$"[RobotsTxt {TotalSkippedByRobotsTxt} ({skippedByRobotsTxtPercentage}%) | " +
-                $"[RobotsTxt {skippedByRobotsTxtPercentage}% | " +
-                //$"CrawlDelay {TotalSkippedByCrawlDelay} ({skippedByCrawlDelayPercentage}%) | " +
-                $"CrawlDelay {skippedByCrawlDelayPercentage}% | " +
-                //$"Blocked {TotalSkippedByBlockedWebsite} ({skippedByBlockedWebsitePercentage}%)]" +
-                $"Blocked {skippedByBlockedWebsitePercentage}%]" +
-                $"]";
+            return new ScraperLogCounters
+            {
+                Total = Counter,
+                Processed = Processed,
+                ScrapedSuccess = ScrapedSuccess,
+                Crashed = Crashed,
+                DownloadErrors = DownloadErrors,
+                SkippedByRobotsTxt = SkippedByRobotsTxt,
+                SkippedByCrawlDelay = SkippedByCrawlDelay,
+                SkippedByBlockedWebsite = SkippedByBlockedWebsite
+            };
         }
 
-        private static double GetPercentage(int value, int total)
+        private ScraperLogCounters GetTotalCounters()
         {
-            if (total <= 0)
+            return new ScraperLogCounters
             {
-                return 0;
-            }
-
-            return Math.Round((double)value * 100 / total, 0);
+                Total = TotalCounter,
+                Processed = TotalProcessed,
+                ScrapedSuccess = TotalScrapedSuccess,
+                Crashed = TotalCrashed,
+                DownloadErrors = TotalDownloadErrors,
+                SkippedByRobotsTxt = TotalSkippedByRobotsTxt,
+                SkippedByCrawlDelay = TotalSkippedByCrawlDelay,
+                SkippedByBlockedWebsite = TotalSkippedByBlockedWebsite
+            };
         }
 
         private void InsertStatistics()
@@ -313,8 +278,6 @@ namespace landerist_library.Scrape
 
             if (result.Equals(ScrapeAttemptResult.Success))
             {
-                Interlocked.Increment(ref ScrapedSuccess);
-
                 if (page.IsHttpStatusCodeForbidden())
                 {
                     WebsitesThrottle.ReportForbidden(page.Website);
@@ -327,7 +290,10 @@ namespace landerist_library.Scrape
                 if (page.PageType.Equals(PageType.HttpStatusCodeNotOK))
                 {
                     Interlocked.Increment(ref DownloadErrors);
+                    return;
                 }
+
+                Interlocked.Increment(ref ScrapedSuccess);
             }
             else
             {
