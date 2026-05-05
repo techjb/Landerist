@@ -1,88 +1,57 @@
-USE [master]
-GO
-/****** Object:  Database [Landerist]    Script Date: 20/06/2023 11:52:48 ******/
-CREATE DATABASE [Landerist]
- CONTAINMENT = NONE
- ON  PRIMARY 
-( NAME = N'Landerist', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQL\DATA\Landerist.mdf' , SIZE = 6955008KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
- LOG ON 
-( NAME = N'Landerist_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQL\DATA\Landerist_log.ldf' , SIZE = 5120000KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
- WITH CATALOG_COLLATION = DATABASE_DEFAULT
-GO
-ALTER DATABASE [Landerist] SET COMPATIBILITY_LEVEL = 150
-GO
-IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
-begin
-EXEC [Landerist].[dbo].[sp_fulltext_database] @action = 'enable'
-end
-GO
-ALTER DATABASE [Landerist] SET ANSI_NULL_DEFAULT OFF 
-GO
-ALTER DATABASE [Landerist] SET ANSI_NULLS OFF 
-GO
-ALTER DATABASE [Landerist] SET ANSI_PADDING OFF 
-GO
-ALTER DATABASE [Landerist] SET ANSI_WARNINGS OFF 
-GO
-ALTER DATABASE [Landerist] SET ARITHABORT OFF 
-GO
-ALTER DATABASE [Landerist] SET AUTO_CLOSE OFF 
-GO
-ALTER DATABASE [Landerist] SET AUTO_SHRINK OFF 
-GO
-ALTER DATABASE [Landerist] SET AUTO_UPDATE_STATISTICS ON 
-GO
-ALTER DATABASE [Landerist] SET CURSOR_CLOSE_ON_COMMIT OFF 
-GO
-ALTER DATABASE [Landerist] SET CURSOR_DEFAULT  GLOBAL 
-GO
-ALTER DATABASE [Landerist] SET CONCAT_NULL_YIELDS_NULL OFF 
-GO
-ALTER DATABASE [Landerist] SET NUMERIC_ROUNDABORT OFF 
-GO
-ALTER DATABASE [Landerist] SET QUOTED_IDENTIFIER OFF 
-GO
-ALTER DATABASE [Landerist] SET RECURSIVE_TRIGGERS OFF 
-GO
-ALTER DATABASE [Landerist] SET  DISABLE_BROKER 
-GO
-ALTER DATABASE [Landerist] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
-GO
-ALTER DATABASE [Landerist] SET DATE_CORRELATION_OPTIMIZATION OFF 
-GO
-ALTER DATABASE [Landerist] SET TRUSTWORTHY OFF 
-GO
-ALTER DATABASE [Landerist] SET ALLOW_SNAPSHOT_ISOLATION OFF 
-GO
-ALTER DATABASE [Landerist] SET PARAMETERIZATION SIMPLE 
-GO
-ALTER DATABASE [Landerist] SET READ_COMMITTED_SNAPSHOT OFF 
-GO
-ALTER DATABASE [Landerist] SET HONOR_BROKER_PRIORITY OFF 
-GO
-ALTER DATABASE [Landerist] SET RECOVERY FULL 
-GO
-ALTER DATABASE [Landerist] SET  MULTI_USER 
-GO
-ALTER DATABASE [Landerist] SET PAGE_VERIFY CHECKSUM  
-GO
-ALTER DATABASE [Landerist] SET DB_CHAINING OFF 
-GO
-ALTER DATABASE [Landerist] SET FILESTREAM( NON_TRANSACTED_ACCESS = OFF ) 
-GO
-ALTER DATABASE [Landerist] SET TARGET_RECOVERY_TIME = 60 SECONDS 
-GO
-ALTER DATABASE [Landerist] SET DELAYED_DURABILITY = DISABLED 
-GO
-ALTER DATABASE [Landerist] SET ACCELERATED_DATABASE_RECOVERY = OFF  
-GO
-EXEC sys.sp_db_vardecimal_storage_format N'Landerist', N'ON'
-GO
-ALTER DATABASE [Landerist] SET QUERY_STORE = OFF
-GO
 USE [Landerist]
 GO
-/****** Object:  Table [dbo].[CNIG]    Script Date: 20/06/2023 11:52:48 ******/
+/****** Object:  Table [dbo].[ADDRESS_CADASTRAL_REFERENCE]    Script Date: 05/05/2026 15:45:28 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[ADDRESS_CADASTRAL_REFERENCE](
+	[DateInsert] [datetime] NOT NULL,
+	[Address] [nvarchar](200) NOT NULL,
+	[CadastralReference] [nvarchar](50) NULL,
+ CONSTRAINT [PK_ADDRESS_CADASTRAL_REFERENCE] PRIMARY KEY CLUSTERED 
+(
+	[Address] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[ADDRESS_LAT_LNG]    Script Date: 05/05/2026 15:45:29 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[ADDRESS_LAT_LNG](
+	[DateInsert] [datetime] NOT NULL,
+	[Address] [nvarchar](100) NOT NULL,
+	[Region] [nvarchar](10) NOT NULL,
+	[Lat] [float] NOT NULL,
+	[Lng] [float] NOT NULL,
+	[IsAccurate] [bit] NOT NULL,
+ CONSTRAINT [PK_ADDRESS_LAT_LNG] PRIMARY KEY CLUSTERED 
+(
+	[Address] ASC,
+	[Region] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[BATCHES]    Script Date: 05/05/2026 15:45:29 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[BATCHES](
+	[Created] [datetime] NOT NULL,
+	[LLMProvider] [nvarchar](20) NOT NULL,
+	[Id] [nvarchar](200) NOT NULL,
+	[PagesUriHashes] [nvarchar](max) NOT NULL,
+	[Downloaded] [bit] NOT NULL,
+ CONSTRAINT [PK_BATCHES] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[CNIG]    Script Date: 05/05/2026 15:45:29 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -99,7 +68,7 @@ CREATE TABLE [dbo].[CNIG](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[COUNTRIES]    Script Date: 20/06/2023 11:52:48 ******/
+/****** Object:  Table [dbo].[COUNTRIES]    Script Date: 05/05/2026 15:45:29 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -113,7 +82,21 @@ CREATE TABLE [dbo].[COUNTRIES](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ES_LISTINGS]    Script Date: 20/06/2023 11:52:48 ******/
+/****** Object:  Table [dbo].[COUNTRY_SPAIN]    Script Date: 05/05/2026 15:45:29 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[COUNTRY_SPAIN](
+	[Id] [nchar](10) NOT NULL,
+	[geography] [geography] NOT NULL,
+ CONSTRAINT [PK_COUNTRY_SPAIN] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[ES_LISTINGS]    Script Date: 05/05/2026 15:45:29 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -122,6 +105,7 @@ CREATE TABLE [dbo].[ES_LISTINGS](
 	[guid] [char](64) NOT NULL,
 	[listingStatus] [nvarchar](50) NOT NULL,
 	[listingDate] [datetime] NULL,
+	[updated] [datetime] NOT NULL,
 	[unlistingDate] [datetime] NULL,
 	[operation] [nvarchar](50) NOT NULL,
 	[propertyType] [nvarchar](50) NOT NULL,
@@ -129,10 +113,6 @@ CREATE TABLE [dbo].[ES_LISTINGS](
 	[priceAmount] [float] NULL,
 	[priceCurrency] [nvarchar](10) NULL,
 	[description] [nvarchar](max) NULL,
-	[dataSourceName] [nvarchar](500) NULL,
-	[dataSourceGuid] [nvarchar](500) NULL,
-	[dataSourceUpdate] [datetime] NULL,
-	[dataSourceUrl] [nvarchar](max) NULL,
 	[contactName] [nvarchar](500) NULL,
 	[contactPhone] [nvarchar](500) NULL,
 	[contactEmail] [nvarchar](500) NULL,
@@ -140,6 +120,7 @@ CREATE TABLE [dbo].[ES_LISTINGS](
 	[contactOther] [nvarchar](500) NULL,
 	[address] [nvarchar](500) NULL,
 	[lauId] [varchar](10) NULL,
+	[lauName] [nvarchar](200) NULL,
 	[latitude] [float] NULL,
 	[longitude] [float] NULL,
 	[locationIsAccurate] [bit] NULL,
@@ -167,33 +148,90 @@ CREATE TABLE [dbo].[ES_LISTINGS](
 	[airConditioning] [bit] NULL,
 	[petsAllowed] [bit] NULL,
 	[securitySystems] [bit] NULL,
+	[host] [nvarchar](255) NOT NULL,
  CONSTRAINT [PK_ES_LISTINGS] PRIMARY KEY CLUSTERED 
 (
 	[guid] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ES_MEDIA]    Script Date: 20/06/2023 11:52:48 ******/
+/****** Object:  Table [dbo].[ES_MEDIA]    Script Date: 05/05/2026 15:45:29 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [dbo].[ES_MEDIA](
-	[listingGuid] [nvarchar](100) NOT NULL,
+	[listingGuid] [char](64) NOT NULL,
 	[mediaType] [nvarchar](50) NULL,
 	[title] [nvarchar](500) NULL,
 	[url] [nvarchar](max) NOT NULL
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-SET ANSI_PADDING ON
+/****** Object:  Table [dbo].[ES_SOURCES]    Script Date: 05/05/2026 15:45:29 ******/
+SET ANSI_NULLS ON
 GO
-/****** Object:  Index [ClusteredIndex-20230422-102012]    Script Date: 20/06/2023 11:52:48 ******/
-CREATE CLUSTERED INDEX [ClusteredIndex-20230422-102012] ON [dbo].[ES_MEDIA]
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[ES_SOURCES](
+	[listingGuid] [char](64) NOT NULL,
+	[sourceName] [nvarchar](500) NULL,
+	[sourceUrl] [nvarchar](max) NOT NULL,
+	[sourceGuid] [nvarchar](500) NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[FT_AGENCIES_URLS]    Script Date: 05/05/2026 15:45:29 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[FT_AGENCIES_URLS](
+	[Url] [nvarchar](400) NOT NULL,
+	[AgencyUrl] [nvarchar](500) NULL,
+ CONSTRAINT [PK_FT_AGENCIES_URLS] PRIMARY KEY CLUSTERED 
 (
-	[listingGuid] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+	[Url] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[INVALID_IMAGES]    Script Date: 20/06/2023 11:52:48 ******/
+/****** Object:  Table [dbo].[GLOBAL_STATISTICS]    Script Date: 05/05/2026 15:45:29 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[GLOBAL_STATISTICS](
+	[Date] [datetime] NOT NULL,
+	[Key] [nvarchar](50) NOT NULL,
+	[Counter] [bigint] NOT NULL
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[HOST_STATISTICS]    Script Date: 05/05/2026 15:45:29 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[HOST_STATISTICS](
+	[Date] [datetime] NOT NULL,
+	[Host] [nvarchar](200) NOT NULL,
+	[Key] [nvarchar](200) NOT NULL,
+	[Counter] [int] NOT NULL
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[ID_AGENCIES_URLS]    Script Date: 05/05/2026 15:45:29 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[ID_AGENCIES_URLS](
+	[Url] [nvarchar](400) NOT NULL,
+	[Province] [smallint] NOT NULL,
+	[AgencyUrl] [nvarchar](500) NULL,
+ CONSTRAINT [PK_AGENCIES_URLS] PRIMARY KEY CLUSTERED 
+(
+	[Url] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[INVALID_IMAGES]    Script Date: 05/05/2026 15:45:29 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -207,7 +245,7 @@ CREATE TABLE [dbo].[INVALID_IMAGES](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[LAU]    Script Date: 20/06/2023 11:52:48 ******/
+/****** Object:  Table [dbo].[LAU]    Script Date: 05/05/2026 15:45:29 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -223,7 +261,7 @@ CREATE TABLE [dbo].[LAU](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[LOGS]    Script Date: 20/06/2023 11:52:48 ******/
+/****** Object:  Table [dbo].[LOGS]    Script Date: 05/05/2026 15:45:29 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -231,7 +269,8 @@ GO
 CREATE TABLE [dbo].[LOGS](
 	[IdLog] [bigint] IDENTITY(1000000,1) NOT NULL,
 	[Date] [datetime] NOT NULL,
-	[LogKey] [nvarchar](50) NOT NULL,
+	[MachineName] [varchar](50) NOT NULL,
+	[LogKey] [varchar](50) NOT NULL,
 	[Source] [nvarchar](max) NOT NULL,
 	[Text] [nvarchar](max) NOT NULL,
  CONSTRAINT [PK_TABLAGOOLZOOMLOG] PRIMARY KEY CLUSTERED 
@@ -240,7 +279,23 @@ CREATE TABLE [dbo].[LOGS](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[PAGES]    Script Date: 20/06/2023 11:52:48 ******/
+/****** Object:  Table [dbo].[NOT_LISTINGS_CACHE]    Script Date: 05/05/2026 15:45:29 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[NOT_LISTINGS_CACHE](
+	[Inserted] [datetime] NOT NULL,
+	[Host] [nvarchar](200) NOT NULL,
+	[ListingParserInputHash] [char](64) NOT NULL,
+ CONSTRAINT [PK_NOT_LISTINGS_ALREADY_PARSED] PRIMARY KEY CLUSTERED 
+(
+	[Host] ASC,
+	[ListingParserInputHash] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[PAGES]    Script Date: 05/05/2026 15:45:29 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -251,15 +306,37 @@ CREATE TABLE [dbo].[PAGES](
 	[UriHash] [char](64) NOT NULL,
 	[Inserted] [datetime] NOT NULL,
 	[Updated] [datetime] NULL,
+	[NextUpdate] [datetime] NULL,
 	[HttpStatusCode] [smallint] NULL,
-	[IsListing] [bit] NULL,
+	[PageType] [varchar](50) NULL,
+	[PageTypeCounter] [smallint] NULL,
+	[ListingStatus] [varchar](50) NULL,
+	[LockedBy] [varchar](50) NULL,
+	[WaitingStatus] [varchar](50) NULL,
+	[ListingParserInputHash] [char](64) NULL,
+	[ResponseBodyZipped] [varbinary](max) NULL,
+	[TokenCount] [int] NULL,
+	[ListingParserInputNotChangedCounter] [smallint] NULL,
+	[TransientErrorCounter] [smallint] NULL,
+	[Etag] [varchar](512) NULL,
  CONSTRAINT [PK_PAGES] PRIMARY KEY CLUSTERED 
 (
 	[UriHash] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TIMERS]    Script Date: 20/06/2023 11:52:48 ******/
+/****** Object:  Table [dbo].[REDIRECT_URL]    Script Date: 05/05/2026 15:45:29 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[REDIRECT_URL](
+	[DateInsert] [datetime] NOT NULL,
+	[OriginalUrl] [nvarchar](max) NOT NULL,
+	[RedirectUrl] [nvarchar](max) NOT NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[TIMERS]    Script Date: 05/05/2026 15:45:29 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -276,7 +353,27 @@ CREATE TABLE [dbo].[TIMERS](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[VALID_IMAGES]    Script Date: 20/06/2023 11:52:48 ******/
+/****** Object:  Table [dbo].[TRAINING_DATA]    Script Date: 05/05/2026 15:45:29 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[TRAINING_DATA](
+	[UriHash] [char](64) NOT NULL,
+	[ResponseBodyTextHash] [char](64) NOT NULL,
+	[ResponseBodyZipped] [varbinary](max) NOT NULL,
+	[IsListing] [bit] NOT NULL,
+ CONSTRAINT [PK_TRAINING_DATA] PRIMARY KEY CLUSTERED 
+(
+	[UriHash] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+ CONSTRAINT [IX_TRAINING_DATA] UNIQUE NONCLUSTERED 
+(
+	[ResponseBodyTextHash] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[VALID_IMAGES]    Script Date: 05/05/2026 15:45:29 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -290,7 +387,7 @@ CREATE TABLE [dbo].[VALID_IMAGES](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[WEBSITES]    Script Date: 20/06/2023 11:52:48 ******/
+/****** Object:  Table [dbo].[WEBSITES]    Script Date: 05/05/2026 15:45:29 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -301,219 +398,69 @@ CREATE TABLE [dbo].[WEBSITES](
 	[LanguageCode] [nvarchar](10) NOT NULL,
 	[CountryCode] [nvarchar](10) NOT NULL,
 	[RobotsTxt] [text] NULL,
+	[RobotsTxtUpdated] [datetime] NULL,
+	[SitemapUpdated] [datetime] NULL,
 	[IpAddress] [nvarchar](50) NULL,
-   [ApplySpecialRules] [bit] NOT NULL,
-   [UseProxy] [bit] NOT NULL CONSTRAINT [DF_WEBSITES_UseProxy] DEFAULT ((0)),
-	[HttpStatusCode] [smallint] NULL,
+	[IpAddressUpdated] [datetime] NULL,
+	[ListingUrlRegex] [nvarchar](500) NULL,
+	[ApplySpecialRules] [bit] NULL,
+	[IndexUrlRegex] [nvarchar](500) NULL,
+	[SitemapUrlRegex] [nvarchar](500) NULL,
+	[HtmlIndexingEnabled] [bit] NOT NULL,
+	[ListingHtmlRemoveXPath] [nvarchar](max) NULL,
+	[UseProxy] [bit] NOT NULL,
  CONSTRAINT [PK_WEBSITES] PRIMARY KEY CLUSTERED 
 (
 	[Host] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-IF COL_LENGTH('dbo.WEBSITES', 'ListingExampleNodeSetUpdated') IS NOT NULL
-BEGIN
-	ALTER TABLE [dbo].[WEBSITES] DROP COLUMN [ListingExampleNodeSetUpdated]
-END
-GO
-IF COL_LENGTH('dbo.WEBSITES', 'ListingExampleNodeSet') IS NOT NULL
-BEGIN
-	ALTER TABLE [dbo].[WEBSITES] DROP COLUMN [ListingExampleNodeSet]
-END
-GO
-IF COL_LENGTH('dbo.WEBSITES', 'ListingUrlRegex') IS NULL
-BEGIN
-	ALTER TABLE [dbo].[WEBSITES] ADD [ListingUrlRegex] [nvarchar](max) NULL
-END
-GO
-IF COL_LENGTH('dbo.WEBSITES', 'ListingHtmlRemoveXPath') IS NULL
-BEGIN
-	ALTER TABLE [dbo].[WEBSITES] ADD [ListingHtmlRemoveXPath] [nvarchar](max) NULL
-END
-GO
-IF COL_LENGTH('dbo.WEBSITES', 'ApplySpecialRules') IS NULL
-BEGIN
-	ALTER TABLE [dbo].[WEBSITES] ADD [ApplySpecialRules] [bit] NOT NULL CONSTRAINT [DF_WEBSITES_ApplySpecialRules] DEFAULT ((0))
-END
-GO
-IF COL_LENGTH('dbo.WEBSITES', 'UseProxy') IS NULL
-BEGIN
-	ALTER TABLE [dbo].[WEBSITES] ADD [UseProxy] [bit] NOT NULL CONSTRAINT [DF_WEBSITES_UseProxy] DEFAULT ((0))
-END
-GO
-SET ARITHABORT ON
-SET CONCAT_NULL_YIELDS_NULL ON
-SET QUOTED_IDENTIFIER ON
+/****** Object:  Table [dbo].[WEBSITES_THROTTLE]    Script Date: 05/05/2026 15:45:29 ******/
 SET ANSI_NULLS ON
-SET ANSI_PADDING ON
-SET ANSI_WARNINGS ON
-SET NUMERIC_ROUNDABORT OFF
 GO
-/****** Object:  Index [SpatialIndex-the_geom]    Script Date: 20/06/2023 11:52:48 ******/
-CREATE SPATIAL INDEX [SpatialIndex-the_geom] ON [dbo].[CNIG]
-(
-	[the_geom]
-)USING  GEOGRAPHY_AUTO_GRID 
-WITH (
-CELLS_PER_OBJECT = 16, PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-GO
-SET ARITHABORT ON
-SET CONCAT_NULL_YIELDS_NULL ON
 SET QUOTED_IDENTIFIER ON
-SET ANSI_NULLS ON
-SET ANSI_PADDING ON
-SET ANSI_WARNINGS ON
-SET NUMERIC_ROUNDABORT OFF
 GO
-/****** Object:  Index [SpatialIndex-the_geom]    Script Date: 20/06/2023 11:52:48 ******/
-CREATE SPATIAL INDEX [SpatialIndex-the_geom] ON [dbo].[COUNTRIES]
+CREATE TABLE [dbo].[WEBSITES_THROTTLE](
+	[BlockUntil] [datetime] NOT NULL,
+	[IpOrHost] [nvarchar](100) NOT NULL,
+	[ForbiddenBackoffLevel] [smallint] NOT NULL,
+	[ForbiddenRetryDelaySeconds] [int] NOT NULL,
+	[ForbiddenCounter] [int] NOT NULL,
+	[SuccessCounterAfterForbidden] [int] NOT NULL,
+	[LastForbiddenAt] [datetime] NULL,
+	[LastSuccessAt] [datetime] NULL,
+	[Updated] [datetime] NOT NULL,
+ CONSTRAINT [PK_IPHOST_BLOCKER] PRIMARY KEY CLUSTERED 
 (
-	[the_geom]
-)USING  GEOGRAPHY_GRID 
-WITH (GRIDS =(LEVEL_1 = MEDIUM,LEVEL_2 = MEDIUM,LEVEL_3 = MEDIUM,LEVEL_4 = MEDIUM), 
-CELLS_PER_OBJECT = 16, PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+	[IpOrHost] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
 GO
-SET ARITHABORT ON
-SET CONCAT_NULL_YIELDS_NULL ON
+/****** Object:  Table [dbo].[WORDS]    Script Date: 05/05/2026 15:45:29 ******/
+SET ANSI_NULLS ON
+GO
 SET QUOTED_IDENTIFIER ON
-SET ANSI_NULLS ON
-SET ANSI_PADDING ON
-SET ANSI_WARNINGS ON
-SET NUMERIC_ROUNDABORT OFF
 GO
-/****** Object:  Index [SpatialIndex-the_geom]    Script Date: 20/06/2023 11:52:48 ******/
-CREATE SPATIAL INDEX [SpatialIndex-the_geom] ON [dbo].[LAU]
+CREATE TABLE [dbo].[WORDS](
+	[Word] [nvarchar](200) NOT NULL,
+	[Counter] [bigint] NOT NULL,
+ CONSTRAINT [PK_WORDS] PRIMARY KEY CLUSTERED 
 (
-	[the_geom]
-)USING  GEOGRAPHY_AUTO_GRID 
-WITH (
-CELLS_PER_OBJECT = 16, PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+	[Word] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
 GO
-USE [master]
+ALTER TABLE [dbo].[WEBSITES] ADD  CONSTRAINT [DF_WEBSITES_HtmlIndexingEnabled]  DEFAULT ((1)) FOR [HtmlIndexingEnabled]
 GO
-ALTER DATABASE [Landerist] SET  READ_WRITE 
+ALTER TABLE [dbo].[WEBSITES] ADD  CONSTRAINT [DF_WEBSITES_UseProxy]  DEFAULT ((0)) FOR [UseProxy]
 GO
-
-USE [Landerist]
+ALTER TABLE [dbo].[WEBSITES_THROTTLE] ADD  CONSTRAINT [DF_WEBSITES_BLOCKER_ForbiddenBackoffLevel]  DEFAULT ((0)) FOR [ForbiddenBackoffLevel]
 GO
-IF OBJECT_ID('dbo.WEBSITES_THROTTLE', 'U') IS NULL
-BEGIN
-	CREATE TABLE [dbo].[WEBSITES_THROTTLE](
-		[IpOrHost] [nvarchar](200) NOT NULL,
-		[BlockUntil] [datetime] NOT NULL,
-		[ForbiddenBackoffLevel] [smallint] NOT NULL CONSTRAINT [DF_WEBSITES_THROTTLE_ForbiddenBackoffLevel] DEFAULT ((0)),
-		[ForbiddenRetryDelaySeconds] [int] NOT NULL CONSTRAINT [DF_WEBSITES_THROTTLE_ForbiddenRetryDelaySeconds] DEFAULT ((0)),
-		[ForbiddenCounter] [int] NOT NULL CONSTRAINT [DF_WEBSITES_THROTTLE_ForbiddenCounter] DEFAULT ((0)),
-		[SuccessCounterAfterForbidden] [int] NOT NULL CONSTRAINT [DF_WEBSITES_THROTTLE_SuccessCounterAfterForbidden] DEFAULT ((0)),
-		[LastForbiddenAt] [datetime] NULL,
-		[LastSuccessAt] [datetime] NULL,
-		[Updated] [datetime] NOT NULL CONSTRAINT [DF_WEBSITES_THROTTLE_Updated] DEFAULT (GETDATE()),
-	 CONSTRAINT [PK_WEBSITES_THROTTLE] PRIMARY KEY CLUSTERED 
-	(
-		[IpOrHost] ASC
-	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-	) ON [PRIMARY]
-END
+ALTER TABLE [dbo].[WEBSITES_THROTTLE] ADD  CONSTRAINT [DF_WEBSITES_BLOCKER_ForbiddenRetryDelaySeconds]  DEFAULT ((0)) FOR [ForbiddenRetryDelaySeconds]
 GO
-IF COL_LENGTH('dbo.WEBSITES_THROTTLE', 'ForbiddenBackoffLevel') IS NULL
-BEGIN
-	ALTER TABLE [dbo].[WEBSITES_THROTTLE]
-	ADD [ForbiddenBackoffLevel] [smallint] NOT NULL CONSTRAINT [DF_WEBSITES_THROTTLE_ForbiddenBackoffLevel] DEFAULT ((0))
-END
+ALTER TABLE [dbo].[WEBSITES_THROTTLE] ADD  CONSTRAINT [DF_WEBSITES_BLOCKER_ForbiddenCounter]  DEFAULT ((0)) FOR [ForbiddenCounter]
 GO
-IF COL_LENGTH('dbo.WEBSITES_THROTTLE', 'ForbiddenRetryDelaySeconds') IS NULL
-BEGIN
-	ALTER TABLE [dbo].[WEBSITES_THROTTLE]
-	ADD [ForbiddenRetryDelaySeconds] [int] NOT NULL CONSTRAINT [DF_WEBSITES_THROTTLE_ForbiddenRetryDelaySeconds] DEFAULT ((0))
-END
+ALTER TABLE [dbo].[WEBSITES_THROTTLE] ADD  CONSTRAINT [DF_WEBSITES_BLOCKER_SuccessCounterAfterForbidden]  DEFAULT ((0)) FOR [SuccessCounterAfterForbidden]
 GO
-IF COL_LENGTH('dbo.WEBSITES_THROTTLE', 'ForbiddenCounter') IS NULL
-BEGIN
-	ALTER TABLE [dbo].[WEBSITES_THROTTLE]
-	ADD [ForbiddenCounter] [int] NOT NULL CONSTRAINT [DF_WEBSITES_THROTTLE_ForbiddenCounter] DEFAULT ((0))
-END
-GO
-IF COL_LENGTH('dbo.WEBSITES_THROTTLE', 'SuccessCounterAfterForbidden') IS NULL
-BEGIN
-	ALTER TABLE [dbo].[WEBSITES_THROTTLE]
-	ADD [SuccessCounterAfterForbidden] [int] NOT NULL CONSTRAINT [DF_WEBSITES_THROTTLE_SuccessCounterAfterForbidden] DEFAULT ((0))
-END
-GO
-IF COL_LENGTH('dbo.WEBSITES_THROTTLE', 'LastForbiddenAt') IS NULL
-BEGIN
-	ALTER TABLE [dbo].[WEBSITES_THROTTLE]
-	ADD [LastForbiddenAt] [datetime] NULL
-END
-GO
-IF COL_LENGTH('dbo.WEBSITES_THROTTLE', 'LastSuccessAt') IS NULL
-BEGIN
-	ALTER TABLE [dbo].[WEBSITES_THROTTLE]
-	ADD [LastSuccessAt] [datetime] NULL
-END
-GO
-IF COL_LENGTH('dbo.WEBSITES_THROTTLE', 'Updated') IS NULL
-BEGIN
-	ALTER TABLE [dbo].[WEBSITES_THROTTLE]
-	ADD [Updated] [datetime] NOT NULL CONSTRAINT [DF_WEBSITES_THROTTLE_Updated] DEFAULT (GETDATE())
-END
-GO
-IF COL_LENGTH('dbo.PAGES', 'ResponseBodyTextHash') IS NOT NULL AND COL_LENGTH('dbo.PAGES', 'ListingParserInputHash') IS NULL
-BEGIN
-	EXEC sp_rename 'dbo.PAGES.ResponseBodyTextHash', 'ListingParserInputHash', 'COLUMN'
-END
-GO
-IF COL_LENGTH('dbo.PAGES', 'ListingParserInputHash') IS NULL
-BEGIN
-	ALTER TABLE [dbo].[PAGES]
-	ADD [ListingParserInputHash] [char](64) NULL
-END
-GO
-IF COL_LENGTH('dbo.PAGES', 'ResponseBodyTextNotChangedCounter') IS NOT NULL AND COL_LENGTH('dbo.PAGES', 'ListingParserInputNotChangedCounter') IS NULL
-BEGIN
-	EXEC sp_rename 'dbo.PAGES.ResponseBodyTextNotChangedCounter', 'ListingParserInputNotChangedCounter', 'COLUMN'
-END
-GO
-IF COL_LENGTH('dbo.PAGES', 'ListingParserInputNotChangedCounter') IS NULL
-BEGIN
-	ALTER TABLE [dbo].[PAGES]
-	ADD [ListingParserInputNotChangedCounter] [smallint] NULL
-END
-GO
-IF OBJECT_ID('dbo.NOT_LISTINGS_CACHE', 'U') IS NOT NULL AND COL_LENGTH('dbo.NOT_LISTINGS_CACHE', 'ResponseBodyTextHash') IS NOT NULL AND COL_LENGTH('dbo.NOT_LISTINGS_CACHE', 'ListingParserInputHash') IS NULL
-BEGIN
-	EXEC sp_rename 'dbo.NOT_LISTINGS_CACHE.ResponseBodyTextHash', 'ListingParserInputHash', 'COLUMN'
-END
-GO
-IF OBJECT_ID('dbo.NOT_LISTINGS_CACHE', 'U') IS NOT NULL AND COL_LENGTH('dbo.NOT_LISTINGS_CACHE', 'ListingParserInputHash') IS NULL
-BEGIN
-	ALTER TABLE [dbo].[NOT_LISTINGS_CACHE]
-	ADD [ListingParserInputHash] [char](64) NULL
-END
-GO
-IF COL_LENGTH('dbo.PAGES', 'TransientErrorCounter') IS NULL
-BEGIN
-	ALTER TABLE [dbo].[PAGES]
-	ADD [TransientErrorCounter] [smallint] NULL
-END
-GO
-IF OBJECT_ID('dbo.HOST_STATISTICS_SNAPSHOT', 'U') IS NULL
-BEGIN
-	CREATE TABLE [dbo].[HOST_STATISTICS_SNAPSHOT](
-		[Date] [datetime] NOT NULL,
-		[Host] [nvarchar](200) NOT NULL,
-		[Key] [nvarchar](200) NOT NULL,
-		[Counter] [int] NOT NULL
-	) ON [PRIMARY]
-END
-GO
-IF NOT EXISTS (
-	SELECT 1
-	FROM sys.indexes
-	WHERE [name] = 'IX_HOST_STATISTICS_SNAPSHOT_Host_Key_Date'
-	AND [object_id] = OBJECT_ID('dbo.HOST_STATISTICS_SNAPSHOT')
-)
-BEGIN
-	CREATE NONCLUSTERED INDEX [IX_HOST_STATISTICS_SNAPSHOT_Host_Key_Date]
-	ON [dbo].[HOST_STATISTICS_SNAPSHOT] ([Host] ASC, [Key] ASC, [Date] DESC)
-END
+ALTER TABLE [dbo].[WEBSITES_THROTTLE] ADD  CONSTRAINT [DF_WEBSITES_BLOCKER_Updated]  DEFAULT (getdate()) FOR [Updated]
 GO
