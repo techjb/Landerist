@@ -143,7 +143,6 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private static AllowedResourceTypesCacheItem ParseAllowedResourceTypes(string allowedResourceTypes)
         {
-            Console.WriteLine(allowedResourceTypes);
             HashSet<ResourceType> resourceTypes = [];
             foreach (var item in allowedResourceTypes.Split(ResourceTypeSeparators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
             {
