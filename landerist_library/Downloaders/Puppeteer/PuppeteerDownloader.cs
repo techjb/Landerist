@@ -1,4 +1,3 @@
-﻿using Amazon.S3;
 using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Pages;
@@ -17,202 +16,7 @@ namespace landerist_library.Downloaders.Puppeteer
         public string? Etag { get; set; } = null;
 
         private Pages.Page? Page;
-
-        private const string ExpressionRemoveCookies =
-            @"document.querySelectorAll('[class*=""cookie"" i], [id*=""cookie"" i]').forEach(el => el.remove());";
-
-        private const string ExpressionRemoveInvisibleElements = @"
-            () => {
-                const isVisible = (elem) => {
-                    if (!(elem instanceof Element)) return false;
-                    const style = window.getComputedStyle(elem);
-                    if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
-                        return false;
-                    }
-                    return true;
-                };
-
-                const removeInvisibleElements = (root) => {
-                    if (!(root instanceof Node)) {
-                        return;
-                    }
-
-                    const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, null, false);
-                    const toRemove = [];
-                    while (walker.nextNode()) {
-                        const node = walker.currentNode;
-                        if (!isVisible(node)) {
-                            toRemove.push(node);
-                        }
-                    }
-                    for (const node of toRemove) {
-                        node.remove();
-                    }
-                };
-
-                const root = document.body ?? document.documentElement;
-                removeInvisibleElements(root);
-            }
-        ";
-
-        private static readonly HashSet<ResourceType> BlockResources = Config.TAKE_SCREENSHOT ?
-        [
-            ResourceType.Font,
-            ResourceType.Media,
-        ] :
-        [
-            ResourceType.Image,
-            ResourceType.ImageSet,
-            ResourceType.Img,
-            ResourceType.Font,
-            ResourceType.Media,
-        ];
-
-        private static readonly HashSet<ResourceType> ImageResourceTypes =
-        [
-            ResourceType.Image,
-            ResourceType.ImageSet,
-            ResourceType.Img,
-        ];
-
-        private static readonly HashSet<ResourceType> StylesAndScriptResources =
-        [
-            ResourceType.StyleSheet,
-            ResourceType.Script,
-        ];
-
-        private static readonly HashSet<ResourceType> ScriptResources =
-        [
-            ResourceType.Script,
-        ];
-
-        private static readonly HashSet<ResourceType> StylesResources =
-        [
-            ResourceType.StyleSheet,
-        ];
-
-        private static readonly byte[] TransparentGifBytes =
-            Convert.FromBase64String("R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==");
-
-        private static readonly string IDontCareAboutCookies = Config.CHROME_EXTENSIONS_DIRECTORY
-            + "IDontCareAboutCookies\\1.0.1_0\\";
-
-        private static readonly string[] LaunchOptionsArgs =
-            [
-            "--no-sandbox",
-            "--disable-notifications",
-            "--disable-infobars",
-            "--disable-setuid-sandbox",
-            "--disable-features=TranslateUI",
-            "--disable-features=ChromeLabs",
-            "--disable-features=Translate",
-            "--disable-features=LensStandalone",
-            "--window-position=0,0",
-            "--ignore-certificate-errors",
-            "--ignore-certificate-errors-spki-list",
-            "--disable-gpu",
-            "--disable-dev-shm-usage",
-            "--disable-background-timer-throttling",
-            "--disable-renderer-backgrounding",
-            "--disable-dev-profile",
-            "--aggressive-cache-discard",
-            "--disable-cache",
-            "--disable-application-cache",
-            "--disable-offline-load-stale-cache",
-            "--disable-gpu-shader-disk-cache",
-            "--media-cache-size=0",
-            "--disk-cache-size=0",
-            "--disable-gl-drawing-for-tests",
-            "--disable-offline-load-stale-cache",
-            "--disable-histograms",
-            "--disk-cache-dir=null",
-            "--no-experiments",
-            "--no-default-browser-check",
-            "--disable-background-timer-throttling",
-            "--disable-backgrounding-occluded-windows",
-            "--disable-notifications",
-            "--disable-background-networking",
-            "--disable-component-update",
-            "--disable-blink-features=AutomationControlled"
-            ];
-
-        private static readonly string[] LaunchOptionsScreenShot =
-        [
-            "--disable-extensions-except=" + IDontCareAboutCookies,
-            "--load-extension=" + IDontCareAboutCookies
-        ];
-
-        private readonly LaunchOptions launchOptions = new()
-        {
-            //Headless = true, // if false, maybe need to comment await browserPage.SetRequestInterceptionAsync(true);
-            Headless = Config.HEADLESS_BROWSER,
-            Devtools = false,
-            //IgnoreHTTPSErrors = true,
-            Args = BuildLaunchOptionsArgs(false),
-        };
-
-        private static readonly HashSet<string> BlockDomains = new(StringComparer.OrdinalIgnoreCase)
-        {
-            "www.google-analytics.com",
-            "www.googletagmanager.com",
-            "tagmanager.google.com",
-            "doubleclick.net",
-            "connect.facebook.net",
-            "stats.g.doubleclick.net",
-            "adservice.google.com",
-            "pagead2.googlesyndication.com",
-            "mads.amazon-adsystem.com",
-            "ad.doubleclick.net",
-            "maps.googleapis.com",
-            "ads.yahoo.com",
-            "ads.twitter.com",
-            "analytics.twitter.com",
-            "cdn.taboola.com",
-            "ads.pubmatic.com",
-            "adsymptotic.com",
-            "pixel.quantserve.com",
-            "googleads.g.doubleclick.net",
-            "adroll.com",
-            "media.net",
-            "scorecardresearch.com",
-            "ssl.google-analytics.com",
-            "tracking.kissmetrics.com",
-            "banners.adfox.ru",
-            "static.criteo.net",
-            "ib.adnxs.com",
-            "cdn.adsafeprotected.com",
-            "contextweb.com",
-            "onetag.io",
-            "rubiconproject.com",
-            "yieldmo.com",
-            "casalemedia.com",
-            "googlesyndication.com",
-            "adsafeprotected.com",
-            "moatads.com",
-            "criteo.com",
-            "openx.net",
-            "yahoo.com",
-            "cloudflareinsights.com",
-            "adlightning.com",
-            "advertising.com",
-            "zqtk.net",
-            "everesttech.net",
-            "demdex.net",
-            "gumgum.com",
-            "outbrain.com",
-            "bing.com",
-            "pippio.com",
-            "static.addtoany.com",
-            "cercalia.com",
-            "content-autofill.googleapis.com",
-            "android.clients.google.com",
-            "accounts.google.com"
-        };
-
-        private static readonly HashSet<string> BlockedExtensions = new(StringComparer.OrdinalIgnoreCase)
-        {
-            ".exe", ".zip", ".rar", ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".tmp"
-        };
+        private readonly LaunchOptions launchOptions;
 
         private IBrowser? Browser;
         private IPage? BrowserPage;
@@ -239,35 +43,10 @@ namespace landerist_library.Downloaders.Puppeteer
                     Username = PrivateConfig.PROXY_USERNAME,
                     Password = PrivateConfig.PROXY_PASSWORD
                 };
-                launchOptions.Args = BuildLaunchOptionsArgs(true);
             }
 
+            launchOptions = PuppeteerLaunchOptionsFactory.Create(UseProxy);
             Browser = LaunchAsync().GetAwaiter().GetResult();
-        }
-
-        private static string[] BuildLaunchOptionsArgs(bool useProxy)
-        {
-            var args = Config.TAKE_SCREENSHOT ? [.. LaunchOptionsArgs, .. LaunchOptionsScreenShot] : LaunchOptionsArgs;
-
-            return useProxy ? [.. args, BuildProxyServerArgument()] : args;
-        }
-
-        private static string BuildProxyServerArgument()
-        {
-            return "--proxy-server=" + PrivateConfig.PROXY_HOST + ":" + GetProxyPort();
-        }
-
-        private static string GetProxyPort()
-        {
-            if (!PrivateConfig.PROXY_RANDOMIZE_STICKY_PORTS ||
-                PrivateConfig.PROXY_STICKY_PORT_MIN > PrivateConfig.PROXY_STICKY_PORT_MAX)
-            {
-                return PrivateConfig.PROXY_PORT;
-            }
-
-            return Random.Shared
-                .Next(PrivateConfig.PROXY_STICKY_PORT_MIN, PrivateConfig.PROXY_STICKY_PORT_MAX + 1)
-                .ToString();
         }
 
         public bool BrowserInitialized()
@@ -539,7 +318,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 try
                 {
                     SetExecutionStep("Removing cookie banners");
-                    await BrowserPage!.EvaluateExpressionAsync(ExpressionRemoveCookies);
+                    await BrowserPage!.EvaluateExpressionAsync(PuppeteerPageScripts.RemoveCookies);
                 }
                 catch //(Exception exception)
                 {
@@ -549,7 +328,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 try
                 {
                     SetExecutionStep("Removing invisible elements");
-                    await BrowserPage!.EvaluateFunctionAsync(ExpressionRemoveInvisibleElements);
+                    await BrowserPage!.EvaluateFunctionAsync(PuppeteerPageScripts.RemoveInvisibleElements);
                 }
                 catch //(Exception exception)
                 {
@@ -699,63 +478,15 @@ namespace landerist_library.Downloaders.Puppeteer
                     return;
                 }
 
-                var requestHost = currentPage.Uri.Host;
-                if (Uri.TryCreate(e.Request.Url, UriKind.Absolute, out Uri? requestUri))
+                var action = PuppeteerRequestRules.GetAction(e, currentPage);
+                switch (action)
                 {
-                    requestHost = requestUri.Host;
-                }
-
-                var url = e.Request.Url.ToLowerInvariant();
-                if (BlockResources.Contains(e.Request.ResourceType))
-                {
-                    if (ImageResourceTypes.Contains(e.Request.ResourceType))
-                    {
-                        await e.Request.RespondAsync(new ResponseData
-                        {
-                            Status = System.Net.HttpStatusCode.OK,
-                            ContentType = "image/gif",
-                            BodyData = TransparentGifBytes
-                        });
+                    case PuppeteerRequestAction.RespondWithTransparentGif:
+                        await e.Request.RespondAsync(PuppeteerRequestRules.CreateTransparentGifResponse());
                         return;
-                    }
-
-                    await e.Request.AbortAsync();
-                    return;
-                }
-
-                if (Page!.Website.IsServihabitat())
-                {
-                    if (StylesAndScriptResources.Contains(e.Request.ResourceType))
-                    {
+                    case PuppeteerRequestAction.Abort:
                         await e.Request.AbortAsync();
                         return;
-                    }
-                }
-
-                if (Page!.Website.IsEngelsAnVolgers())
-                {
-                    if (StylesResources.Contains(e.Request.ResourceType))
-                    {
-                        await e.Request.AbortAsync();
-                        return;
-                    }
-                }
-
-                //if (Page!.Website.IsRemax() && false)
-                //{
-                //    if (ScriptResources.Contains(e.Request.ResourceType))
-                //    {
-                //        await e.Request.AbortAsync();
-                //        return;
-                //    }
-                //} 
-
-                if (BlockDomains.Contains(requestHost) ||
-                    BlockedExtensions.Any(url.EndsWith) ||
-                    e.Request.IsNavigationRequest && e.Request.RedirectChain.Length != 0)
-                {
-                    await e.Request.AbortAsync();
-                    return;
                 }
 
                 await e.Request.ContinueAsync();
