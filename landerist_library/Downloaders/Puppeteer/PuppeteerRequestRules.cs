@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using PuppeteerSharp;
 
 namespace landerist_library.Downloaders.Puppeteer
@@ -22,6 +23,8 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private static readonly char[] ResourceTypeSeparators = [',', ';', '|', ' ', '\r', '\n', '\t'];
 
+        private static readonly ConcurrentDictionary<string, AllowedResourceTypesCacheItem> AllowedResourceTypesCache =
+            new(StringComparer.OrdinalIgnoreCase);
 
         private static readonly HashSet<string> BlockedDomains = new(StringComparer.OrdinalIgnoreCase)
         {
@@ -133,6 +136,14 @@ namespace landerist_library.Downloaders.Puppeteer
                 return null;
             }
 
+            return AllowedResourceTypesCache
+                .GetOrAdd(allowedResourceTypes.Trim(), ParseAllowedResourceTypes)
+                .ResourceTypes;
+        }
+
+        private static AllowedResourceTypesCacheItem ParseAllowedResourceTypes(string allowedResourceTypes)
+        {
+            Console.WriteLine(allowedResourceTypes);
             HashSet<ResourceType> resourceTypes = [];
             foreach (var item in allowedResourceTypes.Split(ResourceTypeSeparators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
             {
@@ -141,8 +152,8 @@ namespace landerist_library.Downloaders.Puppeteer
                     resourceTypes.Add(resourceType);
                 }
             }
-            Console.WriteLine(resourceTypes.Count);
-            return resourceTypes.Count > 0 ? resourceTypes : null;
+
+            return new AllowedResourceTypesCacheItem(resourceTypes.Count > 0 ? resourceTypes : null);
         }
 
         private static PuppeteerRequestAction GetBlockedResourceAction(ResourceType resourceType)
@@ -157,6 +168,11 @@ namespace landerist_library.Downloaders.Puppeteer
             return Uri.TryCreate(url, UriKind.Absolute, out Uri? requestUri)
                 ? requestUri.Host
                 : defaultHost;
+        }
+
+        private sealed class AllowedResourceTypesCacheItem(HashSet<ResourceType>? resourceTypes)
+        {
+            public HashSet<ResourceType>? ResourceTypes { get; } = resourceTypes;
         }
     }
 
