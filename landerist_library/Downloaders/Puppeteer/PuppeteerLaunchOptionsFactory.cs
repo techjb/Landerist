@@ -5,9 +5,6 @@ namespace landerist_library.Downloaders.Puppeteer
 {
     internal static class PuppeteerLaunchOptionsFactory
     {
-        private static readonly string IDontCareAboutCookies = Config.CHROME_EXTENSIONS_DIRECTORY
-            + "IDontCareAboutCookies\\1.0.1_0\\";
-
         private static readonly string[] DefaultArgs =
         [
             "--no-sandbox",
@@ -47,12 +44,6 @@ namespace landerist_library.Downloaders.Puppeteer
             "--disable-blink-features=AutomationControlled"
         ];
 
-        private static readonly string[] ScreenshotArgs =
-        [
-            "--disable-extensions-except=" + IDontCareAboutCookies,
-            "--load-extension=" + IDontCareAboutCookies
-        ];
-
         public static LaunchOptions Create(bool useProxy)
         {
             return new LaunchOptions
@@ -67,9 +58,7 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private static string[] BuildArgs(bool useProxy)
         {
-            var args = Config.TAKE_SCREENSHOT ? [.. DefaultArgs, .. ScreenshotArgs] : DefaultArgs;
-
-            return useProxy ? [.. args, BuildProxyServerArgument()] : args;
+            return useProxy ? [.. DefaultArgs, BuildProxyServerArgument()] : DefaultArgs;
         }
 
         private static string BuildProxyServerArgument()

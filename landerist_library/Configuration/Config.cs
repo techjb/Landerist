@@ -65,7 +65,6 @@ namespace landerist_library.Configuration
         public static string? LANDERIST_COM_TEMPLATES { get; set; }
         public static string? BACKUPS_DIRECTORY { get; set; }
         public static string? SCREENSHOTS_DIRECTORY { get; set; }
-        public static bool TAKE_SCREENSHOT { get; set; }
         public static bool SAVE_SCREENSHOT_FILE { get; set; }
 
         public static readonly ScreenshotType SCREENSHOT_TYPE = ScreenshotType.Jpeg;
@@ -206,8 +205,6 @@ namespace landerist_library.Configuration
             SCREENSHOTS_DIRECTORY = ConfigurationProduction ?
                 PrivateConfig.SCREENSHOTS_DIRECTORY_PRODUCTION :
                 PrivateConfig.SCREENSHOTS_DIRECTORY_LOCAL;
-
-            TAKE_SCREENSHOT = false;
 
             SAVE_SCREENSHOT_FILE = !ConfigurationProduction;
 

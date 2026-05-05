@@ -47,8 +47,9 @@ namespace landerist_tests
             //string listingUrlRegex = @"^https:\/\/www\.remax\.es\/buscador-de-inmuebles\/(?:venta|alquiler)\/[^\/]+\/[^\/]+\/[^\/]+\/[^\/]+\/[^\/]+\/$";
             //string indexUrlRegex = listingUrlRegex;
             //string sitemapUrlRegex = @"^https:\/\/www\.remax\.es\/(?:sitemap-general\.xml|sitemaps\/sitemap-fichas-[va].*\.xml)$";
+            //string allowebResourceTypes = "Unknown,Beacon,Document,TextTrack,Xhr,Fetch,EventSource,WebSocket,Manifest,Ping,Other";
 
-            //WebsitesInserter.InsertSpecialWebsite(mainUri, hostUri, listingUrlRegex, indexUrlRegex, sitemapUrlRegex);
+            //WebsitesInserter.InsertSpecialWebsite(mainUri, hostUri, listingUrlRegex, indexUrlRegex, sitemapUrlRegex, allowebResourceTypes);
 
             //Website website = new(hostUri);
             //website.ReadSitemap();

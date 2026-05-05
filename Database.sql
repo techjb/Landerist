@@ -408,6 +408,7 @@ CREATE TABLE [dbo].[WEBSITES](
 	[SitemapUrlRegex] [nvarchar](500) NULL,
 	[HtmlIndexingEnabled] [bit] NOT NULL,
 	[ListingHtmlRemoveXPath] [nvarchar](max) NULL,
+	[AllowedResourceTypes] [nvarchar](500) NULL,
 	[UseProxy] [bit] NOT NULL,
  CONSTRAINT [PK_WEBSITES] PRIMARY KEY CLUSTERED 
 (

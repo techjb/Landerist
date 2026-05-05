@@ -1,15 +1,10 @@
-using landerist_library.Configuration;
 using PuppeteerSharp;
 
 namespace landerist_library.Downloaders.Puppeteer
 {
     internal static class PuppeteerRequestRules
     {
-        private static readonly HashSet<ResourceType> BlockedResourceTypes = Config.TAKE_SCREENSHOT ?
-        [
-            ResourceType.Font,
-            ResourceType.Media,
-        ] :
+        private static readonly HashSet<ResourceType> BlockedResourceTypes = 
         [
             ResourceType.Image,
             ResourceType.ImageSet,
@@ -25,16 +20,8 @@ namespace landerist_library.Downloaders.Puppeteer
             ResourceType.Img,
         ];
 
-        private static readonly HashSet<ResourceType> StylesAndScriptResourceTypes =
-        [
-            ResourceType.StyleSheet,
-            ResourceType.Script,
-        ];
+        private static readonly char[] ResourceTypeSeparators = [',', ';', '|', ' ', '\r', '\n', '\t'];
 
-        private static readonly HashSet<ResourceType> StyleResourceTypes =
-        [
-            ResourceType.StyleSheet,
-        ];
 
         private static readonly HashSet<string> BlockedDomains = new(StringComparer.OrdinalIgnoreCase)
         {
@@ -114,23 +101,17 @@ namespace landerist_library.Downloaders.Puppeteer
 
         public static PuppeteerRequestAction GetAction(RequestEventArgs e, Pages.Page currentPage)
         {
-            if (BlockedResourceTypes.Contains(e.Request.ResourceType))
+            var allowedResourceTypes = GetAllowedResourceTypes(currentPage.Website.AllowedResourceTypes);
+            if (allowedResourceTypes is not null)
             {
-                return ImageResourceTypes.Contains(e.Request.ResourceType)
-                    ? PuppeteerRequestAction.RespondWithTransparentGif
-                    : PuppeteerRequestAction.Abort;
+                if (!allowedResourceTypes.Contains(e.Request.ResourceType))
+                {
+                    return GetBlockedResourceAction(e.Request.ResourceType);
+                }
             }
-
-            if (currentPage.Website.IsServihabitat() &&
-                StylesAndScriptResourceTypes.Contains(e.Request.ResourceType))
+            else if (BlockedResourceTypes.Contains(e.Request.ResourceType))
             {
-                return PuppeteerRequestAction.Abort;
-            }
-
-            if (currentPage.Website.IsEngelsAnVolgers() &&
-                StyleResourceTypes.Contains(e.Request.ResourceType))
-            {
-                return PuppeteerRequestAction.Abort;
+                return GetBlockedResourceAction(e.Request.ResourceType);
             }
 
             var requestHost = GetRequestHost(e.Request.Url, currentPage.Uri.Host);
@@ -143,6 +124,32 @@ namespace landerist_library.Downloaders.Puppeteer
             }
 
             return PuppeteerRequestAction.Continue;
+        }
+
+        private static HashSet<ResourceType>? GetAllowedResourceTypes(string? allowedResourceTypes)
+        {
+            if (string.IsNullOrWhiteSpace(allowedResourceTypes))
+            {
+                return null;
+            }
+
+            HashSet<ResourceType> resourceTypes = [];
+            foreach (var item in allowedResourceTypes.Split(ResourceTypeSeparators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            {
+                if (Enum.TryParse(item, ignoreCase: true, out ResourceType resourceType))
+                {
+                    resourceTypes.Add(resourceType);
+                }
+            }
+            Console.WriteLine(resourceTypes.Count);
+            return resourceTypes.Count > 0 ? resourceTypes : null;
+        }
+
+        private static PuppeteerRequestAction GetBlockedResourceAction(ResourceType resourceType)
+        {
+            return ImageResourceTypes.Contains(resourceType)
+                ? PuppeteerRequestAction.RespondWithTransparentGif
+                : PuppeteerRequestAction.Abort;
         }
 
         private static string GetRequestHost(string url, string defaultHost)

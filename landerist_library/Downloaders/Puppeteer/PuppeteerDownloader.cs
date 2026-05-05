@@ -253,7 +253,7 @@ namespace landerist_library.Downloaders.Puppeteer
 
                 if (completedTask == taskGetAsync)
                 {
-                    (Content, Screenshot) = taskGetAsync.GetAwaiter().GetResult();
+                    Content = taskGetAsync.GetAwaiter().GetResult();
                 }
                 else
                 {
@@ -267,14 +267,13 @@ namespace landerist_library.Downloaders.Puppeteer
             }
         }
 
-        private async Task<(string? content, byte[]? screenShot)> GetAsync()
+        private async Task<string?> GetAsync()
         {
             string? content = null;
-            byte[]? screenShot = null;
             BrowserChrashed = false;
             if (Browser is null)
             {
-                return (null, null);
+                return null;
             }
 
             try
@@ -335,16 +334,10 @@ namespace landerist_library.Downloaders.Puppeteer
                     //Logs.Log.WriteInfo("PuppeteerDownloader ExpressionRemoveInvisibleElements", exception.Message);
                 }
 
-                if (Config.TAKE_SCREENSHOT)
-                {
-                    SetExecutionStep("Taking screenshot");
-                    screenShot = await PuppeteerScreenshot.TakeScreenshot(BrowserPage!, Page);
-                }
-
                 SetExecutionStep("Reading page content");
                 content = await BrowserPage!.GetContentAsync();
                 SetExecutionStep("Completed");
-                return (content, screenShot);
+                return content;
             }
 
             catch (NavigationException exception)
@@ -358,7 +351,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 if (UseProxy && HttpStatusCode == ProxyAuthenticationRequiredStatusCode)
                 {
                     SetBrowserChrashed("Proxy authentication failed: " + message);
-                    return (content, screenShot);
+                    return content;
                 }
 
                 //Logs.Log.WriteInfo("PuppeteerDownloader NavigationException", message);
@@ -374,7 +367,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 Console.WriteLine("Exception " + message);
             }
 
-            return (content, screenShot);
+            return content;
         }
 
         private async Task<IResponse?> NavigateWithTimeoutAsync(string url)

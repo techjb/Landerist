@@ -16,7 +16,7 @@ namespace landerist_tests
             //new Scraper().ProcessPages();
             //new Scraper().Scrape(page, false);
 
-            //new landerist_library.Scrape.Scraper().Scrape("https://www.tecnocasa.es/venta/terrenos/cadiz/conil-de-la-frontera/623689.html", false);
+            new landerist_library.Scrape.Scraper().Scrape("https://www.tecnocasa.es/alquiler/local-comercial/madrid/villalbilla/584817.html", false);
             //new Scraper().TestSinglePage();
             //landerist_library.Scrape.PageSelector.SelectTop1();
             //Console.WriteLine("Block: " + WebsitesThrottle.Block(page.Website));

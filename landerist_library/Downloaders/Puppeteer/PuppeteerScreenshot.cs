@@ -11,11 +11,6 @@ namespace landerist_library.Downloaders.Puppeteer
     {
         public static async Task<byte[]?> TakeScreenshot(IPage browserPage, Pages.Page page)
         {
-            if (!Config.TAKE_SCREENSHOT)
-            {
-                return null;
-            }
-
             ScreenshotOptions screenshotOptions = new()
             {
                 Type = Config.SCREENSHOT_TYPE,
