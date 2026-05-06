@@ -18,7 +18,7 @@ namespace landerist_library.Parse.PageTypeParser
             GetPageType()
         {
 
-            var isProduction = Configuration.Config.IsConfigurationProduction();            
+            var isProduction = Configuration.Config.IsConfigurationProduction();
             //var isProduction = true;
 
             if (Page.HttpStatusCode is null)
@@ -108,6 +108,11 @@ namespace landerist_library.Parse.PageTypeParser
                 GlobalStatistics.InsertDailyCounter(StatisticsKey.ListingParserInputIsAnotherListingInHost);
                 HostStatistics.InsertDailyCounter(Page.Host, HostStatisticsKey.ListingParserInputIsAnotherListingInHost);
                 return (PageType.ResponseBodyRepeatedInHost, null, false);
+            }
+
+            if (!Page.Website.ApplySpecialRules) // todo: remove this condition after special rules are applied to all websites
+            {
+                return (Page.PageType, null, false);
             }
 
             if (Tokenizer.TooManyTokens(Page))
