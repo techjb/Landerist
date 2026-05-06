@@ -583,7 +583,7 @@ namespace landerist_library.Database
             return GetListing(guid, false, false);
         }
 
-        private static Listing? GetListing(string guid, bool loadMedia, bool loadSources)
+        public static Listing? GetListing(string guid, bool loadMedia, bool loadSources)
         {
             string query =
                 "SELECT * " +
