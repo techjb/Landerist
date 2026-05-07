@@ -28,14 +28,9 @@ namespace landerist_library.Landerist_com
             {
                 Charts.Clear();
 
-                Websites();
-                Pages();
-                Listings();
                 ProcessedPages();
                 UpdatedPages();
-                NeedUpdate();
                 NextUpdateDistribution();
-                UnknownPageType();
                 //UpdatedHttpStatusCodeNull();
                 //UpdatedHttpStatusCode200();
                 //UpdatedHttpStatusCodeErrors();
@@ -46,7 +41,6 @@ namespace landerist_library.Landerist_com
                 EtagHasNotChanged();
                 ListingParserInputAlreadyParsed();
                 ListingParserInputIsAnotherListingInHost();
-                WaitingAIRequest();
                 BatchReaded();
                 LocalAIParsing();
                 ListingInsertUpdate();
@@ -67,45 +61,15 @@ namespace landerist_library.Landerist_com
             }
         }
 
-        private static void Listings()
-        {
-            List<StatisticsKey> statisticsKeys =
-            [
-                StatisticsKey.PublishedListings,
-                StatisticsKey.UnpublishedListings,
-            ];
-            AreaChart("Listings", statisticsKeys, false);
-        }
-
-        private static void Websites()
-        {
-            AreaChart("Websites", StatisticsKey.Websites, false);
-        }
-
-        private static void Pages()
-        {
-            AreaChart("Pages", StatisticsKey.Pages, false);
-        }
-
         private static void UpdatedPages()
         {
             BarChart("Updated Pages", StatisticsKey.UpdatedPages, false);
-        }
-
-        private static void NeedUpdate()
-        {
-            AreaChart("Need Update", StatisticsKey.NeedUpdate, true);
         }
 
         private static void NextUpdateDistribution()
         {
             var dictionary = landerist_library.Pages.Pages.GroupByNextUpdate();
             BarChart("Next Update Distribution", "nextupdate", dictionary);
-        }
-
-        private static void UnknownPageType()
-        {
-            BarChart("Unknown PageType", StatisticsKey.UnknownPageType, true);
         }
 
         //private static void UpdatedHttpStatusCodeNull()
@@ -149,11 +113,6 @@ namespace landerist_library.Landerist_com
                 StatisticsKey.ScrapedCrashed,
             ];
             BarChart("Scraper Success/Chrash", statisticsKeys, false);
-        }
-
-        private static void WaitingAIRequest()
-        {
-            AreaChart("Waiting AI Request", StatisticsKey.WaitingAIRequest, false);
         }
 
         private static void BatchReaded()
@@ -417,10 +376,55 @@ namespace landerist_library.Landerist_com
         {
             var statisticsTemplate = File.ReadAllText(StatisticsTemplateHtmlFile);
             var charts = string.Join("; " + Environment.NewLine, Charts);
+            statisticsTemplate = statisticsTemplate.Replace("/*SUMMARY_TABLE*/", GetSummaryTable());
             statisticsTemplate = statisticsTemplate.Replace("/*CHARTS*/", charts);
 
             File.WriteAllText(StatisticsHtmlFile, statisticsTemplate);
             return new S3().UploadToWebsiteBucket(StatisticsHtmlFile, "index.html", "statistics");
+        }
+
+        private static string GetSummaryTable()
+        {
+            List<(string Label, StatisticsKey Key)> rows =
+            [
+                ("Websites", StatisticsKey.Websites),
+                ("Pages", StatisticsKey.Pages),
+                ("Unknown Page Type", StatisticsKey.UnknownPageType),
+                ("Need Update", StatisticsKey.NeedUpdate),
+                ("Waiting AI Request", StatisticsKey.WaitingAIRequest),
+                ("Listings", StatisticsKey.Listings),
+                ("Published Listings", StatisticsKey.PublishedListings),
+                ("Unpublished Listings", StatisticsKey.UnpublishedListings),
+            ];
+
+            var tableRows = string.Join(
+                Environment.NewLine,
+                rows.Select(row =>
+                    "                        <tr>" + Environment.NewLine +
+                    $"                            <td>{row.Label}</td>" + Environment.NewLine +
+                    $"                            <td>{GetLatestCounter(row.Key).ToString("N0", CultureInfo.InvariantCulture)}</td>" + Environment.NewLine +
+                    "                        </tr>"));
+
+            return
+                "                <table>" + Environment.NewLine +
+                "                    <thead>" + Environment.NewLine +
+                "                        <tr>" + Environment.NewLine +
+                "                            <th>Data Type</th>" + Environment.NewLine +
+                "                            <th>Value</th>" + Environment.NewLine +
+                "                        </tr>" + Environment.NewLine +
+                "                    </thead>" + Environment.NewLine +
+                "                    <tbody>" + Environment.NewLine +
+                tableRows + Environment.NewLine +
+                "                    </tbody>" + Environment.NewLine +
+                "                </table>";
+        }
+
+        private static int GetLatestCounter(StatisticsKey statisticsKey)
+        {
+            var dataTable = GlobalStatistics.GetLatestStatistics(statisticsKey.ToString(), 1);
+            return dataTable.Rows.Count == 0
+                ? 0
+                : Convert.ToInt32(dataTable.Rows[0]["Counter"]);
         }
     }
 }
