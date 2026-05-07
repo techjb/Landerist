@@ -138,7 +138,7 @@ namespace landerist_library.Pages
                 return ListingParserInput;
             }
 
-            ListingParserInput = Website.ApplySpecialRules ?
+            ListingParserInput = Website.ApplySpecialRules || Config.IsConfigurationLocal() ?
                 Parse.ListingParser.UserInput.ParseListingUserInput.GetHtml(this) :
                 Parse.ListingParser.UserInput.ParseListingUserInput.GetText(this);
 

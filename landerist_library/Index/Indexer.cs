@@ -36,11 +36,7 @@ namespace landerist_library.Index
                 return;
             }
 
-            if (!Page.Website.HtmlIndexingEnabled)
-            {
-                return;
-            }
-
+           
             if (Page.Website.AchievedMaxNumberOfPages())
             {
                 return;
@@ -49,6 +45,11 @@ namespace landerist_library.Index
             if (!string.IsNullOrEmpty(Page.RedirectUrl))
             {
                 Insert(Page.RedirectUrl);
+                return;
+            }
+
+            if (!Page.Website.HtmlIndexingEnabled)
+            {
                 return;
             }
 
@@ -186,12 +187,7 @@ namespace landerist_library.Index
             if (website.MainUri.Equals(uri))
             {
                 return false;
-            }
-
-            if (website.AchievedMaxNumberOfPages())
-            {
-                return false;
-            }
+            }          
 
             bool inserted = Pages.Pages.Insert(website, uri);
             Processed.Add(uri);

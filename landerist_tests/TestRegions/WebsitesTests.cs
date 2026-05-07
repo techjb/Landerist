@@ -42,12 +42,12 @@ namespace landerist_tests
             //WebsitesCleanner.DeletePagesDiscardedByIndexUrlRegex("www.engelvoelkers.com");
 
 
-            //string mainUri = "https://www.remax.es/";
-            //string hostUri = "www.remax.es";
-            //string listingUrlRegex = @"^https:\/\/www\.remax\.es\/buscador-de-inmuebles\/(?:venta|alquiler)\/[^\/]+\/[^\/]+\/[^\/]+\/[^\/]+\/[^\/]+\/$";
+            //string mainUri = "https://www.redpiso.es/";
+            //string hostUri = "www.redpiso.es";
+            //string listingUrlRegex = @"^https:\/\/www\.redpiso\.es\/inmueble\/(?:[a-z0-9][a-z0-9.-]*-)?[Rr][Pp]\d+\/?$";
             //string indexUrlRegex = listingUrlRegex;
-            //string sitemapUrlRegex = @"^https:\/\/www\.remax\.es\/(?:sitemap-general\.xml|sitemaps\/sitemap-fichas-[va].*\.xml)$";
-            //string allowebResourceTypes = "Unknown,Beacon,Document,TextTrack,Xhr,Fetch,EventSource,WebSocket,Manifest,Ping,Other";
+            //string sitemapUrlRegex = @"^https:\/\/www\.redpiso\.es\/sitemaps\/properties-\d+\.xml$";
+            //string allowebResourceTypes = "Unknown,Beacon,Document,StyleSheet,Script,TextTrack,Xhr,Fetch,EventSource,WebSocket,Manifest,Ping,Other";
 
             //WebsitesInserter.InsertSpecialWebsite(mainUri, hostUri, listingUrlRegex, indexUrlRegex, sitemapUrlRegex, allowebResourceTypes);
 
