@@ -19,6 +19,8 @@ namespace landerist_library.Pages
 
         public DateTime? Updated { get; set; }
 
+        public DateTime? LastSuccessfulDownload { get; set; }
+
         public DateTime? NextUpdate { get; set; }
 
         public short? HttpStatusCode { get; set; }

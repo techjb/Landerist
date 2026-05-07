@@ -132,6 +132,7 @@ namespace landerist_library.Pages
                     "INSERTED.[UriHash], " +
                     "INSERTED.[Inserted], " +
                     "INSERTED.[Updated], " +
+                    "INSERTED.[LastSuccessfulDownload], " +
                     "INSERTED.[NextUpdate], " +
                     "INSERTED.[HttpStatusCode], " +
                     "INSERTED.[Etag], " +
@@ -344,6 +345,7 @@ namespace landerist_library.Pages
                 pagesTableName + ".[UriHash], " +
                 pagesTableName + ".[Inserted], " +
                 pagesTableName + ".[Updated], " +
+                pagesTableName + ".[LastSuccessfulDownload], " +
                 pagesTableName + ".[NextUpdate], " +
                 pagesTableName + ".[HttpStatusCode], " +
                 pagesTableName + ".[Etag], " +
@@ -810,6 +812,7 @@ namespace landerist_library.Pages
                 "[UriHash], " +
                 "[Inserted], " +
                 "[Updated], " +
+                "[LastSuccessfulDownload], " +
                 "[NextUpdate], " +
                 "[HttpStatusCode], " +
                 "[Etag], " +

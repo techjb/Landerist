@@ -14,6 +14,9 @@ namespace landerist_library.Pages
             UriHash = dataRow["UriHash"].ToString()!;
             Inserted = (DateTime)dataRow["Inserted"];
             Updated = dataRow["Updated"] is DBNull ? null : (DateTime)dataRow["Updated"];
+            LastSuccessfulDownload = dataRow.Table.Columns.Contains("LastSuccessfulDownload") && dataRow["LastSuccessfulDownload"] is not DBNull
+                ? (DateTime)dataRow["LastSuccessfulDownload"]
+                : null;
             NextUpdate = dataRow["NextUpdate"] is DBNull ? null : (DateTime)dataRow["NextUpdate"];
             HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
             Etag = dataRow.Table.Columns.Contains("Etag") && dataRow["Etag"] is not DBNull
@@ -57,10 +60,10 @@ namespace landerist_library.Pages
         {
             string query =
                 "INSERT INTO " + Pages.PAGES + " (" +
-                "[Host], [Uri], [UriHash], [Inserted], [Updated], [NextUpdate], [HttpStatusCode], [Etag], [PageType], " +
+                "[Host], [Uri], [UriHash], [Inserted], [Updated], [LastSuccessfulDownload], [NextUpdate], [HttpStatusCode], [Etag], [PageType], " +
                 "[PageTypeCounter], [ListingStatus], [LockedBy], [WaitingStatus], [ListingParserInputHash], " +
                 "[ListingParserInputNotChangedCounter], [TransientErrorCounter], [ResponseBodyZipped], [TokenCount]) " +
-                "VALUES(@Host, @Uri, @UriHash, @Inserted, @Updated, @NextUpdate, @HttpStatusCode, @Etag, @PageType, " +
+                "VALUES(@Host, @Uri, @UriHash, @Inserted, @Updated, @LastSuccessfulDownload, @NextUpdate, @HttpStatusCode, @Etag, @PageType, " +
                 "@PageTypeCounter, @ListingStatus, @LockedBy, @WaitingStatus, @ListingParserInputHash, " +
                 "@ListingParserInputNotChangedCounter, @TransientErrorCounter, CONVERT(varbinary(max), @ResponseBodyZipped), @TokenCount)";
 
@@ -70,6 +73,7 @@ namespace landerist_library.Pages
                 {"UriHash", UriHash },
                 {"Inserted", DateTime.Now },
                 {"Updated", null },
+                {"LastSuccessfulDownload", null },
                 {"NextUpdate", null },
                 {"HttpStatusCode", null },
                 {"Etag", null },
@@ -106,6 +110,7 @@ namespace landerist_library.Pages
             string query =
                 "UPDATE " + Pages.PAGES + " SET " +
                 "[Updated] = @Updated, " +
+                "[LastSuccessfulDownload] = @LastSuccessfulDownload, " +
                 "[NextUpdate] = @NextUpdate, " +
                 "[HttpStatusCode] = @HttpStatusCode, " +
                 "[Etag] = @Etag, " +
@@ -123,6 +128,7 @@ namespace landerist_library.Pages
 
             var sucess = new DataBase().Query(query, new Dictionary<string, object?> {
                 {"Updated", Updated },
+                {"LastSuccessfulDownload", LastSuccessfulDownload },
                 {"NextUpdate", NextUpdate },
                 {"HttpStatusCode", HttpStatusCode},
                 {"Etag", Etag},

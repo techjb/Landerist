@@ -32,6 +32,8 @@ namespace landerist_library.Scrape
                 return false;
             }
 
+            _page.LastSuccessfulDownload = DateTime.Now;
+
             (var newPageType, var newListing, var waitingAIRequest) = new PageTypeParser(_page).GetPageType();
             var success = ApplyClassificationResultAfterDownload(newPageType, newListing, waitingAIRequest);
 
