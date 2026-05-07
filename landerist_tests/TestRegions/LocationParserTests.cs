@@ -1,10 +1,12 @@
+using landerist_library.Websites;
+
 namespace landerist_tests
 {
     internal static class LocationParserTests
     {
         public static void Run()
         {
-            //var tuple1 = landerist_library.GetLatLng.Location.GoogleMaps.AddressToLatLng.GetLatLng("Av. Domingo Bueno, 126. O Porriño, 36.400 Pontevedra", CountryCode.ES);
+            //var tuple1 = new landerist_library.Parse.Location.GoogleMaps.GoogleMapsApi().GetLatLng("Av. Domingo Bueno, 126. O Porriño, 36.400 Pontevedra", CountryCode.ES);
             //Console.WriteLine(tuple1);
 
             //var tuple1 = landerist_library.GetLatLng.Location.Goolzoom.CadastralRefToLatLng.GetLatLng("9441515XM7094A0001FT");

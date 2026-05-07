@@ -188,8 +188,10 @@ namespace landerist_library.Parse.Location
                     else
                     {
                         longitude = latOrLng;
-                        AddLatLng((double)latitude, (double)longitude, false);
-                        return true;
+                        if (AddLatLng((double)latitude, (double)longitude, false))
+                        {
+                            return true;
+                        }
                     }
                 }
             }

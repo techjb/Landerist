@@ -24,7 +24,7 @@ namespace landerist_library.Parse.Location.GoogleMaps
             var normalizedAddress = address.Trim();
             var region = GetRegion(countryCode);
 
-            if (AddressLatLng.Select(normalizedAddress, region) is (double lat, double lng, bool isAccurate)
+            if (AddressLatLng.Select(normalizedAddress, region) is (double lat, double lng, bool isAccurate) 
                 //&& Config.IsConfigurationProduction()
                 )
             {
@@ -42,9 +42,14 @@ namespace landerist_library.Parse.Location.GoogleMaps
                 {
                     var geocodeData = JsonConvert.DeserializeObject<GeocodeData>(content);
                     var results = geocodeData?.results;
-                    if (results != null && results.Length > 0)
+                    if (IsOk(geocodeData) && results != null && results.Length > 0)
                     {
-                        var selectedResult = results.FirstOrDefault(IsAccurate) ?? results[0];
+                        var usableResults = results.Where(result => IsUsable(result, countryCode));
+                        var selectedResult = usableResults.FirstOrDefault(IsAccurate) ?? usableResults.FirstOrDefault();
+                        if (selectedResult == null)
+                        {
+                            return null;
+                        }
                         var parsedCoordinates = GetLatLng(selectedResult);
                         if (parsedCoordinates.HasValue)
                         {
@@ -68,9 +73,19 @@ namespace landerist_library.Parse.Location.GoogleMaps
         private string GetUrl(string address, CountryCode countryCode) => "https://maps.googleapis.com/maps/api/geocode/json?" +
             "address=" + Uri.EscapeDataString(address) +
             "&region=" + GetRegion(countryCode) +
+            GetComponents(countryCode) +
             //"&extra_computations=BUILDING_AND_ENTRANCES" +
             //"&extra_computations=GROUNDS" +
             "&key=" + PrivateConfig.GOOGLE_CLOUD_LANDERIST_API_KEY;
+
+        private static string GetComponents(CountryCode countryCode)
+        {
+            return countryCode switch
+            {
+                CountryCode.ES => "&components=country:ES",
+                _ => string.Empty,
+            };
+        }
 
         private (Tuple<double, double> latLng, bool isAccurate)? GetLatLng(Result result)
         {
@@ -83,6 +98,38 @@ namespace landerist_library.Parse.Location.GoogleMaps
             }
 
             return resultLatLng;
+        }
+
+        private static bool IsOk(GeocodeData? geocodeData)
+        {
+            return string.Equals(geocodeData?.status, "OK", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsUsable(Result result, CountryCode countryCode)
+        {
+            return result != null &&
+                   result.partial_match != true &&
+                   result.geometry?.location?.lat != null &&
+                   result.geometry.location.lng != null &&
+                   IsExpectedCountry(result, countryCode);
+        }
+
+        private static bool IsExpectedCountry(Result result, CountryCode countryCode)
+        {
+            var expectedCountryCode = countryCode switch
+            {
+                CountryCode.ES => "ES",
+                _ => null,
+            };
+
+            if (expectedCountryCode == null)
+            {
+                return true;
+            }
+
+            return result.address_components?.Any(component =>
+                component.types?.Contains("country") == true &&
+                string.Equals(component.short_name, expectedCountryCode, StringComparison.OrdinalIgnoreCase)) == true;
         }
 
         private static bool IsAccurate(Result result)
