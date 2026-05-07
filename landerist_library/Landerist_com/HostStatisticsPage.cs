@@ -74,6 +74,9 @@ namespace landerist_library.Landerist_com
             {
                 MainUri = website.MainUri.AbsoluteUri,
                 UpdatedAt = HostStatistics.GetLatestDate(website.Host)?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+                RobotsTxtUpdated = FormatWebsiteDate(website.RobotsTxtUpdated),
+                SitemapUpdated = FormatWebsiteDate(website.SitemapUpdated),
+                IpAddressUpdated = FormatWebsiteDate(website.IpAddressUpdated),
                 Summary = new HostStatisticsSummary
                 {
                     TotalPages = website.GetNumPages(),
@@ -99,6 +102,11 @@ namespace landerist_library.Landerist_com
                     PublishedListingsByPropertyType = GetDistribution(HostStatistics.GetPublishedListingsByPropertyType(website.Host), "PropertyType"),
                 }
             };
+        }
+
+        private static string? FormatWebsiteDate(DateTime? dateTime)
+        {
+            return dateTime?.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
         }
 
         private static List<ChartSeriesModel> GetTimeSeries(string host, HostStatisticsKey key, string label)
@@ -204,6 +212,9 @@ namespace landerist_library.Landerist_com
         {
             public required string MainUri { get; init; }
             public string? UpdatedAt { get; init; }
+            public string? RobotsTxtUpdated { get; init; }
+            public string? SitemapUpdated { get; init; }
+            public string? IpAddressUpdated { get; init; }
             public required HostStatisticsSummary Summary { get; init; }
             public required HostStatisticsCharts Charts { get; init; }
         }

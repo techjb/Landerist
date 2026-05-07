@@ -22,6 +22,8 @@ namespace landerist_library.Landerist_com
 
         private static readonly List<string> Charts = [];
 
+        private static readonly CultureInfo SummaryCulture = CultureInfo.GetCultureInfo("es-ES");
+
         public static void UpdateCharts()
         {
             try
@@ -402,7 +404,7 @@ namespace landerist_library.Landerist_com
                 rows.Select(row =>
                     "                        <tr>" + Environment.NewLine +
                     $"                            <td>{row.Label}</td>" + Environment.NewLine +
-                    $"                            <td>{GetLatestCounter(row.Key).ToString("N0", CultureInfo.InvariantCulture)}</td>" + Environment.NewLine +
+                    $"                            <td>{GetLatestCounter(row.Key).ToString("N0", SummaryCulture)}</td>" + Environment.NewLine +
                     "                        </tr>"));
 
             return

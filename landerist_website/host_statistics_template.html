@@ -35,10 +35,15 @@
         <div class="section">
             <div class="form-group">
                 <select id="HostSelect" class="form-input" title="Select a host">
+                    <option value="" selected>Select a host</option>
                     /*HOST_OPTIONS*/
                 </select>
             </div>
+            <div id="WebsiteSummary" class="table-wrapper"></div>
             <div id="HostSummary" class="table-wrapper"></div>
+        </div>
+
+        <div class="section">
             <div id="Statistics" class="chart-grid"></div>
         </div>
 
@@ -121,6 +126,9 @@ const palette = [
             return {
                 mainUri: GetObjectProperty(hostData, 'mainUri', 'MainUri'),
                 updatedAt: GetObjectProperty(hostData, 'updatedAt', 'UpdatedAt'),
+                robotsTxtUpdated: GetObjectProperty(hostData, 'robotsTxtUpdated', 'RobotsTxtUpdated'),
+                sitemapUpdated: GetObjectProperty(hostData, 'sitemapUpdated', 'SitemapUpdated'),
+                ipAddressUpdated: GetObjectProperty(hostData, 'ipAddressUpdated', 'IpAddressUpdated'),
                 summary: NormalizeSummary(GetObjectProperty(hostData, 'summary', 'Summary') || {}),
                 charts: NormalizeCharts(GetObjectProperty(hostData, 'charts', 'Charts') || {})
             };
@@ -267,7 +275,7 @@ const palette = [
         }
 
         function FormatNumber(value) {
-            return Number(value || 0).toLocaleString('en-US');
+            return Number(value || 0).toLocaleString('es-ES');
         }
 
         function FormatPercentage(value, total) {
@@ -279,10 +287,37 @@ const palette = [
         }
 
         function RenderEmptyState(message) {
+            document.getElementById('WebsiteSummary').innerHTML = '';
             document.getElementById('HostSummary').innerHTML = '';
 
             const container = document.getElementById('Statistics');
             container.innerHTML = `<div class="empty-state">${message}</div>`;
+        }
+
+        function RenderWebsiteSummary(hostData) {
+            const rows = [
+                { label: 'RobotsTxt Updated', value: hostData.robotsTxtUpdated || '' },
+                { label: 'Sitemap Updated', value: hostData.sitemapUpdated || '' },
+                { label: 'IP Address Updated', value: hostData.ipAddressUpdated || '' }
+            ];
+
+            document.getElementById('WebsiteSummary').innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Website Data</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rows.map(row => `
+                            <tr>
+                                <td>${row.label}</td>
+                                <td>${row.value}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>`;
         }
 
         function RenderHostSummary(hostData) {
@@ -331,6 +366,7 @@ const palette = [
             }
 
             const hostData = NormalizeHostData(rawHostData);
+            RenderWebsiteSummary(hostData);
             RenderHostSummary(hostData);
 
             const chartDefinitions = [
@@ -364,28 +400,33 @@ const palette = [
         }
 
         function GetInitialHost() {
-            const hosts = Object.keys(hostStatisticsData);
-            if (hosts.length === 0) {
-                return '';
-            }
-
             const hash = decodeURIComponent(window.location.hash.replace(/^#/, ''));
-            return hostStatisticsData[hash] ? hash : hosts[0];
+            return hostStatisticsData[hash] ? hash : '';
         }
 
         const hostSelect = document.getElementById('HostSelect');
         const initialHost = GetInitialHost();
+        const hasHosts = Object.keys(hostStatisticsData).length > 0;
 
         if (initialHost) {
             hostSelect.value = initialHost;
             RenderHost(initialHost);
             window.location.hash = encodeURIComponent(initialHost);
+        } else if (hasHosts) {
+            hostSelect.value = '';
+            RenderEmptyState('Select a host to view statistics.');
         } else {
             RenderEmptyState('No hosts with special rules are available.');
         }
 
         hostSelect.addEventListener('change', event => {
             const host = event.target.value;
+            if (!host) {
+                RenderEmptyState('Select a host to view statistics.');
+                history.replaceState(null, '', window.location.pathname);
+                return;
+            }
+
             RenderHost(host);
             window.location.hash = encodeURIComponent(host);
         });</script>
