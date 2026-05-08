@@ -26,6 +26,7 @@ namespace landerist_library.Tasks
 
         private const int OneSecond = 1000;
         private const int TwoSeconds = 2000;
+        private const int ThreeSeconds = 3000;
         private const int TenSeconds = 10 * OneSecond;
         private const int OneMinute = 60 * OneSecond;
         private const int TenMinutes = 10 * OneMinute;
@@ -66,8 +67,8 @@ namespace landerist_library.Tasks
 
             PuppeteerDownloader.UpdateChrome();
 
-            Timer1 = new Timer(Scrape, null, OneSecond, TenSeconds);
-            Timer2 = new Timer(BlockingCollection, null, OneSecond, OneSecond);
+            Timer1 = new Timer(Scrape, null, OneSecond, ThreeSeconds);
+            //Timer2 = new Timer(BlockingCollection, null, OneSecond, OneSecond);
 
             if (Configuration.Config.IsPrincipalMachine())
             {
