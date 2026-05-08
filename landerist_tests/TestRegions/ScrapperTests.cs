@@ -16,7 +16,7 @@ namespace landerist_tests
             //new Scraper().ProcessPages();
             //new Scraper().Scrape(page, false);
 
-            //new landerist_library.Scrape.Scraper().Scrape("https://www.redpiso.es/inmueble/piso-en-venta-en-calle-marques-de-mondejar-fuente-del-berro-salamanca-madrid-madrid-rp1242024123749", false);
+            //new landerist_library.Scrape.Scraper().Scrape("https://www.redpiso.es/inmueble/piso-en-venta-en-aluche-latina-madrid-rp272026150678", false);
             //new Scraper().TestSinglePage();
             //landerist_library.Scrape.PageSelector.SelectTop1();
             //Console.WriteLine("Block: " + WebsitesThrottle.Block(page.Website));

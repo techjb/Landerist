@@ -17,6 +17,11 @@ namespace landerist_library.Pages
                 return false;
             }
 
+            if (_page.IsDiscardedByListingUrlRegex())
+            {
+                return true;
+            }
+
             if (_page.IsListing() || _page.IsMayBeListing())
             {
                 return false;
@@ -43,8 +48,7 @@ namespace landerist_library.Pages
         private bool IsStrongUnpublishEvidence()
         {
             return _page.IsHttpStatusCodeNotFound() 
-                || _page.IsHttpStatusCodeGone() 
-                || _page.IsDiscardedByListingUrlRegex();
+                || _page.IsHttpStatusCodeGone();
         }
 
         private int GetRequiredCounter()
