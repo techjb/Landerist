@@ -18,7 +18,7 @@ namespace landerist_tests
             //new Scraper().Start();
             //new Scraper().Scrape(page, false);
 
-            //new landerist_library.Scrape.Scraper().Scrape("https://www.redpiso.es/inmueble/piso-en-venta-en-aluche-latina-madrid-rp272026150678", false);
+            //new landerist_library.Scrape.Scraper().Scrape("https://www.alisedainmobiliaria.com/inmueble/48151786", false);
             //new Scraper().TestSinglePage();
             //landerist_library.Scrape.PageSelector.SelectTop1();
             //Console.WriteLine("Block: " + WebsitesThrottle.Block(page.Website));

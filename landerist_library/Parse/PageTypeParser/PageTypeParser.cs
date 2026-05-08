@@ -36,7 +36,7 @@ namespace landerist_library.Parse.PageTypeParser
                 return (PageType.RedirectToAnotherUrl, null, false);
             }
 
-            if (Page.PageType.HasValue && Page.EtagHasNotChanged())
+            if (Page.PageType.HasValue && Page.EtagHasNotChanged() && isProduction)
             {
                 GlobalStatistics.InsertDailyCounter(StatisticsKey.EtagHasNotChanged);
                 return (Page.PageType, null, false);
@@ -110,7 +110,7 @@ namespace landerist_library.Parse.PageTypeParser
                 return (PageType.ResponseBodyRepeatedInHost, null, false);
             }
 
-            if (!Page.Website.ApplySpecialRules) // todo: remove this condition after special rules are applied to all websites
+            if (!Page.Website.ApplySpecialRules && isProduction)
             {
                 return (Page.PageType, null, false);
             }

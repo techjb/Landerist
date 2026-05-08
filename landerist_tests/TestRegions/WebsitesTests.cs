@@ -42,8 +42,8 @@ namespace landerist_tests
             //WebsitesCleanner.DeletePagesDiscardedByIndexUrlRegex("www.engelvoelkers.com");
 
 
+            //string hostUri = "www.alisedainmobiliaria.com";
             //string mainUri = "https://www.redpiso.es/";
-            //string hostUri = "www.redpiso.es";
             //string listingUrlRegex = @"^https:\/\/www\.redpiso\.es\/inmueble\/(?:[a-z0-9][a-z0-9.-]*-)?[Rr][Pp]\d+\/?$";
             //string indexUrlRegex = listingUrlRegex;
             //string sitemapUrlRegex = @"^https:\/\/www\.redpiso\.es\/sitemaps\/properties-\d+\.xml$";

@@ -4,8 +4,6 @@ using landerist_library.Pages;
 using landerist_library.Parse.ListingParser;
 using landerist_library.Scrape;
 using landerist_library.Statistics;
-using landerist_orels.ES;
-using SharpToken;
 using System.Collections.Concurrent;
 
 namespace landerist_library.Tasks
@@ -100,9 +98,9 @@ namespace landerist_library.Tasks
                             Log.WriteLocalAI(
                                 "ProcessPages",
                                 $"Processed: {totalProcessed} " +
-                                $"Errors: {totalErrorPercentage}% " +
-                                $"Listing: {totalListingPercentage}% " +
-                                $"NotListing: {totalNotListingByParserPercentage}%");
+                                $"Errors: {totalErrors} ({totalErrorPercentage}%) " +
+                                $"Listing: {totalListing} ({totalListingPercentage}%) " +
+                                $"NotListing: {totalNotListingByParser} ({totalNotListingByParserPercentage}%)");
                         }
                     });
             }
@@ -203,6 +201,17 @@ namespace landerist_library.Tasks
                     Interlocked.Increment(ref TotalNotListingByParser);
                     break;
             }
+        }
+
+        public void ProcessPage(string uriHash)
+        {
+            var page = Pages.Pages.GetPage(uriHash);
+            if (page == null)
+            {
+                Log.WriteError("TaskLocalAIParsing ProcessPage", "Page not found. UriHash: " + uriHash);
+                return;
+            }
+            ProcessPage(page);
         }
 
         private (bool Success, PageType? PageType) ProcessPage(Page page)

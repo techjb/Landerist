@@ -11,9 +11,10 @@ namespace landerist_tests
             //landerist_library.Parse.ListingParser.LocalAI.LocalAIRequest.PrintOutputSchema();
             //Console.WriteLine(ParseListingSystem.GetSystemPrompt());
             //new landerist_library.Tasks.TaskLocalAIParsing();
-            //new TaskLocalAIParsing().ProcessPages();
+            //new landerist_library.Tasks.TaskLocalAIParsing().ProcessPages();
+            //new landerist_library.Tasks.TaskLocalAIParsing().ProcessPage("7774C6909BA2A4BD285089AFEA09D37B9CD0F0E580F7629069F1A17006F69BA3");
 
-            
+
 
         }
     }
