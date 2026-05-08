@@ -1,3 +1,5 @@
+using landerist_library.Scrape;
+
 namespace landerist_tests
 {
     internal static class ScrapperTests
@@ -13,7 +15,7 @@ namespace landerist_tests
             //new Scraper().ScrapeUnknowPageType(website);
             //new Scraper().ScrapeAllPages();
             //new Scraper().ScrapeResponseBodyRepeatedInListings();
-            //new Scraper().ProcessPages();
+            new Scraper().Start();
             //new Scraper().Scrape(page, false);
 
             //new landerist_library.Scrape.Scraper().Scrape("https://www.redpiso.es/inmueble/piso-en-venta-en-aluche-latina-madrid-rp272026150678", false);

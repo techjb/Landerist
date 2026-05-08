@@ -24,9 +24,15 @@ namespace landerist_library.Scrape
 
         private static void SelectPages()
         {
-            AddUnknownPageType();
-            AddNextUpdate();
+            AddScrapePages();
             //AddRecentlyUnpublishedListingsPages();
+        }
+
+        private static void AddScrapePages()
+        {
+            var topRows = GetTopRows();
+            var pages = landerist_library.Pages.Pages.GetScrapePages(topRows);
+            AddPages(pages);
         }
 
         private static void AddUnknownPageType()
@@ -87,6 +93,11 @@ namespace landerist_library.Scrape
 
         private static bool AddPage(Page page)
         {
+            if (Pages.Count(p => p.Website.Host.Equals(page.Website.Host)) >= Config.MAX_PAGES_PER_HOST_PER_SCRAPE)
+            {
+                return false;
+            }
+
             Pages.Add(page);
             return true;
         }
