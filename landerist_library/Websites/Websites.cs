@@ -232,13 +232,7 @@ namespace landerist_library.Websites
         {
             var websites = GetAll();
             SetRobotsTxt(websites);
-        }
-
-        public static void SetRobotsTxtToHttpStatusCodeOk()
-        {
-            var websites = GetStatusCodeOk();
-            SetRobotsTxt(websites);
-        }
+        }      
 
         private static void SetRobotsTxt(HashSet<Website> websites)
         {
@@ -450,18 +444,15 @@ namespace landerist_library.Websites
 
         private static HashSet<Website> GetNeedToUpdateRobotsTxt()
         {
-            DateTime robotsTxtUpdated = DateTime.Now.AddDays(-Config.DAYS_TO_UPDATE_ROBOTS_TXT);
             DateTime robotsTxtUpdatedSpecialRules = DateTime.Now.AddDays(-1);
 
             string query =
                 "SELECT * " +
                 "FROM " + WEBSITES + " " +
-                "WHERE [RobotsTxtUpdated] IS NULL " +
-                "OR ([ApplySpecialRules] = 1 AND [RobotsTxtUpdated] < @RobotsTxtUpdatedSpecialRules) " +
-                "OR (([ApplySpecialRules] = 0 OR [ApplySpecialRules] IS NULL) AND [RobotsTxtUpdated] < @RobotsTxtUpdated)";
+                "WHERE [ApplySpecialRules] = 1 AND " +
+                "([RobotsTxtUpdated] IS NULL OR [RobotsTxtUpdated] < @RobotsTxtUpdatedSpecialRules)";
 
             var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"RobotsTxtUpdated", robotsTxtUpdated },
                 {"RobotsTxtUpdatedSpecialRules", robotsTxtUpdatedSpecialRules },
             });
 
@@ -499,18 +490,15 @@ namespace landerist_library.Websites
 
         private static HashSet<Website> GetNeedToUpdateSitemaps()
         {
-            DateTime sitemapUpdated = DateTime.Now.AddDays(-Config.DAYS_TO_UPDATE_SITEMAP);
             DateTime sitemapUpdatedSpecialRules = DateTime.Now.AddDays(-1);
 
             string query =
                 "SELECT * " +
                 "FROM " + WEBSITES + " " +
-                "WHERE [SitemapUpdated] IS NULL " +
-                "OR ([ApplySpecialRules] = 1 AND [SitemapUpdated] < @SitemapUpdatedSpecialRules) " +
-                "OR (([ApplySpecialRules] = 0 OR [ApplySpecialRules] IS NULL) AND [SitemapUpdated] < @SitemapUpdated)";
+                "WHERE [ApplySpecialRules] = 1 AND " +
+                "([SitemapUpdated] IS NULL OR [SitemapUpdated] < @SitemapUpdatedSpecialRules)";
 
             var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"SitemapUpdated", sitemapUpdated },
                 {"SitemapUpdatedSpecialRules", sitemapUpdatedSpecialRules },
             });
 
@@ -554,7 +542,8 @@ namespace landerist_library.Websites
             string query =
                 "SELECT * " +
                 "FROM " + WEBSITES + " " +
-                "WHERE [IpAddressUpdated] < @IpAddressUpdated OR [IpAddressUpdated] IS NULL";
+                "WHERE [ApplySpecialRules] = 1 AND " +
+                "([IpAddressUpdated] < @IpAddressUpdated OR [IpAddressUpdated] IS NULL)";
 
             var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"IpAddressUpdated", ipAddressUpdated },
