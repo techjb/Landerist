@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "5.20";
+        public static readonly string VERSION = "5.21";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -235,7 +235,7 @@ namespace landerist_library.Configuration
             MAX_DEGREE_OF_PARALLELISM_SCRAPER = ConfigurationProduction ?
                 //Environment.ProcessorCount * 70 / 100 : // % of the processors
                 30 :
-                1;
+                1;                
 
             //MAX_DEGREE_OF_PARALLELISM_SCRAPER = 5;
 

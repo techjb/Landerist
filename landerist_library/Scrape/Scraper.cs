@@ -5,6 +5,7 @@ using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Pages;
 using landerist_library.Statistics;
 using landerist_library.Websites;
+using System.Collections.Concurrent;
 
 namespace landerist_library.Scrape
 {
@@ -16,6 +17,10 @@ namespace landerist_library.Scrape
             Crashed,
             Success
         }
+
+        private const int EstimatedMinimumScrapeSeconds = 2;
+
+        private const int MinimumHostThrottleSeconds = 3;
 
         private int Counter = 0;
 
@@ -118,13 +123,15 @@ namespace landerist_library.Scrape
             SkippedByBlockedWebsite = 0;
 
             ScraperLog.WriteStart(Counter);
+            _pageQueue = SpreadPagesByHost(_pageQueue);
 
             try
             {
-                Parallel.ForEach(_pageQueue,
+                var partitioner = Partitioner.Create(_pageQueue, EnumerablePartitionerOptions.NoBuffering);
+                Parallel.ForEach(partitioner,
                     new ParallelOptions()
                     {
-                        MaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
+                        MaxDegreeOfParallelism = GetMaxDegreeOfParallelism(_pageQueue),
                         CancellationToken = _cancellation.Token
                     },
                     (page, state) =>
@@ -149,6 +156,75 @@ namespace landerist_library.Scrape
             DownloadersPool.Clear();
             CromeKiller.KillChrome();
             return true;
+        }
+
+        private static List<Page> SpreadPagesByHost(List<Page> pages)
+        {
+            Dictionary<string, Queue<Page>> pagesByHost = [];
+            List<string> hosts = [];
+
+            foreach (var page in pages)
+            {
+                var host = page.Host;
+                if (!pagesByHost.TryGetValue(host, out var hostPages))
+                {
+                    hostPages = [];
+                    pagesByHost[host] = hostPages;
+                    hosts.Add(host);
+                }
+
+                hostPages.Enqueue(page);
+            }
+
+            List<Page> spreadPages = new(pages.Count);
+            while (spreadPages.Count < pages.Count)
+            {
+                foreach (var host in hosts)
+                {
+                    var hostPages = pagesByHost[host];
+                    if (hostPages.Count > 0)
+                    {
+                        spreadPages.Add(hostPages.Dequeue());
+                    }
+                }
+            }
+
+            return spreadPages;
+        }
+
+        private static int GetMaxDegreeOfParallelism(List<Page> pages)
+        {
+            if (Config.IsConfigurationLocal())
+            {
+                return 1;
+            }
+
+            var pageCount = pages.Count;
+            var configuredMaxDegreeOfParallelism = Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER;
+            var maxDegreeOfParallelism = configuredMaxDegreeOfParallelism < 1
+                ? pageCount
+                : Math.Min(configuredMaxDegreeOfParallelism, pageCount);
+            if (maxDegreeOfParallelism <= 1)
+            {
+                return 1;
+            }
+
+            HashSet<string> hosts = [];
+            foreach (var page in pages)
+            {
+                hosts.Add(page.Host);
+            }
+
+            var distinctHostCount = hosts.Count;
+            if (distinctHostCount == pageCount)
+            {
+                return maxDegreeOfParallelism;
+            }
+
+            var wavesBeforeSameHost = (int)Math.Ceiling((double)MinimumHostThrottleSeconds / EstimatedMinimumScrapeSeconds);
+            var hostLimitedMaxDegreeOfParallelism = Math.Max(1, distinctHostCount / wavesBeforeSameHost);
+
+            return Math.Min(maxDegreeOfParallelism, hostLimitedMaxDegreeOfParallelism);
         }
 
         private void ProcessThread(Page page)
