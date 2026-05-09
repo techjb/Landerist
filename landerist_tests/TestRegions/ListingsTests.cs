@@ -26,6 +26,7 @@ namespace landerist_tests
             //Console.WriteLine(json);
 
             //ListingsCleanner.UnpublishListingsWithoutPage();
+            //ListingsCleanner.UnpublishListingsByPageType("www.redpiso.es", landerist_library.Pages.PageType.NotIndexable);
         }
     }
 }
