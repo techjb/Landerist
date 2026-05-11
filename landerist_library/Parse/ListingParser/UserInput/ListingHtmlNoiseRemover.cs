@@ -51,7 +51,7 @@ namespace landerist_library.Parse.ListingParser.UserInput
             RemoveTags(htmlDocument);
             ListingHtmlNodeRemover.Remove(htmlDocument, NoiseIdXPath);
             ListingHtmlNodeRemover.Remove(htmlDocument, NoiseClassXPath);
-            ListingRecommendationSectionRemover.Remove(htmlDocument);
+            //ListingRecommendationSectionRemover.Remove(htmlDocument);
         }
 
         public static void RemoveTags(HtmlDocument htmlDocument)

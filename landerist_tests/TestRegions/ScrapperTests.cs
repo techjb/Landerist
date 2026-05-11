@@ -15,11 +15,11 @@ namespace landerist_tests
             //new Scraper().ScrapeUnknowPageType(website);
             //new Scraper().ScrapeAllPages();
             //new Scraper().ScrapeResponseBodyRepeatedInListings();
-            
+
             //new Scraper().Start();
             //new Scraper().Scrape(page, false);
 
-            //new landerist_library.Scrape.Scraper().Scrape("https://www.alisedainmobiliaria.com/inmueble/48151786", false);
+            //new landerist_library.Scrape.Scraper().Scrape("https://www.lucasfox.es/comprar-vivienda/espana/costa-blanca/alicante/albufereta/atico/ali53589.html", true);
             //new Scraper().TestSinglePage();
             //landerist_library.Scrape.PageSelector.SelectTop1();
             //Console.WriteLine("Block: " + WebsitesThrottle.Block(page.Website));
