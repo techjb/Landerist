@@ -90,7 +90,7 @@ namespace landerist_library.Pages
         public bool SetPageTypeAndNextScrape(PageType? pageType)
         {
             SetPageType(pageType);
-            SetNextScrape(DateTime.Now);
+            SetNextScrapeFromNow();
             return Update();
         }
 
@@ -153,6 +153,11 @@ namespace landerist_library.Pages
         {
             var calculationDate = LastScrape ?? Inserted;
             SetNextScrape(calculationDate);
+        }
+
+        public void SetNextScrapeFromNow()
+        {
+            SetNextScrape(DateTime.Now);
         }
 
         private void SetNextScrape(DateTime calculationDate)

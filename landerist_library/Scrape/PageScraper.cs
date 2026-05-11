@@ -67,8 +67,7 @@ namespace landerist_library.Scrape
             }
 
             UpdatePageTypeAndListing(pageType, null);
-            _page.SetLastScrape();
-            _page.SetNextScrape();
+            _page.SetNextScrapeFromNow();
             return _page.Update();
         }
 
