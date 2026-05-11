@@ -4,7 +4,7 @@ namespace landerist_tests
     {
         public static void Run()
         {
-            //landerist_library.Database.Backup.SetPageTypeAndNextUpdate();
+            //landerist_library.Database.Backup.SetPageTypeAndNextScrape();
             //Backup.DeleteRemoteOldBackups();
         }
     }

@@ -1,4 +1,4 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Configuration;
 using landerist_library.Pages;
 
 namespace landerist_library.Scrape
@@ -42,7 +42,7 @@ namespace landerist_library.Scrape
             AddPages(pages);
         }
 
-        private static void AddNextUpdate()
+        private static void AddNextScrape()
         {
             if (ScraperIsFull())
             {
@@ -50,7 +50,7 @@ namespace landerist_library.Scrape
             }
 
             var topRows = GetTopRows();
-            var pages = landerist_library.Pages.Pages.GetNextUpdate(topRows, false);
+            var pages = landerist_library.Pages.Pages.GetNextScrape(topRows, false);
             AddPages(pages);
         }
 

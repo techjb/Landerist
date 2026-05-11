@@ -81,15 +81,15 @@ namespace landerist_library.Pages
             return GetPages(topRows, where);
         }
 
-        public static List<Page> GetNextUpdate(int topRows, bool extendToFillTopRows)
+        public static List<Page> GetNextScrape(int topRows, bool extendToFillTopRows)
         {
-            string where = extendToFillTopRows ? string.Empty : "P.[NextUpdate] < GETDATE()";
+            string where = extendToFillTopRows ? string.Empty : "P.[NextScrape] < GETDATE()";
             return GetPages(topRows, where);
         }
 
-        public static List<Page> GetNextUpdateFuture(int topRows)
+        public static List<Page> GetNextScrapeFuture(int topRows)
         {
-            string where = "P.[NextUpdate] >= GETDATE()";
+            string where = "P.[NextScrape] >= GETDATE()";
             return GetPages(topRows, where);
         }
 
@@ -109,16 +109,16 @@ namespace landerist_library.Pages
                 "WITH CandidatePages AS (" +
                 "   SELECT " +
                 "       P.[UriHash], " +
-                "       P.[NextUpdate], " +
+                "       P.[NextScrape], " +
                 "       CASE WHEN P.[PageType] IS NULL THEN 0 ELSE 1 END AS SelectionPriority, " +
                 "       ROW_NUMBER() OVER (" +
                 "           PARTITION BY P.[Host] " +
-                "           ORDER BY CASE WHEN P.[PageType] IS NULL THEN 0 ELSE 1 END ASC, P.[NextUpdate] ASC, P.[UriHash] ASC" +
+                "           ORDER BY CASE WHEN P.[PageType] IS NULL THEN 0 ELSE 1 END ASC, P.[NextScrape] ASC, P.[UriHash] ASC" +
                 "       ) AS HostPageRank " +
                 "   FROM " + PAGES + " AS P " +
                 "   INNER JOIN " + Websites.Websites.WEBSITES + " AS W ON P.[Host] = W.[Host] " +
                 "   WHERE P.[LockedBy] IS NULL AND P.[WaitingStatus] IS NULL " +
-                "   AND (P.[PageType] IS NULL OR P.[NextUpdate] < GETDATE()) " +
+                "   AND (P.[PageType] IS NULL OR P.[NextScrape] < GETDATE()) " +
                 "   AND NOT EXISTS (" +
                 "       SELECT 1 " +
                 "       FROM " + WebsitesThrottle.WEBSITES_THROTTLE + " AS WB " +
@@ -129,7 +129,7 @@ namespace landerist_library.Pages
                 "   SELECT TOP " + topRows + " [UriHash] " +
                 "   FROM CandidatePages " +
                 "   WHERE HostPageRank <= @MaxPagesPerHost " +
-                "   ORDER BY SelectionPriority ASC, [NextUpdate] ASC, [UriHash] ASC" +
+                "   ORDER BY SelectionPriority ASC, [NextScrape] ASC, [UriHash] ASC" +
                 ") " +
                 "UPDATE P " +
                 "SET LockedBy = @LockedBy " +
@@ -138,9 +138,8 @@ namespace landerist_library.Pages
                     "INSERTED.[Uri], " +
                     "INSERTED.[UriHash], " +
                     "INSERTED.[Inserted], " +
-                    "INSERTED.[Updated], " +
-                    "INSERTED.[LastSuccessfulDownload], " +
-                    "INSERTED.[NextUpdate], " +
+                    "INSERTED.[LastScrape], " +
+                    "INSERTED.[NextScrape], " +
                     "INSERTED.[HttpStatusCode], " +
                     "INSERTED.[Etag], " +
                     "INSERTED.[PageType], " +
@@ -186,7 +185,7 @@ namespace landerist_library.Pages
                 "SELECT * " +
                 "FROM " + PAGES + " " +
                 "WHERE [Host] = @Host AND " +
-                "[Updated] IS NULL";
+                "[LastScrape] IS NULL";
 
             DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"Host", website.Host }
@@ -248,9 +247,8 @@ namespace landerist_library.Pages
                 "[Uri], " +
                 "[UriHash], " +
                 "[Inserted], " +
-                "[Updated], " +
-                "[LastSuccessfulDownload], " +
-                "[NextUpdate], " +
+                "[LastScrape], " +
+                "[NextScrape], " +
                 "[HttpStatusCode], " +
                 "[Etag], " +
                 "[PageType], " +
@@ -285,7 +283,7 @@ namespace landerist_library.Pages
                 "       WHERE WB.[IpOrHost] = P.[Host] AND WB.[BlockUntil] > GETDATE()" +
                 "   ) " +
                 (string.IsNullOrEmpty(where) ? string.Empty : " AND " + where) + " " +
-                "   ORDER BY P.[NextUpdate] ASC" +
+                "   ORDER BY P.[NextScrape] ASC" +
                 ") " +
                 "UPDATE P " +
                 "SET LockedBy = @LockedBy " +
@@ -294,9 +292,8 @@ namespace landerist_library.Pages
                     "INSERTED.[Uri], " +
                     "INSERTED.[UriHash], " +
                     "INSERTED.[Inserted], " +
-                    "INSERTED.[Updated], " +
-                    "INSERTED.[LastSuccessfulDownload], " +
-                    "INSERTED.[NextUpdate], " +
+                    "INSERTED.[LastScrape], " +
+                    "INSERTED.[NextScrape], " +
                     "INSERTED.[HttpStatusCode], " +
                     "INSERTED.[Etag], " +
                     "INSERTED.[PageType], " +
@@ -409,9 +406,8 @@ namespace landerist_library.Pages
                 pagesTableName + ".[Uri], " +
                 pagesTableName + ".[UriHash], " +
                 pagesTableName + ".[Inserted], " +
-                pagesTableName + ".[Updated], " +
-                pagesTableName + ".[LastSuccessfulDownload], " +
-                pagesTableName + ".[NextUpdate], " +
+                pagesTableName + ".[LastScrape], " +
+                pagesTableName + ".[NextScrape], " +
                 pagesTableName + ".[HttpStatusCode], " +
                 pagesTableName + ".[Etag], " +
                 pagesTableName + ".[PageType], " +

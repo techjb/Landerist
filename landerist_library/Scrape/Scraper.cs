@@ -1,4 +1,4 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Downloaders.Multiple;
 using landerist_library.Downloaders.Puppeteer;
@@ -231,14 +231,14 @@ namespace landerist_library.Scrape
         {
             if (!page.Website.IsAllowedByRobotsTxt(page.Uri))
             {
-                page.SetPageTypeAndNextUpdate(PageType.BlockedByRobotsTxt);
+                page.SetPageTypeAndNextScrape(PageType.BlockedByRobotsTxt);
                 Interlocked.Increment(ref SkippedByRobotsTxt);
                 return;
             }
 
             if (page.Website.CrawlDelayTooBig())
             {
-                page.SetPageTypeAndNextUpdate(PageType.CrawlDelayTooBig);
+                page.SetPageTypeAndNextScrape(PageType.CrawlDelayTooBig);
                 Interlocked.Increment(ref SkippedByCrawlDelay);
                 return;
             }

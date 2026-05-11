@@ -1,4 +1,4 @@
-﻿using landerist_library.Database;
+using landerist_library.Database;
 using landerist_library.Pages;
 using landerist_orels.ES;
 using System.Data;
@@ -14,7 +14,7 @@ namespace landerist_library.Statistics
         Pages,
         Websites,
         UpdatedIpAddress,
-        UpdatedPages,
+        LastScrapePages,
         NeedUpdate,
         WaitingAIRequest,
         UnknownPageType,
@@ -52,7 +52,7 @@ namespace landerist_library.Statistics
             UpdatedSitemaps();
             UpdatedIpAddress();
             Pages();
-            UpdatedPages();
+            LastScrapePages();
             NeedUpdate();
             WaitingAIRequest();
             UnknownPageType();
@@ -112,14 +112,14 @@ namespace landerist_library.Statistics
             InsertDaily(StatisticsKey.Pages, query);
         }
 
-        private static void UpdatedPages()
+        private static void LastScrapePages()
         {
             string query =
                 "SELECT COUNT(*) " +
                 "FROM " + landerist_library.Pages.Pages.PAGES + " " +
-                "WHERE CONVERT(date, [Updated]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
+                "WHERE CONVERT(date, [LastScrape]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
 
-            InsertDaily(StatisticsKey.UpdatedPages, query);
+            InsertDaily(StatisticsKey.LastScrapePages, query);
         }
 
         private static void NeedUpdate()
@@ -127,7 +127,7 @@ namespace landerist_library.Statistics
             string query =
                 "SELECT COUNT(*) " +
                 "FROM " + landerist_library.Pages.Pages.PAGES + " " +
-                "WHERE [NextUpdate] < GETDATE()";
+                "WHERE [NextScrape] < GETDATE()";
 
             InsertDaily(StatisticsKey.NeedUpdate, query);
         }
@@ -218,7 +218,7 @@ namespace landerist_library.Statistics
             string query =
                 "SELECT [HttpStatusCode], COUNT(*) AS [Counter] " +
                 "FROM " + landerist_library.Pages.Pages.PAGES + " " +
-                "WHERE CAST([Updated] AS date) = CAST(@Date AS date) " +
+                "WHERE CAST([LastScrape] AS date) = CAST(@Date AS date) " +
                 "GROUP BY [HttpStatusCode] ";
 
             var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>
@@ -280,7 +280,7 @@ namespace landerist_library.Statistics
             string query =
                 "SELECT [PageType], COUNT(*) AS [Counter] " +
                 "FROM " + landerist_library.Pages.Pages.PAGES + " " +
-                "WHERE CAST([Updated] AS date) = CAST(@Date AS date) " +
+                "WHERE CAST([LastScrape] AS date) = CAST(@Date AS date) " +
                 "AND [PageType] IS NOT NULL " +
                 "GROUP BY [PageType] ";
 

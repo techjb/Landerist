@@ -20,7 +20,7 @@ namespace landerist_library.Pages
                 "FROM " + PAGES + " " +
                 "INNER JOIN " + Websites.Websites.WEBSITES + " ON " + PAGES + ".[Host] = " + Websites.Websites.WEBSITES + ".[Host] " +
                 "WHERE " + PAGES + ".[WaitingStatus] = @waitingStatusFrom AND [TokenCount] " + (isMaxTokenCount ? "<=" : ">") + " " + tokenCount + " " +
-                "ORDER BY " + PAGES + ".[Updated] ASC ) " +
+                "ORDER BY " + PAGES + ".[LastScrape] ASC ) " +
                 "UPDATE " + PAGES + " " +
                 "SET [WaitingStatus] = @waitingStatusTo " +
                 "OUTPUT " + SelectColumns("INSERTED") + " " +

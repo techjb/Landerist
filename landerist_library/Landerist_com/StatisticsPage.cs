@@ -1,4 +1,4 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Export;
 using landerist_library.Logs;
@@ -31,13 +31,13 @@ namespace landerist_library.Landerist_com
                 Charts.Clear();
 
                 ProcessedPages();
-                UpdatedPages();
-                NextUpdateDistribution();
-                //UpdatedHttpStatusCodeNull();
-                //UpdatedHttpStatusCode200();
-                //UpdatedHttpStatusCodeErrors();
-                UpdatedHttpStatusCode();
-                UpdatedPageType();                
+                LastScrapePages();
+                NextScrapeDistribution();
+                //LastScrapeHttpStatusCodeNull();
+                //LastScrapeHttpStatusCode200();
+                //LastScrapeHttpStatusCodeErrors();
+                LastScrapeHttpStatusCode();
+                LastScrapePageType();
                 ScraperSuccessCrash();
                 NotListingsCache();
                 EtagHasNotChanged();
@@ -63,43 +63,43 @@ namespace landerist_library.Landerist_com
             }
         }
 
-        private static void UpdatedPages()
+        private static void LastScrapePages()
         {
-            BarChart("Updated Pages", StatisticsKey.UpdatedPages, false);
+            BarChart("Last Scrape Pages", StatisticsKey.LastScrapePages, false);
         }
 
-        private static void NextUpdateDistribution()
+        private static void NextScrapeDistribution()
         {
-            var dictionary = landerist_library.Pages.Pages.GroupByNextUpdate();
-            BarChart("Next Update Distribution", "nextupdate", dictionary);
+            var dictionary = landerist_library.Pages.Pages.GroupByNextScrape();
+            BarChart("Next Scrape Distribution", "NextScrape", dictionary);
         }
 
-        //private static void UpdatedHttpStatusCodeNull()
+        //private static void LastScrapeHttpStatusCodeNull()
         //{
-        //    LineChart("Updated HttpStatusCode null", StatisticsKey.HttpStatusCode_NULL, true);
+        //    LineChart("Last Scrape HttpStatusCode null", StatisticsKey.HttpStatusCode_NULL, true);
         //}
 
-        //private static void UpdatedHttpStatusCode200()
+        //private static void LastScrapeHttpStatusCode200()
         //{
-        //    LineChart("Updated HttpStatusCode 200", StatisticsKey.HttpStatusCode_200, true);
+        //    LineChart("Last Scrape HttpStatusCode 200", StatisticsKey.HttpStatusCode_200, true);
         //}
-        //private static void UpdatedHttpStatusCodeErrors()
+        //private static void LastScrapeHttpStatusCodeErrors()
         //{
         //    var keys = GlobalStatistics.GetHttpStatusCodeKeys();
         //    keys.RemoveAll(code => code == StatisticsKey.HttpStatusCode_NULL.ToString() || code == StatisticsKey.HttpStatusCode_200.ToString());
-        //    BarChart("Updated HttpStatusCode errors", keys, false);
+        //    BarChart("Last Scrape HttpStatusCode errors", keys, false);
         //}
 
-        private static void UpdatedHttpStatusCode()
+        private static void LastScrapeHttpStatusCode()
         {
             var keys = GlobalStatistics.GetHttpStatusCodeKeys();            
-            BarChart("Updated by HttpStatusCode", keys, false);
+            BarChart("Last Scrape by HttpStatusCode", keys, false);
         }
 
-        private static void UpdatedPageType()
+        private static void LastScrapePageType()
         {
             var keys = GlobalStatistics.GetPageTypeKeys();
-            BarChart("Updated by PageType", keys, false);
+            BarChart("Last Scrape by PageType", keys, false);
         }
 
         private static void ProcessedPages()

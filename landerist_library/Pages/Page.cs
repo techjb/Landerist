@@ -1,4 +1,4 @@
-﻿using HtmlAgilityPack;
+using HtmlAgilityPack;
 using landerist_library.Tools;
 using landerist_library.Websites;
 using landerist_orels.ES;
@@ -17,11 +17,9 @@ namespace landerist_library.Pages
 
         public DateTime Inserted { get; set; }
 
-        public DateTime? Updated { get; set; }
+        public DateTime? LastScrape { get; set; }
 
-        public DateTime? LastSuccessfulDownload { get; set; }
-
-        public DateTime? NextUpdate { get; set; }
+        public DateTime? NextScrape { get; set; }
 
         public short? HttpStatusCode { get; set; }
 
@@ -96,7 +94,6 @@ namespace landerist_library.Pages
             Uri = uri;
             UriHash = GetUriHash();
             Inserted = DateTime.Now;
-            Updated = DateTime.Now;
 
             var dataRow = GetDataRow();
             if (dataRow != null)

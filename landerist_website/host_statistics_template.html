@@ -97,12 +97,12 @@ const palette = [
         function NormalizeCharts(charts) {
             return {
                 inserted: (GetObjectProperty(charts, 'inserted', 'Inserted') || []).map(NormalizeSeries),
-                updated: (GetObjectProperty(charts, 'updated', 'Updated') || []).map(NormalizeSeries),
+                lastScrape: (GetObjectProperty(charts, 'lastScrape', 'LastScrape') || []).map(NormalizeSeries),
                 notListingCache: (GetObjectProperty(charts, 'notListingCache', 'NotListingCache') || []).map(NormalizeSeries),
                 listingParserInputAlreadyParsed: (GetObjectProperty(charts, 'listingParserInputAlreadyParsed', 'ListingParserInputAlreadyParsed', 'responseBodyTextAlreadyParsed', 'ResponseBodyTextAlreadyParsed') || []).map(NormalizeSeries),
                 listingParserInputIsAnotherListingInHost: (GetObjectProperty(charts, 'listingParserInputIsAnotherListingInHost', 'ListingParserInputIsAnotherListingInHost', 'reponseBodyTextIsAnotherListingInHost', 'ReponseBodyTextIsAnotherListingInHost') || []).map(NormalizeSeries),
                 parseListingRetryNotListing: (GetObjectProperty(charts, 'parseListingRetryNotListing', 'ParseListingRetryNotListing') || []).map(NormalizeSeries),
-                nextUpdateDistribution: (GetObjectProperty(charts, 'nextUpdateDistribution', 'NextUpdateDistribution') || []).map(NormalizeSeries),
+                nextScrapeDistribution: (GetObjectProperty(charts, 'nextScrapeDistribution', 'NextScrapeDistribution') || []).map(NormalizeSeries),
                 pageType: (GetObjectProperty(charts, 'pageType', 'PageType') || []).map(NormalizeSeries),
                 httpStatusCode: (GetObjectProperty(charts, 'httpStatusCode', 'HttpStatusCode') || []).map(NormalizeSeries),
                 publishedListingsByOperation: (GetObjectProperty(charts, 'publishedListingsByOperation', 'PublishedListingsByOperation') || []).map(NormalizeSeries),
@@ -371,12 +371,12 @@ const palette = [
 
             const chartDefinitions = [
                 { title: 'Inserted Pages', values: hostData.charts.inserted, type: AreaChart },
-                { title: 'Updated Pages', values: hostData.charts.updated, type: AreaChart },
+                { title: 'Last Scrape Pages', values: hostData.charts.lastScrape, type: AreaChart },
                 { title: 'Not Listing By Cache', values: hostData.charts.notListingCache, type: AreaChart },
                 { title: 'ListingParserInput Already Parsed', values: hostData.charts.listingParserInputAlreadyParsed, type: AreaChart },
                 { title: 'ListingParserInput Is Another Listing In Host', values: hostData.charts.listingParserInputIsAnotherListingInHost, type: AreaChart },
                 { title: 'Parse Listing Retry Not Listing', values: hostData.charts.parseListingRetryNotListing, type: AreaChart },
-                { title: 'Next Update Distribution', values: hostData.charts.nextUpdateDistribution, type: BarChart },
+                { title: 'Next Scrape Distribution', values: hostData.charts.nextScrapeDistribution, type: BarChart },
                 { title: 'Pages by PageType', values: hostData.charts.pageType, type: PieChart },
                 { title: 'Pages by HttpStatusCode', values: hostData.charts.httpStatusCode, type: PieChart },
                 { title: 'Published Listings by Operation', values: hostData.charts.publishedListingsByOperation, type: PieChart },

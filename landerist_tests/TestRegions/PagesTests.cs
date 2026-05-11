@@ -1,4 +1,4 @@
-﻿using landerist_library.Database;
+using landerist_library.Database;
 using landerist_library.Pages;
 
 namespace landerist_tests
@@ -13,7 +13,7 @@ namespace landerist_tests
             //Pages.DeleteListingsHttpStatusCodeError();
             //Pages.DeleteListingsResponseBodyRepeated();
             //Pages.UpdateInvalidCadastastralReferences();
-            //Pages.UpdateNextUpdate();
+            //Pages.UpdateNextScrape();
             //Pages.RemoveListingParserInputHashToAll();
             //Pages.RemoveListingParserInputHash(PageType.NotListingByLastSegment);
             //Pages.DeleteUnpublishedListings();
@@ -24,7 +24,7 @@ namespace landerist_tests
             //page.InsertSpecialWebsite();
 
             //Console.WriteLine(WebsitesThrottle.IsBlocked(page.Website));
-            //Pages.UpdateNextUpdate(); // 30 min (mienstras se ejecuta, hay que parar el scraper)
+            //Pages.UpdateNextScrape(); // 30 min (mienstras se ejecuta, hay que parar el scraper)
             
         }
     }

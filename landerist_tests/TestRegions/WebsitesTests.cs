@@ -20,7 +20,7 @@ namespace landerist_tests
             //Websites.CountRobotsSiteMaps();
             //Websites.InsertMainPages();
             //Websites.UpdateNumPages();
-            //Websites.SetPageTypeAndNextUpdate();
+            //Websites.SetPageTypeAndNextScrape();
 
             //Websites.DeleteFromFile();
 

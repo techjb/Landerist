@@ -1,4 +1,4 @@
-﻿using landerist_library.Database;
+using landerist_library.Database;
 using landerist_orels.ES;
 using System.Data;
 
@@ -8,7 +8,7 @@ namespace landerist_library.Statistics
     {
         Pages,
         Inserted,
-        Updated,
+        LastScrape,
         Listings,
         PublishedListings,
         UnpublishedListings,
@@ -45,7 +45,7 @@ namespace landerist_library.Statistics
 
             Pages(host);
             Inserted(host);
-            Updated(host);
+            LastScrape(host);
             Listings(host);
             PublishedListings(host);
             UnpublishedListings(host);
@@ -74,15 +74,15 @@ namespace landerist_library.Statistics
             InsertDaily(host, HostStatisticsKey.Inserted, query);
         }
 
-        private static void Updated(string host)
+        private static void LastScrape(string host)
         {
             string query =
                 "SELECT COUNT(*) " +
                 "FROM " + landerist_library.Pages.Pages.PAGES + " " +
                 "WHERE [Host] = @Host " +
-                "AND CONVERT(date, [Updated]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
+                "AND CONVERT(date, [LastScrape]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
 
-            InsertDaily(host, HostStatisticsKey.Updated, query);
+            InsertDaily(host, HostStatisticsKey.LastScrape, query);
         }
 
         private static void Listings(string host)
@@ -342,13 +342,13 @@ namespace landerist_library.Statistics
             });
         }
 
-        public static DataTable GetPagesByNextUpdate(string host)
+        public static DataTable GetPagesByNextScrape(string host)
         {
             string query =
-                "SELECT COALESCE(CONVERT(VARCHAR, [NextUpdate], 23), 'NULL') AS [Key], COUNT(*) AS [Counter] " +
+                "SELECT COALESCE(CONVERT(VARCHAR, [NextScrape], 23), 'NULL') AS [Key], COUNT(*) AS [Counter] " +
                 "FROM " + landerist_library.Pages.Pages.PAGES + " " +
                 "WHERE [Host] = @Host " +
-                "GROUP BY CONVERT(VARCHAR, [NextUpdate], 23) " +
+                "GROUP BY CONVERT(VARCHAR, [NextScrape], 23) " +
                 "ORDER BY [Key] ASC";
 
             return new DataBase().QueryTable(query, new Dictionary<string, object?>

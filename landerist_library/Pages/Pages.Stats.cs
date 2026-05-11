@@ -41,12 +41,12 @@ namespace landerist_library.Pages
             });
         }
 
-        public static Dictionary<string, object?> GroupByNextUpdate()
+        public static Dictionary<string, object?> GroupByNextScrape()
         {
             string query =
-                "SELECT  CONVERT(VARCHAR, [NextUpdate], 23) AS [DateWhithoutTime], COUNT(*) AS [Total] " +
+                "SELECT  CONVERT(VARCHAR, [NextScrape], 23) AS [DateWhithoutTime], COUNT(*) AS [Total] " +
                 "FROM " + PAGES + " " +
-                "GROUP BY CONVERT(VARCHAR, [NextUpdate], 23) " +
+                "GROUP BY CONVERT(VARCHAR, [NextScrape], 23) " +
                 "ORDER BY [DateWhithoutTime] ASC";
 
             return new DataBase().QueryDictionary(query);

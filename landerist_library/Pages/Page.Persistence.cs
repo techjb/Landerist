@@ -13,11 +13,8 @@ namespace landerist_library.Pages
             Uri = new Uri(uriString);
             UriHash = dataRow["UriHash"].ToString()!;
             Inserted = (DateTime)dataRow["Inserted"];
-            Updated = dataRow["Updated"] is DBNull ? null : (DateTime)dataRow["Updated"];
-            LastSuccessfulDownload = dataRow.Table.Columns.Contains("LastSuccessfulDownload") && dataRow["LastSuccessfulDownload"] is not DBNull
-                ? (DateTime)dataRow["LastSuccessfulDownload"]
-                : null;
-            NextUpdate = dataRow["NextUpdate"] is DBNull ? null : (DateTime)dataRow["NextUpdate"];
+            LastScrape = dataRow["LastScrape"] is DBNull ? null : (DateTime)dataRow["LastScrape"];
+            NextScrape = dataRow["NextScrape"] is DBNull ? null : (DateTime)dataRow["NextScrape"];
             HttpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
             Etag = dataRow.Table.Columns.Contains("Etag") && dataRow["Etag"] is not DBNull
                 ? dataRow["Etag"].ToString()
@@ -60,10 +57,10 @@ namespace landerist_library.Pages
         {
             string query =
                 "INSERT INTO " + Pages.PAGES + " (" +
-                "[Host], [Uri], [UriHash], [Inserted], [Updated], [LastSuccessfulDownload], [NextUpdate], [HttpStatusCode], [Etag], [PageType], " +
+                "[Host], [Uri], [UriHash], [Inserted], [LastScrape], [NextScrape], [HttpStatusCode], [Etag], [PageType], " +
                 "[PageTypeCounter], [ListingStatus], [LockedBy], [WaitingStatus], [ListingParserInputHash], " +
                 "[ListingParserInputNotChangedCounter], [TransientErrorCounter], [ResponseBodyZipped], [TokenCount]) " +
-                "VALUES(@Host, @Uri, @UriHash, @Inserted, @Updated, @LastSuccessfulDownload, @NextUpdate, @HttpStatusCode, @Etag, @PageType, " +
+                "VALUES(@Host, @Uri, @UriHash, @Inserted, @LastScrape, @NextScrape, @HttpStatusCode, @Etag, @PageType, " +
                 "@PageTypeCounter, @ListingStatus, @LockedBy, @WaitingStatus, @ListingParserInputHash, " +
                 "@ListingParserInputNotChangedCounter, @TransientErrorCounter, CONVERT(varbinary(max), @ResponseBodyZipped), @TokenCount)";
 
@@ -72,9 +69,8 @@ namespace landerist_library.Pages
                 {"Uri", Uri.ToString() },
                 {"UriHash", UriHash },
                 {"Inserted", DateTime.Now },
-                {"Updated", null },
-                {"LastSuccessfulDownload", null },
-                {"NextUpdate", null },
+                {"LastScrape", null },
+                {"NextScrape", null },
                 {"HttpStatusCode", null },
                 {"Etag", null },
                 {"PageType", null },
@@ -91,10 +87,10 @@ namespace landerist_library.Pages
             return sucess;
         }
 
-        public bool SetPageTypeAndNextUpdate(PageType? pageType)
+        public bool SetPageTypeAndNextScrape(PageType? pageType)
         {
             SetPageType(pageType);
-            SetNextUpdate();
+            SetNextScrape(DateTime.Now);
             return Update();
         }
 
@@ -105,13 +101,10 @@ namespace landerist_library.Pages
             //    return true;
             //}
 
-            Updated = DateTime.Now;
-
             string query =
                 "UPDATE " + Pages.PAGES + " SET " +
-                "[Updated] = @Updated, " +
-                "[LastSuccessfulDownload] = @LastSuccessfulDownload, " +
-                "[NextUpdate] = @NextUpdate, " +
+                "[LastScrape] = @LastScrape, " +
+                "[NextScrape] = @NextScrape, " +
                 "[HttpStatusCode] = @HttpStatusCode, " +
                 "[Etag] = @Etag, " +
                 "[PageType] = @PageType, " +
@@ -127,9 +120,8 @@ namespace landerist_library.Pages
                 "WHERE [UriHash] = @UriHash";
 
             var sucess = new DataBase().Query(query, new Dictionary<string, object?> {
-                {"Updated", Updated },
-                {"LastSuccessfulDownload", LastSuccessfulDownload },
-                {"NextUpdate", NextUpdate },
+                {"LastScrape", LastScrape },
+                {"NextScrape", NextScrape },
                 {"HttpStatusCode", HttpStatusCode},
                 {"Etag", Etag},
                 {"PageType", PageType?.ToString()},
@@ -152,21 +144,32 @@ namespace landerist_library.Pages
             return sucess;
         }
 
-        public void SetNextUpdate()
+        public void SetLastScrape()
         {
-            NextUpdate = PageNextUpdateCalculator.Calculate(this, DateTime.Now);
+            LastScrape = DateTime.Now;
         }
 
-        public bool UpdateNextUpdate()
+        public void SetNextScrape()
+        {
+            var calculationDate = LastScrape ?? Inserted;
+            SetNextScrape(calculationDate);
+        }
+
+        private void SetNextScrape(DateTime calculationDate)
+        {
+            NextScrape = PageNextScrapeCalculator.Calculate(this, calculationDate);
+        }
+
+        public bool UpdateNextScrape()
         {
             string query =
                "UPDATE " + Pages.PAGES + " SET " +
-               "[NextUpdate] = @NextUpdate " +
+               "[NextScrape] = @NextScrape " +
                "WHERE [UriHash] = @UriHash";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"UriHash", UriHash },
-                {"NextUpdate", NextUpdate },
+                {"NextScrape", NextScrape },
             });
         }
 

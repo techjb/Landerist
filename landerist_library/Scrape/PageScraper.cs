@@ -1,4 +1,4 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Downloaders.Multiple;
 using landerist_library.Index;
@@ -31,8 +31,6 @@ namespace landerist_library.Scrape
             {
                 return false;
             }
-
-            _page.LastSuccessfulDownload = DateTime.Now;
 
             (var newPageType, var newListing, var waitingAIRequest) = new PageTypeParser(_page).GetPageType();
             var success = ApplyClassificationResultAfterDownload(newPageType, newListing, waitingAIRequest);
@@ -69,7 +67,8 @@ namespace landerist_library.Scrape
             }
 
             UpdatePageTypeAndListing(pageType, null);
-            _page.SetNextUpdate();
+            _page.SetLastScrape();
+            _page.SetNextScrape();
             return _page.Update();
         }
 
@@ -112,7 +111,8 @@ namespace landerist_library.Scrape
             }
 
             UpdatePageTypeAndListing(newPageType, newListing);
-            _page.SetNextUpdate();
+            _page.SetLastScrape();
+            _page.SetNextScrape();
             return _page.Update();
         }
 

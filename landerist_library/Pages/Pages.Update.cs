@@ -40,7 +40,7 @@ namespace landerist_library.Pages
             Console.WriteLine(updated + "/" + total);
         }
 
-        public static void UpdateNextUpdate()
+        public static void UpdateNextScrape()
         {
             int total = CountPages();
             int updated = 0;
@@ -52,10 +52,10 @@ namespace landerist_library.Pages
                 Parallel.ForEach(pages, page =>
                 {
                     Interlocked.Increment(ref counter);
-                    DateTime calculationDate = page.Updated ?? page.Inserted;
-                    page.NextUpdate = PageNextUpdateCalculator.Calculate(page, calculationDate);
+                    DateTime calculationDate = page.LastScrape ?? page.Inserted;
+                    page.NextScrape = PageNextScrapeCalculator.Calculate(page, calculationDate);
 
-                    if (page.UpdateNextUpdate())
+                    if (page.UpdateNextScrape())
                     {
                         Interlocked.Increment(ref updated);
                     }

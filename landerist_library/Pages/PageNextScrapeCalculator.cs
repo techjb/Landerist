@@ -1,6 +1,6 @@
-﻿namespace landerist_library.Pages
+namespace landerist_library.Pages
 {
-    public static class PageNextUpdateCalculator
+    public static class PageNextScrapeCalculator
     {
         private enum TransientErrorKind
         {

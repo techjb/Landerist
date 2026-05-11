@@ -1,4 +1,4 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Configuration;
 using landerist_library.Export;
 using landerist_library.Logs;
 using landerist_library.Statistics;
@@ -90,12 +90,12 @@ namespace landerist_library.Landerist_com
                 Charts = new HostStatisticsCharts
                 {
                     Inserted = GetTimeSeries(website.Host, HostStatisticsKey.Inserted, "Inserted Pages"),
-                    Updated = GetTimeSeries(website.Host, HostStatisticsKey.Updated, "Updated Pages"),
+                    LastScrape = GetTimeSeries(website.Host, HostStatisticsKey.LastScrape, "Last Scrape Pages"),
                     NotListingCache = GetTimeSeries(website.Host, HostStatisticsKey.NotListingCache, "Not listing by cache"),
                     ListingParserInputAlreadyParsed = GetTimeSeries(website.Host, HostStatisticsKey.ListingParserInputAlreadyParsed, "ListingParserInput already parsed"),
                     ListingParserInputIsAnotherListingInHost = GetTimeSeries(website.Host, HostStatisticsKey.ListingParserInputIsAnotherListingInHost, "ListingParserInput is another listing in host"),
                     ParseListingRetryNotListing = GetTimeSeries(website.Host, HostStatisticsKey.ParseListingRetryNotListing, "Parse listing retry not listing"),
-                    NextUpdateDistribution = GetDistribution(HostStatistics.GetPagesByNextUpdate(website.Host), "nextupdate"),
+                    NextScrapeDistribution = GetDistribution(HostStatistics.GetPagesByNextScrape(website.Host), "NextScrape"),
                     PageType = GetDistribution(HostStatistics.GetPagesByPageType(website.Host), "PageType"),
                     HttpStatusCode = GetDistribution(HostStatistics.GetPagesByHttpStatusCode(website.Host), "HttpStatusCode"),
                     PublishedListingsByOperation = GetDistribution(HostStatistics.GetPublishedListingsByOperation(website.Host), "Operation"),
@@ -233,12 +233,12 @@ namespace landerist_library.Landerist_com
         private sealed class HostStatisticsCharts
         {
             public required List<ChartSeriesModel> Inserted { get; init; }
-            public required List<ChartSeriesModel> Updated { get; init; }
+            public required List<ChartSeriesModel> LastScrape { get; init; }
             public required List<ChartSeriesModel> NotListingCache { get; init; }
             public required List<ChartSeriesModel> ListingParserInputAlreadyParsed { get; init; }
             public required List<ChartSeriesModel> ListingParserInputIsAnotherListingInHost { get; init; }
             public required List<ChartSeriesModel> ParseListingRetryNotListing { get; init; }
-            public required List<ChartSeriesModel> NextUpdateDistribution { get; init; }
+            public required List<ChartSeriesModel> NextScrapeDistribution { get; init; }
             public required List<ChartSeriesModel> PageType { get; init; }
             public required List<ChartSeriesModel> HttpStatusCode { get; init; }
             public required List<ChartSeriesModel> PublishedListingsByOperation { get; init; }
