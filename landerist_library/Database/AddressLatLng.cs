@@ -8,6 +8,7 @@
         {
             string query =
                 "INSERT INTO " + ADDRESS_LAT_LNG + " " +
+                "([DateInsert], [Address], [Region], [Lat], [Lng], [IsAccurate]) " +
                 "VALUES (GETDATE(), @Address, @Region, @Lat, @Lng, @IsAccurate)";
             return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"Address", address },
@@ -21,7 +22,7 @@
         public static (double lat, double lng, bool isAccurate)? Select(string address, string region)
         {
             string query =
-                "SELECT TOP 1 Lat, Lng, IsAccurate " +
+                "SELECT Lat, Lng, IsAccurate " +
                 "FROM " + ADDRESS_LAT_LNG + " " +
                 "WHERE Address = @Address AND Region = @Region";
 
@@ -46,7 +47,7 @@
         {
             string query =
                 "DELETE FROM " + ADDRESS_LAT_LNG + " " +
-                "WHERE [DateInsert] < DATEADD(YEAR, -2, GETDATE())";
+                "WHERE [DateInsert] < DATEADD(YEAR, -1, GETDATE())";
 
             return new DataBase().Query(query);
         }

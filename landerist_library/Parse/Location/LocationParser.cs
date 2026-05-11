@@ -239,12 +239,12 @@ namespace landerist_library.Parse.Location
             {
                 return false;
             }
-            var latLng = new GoogleMaps.GoogleMapsApi().GetLatLng(Listing.address, Page.Website.CountryCode);
-            if (latLng == null)
+            var result = new GoogleMaps.GoogleMapsApi().GetLatLng(Listing.address, Page.Website.CountryCode);
+            if (result == null)
             {
                 return false;
             }
-            return AddLatLng(latLng.Value.latLng, latLng.Value.isAccurate);
+            return AddLatLng(result.Value.Latitude, result.Value.Longitude, result.Value.IsAccurate);
 
         }
 

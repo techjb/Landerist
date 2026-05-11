@@ -1,46 +1,38 @@
 ﻿using landerist_library.Configuration;
-using landerist_library.Database;
 using landerist_library.Websites;
-using NetTopologySuite.Geometries;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace landerist_library.Parse.Location.GoogleMaps
 {
     public class GoogleMapsApi
     {
+        private const int GeocodeApiMaxAttempts = 3;
+
+        private readonly GoogleMapsLatLngCache latLngCache = new();
+
         private static readonly HttpClient httpClient = new()
         {
             Timeout = TimeSpan.FromSeconds(20),
         };
 
-        public (Tuple<double, double> latLng, bool isAccurate)? GetLatLng(string address, CountryCode countryCode = CountryCode.ES)
+        public GoogleMapsLatLngResult? GetLatLng(string address, CountryCode countryCode = CountryCode.ES)
         {
-            if (string.IsNullOrWhiteSpace(address))
-            {
-                return null;
-            }
+            return GetLatLngLookup(address, countryCode).Coordinates;
+        }
 
-            var normalizedAddress = address.Trim();
-            var region = GetRegion(countryCode);
+        internal GoogleMapsLatLngLookupResult GetLatLngLookup(string address, CountryCode countryCode = CountryCode.ES)
+        {
+            return latLngCache.GetOrAdd(address, countryCode, GetLatLngFromGoogle);
+        }
 
-            if (AddressLatLng.Select(normalizedAddress, region) is (double lat, double lng, bool isAccurate) 
-                //&& Config.IsConfigurationProduction()
-                )
-            {
-                return (Tuple.Create(lat, lng), isAccurate);
-            }
-
+        private GoogleMapsLatLngLookupResult GetLatLngFromGoogle(string normalizedAddress, string region, CountryCode countryCode)
+        {
             var url = GetUrl(normalizedAddress, countryCode);
             try
             {
-                var response = httpClient.GetAsync(url).GetAwaiter().GetResult();
-                response.EnsureSuccessStatusCode();
-
-                var content = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-                if (!string.IsNullOrEmpty(content))
+                var geocodeData = GetGeocodeData(url);
+                if (geocodeData != null)
                 {
-                    var geocodeData = JsonConvert.DeserializeObject<GeocodeData>(content);
                     var results = geocodeData?.results;
                     if (IsOk(geocodeData) && results != null && results.Length > 0)
                     {
@@ -48,18 +40,23 @@ namespace landerist_library.Parse.Location.GoogleMaps
                         var selectedResult = usableResults.FirstOrDefault(IsAccurate) ?? usableResults.FirstOrDefault();
                         if (selectedResult == null)
                         {
-                            return null;
+                            return new GoogleMapsLatLngLookupResult(GoogleMapsLatLngLookupStatus.NotFound, null);
                         }
                         var parsedCoordinates = GetLatLng(selectedResult);
                         if (parsedCoordinates.HasValue)
                         {
-                            lat = parsedCoordinates.Value.latLng.Item1;
-                            lng = parsedCoordinates.Value.latLng.Item2;
-                            isAccurate = parsedCoordinates.Value.isAccurate;
-                            AddressLatLng.Insert(normalizedAddress, region, lat, lng, isAccurate);
-                            return parsedCoordinates;
+                            return new GoogleMapsLatLngLookupResult(GoogleMapsLatLngLookupStatus.Found, parsedCoordinates);
                         }
+
+                        return new GoogleMapsLatLngLookupResult(GoogleMapsLatLngLookupStatus.NotFound, null);
                     }
+
+                    if (IsOk(geocodeData) || IsZeroResults(geocodeData))
+                    {
+                        return new GoogleMapsLatLngLookupResult(GoogleMapsLatLngLookupStatus.NotFound, null);
+                    }
+
+                    LogGoogleMapsStatus(geocodeData);
                 }
             }
             catch (Exception exception)
@@ -67,15 +64,42 @@ namespace landerist_library.Parse.Location.GoogleMaps
                 Logs.Log.WriteError("GoogleMapsApi GetLatLng", exception);
             }
 
+            return new GoogleMapsLatLngLookupResult(GoogleMapsLatLngLookupStatus.Error, null);
+        }
+
+        private static GeocodeData? GetGeocodeData(string url)
+        {
+            for (var attempt = 1; attempt <= GeocodeApiMaxAttempts; attempt++)
+            {
+                var response = httpClient.GetAsync(url).GetAwaiter().GetResult();
+                response.EnsureSuccessStatusCode();
+
+                var content = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                if (string.IsNullOrWhiteSpace(content))
+                {
+                    Logs.Log.WriteError(
+                        "GoogleMapsApi GetLatLng",
+                        $"Google Maps empty response. Attempt {attempt}/{GeocodeApiMaxAttempts}.");
+                    return null;
+                }
+
+                var geocodeData = JsonConvert.DeserializeObject<GeocodeData>(content);
+                if (!IsRetryableGoogleMapsStatus(geocodeData) || attempt == GeocodeApiMaxAttempts)
+                {
+                    return geocodeData;
+                }
+
+                LogGoogleMapsStatus(geocodeData, attempt, retrying: true);
+                Thread.Sleep(GetRetryDelay(attempt));
+            }
+
             return null;
         }
 
         private string GetUrl(string address, CountryCode countryCode) => "https://maps.googleapis.com/maps/api/geocode/json?" +
             "address=" + Uri.EscapeDataString(address) +
-            "&region=" + GetRegion(countryCode) +
+            "&region=" + GoogleMapsCountry.GetRegion(countryCode) +
             GetComponents(countryCode) +
-            //"&extra_computations=BUILDING_AND_ENTRANCES" +
-            //"&extra_computations=GROUNDS" +
             "&key=" + PrivateConfig.GOOGLE_CLOUD_LANDERIST_API_KEY;
 
         private static string GetComponents(CountryCode countryCode)
@@ -87,14 +111,13 @@ namespace landerist_library.Parse.Location.GoogleMaps
             };
         }
 
-        private (Tuple<double, double> latLng, bool isAccurate)? GetLatLng(Result result)
+        private GoogleMapsLatLngResult? GetLatLng(Result result)
         {
-            (Tuple<double, double> latLng, bool isAccurate)? resultLatLng = null;
+            GoogleMapsLatLngResult? resultLatLng = null;
             if (result.geometry?.location?.lat is double latitude && result.geometry.location.lng is double longitude)
             {
-                var latLng = Tuple.Create(latitude, longitude);
                 var isAccurate = IsAccurate(result);
-                resultLatLng = (latLng, isAccurate);
+                resultLatLng = new GoogleMapsLatLngResult(latitude, longitude, isAccurate);
             }
 
             return resultLatLng;
@@ -103,6 +126,36 @@ namespace landerist_library.Parse.Location.GoogleMaps
         private static bool IsOk(GeocodeData? geocodeData)
         {
             return string.Equals(geocodeData?.status, "OK", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsZeroResults(GeocodeData? geocodeData)
+        {
+            return string.Equals(geocodeData?.status, "ZERO_RESULTS", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsRetryableGoogleMapsStatus(GeocodeData? geocodeData)
+        {
+            return string.Equals(geocodeData?.status, "OVER_QUERY_LIMIT", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(geocodeData?.status, "UNKNOWN_ERROR", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static TimeSpan GetRetryDelay(int attempt)
+        {
+            return TimeSpan.FromSeconds(attempt * 2);
+        }
+
+        private static void LogGoogleMapsStatus(GeocodeData? geocodeData, int? attempt = null, bool retrying = false)
+        {
+            var status = string.IsNullOrWhiteSpace(geocodeData?.status) ? "NO_STATUS" : geocodeData.status;
+            var errorMessage = string.IsNullOrWhiteSpace(geocodeData?.error_message)
+                ? "No error_message."
+                : geocodeData.error_message;
+            var attemptText = attempt.HasValue ? $" Attempt {attempt.Value}/{GeocodeApiMaxAttempts}." : string.Empty;
+            var retryText = retrying ? " Retrying." : string.Empty;
+
+            Logs.Log.WriteError(
+                "GoogleMapsApi GetLatLng",
+                $"Google Maps status: {status}.{attemptText}{retryText} {errorMessage}");
         }
 
         private static bool IsUsable(Result result, CountryCode countryCode)
@@ -143,225 +196,6 @@ namespace landerist_library.Parse.Location.GoogleMaps
                    (result.types.Contains("street_address") ||
                     result.types.Contains("premise") ||
                     result.types.Contains("subpremise"));
-        }
-
-        //private static Tuple<double, double>? GetCentroid(DisplayPolygon displayPolygon)
-        //{
-        //    if (displayPolygon == null || displayPolygon.coordinates == null)
-        //    {
-        //        return null;
-        //    }
-        //    switch (displayPolygon.type)
-        //    {
-        //        case "Polygon":
-        //            {
-        //                var polygon = ToPolygon(displayPolygon.coordinates);
-        //                return GetCentroid(polygon);
-        //            }
-        //        case "MultiPolygon":
-        //            {
-        //                var multiPolygon = ToMultiPolygon(displayPolygon.coordinates);
-        //                return GetCentroid(multiPolygon);
-        //            }
-        //    }
-        //    return null;
-        //}
-
-
-        //public static double[][][]? ToPolygon(object obj)
-        //{
-        //    if (obj is JArray jArray)
-        //    {
-        //        return jArray.ToObject<double[][][]>();
-        //    }
-
-        //    if (obj is List<object> outerList)
-        //    {
-        //        return [.. outerList
-        //            .Cast<List<object>>()
-        //            .SelectTop1(innerList => innerList
-        //                .Cast<List<object>>()
-        //                .SelectTop1(innerInnerList => innerInnerList
-        //                    .SelectTop1(Convert.ToDouble)
-        //                    .ToArray()
-        //                ).ToArray()
-        //            )];
-        //    }
-        //    return null;
-        //}
-
-        //public static double[][][][]? ToMultiPolygon(object obj)
-        //{
-        //    if (obj is JArray jArray)
-        //    {
-        //        return jArray.ToObject<double[][][][]>();
-        //    }
-
-        //    if (obj is List<object> outerList)
-        //    {
-        //        return [.. outerList
-        //            .Cast<List<object>>()
-        //            .SelectTop1(level1 => level1
-        //                .Cast<List<object>>()
-        //                .SelectTop1(level2 => level2
-        //                    .Cast<List<object>>()
-        //                    .SelectTop1(level3 => level3
-        //                        .SelectTop1(Convert.ToDouble)
-        //                        .ToArray()
-        //                    ).ToArray()
-        //                ).ToArray()
-        //            )];
-        //    }
-        //    return null;
-        //}
-
-
-        //private static Tuple<double, double>? GetCentroid(double[][][]? coordinates)
-        //{
-        //    if (coordinates is null)
-        //    {
-        //        return null;
-        //    }
-        //    try
-        //    {
-        //        var geometryFactory = new GeometryFactory();
-        //        var shellCoordinates = coordinates[0]
-        //            .SelectTop1(coord => new Coordinate(coord[0], coord[1]))
-        //            .ToArray();
-
-        //        LinearRing shell = geometryFactory.CreateLinearRing(shellCoordinates);
-        //        Polygon polygon = geometryFactory.CreatePolygon(shell);
-        //        Point centroid = polygon.Centroid;
-        //        return Tuple.Create(centroid.Y, centroid.X);
-        //    }
-        //    catch// (Exception excption)
-        //    {
-
-        //    }
-        //    return null;
-        //}
-
-        //private static Tuple<double, double>? GetCentroid(double[][][][]? coordinates)
-        //{
-        //    if (coordinates is null)
-        //    {
-        //        return null;
-        //    }
-        //    try
-        //    {
-        //        var geometryFactory = new GeometryFactory();
-
-        //        Polygon[] polygons = [.. coordinates.SelectTop1(polygonCoords =>
-        //        {
-        //            Coordinate[] exteriorCoords = [.. polygonCoords[0].SelectTop1(point => new Coordinate(point[0], point[1]))];
-        //            LinearRing shell = geometryFactory.CreateLinearRing(exteriorCoords);
-        //            LinearRing[] holes = [.. polygonCoords.Skip(1)
-        //                .SelectTop1(ringCoords =>
-        //                    geometryFactory.CreateLinearRing(
-        //                        [.. ringCoords.SelectTop1(point => new Coordinate(point[0], point[1]))]
-        //                    )
-        //                )];
-
-        //            return geometryFactory.CreatePolygon(shell, holes);
-        //        })];
-
-        //        MultiPolygon multiPolygon = geometryFactory.CreateMultiPolygon(polygons);
-
-        //        Point centroid = multiPolygon.Centroid;
-        //        return Tuple.Create(centroid.Y, centroid.X);
-        //    }
-        //    catch// (Exception excption)
-        //    {
-
-        //    }
-        //    return null;
-        //}
-
-        private static string GetRegion(CountryCode countryCode)
-        {
-            return countryCode switch
-            {
-                CountryCode.ES => "es",
-                _ => string.Empty,
-            };
-        }
-
-        public static void UpdateListingsLocationIsAccurate()
-        {
-            var listings = ES_Listings.GetListingsLocationIsAccurateNoCadastralReference();
-            if (listings == null || listings.Count == 0)
-            {
-                return;
-            }
-
-            var googleMapsApi = new GoogleMapsApi();
-
-            int total = listings.Count;
-            int processed = 0;
-            int latLngFound = 0;
-            int latLngNotFound = 0;
-            int accurate = 0;
-            int notAccurate = 0;
-            int errors = 0;
-
-            Parallel.ForEach(listings,
-                new ParallelOptions() { MaxDegreeOfParallelism = 10 },
-                listing =>
-            {
-                double? lat = null;
-                double? lng = null;
-                bool? locationIsAccurate = null;
-
-                if (listing.address != null)
-                {
-                    var result = googleMapsApi.GetLatLng(listing.address, CountryCode.ES);
-                    if (result != null)
-                    {
-                        lat = result.Value.latLng.Item1;
-                        lng = result.Value.latLng.Item2;
-                        locationIsAccurate = result.Value.isAccurate;
-                    }
-                }
-
-                if (!new ES_Listings().UpdateAddress(listing.guid, lat, lng, locationIsAccurate))
-                {
-                    Interlocked.Increment(ref errors);
-                }
-
-                Interlocked.Increment(ref processed);
-
-                if (locationIsAccurate is true)
-                {
-                    Interlocked.Increment(ref accurate);
-                }
-                else if (locationIsAccurate is false)
-                {
-                    Interlocked.Increment(ref notAccurate);
-                }
-
-                if (lat is not null && lng is not null)
-                {
-                    Interlocked.Increment(ref latLngFound);
-                }
-                else
-                {
-                    Interlocked.Increment(ref latLngNotFound);
-                }
-
-                var accuratePercentage = total > 0 ? (double)accurate / total * 100 : 0;
-                var notAccuratePercentage = total > 0 ? (double)notAccurate / total * 100 : 0;
-                var latLngFoundPercentage = total > 0 ? (double)latLngFound / total * 100 : 0;
-                var latLngNotFoundPercentage = total > 0 ? (double)latLngNotFound / total * 100 : 0;
-
-                Console.WriteLine(
-                    $"{processed}/{total}. " +
-                    $"latLngFound: {latLngFound} ({(int)latLngFoundPercentage}%) " +
-                    $"latLngNotFound: {latLngNotFound} ({(int)latLngNotFoundPercentage}%) " +
-                    $"Accurate: {accurate} ({(int)accuratePercentage}%) " +
-                    $"NotAccurate: {notAccurate} ({(int)notAccuratePercentage}%) " +
-                    $"Errors: {errors} "
-                    );
-            });
         }
     }
 }
