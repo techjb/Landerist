@@ -30,8 +30,8 @@ namespace landerist_library.Parse.Location
                     var lauIdAndLauName = Delimitations.LAUParser.GetLauIdAndLauName(_listing);
                     if (lauIdAndLauName != null)
                     {
-                        _listing.lauId = lauIdAndLauName.Value.lau_id;
-                        _listing.lauName = lauIdAndLauName.Value.lau_name;
+                        _listing.lauId = lauIdAndLauName.Value.lauId;
+                        _listing.lauName = lauIdAndLauName.Value.lauName;
                     }
                     break;
                 }

@@ -254,25 +254,26 @@ namespace landerist_library.Parse.Location
             {
                 return false;
             }
-            var result = new Goolzoom.GoolzoomApi().GetLatLng(Listing.cadastralReference);
-            if (result == null || !result.Value.requestSucess)
+            var goolzoomApi = new Goolzoom.GoolzoomApi();
+            var result = goolzoomApi.GetLatLng(Listing.cadastralReference);
+            if (result == null || !result.RequestSuccess)
             {
                 return false;
             }
-            if (result.Value.lat == null || result.Value.lng == null)
+            if (result.Latitude == null || result.Longitude == null)
             {
                 Listing.cadastralReference = null;
                 return false;
             }
             if (string.IsNullOrEmpty(Listing.address))
             {
-                var address = new Goolzoom.GoolzoomApi().GetAddrees(Listing.cadastralReference);
+                var address = goolzoomApi.GetAddress(Listing.cadastralReference);
                 if (!string.IsNullOrEmpty(address))
                 {
                     Listing.address = address;
                 }
             }
-            return AddLatLng((double)result.Value.lat, (double)result.Value.lng, true);
+            return AddLatLng(result.Latitude.Value, result.Longitude.Value, true);
         }
 
         private void SetCadastralReferenceFromAddress()

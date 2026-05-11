@@ -7,6 +7,11 @@ namespace landerist_library.Parse.Location.Delimitations
 {
     public class CountriesParser
     {
+        private static readonly IReadOnlyDictionary<CountryCode, string> CountryIsoA3 = new Dictionary<CountryCode, string>
+        {
+            { CountryCode.ES, "ESP" },
+        };
+
         // CSV obtained from https://rtr.carto.com/tables/world_countries_geojson/public/map
         //public static void InsertSpecialWebsite()
         //{
@@ -138,26 +143,38 @@ namespace landerist_library.Parse.Location.Delimitations
 
         public static bool ContainsCountry(CountryCode countryCode, double latitude, double longitude)
         {
-            return countryCode switch
-            {
-                CountryCode.ES => Database.CountrySpain.Contains(latitude, longitude),
-                _ => ContainsCountryAll(countryCode, latitude, longitude),
-            };
-        }
-
-        public static bool ContainsCountryAll(CountryCode countryCode, double latitude, double longitude)
-        {
-            string? iso3 = Database.Countries.Get(latitude, longitude);
-            if (iso3 is null)
+            if (!IsValidCoordinate(latitude, longitude))
             {
                 return false;
             }
 
             return countryCode switch
             {
-                CountryCode.ES => iso3 == "ESP",
-                _ => false
+                // Spain has a more precise local boundary table; fall back to the global countries table when needed.
+                CountryCode.ES => Database.CountrySpain.Contains(latitude, longitude)
+                    || ContainsCountryUsingGlobalBoundaries(countryCode, latitude, longitude),
+                _ => ContainsCountryUsingGlobalBoundaries(countryCode, latitude, longitude),
             };
+        }
+
+        private static bool ContainsCountryUsingGlobalBoundaries(CountryCode countryCode, double latitude, double longitude)
+        {
+            if (!CountryIsoA3.TryGetValue(countryCode, out var expectedIso3))
+            {
+                throw new NotSupportedException($"Country code {countryCode} does not have an ISO A3 mapping.");
+            }
+
+            string? actualIso3 = Database.Countries.Get(latitude, longitude);
+
+            return string.Equals(actualIso3, expectedIso3, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsValidCoordinate(double latitude, double longitude)
+        {
+            return double.IsFinite(latitude)
+                && double.IsFinite(longitude)
+                && latitude is >= -90 and <= 90
+                && longitude is >= -180 and <= 180;
         }
     }
 }

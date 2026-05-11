@@ -1,4 +1,6 @@
 using landerist_library.Websites;
+using landerist_library.Parse.Location.Goolzoom;
+using landerist_library.Parse.Location.GoogleMaps;
 
 namespace landerist_tests
 {
@@ -9,10 +11,10 @@ namespace landerist_tests
             //var tuple1 = new landerist_library.Parse.Location.GoogleMaps.GoogleMapsApi().GetLatLng("Av. Domingo Bueno, 126. O Porriño, 36.400 Pontevedra", CountryCode.ES);
             //Console.WriteLine(tuple1);
 
-            //var tuple1 = landerist_library.GetLatLng.Location.Goolzoom.CadastralRefToLatLng.GetLatLng("9441515XM7094A0001FT");
+            //var tuple1 = new landerist_library.Parse.Location.Goolzoom.GoolzoomApi().GetLatLng("9441515XM7094A0001FT");
             //Console.WriteLine(tuple1);
 
-            //var tuple2 = landerist_library.GetLatLng.Location.Goolzoom.CadastralRefToLatLng.GetLatLng("9441515XM7094A");
+            //var tuple2 = landerist_library.Parse.Location.Goolzoom.CadastralRefToLatLng.GetLatLng("9441515XM7094A");
             //Console.WriteLine(tuple2);
 
             //Console.WriteLine(landerist_library.Tools.Validate.CadastralReference("3979515DD7737H0002LX"));
@@ -20,7 +22,7 @@ namespace landerist_tests
 
             //string address = "Fuengirola, Torreblanca del Sol, Málaga, España, 29640";
             //var latLNg = new GoogleMapsApi().GetLatLng(address, CountryCode.ES);
-            //var cadastralReference = new AddressToCadastralReference().GetCadastralReference(latLNg.Value.latLng.Item1, latLNg.Value.latLng.Item2, address);
+            //var cadastralReference = new GoolzoomApi().GetAddresses(latLNg.Value.Latitude, latLNg.Value.Longitude, 10);
             //Console.WriteLine(cadastralReference);
 
             //Console.WriteLine(d.latLng.ToString() + " " +  d.isAccurate);

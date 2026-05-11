@@ -1,237 +1,252 @@
-﻿using landerist_library.Database;
+using landerist_library.Configuration;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 using System.Globalization;
-using System.Linq;
-using System.Net.Http;
+using System.Net;
 
 namespace landerist_library.Parse.Location.Goolzoom
 {
     public class GoolzoomCenter
     {
-        public double lat;
-        public double lng;
+        [JsonProperty("lat")]
+        public double? Lat { get; set; }
+
+        [JsonProperty("lng")]
+        public double? Lng { get; set; }
     }
+
+    public sealed record GoolzoomLatLngResult(bool RequestSuccess, double? Latitude, double? Longitude);
 
     public class GoolzoomApi
     {
-        private const string BASE_URL = "https://api.goolzoom.com/v1/cadastre/";
+        private const string BaseUrl = "https://api.goolzoom.com/v1/cadastre/";
+        private const int MaxRetryAttempts = 3;
         private static readonly HttpClient SharedHttpClient = CreateHttpClient();
 
-        public (bool requestSucess, double? lat, double? lng)? GetLatLng(string cadastralReference)
+        public GoolzoomLatLngResult? GetLatLng(string cadastralReference)
         {
-            if (string.IsNullOrEmpty(cadastralReference))
+            return GetLatLngAsync(cadastralReference).GetAwaiter().GetResult();
+        }
+
+        public async Task<GoolzoomLatLngResult?> GetLatLngAsync(
+            string cadastralReference,
+            CancellationToken cancellationToken = default)
+        {
+            string? normalizedCadastralReference = NormalizeReference(cadastralReference);
+            if (normalizedCadastralReference is null)
             {
                 return null;
             }
 
-            string url = BASE_URL + "cadastralreference/" + cadastralReference + "/center";
-
-            bool requestSucess = false;
-            double? lat = null;
-            double? lng = null;
+            string url = BaseUrl + "cadastralreference/" + Uri.EscapeDataString(normalizedCadastralReference) + "/center";
 
             try
             {
-                var response = HttpClient.GetAsync(url).Result;
+                using var response = await GetWithRetryAsync(url, cancellationToken);
                 response.EnsureSuccessStatusCode();
 
-                var content = response.Content.ReadAsStringAsync().Result;
-                requestSucess = true;
-
-                if (!string.IsNullOrEmpty(content))
+                var content = await response.Content.ReadAsStringAsync(cancellationToken);
+                if (string.IsNullOrWhiteSpace(content))
                 {
-                    var goolzoomCenter = JsonConvert.DeserializeObject<GoolzoomCenter>(content);
-                    if (goolzoomCenter != null)
-                    {
-                        lng = goolzoomCenter.lng;
-                        lat = goolzoomCenter.lat;
-                    }
+                    return new GoolzoomLatLngResult(true, null, null);
                 }
+
+                var goolzoomCenter = JsonConvert.DeserializeObject<GoolzoomCenter>(content);
+                if (goolzoomCenter?.Lat is not double latitude ||
+                    goolzoomCenter.Lng is not double longitude ||
+                    !IsValidCoordinate(latitude, longitude))
+                {
+                    return new GoolzoomLatLngResult(true, null, null);
+                }
+
+                return new GoolzoomLatLngResult(true, latitude, longitude);
             }
             catch (Exception exception)
             {
                 Logs.Log.WriteError("GoolzoomApi GetLatLng", exception);
             }
 
-            return (requestSucess, lat, lng);
+            return new GoolzoomLatLngResult(false, null, null);
         }
 
-        public string? GetAddrees(string cadastralReference)
+        public string? GetAddress(string cadastralReference)
         {
-            if (string.IsNullOrEmpty(cadastralReference))
+            return GetAddressAsync(cadastralReference).GetAwaiter().GetResult();
+        }
+
+        public async Task<string?> GetAddressAsync(
+            string cadastralReference,
+            CancellationToken cancellationToken = default)
+        {
+            string? normalizedCadastralReference = NormalizeReference(cadastralReference);
+            if (normalizedCadastralReference is null)
             {
                 return null;
             }
 
-            bool isCadastraReference = cadastralReference.Length.Equals(20);
+            bool isCadastralReference = normalizedCadastralReference.Length == 20;
             string url =
-                BASE_URL +
-                (isCadastraReference ? "cadastralreference/" : "cadastralparcel/") +
-                cadastralReference + "/?language=es";
+                BaseUrl +
+                (isCadastralReference ? "cadastralreference/" : "cadastralparcel/") +
+                Uri.EscapeDataString(normalizedCadastralReference) +
+                "/?language=es";
 
             try
             {
-                var response = HttpClient.GetAsync(url).Result;
+                using var response = await GetWithRetryAsync(url, cancellationToken);
                 response.EnsureSuccessStatusCode();
 
-                var content = response.Content.ReadAsStringAsync().Result;
-                if (!string.IsNullOrEmpty(content))
+                var content = await response.Content.ReadAsStringAsync(cancellationToken);
+                if (string.IsNullOrWhiteSpace(content))
                 {
-                    var data = JsonConvert.DeserializeObject<dynamic>(content);
-                    return GetAddress(data);
+                    return null;
                 }
+
+                var data = JToken.Parse(content);
+                return GetAddress(data);
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteError("GoolzoomApi GetAddrees", exception);
+                Logs.Log.WriteError("GoolzoomApi GetAddress", exception);
             }
 
             return null;
         }
 
-        private static string? GetAddress(dynamic data)
+        [Obsolete("Use GetAddress instead.")]
+        public string? GetAddrees(string cadastralReference)
         {
-            if (data == null)
+            return GetAddress(cadastralReference);
+        }
+
+        private static string? GetAddress(JToken? data)
+        {
+            JToken? registros = data?.SelectToken("datos[0].registros") ?? data?.SelectToken("registros");
+            JToken? finca = registros?["finca"];
+            if (finca is null)
             {
                 return null;
             }
 
-            dynamic? registros = null;
-            if (data.datos != null)
-            {
-                registros = data.datos[0].registros;
-            }
-            else if (data.registros != null)
-            {
-                registros = data.registros;
-            }
+            List<string?> addressParts =
+            [
+                finca["Dirección"]?.ToString(),
+                finca["Municipio"]?.ToString(),
+                finca["Provincia"]?.ToString()
+            ];
 
-            if (registros != null)
-            {
-                List<string?> addressParts =
-                [
-                    (string?)registros.finca.Dirección,
-                    (string?)registros.finca.Municipio,
-                    (string?)registros.finca.Provincia
-                ];
+            string address = string.Join(
+                ", ",
+                addressParts
+                    .Select(part => part?.Trim())
+                    .Where(part => !string.IsNullOrWhiteSpace(part)));
 
-                return string.Join(", ", addressParts.Where(part => !string.IsNullOrWhiteSpace(part)));
-            }
-
-            return null;
+            return string.IsNullOrWhiteSpace(address) ? null : address;
         }
 
         public string? GetAddresses(double latitude, double longitude, int radio)
         {
+            return GetAddressesAsync(latitude, longitude, radio).GetAwaiter().GetResult();
+        }
+
+        public async Task<string?> GetAddressesAsync(
+            double latitude,
+            double longitude,
+            int radio,
+            CancellationToken cancellationToken = default)
+        {
+            if (!IsValidCoordinate(latitude, longitude) || radio <= 0)
+            {
+                return null;
+            }
+
             string url =
-                BASE_URL + "radio/" +
+                BaseUrl + "radio/" +
                 latitude.ToString(CultureInfo.InvariantCulture) + "/" +
                 longitude.ToString(CultureInfo.InvariantCulture) + "/" +
-                radio + "/addresses";
+                radio.ToString(CultureInfo.InvariantCulture) + "/addresses";
 
             try
             {
-                var response = HttpClient.GetAsync(url).Result;
+                using var response = await GetWithRetryAsync(url, cancellationToken);
                 response.EnsureSuccessStatusCode();
-                return response.Content.ReadAsStringAsync().Result;
+                return await response.Content.ReadAsStringAsync(cancellationToken);
             }
             catch (Exception exception)
             {
-                Console.WriteLine($"Error in GoolzoomApi GetAddresses: {exception.Message} {url}");
+                Console.WriteLine($"Error in GoolzoomApi GetAddresses: {exception.Message}");
                 Logs.Log.WriteError("GoolzoomApi GetAddresses", exception);
             }
 
             return null;
         }
 
+        private static async Task<HttpResponseMessage> GetWithRetryAsync(
+            string url,
+            CancellationToken cancellationToken)
+        {
+            for (int attempt = 1; attempt <= MaxRetryAttempts; attempt++)
+            {
+                try
+                {
+                    var response = await SharedHttpClient.GetAsync(url, cancellationToken);
+                    if (!ShouldRetry(response.StatusCode) || attempt == MaxRetryAttempts)
+                    {
+                        return response;
+                    }
+
+                    response.Dispose();
+                    await Task.Delay(GetRetryDelay(attempt), cancellationToken);
+                }
+                catch (HttpRequestException) when (attempt < MaxRetryAttempts)
+                {
+                    await Task.Delay(GetRetryDelay(attempt), cancellationToken);
+                }
+            }
+
+            throw new InvalidOperationException("Goolzoom request retry loop ended without a response.");
+        }
+
+        private static bool ShouldRetry(HttpStatusCode statusCode)
+        {
+            return statusCode == HttpStatusCode.TooManyRequests ||
+                statusCode == HttpStatusCode.RequestTimeout ||
+                (int)statusCode >= 500;
+        }
+
+        private static TimeSpan GetRetryDelay(int attempt)
+        {
+            return TimeSpan.FromSeconds(attempt);
+        }
+
         private static HttpClient CreateHttpClient()
         {
-            var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("x-api-key", Configuration.PrivateConfig.GOOLZOOM_API);
+            var client = new HttpClient
+            {
+                Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT)
+            };
+
+            if (!string.IsNullOrWhiteSpace(PrivateConfig.GOOLZOOM_API))
+            {
+                client.DefaultRequestHeaders.Add("x-api-key", PrivateConfig.GOOLZOOM_API);
+            }
+
             return client;
         }
 
-        private HttpClient HttpClient => SharedHttpClient;
-
-        public static void UpdateLocationFromCadastralRef()
+        private static string? NormalizeReference(string cadastralReference)
         {
-            var listings = ES_Listings.GetListingWithCatastralReference();
-            int total = listings.Count;
-            int processed = 0;
-            int updated = 0;
-            int errors = 0;
-
-            var api = new GoolzoomApi();
-
-            foreach (var listing in listings)
-            {
-                processed++;
-
-                var latLng = api.GetLatLng(listing.cadastralReference);
-                if (latLng is { } result &&
-                    result.requestSucess &&
-                    result.lat.HasValue &&
-                    result.lng.HasValue)
-                {
-                    listing.latitude = result.lat.Value;
-                    listing.longitude = result.lng.Value;
-                    listing.locationIsAccurate = true;
-
-                    if (ES_Listings.Update(listing))
-                    {
-                        updated++;
-                    }
-                    else
-                    {
-                        errors++;
-                    }
-                }
-                else
-                {
-                    errors++;
-                }
-
-                Console.WriteLine($"Processed {processed}/{total}, Updated: {updated}, Errors: {errors}");
-            }
+            return string.IsNullOrWhiteSpace(cadastralReference)
+                ? null
+                : cadastralReference.Trim();
         }
 
-        public static void UpdateAddressFromCadastralRef()
+        private static bool IsValidCoordinate(double latitude, double longitude)
         {
-            var listings = ES_Listings.GetListingWithCatastralReferenceAndNoAddress();
-            int total = listings.Count;
-            int processed = 0;
-            int updated = 0;
-            int errors = 0;
-
-            var api = new GoolzoomApi();
-
-            foreach (var listing in listings)
-            {
-                processed++;
-
-                var address = api.GetAddrees(listing.cadastralReference);
-                if (!string.IsNullOrWhiteSpace(address))
-                {
-                    listing.address = address;
-
-                    if (ES_Listings.Update(listing))
-                    {
-                        updated++;
-                    }
-                    else
-                    {
-                        errors++;
-                    }
-                }
-                else
-                {
-                    errors++;
-                }
-
-                Console.WriteLine($"Processed {processed}/{total}, Updated: {updated}, Errors: {errors}");
-            }
+            return double.IsFinite(latitude)
+                && double.IsFinite(longitude)
+                && latitude is >= -90 and <= 90
+                && longitude is >= -180 and <= 180;
         }
     }
 }

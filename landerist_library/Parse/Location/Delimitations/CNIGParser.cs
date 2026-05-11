@@ -2,12 +2,16 @@
 using NetTopologySuite.IO;
 using Newtonsoft.Json;
 using System.Data;
-using System.Threading;
 
 namespace landerist_library.Parse.Location.Delimitations
 {
     public class CNIGParser
     {
+        private const string NatCodeColumnName = "NatCode";
+        private const string NameUnitColumnName = "NameUnit";
+        private const int NatCodeExpectedLength = 11;
+        private const int NatCodePrefixLength = 6;
+
         public static void Insert()
         {
             Database.CNIG.DeleteAll();
@@ -73,27 +77,47 @@ namespace landerist_library.Parse.Location.Delimitations
 
         public static (string natCode, string nameUnit)? GetNatCodeAndNameUnit(landerist_orels.ES.Listing listing)
         {
-            if (listing.latitude == null || listing.longitude == null)
+            ArgumentNullException.ThrowIfNull(listing);
+
+            if (listing.latitude is not double latitude || listing.longitude is not double longitude)
             {
                 return null;
             }
 
-            DataRow? dataRow = Database.CNIG.Get((double)listing.latitude, (double)listing.longitude);
+            return GetNatCodeAndNameUnit(latitude, longitude);
+        }
+
+        public static (string natCode, string nameUnit)? GetNatCodeAndNameUnit(double latitude, double longitude)
+        {
+            if (!IsValidCoordinate(latitude, longitude))
+            {
+                return null;
+            }
+
+            DataRow? dataRow = Database.CNIG.Get(latitude, longitude);
             if (dataRow == null)
             {
                 return null;
             }
 
-            string natCode = dataRow["natcode"].ToString() ?? string.Empty;
-            string nameUnit = dataRow["nameunit"].ToString() ?? string.Empty;
+            string natCode = dataRow[NatCodeColumnName].ToString()?.Trim() ?? string.Empty;
+            string nameUnit = dataRow[NameUnitColumnName].ToString()?.Trim() ?? string.Empty;
 
-            if (natCode.Length <= 6 || string.IsNullOrWhiteSpace(nameUnit))
+            if (natCode.Length != NatCodeExpectedLength || string.IsNullOrWhiteSpace(nameUnit))
             {
                 return null;
             }
 
-            natCode = natCode[6..]; // always natCode is 11 length
+            natCode = natCode[NatCodePrefixLength..];
             return (natCode, nameUnit);
+        }
+
+        private static bool IsValidCoordinate(double latitude, double longitude)
+        {
+            return double.IsFinite(latitude)
+                && double.IsFinite(longitude)
+                && latitude is >= -90 and <= 90
+                && longitude is >= -180 and <= 180;
         }
     }
 }
