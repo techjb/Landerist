@@ -1,42 +1,85 @@
-﻿using System.Data;
+using System.Text.RegularExpressions;
 
 namespace landerist_library.Database
 {
     public class AddressCadastralReference
     {
-        private const string ADDRESS_CADASTRAL_REFERENCE = "[ADDRESS_CADASTRAL_REFERENCE]";
+        private const string TableAddressCadastralReference = "[ADDRESS_CADASTRAL_REFERENCE]";
+        private const int AddressMaxLength = 200;
+        private const int CadastralReferenceMaxLength = 50;
 
-        public bool Insert(string address, string? cadastralReference)
+        public static bool Insert(string address, string? cadastralReference)
         {
+            string? normalizedAddress = NormalizeAddress(address);
+            string? normalizedCadastralReference = NormalizeCadastralReference(cadastralReference);
+
+            if (normalizedAddress is null || normalizedCadastralReference is null)
+            {
+                return false;
+            }
+
             string query =
-                "INSERT INTO " + ADDRESS_CADASTRAL_REFERENCE + " " +
+                "INSERT INTO " + TableAddressCadastralReference + " " +
+                "([DateInsert], [Address], [CadastralReference]) " +
                 "VALUES (GETDATE(), @Address, @CadastralReference)";
 
-            return new DataBase().Query(query, new Dictionary<string, object?> {
-                {"Address", address },
-                {"CadastralReference", cadastralReference }
+            return new DataBase().Query(query, new Dictionary<string, object?>
+            {
+                { "Address", normalizedAddress },
+                { "CadastralReference", normalizedCadastralReference }
             });
         }
 
-        public DataTable SelectTop1(string address)
+        public static string? Select(string address)
         {
-            string query =
-                "SELECT TOP 1 * " +
-                "FROM " + ADDRESS_CADASTRAL_REFERENCE + " " +
-                "WHERE Address = @Address";
+            string? normalizedAddress = NormalizeAddress(address);
+            if (normalizedAddress is null)
+            {
+                return null;
+            }
 
-            return new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"Address", address }
+            string query =
+                "SELECT [CadastralReference] " +
+                "FROM " + TableAddressCadastralReference + " " +
+                "WHERE [Address] = @Address";
+
+            return new DataBase().QueryString(query, new Dictionary<string, object?>
+            {
+                { "Address", normalizedAddress }
             });
         }
 
         public static bool Clean()
         {
             string query =
-                "DELETE FROM " + ADDRESS_CADASTRAL_REFERENCE + " " +
-                "WHERE [DateInsert] < DATEADD(YEAR, -2, GETDATE())";
+                "DELETE FROM " + TableAddressCadastralReference + " " +
+                "WHERE [DateInsert] < DATEADD(YEAR, -1, GETDATE())";
 
             return new DataBase().Query(query);
+        }
+
+        private static string? NormalizeAddress(string? address)
+        {
+            if (string.IsNullOrWhiteSpace(address))
+            {
+                return null;
+            }
+
+            string normalizedAddress = Regex.Replace(address.Trim(), @"\s+", " ");
+            return normalizedAddress.Length > AddressMaxLength ? null : normalizedAddress;
+        }
+
+        private static string? NormalizeCadastralReference(string? cadastralReference)
+        {
+            if (string.IsNullOrWhiteSpace(cadastralReference))
+            {
+                return null;
+            }
+
+            string normalizedCadastralReference = cadastralReference.Trim();
+            return normalizedCadastralReference.Length > CadastralReferenceMaxLength
+                ? null
+                : normalizedCadastralReference;
         }
     }
 }

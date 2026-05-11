@@ -1,6 +1,8 @@
-using landerist_library.Websites;
-using landerist_library.Parse.Location.Goolzoom;
+using landerist_library.Parse.CadastralReference;
 using landerist_library.Parse.Location.GoogleMaps;
+using landerist_library.Parse.Location.Goolzoom;
+using landerist_library.Websites;
+using landerist_orels.ES;
 
 namespace landerist_tests
 {
@@ -21,8 +23,10 @@ namespace landerist_tests
             //landerist_library.Tools.Validate.RemoveInvalidCatastralReferences();
 
             //string address = "Fuengirola, Torreblanca del Sol, Málaga, España, 29640";
+            //string address = "Calle Alondra 8, 28232, las rozas de madrid";
             //var latLNg = new GoogleMapsApi().GetLatLng(address, CountryCode.ES);
-            //var cadastralReference = new GoolzoomApi().GetAddresses(latLNg.Value.Latitude, latLNg.Value.Longitude, 10);
+            // var cadastralReference = new GoolzoomApi().GetAddresses(latLNg.Value.Latitude, latLNg.Value.Longitude, 10);
+            //var cadastralReference = new AddressToCadastralReference().GetCadastralReference(latLNg.Value.Latitude, latLNg.Value.Longitude, address);
             //Console.WriteLine(cadastralReference);
 
             //Console.WriteLine(d.latLng.ToString() + " " +  d.isAccurate);

@@ -15,14 +15,12 @@ namespace landerist_library.Parse.CadastralReference
                 return null;
             }
 
-            var addressCadastralReference = new AddressCadastralReference();
-
             if (firstTry)
             {
-                var dataTable = addressCadastralReference.SelectTop1(address);
-                if (dataTable.Rows.Count == 1)
+                string? cachedCadastralReference = AddressCadastralReference.Select(address);
+                if (!string.IsNullOrWhiteSpace(cachedCadastralReference))
                 {
-                    return dataTable.Rows[0].Field<string>("cadastralReference");
+                    return cachedCadastralReference;
                 }
             }
 
@@ -45,7 +43,7 @@ namespace landerist_library.Parse.CadastralReference
 
                     if (!string.IsNullOrEmpty(cadastralReference))
                     {
-                        addressCadastralReference.Insert(address, cadastralReference);
+                        AddressCadastralReference.Insert(address, cadastralReference);
                     }
                 }
             }
