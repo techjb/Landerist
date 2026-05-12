@@ -287,7 +287,7 @@ namespace landerist_library.Landerist_com
                 return false;
             }
 
-            return Update(filePathJson, countryCode, exportType, listings.Count, dateFrom, dateTo);
+            return UploadListingsFile(filePathJson, countryCode, exportType, listings.Count, dateFrom, dateTo);
         }
 
         private static bool Update(string filePath, CountryCode countryCode, ExportType exportType, int counter)
@@ -313,12 +313,34 @@ namespace landerist_library.Landerist_com
                 return false;
             }
 
-            if (!UploadHistoricFile(countryCode, exportType, filePathZip, subdirectoryInBucket, counter, dateFrom, dateTo))
+            if (!UploadHistoricFile(countryCode, exportType, filePathZip, subdirectoryInBucket, counter, dateFrom, dateTo, "zip"))
             {
                 return false;
             }
 
             Log.WriteInfo("filesupdater", fileNameZip);
+            return true;
+        }
+
+        private static bool UploadListingsFile(string filePath, CountryCode countryCode, ExportType exportType, int counter, DateOnly? dateFrom, DateOnly? dateTo)
+        {
+            string subdirectory = GetLocalSubdirectory(countryCode, exportType);
+            string fileNameJson = GetFileName(countryCode, exportType, "json");
+            string subdirectoryInBucket = subdirectory.Replace("\\", "/");
+            string contentDisposition = $"attachment; filename=\"{fileNameJson}\"";
+
+            var metadata = GetMetadata(counter, dateFrom, dateTo);
+            if (!new S3().UploadToDownloadsBucket(filePath, fileNameJson, subdirectoryInBucket, metadata, contentDisposition))
+            {
+                return false;
+            }
+
+            if (!UploadHistoricFile(countryCode, exportType, filePath, subdirectoryInBucket, counter, dateFrom, dateTo, "json"))
+            {
+                return false;
+            }
+
+            Log.WriteInfo("filesupdater", fileNameJson);
             return true;
         }
 
@@ -343,28 +365,30 @@ namespace landerist_library.Landerist_com
         private static bool UploadHistoricFile(
             CountryCode countryCode,
             ExportType exportType,
-            string filePathZip,
+            string filePath,
             string subdirectoryInBucket,
             int counter,
             DateOnly? dateFrom,
-            DateOnly? dateTo)
+            DateOnly? dateTo,
+            string extension)
         {
             string fileNameWithoutExtension = GetFileName(countryCode, exportType);
-            string newFileNameZip = GetFileNameWidhDate(Yesterday(), fileNameWithoutExtension, "zip");
+            string newFileName = GetFileNameWidhDate(Yesterday(), fileNameWithoutExtension, extension);
             string subdirectory = GetLocalSubdirectory(countryCode, exportType);
-            string newFilePathZip = GetFilePath(subdirectory, newFileNameZip);
+            string newFilePath = GetFilePath(subdirectory, newFileName);
 
             try
             {
-                File.Copy(filePathZip, newFilePathZip, true);
+                File.Copy(filePath, newFilePath, true);
                 var metadata = GetMetadata(counter, dateFrom, dateTo);
-                return new S3().UploadToDownloadsBucket(newFilePathZip, newFileNameZip, subdirectoryInBucket, metadata);
+                string contentDisposition = $"attachment; filename=\"{newFileName}\"";
+                return new S3().UploadToDownloadsBucket(newFilePath, newFileName, subdirectoryInBucket, metadata, contentDisposition);
             }
             finally
             {
-                if (File.Exists(newFilePathZip))
+                if (File.Exists(newFilePath))
                 {
-                    File.Delete(newFilePathZip);
+                    File.Delete(newFilePath);
                 }
             }
         }
@@ -376,8 +400,14 @@ namespace landerist_library.Landerist_com
 
             foreach (var exportType in exportTypes)
             {
-                var objectKey = GetObjectKey(CountryCode.ES, exportType, "zip");
+                var objectKey = GetObjectKey(CountryCode.ES, exportType, "json");
                 var metaDataValue = s3.GetMetadataValue(PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey, METADATA_KEY_DATETO);
+
+                if (metaDataValue is null)
+                {
+                    objectKey = GetObjectKey(CountryCode.ES, exportType, "zip");
+                    metaDataValue = s3.GetMetadataValue(PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey, METADATA_KEY_DATETO);
+                }
 
                 if (metaDataValue != null)
                 {

@@ -68,7 +68,7 @@ namespace landerist_library.Landerist_com
         private static void UpdateDownloadsTemplate(CountryCode countryCode, ExportType exportType)
         {
             var s3 = new S3();
-            string objectKey = GetObjectKey(countryCode, exportType, "zip");
+            string objectKey = GetObjectKey(countryCode, exportType, "json");
 
             var (lastModified, contentLength) = s3.GetFileInfo(PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey);
             if (lastModified is null || contentLength is null)
@@ -85,9 +85,9 @@ namespace landerist_library.Landerist_com
             Replace(Comment(countryCode, exportType, "Size"), sizeString);
 
             var url = $"https://{PrivateConfig.AWS_S3_DOWNLOADS_BUCKET}.s3.amazonaws.com/{objectKey}";
-            string fileName = GetFileName(countryCode, exportType, "zip");
+            string fileName = GetFileName(countryCode, exportType, "json");
             string counterText = counter ?? "-";
-            string counterHyperlink = $"<a title=\"Donwload\" href=\"{WebUtility.HtmlEncode(url)}\">{WebUtility.HtmlEncode(counterText)}</a>";
+            string counterHyperlink = $"<a title=\"Download\" href=\"{WebUtility.HtmlEncode(url)}\" download=\"{WebUtility.HtmlEncode(fileName)}\">{WebUtility.HtmlEncode(counterText)}</a>";
             Replace(Comment(countryCode, exportType, "Counter"), counterHyperlink);
         }
 
