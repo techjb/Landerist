@@ -19,7 +19,7 @@ namespace landerist_tests
             //new Scraper().Start();
             //new Scraper().Scrape(page, false);
 
-            //new landerist_library.Scrape.Scraper().Scrape("https://www.lucasfox.es/comprar-vivienda/espana/costa-blanca/alicante/albufereta/atico/ali53589.html", true);
+            //new landerist_library.Scrape.Scraper().Scrape("https://www.aproperties.es/sitges/centro/piso-de-116-m2-con-terraza-y-vistas-en-venta-en-centro-sitges", false);
             //new Scraper().TestSinglePage();
             //landerist_library.Scrape.PageSelector.SelectTop1();
             //Console.WriteLine("Block: " + WebsitesThrottle.Block(page.Website));

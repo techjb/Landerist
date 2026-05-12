@@ -42,7 +42,7 @@ namespace landerist_tests
             //WebsitesCleanner.DeletePagesDiscardedByIndexUrlRegex("www.engelvoelkers.com");
 
 
-            string hostUri = "www.lucasfox.es";
+            //string hostUri = "www.aproperties.es";
             //string mainUri = "https://www.redpiso.es/";
             //string listingUrlRegex = @"^https:\/\/www\.redpiso\.es\/inmueble\/(?:[a-z0-9][a-z0-9.-]*-)?[Rr][Pp]\d+\/?$";
             //string indexUrlRegex = listingUrlRegex;
@@ -51,8 +51,8 @@ namespace landerist_tests
 
             //WebsitesInserter.InsertSpecialWebsite(mainUri, hostUri, listingUrlRegex, indexUrlRegex, sitemapUrlRegex, allowebResourceTypes);
 
-            Website website = new(hostUri);
-            website.ReadSitemap();
+            //Website website = new(hostUri);
+            //website.ReadSitemap();
 
         }
     }
