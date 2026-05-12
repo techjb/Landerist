@@ -61,8 +61,7 @@ namespace landerist_library.Landerist_com
                 ExportType.Published,
                 ExportType.Unpublished,
                 ExportType.PublishedUpdates,
-                ExportType.UnpublishedUpdates,
-                ExportType.Websites
+                ExportType.UnpublishedUpdates
             ];
         }
 
