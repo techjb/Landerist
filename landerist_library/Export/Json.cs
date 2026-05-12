@@ -51,8 +51,23 @@ namespace landerist_library.Export
                 DateFormatString = "yyyy-MM-ddTHH:mm:ssK",
                 DateTimeZoneHandling = DateTimeZoneHandling.Local
             };
+            serializer.Converters.Add(new AbsoluteUriJsonConverter());
             serializer.Converters.Add(new StringEnumConverter());
             return serializer;
+        }
+
+        private sealed class AbsoluteUriJsonConverter : JsonConverter<Uri>
+        {
+            public override void WriteJson(JsonWriter writer, Uri? value, JsonSerializer serializer)
+            {
+                writer.WriteValue(value?.AbsoluteUri);
+            }
+
+            public override Uri? ReadJson(JsonReader reader, Type objectType, Uri? existingValue, bool hasExistingValue, JsonSerializer serializer)
+            {
+                var value = reader.Value?.ToString();
+                return Uri.TryCreate(value, UriKind.Absolute, out var uri) ? uri : null;
+            }
         }
     }
 }
