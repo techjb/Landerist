@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 using System.Globalization;
 using System.Net;
 
-namespace landerist_library.Parse.Location.Goolzoom
+namespace landerist_library.Parse.Location.Providers.Goolzoom
 {
     public class GoolzoomCenter
     {
@@ -250,3 +250,4 @@ namespace landerist_library.Parse.Location.Goolzoom
         }
     }
 }
+

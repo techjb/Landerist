@@ -1,6 +1,6 @@
 using landerist_library.Database;
 
-namespace landerist_library.Parse.Location.Goolzoom
+namespace landerist_library.Parse.Location.Providers.Goolzoom
 {
     public static class GoolzoomListingsUpdater
     {
@@ -81,3 +81,4 @@ namespace landerist_library.Parse.Location.Goolzoom
         }
     }
 }
+

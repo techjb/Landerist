@@ -1,5 +1,5 @@
-﻿using landerist_library.Database;
-using landerist_library.Parse.Location.Goolzoom;
+using landerist_library.Database;
+using landerist_library.Parse.Location.Providers.Goolzoom;
 using landerist_library.Statistics;
 using Newtonsoft.Json;
 using System.Data;
@@ -160,3 +160,4 @@ namespace landerist_library.Parse.CadastralReference
         }
     }
 }
+

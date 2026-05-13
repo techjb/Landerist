@@ -1,8 +1,8 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Configuration;
 using landerist_library.Websites;
 using Newtonsoft.Json;
 
-namespace landerist_library.Parse.Location.GoogleMaps
+namespace landerist_library.Parse.Location.Providers.GoogleMaps
 {
     public class GoogleMapsApi
     {
@@ -199,3 +199,4 @@ namespace landerist_library.Parse.Location.GoogleMaps
         }
     }
 }
+

@@ -1,7 +1,7 @@
 using landerist_library.Database;
 using landerist_library.Websites;
 
-namespace landerist_library.Parse.Location.GoogleMaps
+namespace landerist_library.Parse.Location.Providers.GoogleMaps
 {
     internal class GoogleMapsLatLngCache
     {
@@ -56,3 +56,4 @@ namespace landerist_library.Parse.Location.GoogleMaps
         }
     }
 }
+

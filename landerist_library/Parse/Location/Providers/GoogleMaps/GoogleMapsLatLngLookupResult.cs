@@ -1,4 +1,4 @@
-namespace landerist_library.Parse.Location.GoogleMaps
+namespace landerist_library.Parse.Location.Providers.GoogleMaps
 {
     public readonly record struct GoogleMapsLatLngResult(double Latitude, double Longitude, bool IsAccurate);
 
@@ -13,3 +13,4 @@ namespace landerist_library.Parse.Location.GoogleMaps
         GoogleMapsLatLngLookupStatus Status,
         GoogleMapsLatLngResult? Coordinates);
 }
+

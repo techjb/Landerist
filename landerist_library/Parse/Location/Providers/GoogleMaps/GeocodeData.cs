@@ -1,4 +1,4 @@
-﻿namespace landerist_library.Parse.Location.GoogleMaps
+namespace landerist_library.Parse.Location.Providers.GoogleMaps
 {
 #pragma warning disable IDE1006
     public class GeocodeData
@@ -81,3 +81,4 @@
 
 #pragma warning restore IDE1006
 }
+

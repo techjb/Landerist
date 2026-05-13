@@ -1,6 +1,6 @@
 using landerist_library.Parse.CadastralReference;
-using landerist_library.Parse.Location.GoogleMaps;
-using landerist_library.Parse.Location.Goolzoom;
+using landerist_library.Parse.Location.Providers.GoogleMaps;
+using landerist_library.Parse.Location.Providers.Goolzoom;
 using landerist_library.Websites;
 using landerist_orels.ES;
 
@@ -10,13 +10,13 @@ namespace landerist_tests
     {
         public static void Run()
         {
-            //var tuple1 = new landerist_library.Parse.Location.GoogleMaps.GoogleMapsApi().GetLatLng("Av. Domingo Bueno, 126. O Porriño, 36.400 Pontevedra", CountryCode.ES);
+            //var tuple1 = new landerist_library.Parse.Location.Providers.GoogleMaps.GoogleMapsApi().GetLatLng("Av. Domingo Bueno, 126. O Porriño, 36.400 Pontevedra", CountryCode.ES);
             //Console.WriteLine(tuple1);
 
-            //var tuple1 = new landerist_library.Parse.Location.Goolzoom.GoolzoomApi().GetLatLng("9441515XM7094A0001FT");
+            //var tuple1 = new landerist_library.Parse.Location.Providers.Goolzoom.GoolzoomApi().GetLatLng("9441515XM7094A0001FT");
             //Console.WriteLine(tuple1);
 
-            //var tuple2 = landerist_library.Parse.Location.Goolzoom.CadastralRefToLatLng.GetLatLng("9441515XM7094A");
+            //var tuple2 = landerist_library.Parse.Location.Providers.Goolzoom.CadastralRefToLatLng.GetLatLng("9441515XM7094A");
             //Console.WriteLine(tuple2);
 
             //Console.WriteLine(landerist_library.Tools.Validate.CadastralReference("3979515DD7737H0002LX"));
@@ -42,3 +42,4 @@ namespace landerist_tests
         }
     }
 }
+
