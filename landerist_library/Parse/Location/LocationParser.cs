@@ -56,13 +56,13 @@ namespace landerist_library.Parse.Location
                 return;
             }
 
-            var htmlDocument = Page.GetHtmlDocument();
-            if (htmlDocument != null && AddHtmlLatLng(htmlDocument))
+            if (AddAddressLatLng())
             {
                 return;
             }
 
-            if (AddAddressLatLng())
+            var htmlDocument = Page.GetHtmlDocument();
+            if (htmlDocument != null && AddHtmlLatLng(htmlDocument))
             {
                 return;
             }
