@@ -261,7 +261,7 @@ namespace landerist_library.Scrape
             Scrape(page, useProxy);
         }
 
-        private bool TryApplyPreClassificationBeforeDownload(Page page)
+        public bool TryApplyPreClassificationBeforeDownload(Page page)
         {
             var success = new PageScraper(page).TryApplyPreClassificationBeforeDownload();
             if (success)

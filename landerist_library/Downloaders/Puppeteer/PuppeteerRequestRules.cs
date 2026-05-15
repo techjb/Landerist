@@ -81,7 +81,8 @@ namespace landerist_library.Downloaders.Puppeteer
             "cercalia.com",
             "content-autofill.googleapis.com",
             "android.clients.google.com",
-            "accounts.google.com"
+            "accounts.google.com",
+            "android.clients.google.com"
         };
 
         private static readonly HashSet<string> BlockedExtensions = new(StringComparer.OrdinalIgnoreCase)
@@ -104,6 +105,11 @@ namespace landerist_library.Downloaders.Puppeteer
 
         public static PuppeteerRequestAction GetAction(RequestEventArgs e, Pages.Page currentPage)
         {
+            if (IsFaviconRequest(e.Request.Url))
+            {
+                return PuppeteerRequestAction.Abort;
+            }
+
             var allowedResourceTypes = GetAllowedResourceTypes(currentPage.Website.AllowedResourceTypes);
             if (allowedResourceTypes is not null)
             {
@@ -119,6 +125,7 @@ namespace landerist_library.Downloaders.Puppeteer
 
             var requestHost = GetRequestHost(e.Request.Url, currentPage.Uri.Host);
             var url = e.Request.Url.ToLowerInvariant();
+            //Console.WriteLine(url);
             if (BlockedDomains.Contains(requestHost) ||
                 BlockedExtensions.Any(url.EndsWith) ||
                 e.Request.IsNavigationRequest && e.Request.RedirectChain.Length != 0)
@@ -127,6 +134,21 @@ namespace landerist_library.Downloaders.Puppeteer
             }
 
             return PuppeteerRequestAction.Continue;
+        }
+
+        private static bool IsFaviconRequest(string url)
+        {
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
+            {
+                return false;
+            }
+
+            var path = uri.AbsolutePath.ToLowerInvariant();
+
+            return path.EndsWith("/favicon.ico") ||
+                   path.Contains("/favicon-") ||
+                   path.Contains("/apple-touch-icon") ||
+                   path.EndsWith(".ico");
         }
 
         private static HashSet<ResourceType>? GetAllowedResourceTypes(string? allowedResourceTypes)

@@ -42,7 +42,7 @@ namespace landerist_tests
             //WebsitesCleanner.DeletePagesDiscardedByIndexUrlRegex("www.engelvoelkers.com");
 
 
-            //string hostUri = "forcadell.com";
+            //string hostUri = "www.iadespana.es";
             //string mainUri = "https://forcadell.com/";
             //string listingUrlRegex = @"^https:\/\/forcadell\.com\/propiedades\/(?:[a-z0-9_-]|%[0-9a-f]{2})+\/?$";
             //string indexUrlRegex = listingUrlRegex;
