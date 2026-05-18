@@ -164,8 +164,8 @@ namespace landerist_library.Landerist_com
                 return counterText;
             }
 
-            string fileName = GetListingsByOperationPropertyTypeFileName(operation, propertyType, listingStatus, "json");
-            return $"<a title=\"Donwload\" href=\"{WebUtility.HtmlEncode(url)}\" download=\"{WebUtility.HtmlEncode(fileName)}\">{counterText}</a>";
+            string fileName = GetListingsByOperationPropertyTypeFileName(CountryCode.ES, operation, propertyType, listingStatus, "json");
+            return $"<a title=\"Download\" href=\"{WebUtility.HtmlEncode(url)}\" download=\"{WebUtility.HtmlEncode(fileName)}\">{counterText}</a>";
         }
 
         private static string? GetListingsByOperationPropertyTypeDownloadUrl(
@@ -190,16 +190,7 @@ namespace landerist_library.Landerist_com
             ListingStatus listingStatus,
             string extension)
         {
-            return $"{LISTINGS_BY_OPERATION_PROPERTY_TYPE_SUBDIRECTORY}/{GetListingsByOperationPropertyTypeFileName(operation, propertyType, listingStatus, extension)}";
-        }
-
-        private static string GetListingsByOperationPropertyTypeFileName(
-            Operation operation,
-            PropertyType propertyType,
-            ListingStatus listingStatus,
-            string extension)
-        {
-            return $"{operation}_{propertyType}_listings_{listingStatus}.{extension}";
+            return $"{LISTINGS_BY_OPERATION_PROPERTY_TYPE_SUBDIRECTORY}/{GetListingsByOperationPropertyTypeFileName(CountryCode.ES, operation, propertyType, listingStatus, extension)}";
         }
 
         private static string GetHostsTableRows()
@@ -229,12 +220,12 @@ namespace landerist_library.Landerist_com
             return
                 "                <tr>" + Environment.NewLine +
                 $"                    <td>{WebUtility.HtmlEncode(website.Host)}</td>" + Environment.NewLine +
-                $"                    <td>{GetHostDownloadCellText(website.Host, "listings_published", "json", publishedListingsCount)}</td>" + Environment.NewLine +
-                $"                    <td>{GetHostDownloadCellText(website.Host, "listings_unpublished", "json", unpublishedListingsCount)}</td>" + Environment.NewLine +
+                $"                    <td>{GetHostDownloadCellText(website.Host, ListingStatus.published, "json", publishedListingsCount)}</td>" + Environment.NewLine +
+                $"                    <td>{GetHostDownloadCellText(website.Host, ListingStatus.unpublished, "json", unpublishedListingsCount)}</td>" + Environment.NewLine +
                 "                </tr>";
         }
 
-        private static string GetHostDownloadCellText(string host, string downloadType, string extension, int counter)
+        private static string GetHostDownloadCellText(string host, ListingStatus listingStatus, string extension, int counter)
         {
             string counterText = counter.ToString(CultureInfo.InvariantCulture);
             if (counter <= 0)
@@ -242,19 +233,19 @@ namespace landerist_library.Landerist_com
                 return counterText;
             }
 
-            string? url = GetHostDownloadUrl(host, downloadType, extension);
+            string? url = GetHostDownloadUrl(host, listingStatus, extension);
             if (string.IsNullOrWhiteSpace(url))
             {
                 return counterText;
             }
 
-            string fileName = GetHostFileName(host, downloadType, extension);
-            return $"<a title=\"Donwload\" href=\"{WebUtility.HtmlEncode(url)}\" download=\"{WebUtility.HtmlEncode(fileName)}\">{counterText}</a>";
+            string fileName = GetHostListingsFileName(CountryCode.ES, host, listingStatus, extension);
+            return $"<a title=\"Download\" href=\"{WebUtility.HtmlEncode(url)}\" download=\"{WebUtility.HtmlEncode(fileName)}\">{counterText}</a>";
         }
 
-        private static string? GetHostDownloadUrl(string host, string downloadType, string extension)
+        private static string? GetHostDownloadUrl(string host, ListingStatus listingStatus, string extension)
         {
-            string objectKey = GetHostObjectKey(host, downloadType, extension);
+            string objectKey = GetHostObjectKey(host, listingStatus, extension);
             var (lastModified, contentLength) = new S3().GetFileInfo(PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey);
 
             if (lastModified is null || contentLength is null)
@@ -265,14 +256,9 @@ namespace landerist_library.Landerist_com
             return $"https://{PrivateConfig.AWS_S3_DOWNLOADS_BUCKET}.s3.amazonaws.com/{objectKey}";
         }
 
-        private static string GetHostObjectKey(string host, string downloadType, string extension)
+        private static string GetHostObjectKey(string host, ListingStatus listingStatus, string extension)
         {
-            return $"ES/Hosts/{GetHostFileName(host, downloadType, extension)}";
-        }
-
-        private static string GetHostFileName(string host, string downloadType, string extension)
-        {
-            return $"{host}_{downloadType}.{extension}";
+            return $"ES/Hosts/{GetHostListingsFileName(CountryCode.ES, host, listingStatus, extension)}";
         }
 
         private static string Comment(CountryCode countryCode, ExportType exportType, string key)

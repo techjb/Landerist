@@ -103,7 +103,7 @@ namespace landerist_library.Landerist_com
                 return false;
             }
 
-            return Update(filePath, CountryCode.ES, ExportType.Websites, websites.Count);
+            return UploadWebsitesFile(filePath, CountryCode.ES, websites.Count);
         }
 
         public static bool UpdateListingsByWebsite()
@@ -127,8 +127,8 @@ namespace landerist_library.Landerist_com
 
             foreach (var website in websites)
             {
-                if (!UpdateHostListings(website, ListingStatus.published, "listings_published") ||
-                    !UpdateHostListings(website, ListingStatus.unpublished, "listings_unpublished"))
+                if (!UpdateHostListings(website, ListingStatus.published) ||
+                    !UpdateHostListings(website, ListingStatus.unpublished))
                 {
                     Log.WriteError("filesupdater", "Error updating host files: " + website.Host);
                     return false;
@@ -181,7 +181,7 @@ namespace landerist_library.Landerist_com
                 return true;
             }
 
-            string fileName = GetListingsByOperationPropertyTypeFileName(operation, propertyType, listingStatus, "json");
+            string fileName = GetListingsByOperationPropertyTypeFileName(CountryCode.ES, operation, propertyType, listingStatus, "json");
             string filePath = GetFilePath(LISTINGS_BY_OPERATION_PROPERTY_TYPE_SUBDIRECTORY, fileName);
 
             if (!Json.ExportListings(listings, filePath))
@@ -192,7 +192,7 @@ namespace landerist_library.Landerist_com
             return UploadListingsByOperationPropertyTypeFile(filePath, operation, propertyType, listingStatus, listings.Count, "json");
         }
 
-        private static bool UpdateHostListings(Website website, ListingStatus? listingStatus, string suffix)
+        private static bool UpdateHostListings(Website website, ListingStatus listingStatus)
         {
             var listings = ES_Listings.GetListings(website.Host, listingStatus);
             if (listings.Count == 0)
@@ -200,7 +200,7 @@ namespace landerist_library.Landerist_com
                 return true;
             }
 
-            string fileName = GetHostFileName(website.Host, suffix, "json");
+            string fileName = GetHostListingsFileName(CountryCode.ES, website.Host, listingStatus, "json");
             string filePath = GetFilePath(HOSTS_SUBDIRECTORY, fileName);
 
             if (!Json.ExportListings(listings, filePath))
@@ -208,7 +208,7 @@ namespace landerist_library.Landerist_com
                 return false;
             }
 
-            return UploadHostFile(filePath, website.Host, suffix, listings.Count, "json");
+            return UploadHostFile(filePath, website.Host, listingStatus, listings.Count, "json");
         }
 
         private static bool UploadListingsByOperationPropertyTypeFile(
@@ -219,7 +219,7 @@ namespace landerist_library.Landerist_com
             int counter,
             string extension)
         {
-            string fileName = GetListingsByOperationPropertyTypeFileName(operation, propertyType, listingStatus, extension);
+            string fileName = GetListingsByOperationPropertyTypeFileName(CountryCode.ES, operation, propertyType, listingStatus, extension);
             string subdirectoryInBucket = LISTINGS_BY_OPERATION_PROPERTY_TYPE_SUBDIRECTORY.Replace("\\", "/");
             string contentDisposition = $"attachment; filename=\"{fileName}\"";
 
@@ -233,9 +233,9 @@ namespace landerist_library.Landerist_com
             return true;
         }
 
-        private static bool UploadHostFile(string filePath, string host, string suffix, int counter, string extension)
+        private static bool UploadHostFile(string filePath, string host, ListingStatus listingStatus, int counter, string extension)
         {
-            string fileName = GetHostFileName(host, suffix, extension);
+            string fileName = GetHostListingsFileName(CountryCode.ES, host, listingStatus, extension);
             string subdirectoryInBucket = HOSTS_SUBDIRECTORY.Replace("\\", "/");
             string contentDisposition = $"attachment; filename=\"{fileName}\"";
 
@@ -247,20 +247,6 @@ namespace landerist_library.Landerist_com
 
             Log.WriteInfo("filesupdater", fileName);
             return true;
-        }
-
-        private static string GetHostFileName(string host, string suffix, string extension)
-        {
-            return host + "_" + suffix + "." + extension;
-        }
-
-        private static string GetListingsByOperationPropertyTypeFileName(
-            Operation operation,
-            PropertyType propertyType,
-            ListingStatus listingStatus,
-            string extension)
-        {
-            return $"{operation}_{propertyType}_listings_{listingStatus}.{extension}";
         }
 
         private static bool Update(SortedSet<Listing> listings, CountryCode countryCode, ExportType exportType, DateOnly? dateFrom, DateOnly? dateTo)
@@ -344,6 +330,29 @@ namespace landerist_library.Landerist_com
             return true;
         }
 
+        private static bool UploadWebsitesFile(string filePath, CountryCode countryCode, int counter)
+        {
+            ExportType exportType = ExportType.Websites;
+            string subdirectory = GetLocalSubdirectory(countryCode, exportType);
+            string fileNameCsv = GetFileName(countryCode, exportType, "csv");
+            string subdirectoryInBucket = subdirectory.Replace("\\", "/");
+            string contentDisposition = $"attachment; filename=\"{fileNameCsv}\"";
+
+            var metadata = GetMetadata(counter, null, null);
+            if (!new S3().UploadToDownloadsBucket(filePath, fileNameCsv, subdirectoryInBucket, metadata, contentDisposition))
+            {
+                return false;
+            }
+
+            if (!UploadHistoricFile(countryCode, exportType, filePath, subdirectoryInBucket, counter, null, null, "csv"))
+            {
+                return false;
+            }
+
+            Log.WriteInfo("filesupdater", fileNameCsv);
+            return true;
+        }
+
         private static List<(string, string)> GetMetadata(int counter, DateOnly? dateFrom, DateOnly? dateTo)
         {
             List<(string, string)> metadata = [];
@@ -372,8 +381,7 @@ namespace landerist_library.Landerist_com
             DateOnly? dateTo,
             string extension)
         {
-            string fileNameWithoutExtension = GetFileName(countryCode, exportType);
-            string newFileName = GetFileNameWidhDate(Yesterday(), fileNameWithoutExtension, extension);
+            string newFileName = GetHistoricFileName(countryCode, exportType, dateFrom, dateTo, extension);
             string subdirectory = GetLocalSubdirectory(countryCode, exportType);
             string newFilePath = GetFilePath(subdirectory, newFileName);
 
@@ -393,6 +401,41 @@ namespace landerist_library.Landerist_com
             }
         }
 
+        private static string GetHistoricFileName(
+            CountryCode countryCode,
+            ExportType exportType,
+            DateOnly? dateFrom,
+            DateOnly? dateTo,
+            string extension)
+        {
+            string fileNameWithoutExtension = GetFileName(countryCode, exportType);
+            if (IsUpdatesExportType(exportType) && dateFrom.HasValue && dateTo.HasValue)
+            {
+                return GetFileNameWithDateRange(dateFrom.Value, dateTo.Value, fileNameWithoutExtension, extension);
+            }
+
+            if (UsesModernHistoricFileName(exportType))
+            {
+                return GetFileNameWithDate(Yesterday(), fileNameWithoutExtension, extension);
+            }
+
+            return GetLegacyFileNameWithDate(Yesterday(), fileNameWithoutExtension, extension);
+        }
+
+        private static bool IsUpdatesExportType(ExportType exportType)
+        {
+            return exportType is ExportType.PublishedUpdates or ExportType.UnpublishedUpdates;
+        }
+
+        private static bool UsesModernHistoricFileName(ExportType exportType)
+        {
+            return exportType is ExportType.Published
+                or ExportType.Unpublished
+                or ExportType.PublishedUpdates
+                or ExportType.UnpublishedUpdates
+                or ExportType.Websites;
+        }
+
         private static DateOnly GetDateFrom(params ExportType[] exportTypes)
         {
             var dateFrom = Yesterday();
@@ -400,28 +443,36 @@ namespace landerist_library.Landerist_com
 
             foreach (var exportType in exportTypes)
             {
-                var objectKey = GetObjectKey(CountryCode.ES, exportType, "json");
-                var metaDataValue = s3.GetMetadataValue(PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey, METADATA_KEY_DATETO);
-
-                if (metaDataValue is null)
+                foreach (string objectKey in GetObjectKeysForMetadata(exportType))
                 {
-                    objectKey = GetObjectKey(CountryCode.ES, exportType, "zip");
-                    metaDataValue = s3.GetMetadataValue(PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey, METADATA_KEY_DATETO);
-                }
-
-                if (metaDataValue != null)
-                {
-                    if (DateOnly.TryParseExact(metaDataValue, METADATA_DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly dateTo))
+                    var metaDataValue = s3.GetMetadataValue(PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey, METADATA_KEY_DATETO);
+                    if (metaDataValue != null &&
+                        DateOnly.TryParseExact(metaDataValue, METADATA_DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly dateTo))
                     {
                         if (dateTo.AddDays(1) < dateFrom)
                         {
                             dateFrom = dateTo.AddDays(1);
                         }
+
+                        break;
                     }
                 }
             }
 
             return dateFrom;
+        }
+
+        private static List<string> GetObjectKeysForMetadata(ExportType exportType)
+        {
+            List<string> objectKeys =
+            [
+                GetObjectKey(CountryCode.ES, exportType, "json"),
+                GetObjectKey(CountryCode.ES, exportType, "zip"),
+                GetLegacyObjectKey(CountryCode.ES, exportType, "json"),
+                GetLegacyObjectKey(CountryCode.ES, exportType, "zip")
+            ];
+
+            return objectKeys.Distinct(StringComparer.Ordinal).ToList();
         }
 
         private static DateOnly Yesterday()
