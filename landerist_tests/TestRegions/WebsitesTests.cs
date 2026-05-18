@@ -42,11 +42,11 @@ namespace landerist_tests
             //WebsitesCleanner.DeletePagesDiscardedByIndexUrlRegex("www.engelvoelkers.com");
 
 
-            //string hostUri = "www.iadespana.es";
-            //string mainUri = "https://forcadell.com/";
-            //string listingUrlRegex = @"^https:\/\/forcadell\.com\/propiedades\/(?:[a-z0-9_-]|%[0-9a-f]{2})+\/?$";
+            //string hostUri = "century21.es";
+            //string mainUri = "https://century21.es/";
+            //string listingUrlRegex = @"^https:\/\/century21\.es\/ref\/[A-Z0-9]+(?:-[A-Z0-9]+)+$";
             //string indexUrlRegex = listingUrlRegex;
-            //string sitemapUrlRegex = @"^https:\/\/forcadell\.com\/(?:sitemap_index|properties_post-sitemap[23]?)\.xml$";
+            //string sitemapUrlRegex = @"^https:\/\/century21\.es\/(?:sitemap_index\.xml|ref\/sitemap\/\d+\.xml)$";
             //string allowebResourceTypes = "Unknown,Beacon,Document,StyleSheet,Script,TextTrack,Xhr,Fetch,EventSource,WebSocket,Manifest,Ping,Other";
 
             //WebsitesInserter.InsertSpecialWebsite(mainUri, hostUri, listingUrlRegex, indexUrlRegex, sitemapUrlRegex, allowebResourceTypes);

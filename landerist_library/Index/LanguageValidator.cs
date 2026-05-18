@@ -83,7 +83,7 @@ namespace landerist_library.Index
                 return false;
             }
 
-            var hrefLangParts = hreflang.Split('-', StringSplitOptions.RemoveEmptyEntries);
+            var hrefLangParts = hreflang.Split(['-', '_'], StringSplitOptions.RemoveEmptyEntries);
             if (hrefLangParts.Length == 0 || hrefLangParts.Length > 2)
             {
                 return false;
