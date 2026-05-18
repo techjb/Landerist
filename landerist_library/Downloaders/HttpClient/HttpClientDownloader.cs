@@ -11,6 +11,7 @@ namespace landerist_library.Downloaders.HttpClient
         public byte[]? Screenshot { get; set; } = null;
         public string? RedirectUrl { get; set; } = null;
         public string? Etag { get; set; } = null;
+        public string? LastModified { get; set; } = null;
 
         private HttpResponseMessage? HttpResponseMessage;
 
@@ -21,14 +22,26 @@ namespace landerist_library.Downloaders.HttpClient
             Screenshot = null;
             RedirectUrl = null;
             Etag = null;
+            LastModified = null;
 
             GetAsync(page.Website.LanguageCode, page.Uri);
             if (HttpResponseMessage != null)
             {
                 HttpStatusCode = (short)HttpResponseMessage.StatusCode;
                 Etag = HttpResponseMessage.Headers.ETag?.ToString();
+                LastModified = GetLastModified();
             }
             page.SetDownloadedData(this);
+        }
+
+        private string? GetLastModified()
+        {
+            if (HttpResponseMessage?.Content.Headers.TryGetValues("Last-Modified", out var lastModifiedValues) == true)
+            {
+                return lastModifiedValues.FirstOrDefault();
+            }
+
+            return null;
         }
 
         public async void GetAsync(LanguageCode languageCode, Uri uri)

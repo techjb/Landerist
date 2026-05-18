@@ -319,6 +319,7 @@ CREATE TABLE [dbo].[PAGES](
 	[ListingParserInputNotChangedCounter] [smallint] NULL,
 	[TransientErrorCounter] [smallint] NULL,
 	[Etag] [varchar](512) NULL,
+	[LastModified] [varchar](512) NULL,
  CONSTRAINT [PK_PAGES] PRIMARY KEY CLUSTERED 
 (
 	[UriHash] ASC

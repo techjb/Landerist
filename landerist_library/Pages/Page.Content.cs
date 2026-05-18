@@ -43,11 +43,18 @@ namespace landerist_library.Pages
 
         public void SetDownloadedData(IDownloader downloader)
         {
-            var previousEtag = NormalizeEtag(Etag);
-            var downloadedEtag = NormalizeEtag(downloader.Etag);
+            var previousEtag = NormalizeHeaderValue(Etag);
+            var downloadedEtag = NormalizeHeaderValue(downloader.Etag);
+            var previousLastModified = NormalizeHeaderValue(LastModified);
+            var downloadedLastModified = NormalizeHeaderValue(downloader.LastModified);
 
             HasComparableEtag = !string.IsNullOrEmpty(previousEtag) && !string.IsNullOrEmpty(downloadedEtag);
             EtagNotChanged = HasComparableEtag && string.Equals(previousEtag, downloadedEtag, StringComparison.Ordinal);
+            HasComparableLastModified = !HasComparableEtag &&
+                !string.IsNullOrEmpty(previousLastModified) &&
+                !string.IsNullOrEmpty(downloadedLastModified);
+            LastModifiedNotChanged = HasComparableLastModified &&
+                string.Equals(previousLastModified, downloadedLastModified, StringComparison.Ordinal);
 
             ResponseBody = downloader.Content;
             ResetResponseBodyDerivedData();
@@ -55,13 +62,23 @@ namespace landerist_library.Pages
             HttpStatusCode = downloader.HttpStatusCode;
             RedirectUrl = downloader.RedirectUrl;
             Etag = downloadedEtag;
+            LastModified = downloadedLastModified;
         }
 
         public bool EtagHasNotChanged()
         {
+            return DownloadedHeadersHaveNotChanged();
+        }
+
+        public bool DownloadedHeadersHaveNotChanged()
+        {
             if (HasComparableEtag)
             {
                 return EtagNotChanged;
+            }
+            if (HasComparableLastModified)
+            {
+                return LastModifiedNotChanged;
             }
             return false;
         }
@@ -154,9 +171,9 @@ namespace landerist_library.Pages
             OriginalOuterHtml = null;
         }
 
-        private static string? NormalizeEtag(string? etag)
+        private static string? NormalizeHeaderValue(string? headerValue)
         {
-            return string.IsNullOrWhiteSpace(etag) ? null : etag.Trim();
+            return string.IsNullOrWhiteSpace(headerValue) ? null : headerValue.Trim();
         }
     }
 }

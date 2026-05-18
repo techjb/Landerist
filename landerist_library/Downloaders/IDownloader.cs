@@ -14,6 +14,8 @@ namespace landerist_library.Downloaders
 
         public string? Etag { get; set; }
 
+        public string? LastModified { get; set; }
+
         public void Download(Page page);
 
     }

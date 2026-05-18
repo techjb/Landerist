@@ -14,6 +14,7 @@ namespace landerist_library.Downloaders.Puppeteer
         public short? HttpStatusCode { get; set; } = null;
         public string? RedirectUrl { get; set; } = null;
         public string? Etag { get; set; } = null;
+        public string? LastModified { get; set; } = null;
 
         private Pages.Page? Page;
         private readonly LaunchOptions launchOptions;
@@ -234,6 +235,7 @@ namespace landerist_library.Downloaders.Puppeteer
             HttpStatusCode = null;
             RedirectUrl = null;
             Etag = null;
+            LastModified = null;
             Page = page;
 
             var delay = GetTimeout(UseProxy);
@@ -511,6 +513,7 @@ namespace landerist_library.Downloaders.Puppeteer
 
                 HttpStatusCode = (short)e.Response.Status;
                 Etag = GetHeaderValue(e.Response.Headers, "ETag");
+                LastModified = GetHeaderValue(e.Response.Headers, "Last-Modified");
                 var location = GetHeaderValue(e.Response.Headers, "Location");
                 if (!string.IsNullOrWhiteSpace(location))
                 {

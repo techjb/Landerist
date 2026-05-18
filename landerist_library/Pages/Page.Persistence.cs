@@ -19,6 +19,7 @@ namespace landerist_library.Pages
             Etag = dataRow.Table.Columns.Contains("Etag") && dataRow["Etag"] is not DBNull
                 ? dataRow["Etag"].ToString()
                 : null;
+            LastModified = dataRow["LastModified"] is DBNull ? null : dataRow["LastModified"].ToString();
             PageType = dataRow["PageType"] is DBNull ? null : (PageType)Enum.Parse(typeof(PageType), dataRow["PageType"].ToString()!);
             PageTypeCounter = dataRow["PageTypeCounter"] is DBNull ? null : (short)dataRow["PageTypeCounter"];
             ListingStatus = dataRow["ListingStatus"] is DBNull ? null : (ListingStatus)Enum.Parse(typeof(ListingStatus), dataRow["ListingStatus"].ToString()!);
@@ -57,10 +58,10 @@ namespace landerist_library.Pages
         {
             string query =
                 "INSERT INTO " + Pages.PAGES + " (" +
-                "[Host], [Uri], [UriHash], [Inserted], [LastScrape], [NextScrape], [HttpStatusCode], [Etag], [PageType], " +
+                "[Host], [Uri], [UriHash], [Inserted], [LastScrape], [NextScrape], [HttpStatusCode], [Etag], [LastModified], [PageType], " +
                 "[PageTypeCounter], [ListingStatus], [LockedBy], [WaitingStatus], [ListingParserInputHash], " +
                 "[ListingParserInputNotChangedCounter], [TransientErrorCounter], [ResponseBodyZipped], [TokenCount]) " +
-                "VALUES(@Host, @Uri, @UriHash, @Inserted, @LastScrape, @NextScrape, @HttpStatusCode, @Etag, @PageType, " +
+                "VALUES(@Host, @Uri, @UriHash, @Inserted, @LastScrape, @NextScrape, @HttpStatusCode, @Etag, @LastModified, @PageType, " +
                 "@PageTypeCounter, @ListingStatus, @LockedBy, @WaitingStatus, @ListingParserInputHash, " +
                 "@ListingParserInputNotChangedCounter, @TransientErrorCounter, CONVERT(varbinary(max), @ResponseBodyZipped), @TokenCount)";
 
@@ -73,6 +74,7 @@ namespace landerist_library.Pages
                 {"NextScrape", null },
                 {"HttpStatusCode", null },
                 {"Etag", null },
+                {"LastModified", null },
                 {"PageType", null },
                 {"PageTypeCounter", null },
                 {"ListingStatus", null },
@@ -107,6 +109,7 @@ namespace landerist_library.Pages
                 "[NextScrape] = @NextScrape, " +
                 "[HttpStatusCode] = @HttpStatusCode, " +
                 "[Etag] = @Etag, " +
+                "[LastModified] = @LastModified, " +
                 "[PageType] = @PageType, " +
                 "[PageTypeCounter] = @PageTypeCounter, " +
                 "[ListingStatus] = @ListingStatus, " +
@@ -124,6 +127,7 @@ namespace landerist_library.Pages
                 {"NextScrape", NextScrape },
                 {"HttpStatusCode", HttpStatusCode},
                 {"Etag", Etag},
+                {"LastModified", LastModified},
                 {"PageType", PageType?.ToString()},
                 {"PageTypeCounter", PageTypeCounter},
                 {"ListingStatus", ListingStatus?.ToString()},

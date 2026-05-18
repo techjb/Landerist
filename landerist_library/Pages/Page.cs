@@ -27,6 +27,8 @@ namespace landerist_library.Pages
 
         public string? Etag { get; set; } = null;
 
+        public string? LastModified { get; set; } = null;
+
         public PageType? PageType { get; private set; }
 
         public short? PageTypeCounter { get; private set; }
@@ -58,6 +60,10 @@ namespace landerist_library.Pages
         private bool EtagNotChanged { get; set; } = false;
 
         private bool HasComparableEtag { get; set; } = false;
+
+        private bool LastModifiedNotChanged { get; set; } = false;
+
+        private bool HasComparableLastModified { get; set; } = false;
 
         private const string RemaxInvalidCanonicalPath = "/buscador-de-inmuebles/todos/todos/todos/todos/todos/todos";
 
@@ -125,6 +131,7 @@ namespace landerist_library.Pages
                 ListingParserInput = null;
                 ListingParserInputHash = null;
                 Etag = null;
+                LastModified = null;
                 ResponseBodyZipped = null;
                 Screenshot = null;
             }

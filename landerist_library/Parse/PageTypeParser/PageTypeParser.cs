@@ -36,7 +36,7 @@ namespace landerist_library.Parse.PageTypeParser
                 return (PageType.RedirectToAnotherUrl, null, false);
             }
 
-            if (Page.PageType.HasValue && Page.EtagHasNotChanged() && isProduction)
+            if (Page.PageType.HasValue && Page.DownloadedHeadersHaveNotChanged() && isProduction)
             {
                 GlobalStatistics.InsertDailyCounter(StatisticsKey.EtagHasNotChanged);
                 return (Page.PageType, null, false);
