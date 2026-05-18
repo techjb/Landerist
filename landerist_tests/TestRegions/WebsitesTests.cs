@@ -42,7 +42,7 @@ namespace landerist_tests
             //WebsitesCleanner.DeletePagesDiscardedByIndexUrlRegex("www.engelvoelkers.com");
 
 
-            //string hostUri = "century21.es";
+            string hostUri = "www.coldwellbanker.es";
             //string mainUri = "https://century21.es/";
             //string listingUrlRegex = @"^https:\/\/century21\.es\/ref\/[A-Z0-9]+(?:-[A-Z0-9]+)+$";
             //string indexUrlRegex = listingUrlRegex;
@@ -51,8 +51,8 @@ namespace landerist_tests
 
             //WebsitesInserter.InsertSpecialWebsite(mainUri, hostUri, listingUrlRegex, indexUrlRegex, sitemapUrlRegex, allowebResourceTypes);
 
-            //Website website = new(hostUri);
-            //website.ReadSitemap();
+            Website website = new(hostUri);
+            website.ReadSitemap();
 
         }
     }
