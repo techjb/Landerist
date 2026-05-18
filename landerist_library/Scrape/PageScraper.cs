@@ -27,7 +27,7 @@ namespace landerist_library.Scrape
 
         public bool Scrape()
         {
-            if (!Download())
+            if (!DownloadersPool.Download(_page, _useProxy))
             {
                 return false;
             }
@@ -70,31 +70,6 @@ namespace landerist_library.Scrape
             _page.SetNextScrapeFromNow();
             return _page.Update();
         }
-
-        private bool Download()
-        {
-            if (Config.DOWNLOADERS_POOL_ENABLED)
-            {
-                return DownloadersPool.Download(_page, _useProxy);
-            }
-
-            var singleDownloader = new SingleDownloader(_useProxy);
-            if (!singleDownloader.TryReserve(_useProxy))
-            {
-                Logs.Log.WriteInfo("PageScraper DownloadPageSingleDownloader", "Downloader not available");
-                return false;
-            }
-
-            try
-            {
-                return singleDownloader.Download(_page);
-            }
-            finally
-            {
-                singleDownloader.CloseBrowser();
-            }
-        }
-
 
         public bool ApplyClassificationResultAfterDownload(PageType? newPageType, Listing? newListing, bool waitingAIRequest)
         {

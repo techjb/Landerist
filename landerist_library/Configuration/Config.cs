@@ -25,8 +25,6 @@ namespace landerist_library.Configuration
 
         public static readonly int MAX_PAGES_PER_HOST_PER_SCRAPE = 2;
        
-        public static readonly bool DOWNLOADERS_POOL_ENABLED = true;
-
         public static readonly int DAYS_TO_UPDATE_ROBOTS_TXT = 3;
 
         public static readonly int DAYS_TO_UPDATE_SITEMAP = 3;
