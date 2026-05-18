@@ -94,6 +94,7 @@ namespace landerist_library.Landerist_com
                     NotListingCache = GetTimeSeries(website.Host, HostStatisticsKey.NotListingCache, "Not listing by cache"),
                     ListingParserInputAlreadyParsed = GetTimeSeries(website.Host, HostStatisticsKey.ListingParserInputAlreadyParsed, "ListingParserInput already parsed"),
                     ListingParserInputIsAnotherListingInHost = GetTimeSeries(website.Host, HostStatisticsKey.ListingParserInputIsAnotherListingInHost, "ListingParserInput is another listing in host"),
+                    PageNotModified = GetTimeSeries(website.Host, HostStatisticsKey.PageNotModified, "Page not modified"),
                     ParseListingRetryNotListing = GetTimeSeries(website.Host, HostStatisticsKey.ParseListingRetryNotListing, "Parse listing retry not listing"),
                     NextScrapeDistribution = GetDistribution(HostStatistics.GetPagesByNextScrape(website.Host), "NextScrape"),
                     PageType = GetDistribution(HostStatistics.GetPagesByPageType(website.Host), "PageType"),
@@ -237,6 +238,7 @@ namespace landerist_library.Landerist_com
             public required List<ChartSeriesModel> NotListingCache { get; init; }
             public required List<ChartSeriesModel> ListingParserInputAlreadyParsed { get; init; }
             public required List<ChartSeriesModel> ListingParserInputIsAnotherListingInHost { get; init; }
+            public required List<ChartSeriesModel> PageNotModified { get; init; }
             public required List<ChartSeriesModel> ParseListingRetryNotListing { get; init; }
             public required List<ChartSeriesModel> NextScrapeDistribution { get; init; }
             public required List<ChartSeriesModel> PageType { get; init; }

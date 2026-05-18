@@ -40,7 +40,7 @@ namespace landerist_library.Landerist_com
                 LastScrapePageType();
                 ScraperSuccessCrash();
                 NotListingsCache();
-                EtagHasNotChanged();
+                PageNotModified();
                 ListingParserInputAlreadyParsed();
                 ListingParserInputIsAnotherListingInHost();
                 BatchReaded();
@@ -147,9 +147,9 @@ namespace landerist_library.Landerist_com
             BarChart("ListingParserInput already parsed", StatisticsKey.ListingParserInputAlreadyParsed, false);
         }
 
-        private static void EtagHasNotChanged()
+        private static void PageNotModified()
         {
-            BarChart("Etag not changed", StatisticsKey.EtagHasNotChanged, false);
+            BarChart("Page not modified", StatisticsKey.PageNotModified, false);
         }
 
         private static void ListingParserInputIsAnotherListingInHost()

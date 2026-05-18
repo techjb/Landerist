@@ -17,6 +17,7 @@ namespace landerist_library.Statistics
         NotListingCache,
         ListingParserInputAlreadyParsed,
         ListingParserInputIsAnotherListingInHost,
+        PageNotModified,
         ParseListingRetryNotListing,
     }
 

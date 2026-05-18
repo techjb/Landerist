@@ -5,6 +5,7 @@ using landerist_library.Index;
 using landerist_library.Pages;
 using landerist_library.Parse.Location;
 using landerist_library.Parse.PageTypeParser;
+using landerist_library.Statistics;
 using landerist_orels.ES;
 
 namespace landerist_library.Scrape
@@ -18,6 +19,7 @@ namespace landerist_library.Scrape
         {
             ArgumentNullException.ThrowIfNull(page);
             _page = page;
+            _useProxy = page.Website.UseProxy;
         }
 
         public PageScraper(Page page, bool useProxy) : this(page)
@@ -27,6 +29,11 @@ namespace landerist_library.Scrape
 
         public bool Scrape()
         {
+            if (TryApplyNotModifiedBeforeDownload())
+            {
+                return true;
+            }
+
             if (!DownloadersPool.Download(_page, _useProxy))
             {
                 return false;
@@ -41,6 +48,42 @@ namespace landerist_library.Scrape
             }
 
             return success;
+        }
+
+        private bool TryApplyNotModifiedBeforeDownload()
+        {
+            if (!CanCheckConditionalHeaders())
+            {
+                return false;
+            }
+
+            var result = new ConditionalPageHeaderChecker(_useProxy).Check(_page);
+            if (!result.NotModified)
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrWhiteSpace(result.Etag))
+            {
+                _page.Etag = result.Etag;
+            }
+
+            if (!string.IsNullOrWhiteSpace(result.LastModified))
+            {
+                _page.LastModified = result.LastModified;
+            }
+
+            _page.RedirectUrl = result.RedirectUrl;
+
+            GlobalStatistics.InsertDailyCounter(StatisticsKey.PageNotModified);
+            HostStatistics.InsertDailyCounter(_page.Host, HostStatisticsKey.PageNotModified);
+            return ApplyClassificationResultAfterDownload(_page.PageType, null, false);
+        }
+
+        private bool CanCheckConditionalHeaders()
+        {
+            return _page.PageType.HasValue &&                
+                (!string.IsNullOrWhiteSpace(_page.Etag) || !string.IsNullOrWhiteSpace(_page.LastModified));
         }
 
         public bool TryApplyPreClassificationBeforeDownload()

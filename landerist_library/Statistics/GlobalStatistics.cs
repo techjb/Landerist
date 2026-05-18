@@ -38,7 +38,7 @@ namespace landerist_library.Statistics
         NotListingCache,
         ListingParserInputAlreadyParsed,
         ListingParserInputIsAnotherListingInHost,
-        EtagHasNotChanged,
+        PageNotModified,
     }
 
     public class GlobalStatistics
