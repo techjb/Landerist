@@ -40,6 +40,7 @@ namespace landerist_library.Landerist_com
                 LastScrapePageType();
                 ScraperSuccessCrash();
                 NotListingsCache();
+                PageConditionalHeadersCheck();
                 PageNotModified();
                 ListingParserInputAlreadyParsed();
                 ListingParserInputIsAnotherListingInHost();
@@ -150,6 +151,11 @@ namespace landerist_library.Landerist_com
         private static void PageNotModified()
         {
             BarChart("Page not modified", StatisticsKey.PageNotModified, false);
+        }
+
+        private static void PageConditionalHeadersCheck()
+        {
+            BarChart("Page conditional headers check", StatisticsKey.PageConditionalHeadersCheck, false);
         }
 
         private static void ListingParserInputIsAnotherListingInHost()

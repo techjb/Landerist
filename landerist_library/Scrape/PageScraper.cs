@@ -57,6 +57,8 @@ namespace landerist_library.Scrape
                 return false;
             }
 
+            GlobalStatistics.InsertDailyCounter(StatisticsKey.PageConditionalHeadersCheck);
+
             var result = new ConditionalPageHeaderChecker(_useProxy).Check(_page);
             if (!result.NotModified)
             {

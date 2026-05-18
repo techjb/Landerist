@@ -38,6 +38,7 @@ namespace landerist_library.Statistics
         NotListingCache,
         ListingParserInputAlreadyParsed,
         ListingParserInputIsAnotherListingInHost,
+        PageConditionalHeadersCheck,
         PageNotModified,
     }
 
