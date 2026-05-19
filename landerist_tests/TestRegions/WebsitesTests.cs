@@ -39,10 +39,9 @@ namespace landerist_tests
             //WebsitesCleanner.DeleteWebsitesWithoutListings();
             //WebsitesCleanner.DeleteWebsitesWithoutPageTypeListing();
             //WebsitesCleanner.DeleteWebsitesWithoutPublishedListings();
-            //WebsitesCleanner.DeletePagesDiscardedByIndexUrlRegex("www.engelvoelkers.com");
 
 
-            //string hostUri = "www.coldwellbanker.es";
+            //string hostUri = "housfy.com";
             //string mainUri = "https://century21.es/";
             //string listingUrlRegex = @"^https:\/\/century21\.es\/ref\/[A-Z0-9]+(?:-[A-Z0-9]+)+$";
             //string indexUrlRegex = listingUrlRegex;

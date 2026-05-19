@@ -19,8 +19,8 @@ namespace landerist_tests
             //new Scraper().Start();
             //new Scraper().Scrape(page, false);
 
-            //new landerist_library.Scrape.Scraper().Scrape("https://www.coldwellbanker.es/velez-malaga/caleta-de-velez/exclusivo-residencial-en-pleno-campo-de-golf-de-baviera-velez-malaga", false);
-            //new landerist_library.Scrape.Scraper().TryApplyPreClassificationBeforeDownload(new landerist_library.Pages.Page("https://www.iadespana.es/anuncios/aspe-03680/venta/casa"));
+            //new landerist_library.Scrape.Scraper().Scrape("https://housfy.com/venta-casas/p/torrelles-de-foix/carrer-sant-quinti-904088", false);
+            ////new landerist_library.Scrape.Scraper().TryApplyPreClassificationBeforeDownload(new landerist_library.Pages.Page("https://www.iadespana.es/anuncios/aspe-03680/venta/casa"));
             //new Scraper().TestSinglePage();
             //landerist_library.Scrape.PageSelector.SelectTop1();
             //Console.WriteLine("Block: " + WebsitesThrottle.Block(page.Website));
