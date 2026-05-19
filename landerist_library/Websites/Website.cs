@@ -11,19 +11,6 @@ using System.Text.RegularExpressions;
 
 namespace landerist_library.Websites
 {
-
-    // https://www.w3schools.com/tags/ref_country_codes.asp
-    public enum CountryCode
-    {
-        ES
-    }
-
-    // https://www.w3schools.com/tags/ref_language_codes.asp
-    public enum LanguageCode
-    {
-        es
-    }
-
     public class Website : IDisposable
     {
         public Uri MainUri { get; set; }

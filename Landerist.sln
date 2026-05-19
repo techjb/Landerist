@@ -18,7 +18,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "landerist_website", "landerist_website", "{B0045D1A-422C-4327-8A3C-F90D55CFF0A8}"
 	ProjectSection(SolutionItems) = preProject
 		landerist_website\DESIGN.md = landerist_website\DESIGN.md
-		landerist_website\downloads_template.html = landerist_website\downloads_template.html
 		landerist_website\host_statistics_template.html = landerist_website\host_statistics_template.html
 		landerist_website\index.html = landerist_website\index.html
 		landerist_website\statistics_template.html = landerist_website\statistics_template.html
@@ -32,6 +31,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LocalIsListing", "LocalIsLi
 		E:\Landerist\LocalIsListing\baseline_tfidf.py = E:\Landerist\LocalIsListing\baseline_tfidf.py
 		E:\Landerist\LocalIsListing\infer.py = E:\Landerist\LocalIsListing\infer.py
 		E:\Landerist\LocalIsListing\train_transformer.py = E:\Landerist\LocalIsListing\train_transformer.py
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "downloads", "downloads", "{9CD8CE4A-DACA-4356-9873-4F1AEB6E33CA}"
+	ProjectSection(SolutionItems) = preProject
+		landerist_website\downloads\downloads_template.html = landerist_website\downloads\downloads_template.html
+		landerist_website\downloads\index.html = landerist_website\downloads\index.html
 	EndProjectSection
 EndProject
 Global
@@ -59,6 +64,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9CD8CE4A-DACA-4356-9873-4F1AEB6E33CA} = {B0045D1A-422C-4327-8A3C-F90D55CFF0A8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F392E95A-422C-40BC-A9C9-32A571641854}
