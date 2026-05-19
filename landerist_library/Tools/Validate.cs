@@ -20,7 +20,13 @@ namespace landerist_library.Tools
             try
             {
                 var addr = new System.Net.Mail.MailAddress(trimmedEmail);
-                return string.Equals(addr.Address, trimmedEmail, StringComparison.Ordinal);
+                if (!string.Equals(addr.Address, trimmedEmail, StringComparison.Ordinal))
+                {
+                    return false;
+                }
+
+                var hostLabels = addr.Host.Split('.');
+                return hostLabels.Length >= 2 && hostLabels.All(label => label.Length > 0);
             }
             catch (FormatException)
             {

@@ -134,6 +134,7 @@ namespace landerist_tests
             LanderistComTests.Run();
             DataBaseTests.Run();
             TasksTests.Run();
+            ToolsTests.Run();
             LocalIsListingTests.Run();
         }
     }
