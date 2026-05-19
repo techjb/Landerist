@@ -14,10 +14,10 @@ namespace landerist_library.Landerist_com
     {
 
         private static readonly string StatisticsTemplateHtmlFile =
-            Config.LANDERIST_COM_TEMPLATES + "statistics_template.html";
+            Path.Combine(Config.LANDERIST_COM_TEMPLATES!, "statistics", "statistics_template.html");
 
         private static readonly string StatisticsHtmlFile =
-            Config.LANDERIST_COM_OUTPUT + "statistics.html";
+            Path.Combine(Config.LANDERIST_COM_OUTPUT!, "statistics.html");
 
 
         private static readonly List<string> Charts = [];

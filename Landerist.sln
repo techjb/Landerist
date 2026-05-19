@@ -18,9 +18,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "landerist_website", "landerist_website", "{B0045D1A-422C-4327-8A3C-F90D55CFF0A8}"
 	ProjectSection(SolutionItems) = preProject
 		landerist_website\DESIGN.md = landerist_website\DESIGN.md
-		landerist_website\host_statistics_template.html = landerist_website\host_statistics_template.html
 		landerist_website\index.html = landerist_website\index.html
-		landerist_website\statistics_template.html = landerist_website\statistics_template.html
 		landerist_website\styles.css = landerist_website\styles.css
 	EndProjectSection
 EndProject
@@ -37,6 +35,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "downloads", "downloads", "{
 	ProjectSection(SolutionItems) = preProject
 		landerist_website\downloads\downloads_template.html = landerist_website\downloads\downloads_template.html
 		landerist_website\downloads\index.html = landerist_website\downloads\index.html
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "statistics", "statistics", "{70033D09-4CF1-47B2-8E01-DFA6763A2C57}"
+	ProjectSection(SolutionItems) = preProject
+		landerist_website\statistics\statistics_template.html = landerist_website\statistics\statistics_template.html
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "host-statistics", "host-statistics", "{2941C7A0-5146-4DCB-ADEF-309E790F3564}"
+	ProjectSection(SolutionItems) = preProject
+		landerist_website\host-statistics\host_statistics_template.html = landerist_website\host-statistics\host_statistics_template.html
 	EndProjectSection
 EndProject
 Global
@@ -67,6 +75,8 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{9CD8CE4A-DACA-4356-9873-4F1AEB6E33CA} = {B0045D1A-422C-4327-8A3C-F90D55CFF0A8}
+		{70033D09-4CF1-47B2-8E01-DFA6763A2C57} = {B0045D1A-422C-4327-8A3C-F90D55CFF0A8}
+		{2941C7A0-5146-4DCB-ADEF-309E790F3564} = {B0045D1A-422C-4327-8A3C-F90D55CFF0A8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F392E95A-422C-40BC-A9C9-32A571641854}

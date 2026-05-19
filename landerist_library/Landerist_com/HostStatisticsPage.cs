@@ -12,7 +12,7 @@ namespace landerist_library.Landerist_com
     public class HostStatisticsPage : Landerist_com
     {
         private static readonly string HostStatisticsTemplateHtmlFile =
-            Path.Combine(Config.LANDERIST_COM_TEMPLATES!, "host_statistics_template.html");
+            Path.Combine(Config.LANDERIST_COM_TEMPLATES!, "host-statistics", "host_statistics_template.html");
 
         private static readonly string HostStatisticsHtmlFile =
             Path.Combine(Config.LANDERIST_COM_OUTPUT!, "host_statistics.html");
