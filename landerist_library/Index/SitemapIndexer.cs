@@ -140,7 +140,6 @@ namespace landerist_library.Index
 
             try
             {
-                // can return null.
                 return siteMap.LoadAsync(WebsiteSitemapFetcher, SitemapParser).ConfigureAwait(false).GetAwaiter().GetResult();
             }
             catch

@@ -328,7 +328,7 @@ namespace landerist_library.Websites
                 RobotsTxt = null;
                 Robots = null;
 
-                if (response.IsSuccessStatusCode)
+                if (response.StatusCode == HttpStatusCode.OK)
                 {
                     using var streamReader = new StreamReader(response.Content.ReadAsStreamAsync().GetAwaiter().GetResult(), Encoding.Default);
                     RobotsTxt = streamReader.ReadToEnd();

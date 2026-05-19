@@ -41,11 +41,12 @@ namespace landerist_tests
             //WebsitesCleanner.DeleteWebsitesWithoutPublishedListings();
 
 
-            //string hostUri = "housfy.com";
-            //string mainUri = "https://century21.es/";
-            //string listingUrlRegex = @"^https:\/\/century21\.es\/ref\/[A-Z0-9]+(?:-[A-Z0-9]+)+$";
+            //string hostUri = "www.hogaresgroup.es";
+            //string mainUri = "https://www.hogaresgroup.es/";
+            //string sitemapUrlRegex = @"^https:\/\/www\.hogaresgroup\.es\/(?:sitemap_index|(?:alquiler|compra)-sitemap[0-9]*)\.xml$";
+            //string listingUrlRegex = @"^https:\/\/www\.hogaresgroup\.es\/(?:compra|alquiler)\/[0-9]+\/?$";
             //string indexUrlRegex = listingUrlRegex;
-            //string sitemapUrlRegex = @"^https:\/\/century21\.es\/(?:sitemap_index\.xml|ref\/sitemap\/\d+\.xml)$";
+
             //string allowebResourceTypes = "Unknown,Beacon,Document,StyleSheet,Script,TextTrack,Xhr,Fetch,EventSource,WebSocket,Manifest,Ping,Other";
 
             //WebsitesInserter.InsertSpecialWebsite(mainUri, hostUri, listingUrlRegex, indexUrlRegex, sitemapUrlRegex, allowebResourceTypes);
