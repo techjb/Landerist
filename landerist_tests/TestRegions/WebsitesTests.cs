@@ -41,12 +41,11 @@ namespace landerist_tests
             //WebsitesCleanner.DeleteWebsitesWithoutPublishedListings();
 
 
-            //string hostUri = "www.hogaresgroup.es";
-            //string mainUri = "https://www.hogaresgroup.es/";
-            //string sitemapUrlRegex = @"^https:\/\/www\.hogaresgroup\.es\/(?:sitemap_index|(?:alquiler|compra)-sitemap[0-9]*)\.xml$";
-            //string listingUrlRegex = @"^https:\/\/www\.hogaresgroup\.es\/(?:compra|alquiler)\/[0-9]+\/?$";
+            //string hostUri = "www.promora.com";
+            //string mainUri = "https://www.knightfrank.es/";
+            //string sitemapUrlRegex = @"/^https:\/\/www\.knightfrank\.es\/(?:sitemap\.xml|sitemaps\/sitemap-pdp-\d{1,2}\.xml)$/gm";
+            //string listingUrlRegex = @"^https:\/\/www\.knightfrank\.es\/properties\/(?:residencial|comercial)\/(?:en-venta|en-alquiler)\/[a-z0-9-]+\/[a-z0-9-]+$";
             //string indexUrlRegex = listingUrlRegex;
-
             //string allowebResourceTypes = "Unknown,Beacon,Document,StyleSheet,Script,TextTrack,Xhr,Fetch,EventSource,WebSocket,Manifest,Ping,Other";
 
             //WebsitesInserter.InsertSpecialWebsite(mainUri, hostUri, listingUrlRegex, indexUrlRegex, sitemapUrlRegex, allowebResourceTypes);

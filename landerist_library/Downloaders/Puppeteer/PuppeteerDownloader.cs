@@ -479,7 +479,7 @@ namespace landerist_library.Downloaders.Puppeteer
                     case PuppeteerRequestAction.RespondWithTransparentGif:
                         await e.Request.RespondAsync(PuppeteerRequestRules.CreateTransparentGifResponse());
                         return;
-                    case PuppeteerRequestAction.Abort:
+                    case PuppeteerRequestAction.Abort:                        
                         await e.Request.AbortAsync();
                         return;
                 }
