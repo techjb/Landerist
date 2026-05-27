@@ -41,7 +41,7 @@ namespace landerist_tests
             //WebsitesCleanner.DeleteWebsitesWithoutPublishedListings();
 
 
-            //string hostUri = "www.promora.com";
+            //string hostUri = "www.safti.es";
             //string mainUri = "https://www.knightfrank.es/";
             //string sitemapUrlRegex = @"/^https:\/\/www\.knightfrank\.es\/(?:sitemap\.xml|sitemaps\/sitemap-pdp-\d{1,2}\.xml)$/gm";
             //string listingUrlRegex = @"^https:\/\/www\.knightfrank\.es\/properties\/(?:residencial|comercial)\/(?:en-venta|en-alquiler)\/[a-z0-9-]+\/[a-z0-9-]+$";
