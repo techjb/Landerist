@@ -40,7 +40,7 @@ namespace landerist_library.Index
                 : new HttpClient();
 
             client.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
-            client.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT_ROBOTSTXT);
 
             return client;
         }

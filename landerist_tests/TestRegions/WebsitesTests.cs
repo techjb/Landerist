@@ -41,10 +41,10 @@ namespace landerist_tests
             //WebsitesCleanner.DeleteWebsitesWithoutPublishedListings();
 
 
-            //string hostUri = "www.safti.es";
-            //string mainUri = "https://www.knightfrank.es/";
-            //string sitemapUrlRegex = @"/^https:\/\/www\.knightfrank\.es\/(?:sitemap\.xml|sitemaps\/sitemap-pdp-\d{1,2}\.xml)$/gm";
-            //string listingUrlRegex = @"^https:\/\/www\.knightfrank\.es\/properties\/(?:residencial|comercial)\/(?:en-venta|en-alquiler)\/[a-z0-9-]+\/[a-z0-9-]+$";
+            //string hostUri = "www.balearic-properties.com";
+            //string mainUri = "https://www.balearic-properties.com/";
+            //string sitemapUrlRegex = @"^https:\/\/www\.balearic-properties\.com\/(?:sitemap\.xml|core\/components\/infocasa\/files\/infocasaengine\/handlers\/propsitemap\.php)$";
+            //string listingUrlRegex = @"^https:\/\/www\.balearic-properties\.com\/es\/property\/id\/\d+$";
             //string indexUrlRegex = listingUrlRegex;
             //string allowebResourceTypes = "Unknown,Beacon,Document,StyleSheet,Script,TextTrack,Xhr,Fetch,EventSource,WebSocket,Manifest,Ping,Other";
 
@@ -56,3 +56,4 @@ namespace landerist_tests
         }
     }
 }
+

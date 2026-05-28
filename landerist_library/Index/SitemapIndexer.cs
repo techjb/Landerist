@@ -10,6 +10,8 @@ namespace landerist_library.Index
         private readonly ISitemapFetcher WebsiteSitemapFetcher;
         private readonly HashSet<string> SitemapsIndexes = new(StringComparer.OrdinalIgnoreCase);
 
+        private sealed record LoadedSitemap(Sitemap Sitemap, IReadOnlyList<Uri> AlternateUrls);
+
         public SitemapIndexer(Website website) : base(website)
         {
             WebsiteSitemapFetcher = website.UseProxy
@@ -78,9 +80,12 @@ namespace landerist_library.Index
                 return false;
             }
 
+            IReadOnlyList<Uri> alternateUrls = [];
             if (!sitemap.IsLoaded)
             {
-                sitemap = DownloadSitemap(sitemap);
+                var loadedSitemap = DownloadSitemap(sitemap);
+                sitemap = loadedSitemap?.Sitemap;
+                alternateUrls = loadedSitemap?.AlternateUrls ?? [];
             }
 
             if (sitemap == null || !sitemap.IsLoaded)
@@ -109,7 +114,13 @@ namespace landerist_library.Index
             {
                 foreach (var item in sitemap.Items)
                 {
+                    
                     insertedAnyPage |= InsertUri(item.Location);
+                }
+
+                foreach (var alternateUrl in alternateUrls)
+                {
+                    insertedAnyPage |= InsertUri(alternateUrl);
                 }
             }
 
@@ -131,7 +142,7 @@ namespace landerist_library.Index
             return SitemapsIndexes.Add(location.ToString());
         }
 
-        private Sitemap? DownloadSitemap(Sitemap siteMap)
+        private LoadedSitemap? DownloadSitemap(Sitemap siteMap)
         {
             if (siteMap == null)
             {
@@ -140,11 +151,63 @@ namespace landerist_library.Index
 
             try
             {
-                return siteMap.LoadAsync(WebsiteSitemapFetcher, SitemapParser).ConfigureAwait(false).GetAwaiter().GetResult();
+                var content = WebsiteSitemapFetcher.Fetch(siteMap.SitemapLocation).ConfigureAwait(false).GetAwaiter().GetResult();
+                var sitemap = SitemapParser.Parse(content, siteMap.SitemapLocation);
+                var alternateUrls = GetAlternateUrls(content, siteMap.SitemapLocation);
+
+                return new LoadedSitemap(sitemap, alternateUrls);
             }
             catch
             {
                 return null;
+            }
+        }
+
+        private static IReadOnlyList<Uri> GetAlternateUrls(string content, Uri sitemapLocation)
+        {
+            if (string.IsNullOrWhiteSpace(content) || sitemapLocation == null)
+            {
+                return [];
+            }
+
+            try
+            {
+                var document = System.Xml.Linq.XDocument.Parse(content);
+                HashSet<string> urls = new(StringComparer.OrdinalIgnoreCase);
+                List<Uri> alternateUrls = [];
+
+                foreach (var element in document.Descendants())
+                {
+                    if (!string.Equals(element.Name.LocalName, "link", StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    var rel = element.Attribute("rel")?.Value;
+                    if (string.IsNullOrWhiteSpace(rel) ||
+                        !rel.Contains("alternate", StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    var href = element.Attribute("href")?.Value;
+                    if (string.IsNullOrWhiteSpace(href) ||
+                        !Uri.TryCreate(sitemapLocation, href, out Uri? alternateUrl))
+                    {
+                        continue;
+                    }
+
+                    if (urls.Add(alternateUrl.ToString()))
+                    {
+                        alternateUrls.Add(alternateUrl);
+                    }
+                }
+
+                return alternateUrls;
+            }
+            catch
+            {
+                return [];
             }
         }
 

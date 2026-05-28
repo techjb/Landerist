@@ -322,7 +322,7 @@ namespace landerist_library.Websites
             try
             {
                 using var httpClient = GetRobotsTxtHttpClient();
-                httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
+                httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT_ROBOTSTXT);
 
                 var response = httpClient.GetAsync(robotsTxtUrl).GetAwaiter().GetResult();
                 RobotsTxt = null;
