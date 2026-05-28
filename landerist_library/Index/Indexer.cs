@@ -36,7 +36,7 @@ namespace landerist_library.Index
                 return;
             }
 
-           
+
             if (Page.Website.AchievedMaxNumberOfPages())
             {
                 return;
@@ -48,15 +48,6 @@ namespace landerist_library.Index
                 return;
             }
 
-            if (!Page.Website.HtmlIndexingEnabled)
-            {
-                return;
-            }
-
-            if (Page.ContainsMetaRobotsNoFollow())
-            {
-                return;
-            }
 
             if (Page.PageType.Equals(PageType.IncorrectLanguage))
             {
@@ -70,7 +61,15 @@ namespace landerist_library.Index
                 return;
             }
 
-            new HyperlinksIndexer(Page).Insert();
+            if (Page.ContainsMetaRobotsNoFollow())
+            {
+                return;
+            }
+
+            if (Page.Website.HtmlIndexingEnabled)
+            {
+                new HyperlinksIndexer(Page).Insert();
+            }
         }
 
         public void Insert(List<string?> urls)
@@ -149,7 +148,7 @@ namespace landerist_library.Index
 
             if (website.IsDiscardedByIndexUrlRegex(uri))
             {
-                 return false;
+                return false;
             }
 
             uri = Uris.CleanUri(uri);
@@ -187,7 +186,7 @@ namespace landerist_library.Index
             if (website.MainUri.Equals(uri))
             {
                 return false;
-            }          
+            }
 
             bool inserted = Pages.Pages.Insert(website, uri);
             Processed.Add(uri);
