@@ -436,7 +436,7 @@ namespace landerist_library.Downloaders.Puppeteer
 
             BrowserPage.DefaultNavigationTimeout = GetTimeout(UseProxy);
             SetExecutionStep("Configuring browser page");
-            await SetAcceptLanguageAsync(BrowserPage, Page.Website.LanguageCode);
+            await SetExtraHttpHeadersAsync(BrowserPage, Page.Website);
             await BrowserPage.SetUserAgentAsync(Page.Website.BrowserUserAgent);
             await BrowserPage.SetCacheEnabledAsync(false);
             await BrowserPage.SetRequestInterceptionAsync(true);
@@ -444,14 +444,15 @@ namespace landerist_library.Downloaders.Puppeteer
             BrowserPage.Response += (_, e) => HandleResponseAsync(e);
         }
 
-        private static async Task SetAcceptLanguageAsync(IPage browserPage, LanguageCode languageCode)
+        private static async Task SetExtraHttpHeadersAsync(IPage browserPage, Website website)
         {
-            Dictionary<string, string> extraHeaders = [];
-            switch (languageCode)
+            Dictionary<string, string> extraHeaders = website.GetHttpRequestHeaders();
+            extraHeaders.Remove("User-Agent");
+            switch (website.LanguageCode)
             {
                 case LanguageCode.es:
                     {
-                        extraHeaders.Add("Accept-Language", "es-ES, es;q=0.9");
+                        extraHeaders.TryAdd("Accept-Language", "es-ES, es;q=0.9");
                     }
                     break;
             }

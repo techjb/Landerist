@@ -24,7 +24,7 @@ namespace landerist_library.Downloaders.HttpClient
             Etag = null;
             LastModified = null;
 
-            GetAsync(page.Website.LanguageCode, page.Uri);
+            GetAsync(page);
             if (HttpResponseMessage != null)
             {
                 HttpStatusCode = (short)HttpResponseMessage.StatusCode;
@@ -44,7 +44,7 @@ namespace landerist_library.Downloaders.HttpClient
             return null;
         }
 
-        public async void GetAsync(LanguageCode languageCode, Uri uri)
+        public async void GetAsync(Page page)
         {
             HttpClientHandler handler = new()
             {
@@ -54,19 +54,17 @@ namespace landerist_library.Downloaders.HttpClient
             };
 
             using var httpClient = new System.Net.Http.HttpClient(handler);
-            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
-
-            SetAccepLanguage(httpClient, languageCode);
             httpClient.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
 
-            HttpRequestMessage httpRequestMessage = new(HttpMethod.Get, uri);
+            using HttpRequestMessage httpRequestMessage = page.Website.CreateHttpRequestMessage(HttpMethod.Get, page.Uri);
+            SetAccepLanguage(httpRequestMessage, page.Website.LanguageCode);
             HttpResponseMessage = null;
 
             try
             {
                 DateTime dateStart = DateTime.Now;
                 HttpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
-                Timers.Timer.SaveTimerDownloadPage(uri.ToString(), dateStart);
+                Timers.Timer.SaveTimerDownloadPage(page.Uri.ToString(), dateStart);
                 SetRedirectUrl();
                 Content = await HttpResponseMessage.Content.ReadAsStringAsync();
             }
@@ -76,14 +74,14 @@ namespace landerist_library.Downloaders.HttpClient
             }
         }
 
-        private static void SetAccepLanguage(System.Net.Http.HttpClient httpClient, LanguageCode languageCode)
+        private static void SetAccepLanguage(HttpRequestMessage request, LanguageCode languageCode)
         {
             switch (languageCode)
             {
                 case LanguageCode.es:
                     {
-                        httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("es-ES"));
-                        httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("es", 0.9));
+                        request.Headers.AcceptLanguage.Add(new StringWithQualityHeaderValue("es-ES"));
+                        request.Headers.AcceptLanguage.Add(new StringWithQualityHeaderValue("es", 0.9));
                     }
                     break;
             }

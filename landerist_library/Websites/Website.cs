@@ -7,6 +7,7 @@ using landerist_orels.ES;
 using System.Data;
 using System.Net;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace landerist_library.Websites
@@ -38,6 +39,8 @@ namespace landerist_library.Websites
         public string? AllowedResourceTypes { get; set; }
 
         public string? UserAgent { get; set; }
+
+        public string? HttpRequestHeaders { get; set; }
 
         public string BrowserUserAgent =>
             string.IsNullOrWhiteSpace(UserAgent)
@@ -142,6 +145,9 @@ namespace landerist_library.Websites
             UserAgent = dataRow.Table.Columns.Contains("UserAgent") && dataRow["UserAgent"] is not DBNull
                 ? NullIfWhiteSpace(dataRow["UserAgent"].ToString())
                 : null;
+            HttpRequestHeaders = dataRow.Table.Columns.Contains("HttpRequestHeaders") && dataRow["HttpRequestHeaders"] is not DBNull
+                ? NullIfWhiteSpace(dataRow["HttpRequestHeaders"].ToString())
+                : null;
             ApplySpecialRules = dataRow.Table.Columns.Contains("ApplySpecialRules")
                 && dataRow["ApplySpecialRules"] is not DBNull
                 && (bool)dataRow["ApplySpecialRules"];
@@ -159,9 +165,9 @@ namespace landerist_library.Websites
             string query =
                 "INSERT INTO " + Websites.WEBSITES + " (" +
                 "[MainUri], [Host], [LanguageCode], [CountryCode], [RobotsTxt], [RobotsTxtUpdated], " +
-                "[SitemapUpdated], [IpAddress], [IpAddressUpdated], [IndexUrlRegex], [SitemapUrlRegex], [ListingUrlRegex], [ListingHtmlRemoveXPath], [AllowedResourceTypes], [UserAgent], [ApplySpecialRules], [HtmlIndexingEnabled], [UseProxy]) VALUES (" +
+                "[SitemapUpdated], [IpAddress], [IpAddressUpdated], [IndexUrlRegex], [SitemapUrlRegex], [ListingUrlRegex], [ListingHtmlRemoveXPath], [AllowedResourceTypes], [UserAgent], [HttpRequestHeaders], [ApplySpecialRules], [HtmlIndexingEnabled], [UseProxy]) VALUES (" +
                 "@MainUri, @Host, @LanguageCode, @CountryCode, @RobotsTxt, @RobotsTxtUpdated, " +
-                "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @IndexUrlRegex, @SitemapUrlRegex, @ListingUrlRegex, @ListingHtmlRemoveXPath, @AllowedResourceTypes, @UserAgent, @ApplySpecialRules, @HtmlIndexingEnabled, @UseProxy)";
+                "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @IndexUrlRegex, @SitemapUrlRegex, @ListingUrlRegex, @ListingHtmlRemoveXPath, @AllowedResourceTypes, @UserAgent, @HttpRequestHeaders, @ApplySpecialRules, @HtmlIndexingEnabled, @UseProxy)";
 
             var parameters = GetQueryParameters();
             return new DataBase().Query(query, parameters);
@@ -185,6 +191,7 @@ namespace landerist_library.Websites
                 "[ListingHtmlRemoveXPath] = @ListingHtmlRemoveXPath, " +
                 "[AllowedResourceTypes] = @AllowedResourceTypes, " +
                 "[UserAgent] = @UserAgent, " +
+                "[HttpRequestHeaders] = @HttpRequestHeaders, " +
                 "[ApplySpecialRules] = @ApplySpecialRules, " +
                 "[HtmlIndexingEnabled] = @HtmlIndexingEnabled, " +
                 "[UseProxy] = @UseProxy " +
@@ -212,6 +219,7 @@ namespace landerist_library.Websites
                 {"ListingHtmlRemoveXPath", ListingHtmlRemoveXPath },
                 {"AllowedResourceTypes", AllowedResourceTypes },
                 {"UserAgent", NullIfWhiteSpace(UserAgent) },
+                {"HttpRequestHeaders", NullIfWhiteSpace(HttpRequestHeaders) },
                 {"ApplySpecialRules", ApplySpecialRules },
                 {"HtmlIndexingEnabled", HtmlIndexingEnabled },
                 {"UseProxy", UseProxy },
@@ -221,6 +229,118 @@ namespace landerist_library.Websites
         private static string? NullIfWhiteSpace(string? value)
         {
             return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+        }
+
+        public Dictionary<string, string> GetHttpRequestHeaders()
+        {
+            var value = NullIfWhiteSpace(HttpRequestHeaders);
+            if (value == null)
+            {
+                return [];
+            }
+
+            if (TryParseJsonHttpRequestHeaders(value, out var jsonHeaders))
+            {
+                return jsonHeaders;
+            }
+
+            return ParseLineHttpRequestHeaders(value);
+        }
+
+        public HttpRequestMessage CreateHttpRequestMessage(HttpMethod method, Uri uri)
+        {
+            HttpRequestMessage request = new(method, uri);
+            request.Headers.UserAgent.ParseAdd(BrowserUserAgent);
+            ApplyHttpRequestHeaders(request);
+            return request;
+        }
+
+        public void ApplyHttpRequestHeaders(HttpRequestMessage request)
+        {
+            ApplyHttpRequestHeaders(request, GetHttpRequestHeaders());
+        }
+
+        public static void ApplyHttpRequestHeaders(
+            HttpRequestMessage request,
+            IReadOnlyDictionary<string, string> headers)
+        {
+            foreach (var header in headers)
+            {
+                if (string.Equals(header.Key, "User-Agent", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                request.Headers.TryAddWithoutValidation(header.Key, header.Value);
+            }
+        }
+
+        private static bool TryParseJsonHttpRequestHeaders(
+            string value,
+            out Dictionary<string, string> headers)
+        {
+            headers = new(StringComparer.OrdinalIgnoreCase);
+
+            var json = value.Trim();
+            if (!json.StartsWith('{') && json.StartsWith('"') && json.Contains(':'))
+            {
+                json = "{" + json + "}";
+            }
+
+            if (!json.StartsWith('{'))
+            {
+                return false;
+            }
+
+            try
+            {
+                var parsedHeaders = JsonSerializer.Deserialize<Dictionary<string, string?>>(json);
+                if (parsedHeaders == null)
+                {
+                    return false;
+                }
+
+                foreach (var header in parsedHeaders)
+                {
+                    var headerName = NullIfWhiteSpace(header.Key);
+                    var headerValue = NullIfWhiteSpace(header.Value);
+                    if (headerName != null && headerValue != null)
+                    {
+                        headers[headerName] = headerValue;
+                    }
+                }
+
+                return true;
+            }
+            catch (JsonException)
+            {
+                headers.Clear();
+                return false;
+            }
+        }
+
+        private static Dictionary<string, string> ParseLineHttpRequestHeaders(string value)
+        {
+            Dictionary<string, string> headers = new(StringComparer.OrdinalIgnoreCase);
+            var lines = value.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            foreach (var line in lines)
+            {
+                var index = line.IndexOf(':');
+                if (index <= 0)
+                {
+                    continue;
+                }
+
+                var headerName = NullIfWhiteSpace(line[..index].Trim().Trim('"'));
+                var headerValue = NullIfWhiteSpace(line[(index + 1)..].Trim().TrimEnd(',').Trim().Trim('"'));
+                if (headerName != null && headerValue != null)
+                {
+                    headers[headerName] = headerValue;
+                }
+            }
+
+            return headers;
         }
 
         public bool IsDiscardedByIndexUrlRegex(Uri uri)
@@ -296,12 +416,11 @@ namespace landerist_library.Websites
             };
 
             using var httpClient = new HttpClient(handler);
-            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(BrowserUserAgent);
             httpClient.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
 
             try
             {
-                HttpRequestMessage request = new(HttpMethod.Head, MainUri);
+                using var request = CreateHttpRequestMessage(HttpMethod.Head, MainUri);
                 var response = httpClient.SendAsync(request).GetAwaiter().GetResult();
 
                 if (response?.Headers?.Location != null)
@@ -339,9 +458,9 @@ namespace landerist_library.Websites
             try
             {
                 using var httpClient = GetRobotsTxtHttpClient();
-                httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(BrowserUserAgent);
+                using var request = CreateHttpRequestMessage(HttpMethod.Get, robotsTxtUrl);
 
-                var response = httpClient.GetAsync(robotsTxtUrl).GetAwaiter().GetResult();
+                var response = httpClient.SendAsync(request).GetAwaiter().GetResult();
                 RobotsTxt = null;
                 Robots = null;
 
@@ -662,6 +781,7 @@ namespace landerist_library.Websites
                 ListingHtmlRemoveXPath = null;
                 AllowedResourceTypes = null;
                 UserAgent = null;
+                HttpRequestHeaders = null;
                 ApplySpecialRules = false;
                 HtmlIndexingEnabled = false;
                 UseProxy = false;

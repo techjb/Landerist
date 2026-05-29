@@ -13,7 +13,7 @@ namespace landerist_library.Index
 
         public SitemapIndexer(Website website) : base(website)
         {
-            WebsiteSitemapFetcher = new GzipAwareSitemapFetcher(website.BrowserUserAgent, website.UseProxy);
+            WebsiteSitemapFetcher = new GzipAwareSitemapFetcher(website);
         }
 
         public bool IndexNewPages(List<Com.Bekijkhet.RobotsTxt.Sitemap> sitemaps)

@@ -411,6 +411,7 @@ CREATE TABLE [dbo].[WEBSITES](
 	[ListingHtmlRemoveXPath] [nvarchar](max) NULL,
 	[AllowedResourceTypes] [nvarchar](500) NULL,
 	[UserAgent] [nvarchar](500) NULL,
+	[HttpRequestHeaders] [nvarchar](max) NULL,
 	[UseProxy] [bit] NOT NULL,
  CONSTRAINT [PK_WEBSITES] PRIMARY KEY CLUSTERED 
 (

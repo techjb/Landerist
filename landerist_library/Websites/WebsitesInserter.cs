@@ -101,7 +101,8 @@ namespace landerist_library.Websites
             string? indexUrlRegex,
             string? sitemapUrlRegex,
             string? allowedResourceTypes = null,
-            string? userAgent = null)
+            string? userAgent = null,
+            string? httpRequestHeaders = null)
         {
             if (!Uri.TryCreate(mainUri, UriKind.Absolute, out Uri? uri))
             {
@@ -122,6 +123,7 @@ namespace landerist_library.Websites
                 SitemapUrlRegex = NullIfWhiteSpace(sitemapUrlRegex),
                 AllowedResourceTypes = NullIfWhiteSpace(allowedResourceTypes),
                 UserAgent = NullIfWhiteSpace(userAgent),
+                HttpRequestHeaders = NullIfWhiteSpace(httpRequestHeaders),
                 ApplySpecialRules = true,
                 HtmlIndexingEnabled = false,
             };

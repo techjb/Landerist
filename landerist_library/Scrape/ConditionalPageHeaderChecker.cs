@@ -32,7 +32,7 @@ namespace landerist_library.Scrape
 
         private async Task<ConditionalHeaderCheckResult> CheckAsync(Page page)
         {
-            using var httpClient = CreateHttpClient(page.Website);
+            using var httpClient = CreateHttpClient();
             using var request = CreateRequest(page);
             using var response = await httpClient
                 .SendAsync(request, HttpCompletionOption.ResponseHeadersRead)
@@ -52,14 +52,13 @@ namespace landerist_library.Scrape
             };
         }
 
-        private HttpClient CreateHttpClient(Website website)
+        private HttpClient CreateHttpClient()
         {
             var httpClient = UseProxy
                 ? new HttpClient(CreateProxyHandler())
                 : new HttpClient(CreateHandler());
 
             httpClient.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
-            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(website.BrowserUserAgent);
             return httpClient;
         }
 
@@ -101,7 +100,7 @@ namespace landerist_library.Scrape
 
         private static HttpRequestMessage CreateRequest(Page page)
         {
-            var request = new HttpRequestMessage(HttpMethod.Head, page.Uri);
+            var request = page.Website.CreateHttpRequestMessage(HttpMethod.Head, page.Uri);
             SetAcceptLanguage(request, page.Website.LanguageCode);
 
             if (!string.IsNullOrWhiteSpace(page.Etag))

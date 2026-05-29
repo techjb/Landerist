@@ -1,4 +1,5 @@
 using landerist_library.Configuration;
+using landerist_library.Websites;
 using Louw.SitemapParser;
 using System.IO.Compression;
 using System.Net;
@@ -9,18 +10,21 @@ namespace landerist_library.Index
     {
         private static readonly HttpClient HttpClient = CreateHttpClient(useProxy: false);
         private readonly string UserAgent;
+        private readonly IReadOnlyDictionary<string, string> HttpRequestHeaders;
         private readonly bool UseProxy;
 
-        public GzipAwareSitemapFetcher(string userAgent, bool useProxy = false)
+        public GzipAwareSitemapFetcher(Website website)
         {
-            UserAgent = userAgent;
-            UseProxy = useProxy;
+            UserAgent = website.BrowserUserAgent;
+            HttpRequestHeaders = website.GetHttpRequestHeaders();
+            UseProxy = website.UseProxy;
         }
 
         public async Task<string> Fetch(Uri uri)
         {
             using HttpRequestMessage request = new(HttpMethod.Get, uri);
             request.Headers.UserAgent.ParseAdd(UserAgent);
+            Website.ApplyHttpRequestHeaders(request, HttpRequestHeaders);
 
             if (UseProxy)
             {

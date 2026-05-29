@@ -53,8 +53,7 @@ namespace landerist_library.Parse.Media.Image
         {
             try
             {
-                using var request = new HttpRequestMessage(HttpMethod.Get, uri);
-                request.Headers.UserAgent.ParseAdd(ImageParser.MediaParser.Page.Website.BrowserUserAgent);
+                using var request = ImageParser.MediaParser.Page.Website.CreateHttpRequestMessage(HttpMethod.Get, uri);
                 using var response = HttpClient.SendAsync(request).GetAwaiter().GetResult();
                 response.EnsureSuccessStatusCode();
                 var bytes = response.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
