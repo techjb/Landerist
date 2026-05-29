@@ -279,7 +279,7 @@ namespace landerist_library.Websites
             };
 
             using var httpClient = new HttpClient(handler);
-            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
+            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT_BROWSER);
             httpClient.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
 
             try
@@ -412,7 +412,7 @@ namespace landerist_library.Websites
             if (RobotsTxt != null)
             {
                 Robots ??= Robots.Load(RobotsTxt);
-                return Robots.IsPathAllowed(Config.USER_AGENT, uri.PathAndQuery);
+                return Robots.IsPathAllowed(Config.USER_AGENT_BROWSER, uri.PathAndQuery);
             }
 
             return true;
@@ -438,7 +438,7 @@ namespace landerist_library.Websites
             if (RobotsTxt != null)
             {
                 Robots ??= Robots.Load(RobotsTxt);
-                return (int)Robots.CrawlDelay(Config.USER_AGENT) / 1000;
+                return (int)Robots.CrawlDelay(Config.USER_AGENT_BROWSER) / 1000;
             }
 
             return 0;

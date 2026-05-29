@@ -44,8 +44,12 @@ namespace landerist_library.Configuration
         public static bool LOGS_ERRORS_IN_CONSOLE = false;
         public static bool TIMERS_ENABLED { get; set; }
 
-        //public static readonly string USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36";
-        public static readonly string USER_AGENT = "Mozilla/5.0 (compatible;)";
+        //public static readonly string USER_AGENT_BROWSER = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36";
+        //public static readonly string USER_AGENT_BROWSER = "Mozilla/5.0 (compatible;)";
+        public static readonly string USER_AGENT_BROWSER = "Mozilla/5.0 (compatible; AcmeInc/1.0)";
+
+        
+        
 
         public static readonly string USER_AGENT_ROBOTSTXT = "Mozilla/5.0 (compatible;)";
 

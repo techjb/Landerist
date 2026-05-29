@@ -437,7 +437,7 @@ namespace landerist_library.Downloaders.Puppeteer
             BrowserPage.DefaultNavigationTimeout = GetTimeout(UseProxy);
             SetExecutionStep("Configuring browser page");
             await SetAcceptLanguageAsync(BrowserPage, Page.Website.LanguageCode);
-            await BrowserPage.SetUserAgentAsync(Config.USER_AGENT);
+            await BrowserPage.SetUserAgentAsync(Config.USER_AGENT_BROWSER);
             await BrowserPage.SetCacheEnabledAsync(false);
             await BrowserPage.SetRequestInterceptionAsync(true);
             BrowserPage.Request += (_, e) => _ = HandleRequestAsync(e);

@@ -78,7 +78,7 @@ namespace landerist_library.Parse.Media.Image
         private static HttpClient CreateHttpClient()
         {
             var client = new HttpClient();
-            client.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT_BROWSER);
             return client;
         }
     }

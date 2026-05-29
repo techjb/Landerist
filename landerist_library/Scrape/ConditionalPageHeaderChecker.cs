@@ -59,7 +59,7 @@ namespace landerist_library.Scrape
                 : new HttpClient(CreateHandler());
 
             httpClient.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
-            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT);
+            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT_BROWSER);
             return httpClient;
         }
 
