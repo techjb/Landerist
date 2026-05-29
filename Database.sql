@@ -410,6 +410,7 @@ CREATE TABLE [dbo].[WEBSITES](
 	[HtmlIndexingEnabled] [bit] NOT NULL,
 	[ListingHtmlRemoveXPath] [nvarchar](max) NULL,
 	[AllowedResourceTypes] [nvarchar](500) NULL,
+	[UserAgent] [nvarchar](500) NULL,
 	[UseProxy] [bit] NOT NULL,
  CONSTRAINT [PK_WEBSITES] PRIMARY KEY CLUSTERED 
 (

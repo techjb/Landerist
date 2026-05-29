@@ -8,16 +8,20 @@ namespace landerist_library.Index
     internal sealed class GzipAwareSitemapFetcher : ISitemapFetcher
     {
         private static readonly HttpClient HttpClient = CreateHttpClient(useProxy: false);
+        private readonly string UserAgent;
         private readonly bool UseProxy;
 
-        public GzipAwareSitemapFetcher(bool useProxy = false)
+        public GzipAwareSitemapFetcher(string userAgent, bool useProxy = false)
         {
+            UserAgent = userAgent;
             UseProxy = useProxy;
         }
 
         public async Task<string> Fetch(Uri uri)
         {
             using HttpRequestMessage request = new(HttpMethod.Get, uri);
+            request.Headers.UserAgent.ParseAdd(UserAgent);
+
             if (UseProxy)
             {
                 using HttpClient httpClient = CreateHttpClient(useProxy: true);
@@ -40,7 +44,6 @@ namespace landerist_library.Index
                 : new HttpClient();
 
             client.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
-            client.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT_ROBOTSTXT);
 
             return client;
         }

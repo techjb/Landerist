@@ -53,7 +53,11 @@ namespace landerist_library.Parse.Media.Image
         {
             try
             {
-                var bytes = HttpClient.GetByteArrayAsync(uri).GetAwaiter().GetResult();
+                using var request = new HttpRequestMessage(HttpMethod.Get, uri);
+                request.Headers.UserAgent.ParseAdd(ImageParser.MediaParser.Page.Website.BrowserUserAgent);
+                using var response = HttpClient.SendAsync(request).GetAwaiter().GetResult();
+                response.EnsureSuccessStatusCode();
+                var bytes = response.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
                 using var mat = Cv2.ImDecode(bytes, ImreadModes.Color);
 
                 if (mat.Empty())
@@ -77,9 +81,7 @@ namespace landerist_library.Parse.Media.Image
 
         private static HttpClient CreateHttpClient()
         {
-            var client = new HttpClient();
-            client.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT_BROWSER);
-            return client;
+            return new HttpClient();
         }
     }
 }

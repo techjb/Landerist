@@ -37,6 +37,13 @@ namespace landerist_library.Websites
 
         public string? AllowedResourceTypes { get; set; }
 
+        public string? UserAgent { get; set; }
+
+        public string BrowserUserAgent =>
+            string.IsNullOrWhiteSpace(UserAgent)
+                ? Config.USER_AGENT_BROWSER
+                : UserAgent.Trim();
+
         public bool ApplySpecialRules { get; set; }
 
         public bool HtmlIndexingEnabled { get; set; } = true;
@@ -132,6 +139,9 @@ namespace landerist_library.Websites
             AllowedResourceTypes = dataRow.Table.Columns.Contains("AllowedResourceTypes") && dataRow["AllowedResourceTypes"] is not DBNull
                 ? dataRow["AllowedResourceTypes"].ToString()
                 : null;
+            UserAgent = dataRow.Table.Columns.Contains("UserAgent") && dataRow["UserAgent"] is not DBNull
+                ? NullIfWhiteSpace(dataRow["UserAgent"].ToString())
+                : null;
             ApplySpecialRules = dataRow.Table.Columns.Contains("ApplySpecialRules")
                 && dataRow["ApplySpecialRules"] is not DBNull
                 && (bool)dataRow["ApplySpecialRules"];
@@ -149,9 +159,9 @@ namespace landerist_library.Websites
             string query =
                 "INSERT INTO " + Websites.WEBSITES + " (" +
                 "[MainUri], [Host], [LanguageCode], [CountryCode], [RobotsTxt], [RobotsTxtUpdated], " +
-                "[SitemapUpdated], [IpAddress], [IpAddressUpdated], [IndexUrlRegex], [SitemapUrlRegex], [ListingUrlRegex], [ListingHtmlRemoveXPath], [AllowedResourceTypes], [ApplySpecialRules], [HtmlIndexingEnabled], [UseProxy]) VALUES (" +
+                "[SitemapUpdated], [IpAddress], [IpAddressUpdated], [IndexUrlRegex], [SitemapUrlRegex], [ListingUrlRegex], [ListingHtmlRemoveXPath], [AllowedResourceTypes], [UserAgent], [ApplySpecialRules], [HtmlIndexingEnabled], [UseProxy]) VALUES (" +
                 "@MainUri, @Host, @LanguageCode, @CountryCode, @RobotsTxt, @RobotsTxtUpdated, " +
-                "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @IndexUrlRegex, @SitemapUrlRegex, @ListingUrlRegex, @ListingHtmlRemoveXPath, @AllowedResourceTypes, @ApplySpecialRules, @HtmlIndexingEnabled, @UseProxy)";
+                "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @IndexUrlRegex, @SitemapUrlRegex, @ListingUrlRegex, @ListingHtmlRemoveXPath, @AllowedResourceTypes, @UserAgent, @ApplySpecialRules, @HtmlIndexingEnabled, @UseProxy)";
 
             var parameters = GetQueryParameters();
             return new DataBase().Query(query, parameters);
@@ -174,6 +184,7 @@ namespace landerist_library.Websites
                 "[ListingUrlRegex] = @ListingUrlRegex, " +
                 "[ListingHtmlRemoveXPath] = @ListingHtmlRemoveXPath, " +
                 "[AllowedResourceTypes] = @AllowedResourceTypes, " +
+                "[UserAgent] = @UserAgent, " +
                 "[ApplySpecialRules] = @ApplySpecialRules, " +
                 "[HtmlIndexingEnabled] = @HtmlIndexingEnabled, " +
                 "[UseProxy] = @UseProxy " +
@@ -200,10 +211,16 @@ namespace landerist_library.Websites
                 {"ListingUrlRegex", ListingUrlRegex },
                 {"ListingHtmlRemoveXPath", ListingHtmlRemoveXPath },
                 {"AllowedResourceTypes", AllowedResourceTypes },
+                {"UserAgent", NullIfWhiteSpace(UserAgent) },
                 {"ApplySpecialRules", ApplySpecialRules },
                 {"HtmlIndexingEnabled", HtmlIndexingEnabled },
                 {"UseProxy", UseProxy },
             };
+        }
+
+        private static string? NullIfWhiteSpace(string? value)
+        {
+            return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
         }
 
         public bool IsDiscardedByIndexUrlRegex(Uri uri)
@@ -279,7 +296,7 @@ namespace landerist_library.Websites
             };
 
             using var httpClient = new HttpClient(handler);
-            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT_BROWSER);
+            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(BrowserUserAgent);
             httpClient.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
 
             try
@@ -322,7 +339,7 @@ namespace landerist_library.Websites
             try
             {
                 using var httpClient = GetRobotsTxtHttpClient();
-                httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT_ROBOTSTXT);
+                httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(BrowserUserAgent);
 
                 var response = httpClient.GetAsync(robotsTxtUrl).GetAwaiter().GetResult();
                 RobotsTxt = null;
@@ -412,7 +429,7 @@ namespace landerist_library.Websites
             if (RobotsTxt != null)
             {
                 Robots ??= Robots.Load(RobotsTxt);
-                return Robots.IsPathAllowed(Config.USER_AGENT_BROWSER, uri.PathAndQuery);
+                return Robots.IsPathAllowed(BrowserUserAgent, uri.PathAndQuery);
             }
 
             return true;
@@ -438,7 +455,7 @@ namespace landerist_library.Websites
             if (RobotsTxt != null)
             {
                 Robots ??= Robots.Load(RobotsTxt);
-                return (int)Robots.CrawlDelay(Config.USER_AGENT_BROWSER) / 1000;
+                return (int)Robots.CrawlDelay(BrowserUserAgent) / 1000;
             }
 
             return 0;
@@ -644,6 +661,7 @@ namespace landerist_library.Websites
                 SitemapUrlRegex = null;
                 ListingHtmlRemoveXPath = null;
                 AllowedResourceTypes = null;
+                UserAgent = null;
                 ApplySpecialRules = false;
                 HtmlIndexingEnabled = false;
                 UseProxy = false;

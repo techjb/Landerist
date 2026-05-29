@@ -166,6 +166,7 @@ namespace landerist_library.Pages
                     "W.[ListingUrlRegex]," +
                     "W.[ListingHtmlRemoveXPath], " +
                     "W.[AllowedResourceTypes], " +
+                    "W.[UserAgent], " +
                     "W.[ApplySpecialRules], " +
                     "W.[HtmlIndexingEnabled], " +
                     "W.[UseProxy] " +
@@ -322,6 +323,7 @@ namespace landerist_library.Pages
                     "W.[ListingUrlRegex]," +
                     "W.[ListingHtmlRemoveXPath], " +
                     "W.[AllowedResourceTypes], " +
+                    "W.[UserAgent], " +
                     "W.[ApplySpecialRules], " +
                     "W.[HtmlIndexingEnabled], " +
                     "W.[UseProxy] " +
@@ -437,6 +439,7 @@ namespace landerist_library.Pages
                 Websites.Websites.WEBSITES + ".[ListingUrlRegex], " +
                 Websites.Websites.WEBSITES + ".[ListingHtmlRemoveXPath], " +
                 Websites.Websites.WEBSITES + ".[AllowedResourceTypes], " +
+                Websites.Websites.WEBSITES + ".[UserAgent], " +
                 Websites.Websites.WEBSITES + ".[ApplySpecialRules], " +
                 Websites.Websites.WEBSITES + ".[HtmlIndexingEnabled], " +
                 Websites.Websites.WEBSITES + ".[UseProxy] ";

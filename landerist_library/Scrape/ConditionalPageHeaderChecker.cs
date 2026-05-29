@@ -32,7 +32,7 @@ namespace landerist_library.Scrape
 
         private async Task<ConditionalHeaderCheckResult> CheckAsync(Page page)
         {
-            using var httpClient = CreateHttpClient();
+            using var httpClient = CreateHttpClient(page.Website);
             using var request = CreateRequest(page);
             using var response = await httpClient
                 .SendAsync(request, HttpCompletionOption.ResponseHeadersRead)
@@ -52,14 +52,14 @@ namespace landerist_library.Scrape
             };
         }
 
-        private HttpClient CreateHttpClient()
+        private HttpClient CreateHttpClient(Website website)
         {
             var httpClient = UseProxy
                 ? new HttpClient(CreateProxyHandler())
                 : new HttpClient(CreateHandler());
 
             httpClient.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
-            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Config.USER_AGENT_BROWSER);
+            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(website.BrowserUserAgent);
             return httpClient;
         }
 

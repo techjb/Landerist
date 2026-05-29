@@ -19,7 +19,7 @@ namespace landerist_tests
             //new Scraper().Start();
             //new Scraper().Scrape(page, false);
 
-            new landerist_library.Scrape.Scraper().Scrape("https://www.remax.es/buscador-de-inmuebles/venta/casa/baleares-islas-baleares/andratx/todos/JL2622/", false);
+            //new landerist_library.Scrape.Scraper().Scrape("https://www.balearic-properties.com/es/property/id/968713-nueva-promocion-de-apartamentos-de-1-y-2-dormitorios-en-ses-paisses-san-antonio-ibiza-html", false);
             ////new landerist_library.Scrape.Scraper().TryApplyPreClassificationBeforeDownload(new landerist_library.Pages.Page("https://www.iadespana.es/anuncios/aspe-03680/venta/casa"));
             //new Scraper().TestSinglePage();
             //landerist_library.Scrape.PageSelector.SelectTop1();

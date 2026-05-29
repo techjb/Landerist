@@ -5,7 +5,6 @@ namespace landerist_library.Index
 {
     public class SitemapIndexer : Indexer
     {
-        private static readonly ISitemapFetcher SitemapFetcher = new GzipAwareSitemapFetcher();
         private static readonly ISitemapParser SitemapParser = new SitemapParser();
         private readonly ISitemapFetcher WebsiteSitemapFetcher;
         private readonly HashSet<string> SitemapsIndexes = new(StringComparer.OrdinalIgnoreCase);
@@ -14,9 +13,7 @@ namespace landerist_library.Index
 
         public SitemapIndexer(Website website) : base(website)
         {
-            WebsiteSitemapFetcher = website.UseProxy
-                ? new GzipAwareSitemapFetcher(useProxy: true)
-                : SitemapFetcher;
+            WebsiteSitemapFetcher = new GzipAwareSitemapFetcher(website.BrowserUserAgent, website.UseProxy);
         }
 
         public bool IndexNewPages(List<Com.Bekijkhet.RobotsTxt.Sitemap> sitemaps)
