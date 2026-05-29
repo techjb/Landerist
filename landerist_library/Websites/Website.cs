@@ -142,10 +142,10 @@ namespace landerist_library.Websites
             AllowedResourceTypes = dataRow.Table.Columns.Contains("AllowedResourceTypes") && dataRow["AllowedResourceTypes"] is not DBNull
                 ? dataRow["AllowedResourceTypes"].ToString()
                 : null;
-            UserAgent = dataRow.Table.Columns.Contains("UserAgent") && dataRow["UserAgent"] is not DBNull
+            UserAgent = dataRow["UserAgent"] is not DBNull
                 ? NullIfWhiteSpace(dataRow["UserAgent"].ToString())
                 : null;
-            HttpRequestHeaders = dataRow.Table.Columns.Contains("HttpRequestHeaders") && dataRow["HttpRequestHeaders"] is not DBNull
+            HttpRequestHeaders = dataRow["HttpRequestHeaders"] is not DBNull
                 ? NullIfWhiteSpace(dataRow["HttpRequestHeaders"].ToString())
                 : null;
             ApplySpecialRules = dataRow.Table.Columns.Contains("ApplySpecialRules")
