@@ -151,6 +151,7 @@ namespace landerist_library.Pages
         private static TransientErrorKind GetTransientErrorKind(Page page)
         {
             if (page.IsResponseBodyNullOrEmpty() ||
+                page.IsHttpStatusCodeAccepted() ||
                 page.IsHttpStatusCodeTooManyRequests() ||
                 page.IsHttpStatusCodeServerError())
             {

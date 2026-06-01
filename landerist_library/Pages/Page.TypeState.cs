@@ -54,6 +54,11 @@ namespace landerist_library.Pages
             return HttpStatusCode == 429;
         }
 
+        public bool IsHttpStatusCodeAccepted()
+        {
+            return HttpStatusCode == 202;
+        }
+
         public bool IsHttpStatusCodeForbidden()
         {
             return HttpStatusCode == 403;
