@@ -209,7 +209,8 @@ namespace landerist_library.Database
         {
             int randomMilliseconds = Random.Shared.Next(3000, 6000);
             int crawlDelayMilliseconds = Math.Min(website.CrawlDelay(), Configuration.Config.MAX_CRAW_DELAY_SECONDS) * 1000;
-            return Math.Max(randomMilliseconds, crawlDelayMilliseconds);
+            int configuredMinimumMilliseconds = Math.Max(0, website.MinimumRequestIntervalMilliseconds ?? 0);
+            return Math.Max(Math.Max(randomMilliseconds, crawlDelayMilliseconds), configuredMinimumMilliseconds);
         }
 
         private static string GetForbiddenDelaySecondsSql(string forbiddenBackoffLevelExpression)

@@ -170,7 +170,8 @@ namespace landerist_library.Pages
                     "W.[HttpRequestHeaders], " +
                     "W.[ApplySpecialRules], " +
                     "W.[HtmlIndexingEnabled], " +
-                    "W.[UseProxy] " +
+                    "W.[UseProxy], " +
+                    "W.[MinimumRequestIntervalMilliseconds] " +
                 "FROM " + PAGES + " AS P " +
                 "INNER JOIN " + Websites.Websites.WEBSITES + " AS W ON P.[Host] = W.[Host] " +
                 "INNER JOIN TopPages AS TP ON P.[UriHash] = TP.[UriHash]";
@@ -328,7 +329,8 @@ namespace landerist_library.Pages
                     "W.[HttpRequestHeaders], " +
                     "W.[ApplySpecialRules], " +
                     "W.[HtmlIndexingEnabled], " +
-                    "W.[UseProxy] " +
+                    "W.[UseProxy], " +
+                    "W.[MinimumRequestIntervalMilliseconds] " +
                 "FROM " + PAGES + " AS P " +
                 "INNER JOIN " + Websites.Websites.WEBSITES + " AS W ON P.[Host] = W.[Host] " +
                 "INNER JOIN TopPages AS TP ON P.[UriHash] = TP.[UriHash]";
@@ -445,7 +447,8 @@ namespace landerist_library.Pages
                 Websites.Websites.WEBSITES + ".[HttpRequestHeaders], " +
                 Websites.Websites.WEBSITES + ".[ApplySpecialRules], " +
                 Websites.Websites.WEBSITES + ".[HtmlIndexingEnabled], " +
-                Websites.Websites.WEBSITES + ".[UseProxy] ";
+                Websites.Websites.WEBSITES + ".[UseProxy], " +
+                Websites.Websites.WEBSITES + ".[MinimumRequestIntervalMilliseconds] ";
         }
 
         public static List<Page> GetPages(string query)

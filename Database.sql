@@ -413,6 +413,7 @@ CREATE TABLE [dbo].[WEBSITES](
 	[UserAgent] [nvarchar](500) NULL,
 	[HttpRequestHeaders] [nvarchar](max) NULL,
 	[UseProxy] [bit] NOT NULL,
+	[MinimumRequestIntervalMilliseconds] [int] NULL,
  CONSTRAINT [PK_WEBSITES] PRIMARY KEY CLUSTERED 
 (
 	[Host] ASC

@@ -53,6 +53,8 @@ namespace landerist_library.Websites
 
         public bool UseProxy { get; set; }
 
+        public int? MinimumRequestIntervalMilliseconds { get; set; }
+
         public Robots? Robots = null;
 
         public LanguageCode LanguageCode = LanguageCode.es;
@@ -158,6 +160,9 @@ namespace landerist_library.Websites
             UseProxy = dataRow.Table.Columns.Contains("UseProxy")
                 && dataRow["UseProxy"] is not DBNull
                 && (bool)dataRow["UseProxy"];
+            MinimumRequestIntervalMilliseconds = dataRow["MinimumRequestIntervalMilliseconds"] is not DBNull
+                ? (int)dataRow["MinimumRequestIntervalMilliseconds"]
+                : null;
         }
 
         public bool Insert()
@@ -165,9 +170,9 @@ namespace landerist_library.Websites
             string query =
                 "INSERT INTO " + Websites.WEBSITES + " (" +
                 "[MainUri], [Host], [LanguageCode], [CountryCode], [RobotsTxt], [RobotsTxtUpdated], " +
-                "[SitemapUpdated], [IpAddress], [IpAddressUpdated], [IndexUrlRegex], [SitemapUrlRegex], [ListingUrlRegex], [ListingHtmlRemoveXPath], [AllowedResourceTypes], [UserAgent], [HttpRequestHeaders], [ApplySpecialRules], [HtmlIndexingEnabled], [UseProxy]) VALUES (" +
+                "[SitemapUpdated], [IpAddress], [IpAddressUpdated], [IndexUrlRegex], [SitemapUrlRegex], [ListingUrlRegex], [ListingHtmlRemoveXPath], [AllowedResourceTypes], [UserAgent], [HttpRequestHeaders], [ApplySpecialRules], [HtmlIndexingEnabled], [UseProxy], [MinimumRequestIntervalMilliseconds]) VALUES (" +
                 "@MainUri, @Host, @LanguageCode, @CountryCode, @RobotsTxt, @RobotsTxtUpdated, " +
-                "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @IndexUrlRegex, @SitemapUrlRegex, @ListingUrlRegex, @ListingHtmlRemoveXPath, @AllowedResourceTypes, @UserAgent, @HttpRequestHeaders, @ApplySpecialRules, @HtmlIndexingEnabled, @UseProxy)";
+                "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @IndexUrlRegex, @SitemapUrlRegex, @ListingUrlRegex, @ListingHtmlRemoveXPath, @AllowedResourceTypes, @UserAgent, @HttpRequestHeaders, @ApplySpecialRules, @HtmlIndexingEnabled, @UseProxy, @MinimumRequestIntervalMilliseconds)";
 
             var parameters = GetQueryParameters();
             return new DataBase().Query(query, parameters);
@@ -194,7 +199,8 @@ namespace landerist_library.Websites
                 "[HttpRequestHeaders] = @HttpRequestHeaders, " +
                 "[ApplySpecialRules] = @ApplySpecialRules, " +
                 "[HtmlIndexingEnabled] = @HtmlIndexingEnabled, " +
-                "[UseProxy] = @UseProxy " +
+                "[UseProxy] = @UseProxy, " +
+                "[MinimumRequestIntervalMilliseconds] = @MinimumRequestIntervalMilliseconds " +
                 "WHERE [Host] = @Host";
 
             var parameters = GetQueryParameters();
@@ -223,6 +229,7 @@ namespace landerist_library.Websites
                 {"ApplySpecialRules", ApplySpecialRules },
                 {"HtmlIndexingEnabled", HtmlIndexingEnabled },
                 {"UseProxy", UseProxy },
+                {"MinimumRequestIntervalMilliseconds", MinimumRequestIntervalMilliseconds },
             };
         }
 
@@ -785,6 +792,7 @@ namespace landerist_library.Websites
                 ApplySpecialRules = false;
                 HtmlIndexingEnabled = false;
                 UseProxy = false;
+                MinimumRequestIntervalMilliseconds = null;
             }
 
             Disposed = true;

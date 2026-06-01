@@ -5,6 +5,8 @@ namespace landerist_library.Downloaders.Puppeteer
         public const string RemoveCookies =
             @"document.querySelectorAll('[class*=""cookie"" i], [id*=""cookie"" i]').forEach(el => el.remove());";
 
+        public const string DeleteWebdriver= @"() => { delete navigator.__proto__.webdriver; }";
+
         public const string RemoveInvisibleElements = @"
             () => {
                 const isVisible = (elem) => {

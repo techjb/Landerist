@@ -319,7 +319,17 @@ namespace landerist_library.Downloaders.Puppeteer
                 try
                 {
                     SetExecutionStep("Removing cookie banners");
-                    await BrowserPage!.EvaluateExpressionAsync(PuppeteerPageScripts.RemoveCookies);
+                    await BrowserPage!.EvaluateFunctionOnNewDocumentAsync("() => { delete navigator.__proto__.webdriver; }");
+                }
+                catch //(Exception exception)
+                {
+                    //Logs.Log.WriteInfo("PuppeteerDownloader ExpressionRemoveCookies", exception.Message);
+                }
+
+                try
+                {
+                    SetExecutionStep("Removing web drivers");
+                    await BrowserPage!.EvaluateExpressionAsync(PuppeteerPageScripts.DeleteWebdriver);
                 }
                 catch //(Exception exception)
                 {
