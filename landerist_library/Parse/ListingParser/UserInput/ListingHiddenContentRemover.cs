@@ -1,3 +1,4 @@
+using Amazon.S3.Model.Internal.MarshallTransformations;
 using HtmlAgilityPack;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -116,9 +117,16 @@ namespace landerist_library.Parse.ListingParser.UserInput
             {
                 return true;
             }
+            if (HasHiddenAttributeHint(node.GetAttributeValue("class", string.Empty)))
+            {
+                return true;
+            }
 
-            return HasHiddenAttributeHint(node.GetAttributeValue("class", string.Empty)) ||
-                HasHiddenAttributeHint(node.GetAttributeValue("id", string.Empty));
+            if (HasHiddenAttributeHint(node.GetAttributeValue("id", string.Empty)))
+            {
+                return true;
+            }
+            return false;
         }
 
         private static bool IsHiddenStyle(string style)

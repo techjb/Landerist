@@ -41,14 +41,14 @@ namespace landerist_tests
             //WebsitesCleanner.DeleteWebsitesWithoutPublishedListings();
 
 
-            //string hostUri = "www.gilmar.es";
-            //string mainUri = "https://www.gilmar.es/";
-            //string sitemapUrlRegex = @"^https:\/\/www\.gilmar\.es\/(?:sitemap_index|property-sitemap[0-9]*)\.xml$";
-            //string listingUrlRegex = @"^https:\/\/www\.gilmar\.es\/inmueble\/(?!(?:.*-(?:portugal|polonia|francia|italy|italia|alemania|grecia|andorra|marruecos|mexico|méxico|brasil|colombia|argentina|chile|uruguay|peru|perú|reino-unido|united-kingdom|usa|estados-unidos)-referencia-))(?:comprar|alquilar)-(?:piso|chalet|casa|villa|atico|ático|duplex|dúplex|local|oficina|garaje|parcela|terreno|edificio|nave|finca|apartamento|loft|estudio|adosado|pareado)-(?:[a-z0-9áéíóúñü_-]|%[0-9a-f]{2})+-referencia-[0-9]+\/?$";
+            //string hostUri = "realestate.hipoges.com";
+            //string mainUri = "https://realestate.hipoges.com/";
+            //string sitemapUrlRegex = @"^https:\/\/realestate\.hipoges\.com\/(?:sitemap|activo_es_sitemap)\.xml$";
+            //string listingUrlRegex = @"^https:\/\/realestate\.hipoges\.com\/es\/detail\/[A-Z]{4,5}-[0-9]{4,8}\/?$";
             //string indexUrlRegex = listingUrlRegex;
             //string allowebResourceTypes = "Unknown,Beacon,Document,StyleSheet,Script,TextTrack,Xhr,Fetch,EventSource,WebSocket,Manifest,Ping,Other";
             //string? userAgent = null;
-            //string? httpRequestHeaders = "{\"Cookie\":\"dhd2=1520d1fb7aeaf43ce7399190e6af5b81\"}";
+            //string? httpRequestHeaders = null;
 
             //WebsitesInserter.InsertSpecialWebsite(mainUri, hostUri,
             //    listingUrlRegex, indexUrlRegex, sitemapUrlRegex, allowebResourceTypes, userAgent, httpRequestHeaders);
