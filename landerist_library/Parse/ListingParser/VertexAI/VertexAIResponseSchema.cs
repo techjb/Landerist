@@ -32,6 +32,13 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                             Format = "date",
                             Description = StructuredOutputEsJson.FechaDePublicaciónDescription,
                         },
+                        [nameof(StructuredOutputEsJson.estado_de_publicación)] = new()
+                        {
+                            Nullable = true,
+                            Type = Google.Cloud.AIPlatform.V1.Type.String,
+                            Enum = { GetEnumValues(typeof(EstadosDePublicación)) },
+                            Description = StructuredOutputEsJson.EstadoDePublicaciónDescription,
+                        },
                         [nameof(StructuredOutputEsJson.tipo_de_operación)] = new()
                         {
                             Type = Google.Cloud.AIPlatform.V1.Type.String,

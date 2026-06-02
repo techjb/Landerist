@@ -55,7 +55,7 @@ namespace landerist_library.Pages
             {
                 return 1d;
             }
-            return 1.5d;  // todo: remove have enough data to confirm the new schedule is working as expected
+            return 1.5d;
         }
 
         private static double GetBaseDaysForPageType(PageType pageType)

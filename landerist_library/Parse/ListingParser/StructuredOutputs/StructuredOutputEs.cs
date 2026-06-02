@@ -64,6 +64,12 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         en_ruinas
     };
 
+    public enum EstadosDePublicación
+    {
+        publicado,
+        despublicado
+    };
+
     public class StructuredOutputEs
     {
         [JsonProperty(StructuredOutputEsJson.FunctionNameIsListing, Required = Required.Always)]
@@ -83,6 +89,11 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         [JsonProperty(nameof(StructuredOutputEsJson.fecha_de_publicación), Required = Required.AllowNull)]
         [System.ComponentModel.Description(StructuredOutputEsJson.FechaDePublicaciónDescription)]
         public string? FechaDePublicación { get; set; }
+
+
+        [JsonProperty(nameof(StructuredOutputEsJson.estado_de_publicación), Required = Required.AllowNull)]
+        [System.ComponentModel.Description(StructuredOutputEsJson.EstadoDePublicaciónDescription)]
+        public EstadosDePublicación? EstadoDePublicación { get; set; }
 
 
         [JsonProperty(nameof(StructuredOutputEsJson.tipo_de_operación), Required = Required.AllowNull)]

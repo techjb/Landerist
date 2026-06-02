@@ -24,6 +24,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI
             MapField<string, OpenApiSchema> properties = [];
 
             AddString(properties, nameof(fecha_de_publicación));
+            AddEnum(properties, nameof(estado_de_publicación), EstadosDePublicación);
             AddEnum(properties, nameof(tipo_de_operación), TiposDeOperación);
             AddEnum(properties, nameof(tipo_de_inmueble), TiposDeInmueble);
             AddEnum(properties, nameof(subtipo_de_inmueble), SubtiposDeInmueble);

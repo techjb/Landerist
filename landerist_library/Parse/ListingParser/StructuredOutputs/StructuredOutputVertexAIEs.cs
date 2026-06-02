@@ -31,6 +31,11 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public string? FechaDePublicación { get; private set; }
 
 
+        [JsonProperty(nameof(StructuredOutputEsJson.estado_de_publicación), Required = Required.Default)]
+        [System.ComponentModel.Description(StructuredOutputEsJson.EstadoDePublicaciónDescription)]
+        public EstadosDePublicación? EstadoDePublicación { get; private set; }
+
+
         [JsonProperty(nameof(StructuredOutputEsJson.tipo_de_operación), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.TipoDeOperaciónDescription)]
         public TiposDeOperacion? TipoDeOperación { get; private set; }
@@ -212,6 +217,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             return new Anuncio()
             {
                 FechaDePublicación = this.FechaDePublicación,
+                EstadoDePublicación = this.EstadoDePublicación,
                 TipoDeOperación = this.TipoDeOperación,
                 TipoDeInmueble = this.TipoDeInmueble,
                 SubtipoDeInmueble = this.SubtipoDeInmueble,

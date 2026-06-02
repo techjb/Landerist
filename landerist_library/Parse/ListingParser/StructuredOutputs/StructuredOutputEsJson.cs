@@ -26,25 +26,22 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public string? fecha_de_publicación { get; set; } = null;
 
 
+        public const string EstadoDePublicaciónDescription =
+            "estado de publicación del anuncio. " +
+            "Usa publicado por defecto. " +
+            "Usa despublicado solo si el texto de la página indica explícitamente que el anuncio ya está vendido, alquilado o no disponible, aunque conserve los datos del anuncio";
+
+        [Description(EstadoDePublicaciónDescription)]
+        public string? estado_de_publicación { get; set; } = null;
+
+
         public const string TipoDeOperaciónDescription = "tipo de operación inmobiliaria";
 
         [Description(TipoDeOperaciónDescription)]
         public string? tipo_de_operación { get; set; } = null;
 
 
-        public const string TipoDeInmuebleDescription = "categoría del tipo de inmueble anunciado";
-        //public const string TipoDeInmuebleDescription = 
-        //    "Extrae la categoría del tipo de inmueble anunciado. " +
-        //    "- Vivienda: Propiedad residencial completa destinada a vivienda familiar: piso, ático, dúplex, apartamento, chalet, adosado, casa rústica. " +
-        //    "- Dormitorio: Habitación individual o espacio para dormir. " +
-        //    "- Local Comercial: Espacio destinado a actividades comerciales y venta al público. " +
-        //    "- Nave industrial: Instalación industrial para actividades de producción o almacenamiento. " +
-        //    "- Garaje: Plaza de aparcamiento cubierta para vehículos. " +
-        //    "- Trastero: Espacio pequeño destinado al almacenamiento de objetos personales. " +
-        //    "- Oficina: Espacio destinado a actividades profesionales y administrativas. " +
-        //    "- Parcela: Terreno o parcela sin construcción, apto para edificación. " +
-        //    "- Edificio: Construcción completa que puede contener múltiples unidades." +
-        //    "";
+        public const string TipoDeInmuebleDescription = "categoría del tipo de inmueble anunciado";        
         [Description(TipoDeInmuebleDescription)]
         
         public string? tipo_de_inmueble { get; set; } = null;
@@ -297,6 +294,10 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
 
         protected const string ESTADO_DE_LA_CONSTRUCCIÓN_EN_RUINAS = "en_ruinas";
 
+        protected const string ESTADO_DE_PUBLICACIÓN_PUBLICADO = "publicado";
+
+        protected const string ESTADO_DE_PUBLICACIÓN_DESPUBLICADO = "despublicado";
+
 
         protected readonly JsonArray TiposDeOperación =
         [
@@ -341,6 +342,12 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             ESTADO_DE_LA_CONSTRUCCIÓN_BUENO,
             ESTADO_DE_LA_CONSTRUCCIÓN_A_REFORMAR,
             ESTADO_DE_LA_CONSTRUCCIÓN_EN_RUINAS
+        ];
+
+        protected readonly JsonArray EstadosDePublicación =
+        [
+            ESTADO_DE_PUBLICACIÓN_PUBLICADO,
+            ESTADO_DE_PUBLICACIÓN_DESPUBLICADO
         ];
 
         public static string GetDescriptionAttribute(string name)

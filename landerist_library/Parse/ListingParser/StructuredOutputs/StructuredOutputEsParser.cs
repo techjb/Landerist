@@ -24,7 +24,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
                 var listing = new Listing
                 {
                     guid = page.UriHash,
-                    listingStatus = ListingStatus.published, // todo: ad ai for listing status
+                    listingStatus = GetListingStatus(),
                     listingDate = GetListingDate(),
                     operation = GetOperation(),
                     propertyType = GetPropertyType(),
@@ -70,6 +70,13 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
                 Logs.Log.WriteError("OpenAIStructuredOutput ParseListing", page.Uri, exception);
             }
             return (PageType.MayBeListing, null);
+        }
+
+        private ListingStatus GetListingStatus()
+        {
+            return Anuncio!.EstadoDePublicación == EstadosDePublicación.despublicado
+                ? ListingStatus.unpublished
+                : ListingStatus.published;
         }
       
         private DateTime GetListingDate()

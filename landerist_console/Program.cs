@@ -81,7 +81,7 @@ namespace landerist_console
 
         private static void End()
         {
-            Log.WriteInfo("landerist_console", "Stopping...");
+            Log.WriteInfo("landerist_console", "Stopping Version: " + Config.VERSION + " ..");
             ServiceTasks.Stop();
 
             if (DateStart is null)
