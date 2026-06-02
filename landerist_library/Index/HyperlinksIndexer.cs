@@ -43,7 +43,7 @@ namespace landerist_library.Index
                 //    urls.Add(href);
                 //}
 
-                // todo: select all nodes: Page.HtmlDocument.DocumentNode.SelectNodes("//a");
+                
                 var urls = htmlDocument.DocumentNode
                     .Descendants("a")
                     .Where(a => !HasNoFollow(a))

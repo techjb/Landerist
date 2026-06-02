@@ -71,24 +71,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             }
             return (PageType.MayBeListing, null);
         }
-
-        //private bool IsValidResponse()
-        //{
-        //    return
-        //        IsValidListingDate() &&
-        //        IsValidDescription()
-        //    ;
-        //}
-
-        //private bool IsValidListingDate()
-        //{
-        //    var listingDate = GetListingDate();
-        //    var maxListingDate = DateTime.Now.AddDays(1);
-        //    var minListingDate = DateTime.Now.AddYears(-Config.MAX_YEARS_SINCE_PUBLISHED_LISTING);
-
-        //    return listingDate <= maxListingDate && listingDate >= minListingDate;
-        //}
-
+      
         private DateTime GetListingDate()
         {
             var now = DateTime.Now;

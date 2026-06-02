@@ -1,3 +1,4 @@
+using Amazon.CloudFront.Model;
 using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Downloaders;
@@ -159,8 +160,6 @@ namespace landerist_library.Pages
                 Parse.ListingParser.UserInput.ParseListingUserInput.GetHtml(this) :
                 Parse.ListingParser.UserInput.ParseListingUserInput.GetText(this);
 
-            //ListingParserInput = Parse.ListingParser.UserInput.ParseListingUserInput.GetHtml(this);
-            //var text = this.GetHtmlDocument().Text;
             return ListingParserInput;
         }
 
@@ -170,6 +169,8 @@ namespace landerist_library.Pages
             HtmlDocument = null;
             OriginalOuterHtml = null;
         }
+
+        
 
         private static string? NormalizeHeaderValue(string? headerValue)
         {
