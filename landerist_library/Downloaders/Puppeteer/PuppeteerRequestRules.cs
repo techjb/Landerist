@@ -26,7 +26,10 @@ namespace landerist_library.Downloaders.Puppeteer
         private static readonly ConcurrentDictionary<string, AllowedResourceTypesCacheItem> AllowedResourceTypesCache =
             new(StringComparer.OrdinalIgnoreCase);
 
-        private static readonly HashSet<string> BlockedDomains = new(StringComparer.OrdinalIgnoreCase)
+        private static readonly ConcurrentDictionary<string, BlockedDomainsCacheItem> BlockedDomainsCache =
+            new(StringComparer.OrdinalIgnoreCase);
+
+        private static readonly HashSet<string> DefaultBlockedDomains = new(StringComparer.OrdinalIgnoreCase)
         {
             "www.google-analytics.com",
             "www.googletagmanager.com",
@@ -124,9 +127,8 @@ namespace landerist_library.Downloaders.Puppeteer
             }
 
             var requestHost = GetRequestHost(e.Request.Url, currentPage.Uri.Host);
-            var url = e.Request.Url.ToLowerInvariant();
-            //Console.WriteLine(url);
-            if (BlockedDomains.Contains(requestHost) ||
+            var url = e.Request.Url.ToLowerInvariant();            
+            if (GetBlockedDomains(currentPage.Website.BlockedDomains).Contains(requestHost) ||
                 BlockedExtensions.Any(url.EndsWith) ||
                 e.Request.IsNavigationRequest && e.Request.RedirectChain.Length != 0)
             {
@@ -163,6 +165,18 @@ namespace landerist_library.Downloaders.Puppeteer
                 .ResourceTypes;
         }
 
+        private static HashSet<string> GetBlockedDomains(string? blockedDomains)
+        {
+            if (string.IsNullOrWhiteSpace(blockedDomains))
+            {
+                return DefaultBlockedDomains;
+            }
+
+            return BlockedDomainsCache
+                .GetOrAdd(blockedDomains.Trim(), ParseBlockedDomains)
+                .Domains;
+        }
+
         private static AllowedResourceTypesCacheItem ParseAllowedResourceTypes(string allowedResourceTypes)
         {
             HashSet<ResourceType> resourceTypes = [];
@@ -175,6 +189,39 @@ namespace landerist_library.Downloaders.Puppeteer
             }
 
             return new AllowedResourceTypesCacheItem(resourceTypes.Count > 0 ? resourceTypes : null);
+        }
+
+        private static BlockedDomainsCacheItem ParseBlockedDomains(string blockedDomains)
+        {
+            HashSet<string> domains = new(StringComparer.OrdinalIgnoreCase);
+            foreach (var item in blockedDomains.Split(ResourceTypeSeparators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            {
+                var domain = NormalizeDomain(item);
+                if (!string.IsNullOrEmpty(domain))
+                {
+                    domains.Add(domain);
+                }
+            }
+
+            return new BlockedDomainsCacheItem(domains);
+        }
+
+        private static string? NormalizeDomain(string value)
+        {
+            if (Uri.TryCreate(value, UriKind.Absolute, out var uri))
+            {
+                return uri.Host;
+            }
+
+            var domain = value
+                .Trim()
+                .TrimStart('*')
+                .TrimStart('.')
+                .TrimEnd('/');
+
+            return string.IsNullOrWhiteSpace(domain)
+                ? null
+                : domain;
         }
 
         private static PuppeteerRequestAction GetBlockedResourceAction(ResourceType resourceType)
@@ -194,6 +241,11 @@ namespace landerist_library.Downloaders.Puppeteer
         private sealed class AllowedResourceTypesCacheItem(HashSet<ResourceType>? resourceTypes)
         {
             public HashSet<ResourceType>? ResourceTypes { get; } = resourceTypes;
+        }
+
+        private sealed class BlockedDomainsCacheItem(HashSet<string> domains)
+        {
+            public HashSet<string> Domains { get; } = domains;
         }
     }
 

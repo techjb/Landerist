@@ -165,7 +165,9 @@ namespace landerist_library.Pages
                     "W.[SitemapUrlRegex], " +
                     "W.[ListingUrlRegex]," +
                     "W.[ListingHtmlRemoveXPath], " +
+                    "W.[NavigationWaitSelector], " +
                     "W.[AllowedResourceTypes], " +
+                    "W.[BlockedDomains], " +
                     "W.[UserAgent], " +
                     "W.[HttpRequestHeaders], " +
                     "W.[ApplySpecialRules], " +
@@ -324,7 +326,9 @@ namespace landerist_library.Pages
                     "W.[SitemapUrlRegex], " +
                     "W.[ListingUrlRegex]," +
                     "W.[ListingHtmlRemoveXPath], " +
+                    "W.[NavigationWaitSelector], " +
                     "W.[AllowedResourceTypes], " +
+                    "W.[BlockedDomains], " +
                     "W.[UserAgent], " +
                     "W.[HttpRequestHeaders], " +
                     "W.[ApplySpecialRules], " +
@@ -442,7 +446,9 @@ namespace landerist_library.Pages
                 Websites.Websites.WEBSITES + ".[SitemapUrlRegex], " +
                 Websites.Websites.WEBSITES + ".[ListingUrlRegex], " +
                 Websites.Websites.WEBSITES + ".[ListingHtmlRemoveXPath], " +
+                Websites.Websites.WEBSITES + ".[NavigationWaitSelector], " +
                 Websites.Websites.WEBSITES + ".[AllowedResourceTypes], " +
+                Websites.Websites.WEBSITES + ".[BlockedDomains], " +
                 Websites.Websites.WEBSITES + ".[UserAgent], " +
                 Websites.Websites.WEBSITES + ".[HttpRequestHeaders], " +
                 Websites.Websites.WEBSITES + ".[ApplySpecialRules], " +

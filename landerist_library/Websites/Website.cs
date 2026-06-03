@@ -29,7 +29,11 @@ namespace landerist_library.Websites
 
         public string? ListingHtmlRemoveXPath { get; set; }
 
+        public string? NavigationWaitSelector { get; set; }
+
         public string? AllowedResourceTypes { get; set; }
+
+        public string? BlockedDomains { get; set; }
 
         public string? UserAgent { get; set; }
 
@@ -100,7 +104,9 @@ namespace landerist_library.Websites
                 IndexUrlRegex = null;
                 SitemapUrlRegex = null;
                 ListingHtmlRemoveXPath = null;
+                NavigationWaitSelector = null;
                 AllowedResourceTypes = null;
+                BlockedDomains = null;
                 UserAgent = null;
                 HttpRequestHeaders = null;
                 ApplySpecialRules = false;

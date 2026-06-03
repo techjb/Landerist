@@ -51,9 +51,10 @@ namespace landerist_library.Parse.ListingParser.UserInput
         {
             try
             {
-                var htmlDocument = page.GetHtmlDocument();
-               if (htmlDocument != null)
+                var htmlDocument = page.GetHtmlDocument();                
+                if (htmlDocument != null)
                 {
+                    var html = htmlDocument.DocumentNode.OuterHtml;
                     return GetHtml(htmlDocument, page.Website, page.Uri?.ToString());
                 }
             }

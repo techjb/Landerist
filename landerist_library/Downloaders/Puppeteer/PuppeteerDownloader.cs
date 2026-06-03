@@ -321,9 +321,9 @@ namespace landerist_library.Downloaders.Puppeteer
                     SetExecutionStep("Removing cookie banners");
                     await BrowserPage!.EvaluateFunctionOnNewDocumentAsync("() => { delete navigator.__proto__.webdriver; }");
                 }
-                catch //(Exception exception)
+                catch
                 {
-                    //Logs.Log.WriteInfo("PuppeteerDownloader ExpressionRemoveCookies", exception.Message);
+
                 }
 
                 try
@@ -331,9 +331,9 @@ namespace landerist_library.Downloaders.Puppeteer
                     SetExecutionStep("Removing web drivers");
                     await BrowserPage!.EvaluateExpressionAsync(PuppeteerPageScripts.DeleteWebdriver);
                 }
-                catch //(Exception exception)
+                catch
                 {
-                    //Logs.Log.WriteInfo("PuppeteerDownloader ExpressionRemoveCookies", exception.Message);
+
                 }
 
                 try
@@ -385,14 +385,12 @@ namespace landerist_library.Downloaders.Puppeteer
         private async Task<IResponse?> NavigateWithTimeoutAsync(string url)
         {
             var timeout = GetTimeout(UseProxy);
+            var navigationWaitSelector = Page?.Website.NavigationWaitSelector;
 
-            NavigationOptions NavigationOptions = new()
-            {
-                WaitUntil = [WaitUntilNavigation.Networkidle2],
-                Timeout = timeout
-            };
+            var navigationTask = string.IsNullOrWhiteSpace(navigationWaitSelector)
+                ? NavigateUntilNetworkIdleAsync(url, timeout)
+                : NavigateUntilSelectorAsync(url, navigationWaitSelector.Trim(), timeout);
 
-            var navigationTask = BrowserPage!.GoToAsync(url, NavigationOptions);
             var completedTask = await Task.WhenAny(navigationTask, Task.Delay(timeout));
 
             if (completedTask == navigationTask)
@@ -403,6 +401,44 @@ namespace landerist_library.Downloaders.Puppeteer
             SetExecutionStep("Navigation timeout");
             await ClosePageAsync();
             throw new NavigationException($"Navigation timed out after {timeout} ms.");
+        }
+
+        private async Task<IResponse?> NavigateUntilNetworkIdleAsync(string url, int timeout)
+        {
+            NavigationOptions navigationOptions = new()
+            {
+                WaitUntil = [WaitUntilNavigation.Networkidle2],
+                Timeout = timeout
+            };
+
+            return await BrowserPage!.GoToAsync(url, navigationOptions);
+        }
+
+        private async Task<IResponse?> NavigateUntilSelectorAsync(string url, string selector, int timeout)
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            NavigationOptions navigationOptions = new()
+            {
+                WaitUntil = [WaitUntilNavigation.DOMContentLoaded],
+                Timeout = timeout
+            };
+
+            var response = await BrowserPage!.GoToAsync(url, navigationOptions);
+            var remainingTimeout = timeout - (int)Math.Min(stopwatch.ElapsedMilliseconds, timeout);
+            if (remainingTimeout <= 0)
+            {
+                throw new NavigationException($"Navigation timed out after {timeout} ms.");
+            }
+
+            SetExecutionStep("Waiting navigation selector");
+            await BrowserPage.WaitForSelectorAsync(selector, new WaitForSelectorOptions
+            {
+                Visible = true,
+                Timeout = remainingTimeout
+            });
+
+            return response;
         }
 
         private async Task InitializePage()
