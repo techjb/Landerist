@@ -47,10 +47,12 @@ namespace landerist_library.Landerist_com
             string country = GetCountryCodeFileNamePart(countryCode);
             return exportType switch
             {
-                ExportType.Published => $"{country}-published",
-                ExportType.Unpublished => $"{country}-unpublished",
-                ExportType.PublishedUpdates => $"{country}-published-updates",
-                ExportType.UnpublishedUpdates => $"{country}-unpublished-updates",
+                ExportType.Listings => $"{country}-listings",
+                ExportType.Updates => $"{country}-listings-updates",
+                ExportType.Published => $"{country}-listings-published",
+                ExportType.Unpublished => $"{country}-listings-unpublished",
+                ExportType.PublishedUpdates => $"{country}-listings-published-updates",
+                ExportType.UnpublishedUpdates => $"{country}-listings-unpublished-updates",
                 ExportType.Websites => $"{country}-websites",
                 _ => countryCode.ToString() + "_" + exportType.ToString()
             };
@@ -107,6 +109,7 @@ namespace landerist_library.Landerist_com
             return string.Join(
                 "-",
                 GetCountryCodeFileNamePart(countryCode),
+                "listings",
                 GetListingStatusFileNamePart(listingStatus),
                 operation.ToString().ToLowerInvariant(),
                 propertyType.ToString().ToLowerInvariant()) + "." + extension;
@@ -121,6 +124,7 @@ namespace landerist_library.Landerist_com
             return string.Join(
                 "-",
                 GetCountryCodeFileNamePart(countryCode),
+                "listings",
                 GetListingStatusFileNamePart(listingStatus),
                 host.ToLowerInvariant()) + "." + extension;
         }

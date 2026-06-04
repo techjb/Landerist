@@ -19,7 +19,7 @@ namespace landerist_tests
             //new Scraper().Start();
             //new Scraper().Scrape(page, false);
 
-            //new landerist_library.Scrape.Scraper().Scrape("https://www.knightfrank.es/properties/residencial/en-venta/sotogrande-cadiz-andalucia/rsi012587047", false);
+            //new landerist_library.Scrape.Scraper().Scrape("https://www.knightfrank.es/properties/residencial/en-venta/kings-hills-marbella-malaga/dm5266", false);
             ////new landerist_library.Scrape.Scraper().TryApplyPreClassificationBeforeDownload(new landerist_library.Pages.Page("https://www.iadespana.es/anuncios/aspe-03680/venta/casa"));
             //new Scraper().TestSinglePage();
             //landerist_library.Scrape.PageSelector.SelectTop1();
