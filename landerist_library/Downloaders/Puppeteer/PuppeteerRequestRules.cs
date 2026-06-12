@@ -14,13 +14,6 @@ namespace landerist_library.Downloaders.Puppeteer
             ResourceType.Media,
         ];
 
-        private static readonly HashSet<ResourceType> ImageResourceTypes =
-        [
-            ResourceType.Image,
-            ResourceType.ImageSet,
-            ResourceType.Img,
-        ];
-
         private static readonly char[] ResourceTypeSeparators = [',', ';', '|', ' ', '\r', '\n', '\t'];
 
         private static readonly ConcurrentDictionary<string, AllowedResourceTypesCacheItem> AllowedResourceTypesCache =
@@ -93,19 +86,6 @@ namespace landerist_library.Downloaders.Puppeteer
             ".exe", ".zip", ".rar", ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".tmp"
         };
 
-        private static readonly byte[] TransparentGifBytes =
-            Convert.FromBase64String("R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==");
-
-        public static ResponseData CreateTransparentGifResponse()
-        {
-            return new ResponseData
-            {
-                Status = System.Net.HttpStatusCode.OK,
-                ContentType = "image/gif",
-                BodyData = TransparentGifBytes
-            };
-        }
-
         public static PuppeteerRequestAction GetAction(RequestEventArgs e, Pages.Page currentPage)
         {
             if (IsFaviconRequest(e.Request.Url))
@@ -118,12 +98,12 @@ namespace landerist_library.Downloaders.Puppeteer
             {
                 if (!allowedResourceTypes.Contains(e.Request.ResourceType))
                 {
-                    return GetBlockedResourceAction(e.Request.ResourceType);
+                    return PuppeteerRequestAction.Abort;
                 }
             }
             else if (BlockedResourceTypes.Contains(e.Request.ResourceType))
             {
-                return GetBlockedResourceAction(e.Request.ResourceType);
+                return PuppeteerRequestAction.Abort;
             }
 
             var requestHost = GetRequestHost(e.Request.Url, currentPage.Uri.Host);
@@ -224,13 +204,6 @@ namespace landerist_library.Downloaders.Puppeteer
                 : domain;
         }
 
-        private static PuppeteerRequestAction GetBlockedResourceAction(ResourceType resourceType)
-        {
-            return ImageResourceTypes.Contains(resourceType)
-                ? PuppeteerRequestAction.RespondWithTransparentGif
-                : PuppeteerRequestAction.Abort;
-        }
-
         private static string GetRequestHost(string url, string defaultHost)
         {
             return Uri.TryCreate(url, UriKind.Absolute, out Uri? requestUri)
@@ -253,6 +226,5 @@ namespace landerist_library.Downloaders.Puppeteer
     {
         Continue,
         Abort,
-        RespondWithTransparentGif,
     }
 }

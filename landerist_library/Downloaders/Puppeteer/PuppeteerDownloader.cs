@@ -523,9 +523,6 @@ namespace landerist_library.Downloaders.Puppeteer
                 var action = PuppeteerRequestRules.GetAction(e, currentPage);
                 switch (action)
                 {
-                    case PuppeteerRequestAction.RespondWithTransparentGif:
-                        await e.Request.RespondAsync(PuppeteerRequestRules.CreateTransparentGifResponse());
-                        return;
                     case PuppeteerRequestAction.Abort:                        
                         await e.Request.AbortAsync();
                         return;
