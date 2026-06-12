@@ -65,6 +65,10 @@ body {
     padding: 0 24px;
 }
 
+.page-container-wide {
+    max-width: 1120px;
+}
+
 /* Navigation */
 .nav {
     position: sticky;

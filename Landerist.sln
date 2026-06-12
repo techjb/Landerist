@@ -47,6 +47,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "host-statistics", "host-sta
 		landerist_website\host-statistics\host_statistics_template.html = landerist_website\host-statistics\host_statistics_template.html
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "hosts-statistics", "hosts-statistics", "{7781698D-05BD-409C-9382-665795BE5BA9}"
+	ProjectSection(SolutionItems) = preProject
+		landerist_website\hosts-statistics\hosts_statistics_template.html = landerist_website\hosts-statistics\hosts_statistics_template.html
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +82,7 @@ Global
 		{9CD8CE4A-DACA-4356-9873-4F1AEB6E33CA} = {B0045D1A-422C-4327-8A3C-F90D55CFF0A8}
 		{70033D09-4CF1-47B2-8E01-DFA6763A2C57} = {B0045D1A-422C-4327-8A3C-F90D55CFF0A8}
 		{2941C7A0-5146-4DCB-ADEF-309E790F3564} = {B0045D1A-422C-4327-8A3C-F90D55CFF0A8}
+		{7781698D-05BD-409C-9382-665795BE5BA9} = {B0045D1A-422C-4327-8A3C-F90D55CFF0A8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F392E95A-422C-40BC-A9C9-32A571641854}

@@ -157,11 +157,18 @@ namespace landerist_library.Landerist_com
             InvalidateCloudFront();
         }
 
+        public static void UpdateHostsStatisticsPage()
+        {
+            HostsStatisticsPage.Update();
+            InvalidateCloudFront();
+        }
+
         public static void UpdateAllPages()
         {
             DownloadsPage.Update();
             StatisticsPage.UpdateCharts();
             HostStatisticsPage.Update();
+            HostsStatisticsPage.Update();
             InvalidateCloudFront();
         }
 
