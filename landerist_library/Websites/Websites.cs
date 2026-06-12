@@ -547,7 +547,7 @@ namespace landerist_library.Websites
 
         private static HashSet<Website> GetNeedToUpdateIpAddress()
         {
-            DateTime ipAddressUpdated = DateTime.Now.AddDays(-Config.DAYS_TO_UPDATE_IP_ADDRESS);
+            DateTime ipAddressUpdated = DateTime.Now.AddDays(-1);
 
             string query =
                 "SELECT * " +
