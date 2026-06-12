@@ -59,6 +59,16 @@ namespace landerist_library.Websites
             return GetWebsites(new DataBase().QueryTable(query));
         }
 
+        public static DataTable GetDataTableApplySpecialRules()
+        {
+            string query =
+                "SELECT * " +
+                "FROM " + WEBSITES + " " +
+                "WHERE [ApplySpecialRules] = 1";
+
+            return new DataBase().QueryTable(query);
+        }
+
         public static HashSet<Website> GetStatusCodeNotOk()
         {
             var dataTable = ToDataTableHttpStatusCodeNotOk();

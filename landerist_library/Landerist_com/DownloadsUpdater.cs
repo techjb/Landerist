@@ -82,8 +82,8 @@ namespace landerist_library.Landerist_com
         public static bool UpdateWebsites()
         {
             Console.WriteLine("Reading Websites ..");
-            var websites = Websites.Websites.GetHostsApplySpecialRules();
-            if (websites.Count.Equals(0))
+            var websites = Websites.Websites.GetDataTableApplySpecialRules();
+            if (websites.Rows.Count.Equals(0))
             {
                 return true;
             }
@@ -97,13 +97,17 @@ namespace landerist_library.Landerist_com
                 Directory.CreateDirectory(GetFilePath(subdirectory));
             }
 
-            if (!Tools.Csv.Write(websites, filePath))
+            try
             {
-                Log.WriteError("filesupdater", "Error writing Websites CSV file");
+                Tools.Csv.Write(websites, filePath, true);
+            }
+            catch (Exception exception)
+            {
+                Log.WriteError("filesupdater", "Error writing Websites CSV file", exception);
                 return false;
             }
 
-            return UploadWebsitesFile(filePath, CountryCode.ES, websites.Count);
+            return UploadWebsitesFile(filePath, CountryCode.ES, websites.Rows.Count);
         }
 
         public static bool UpdateListingsByWebsite()
