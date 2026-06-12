@@ -18,7 +18,7 @@ namespace landerist_tests
             //landerist_library.Landerist_com.Landerist_com.UpdateStatisticsPage();
             //landerist_library.Landerist_com.Landerist_com.UpdateDownloadsPage();            
             //landerist_library.Landerist_com.Landerist_com.UpdateHostStatisticsPage();
-            landerist_library.Landerist_com.Landerist_com.UpdateHostsStatisticsPage();
+            //landerist_library.Landerist_com.Landerist_com.UpdateHostsStatisticsPage();
             //landerist_library.Landerist_com.Landerist_com.UpdateAllPages();
 
             //landerist_library.Landerist_com.Landerist_com.InvalidateCloudFront();
