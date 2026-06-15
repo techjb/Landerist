@@ -274,7 +274,6 @@ namespace landerist_library.Database
             string query =
                 "UPDATE " + TABLE_ES_LISTINGS + " SET " +
                 "[listingStatus] = @listingStatus, " +
-                "[listingDate] = @listingDate, " +
                 "[updated] = @updated, " +
                 "[unlistingDate] = @unlistingDate, " +
                 "[operation] = @operation, " +
