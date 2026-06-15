@@ -93,6 +93,21 @@ namespace landerist_library.Database
             });
         }
 
+        public static int CountSinceListingDate(string host, DateTime listingDateFrom)
+        {
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + TABLE_ES_LISTINGS + " " +
+                "WHERE [host] = @Host " +
+                "AND [listingDate] >= @ListingDateFrom";
+
+            return new DataBase().QueryInt(query, new Dictionary<string, object?>
+            {
+                { "Host", host },
+                { "ListingDateFrom", listingDateFrom }
+            });
+        }
+
         public static int CountWithAddress(string host, ListingStatus listingStatus)
         {
             string query =

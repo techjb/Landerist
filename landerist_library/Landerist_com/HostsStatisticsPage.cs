@@ -17,6 +17,8 @@ namespace landerist_library.Landerist_com
 
         private static readonly CultureInfo SummaryCulture = CultureInfo.GetCultureInfo("es-ES");
 
+        private const int RecentListingsDays = 7;
+
         public static void Update()
         {
             try
@@ -56,25 +58,54 @@ namespace landerist_library.Landerist_com
 
         private static string GetHostsStatisticsRow(Websites.Website website)
         {
+            int totalPages = website.GetNumPages();
+            int totalListings = website.GetNumListings();
+            int recentListings = website.GetNumListingsSinceListingDate(DateTime.Now.AddDays(-RecentListingsDays));
+            int publishedListings = website.GetNumPublishedListings();
+            int unpublishedListings = website.GetNumUnpublishedListings();
+
             return
                 "                        <tr>" + Environment.NewLine +
-                $"                            <td>{WebUtility.HtmlEncode(website.Host)}</td>" + Environment.NewLine +
+                $"                            <td>{FormatHostLink(website.Host)}</td>" + Environment.NewLine +
                 $"                            <td>{FormatWebsiteDate(website.RobotsTxtUpdated)}</td>" + Environment.NewLine +
                 $"                            <td>{FormatWebsiteDate(website.SitemapUpdated)}</td>" + Environment.NewLine +
-                $"                            <td>{FormatNumber(website.GetNumPages())}</td>" + Environment.NewLine +
-                $"                            <td>{FormatNumber(website.GetNumPublishedListings())}</td>" + Environment.NewLine +
-                $"                            <td>{FormatNumber(website.GetNumUnpublishedListings())}</td>" + Environment.NewLine +
+                $"                            <td>{FormatNumber(totalPages)}</td>" + Environment.NewLine +
+                $"                            <td>{FormatListings(totalListings, totalPages)}</td>" + Environment.NewLine +
+                $"                            <td>{FormatListings(recentListings, totalListings)}</td>" + Environment.NewLine +
+                $"                            <td>{FormatListings(publishedListings, totalListings)}</td>" + Environment.NewLine +
+                $"                            <td>{FormatListings(unpublishedListings, totalListings)}</td>" + Environment.NewLine +
                 "                        </tr>";
+        }
+
+        private static string FormatHostLink(string host)
+        {
+            string href = "/host-statistics/#" + Uri.EscapeDataString(host);
+            return $"<a href=\"{WebUtility.HtmlEncode(href)}\">{WebUtility.HtmlEncode(host)}</a>";
         }
 
         private static string FormatWebsiteDate(DateTime? dateTime)
         {
-            return dateTime?.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) ?? string.Empty;
+            return dateTime?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? string.Empty;
         }
 
         private static string FormatNumber(int value)
         {
             return value.ToString("N0", SummaryCulture);
+        }
+
+        private static string FormatListings(int listings, int totalPages)
+        {
+            return $"{FormatNumber(listings)} ({FormatPercentage(listings, totalPages)})";
+        }
+
+        private static string FormatPercentage(int value, int total)
+        {
+            if (total <= 0)
+            {
+                return decimal.Zero.ToString("P1", SummaryCulture);
+            }
+
+            return ((decimal)value / total).ToString("P1", SummaryCulture);
         }
     }
 }

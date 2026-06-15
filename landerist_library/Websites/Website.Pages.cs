@@ -80,6 +80,11 @@ namespace landerist_library.Websites
             return ES_Listings.Count(Host);
         }
 
+        public int GetNumListingsSinceListingDate(DateTime listingDateFrom)
+        {
+            return ES_Listings.CountSinceListingDate(Host, listingDateFrom);
+        }
+
         public int GetNumPublishedListings()
         {
             return ES_Listings.Count(Host, ListingStatus.published);
