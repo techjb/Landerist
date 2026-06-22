@@ -134,6 +134,13 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                             Enum =  { GetEnumValues(typeof(EstadosDeLaConstrucción)) },
                             Description = StructuredOutputEsJson.EstadoDeLaConstrucciónDescription,
                         },
+                        [nameof(StructuredOutputEsJson.calificación_energética)] = new()
+                        {
+                            Nullable = true,
+                            Type = Google.Cloud.AIPlatform.V1.Type.String,
+                            Enum =  { GetEnumValues(typeof(CalificacionesDeEficienciaEnergetica)) },
+                            Description = StructuredOutputEsJson.CalificaciónEnergéticaDescription,
+                        },
                         [nameof(StructuredOutputEsJson.plantas_del_edificio)] = new()
                         {
                             Nullable = true,

@@ -56,7 +56,7 @@ namespace landerist_library.Database
                 "@propertySubtype, @priceAmount, @priceCurrency, @description, " +
                 "@contactName, @contactPhone, @contactEmail, @contactUrl, @contactOther, @address, @lauId, @lauName, @latitude, @longitude, " +
                 "@locationIsAccurate, @cadastralReference, @propertySize, @landSize, @constructionYear, " +
-                "@constructionStatus, @floors, @floor, @bedrooms, @bathrooms, @parkings, @terrace, @garden, " +
+                "@constructionStatus, @energyEfficiencyRating, @floors, @floor, @bedrooms, @bathrooms, @parkings, @terrace, @garden, " +
                 "@garage, @motorbikeGarage, @pool, @lift, @disabledAccess, @storageRoom, @furnished, " +
                 "@nonFurnished, @heating, @airConditioning, @petsAllowed, @securitySystems, @host " +
                 ")";
@@ -215,6 +215,7 @@ namespace landerist_library.Database
                 {"landSize", listing.landSize},
                 {"constructionYear", listing.constructionYear},
                 {"constructionStatus", listing.constructionStatus?.ToString()},
+                {"energyEfficiencyRating", listing.energyEfficiencyRating?.ToString()},
                 {"floors", listing.floors},
                 {"floor", listing.floor },
                 {"bedrooms", listing.bedrooms },
@@ -298,6 +299,7 @@ namespace landerist_library.Database
                 "[landSize] = @landSize, " +
                 "[constructionYear] = @constructionYear, " +
                 "[constructionStatus] = @constructionStatus, " +
+                "[energyEfficiencyRating] = @energyEfficiencyRating, " +
                 "[floors] = @floors, " +
                 "[floor] = @floor, " +
                 "[bedrooms] = @bedrooms, " +
@@ -664,6 +666,7 @@ namespace landerist_library.Database
                 landSize = GetDouble(dataRow, "landSize"),
                 constructionYear = GetShort(dataRow, "constructionYear"),
                 constructionStatus = dataRow["constructionStatus"] is DBNull ? null : (ConstructionStatus)Enum.Parse(typeof(ConstructionStatus), dataRow["constructionStatus"].ToString()!),
+                energyEfficiencyRating = dataRow["energyEfficiencyRating"] is DBNull ? null : (EnergyEfficiencyRating)Enum.Parse(typeof(EnergyEfficiencyRating), dataRow["energyEfficiencyRating"].ToString()!),
                 floors = GetShort(dataRow, "floors"),
                 floor = GetString(dataRow, "floor"),
                 bedrooms = GetShort(dataRow, "bedrooms"),

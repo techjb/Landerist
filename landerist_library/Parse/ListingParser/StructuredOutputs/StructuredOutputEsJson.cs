@@ -126,6 +126,11 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         [Description(EstadoDeLaConstrucciónDescription)]
         public string? estado_de_la_construcción { get; set; } = null;
 
+        public const string CalificaciónEnergéticaDescription = "calificación de eficiencia energética del inmueble según el certificado energético";
+
+        [Description(CalificaciónEnergéticaDescription)]
+        public string? calificación_energética { get; set; } = null;
+
         public const string PlantasDelEdificioDescription = "número de plantas del edificio";
 
         [Description(PlantasDelEdificioDescription)]
@@ -294,6 +299,20 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
 
         protected const string ESTADO_DE_LA_CONSTRUCCIÓN_EN_RUINAS = "en_ruinas";
 
+        protected const string CALIFICACIÓN_ENERGÉTICA_A = "A";
+
+        protected const string CALIFICACIÓN_ENERGÉTICA_B = "B";
+
+        protected const string CALIFICACIÓN_ENERGÉTICA_C = "C";
+
+        protected const string CALIFICACIÓN_ENERGÉTICA_D = "D";
+
+        protected const string CALIFICACIÓN_ENERGÉTICA_E = "E";
+
+        protected const string CALIFICACIÓN_ENERGÉTICA_F = "F";
+
+        protected const string CALIFICACIÓN_ENERGÉTICA_G = "G";
+
         protected const string ESTADO_DE_PUBLICACIÓN_PUBLICADO = "publicado";
 
         protected const string ESTADO_DE_PUBLICACIÓN_DESPUBLICADO = "despublicado";
@@ -342,6 +361,17 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             ESTADO_DE_LA_CONSTRUCCIÓN_BUENO,
             ESTADO_DE_LA_CONSTRUCCIÓN_A_REFORMAR,
             ESTADO_DE_LA_CONSTRUCCIÓN_EN_RUINAS
+        ];
+
+        protected readonly JsonArray CalificacionesEnergéticas =
+        [
+            CALIFICACIÓN_ENERGÉTICA_A,
+            CALIFICACIÓN_ENERGÉTICA_B,
+            CALIFICACIÓN_ENERGÉTICA_C,
+            CALIFICACIÓN_ENERGÉTICA_D,
+            CALIFICACIÓN_ENERGÉTICA_E,
+            CALIFICACIÓN_ENERGÉTICA_F,
+            CALIFICACIÓN_ENERGÉTICA_G
         ];
 
         protected readonly JsonArray EstadosDePublicación =

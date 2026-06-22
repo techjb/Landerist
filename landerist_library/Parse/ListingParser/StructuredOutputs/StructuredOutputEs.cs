@@ -64,6 +64,17 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         en_ruinas
     };
 
+    public enum CalificacionesDeEficienciaEnergetica
+    {
+        A,
+        B,
+        C,
+        D,
+        E,
+        F,
+        G
+    };
+
     public enum EstadosDePublicación
     {
         publicado,
@@ -168,6 +179,11 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         [JsonProperty(nameof(StructuredOutputEsJson.estado_de_la_construcción), Required = Required.AllowNull)]
         [System.ComponentModel.Description(StructuredOutputEsJson.EstadoDeLaConstrucciónDescription)]
         public EstadosDeLaConstrucción? EstadoDeLaConstrucción { get; set; }
+
+
+        [JsonProperty(nameof(StructuredOutputEsJson.calificación_energética), Required = Required.AllowNull)]
+        [System.ComponentModel.Description(StructuredOutputEsJson.CalificaciónEnergéticaDescription)]
+        public CalificacionesDeEficienciaEnergetica? CalificaciónEnergética { get; set; }
 
 
         [JsonProperty(nameof(StructuredOutputEsJson.plantas_del_edificio), Required = Required.AllowNull)]

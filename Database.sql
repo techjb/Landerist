@@ -129,6 +129,7 @@ CREATE TABLE [dbo].[ES_LISTINGS](
 	[landSize] [float] NULL,
 	[constructionYear] [smallint] NULL,
 	[constructionStatus] [nvarchar](50) NULL,
+	[energyEfficiencyRating] [nvarchar](1) NULL,
 	[floors] [smallint] NULL,
 	[floor] [nvarchar](500) NULL,
 	[bedrooms] [smallint] NULL,

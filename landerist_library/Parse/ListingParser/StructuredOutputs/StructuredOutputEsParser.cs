@@ -40,6 +40,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
                     landSize = GetLandSize(),
                     constructionYear = GetConstrunctionYear(),
                     constructionStatus = GetConstructionStatus(),
+                    energyEfficiencyRating = GetEnergyEfficiencyRating(),
                     floors = GetFloors(),
                     floor = GetFloor(),
                     bedrooms = GetBedrooms(),
@@ -304,6 +305,26 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
                 EstadosDeLaConstrucción.buen_estado => (ConstructionStatus?)ConstructionStatus.good,
                 EstadosDeLaConstrucción.a_reformar => (ConstructionStatus?)ConstructionStatus.for_renovation,
                 EstadosDeLaConstrucción.en_ruinas => (ConstructionStatus?)ConstructionStatus.refurbished,
+                _ => null,
+            };
+        }
+
+        private EnergyEfficiencyRating? GetEnergyEfficiencyRating()
+        {
+            if (GetPropertyType() == PropertyType.land || Anuncio!.CalificaciónEnergética == null)
+            {
+                return null;
+            }
+
+            return Anuncio!.CalificaciónEnergética switch
+            {
+                CalificacionesDeEficienciaEnergetica.A => (EnergyEfficiencyRating?)EnergyEfficiencyRating.A,
+                CalificacionesDeEficienciaEnergetica.B => (EnergyEfficiencyRating?)EnergyEfficiencyRating.B,
+                CalificacionesDeEficienciaEnergetica.C => (EnergyEfficiencyRating?)EnergyEfficiencyRating.C,
+                CalificacionesDeEficienciaEnergetica.D => (EnergyEfficiencyRating?)EnergyEfficiencyRating.D,
+                CalificacionesDeEficienciaEnergetica.E => (EnergyEfficiencyRating?)EnergyEfficiencyRating.E,
+                CalificacionesDeEficienciaEnergetica.F => (EnergyEfficiencyRating?)EnergyEfficiencyRating.F,
+                CalificacionesDeEficienciaEnergetica.G => (EnergyEfficiencyRating?)EnergyEfficiencyRating.G,
                 _ => null,
             };
         }

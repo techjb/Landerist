@@ -110,6 +110,11 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public EstadosDeLaConstrucción? EstadoDeLaConstrucción { get; private set; }
 
 
+        [JsonProperty(nameof(StructuredOutputEsJson.calificación_energética), Required = Required.Default)]
+        [System.ComponentModel.Description(StructuredOutputEsJson.CalificaciónEnergéticaDescription)]
+        public CalificacionesDeEficienciaEnergetica? CalificaciónEnergética { get; private set; }
+
+
         [JsonProperty(nameof(StructuredOutputEsJson.plantas_del_edificio), Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.PlantasDelEdificioDescription)]
         public int? PlantasDelEdificio { get; private set; }
@@ -233,6 +238,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
                 TamañoDeLaParcela = this.TamañoDeLaParcela,
                 AñoDeConstrucción = this.AñoDeConstrucción,
                 EstadoDeLaConstrucción = this.EstadoDeLaConstrucción,
+                CalificaciónEnergética = this.CalificaciónEnergética,
                 PlantasDelEdificio = this.PlantasDelEdificio,
                 PlantaDelInmueble = this.PlantaDelInmueble,
                 NúmeroDeDormitorios = this.NúmeroDeDormitorios,

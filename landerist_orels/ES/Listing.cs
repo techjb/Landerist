@@ -52,6 +52,17 @@ namespace landerist_orels.ES
         refurbished
     }
 
+    public enum EnergyEfficiencyRating
+    {
+        A,
+        B,
+        C,
+        D,
+        E,
+        F,
+        G
+    }
+
     public class Listing
     {
         public const int MAX_MEDIA_ITEMS = 200;
@@ -144,60 +155,63 @@ namespace landerist_orels.ES
         public ConstructionStatus? constructionStatus { get; set; }
 
         [JsonProperty(Order = 28)]
-        public int? floors { get; set; }
+        public EnergyEfficiencyRating? energyEfficiencyRating { get; set; }
 
         [JsonProperty(Order = 29)]
-        public string floor { get; set; }
+        public int? floors { get; set; }
 
         [JsonProperty(Order = 30)]
-        public int? bedrooms { get; set; }
+        public string floor { get; set; }
 
         [JsonProperty(Order = 31)]
-        public int? bathrooms { get; set; }
+        public int? bedrooms { get; set; }
 
         [JsonProperty(Order = 32)]
-        public int? parkings { get; set; }
+        public int? bathrooms { get; set; }
 
         [JsonProperty(Order = 33)]
-        public bool? terrace { get; set; }
+        public int? parkings { get; set; }
 
         [JsonProperty(Order = 34)]
-        public bool? garden { get; set; }
+        public bool? terrace { get; set; }
 
         [JsonProperty(Order = 35)]
-        public bool? garage { get; set; }
+        public bool? garden { get; set; }
 
         [JsonProperty(Order = 36)]
-        public bool? motorbikeGarage { get; set; }
+        public bool? garage { get; set; }
 
         [JsonProperty(Order = 37)]
-        public bool? pool { get; set; }
+        public bool? motorbikeGarage { get; set; }
 
         [JsonProperty(Order = 38)]
-        public bool? lift { get; set; }
+        public bool? pool { get; set; }
 
         [JsonProperty(Order = 39)]
-        public bool? disabledAccess { get; set; }
+        public bool? lift { get; set; }
 
         [JsonProperty(Order = 40)]
-        public bool? storageRoom { get; set; }
+        public bool? disabledAccess { get; set; }
 
         [JsonProperty(Order = 41)]
-        public bool? furnished { get; set; }
+        public bool? storageRoom { get; set; }
 
         [JsonProperty(Order = 42)]
-        public bool? nonFurnished { get; set; }
+        public bool? furnished { get; set; }
 
         [JsonProperty(Order = 43)]
-        public bool? heating { get; set; }
+        public bool? nonFurnished { get; set; }
 
         [JsonProperty(Order = 44)]
-        public bool? airConditioning { get; set; }
+        public bool? heating { get; set; }
 
         [JsonProperty(Order = 45)]
-        public bool? petsAllowed { get; set; }
+        public bool? airConditioning { get; set; }
 
         [JsonProperty(Order = 46)]
+        public bool? petsAllowed { get; set; }
+
+        [JsonProperty(Order = 47)]
         public bool? securitySystems { get; set; }
 
 #pragma warning restore IDE1006 // Naming Styles
@@ -337,6 +351,7 @@ namespace landerist_orels.ES
                 landSize == other.landSize &&
                 constructionYear == other.constructionYear &&
                 constructionStatus == other.constructionStatus &&
+                energyEfficiencyRating == other.energyEfficiencyRating &&
                 floors == other.floors &&
                 floor == other.floor &&
                 bedrooms == other.bedrooms &&
@@ -388,6 +403,7 @@ namespace landerist_orels.ES
             hash ^= landSize?.GetHashCode() ?? 0;
             hash ^= constructionYear?.GetHashCode() ?? 0;
             hash ^= constructionStatus?.GetHashCode() ?? 0;
+            hash ^= energyEfficiencyRating?.GetHashCode() ?? 0;
             hash ^= floors?.GetHashCode() ?? 0;
             hash ^= floor?.GetHashCode() ?? 0;
             hash ^= bedrooms?.GetHashCode() ?? 0;

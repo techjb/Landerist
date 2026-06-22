@@ -41,6 +41,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI
             AddNumber(properties, nameof(tamaño_de_la_parcela));
             AddNumber(properties, nameof(año_de_construcción));
             AddEnum(properties, nameof(estado_de_la_construcción), EstadosDeLaConstrucción);
+            AddEnum(properties, nameof(calificación_energética), CalificacionesEnergéticas);
             AddNumber(properties, nameof(plantas_del_edificio));
             AddString(properties, nameof(planta_del_inmueble));
             AddNumber(properties, nameof(número_de_dormitorios));
