@@ -15,11 +15,10 @@ namespace landerist_library.Tasks
         private readonly TaskBatchDownload TaskBatchDownload = new();
         private readonly TaskBatchUpload TaskBatchUpload = new();
 
-        private Timer? Timer1;
-        private Timer? Timer2;
-        private Timer? Timer3;
-        private Timer? Timer4;
-        private Timer? Timer5;
+        private Timer? TimerLocalAIParsing;
+        private Timer? TimerTenMinutesTasks;
+        private Timer? TimerHourlyTasks;
+        private Timer? TimerDailyTasks;
 
         private int RunningTimer1;
         private int RunningTimer2;
@@ -49,32 +48,29 @@ namespace landerist_library.Tasks
         {
             ObjectDisposedException.ThrowIf(Disposed, this);
 
-            if (Timer1 is not null
-                || Timer2 is not null
-                || Timer3 is not null
-                || Timer4 is not null
-                || Timer5 is not null)
+            if (TimerLocalAIParsing is not null
+                || TimerTenMinutesTasks is not null
+                || TimerHourlyTasks is not null
+                || TimerDailyTasks is not null)
             {
                 return;
             }
 
-            if (Configuration.Config.IsLocalAIMachine()
-                || Configuration.Config.IsConfigurationLocal())
+            if (Configuration.Config.IsLocalAIMachine() || Configuration.Config.IsConfigurationLocal())
             {
-                Timer1 = new Timer(LocalAIParsing, null, OneSecond, TwoSeconds);
-                return;
+                TimerLocalAIParsing = new Timer(LocalAIParsing, null, OneSecond, TwoSeconds);
+
             }
-
-            PuppeteerDownloader.UpdateChrome();
-
-            Timer1 = new Timer(Scrape, null, OneSecond, ThreeSeconds);
-            //Timer2 = new Timer(BlockingCollection, null, OneSecond, OneSecond);
-
-            if (Configuration.Config.IsPrincipalMachine())
+            else if (Configuration.Config.IsPrincipalMachine())
             {
-                Timer3 = new Timer(QueueTenMinutesTasks, null, 0, TenMinutes);
-                Timer4 = new Timer(QueueHourlyTasks, null, OneHour, OneHour);
-                Timer5 = new Timer(QueueDailyTasks, null, GetDueTime(), OneDay);
+                TimerTenMinutesTasks = new Timer(QueueTenMinutesTasks, null, 0, TenMinutes);
+                TimerHourlyTasks = new Timer(QueueHourlyTasks, null, OneHour, OneHour);
+                TimerDailyTasks = new Timer(QueueDailyTasks, null, GetDueTime(), OneDay);
+            }
+            else
+            {
+                PuppeteerDownloader.UpdateChrome();
+                TimerLocalAIParsing = new Timer(Scrape, null, OneSecond, ThreeSeconds);
             }
         }
 
@@ -259,11 +255,10 @@ namespace landerist_library.Tasks
             Scraper.Stop();
             TaskLocalAIParsing.Stop();
 
-            DisposeTimer(ref Timer1);
-            DisposeTimer(ref Timer2);
-            DisposeTimer(ref Timer3);
-            DisposeTimer(ref Timer4);
-            DisposeTimer(ref Timer5);
+            DisposeTimer(ref TimerLocalAIParsing);
+            DisposeTimer(ref TimerTenMinutesTasks);
+            DisposeTimer(ref TimerHourlyTasks);
+            DisposeTimer(ref TimerDailyTasks);
         }
 
         public void Dispose()
