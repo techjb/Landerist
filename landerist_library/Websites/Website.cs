@@ -44,9 +44,7 @@ namespace landerist_library.Websites
                 ? Config.USER_AGENT_BROWSER
                 : UserAgent.Trim();
 
-        public bool ApplySpecialRules { get; set; }
-
-        public bool HtmlIndexingEnabled { get; set; } = true;
+        public bool HtmlIndexingEnabled { get; set; } = false;
 
         public bool UseProxy { get; set; }
 
@@ -109,7 +107,6 @@ namespace landerist_library.Websites
                 BlockedDomains = null;
                 UserAgent = null;
                 HttpRequestHeaders = null;
-                ApplySpecialRules = false;
                 HtmlIndexingEnabled = false;
                 UseProxy = false;
                 MinimumRequestIntervalMilliseconds = null;

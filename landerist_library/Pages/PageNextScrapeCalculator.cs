@@ -51,11 +51,7 @@ namespace landerist_library.Pages
 
         private static double GetAddDaysMultiplier(Page page)
         {
-            if (page.Website.ApplySpecialRules)
-            {
-                return 1d;
-            }
-            return 1.5d;
+            return 1d;
         }
 
         private static double GetBaseDaysForPageType(PageType pageType)

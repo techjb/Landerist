@@ -126,7 +126,6 @@ namespace landerist_library.Websites
                 BlockedDomains = NullIfWhiteSpace(blockedDomains),
                 UserAgent = NullIfWhiteSpace(userAgent),
                 HttpRequestHeaders = NullIfWhiteSpace(httpRequestHeaders),
-                ApplySpecialRules = true,
                 HtmlIndexingEnabled = false,
             };
 

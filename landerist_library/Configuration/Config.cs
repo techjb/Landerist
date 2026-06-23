@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "5.53";
+        public static readonly string VERSION = "5.54";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -15,9 +15,7 @@ namespace landerist_library.Configuration
 
         public static readonly bool WORDS_ENABLED = false;
 
-        public static readonly int MAX_PAGES_PER_WEBSITE = 2000;
-
-        public static readonly int MAX_PAGES_PER_WEBSITE_SPECIAL_RULES = 40000;
+        public static readonly int MAX_PAGES_PER_WEBSITE = 40000;
 
         public static readonly int MIN_PAGES_PER_SCRAPE = 10;
 

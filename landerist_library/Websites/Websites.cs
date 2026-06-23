@@ -23,15 +23,6 @@ namespace landerist_library.Websites
             return new DataBase().QueryHashSet(query);
         }
 
-        public static HashSet<string> GetHostsApplySpecialRules()
-        {
-            string query =
-                "SELECT [Host] " +
-                "FROM " + WEBSITES + " " +
-                "WHERE [ApplySpecialRules] = 1";
-            return new DataBase().QueryHashSet(query);
-        }
-
         public static Dictionary<string, Website> GetDicionaryStatusCodeOk()
         {
             Dictionary<string, Website> dictionary = new(StringComparer.OrdinalIgnoreCase);
@@ -49,26 +40,6 @@ namespace landerist_library.Websites
             return GetWebsites(dataTable);
         }
 
-        public static HashSet<Website> GetApplySpecialRules()
-        {
-            string query =
-                "SELECT * " +
-                "FROM " + WEBSITES + " " +
-                "WHERE [ApplySpecialRules] = 1";
-
-            return GetWebsites(new DataBase().QueryTable(query));
-        }
-
-        public static DataTable GetDataTableApplySpecialRules()
-        {
-            string query =
-                "SELECT * " +
-                "FROM " + WEBSITES + " " +
-                "WHERE [ApplySpecialRules] = 1";
-
-            return new DataBase().QueryTable(query);
-        }
-
         public static HashSet<Website> GetStatusCodeNotOk()
         {
             var dataTable = ToDataTableHttpStatusCodeNotOk();
@@ -81,7 +52,7 @@ namespace landerist_library.Websites
             return GetWebsites(dataTable);
         }
 
-        private static DataTable GetDataTableAll()
+        public static DataTable GetDataTableAll()
         {
             string query =
                 "SELECT * " +
@@ -459,8 +430,7 @@ namespace landerist_library.Websites
             string query =
                 "SELECT * " +
                 "FROM " + WEBSITES + " " +
-                "WHERE [ApplySpecialRules] = 1 AND " +
-                "([RobotsTxtUpdated] IS NULL OR [RobotsTxtUpdated] < @RobotsTxtUpdatedSpecialRules)";
+                "WHERE ([RobotsTxtUpdated] IS NULL OR [RobotsTxtUpdated] < @RobotsTxtUpdatedSpecialRules)";
 
             var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"RobotsTxtUpdatedSpecialRules", robotsTxtUpdatedSpecialRules },
@@ -505,8 +475,7 @@ namespace landerist_library.Websites
             string query =
                 "SELECT * " +
                 "FROM " + WEBSITES + " " +
-                "WHERE [ApplySpecialRules] = 1 AND " +
-                "([SitemapUpdated] IS NULL OR [SitemapUpdated] < @SitemapUpdatedSpecialRules)";
+                "WHERE ([SitemapUpdated] IS NULL OR [SitemapUpdated] < @SitemapUpdatedSpecialRules)";
 
             var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"SitemapUpdatedSpecialRules", sitemapUpdatedSpecialRules },
@@ -552,8 +521,7 @@ namespace landerist_library.Websites
             string query =
                 "SELECT * " +
                 "FROM " + WEBSITES + " " +
-                "WHERE [ApplySpecialRules] = 1 AND " +
-                "([IpAddressUpdated] < @IpAddressUpdated OR [IpAddressUpdated] IS NULL)";
+                "WHERE ([IpAddressUpdated] < @IpAddressUpdated OR [IpAddressUpdated] IS NULL)";
 
             var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
                 {"IpAddressUpdated", ipAddressUpdated },

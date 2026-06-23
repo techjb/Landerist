@@ -38,7 +38,7 @@ namespace landerist_library.Landerist_com
         public static void UpdateListings()
         {
             Console.WriteLine("Reading all listings ..");
-            var listings = ES_Listings.GetAllApplySpecialRules(true, true);
+            var listings = ES_Listings.GetAll(true, true);
             if (!Update(listings, CountryCode.ES, ExportType.Listings, null, null))
             {
                 Log.WriteError("filesupdater", "Error updating all listings");
@@ -51,13 +51,13 @@ namespace landerist_library.Landerist_com
             DateOnly dateFrom = GetDateFrom(ExportType.PublishedUpdates, ExportType.UnpublishedUpdates);
             DateOnly dateTo = Yesterday();
 
-            var publishedListings = ES_Listings.GetListingsApplySpecialRules(ListingStatus.published, true, true, dateFrom, dateTo);
+            var publishedListings = ES_Listings.GetListings(ListingStatus.published, true, true, dateFrom, dateTo);
             if (!Update(publishedListings, CountryCode.ES, ExportType.PublishedUpdates, dateFrom, dateTo))
             {
                 Log.WriteError("filesupdater", "Error updating PublishedUpdates");
             }
 
-            var unpublishedListings = ES_Listings.GetListingsApplySpecialRules(ListingStatus.unpublished, true, true, dateFrom, dateTo);
+            var unpublishedListings = ES_Listings.GetListings(ListingStatus.unpublished, true, true, dateFrom, dateTo);
             if (!Update(unpublishedListings, CountryCode.ES, ExportType.UnpublishedUpdates, dateFrom, dateTo))
             {
                 Log.WriteError("filesupdater", "Error updating UnpublishedUpdates");
@@ -72,7 +72,7 @@ namespace landerist_library.Landerist_com
                 ? ExportType.Published
                 : ExportType.Unpublished;
 
-            var listings = ES_Listings.GetListingsApplySpecialRules(listingStatus);
+            var listings = ES_Listings.GetListings(listingStatus);
             if (!Update(listings, CountryCode.ES, exportType, null, null))
             {
                 Log.WriteError("filesupdater", "Error updating " + exportType);
@@ -82,7 +82,7 @@ namespace landerist_library.Landerist_com
         public static bool UpdateWebsites()
         {
             Console.WriteLine("Reading Websites ..");
-            var websites = Websites.Websites.GetDataTableApplySpecialRules();
+            var websites = Websites.Websites.GetDataTableAll();
             if (websites.Rows.Count.Equals(0))
             {
                 return true;
@@ -112,9 +112,8 @@ namespace landerist_library.Landerist_com
 
         public static bool UpdateListingsByWebsite()
         {
-            Console.WriteLine("Reading hosts with special rules ..");
+            Console.WriteLine("Reading hosts ..");
             var websites = Websites.Websites.GetAll()
-                .Where(website => website.ApplySpecialRules)
                 .OrderBy(website => website.Host, StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
@@ -173,7 +172,7 @@ namespace landerist_library.Landerist_com
             PropertyType propertyType,
             ListingStatus listingStatus)
         {
-            var listings = ES_Listings.GetListingsApplySpecialRules(
+            var listings = ES_Listings.GetListings(
                 listingStatus,
                 operation,
                 propertyType,

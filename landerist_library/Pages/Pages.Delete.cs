@@ -31,41 +31,7 @@ namespace landerist_library.Pages
             return new DataBase().Query(query);
         }
 
-        public static void DeleteNumPagesExceded()
-        {
-            string query =
-                "SELECT [Host] " +
-                "FROM " + PAGES + " " +
-                "GROUP BY [Host] " +
-                "HAVING COUNT(*) > " + Config.MAX_PAGES_PER_WEBSITE;
-
-            DataTable dataTable = new DataBase().QueryTable(query);
-            int total = dataTable.Rows.Count;
-            int counter = 0;
-            foreach (DataRow dataRow in dataTable.Rows)
-            {
-                Console.WriteLine(counter++ + "/" + total);
-                string host = (string)dataRow[0];
-                Website website = new(host);
-                var pages = website.GetPages();
-                int pageCounter = 0;
-
-                Parallel.ForEach(pages, page =>
-                {
-                    Interlocked.Increment(ref pageCounter);
-                    if (page.IsMainPage())
-                    {
-                        return;
-                    }
-                    if (pageCounter > Config.MAX_PAGES_PER_WEBSITE)
-                    {
-                        page.Delete();
-                    }
-                });
-            }
-            ;
-        }
-
+       
         public static void Delete(PageType pageType)
         {
             var pages = GetPages(pageType);

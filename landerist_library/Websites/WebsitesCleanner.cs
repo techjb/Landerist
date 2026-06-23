@@ -91,7 +91,7 @@ namespace landerist_library.Websites
             {
                 try
                 {
-                    if (website.GetNumListings() > 0 || website.ApplySpecialRules)
+                    if (SpecialRulesApplyToAllWebsites() || website.GetNumListings() > 0)
                     {
                         Interlocked.Increment(ref skipped);
                         return;
@@ -130,7 +130,7 @@ namespace landerist_library.Websites
             {
                 try
                 {
-                    if (HasPublishedListings(website) || website.ApplySpecialRules)
+                    if (SpecialRulesApplyToAllWebsites() || HasPublishedListings(website))
                     {
                         Interlocked.Increment(ref skipped);
                         return;
@@ -173,7 +173,7 @@ namespace landerist_library.Websites
             {
                 try
                 {
-                    if (HasPageTypeListing(website) || website.ApplySpecialRules)
+                    if (SpecialRulesApplyToAllWebsites() || HasPageTypeListing(website))
                     {
                         Interlocked.Increment(ref skipped);
                         return;
@@ -199,6 +199,11 @@ namespace landerist_library.Websites
             Console.WriteLine("Total websites borrados: " + deleted);
         }
 
+
+        private static bool SpecialRulesApplyToAllWebsites()
+        {
+            return true;
+        }
 
         private static bool HasPageTypeListing(Website website)
         {
@@ -246,7 +251,7 @@ namespace landerist_library.Websites
             {
                 try
                 {
-                    if (website.GetNumPages() >= minimumPages || website.GetNumListings() > 0 || website.ApplySpecialRules)
+                    if (SpecialRulesApplyToAllWebsites() || website.GetNumPages() >= minimumPages || website.GetNumListings() > 0)
                     {
                         Interlocked.Increment(ref skipped);
                         return;

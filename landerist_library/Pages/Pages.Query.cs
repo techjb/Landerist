@@ -170,7 +170,6 @@ namespace landerist_library.Pages
                     "W.[BlockedDomains], " +
                     "W.[UserAgent], " +
                     "W.[HttpRequestHeaders], " +
-                    "W.[ApplySpecialRules], " +
                     "W.[HtmlIndexingEnabled], " +
                     "W.[UseProxy], " +
                     "W.[MinimumRequestIntervalMilliseconds] " +
@@ -331,7 +330,6 @@ namespace landerist_library.Pages
                     "W.[BlockedDomains], " +
                     "W.[UserAgent], " +
                     "W.[HttpRequestHeaders], " +
-                    "W.[ApplySpecialRules], " +
                     "W.[HtmlIndexingEnabled], " +
                     "W.[UseProxy], " +
                     "W.[MinimumRequestIntervalMilliseconds] " +
@@ -451,7 +449,6 @@ namespace landerist_library.Pages
                 Websites.Websites.WEBSITES + ".[BlockedDomains], " +
                 Websites.Websites.WEBSITES + ".[UserAgent], " +
                 Websites.Websites.WEBSITES + ".[HttpRequestHeaders], " +
-                Websites.Websites.WEBSITES + ".[ApplySpecialRules], " +
                 Websites.Websites.WEBSITES + ".[HtmlIndexingEnabled], " +
                 Websites.Websites.WEBSITES + ".[UseProxy], " +
                 Websites.Websites.WEBSITES + ".[MinimumRequestIntervalMilliseconds] ";

@@ -44,11 +44,7 @@ namespace landerist_library.Index
 
         private int GetMaxSiteMapsPerWebsite()
         {
-            if (Page.Website.ApplySpecialRules)
-            {
-                return 1000;
-            }
-            return 10;
+            return 1000;
         }
 
         public bool IndexNewPages(Uri uri)

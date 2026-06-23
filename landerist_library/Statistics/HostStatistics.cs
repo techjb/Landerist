@@ -27,7 +27,7 @@ namespace landerist_library.Statistics
 
         public static void TakeSnapshots()
         {
-            foreach (var website in Websites.Websites.GetApplySpecialRules())
+            foreach (var website in Websites.Websites.GetAll())
             {
                 try
                 {

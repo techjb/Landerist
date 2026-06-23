@@ -123,12 +123,12 @@ namespace landerist_library.Landerist_com
             {
                 foreach (PropertyType propertyType in Enum.GetValues<PropertyType>())
                 {
-                    int publishedListingsCount = ES_Listings.CountApplySpecialRules(
+                    int publishedListingsCount = ES_Listings.Count(
                         ListingStatus.published,
                         operation,
                         propertyType);
 
-                    int unpublishedListingsCount = ES_Listings.CountApplySpecialRules(
+                    int unpublishedListingsCount = ES_Listings.Count(
                         ListingStatus.unpublished,
                         operation,
                         propertyType);
@@ -216,7 +216,7 @@ namespace landerist_library.Landerist_com
         {
             StringBuilder rows = new();
 
-            foreach (var website in Websites.Websites.GetApplySpecialRules()
+            foreach (var website in Websites.Websites.GetAll()
                 .Where(website => website.CountryCode == countryCode)
                 .OrderBy(website => website.Host, StringComparer.OrdinalIgnoreCase))
             {

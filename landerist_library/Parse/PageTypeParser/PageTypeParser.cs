@@ -110,12 +110,6 @@ namespace landerist_library.Parse.PageTypeParser
                 HostStatistics.InsertDailyCounter(Page.Host, HostStatisticsKey.ListingParserInputIsAnotherListingInHost);
                 return (PageType.ResponseBodyRepeatedInHost, null, false);
             }
-
-            if (!Page.Website.ApplySpecialRules && isProduction)
-            {
-                return (Page.PageType, null, false);
-            }
-
             if (Tokenizer.TooManyTokens(Page))
             {
                 return (PageType.ResponseBodyTooManyTokens, null, false);

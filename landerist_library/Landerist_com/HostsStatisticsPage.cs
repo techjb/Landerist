@@ -24,7 +24,7 @@ namespace landerist_library.Landerist_com
             try
             {
                 var template = File.ReadAllText(HostsStatisticsTemplateHtmlFile);
-                var websites = Websites.Websites.GetApplySpecialRules()
+                var websites = Websites.Websites.GetAll()
                     .OrderBy(website => website.Host, StringComparer.OrdinalIgnoreCase)
                     .ToList();
 
