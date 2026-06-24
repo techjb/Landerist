@@ -111,7 +111,7 @@ namespace landerist_library.Scrape
 
             if (Pages.Count < Config.MIN_PAGES_PER_SCRAPE)
             {
-                Console.WriteLine("Not enough pages to scrape. " + Pages.Count);
+                //Console.WriteLine("Not enough pages to scrape. " + Pages.Count);
                 Pages.Clear();
             }
         }

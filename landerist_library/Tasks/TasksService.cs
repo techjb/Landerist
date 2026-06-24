@@ -63,9 +63,13 @@ namespace landerist_library.Tasks
             }
             else if (Configuration.Config.IsPrincipalMachine())
             {
-                TimerTenMinutesTasks = new Timer(QueueTenMinutesTasks, null, 0, TenMinutes);
-                TimerHourlyTasks = new Timer(QueueHourlyTasks, null, OneHour, OneHour);
-                TimerDailyTasks = new Timer(QueueDailyTasks, null, GetDueTime(), OneDay);
+                //TimerTenMinutesTasks = new Timer(QueueTenMinutesTasks, null, 0, TenMinutes);
+                //TimerHourlyTasks = new Timer(QueueHourlyTasks, null, OneHour, OneHour);
+                //TimerDailyTasks = new Timer(QueueDailyTasks, null, GetDueTime(), OneDay);
+
+                TimerTenMinutesTasks = new Timer(TenMinutesTasks, null, 0, TenMinutes);
+                TimerHourlyTasks = new Timer(HourlyTasks, null, OneHour, OneHour);
+                TimerDailyTasks = new Timer(DailyTasks, null, GetDueTime(), OneDay);
             }
             else
             {
@@ -87,10 +91,9 @@ namespace landerist_library.Tasks
             return (int)(twelveAM - now).TotalMilliseconds;
         }
 
-        public void PerformDailyTask()
+        public void PerformDailyTask(object? state)
         {
-            Console.WriteLine("Daily task ..");
-            PerformDailyTasks = true;
+            DailyTasks(state);
         }
 
         private void QueueDailyTasks(object? state)
@@ -117,7 +120,7 @@ namespace landerist_library.Tasks
 
             try
             {
-                if (!PerformPendingTasks())
+                if (!PerformPendingTasks(state))
                 {
                     Scraper.Start();
                 }
@@ -153,23 +156,23 @@ namespace landerist_library.Tasks
             }
         }
 
-        private bool PerformPendingTasks()
+        private bool PerformPendingTasks(object? state)
         {
             if (PerformTenMinutesTasks)
             {
-                TenMinutesTasks();
+                TenMinutesTasks(state);
                 return true;
             }
 
             if (PerformHourlyTasks)
             {
-                HourlyTasks();
+                HourlyTasks(state);
                 return true;
             }
 
             if (PerformDailyTasks)
             {
-                DailyTask();
+                DailyTasks(state);
                 return true;
             }
 
@@ -197,14 +200,14 @@ namespace landerist_library.Tasks
             }
         }
 
-        public void TenMinutesTasks()
+        public void TenMinutesTasks(object? state)
         {
             PerformTenMinutesTasks = false;
             TaskBatchDownload.Start();
             TaskBatchUpload.Start();
         }
 
-        public void HourlyTasks()
+        public void HourlyTasks(object? state)
         {
             PerformHourlyTasks = false;
             Websites.Websites.UpdateRobotsTxt();
@@ -213,7 +216,7 @@ namespace landerist_library.Tasks
             TaskBatchCleaner.Start();
         }
 
-        public void DailyTask()
+        public void DailyTasks(object? state)
         {
             PerformDailyTasks = false;
 
@@ -222,6 +225,7 @@ namespace landerist_library.Tasks
                 return;
             }
 
+            Console.WriteLine("Daily task started ..");
             try
             {
                 GlobalStatistics.TakeSnapshots();
@@ -234,6 +238,10 @@ namespace landerist_library.Tasks
             catch (Exception exception)
             {
                 Log.WriteError("ServiceTasks DailyTask", exception);
+            }
+            finally
+            {
+                Console.WriteLine("Daily task finished ..");
             }
         }
 

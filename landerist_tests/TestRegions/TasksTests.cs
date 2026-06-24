@@ -4,7 +4,7 @@ namespace landerist_tests
     {
         public static void Run()
         {
-            //ServiceTasks.DailyTask();
+            //ServiceTasks.DailyTasks();
             //ServiceTasks.ProcessPages();
             //new ServiceTasks().UpdateAndScrape();
             //landerist_library.Landerist_com.FilesUpdater.SetPageTypeAndNextScrape();
