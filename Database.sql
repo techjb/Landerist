@@ -429,7 +429,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [dbo].[WEBSITES_THROTTLE](
 	[BlockUntil] [datetime] NOT NULL,
-	[IpOrHost] [nvarchar](100) NOT NULL,
+	[Host] [nvarchar](100) NOT NULL,
 	[ForbiddenBackoffLevel] [smallint] NOT NULL,
 	[ForbiddenRetryDelaySeconds] [int] NOT NULL,
 	[ForbiddenCounter] [int] NOT NULL,
@@ -439,7 +439,7 @@ CREATE TABLE [dbo].[WEBSITES_THROTTLE](
 	[Updated] [datetime] NOT NULL,
  CONSTRAINT [PK_IPHOST_BLOCKER] PRIMARY KEY CLUSTERED 
 (
-	[IpOrHost] ASC
+	[Host] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO

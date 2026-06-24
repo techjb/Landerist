@@ -29,7 +29,7 @@ namespace landerist_library.Database
                 "       END " +
                 "   AS BIT) AS IsBlocked " +
                 "FROM " + WEBSITES_THROTTLE + " " +
-                "WHERE IpOrHost = @Host";
+                "WHERE Host = @Host";
 
             return new DataBase().QueryBool(query, new Dictionary<string, object?>()
             {
@@ -60,7 +60,7 @@ namespace landerist_library.Database
                 "           ELSE ISNULL(ForbiddenBackoffLevel, 0) + 1 " +
                 "       END " +
                 "FROM " + WEBSITES_THROTTLE + " WITH (UPDLOCK, HOLDLOCK) " +
-                "WHERE IpOrHost = @Host; " +
+                "WHERE Host = @Host; " +
                 "IF @NewForbiddenBackoffLevel IS NULL " +
                 "BEGIN " +
                 "   SET @NewForbiddenBackoffLevel = 1; " +
@@ -87,11 +87,11 @@ namespace landerist_library.Database
                 "   SuccessCounterAfterForbidden = 0, " +
                 "   LastForbiddenAt = @Now, " +
                 "   Updated = @Now " +
-                "WHERE IpOrHost = @Host; " +
+                "WHERE Host = @Host; " +
                 "IF @@ROWCOUNT = 0 " +
                 "BEGIN " +
                 "   INSERT INTO " + WEBSITES_THROTTLE + " " +
-                "       (IpOrHost, BlockUntil, ForbiddenBackoffLevel, ForbiddenRetryDelaySeconds, ForbiddenCounter, SuccessCounterAfterForbidden, LastForbiddenAt, Updated) " +
+                "       (Host, BlockUntil, ForbiddenBackoffLevel, ForbiddenRetryDelaySeconds, ForbiddenCounter, SuccessCounterAfterForbidden, LastForbiddenAt, Updated) " +
                 "   VALUES " +
                 "       (@Host, @HostBlockUntil, @NewForbiddenBackoffLevel, @ForbiddenRetryDelaySeconds, 1, 0, @Now, @Now); " +
                 "END; " +
@@ -121,7 +121,7 @@ namespace landerist_library.Database
                 "   @NewSuccessCounterAfterForbidden = ISNULL(SuccessCounterAfterForbidden, 0) + 1, " +
                 "   @LastBackoffEventAt = COALESCE(LastSuccessAt, LastForbiddenAt) " +
                 "FROM " + WEBSITES_THROTTLE + " WITH (UPDLOCK, HOLDLOCK) " +
-                "WHERE IpOrHost = @Host; " +
+                "WHERE Host = @Host; " +
                 "IF @CurrentForbiddenBackoffLevel IS NOT NULL AND @CurrentForbiddenBackoffLevel > 0 " +
                 "BEGIN " +
                 "   SET @NewForbiddenBackoffLevel = " +
@@ -144,7 +144,7 @@ namespace landerist_library.Database
                 "           END, " +
                 "       LastSuccessAt = CASE WHEN @NewForbiddenBackoffLevel < @CurrentForbiddenBackoffLevel THEN @Now ELSE LastSuccessAt END, " +
                 "       Updated = @Now " +
-                "   WHERE IpOrHost = @Host; " +
+                "   WHERE Host = @Host; " +
                 "END; " +
                 "COMMIT TRANSACTION";
 
@@ -169,7 +169,7 @@ namespace landerist_library.Database
                 "SET " +
                 "   BlockUntil = CASE WHEN BlockUntil > @HostBlockUntil THEN BlockUntil ELSE @HostBlockUntil END, " +
                 "   Updated = @Now " +
-                "WHERE IpOrHost = @Host " +
+                "WHERE Host = @Host " +
                 "AND BlockUntil <= @Now; " +
                 "IF @@ROWCOUNT > 0 " +
                 "BEGIN " +
@@ -178,10 +178,10 @@ namespace landerist_library.Database
                 "ELSE IF NOT EXISTS (" +
                 "   SELECT 1 " +
                 "   FROM " + WEBSITES_THROTTLE + " WITH (UPDLOCK, HOLDLOCK) " +
-                "   WHERE IpOrHost = @Host" +
+                "   WHERE Host = @Host" +
                 ") " +
                 "BEGIN " +
-                "   INSERT INTO " + WEBSITES_THROTTLE + " (IpOrHost, BlockUntil, Updated) " +
+                "   INSERT INTO " + WEBSITES_THROTTLE + " (Host, BlockUntil, Updated) " +
                 "   VALUES (@Host, @HostBlockUntil, @Now); " +
                 "   SET @Acquired = 1; " +
                 "END; " +

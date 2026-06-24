@@ -122,7 +122,7 @@ namespace landerist_library.Pages
                 "   AND NOT EXISTS (" +
                 "       SELECT 1 " +
                 "       FROM " + WebsitesThrottle.WEBSITES_THROTTLE + " AS WB " +
-                "       WHERE WB.[IpOrHost] = P.[Host] AND WB.[BlockUntil] > GETDATE()" +
+                "       WHERE WB.[Host] = P.[Host] AND WB.[BlockUntil] > GETDATE()" +
                 "   ) " +
                 "), " +
                 "TopPages AS (" +
@@ -286,7 +286,7 @@ namespace landerist_library.Pages
                 "   AND NOT EXISTS (" +
                 "       SELECT 1 " +
                 "       FROM " + WebsitesThrottle.WEBSITES_THROTTLE + " AS WB " +
-                "       WHERE WB.[IpOrHost] = P.[Host] AND WB.[BlockUntil] > GETDATE()" +
+                "       WHERE WB.[Host] = P.[Host] AND WB.[BlockUntil] > GETDATE()" +
                 "   ) " +
                 (string.IsNullOrEmpty(where) ? string.Empty : " AND " + where) + " " +
                 "   ORDER BY P.[NextScrape] ASC" +
