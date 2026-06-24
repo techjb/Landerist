@@ -1,4 +1,5 @@
-﻿using Google.Cloud.AIPlatform.V1;
+﻿using Google.Apis.Auth.OAuth2;
+using Google.Cloud.AIPlatform.V1;
 using landerist_library.Configuration;
 using landerist_library.Logs;
 
@@ -124,7 +125,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
             return new JobServiceClientBuilder
             {
                 Endpoint = $"{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}-aiplatform.googleapis.com",
-                JsonCredentials = PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_CREDENTIAL,
+                GoogleCredential = CredentialFactory.FromJson<ServiceAccountCredential>(PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_CREDENTIAL).ToGoogleCredential(),
             }.Build();
         }
     }

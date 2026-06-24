@@ -1,4 +1,5 @@
-﻿using Google.Cloud.AIPlatform.V1;
+﻿using Google.Apis.Auth.OAuth2;
+using Google.Cloud.AIPlatform.V1;
 using Google.Protobuf;
 using Google.Protobuf.Collections;
 using landerist_library.Configuration;
@@ -54,7 +55,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI
             return new PredictionServiceClientBuilder
             {
                 Endpoint = $"{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}-aiplatform.googleapis.com",
-                JsonCredentials = PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_CREDENTIAL,
+                GoogleCredential = CredentialFactory.FromJson<ServiceAccountCredential>(PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_CREDENTIAL).ToGoogleCredential(),
             }.Build();
         }
 

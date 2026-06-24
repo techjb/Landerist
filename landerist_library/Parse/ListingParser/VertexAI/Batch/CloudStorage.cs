@@ -67,7 +67,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
 
         private static StorageClient GetStorageClient()
         {
-            var credentials = GoogleCredential.FromJson(PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_CREDENTIAL);
+            var credentials = CredentialFactory.FromJson<ServiceAccountCredential>(PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_CREDENTIAL).ToGoogleCredential();
             return StorageClient.Create(credentials);
         }
     }

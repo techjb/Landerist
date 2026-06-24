@@ -188,6 +188,24 @@ namespace landerist_library.Database
             return result;
         }
 
+        public bool Query(string query, IDictionary<string, object?>? parameters, out Exception? exception)
+        {
+            bool result = false;
+            exception = null;
+            try
+            {
+                Init(query, parameters);
+                SqlCommand.ExecuteNonQuery();
+                result = true;
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+            }
+            CloseConnection();
+            return result;
+        }
+
         public bool Query(string query, List<SqlParameter> sqlParameters)
         {
             return Query(query, sqlParameters.ToArray());

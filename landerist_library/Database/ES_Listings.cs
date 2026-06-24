@@ -51,6 +51,13 @@ namespace landerist_library.Database
         {
             string query =
                 "INSERT INTO " + TABLE_ES_LISTINGS + " " +
+                "([guid], [listingStatus], [listingDate], [updated], [unlistingDate], [operation], [propertyType], " +
+                "[propertySubtype], [priceAmount], [priceCurrency], [description], " +
+                "[contactName], [contactPhone], [contactEmail], [contactUrl], [contactOther], [address], [lauId], [lauName], [latitude], [longitude], " +
+                "[locationIsAccurate], [cadastralReference], [propertySize], [landSize], [constructionYear], " +
+                "[constructionStatus], [energyEfficiencyRating], [floors], [floor], [bedrooms], [bathrooms], [parkings], [terrace], [garden], " +
+                "[garage], [motorbikeGarage], [pool], [lift], [disabledAccess], [storageRoom], [furnished], " +
+                "[nonFurnished], [heating], [airConditioning], [petsAllowed], [securitySystems], [host]) " +
                 "VALUES( " +
                 "@guid, @listingStatus, @listingDate, @updated, @unlistingDate, @operation, @propertyType, " +
                 "@propertySubtype, @priceAmount, @priceCurrency, @description, " +
@@ -63,7 +70,12 @@ namespace landerist_library.Database
 
             var queryParameters = GetQueryParameters(listing);
             queryParameters.Add("host", host);
-            return new DataBase().Query(query, queryParameters);
+            bool inserted = new DataBase().Query(query, queryParameters, out Exception? exception);
+            if (!inserted && exception != null)
+            {
+                Logs.Log.WriteError("ES_Listings Insert", "Guid: " + listing.guid + " Host: " + host, exception);
+            }
+            return inserted;
         }
 
         public static int Count(string host)
@@ -193,7 +205,7 @@ namespace landerist_library.Database
                 {"unlistingDate", listing.unlistingDate},
                 {"operation", listing.operation.ToString() },
                 {"propertyType", listing.propertyType.ToString() },
-                {"propertySubType", listing.propertySubtype?.ToString()},
+                {"propertySubtype", listing.propertySubtype?.ToString()},
                 {"priceAmount", listing.price?.amount },
                 {"priceCurrency", listing.price?.currency.ToString()},
                 {"description", listing.description },
