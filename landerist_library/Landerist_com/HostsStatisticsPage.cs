@@ -70,17 +70,42 @@ namespace landerist_library.Landerist_com
 
             return
                 "                        <tr>" + Environment.NewLine +
-                $"                            <td>{FormatHostLink(website.Host)}</td>" + Environment.NewLine +
-                $"                            <td>{FormatWebsiteDate(website.RobotsTxtUpdated)}</td>" + Environment.NewLine +
-                $"                            <td>{FormatWebsiteDate(website.SitemapUpdated)}</td>" + Environment.NewLine +
-                $"                            <td>{FormatNumber(totalPages)}</td>" + Environment.NewLine +
-                $"                            <td>{FormatPercentage(recentScrapedPages, totalPages)}</td>" + Environment.NewLine +
-                $"                            <td>{FormatPercentage(recentInsertedPages, totalPages)}</td>" + Environment.NewLine +
-                $"                            <td>{FormatNumber(totalListings)}</td>" + Environment.NewLine +
-                $"                            <td>{FormatPercentage(recentListings, totalListings)}</td>" + Environment.NewLine +
-                $"                            <td>{FormatPercentage(publishedListings, totalListings)}</td>" + Environment.NewLine +
-                $"                            <td>{FormatPercentage(unpublishedListings, totalListings)}</td>" + Environment.NewLine +
+                $"                            {FormatTableCell(FormatHostLink(website.Host), website.Host)}" + Environment.NewLine +
+                $"                            {FormatTableCell(FormatWebsiteDate(website.RobotsTxtUpdated), FormatDateSortValue(website.RobotsTxtUpdated))}" + Environment.NewLine +
+                $"                            {FormatTableCell(FormatWebsiteDate(website.SitemapUpdated), FormatDateSortValue(website.SitemapUpdated))}" + Environment.NewLine +
+                $"                            {FormatTableCell(FormatNumber(totalPages), FormatNumberSortValue(totalPages))}" + Environment.NewLine +
+                $"                            {FormatTableCell(FormatPercentage(recentScrapedPages, totalPages), FormatPercentageSortValue(recentScrapedPages, totalPages))}" + Environment.NewLine +
+                $"                            {FormatTableCell(FormatPercentage(recentInsertedPages, totalPages), FormatPercentageSortValue(recentInsertedPages, totalPages))}" + Environment.NewLine +
+                $"                            {FormatTableCell(FormatNumber(totalListings), FormatNumberSortValue(totalListings))}" + Environment.NewLine +
+                $"                            {FormatTableCell(FormatPercentage(recentListings, totalListings), FormatPercentageSortValue(recentListings, totalListings))}" + Environment.NewLine +
+                $"                            {FormatTableCell(FormatPercentage(publishedListings, totalListings), FormatPercentageSortValue(publishedListings, totalListings))}" + Environment.NewLine +
+                $"                            {FormatTableCell(FormatPercentage(unpublishedListings, totalListings), FormatPercentageSortValue(unpublishedListings, totalListings))}" + Environment.NewLine +
                 "                        </tr>";
+        }
+
+        private static string FormatTableCell(string html, string sortValue)
+        {
+            return $"<td data-sort=\"{WebUtility.HtmlEncode(sortValue)}\">{html}</td>";
+        }
+
+        private static string FormatDateSortValue(DateTime? dateTime)
+        {
+            return dateTime?.ToString("yyyyMMdd", CultureInfo.InvariantCulture) ?? "0";
+        }
+
+        private static string FormatNumberSortValue(int value)
+        {
+            return value.ToString(CultureInfo.InvariantCulture);
+        }
+
+        private static string FormatPercentageSortValue(int value, int total)
+        {
+            if (total <= 0)
+            {
+                return decimal.Zero.ToString(CultureInfo.InvariantCulture);
+            }
+
+            return ((decimal)value / total).ToString(CultureInfo.InvariantCulture);
         }
 
         private static string FormatHostLink(string host)

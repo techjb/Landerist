@@ -360,6 +360,84 @@ tbody tr:hover {
     background: var(--color-gray-50);
 }
 
+.hosts-statistics-table th.dt-head-right,
+.hosts-statistics-table td.dt-body-right {
+    text-align: right;
+}
+
+.dt-container {
+    color: var(--color-text-secondary);
+    font-family: var(--font-sans);
+    font-size: 14px;
+}
+
+.dt-container .dt-layout-row {
+    align-items: center;
+    gap: 16px;
+    margin: 16px 0;
+}
+
+.dt-container .dt-layout-cell {
+    min-width: 0;
+}
+
+.dt-container .dt-length,
+.dt-container .dt-search,
+.dt-container .dt-info {
+    color: var(--color-text-secondary);
+    font-size: 14px;
+}
+
+.dt-container .dt-length select,
+.dt-container .dt-search input {
+    background: var(--white);
+    color: var(--black);
+    border: none;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-ring);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    outline: none;
+    padding: 8px 10px;
+}
+
+.dt-container .dt-search input {
+    min-width: 240px;
+}
+
+.dt-container .dt-length select:focus,
+.dt-container .dt-search input:focus {
+    box-shadow: 0 0 0 2px var(--focus-blue);
+}
+
+.dt-container .dt-paging .dt-paging-button {
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-secondary) !important;
+    margin: 0 2px;
+    padding: 6px 10px;
+}
+
+.dt-container .dt-paging .dt-paging-button.current,
+.dt-container .dt-paging .dt-paging-button.current:hover {
+    background: var(--color-text) !important;
+    border: none;
+    color: var(--color-bg) !important;
+}
+
+.dt-container .dt-paging .dt-paging-button:hover {
+    background: var(--color-gray-50) !important;
+    border: none;
+    color: var(--color-text) !important;
+}
+
+.dt-container table.dataTable thead th,
+.dt-container table.dataTable thead td,
+.dt-container table.dataTable tbody th,
+.dt-container table.dataTable tbody td {
+    border-color: var(--color-gray-100);
+}
+
 .controls-row {
     display: flex;
     flex-wrap: wrap;

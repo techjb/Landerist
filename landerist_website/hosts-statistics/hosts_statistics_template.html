@@ -6,6 +6,7 @@
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@techjb" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.8/css/dataTables.dataTables.min.css" />
     <link rel="stylesheet" href="/styles.css" />
     <title>Hosts Statistics</title>
 </head>
@@ -31,7 +32,7 @@
 
         <div class="section">
             <div class="table-wrapper">
-                <table>
+                <table id="HostsStatisticsTable" class="display hosts-statistics-table">
                     <thead>
                         <tr>
                             <th>Host</th>
@@ -57,5 +58,20 @@
             <p>&copy; Landerist</p>
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/2.3.8/js/dataTables.min.js"></script>
+    <script>
+        new DataTable('#HostsStatisticsTable', {
+            order: [[0, 'asc']],
+            pageLength: 50,
+            lengthMenu: [[25, 50, 100, -1], [25, 50, 100, 'All']],
+            language: {
+                search: 'Filter:'
+            },
+            columnDefs: [
+                { targets: [3, 4, 5, 6, 7, 8, 9], className: 'dt-body-right dt-head-right' }
+            ]
+        });
+    </script>
 </body>
 </html>
