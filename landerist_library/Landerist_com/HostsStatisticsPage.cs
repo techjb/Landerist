@@ -18,6 +18,8 @@ namespace landerist_library.Landerist_com
         private static readonly CultureInfo SummaryCulture = CultureInfo.GetCultureInfo("es-ES");
 
         private const int RecentListingsDays = 7;
+        private const int RecentScrapedPagesDays = 3;
+        private const int RecentInsertedPagesDays = 3;
 
         public static void Update()
         {
@@ -59,6 +61,8 @@ namespace landerist_library.Landerist_com
         private static string GetHostsStatisticsRow(Websites.Website website)
         {
             int totalPages = website.GetNumPages();
+            int recentScrapedPages = website.GetNumPagesScrapedSince(DateTime.Now.AddDays(-RecentScrapedPagesDays));
+            int recentInsertedPages = website.GetNumPagesInsertedSince(DateTime.Now.AddDays(-RecentInsertedPagesDays));
             int totalListings = website.GetNumListings();
             int recentListings = website.GetNumListingsSinceListingDate(DateTime.Now.AddDays(-RecentListingsDays));
             int publishedListings = website.GetNumPublishedListings();
@@ -70,10 +74,12 @@ namespace landerist_library.Landerist_com
                 $"                            <td>{FormatWebsiteDate(website.RobotsTxtUpdated)}</td>" + Environment.NewLine +
                 $"                            <td>{FormatWebsiteDate(website.SitemapUpdated)}</td>" + Environment.NewLine +
                 $"                            <td>{FormatNumber(totalPages)}</td>" + Environment.NewLine +
-                $"                            <td>{FormatListings(totalListings, totalPages)}</td>" + Environment.NewLine +
-                $"                            <td>{FormatListings(recentListings, totalListings)}</td>" + Environment.NewLine +
-                $"                            <td>{FormatListings(publishedListings, totalListings)}</td>" + Environment.NewLine +
-                $"                            <td>{FormatListings(unpublishedListings, totalListings)}</td>" + Environment.NewLine +
+                $"                            <td>{FormatPercentage(recentScrapedPages, totalPages)}</td>" + Environment.NewLine +
+                $"                            <td>{FormatPercentage(recentInsertedPages, totalPages)}</td>" + Environment.NewLine +
+                $"                            <td>{FormatNumber(totalListings)}</td>" + Environment.NewLine +
+                $"                            <td>{FormatPercentage(recentListings, totalListings)}</td>" + Environment.NewLine +
+                $"                            <td>{FormatPercentage(publishedListings, totalListings)}</td>" + Environment.NewLine +
+                $"                            <td>{FormatPercentage(unpublishedListings, totalListings)}</td>" + Environment.NewLine +
                 "                        </tr>";
         }
 
@@ -91,11 +97,6 @@ namespace landerist_library.Landerist_com
         private static string FormatNumber(int value)
         {
             return value.ToString("N0", SummaryCulture);
-        }
-
-        private static string FormatListings(int listings, int totalPages)
-        {
-            return $"{FormatNumber(listings)} ({FormatPercentage(listings, totalPages)})";
         }
 
         private static string FormatPercentage(int value, int total)

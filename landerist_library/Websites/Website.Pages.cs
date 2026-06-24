@@ -61,6 +61,35 @@ namespace landerist_library.Websites
             });
         }       
 
+        public int GetNumPagesScrapedSince(DateTime lastScrapeFrom)
+        {
+            return GetNumPagesSince("LastScrape", lastScrapeFrom);
+        }
+
+        public int GetNumPagesInsertedSince(DateTime insertedFrom)
+        {
+            return GetNumPagesSince("Inserted", insertedFrom);
+        }
+
+        private int GetNumPagesSince(string dateColumn, DateTime dateFrom)
+        {
+            if (dateColumn != "LastScrape" && dateColumn != "Inserted")
+            {
+                throw new ArgumentException("Unexpected date column.", nameof(dateColumn));
+            }
+
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + Pages.Pages.PAGES + " " +
+                "WHERE [Host] = @Host " +
+                $"AND [{dateColumn}] >= @DateFrom";
+
+            return new DataBase().QueryInt(query, new Dictionary<string, object?> {
+                {"Host", Host },
+                {"DateFrom", dateFrom }
+            });
+        }
+
         public bool AchievedMaxNumberOfPages()
         {
             return 
