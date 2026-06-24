@@ -54,7 +54,7 @@ namespace landerist_console
                 if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0 &&
                     keyInfo.Key == ConsoleKey.D)
                 {
-                    ServiceTasks.PerformDailyTask();
+                    ServiceTasks.PerformDailyTask(null);
                 }
             };
             Thread inputThread = new(KeyboardListener);

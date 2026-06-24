@@ -36,6 +36,7 @@ namespace landerist_library.Tasks
         private volatile bool PerformTenMinutesTasks;
         private volatile bool PerformHourlyTasks;
 
+        private volatile bool Stopping;
         private bool Disposed;
 
         public TasksService()
@@ -56,6 +57,8 @@ namespace landerist_library.Tasks
                 return;
             }
 
+            Stopping = false;
+
             if (Configuration.Config.IsLocalAIMachine() || Configuration.Config.IsConfigurationLocal())
             {
                 TimerLocalAIParsing = new Timer(LocalAIParsing, null, OneSecond, TwoSeconds);
@@ -67,8 +70,8 @@ namespace landerist_library.Tasks
                 //TimerHourlyTasks = new Timer(QueueHourlyTasks, null, OneHour, OneHour);
                 //TimerDailyTasks = new Timer(QueueDailyTasks, null, GetDueTime(), OneDay);
 
-                TimerTenMinutesTasks = new Timer(TenMinutesTasks, null, 0, TenMinutes);
-                TimerHourlyTasks = new Timer(HourlyTasks, null, OneHour, OneHour);
+                StartNonOverlappingTimer(ref TimerTenMinutesTasks, TenMinutesTasks, "TenMinutesTasks", 0, TenMinutes);
+                StartNonOverlappingTimer(ref TimerHourlyTasks, HourlyTasks, "HourlyTasks", OneHour, OneHour);
                 TimerDailyTasks = new Timer(DailyTasks, null, GetDueTime(), OneDay);
             }
             else
@@ -76,6 +79,43 @@ namespace landerist_library.Tasks
                 PuppeteerDownloader.UpdateChrome();
                 TimerLocalAIParsing = new Timer(Scrape, null, OneSecond, ThreeSeconds);
             }
+        }
+
+        private void StartNonOverlappingTimer(
+            ref Timer? timer,
+            TimerCallback callback,
+            string taskName,
+            int dueTime,
+            int period)
+        {
+            Timer? newTimer = null;
+            newTimer = new Timer(state =>
+            {
+                try
+                {
+                    callback(state);
+                }
+                catch (Exception exception)
+                {
+                    Log.WriteError("ServiceTasks " + taskName, exception);
+                }
+                finally
+                {
+                    if (!Stopping && !Disposed)
+                    {
+                        try
+                        {
+                            newTimer?.Change(period, Timeout.Infinite);
+                        }
+                        catch (ObjectDisposedException)
+                        {
+                        }
+                    }
+                }
+            }, null, Timeout.Infinite, Timeout.Infinite);
+
+            timer = newTimer;
+            newTimer.Change(dueTime, Timeout.Infinite);
         }
 
         private static int GetDueTime()
@@ -260,6 +300,7 @@ namespace landerist_library.Tasks
             }
 
             Console.WriteLine("Stopping ServiceTasks ..");
+            Stopping = true;
             Scraper.Stop();
             TaskLocalAIParsing.Stop();
 
