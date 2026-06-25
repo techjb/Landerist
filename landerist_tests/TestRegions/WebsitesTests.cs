@@ -47,7 +47,7 @@ namespace landerist_tests
 
             //WebsitesInserter.InsertWebsite(mainUri, listingUrlRegex, sitemapUrlRegex);
 
-            //Website website = new(hostUri);
+            //Website website = new("www.inmobiliarianucleo.com");
             //website.ReadSitemap();
 
         }
