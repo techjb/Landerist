@@ -41,10 +41,10 @@ namespace landerist_tests
             //WebsitesCleanner.DeleteWebsitesWithoutPublishedListings();
 
 
-            //string hostUri = "www.knightfrank.es";
-            //string mainUri = "https://www.knightfrank.es/";
-            //string sitemapUrlRegex = @"^https:\/\/www\.knightfrank\.es\/(?:sitemap\.xml|sitemaps\/sitemap-pdp-1\.xml)$";
-            //string listingUrlRegex = @"^https:\/\/www\.knightfrank\.es\/properties\/(?:residencial\/en-venta|comercial\/(?:en-venta|en-alquiler))\/(?:[a-z0-9_-]|%[0-9a-f]{2})+\/[a-z]{2,4}\d+(?:-\d+)?[a-z]?\/?$";
+            //string hostUri = "grocasa.com";
+            //string mainUri = "https://grocasa.com/";
+            //string sitemapUrlRegex = @"^https:\/\/grocasa\.com\/sitemaps\/properties\.xml$";
+            //string listingUrlRegex = @"^https:\/\/grocasa\.com\/inmueble\/G[0-9]+_[0-9]+\/[a-z0-9]+(?:-[a-z0-9]+)*$";
             //string indexUrlRegex = listingUrlRegex;
             //string allowebResourceTypes = "Unknown,Beacon,Document,StyleSheet,Script,TextTrack,Xhr,Fetch,EventSource,WebSocket,Manifest,Ping,Other";
             //string? userAgent = null;
