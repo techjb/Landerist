@@ -94,7 +94,29 @@ namespace landerist_library.Websites
             return InsertWebsite(uri);
         }
 
-        public static bool InsertSpecialWebsite(
+        public static bool InsertWebsite(
+            string mainUri,
+            string? listingUrlRegex,
+            string? sitemapUrlRegex)
+        {
+            if (!Uri.TryCreate(mainUri, UriKind.Absolute, out Uri? uri))
+            {
+                return false;
+            }
+
+            return InsertWebsite(
+                mainUri,
+                uri.Host,
+                listingUrlRegex,
+                listingUrlRegex,
+                sitemapUrlRegex,
+                "Unknown,Beacon,Document,StyleSheet,Script,TextTrack,Xhr,Fetch,EventSource,WebSocket,Manifest,Ping,Other",
+                null,
+                null,
+                null);
+        }
+
+        public static bool InsertWebsite(
             string mainUri,
             string host,
             string? listingUrlRegex,

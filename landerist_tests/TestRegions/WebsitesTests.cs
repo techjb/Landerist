@@ -41,16 +41,11 @@ namespace landerist_tests
             //WebsitesCleanner.DeleteWebsitesWithoutPublishedListings();
 
 
-            //string hostUri = "grocasa.com";
-            //string mainUri = "https://grocasa.com/";
-            //string sitemapUrlRegex = @"^https:\/\/grocasa\.com\/sitemaps\/properties\.xml$";
-            //string listingUrlRegex = @"^https:\/\/grocasa\.com\/inmueble\/G[0-9]+_[0-9]+\/[a-z0-9]+(?:-[a-z0-9]+)*$";
-            //string indexUrlRegex = listingUrlRegex;
-            //string allowebResourceTypes = "Unknown,Beacon,Document,StyleSheet,Script,TextTrack,Xhr,Fetch,EventSource,WebSocket,Manifest,Ping,Other";
-            //string? userAgent = null;
-            //string? httpRequestHeaders = null;
+            string mainUri = "https://www.inmobiliarianucleo.com/";
+            string sitemapUrlRegex = @"^https:\/\/www\.inmobiliarianucleo\.com\/sitemap\.xml$";
+            string listingUrlRegex = @"^https:\/\/www\.inmobiliarianucleo\.com\/comprar\/(?:atico|casa-rural|casa|edificio|garaje|local-comercial|piso|terreno|trastero)\/(?:[A-Za-z0-9_-]|%[0-9a-f]{2})+-[A-Za-z0-9]{5}\/?$";
 
-            //WebsitesInserter.InsertSpecialWebsite(mainUri, hostUri, listingUrlRegex, indexUrlRegex, sitemapUrlRegex, allowebResourceTypes, userAgent, httpRequestHeaders);
+            WebsitesInserter.InsertWebsite(mainUri, listingUrlRegex, sitemapUrlRegex);
 
             //Website website = new(hostUri);
             //website.ReadSitemap();

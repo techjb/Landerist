@@ -19,9 +19,9 @@ namespace landerist_tests
             //Pages.DeleteUnpublishedListings();
             //Pages.DeleteUrisLikePrint();
             //Pages.DeleteProhibitedUris();
-            //new Page("https://areagestio.com/propiedades/25974555/").InsertSpecialWebsite();
+            //new Page("https://areagestio.com/propiedades/25974555/").InsertWebsite();
             //var page = new Page("https://www.servihabitat.com/es/venta/vivienda-casa/tarragona-baixcamp-reus/60455486");
-            //page.InsertSpecialWebsite();
+            //page.InsertWebsite();
 
             //Console.WriteLine(WebsitesThrottle.IsBlocked(page.Website));
             //Pages.UpdateNextScrape(); // 30 min (mienstras se ejecuta, hay que parar el scraper)

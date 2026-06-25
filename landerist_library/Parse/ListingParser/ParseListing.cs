@@ -157,7 +157,7 @@ namespace landerist_library.Parse.ListingParser
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteError("ParseListing ParseResponse", exception.ToString());
+                Logs.Log.WriteError("ParseListing ParseResponse", exception.Message + " Text:" + text);
                 return (PageType.MayBeListing, null);
             }
         }

@@ -13,7 +13,7 @@ namespace landerist_library.Parse.Location.Delimitations
         };
 
         // CSV obtained from https://rtr.carto.com/tables/world_countries_geojson/public/map
-        //public static void InsertSpecialWebsite()
+        //public static void InsertWebsite()
         //{
         //    Database.CountriesParser.DeleteAll();
 
@@ -54,7 +54,7 @@ namespace landerist_library.Parse.Location.Delimitations
 
         //        }
 
-        //        if(Database.CountriesParser.InsertSpecialWebsite(the_geom, iso_a3, iso_a2))
+        //        if(Database.CountriesParser.InsertWebsite(the_geom, iso_a3, iso_a2))
         //        {
         //            success++;
         //        }
