@@ -64,13 +64,13 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public decimal? precio_del_anuncio { get; set; } = null;
 
 
-        public const string DescripciónDelAnuncioDescription = "texto plano con la descripción detallada del anuncio";
+        public const string DescripciónDelAnuncioDescription = "texto plano con la descripción del anuncio. Máximo 2000 caracteres. No copies HTML ni JSON embebido";
 
         [Description(DescripciónDelAnuncioDescription)]
         public string? descripción_del_anuncio { get; set; } = null;
 
 
-        public const string ReferenciaDelAnuncioDescription = "código de referencia del anuncio";
+        public const string ReferenciaDelAnuncioDescription = "código de referencia del anuncio. Máximo 100 caracteres";
 
         [Description(ReferenciaDelAnuncioDescription)]
         public string? referencia_del_anuncio { get; set; } = null;
@@ -93,12 +93,12 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public string? email_de_contacto { get; set; } = null;
 
 
-        public const string DirecciónDelInmuebleDescription = "dirección postal completa en la que se encuentra ubicado el inmueble (no confundir con la dirección postal del anunciante)";
+        public const string DirecciónDelInmuebleDescription = "dirección postal completa en la que se encuentra ubicado el inmueble (no confundir con la dirección postal del anunciante). Máximo 500 caracteres";
 
         [Description(DirecciónDelInmuebleDescription)]
         public string? dirección_del_inmueble { get; set; } = null;
 
-        public const string ReferenciaCatastralDescription = "referencia catastral del anuncio (14 o 20 caracteres)";
+        public const string ReferenciaCatastralDescription = "referencia catastral del anuncio (14 o 20 caracteres). Usa null si no aparece claramente";
 
         [Description(ReferenciaCatastralDescription)]
         public string? referencia_catastral { get; set; } = null;

@@ -18,6 +18,21 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             }
         };
 
+        private static readonly Dictionary<string, long> StringMaxLengths = new()
+        {
+            [nameof(StructuredOutputEsJson.fecha_de_publicación)] = 10,
+            [nameof(StructuredOutputEsJson.descripción_del_anuncio)] = 2000,
+            [nameof(StructuredOutputEsJson.referencia_del_anuncio)] = 100,
+            [nameof(StructuredOutputEsJson.nombre_de_contacto)] = 200,
+            [nameof(StructuredOutputEsJson.teléfono_de_contacto)] = 50,
+            [nameof(StructuredOutputEsJson.email_de_contacto)] = 254,
+            [nameof(StructuredOutputEsJson.dirección_del_inmueble)] = 500,
+            [nameof(StructuredOutputEsJson.referencia_catastral)] = 20,
+            [nameof(StructuredOutputEsJson.planta_del_inmueble)] = 50,
+            [nameof(StructuredOutputEsJson.url_de_la_imagen)] = 2048,
+            [nameof(StructuredOutputEsJson.título_de_la_imagen)] = 200,
+        };
+
         public static string GetJsonSchemaString()
         {
             JSchema jSChema = GetJsonSchema();
@@ -26,6 +41,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             ParsePropertyType(jSChema);
             //ParsePropertySubtype(jSChema);
             SetImageArrayLimits(jSChema);
+            SetStringLengthLimits(jSChema);
             SetAdditionalPropertiesFalse(jSChema);
             return jSChema.ToString(SchemaVersion.Draft7);
         }
@@ -183,6 +199,51 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             }
 
             imagesSchema.MaximumItems = StructuredOutputEsJson.MAX_URLS_DE_IMAGENES_DEL_ANUNCIO;
+        }
+
+        private static void SetStringLengthLimits(JSchema jSchema)
+        {
+            SetStringLengthLimits(jSchema, null, []);
+        }
+
+        private static void SetStringLengthLimits(JSchema jSchema, string? propertyName, HashSet<JSchema> visitedSchemas)
+        {
+            if (!visitedSchemas.Add(jSchema))
+            {
+                return;
+            }
+
+            if (propertyName != null &&
+                StringMaxLengths.TryGetValue(propertyName, out var maximumLength) &&
+                (jSchema.Type & JSchemaType.String) == JSchemaType.String)
+            {
+                jSchema.MaximumLength = maximumLength;
+            }
+
+            foreach (var propertySchema in jSchema.Properties)
+            {
+                SetStringLengthLimits(propertySchema.Value, propertySchema.Key, visitedSchemas);
+            }
+
+            foreach (var itemSchema in jSchema.Items)
+            {
+                SetStringLengthLimits(itemSchema, null, visitedSchemas);
+            }
+
+            foreach (var subschema in jSchema.AnyOf)
+            {
+                SetStringLengthLimits(subschema, null, visitedSchemas);
+            }
+
+            foreach (var subschema in jSchema.AllOf)
+            {
+                SetStringLengthLimits(subschema, null, visitedSchemas);
+            }
+
+            foreach (var subschema in jSchema.OneOf)
+            {
+                SetStringLengthLimits(subschema, null, visitedSchemas);
+            }
         }
 
         private static void SetAllOf(JSchema jSchema)

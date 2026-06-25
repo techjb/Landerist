@@ -16,6 +16,7 @@ namespace landerist_library.Parse.ListingParser
             "Solo debes responder que no es un anuncio individual cuando el contenido principal de la página sea claramente un listado de resultados, una página de categoría, una home, una página corporativa o una colección de varias propiedades con peso similar. " +
             "No confundas una ficha de inmueble con un listado solo porque aparezcan varias tarjetas secundarias al final o en una barra lateral. " +
             "En caso de identificar que el HTML corresponde a un único anuncio inmobiliario, extrae los datos relevantes y devuélvelos en formato JSON válido que siga estrictamente el esquema. " +
+            "Respeta estrictamente los límites maxItems y maxLength del esquema. No copies HTML ni JSON embebido dentro de campos de texto. " +
             "Si faltan algunos datos, mantén la clasificación como anuncio individual y usa null en los campos que no puedas inferir. " +
             "No incluyas explicaciones ni texto adicional ni markdown.";
     }
