@@ -92,7 +92,7 @@ namespace landerist_library.Parse.ListingParser.LocalAI
                 messages = new[]
                 {
                     new { role = "system", content = GetExtendedSystemPrompt() },
-                    new { role = "user", content = text }
+                    new { role = "user", content = NormalizeUserInput(text) }
                 },
                 response_format = new
                 {
@@ -100,6 +100,11 @@ namespace landerist_library.Parse.ListingParser.LocalAI
                     json_schema = OpenAIRequest.OpenAIJsonSchema
                 }
             };
+        }
+
+        private static string NormalizeUserInput(string text)
+        {
+            return text.Replace('"', '”');
         }
 
         private static string GetExtendedSystemPrompt()

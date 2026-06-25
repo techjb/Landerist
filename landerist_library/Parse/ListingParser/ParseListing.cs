@@ -136,10 +136,9 @@ namespace landerist_library.Parse.ListingParser
                 return (PageType.MayBeListing, null);
             }
 
-            var repairedText = JsonResponseRepairer.EscapeUnescapedStringValueQuotes(text);
             try
             {
-                var structuredOutputEs = DeserializeStructuredOutput(repairedText);
+                var structuredOutputEs = DeserializeStructuredOutput(text);
                 if (structuredOutputEs == null)
                 {
                     throw new Exception("StructuredOutputEs is null");
