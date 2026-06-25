@@ -128,6 +128,7 @@ namespace landerist_library.Parse.ListingParser
                 && page.Website.MatchesListingUrlRegex(page.Uri);
         }
 
+       
         public static (PageType pageType, Listing? listing) ParseResponse(Page page, string? text)
         {
             if (string.IsNullOrWhiteSpace(text))
@@ -135,19 +136,10 @@ namespace landerist_library.Parse.ListingParser
                 return (PageType.MayBeListing, null);
             }
 
+            var repairedText = JsonResponseRepairer.EscapeUnescapedStringValueQuotes(text);
             try
             {
-                StructuredOutputEs? structuredOutputEs;
-                if (Config.LLM_PROVIDER == LLMProvider.VertexAI)
-                {
-                    var structuredOutputVertexAIEs = JsonConvert.DeserializeObject<StructuredOutputVertexAIEs>(text, JsonSerializerSettings);
-                    structuredOutputEs = structuredOutputVertexAIEs?.Parse();
-                }
-                else
-                {
-                    structuredOutputEs = JsonConvert.DeserializeObject<StructuredOutputEs>(text, JsonSerializerSettings);
-                }
-
+                var structuredOutputEs = DeserializeStructuredOutput(repairedText);
                 if (structuredOutputEs == null)
                 {
                     throw new Exception("StructuredOutputEs is null");
@@ -157,9 +149,21 @@ namespace landerist_library.Parse.ListingParser
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteError("ParseListing ParseResponse", exception.Message + " Text:" + text);
+                Logs.Log.WriteError("ParseListing ParseResponse", exception.Message);
                 return (PageType.MayBeListing, null);
             }
         }
+
+        private static StructuredOutputEs? DeserializeStructuredOutput(string text)
+        {
+            if (Config.LLM_PROVIDER == LLMProvider.VertexAI)
+            {
+                var structuredOutputVertexAIEs = JsonConvert.DeserializeObject<StructuredOutputVertexAIEs>(text, JsonSerializerSettings);
+                return structuredOutputVertexAIEs?.Parse();
+            }
+
+            return JsonConvert.DeserializeObject<StructuredOutputEs>(text, JsonSerializerSettings);
+        }
+
     }
 }
