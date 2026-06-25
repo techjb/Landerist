@@ -396,7 +396,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             }
             MediaParser mediaParser = new(page);
             var list = new List<(string url, string? title)>();
-            foreach (var img in Anuncio!.ImagenesDelAnuncio)
+            foreach (var img in Anuncio!.ImagenesDelAnuncio.Take((int)StructuredOutputEsJson.MAX_URLS_DE_IMAGENES_DEL_ANUNCIO))
             {
                 if (img is null || string.IsNullOrWhiteSpace(img.Url))
                 {

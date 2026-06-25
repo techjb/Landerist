@@ -228,7 +228,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public bool? tiene_sistemas_de_seguridad { get; set; } = null;
 
 
-        public const string ImagenesDelAnuncio = "Diez imágenes del anuncio";
+        public const string ImagenesDelAnuncio = "Hasta diez imágenes del anuncio";
         [Description(ImagenesDelAnuncio)]
         public string? imágenes_del_anuncio { get; set; } = null;
 

@@ -25,6 +25,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             //SetAllOf(jSChema); // problems in vllm
             ParsePropertyType(jSChema);
             //ParsePropertySubtype(jSChema);
+            SetImageArrayLimits(jSChema);
             SetAdditionalPropertiesFalse(jSChema);
             return jSChema.ToString(SchemaVersion.Draft7);
         }
@@ -168,6 +169,22 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         {
             jSchema.SchemaVersion = new Uri("http://json-propertyTypeSchema.org/draft-07/propertyTypeSchema#");
         }
+
+        private static void SetImageArrayLimits(JSchema jSchema)
+        {
+            if (!jSchema.Properties.TryGetValue(StructuredOutputEsJson.FunctionNameListing, out var listingSchema))
+            {
+                return;
+            }
+
+            if (!listingSchema.Properties.TryGetValue(nameof(StructuredOutputEsJson.imágenes_del_anuncio), out var imagesSchema))
+            {
+                return;
+            }
+
+            imagesSchema.MaximumItems = StructuredOutputEsJson.MAX_URLS_DE_IMAGENES_DEL_ANUNCIO;
+        }
+
         private static void SetAllOf(JSchema jSchema)
         {
             var condition = new JSchema
