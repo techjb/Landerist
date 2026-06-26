@@ -71,9 +71,14 @@ namespace landerist_library.Websites
             return GetNumPagesSince("Inserted", insertedFrom);
         }
 
+        public int GetNumPagesParseListingSince(DateTime lastParseListingFrom)
+        {
+            return GetNumPagesSince("LastParseListing", lastParseListingFrom);
+        }
+
         private int GetNumPagesSince(string dateColumn, DateTime dateFrom)
         {
-            if (dateColumn != "LastScrape" && dateColumn != "Inserted")
+            if (dateColumn != "LastScrape" && dateColumn != "Inserted" && dateColumn != "LastParseListing")
             {
                 throw new ArgumentException("Unexpected date column.", nameof(dateColumn));
             }

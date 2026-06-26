@@ -20,6 +20,7 @@ namespace landerist_library.Landerist_com
         private const int RecentListingsDays = 7;
         private const int RecentScrapedPagesDays = 3;
         private const int RecentInsertedPagesDays = 3;
+        private const int RecentParseListingPagesDays = 3;
 
         public static void Update()
         {
@@ -63,6 +64,7 @@ namespace landerist_library.Landerist_com
             int totalPages = website.GetNumPages();
             int recentScrapedPages = website.GetNumPagesScrapedSince(DateTime.Now.AddDays(-RecentScrapedPagesDays));
             int recentInsertedPages = website.GetNumPagesInsertedSince(DateTime.Now.AddDays(-RecentInsertedPagesDays));
+            int recentParseListingPages = website.GetNumPagesParseListingSince(DateTime.Now.AddDays(-RecentParseListingPagesDays));
             int totalListings = website.GetNumListings();
             int recentListings = website.GetNumListingsSinceListingDate(DateTime.Now.AddDays(-RecentListingsDays));
             int publishedListings = website.GetNumPublishedListings();
@@ -76,6 +78,7 @@ namespace landerist_library.Landerist_com
                 $"                            {FormatTableCell(FormatNumber(totalPages), FormatNumberSortValue(totalPages))}" + Environment.NewLine +
                 $"                            {FormatTableCell(FormatPercentage(recentScrapedPages, totalPages), FormatPercentageSortValue(recentScrapedPages, totalPages))}" + Environment.NewLine +
                 $"                            {FormatTableCell(FormatPercentage(recentInsertedPages, totalPages), FormatPercentageSortValue(recentInsertedPages, totalPages))}" + Environment.NewLine +
+                $"                            {FormatTableCell(FormatPercentage(recentParseListingPages, totalPages), FormatPercentageSortValue(recentParseListingPages, totalPages))}" + Environment.NewLine +
                 $"                            {FormatTableCell(FormatNumber(totalListings), FormatNumberSortValue(totalListings))}" + Environment.NewLine +
                 $"                            {FormatTableCell(FormatPercentage(recentListings, totalListings), FormatPercentageSortValue(recentListings, totalListings))}" + Environment.NewLine +
                 $"                            {FormatTableCell(FormatPercentage(publishedListings, totalListings), FormatPercentageSortValue(publishedListings, totalListings))}" + Environment.NewLine +
