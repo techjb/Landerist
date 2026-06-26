@@ -29,6 +29,8 @@ namespace landerist_library.Parse.ListingParser
 
         public static (PageType pageType, Listing? listing, bool waitingAIRequest) Parse(Page page)
         {
+            page.SetLastParseListing();
+
             if (Config.BATCH_ENABLED)
             {
                 return (PageType.MayBeListing, null, true);

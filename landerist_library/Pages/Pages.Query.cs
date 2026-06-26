@@ -139,6 +139,7 @@ namespace landerist_library.Pages
                     "INSERTED.[UriHash], " +
                     "INSERTED.[Inserted], " +
                     "INSERTED.[LastScrape], " +
+                    "INSERTED.[LastParseListing], " +
                     "INSERTED.[NextScrape], " +
                     "INSERTED.[HttpStatusCode], " +
                     "INSERTED.[Etag], " +
@@ -253,6 +254,7 @@ namespace landerist_library.Pages
                 "[UriHash], " +
                 "[Inserted], " +
                 "[LastScrape], " +
+                "[LastParseListing], " +
                 "[NextScrape], " +
                 "[HttpStatusCode], " +
                 "[Etag], " +
@@ -299,6 +301,7 @@ namespace landerist_library.Pages
                     "INSERTED.[UriHash], " +
                     "INSERTED.[Inserted], " +
                     "INSERTED.[LastScrape], " +
+                    "INSERTED.[LastParseListing], " +
                     "INSERTED.[NextScrape], " +
                     "INSERTED.[HttpStatusCode], " +
                     "INSERTED.[Etag], " +
@@ -418,6 +421,7 @@ namespace landerist_library.Pages
                 pagesTableName + ".[UriHash], " +
                 pagesTableName + ".[Inserted], " +
                 pagesTableName + ".[LastScrape], " +
+                pagesTableName + ".[LastParseListing], " +
                 pagesTableName + ".[NextScrape], " +
                 pagesTableName + ".[HttpStatusCode], " +
                 pagesTableName + ".[Etag], " +

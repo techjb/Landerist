@@ -19,6 +19,8 @@ namespace landerist_library.Pages
 
         public DateTime? LastScrape { get; set; }
 
+        public DateTime? LastParseListing { get; set; }
+
         public DateTime? NextScrape { get; set; }
 
         public short? HttpStatusCode { get; set; }

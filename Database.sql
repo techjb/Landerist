@@ -307,6 +307,7 @@ CREATE TABLE [dbo].[PAGES](
 	[UriHash] [char](64) NOT NULL,
 	[Inserted] [datetime] NOT NULL,
 	[LastScrape] [datetime] NULL,
+	[LastParseListing] [datetime] NULL,
 	[NextScrape] [datetime] NULL,
 	[HttpStatusCode] [smallint] NULL,
 	[PageType] [varchar](50) NULL,
