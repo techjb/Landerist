@@ -122,7 +122,7 @@ namespace landerist_library.Pages
                 "[TokenCount] = @TokenCount " +
                 "WHERE [UriHash] = @UriHash";
 
-            var sucess = new DataBase().Query(query, new Dictionary<string, object?> {
+            var updated = new DataBase().Query(query, new Dictionary<string, object?> {
                 {"LastScrape", LastScrape },
                 {"NextScrape", NextScrape },
                 {"HttpStatusCode", HttpStatusCode},
@@ -139,13 +139,13 @@ namespace landerist_library.Pages
                 {"ResponseBodyZipped", ResponseBodyZipped},
                 {"TokenCount", TokenCount},
                 {"UriHash", UriHash },
-            });
+            }, out Exception? exception);
 
-            if (!sucess)
+            if (!updated && exception != null)
             {
-                Logs.Log.WriteError("Page Update", "Failed to update page: " + Uri);
+                Logs.Log.WriteError("Page.Persistence Update", "Failed to update page: " + Uri + " Message: " + exception.Message);
             }
-            return sucess;
+            return updated;
         }
 
         public void SetLastScrape()
