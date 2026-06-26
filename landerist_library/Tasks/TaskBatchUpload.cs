@@ -372,7 +372,7 @@ namespace landerist_library.Tasks
                 }
             });
 
-            Log.WriteBatch("TaskBatchUpload", "SetWaitingAIRequestToAllPages: " + counter + "/" + pages.Count);
+            //Log.WriteBatch("TaskBatchUpload", "SetWaitingAIRequestToAllPages: " + counter + "/" + pages.Count);
         }
     }
 }
