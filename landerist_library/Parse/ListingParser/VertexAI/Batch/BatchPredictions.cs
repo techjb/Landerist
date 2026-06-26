@@ -94,7 +94,10 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                     }
                 }
             }
-            Log.WriteInfo("BatchPredictions Clean", "Jobs: " + total + " Deleted: " + deleted);
+            if (deleted > 0)
+            {
+                Log.WriteInfo("BatchPredictions Clean", "Deleted: " + deleted + "/" + total);
+            }
         }
 
         public static bool DeleteBatchPredictionJob(JobServiceClient jobServiceClient, string name)
