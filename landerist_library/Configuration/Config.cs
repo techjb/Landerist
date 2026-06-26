@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "5.62";
+        public static readonly string VERSION = "5.63";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -126,10 +126,9 @@ namespace landerist_library.Configuration
         public static readonly string VERTEXT_AI_MODEL_NAME_GEMINI_FLASH = "gemini-2.5-flash";
 
         public static readonly string VERTEXT_AI_MODEL_NAME_GEMINI_FLASH_LITE = "gemini-2.5-flash-lite";
-
        
 
-        public const int LOCAL_AI_MAX_MODEL_LEN = 20000; // same as in localAI server
+        public const int LOCAL_AI_MAX_MODEL_LEN = 60000; // same as in localAI server
 
         public static bool HEADLESS_BROWSER { get; set; }
 
