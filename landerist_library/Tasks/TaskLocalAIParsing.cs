@@ -12,7 +12,7 @@ namespace landerist_library.Tasks
     {
         private const int MAX_PAGES_PER_TASK = 100;
         private const int MAX_NUM_SEQS = 4; // same as un vllm        
-        private const int COMPLETION_TOKENS = 7000;  // structured output and completion tokens aproximately
+        private const int COMPLETION_TOKENS = 20000;  // structured output and completion tokens aproximately
         private readonly int MAX_TOKEN_COUNT;
 
         private int TotalProcessed = 0;
