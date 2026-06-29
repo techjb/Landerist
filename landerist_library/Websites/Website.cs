@@ -27,6 +27,8 @@ namespace landerist_library.Websites
 
         public string? ListingUrlRegex { get; set; }
 
+        public string? ListingCoordinateRegex { get; set; }
+
         public string? ListingHtmlRemoveXPath { get; set; }
 
         public string? NavigationWaitSelector { get; set; }
@@ -101,6 +103,7 @@ namespace landerist_library.Websites
                 RobotsTxt = null;
                 IndexUrlRegex = null;
                 SitemapUrlRegex = null;
+                ListingCoordinateRegex = null;
                 ListingHtmlRemoveXPath = null;
                 NavigationWaitSelector = null;
                 AllowedResourceTypes = null;

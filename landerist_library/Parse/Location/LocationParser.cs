@@ -56,12 +56,17 @@ namespace landerist_library.Parse.Location
                 return;
             }
 
+            var htmlDocument = Page.GetHtmlDocument();
+            if (htmlDocument != null && AddListingCoordinateRegexLatLng(htmlDocument))
+            {
+                return;
+            }
+
             if (AddAddressLatLng())
             {
                 return;
             }
 
-            var htmlDocument = Page.GetHtmlDocument();
             if (htmlDocument != null && AddHtmlLatLng(htmlDocument))
             {
                 return;
@@ -83,6 +88,22 @@ namespace landerist_library.Parse.Location
         private bool AddHtmlLatLng(HtmlDocument htmlDocument)
         {
             return HtmlLocationExtractor.TryExtract(htmlDocument, out var candidate) &&
+                AddLocationCandidate(candidate);
+        }
+
+        private bool AddListingCoordinateRegexLatLng(HtmlDocument htmlDocument)
+        {
+            var regexPattern = Page.Website.ListingCoordinateRegex;
+            if (string.IsNullOrWhiteSpace(regexPattern))
+            {
+                return false;
+            }
+
+            return HtmlLocationExtractor.TryExtractRegex(
+                htmlDocument.DocumentNode.InnerHtml,
+                regexPattern,
+                LocationCandidateSources.ListingCoordinateRegex,
+                out var candidate) &&
                 AddLocationCandidate(candidate);
         }
 

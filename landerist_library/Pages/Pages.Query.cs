@@ -165,6 +165,7 @@ namespace landerist_library.Pages
                     "W.[IndexUrlRegex], " +
                     "W.[SitemapUrlRegex], " +
                     "W.[ListingUrlRegex]," +
+                    "W.[ListingCoordinateRegex], " +
                     "W.[ListingHtmlRemoveXPath], " +
                     "W.[NavigationWaitSelector], " +
                     "W.[AllowedResourceTypes], " +
@@ -327,6 +328,7 @@ namespace landerist_library.Pages
                     "W.[IndexUrlRegex], " +
                     "W.[SitemapUrlRegex], " +
                     "W.[ListingUrlRegex]," +
+                    "W.[ListingCoordinateRegex], " +
                     "W.[ListingHtmlRemoveXPath], " +
                     "W.[NavigationWaitSelector], " +
                     "W.[AllowedResourceTypes], " +
@@ -447,6 +449,7 @@ namespace landerist_library.Pages
                 Websites.Websites.WEBSITES + ".[IndexUrlRegex], " +
                 Websites.Websites.WEBSITES + ".[SitemapUrlRegex], " +
                 Websites.Websites.WEBSITES + ".[ListingUrlRegex], " +
+                Websites.Websites.WEBSITES + ".[ListingCoordinateRegex], " +
                 Websites.Websites.WEBSITES + ".[ListingHtmlRemoveXPath], " +
                 Websites.Websites.WEBSITES + ".[NavigationWaitSelector], " +
                 Websites.Websites.WEBSITES + ".[AllowedResourceTypes], " +

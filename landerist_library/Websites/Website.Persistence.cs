@@ -53,6 +53,9 @@ namespace landerist_library.Websites
             ListingUrlRegex = dataRow["ListingUrlRegex"] is not DBNull
                 ? dataRow["ListingUrlRegex"].ToString()
                 : null;
+            ListingCoordinateRegex = dataRow.Table.Columns.Contains("ListingCoordinateRegex") && dataRow["ListingCoordinateRegex"] is not DBNull
+                ? NullIfWhiteSpace(dataRow["ListingCoordinateRegex"].ToString())
+                : null;
             ListingHtmlRemoveXPath = dataRow["ListingHtmlRemoveXPath"] is not DBNull
                 ? dataRow["ListingHtmlRemoveXPath"].ToString()
                 : null;
@@ -86,9 +89,9 @@ namespace landerist_library.Websites
             string query =
                 "INSERT INTO " + Websites.WEBSITES + " (" +
                 "[MainUri], [Host], [LanguageCode], [CountryCode], [RobotsTxt], [RobotsTxtUpdated], " +
-                "[SitemapUpdated], [IpAddress], [IpAddressUpdated], [IndexUrlRegex], [SitemapUrlRegex], [ListingUrlRegex], [ListingHtmlRemoveXPath], [NavigationWaitSelector], [AllowedResourceTypes], [BlockedDomains], [UserAgent], [HttpRequestHeaders], [HtmlIndexingEnabled], [UseProxy], [MinimumRequestIntervalMilliseconds]) VALUES (" +
+                "[SitemapUpdated], [IpAddress], [IpAddressUpdated], [IndexUrlRegex], [SitemapUrlRegex], [ListingUrlRegex], [ListingCoordinateRegex], [ListingHtmlRemoveXPath], [NavigationWaitSelector], [AllowedResourceTypes], [BlockedDomains], [UserAgent], [HttpRequestHeaders], [HtmlIndexingEnabled], [UseProxy], [MinimumRequestIntervalMilliseconds]) VALUES (" +
                 "@MainUri, @Host, @LanguageCode, @CountryCode, @RobotsTxt, @RobotsTxtUpdated, " +
-                "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @IndexUrlRegex, @SitemapUrlRegex, @ListingUrlRegex, @ListingHtmlRemoveXPath, @NavigationWaitSelector, @AllowedResourceTypes, @BlockedDomains, @UserAgent, @HttpRequestHeaders, @HtmlIndexingEnabled, @UseProxy, @MinimumRequestIntervalMilliseconds)";
+                "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @IndexUrlRegex, @SitemapUrlRegex, @ListingUrlRegex, @ListingCoordinateRegex, @ListingHtmlRemoveXPath, @NavigationWaitSelector, @AllowedResourceTypes, @BlockedDomains, @UserAgent, @HttpRequestHeaders, @HtmlIndexingEnabled, @UseProxy, @MinimumRequestIntervalMilliseconds)";
 
             var parameters = GetQueryParameters();
             return new DataBase().Query(query, parameters);
@@ -109,6 +112,7 @@ namespace landerist_library.Websites
                 "[IndexUrlRegex] = @IndexUrlRegex, " +
                 "[SitemapUrlRegex] = @SitemapUrlRegex, " +
                 "[ListingUrlRegex] = @ListingUrlRegex, " +
+                "[ListingCoordinateRegex] = @ListingCoordinateRegex, " +
                 "[ListingHtmlRemoveXPath] = @ListingHtmlRemoveXPath, " +
                 "[NavigationWaitSelector] = @NavigationWaitSelector, " +
                 "[AllowedResourceTypes] = @AllowedResourceTypes, " +
@@ -139,6 +143,7 @@ namespace landerist_library.Websites
                 {"IndexUrlRegex", IndexUrlRegex },
                 {"SitemapUrlRegex", SitemapUrlRegex },
                 {"ListingUrlRegex", ListingUrlRegex },
+                {"ListingCoordinateRegex", NullIfWhiteSpace(ListingCoordinateRegex) },
                 {"ListingHtmlRemoveXPath", ListingHtmlRemoveXPath },
                 {"NavigationWaitSelector", NullIfWhiteSpace(NavigationWaitSelector) },
                 {"AllowedResourceTypes", AllowedResourceTypes },

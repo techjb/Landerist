@@ -406,6 +406,7 @@ CREATE TABLE [dbo].[WEBSITES](
 	[IpAddress] [nvarchar](50) NULL,
 	[IpAddressUpdated] [datetime] NULL,
 	[ListingUrlRegex] [nvarchar](500) NULL,
+	[ListingCoordinateRegex] [nvarchar](max) NULL,
 	[IndexUrlRegex] [nvarchar](500) NULL,
 	[SitemapUrlRegex] [nvarchar](500) NULL,
 	[HtmlIndexingEnabled] [bit] NOT NULL,
