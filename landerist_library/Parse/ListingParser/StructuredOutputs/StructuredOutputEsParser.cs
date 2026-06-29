@@ -79,7 +79,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
                 ? ListingStatus.unpublished
                 : ListingStatus.published;
         }
-      
+
         private DateTime GetListingDate()
         {
             var now = DateTime.Now;
@@ -239,7 +239,12 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
                 return null;
             }
             char[] trimChars = { '*', '-', ' ', ',', '.' };
-            return Tools.Strings.Clean(Anuncio!.DirecciónDelInmueble).Trim(trimChars);
+            var address = Tools.Strings.Clean(Anuncio!.DirecciónDelInmueble).Trim(trimChars);
+            if (string.IsNullOrEmpty(address))
+            {
+                return null;
+            }
+            return address;
         }
 
         private string? GetCadastralReference()
