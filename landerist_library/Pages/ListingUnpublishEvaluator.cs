@@ -41,7 +41,8 @@ namespace landerist_library.Pages
                 _page.IsNotListingByParser() ||
                 _page.IsNotListingByCache() ||
                 _page.IsNotCanonical() ||
-                _page.IsRedirectToAnotherUrl()               
+                _page.IsRedirectToAnotherUrl() ||
+                _page.IsHttpStatusCodeNotOK()
                 ;
         }
 
