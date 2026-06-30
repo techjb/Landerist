@@ -19,7 +19,7 @@ namespace landerist_tests
             //new Scraper().Start();
             //new Scraper().Scrape(page, false);
 
-            new landerist_library.Scrape.Scraper().Scrape("https://www.alisedainmobiliaria.com/inmueble/43423928", false);
+            //new landerist_library.Scrape.Scraper().Scrape("https://www.alisedainmobiliaria.com/inmueble/43423928", false);
             //new landerist_library.Scrape.Scraper().TryApplyPreClassificationBeforeDownload(new landerist_library.Pages.Page("https://www.iadespana.es/anuncios/aspe-03680/venta/casa"));
             //new Scraper().TestSinglePage();
             //landerist_library.Scrape.PageSelector.SelectTop1();
