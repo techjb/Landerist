@@ -203,7 +203,7 @@ namespace landerist_library.Tasks
             }
         }
 
-        public void ProcessPage(string uriHash)
+        public static void ProcessPage(string uriHash)
         {
             var page = Pages.Pages.GetPage(uriHash);
             if (page == null)
@@ -214,7 +214,7 @@ namespace landerist_library.Tasks
             ProcessPage(page);
         }
 
-        private (bool Success, PageType? PageType) ProcessPage(Page page)
+        private static (bool Success, PageType? PageType) ProcessPage(Page page)
         {
             bool success = false;
             PageType? newPageType = null;

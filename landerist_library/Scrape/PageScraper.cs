@@ -52,7 +52,7 @@ namespace landerist_library.Scrape
 
         private bool TryApplyNotModifiedBeforeDownload()
         {
-            if (!CanCheckConditionalHeaders())
+            if (!CanCheckConditionalHeaders() || Config.IsConfigurationLocal())
             {
                 return false;
             }
@@ -84,7 +84,7 @@ namespace landerist_library.Scrape
 
         private bool CanCheckConditionalHeaders()
         {
-            return _page.PageType.HasValue &&                
+            return _page.PageType.HasValue &&
                 (!string.IsNullOrWhiteSpace(_page.Etag) || !string.IsNullOrWhiteSpace(_page.LastModified));
         }
 
