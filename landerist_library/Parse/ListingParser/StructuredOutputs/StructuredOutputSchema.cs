@@ -37,7 +37,6 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         {
             JSchema jSChema = GetJsonSchema();
             SetSchemaVersion(jSChema);
-            //SetAllOf(jSChema); // problems in vllm
             ParsePropertyType(jSChema);
             //ParsePropertySubtype(jSChema);
             SetImageArrayLimits(jSChema);
@@ -244,28 +243,6 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             {
                 SetStringLengthLimits(subschema, null, visitedSchemas);
             }
-        }
-
-        private static void SetAllOf(JSchema jSchema)
-        {
-            var condition = new JSchema
-            {
-                If = new JSchema
-                {
-                    Properties =
-                    {
-                        [StructuredOutputEsJson.FunctionNameIsListing] = new JSchema
-                        {
-                            Enum = { new JValue(true) }
-                        }
-                    }
-                },
-                Then = new JSchema
-                {
-                    Required = { StructuredOutputEsJson.FunctionNameListing }
-                }
-            };
-            jSchema.AllOf.Add(condition);
         }
 
         private static void SetAdditionalPropertiesFalse(JSchema jSchema)

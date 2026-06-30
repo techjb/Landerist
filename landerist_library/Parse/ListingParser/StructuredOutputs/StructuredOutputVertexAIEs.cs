@@ -4,11 +4,6 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
 {
     public class StructuredOutputVertexAIEs
     {
-        [JsonProperty(StructuredOutputEsJson.FunctionNameIsListing, Required = Required.Always)]
-        [System.ComponentModel.Description(StructuredOutputEsJson.FunctionNameIsListingDescription)]
-        public bool EsUnAnuncio { get; private set; }
-
-
         [JsonProperty(StructuredOutputEsJson.FunctionNameListing, Required = Required.Default)]
         [System.ComponentModel.Description(StructuredOutputEsJson.FunctionNameListingDescription)]
         public Anuncio2? Anuncio { get; private set; }
@@ -17,7 +12,6 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         {
             return new StructuredOutputEs
             {
-                EsUnAnuncio = EsUnAnuncio,
                 Anuncio = Anuncio?.Parse(),
             };
         }

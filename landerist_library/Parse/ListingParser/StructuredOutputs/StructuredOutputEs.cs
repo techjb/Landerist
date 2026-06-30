@@ -83,11 +83,6 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
 
     public class StructuredOutputEs
     {
-        [JsonProperty(StructuredOutputEsJson.FunctionNameIsListing, Required = Required.Always)]
-        [System.ComponentModel.Description(StructuredOutputEsJson.FunctionNameIsListingDescription)]
-        public bool EsUnAnuncio { get; set; }
-
-
         [JsonProperty(StructuredOutputEsJson.FunctionNameListing, Required = Required.AllowNull)]
         [System.ComponentModel.Description(StructuredOutputEsJson.FunctionNameListingDescription)]
         public Anuncio? Anuncio { get; set; }

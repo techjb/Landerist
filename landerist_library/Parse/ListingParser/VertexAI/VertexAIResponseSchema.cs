@@ -14,11 +14,6 @@ namespace landerist_library.Parse.ListingParser.VertexAI
             Type = Google.Cloud.AIPlatform.V1.Type.Object,
             Properties =
             {
-                [StructuredOutputEsJson.FunctionNameIsListing] = new()
-                {
-                    Type = Google.Cloud.AIPlatform.V1.Type.Boolean,
-                    Description = StructuredOutputEsJson.FunctionNameIsListingDescription,
-                },
                 [StructuredOutputEsJson.FunctionNameListing]= new()
                 {
                     Description =StructuredOutputEsJson.FunctionNameListingDescription,
@@ -284,7 +279,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                     },
                 }
             },
-            Required = { StructuredOutputEsJson.FunctionNameIsListing }
+            Required = { StructuredOutputEsJson.FunctionNameListing }
         };
 
         public static RepeatedField<string> GetEnumValues(System.Type enumType)

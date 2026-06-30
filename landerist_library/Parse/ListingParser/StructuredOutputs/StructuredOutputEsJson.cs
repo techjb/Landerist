@@ -15,7 +15,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
 
         public const string FunctionNameListing = "anuncio";
 
-        public const string FunctionNameListingDescription = "En caso de ser un anuncio, contiene los datos del anuncio.";
+        public const string FunctionNameListingDescription = "Contiene los datos del anuncio. Si el HTML no corresponde a un anuncio inmobiliario, debe ser null.";
 
 #pragma warning disable IDE1006
 

@@ -8,13 +8,11 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
 {
     public class StructuredOutputEsParser(StructuredOutputEs structuredOutputEs)
     {
-        public bool EsUnAnuncio = structuredOutputEs.EsUnAnuncio;
-
         public Anuncio? Anuncio = structuredOutputEs.Anuncio;
 
         public (PageType pageType, Listing? listing) Parse(Page page)
         {
-            if (!EsUnAnuncio || Anuncio == null)
+            if (Anuncio == null)
             {
                 return (PageType.NotListingByParser, null);
             }
