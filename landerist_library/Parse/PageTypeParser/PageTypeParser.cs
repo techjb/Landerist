@@ -90,7 +90,7 @@ namespace landerist_library.Parse.PageTypeParser
                 return (PageType.ResponseBodyIsError, null, false);
             }
 
-            if (Page.IsNotListingCache() && isProduction)
+            if (Configuration.Config.NOT_LISTING_CACHE_ENABLED && Page.IsNotListingCache() && isProduction)
             {
                 GlobalStatistics.InsertDailyCounter(StatisticsKey.NotListingCache);
                 HostStatistics.InsertDailyCounter(Page.Host, HostStatisticsKey.NotListingCache);

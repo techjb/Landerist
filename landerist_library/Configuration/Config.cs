@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "5.67";
+        public static readonly string VERSION = "5.69";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -129,6 +129,8 @@ namespace landerist_library.Configuration
        
 
         public const int LOCAL_AI_MAX_MODEL_LEN = 30000; 
+
+        public const bool NOT_LISTING_CACHE_ENABLED = false;
 
         public static bool HEADLESS_BROWSER { get; set; }
 

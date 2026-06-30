@@ -6,7 +6,7 @@
 
         public static bool Insert(string host, string listingParserInputHash)
         {
-            if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(listingParserInputHash))
+            if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(listingParserInputHash) || !Configuration.Config.NOT_LISTING_CACHE_ENABLED)
             {
                 return false;
             }
@@ -24,7 +24,7 @@
 
         public static bool IsNotListing(string host, string listingParserInputHash)
         {
-            if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(listingParserInputHash))
+            if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(listingParserInputHash) || !Configuration.Config.NOT_LISTING_CACHE_ENABLED)
             {
                 return false;
             }
