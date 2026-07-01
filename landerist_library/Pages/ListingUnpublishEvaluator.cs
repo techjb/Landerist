@@ -1,10 +1,27 @@
 namespace landerist_library.Pages
 {
+    public sealed record ListingUnpublishDecision(
+        bool ShouldUnpublish,
+        ListingUnpublishDecisionReason Reason,
+        PageType? PageType,
+        int ActualEvidenceCount,
+        int? RequiredEvidenceCount);
+
+    public enum ListingUnpublishDecisionReason
+    {
+        ListingStatusIsNotPublished,
+        PageTypeIsListing,
+        PageTypeMayBeListing,
+        NoUnpublishEvidence,
+        EvidenceCounterBelowRequired,
+        EvidenceCounterReachedRequired
+    }
+
     public class ListingUnpublishEvaluator
     {
-        private const int GoneCounter = 1;
-        private const int StrongEvidenceCounter = 2;
-        private const int DefaultEvidenceCounter = 3;
+        private const int RequiredGoneEvidenceCount = 1;
+        private const int RequiredStrongEvidenceCount = 2;
+        private const int RequiredDefaultEvidenceCount = 3;
         private readonly Page _page;
 
         public ListingUnpublishEvaluator(Page page)
@@ -15,35 +32,68 @@ namespace landerist_library.Pages
 
         public bool ShouldUnpublish()
         {
-            if (!_page.IsListingStatusPublished())
-            {
-                return false;
-            }
-
-            if (_page.IsListing() || _page.IsMayBeListing())
-            {
-                return false;
-            }
-
-            var requiredCounter = GetRequiredCounter();
-            if (requiredCounter is null)
-            {
-                return false;
-            }
-
-            return (_page.PageTypeCounter ?? 0) >= requiredCounter;
+            return Evaluate().ShouldUnpublish;
         }
 
-        private int? GetRequiredCounter()
+        public ListingUnpublishDecision Evaluate()
+        {
+            if (!_page.IsListingStatusPublished())
+            {
+                return CreateDecision(false, ListingUnpublishDecisionReason.ListingStatusIsNotPublished, null);
+            }
+
+            if (_page.IsListing())
+            {
+                return CreateDecision(false, ListingUnpublishDecisionReason.PageTypeIsListing, null);
+            }
+
+            if (_page.IsMayBeListing())
+            {
+                return CreateDecision(false, ListingUnpublishDecisionReason.PageTypeMayBeListing, null);
+            }
+
+            var requiredEvidenceCount = GetRequiredEvidenceCount();
+            if (requiredEvidenceCount is null)
+            {
+                return CreateDecision(false, ListingUnpublishDecisionReason.NoUnpublishEvidence, null);
+            }
+
+            if (GetActualEvidenceCount() < requiredEvidenceCount)
+            {
+                return CreateDecision(false, ListingUnpublishDecisionReason.EvidenceCounterBelowRequired, requiredEvidenceCount);
+            }
+
+            return CreateDecision(true, ListingUnpublishDecisionReason.EvidenceCounterReachedRequired, requiredEvidenceCount);
+        }
+
+        private ListingUnpublishDecision CreateDecision(
+            bool shouldUnpublish,
+            ListingUnpublishDecisionReason reason,
+            int? requiredEvidenceCount)
+        {
+            return new ListingUnpublishDecision(
+                shouldUnpublish,
+                reason,
+                _page.PageType,
+                GetActualEvidenceCount(),
+                requiredEvidenceCount);
+        }
+
+        private int GetActualEvidenceCount()
+        {
+            return _page.PageTypeCounter ?? 0;
+        }
+
+        private int? GetRequiredEvidenceCount()
         {
             return _page.PageType switch
             {
-                PageType.HttpStatusCodeGone => GoneCounter,
-                PageType.HttpStatusCodeNotFound => StrongEvidenceCounter,
-                PageType.NotListingByWebsiteRule => StrongEvidenceCounter,
-                PageType.DiscardedByListingUrlRegex => DefaultEvidenceCounter,
-                PageType.NotListingByParser => DefaultEvidenceCounter,
-                PageType.NotListingByCache => DefaultEvidenceCounter,
+                PageType.HttpStatusCodeGone => RequiredGoneEvidenceCount,
+                PageType.HttpStatusCodeNotFound => RequiredStrongEvidenceCount,
+                PageType.NotListingByWebsiteRule => RequiredStrongEvidenceCount,
+                PageType.DiscardedByListingUrlRegex => RequiredDefaultEvidenceCount,
+                PageType.NotListingByParser => RequiredDefaultEvidenceCount,
+                PageType.NotListingByCache => RequiredDefaultEvidenceCount,
                 _ => null
             };
         }

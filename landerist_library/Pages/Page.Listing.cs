@@ -176,7 +176,12 @@ namespace landerist_library.Pages
 
         public bool HaveToUnpublishListing()
         {
-            return new ListingUnpublishEvaluator(this).ShouldUnpublish();
+            return GetListingUnpublishDecision().ShouldUnpublish;
+        }
+
+        public ListingUnpublishDecision GetListingUnpublishDecision()
+        {
+            return new ListingUnpublishEvaluator(this).Evaluate();
         }
 
         public bool IsNotCanonicalListing()
