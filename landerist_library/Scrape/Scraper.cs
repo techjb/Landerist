@@ -363,7 +363,7 @@ namespace landerist_library.Scrape
                     WebsitesThrottle.ReportSuccess(page.Website);
                 }
 
-                if (page.PageType.Equals(PageType.HttpStatusCodeNotOK))
+                if (page.IsHttpStatusCodeNotOK())
                 {
                     Interlocked.Increment(ref DownloadErrors);
                     return;

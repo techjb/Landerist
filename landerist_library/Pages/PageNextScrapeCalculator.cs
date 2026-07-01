@@ -61,6 +61,8 @@ namespace landerist_library.Pages
                 PageType.MainPage => 3d,
                 PageType.MayBeListing => 3d,
                 PageType.Listing => 3d,
+                PageType.HttpStatusCodeGone => 7d,
+                PageType.HttpStatusCodeNotFound => 7d,
                 PageType.NotListingByParser => 21d,
                 PageType.NotListingByCache => 21d,
                 PageType.NotListingByWebsiteRule => 21d,
@@ -72,7 +74,7 @@ namespace landerist_library.Pages
 
         private static bool IsTransientErrorPageType(PageType pageType)
         {
-            return pageType == PageType.HttpStatusCodeNotOK ||
+            return pageType == PageType.HttpStatusCodeOtherNotOK ||
                 pageType == PageType.HttpStatusCodeNull ||                
                 pageType == PageType.ResponseBodyNullOrEmpty;
         }

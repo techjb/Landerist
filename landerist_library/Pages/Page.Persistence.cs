@@ -1,4 +1,5 @@
 using landerist_library.Database;
+using landerist_library.Pages;
 using landerist_orels.ES;
 using System.Data;
 
@@ -23,11 +24,11 @@ namespace landerist_library.Pages
                 ? dataRow["Etag"].ToString()
                 : null;
             LastModified = dataRow["LastModified"] is DBNull ? null : dataRow["LastModified"].ToString();
-            PageType = dataRow["PageType"] is DBNull ? null : (PageType)Enum.Parse(typeof(PageType), dataRow["PageType"].ToString()!);
+            PageType = dataRow["PageType"] is DBNull ? null : ParsePageType(dataRow["PageType"].ToString()!);
             PageTypeCounter = dataRow["PageTypeCounter"] is DBNull ? null : (short)dataRow["PageTypeCounter"];
             ListingStatus = dataRow["ListingStatus"] is DBNull ? null : (ListingStatus)Enum.Parse(typeof(ListingStatus), dataRow["ListingStatus"].ToString()!);
             LockedBy = dataRow["LockedBy"] is DBNull ? null : dataRow["LockedBy"].ToString();
-            WaitingStatus = dataRow["WaitingStatus"] is DBNull ? null : (WaitingStatus)Enum.Parse(typeof(WaitingStatus), dataRow["WaitingStatus"].ToString()!);
+            WaitingStatus = dataRow["WaitingStatus"] is DBNull ? null : (global::landerist_library.Pages.WaitingStatus)Enum.Parse(typeof(global::landerist_library.Pages.WaitingStatus), dataRow["WaitingStatus"].ToString()!);
             ListingParserInputHash = dataRow["ListingParserInputHash"] is DBNull ? null : dataRow["ListingParserInputHash"].ToString();
             ListingParserInputNotChangedCounter = dataRow.Table.Columns.Contains("ListingParserInputNotChangedCounter") && dataRow["ListingParserInputNotChangedCounter"] is not DBNull
                 ? (short)dataRow["ListingParserInputNotChangedCounter"]
@@ -37,6 +38,16 @@ namespace landerist_library.Pages
                 : null;
             ResponseBodyZipped = dataRow["ResponseBodyZipped"] is DBNull ? null : (byte[])dataRow["ResponseBodyZipped"];
             TokenCount = dataRow["TokenCount"] is DBNull ? null : (int?)dataRow["TokenCount"];
+        }
+
+        private static PageType ParsePageType(string pageType)
+        {
+            if (pageType == "HttpStatusCodeNotOK")
+            {
+                return landerist_library.Pages.PageType.HttpStatusCodeOtherNotOK;
+            }
+
+            return Enum.Parse<PageType>(pageType);
         }
 
         public DataRow? GetDataRow()

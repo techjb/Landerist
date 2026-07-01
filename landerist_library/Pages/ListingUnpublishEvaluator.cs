@@ -2,6 +2,9 @@ namespace landerist_library.Pages
 {
     public class ListingUnpublishEvaluator
     {
+        private const int GoneCounter = 1;
+        private const int StrongEvidenceCounter = 2;
+        private const int DefaultEvidenceCounter = 3;
         private readonly Page _page;
 
         public ListingUnpublishEvaluator(Page page)
@@ -17,50 +20,32 @@ namespace landerist_library.Pages
                 return false;
             }
 
-            if (_page.IsDiscardedByListingUrlRegex())
-            {
-                return true;
-            }
-
             if (_page.IsListing() || _page.IsMayBeListing())
             {
                 return false;
             }
 
-            if (!HasUnpublishEvidence())
+            var requiredCounter = GetRequiredCounter();
+            if (requiredCounter is null)
             {
                 return false;
             }
 
-            return (_page.PageTypeCounter ?? 0) >= GetRequiredCounter();
+            return (_page.PageTypeCounter ?? 0) >= requiredCounter;
         }
 
-        private bool HasUnpublishEvidence()
+        private int? GetRequiredCounter()
         {
-            return IsStrongUnpublishEvidence() ||
-                _page.IsNotListingByParser() ||
-                _page.IsNotListingByCache() ||
-                _page.IsNotListingByWebsiteRule() ||
-                _page.IsNotCanonical() ||
-                _page.IsRedirectToAnotherUrl() ||
-                _page.IsHttpStatusCodeNotOK()
-                ;
-        }
-
-        private bool IsStrongUnpublishEvidence()
-        {
-            return _page.IsHttpStatusCodeNotFound() 
-                || _page.IsHttpStatusCodeGone()
-                || _page.IsNotListingByWebsiteRule();
-        }
-
-        private int GetRequiredCounter()
-        {
-            if (IsStrongUnpublishEvidence())
+            return _page.PageType switch
             {
-                return 2;
-            }
-            return 3;
+                PageType.HttpStatusCodeGone => GoneCounter,
+                PageType.HttpStatusCodeNotFound => StrongEvidenceCounter,
+                PageType.NotListingByWebsiteRule => StrongEvidenceCounter,
+                PageType.DiscardedByListingUrlRegex => DefaultEvidenceCounter,
+                PageType.NotListingByParser => DefaultEvidenceCounter,
+                PageType.NotListingByCache => DefaultEvidenceCounter,
+                _ => null
+            };
         }
     }
 }

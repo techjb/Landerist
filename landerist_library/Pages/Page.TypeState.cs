@@ -58,12 +58,14 @@ namespace landerist_library.Pages
 
         public bool IsHttpStatusCodeNotOK()
         {
-            return PageType == landerist_library.Pages.PageType.HttpStatusCodeNotOK;
+            return PageType == landerist_library.Pages.PageType.HttpStatusCodeOtherNotOK ||
+                PageType == landerist_library.Pages.PageType.HttpStatusCodeNotFound ||
+                PageType == landerist_library.Pages.PageType.HttpStatusCodeGone;
         }
 
         public bool IsHttpStatusCodeNotFound()
         {
-            return HttpStatusCode == 404;
+            return PageType == landerist_library.Pages.PageType.HttpStatusCodeNotFound || HttpStatusCode == 404;
         }
 
         public bool IsHttpStatusCodeTooManyRequests()
@@ -83,7 +85,7 @@ namespace landerist_library.Pages
 
         public bool IsHttpStatusCodeGone()
         {
-            return HttpStatusCode == 410;
+            return PageType == landerist_library.Pages.PageType.HttpStatusCodeGone || HttpStatusCode == 410;
         }
 
         public bool IsHttpStatusCodeServerError()
@@ -139,7 +141,7 @@ namespace landerist_library.Pages
 
         private void SetTransientErrorCounter(PageType? newPageType)
         {
-            if (newPageType == landerist_library.Pages.PageType.HttpStatusCodeNotOK ||
+            if (newPageType == landerist_library.Pages.PageType.HttpStatusCodeOtherNotOK ||
                 newPageType == landerist_library.Pages.PageType.HttpStatusCodeNull ||                
                 newPageType == landerist_library.Pages.PageType.ResponseBodyNullOrEmpty)
             {

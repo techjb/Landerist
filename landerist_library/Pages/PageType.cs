@@ -3,7 +3,9 @@ namespace landerist_library.Pages
     public enum PageType
     {
         HttpStatusCodeNull,
-        HttpStatusCodeNotOK,        
+        HttpStatusCodeOtherNotOK,
+        HttpStatusCodeNotFound,
+        HttpStatusCodeGone,
         DiscardedByListingUrlRegex,
         IncorrectLanguage,
         BlockedByRobotsTxt,

@@ -26,9 +26,19 @@ namespace landerist_library.Parse.PageTypeParser
                 return (PageType.HttpStatusCodeNull, null, false);
             }
 
+            if (Page.HttpStatusCode == 404)
+            {
+                return (PageType.HttpStatusCodeNotFound, null, false);
+            }
+
+            if (Page.HttpStatusCode == 410)
+            {
+                return (PageType.HttpStatusCodeGone, null, false);
+            }
+
             if (Page.HttpStatusCode != 200)
             {
-                return (PageType.HttpStatusCodeNotOK, null, false);
+                return (PageType.HttpStatusCodeOtherNotOK, null, false);
             }
 
             if (Page.RedirectToAnotherUrl())
