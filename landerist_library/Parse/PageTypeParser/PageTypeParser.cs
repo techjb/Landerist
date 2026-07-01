@@ -90,7 +90,7 @@ namespace landerist_library.Parse.PageTypeParser
                 return (PageType.ResponseBodyIsError, null, false);
             }
 
-            if (Configuration.Config.NOT_LISTING_CACHE_ENABLED && Page.IsNotListingCache() && isProduction)
+            if (Page.IsNotListingCache() && isProduction)
             {
                 GlobalStatistics.InsertDailyCounter(StatisticsKey.NotListingCache);
                 HostStatistics.InsertDailyCounter(Page.Host, HostStatisticsKey.NotListingCache);
@@ -104,12 +104,12 @@ namespace landerist_library.Parse.PageTypeParser
                 return (Page.PageType, null, false);
             }
 
-            if (Page.ListingParserInputIsAnotherListingInHost())
-            {
-                GlobalStatistics.InsertDailyCounter(StatisticsKey.ListingParserInputIsAnotherListingInHost);
-                HostStatistics.InsertDailyCounter(Page.Host, HostStatisticsKey.ListingParserInputIsAnotherListingInHost);
-                return (PageType.ResponseBodyRepeatedInHost, null, false);
-            }
+            //if (Page.ListingParserInputIsAnotherListingInHost())
+            //{
+            //    GlobalStatistics.InsertDailyCounter(StatisticsKey.ListingParserInputIsAnotherListingInHost);
+            //    HostStatistics.InsertDailyCounter(Page.Host, HostStatisticsKey.ListingParserInputIsAnotherListingInHost);
+            //    return (PageType.ResponseBodyRepeatedInHost, null, false);
+            //}
             if (Tokenizer.TooManyTokens(Page))
             {
                 return (PageType.ResponseBodyTooManyTokens, null, false);

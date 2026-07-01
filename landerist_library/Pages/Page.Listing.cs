@@ -95,7 +95,7 @@ namespace landerist_library.Pages
 
         public bool IsNotListingCache()
         {
-            if (string.IsNullOrEmpty(ListingParserInputHash))
+            if (!Config.NOT_LISTING_CACHE_ENABLED || string.IsNullOrEmpty(ListingParserInputHash))
             {
                 return false;
             }
