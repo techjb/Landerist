@@ -1,4 +1,4 @@
-﻿namespace landerist_library.Pages
+namespace landerist_library.Pages
 {
     public enum PageType
     {
@@ -21,7 +21,8 @@
         MayBeListing,
         Listing,
         NotListingByParser,
-        NotListingByCache
+        NotListingByCache,
+        NotListingByWebsiteRule
     };
 
     public enum WaitingStatus

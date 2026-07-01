@@ -40,6 +40,7 @@ namespace landerist_library.Pages
             return IsStrongUnpublishEvidence() ||
                 _page.IsNotListingByParser() ||
                 _page.IsNotListingByCache() ||
+                _page.IsNotListingByWebsiteRule() ||
                 _page.IsNotCanonical() ||
                 _page.IsRedirectToAnotherUrl() ||
                 _page.IsHttpStatusCodeNotOK()
@@ -49,7 +50,8 @@ namespace landerist_library.Pages
         private bool IsStrongUnpublishEvidence()
         {
             return _page.IsHttpStatusCodeNotFound() 
-                || _page.IsHttpStatusCodeGone();
+                || _page.IsHttpStatusCodeGone()
+                || _page.IsNotListingByWebsiteRule();
         }
 
         private int GetRequiredCounter()

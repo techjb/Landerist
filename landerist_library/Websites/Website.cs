@@ -31,6 +31,8 @@ namespace landerist_library.Websites
 
         public string? ListingHtmlRemoveXPath { get; set; }
 
+        public string? ListingUnavailableRegex { get; set; }
+
         public string? NavigationWaitSelector { get; set; }
 
         public string? AllowedResourceTypes { get; set; }
@@ -105,6 +107,7 @@ namespace landerist_library.Websites
                 SitemapUrlRegex = null;
                 ListingCoordinateRegex = null;
                 ListingHtmlRemoveXPath = null;
+                ListingUnavailableRegex = null;
                 NavigationWaitSelector = null;
                 AllowedResourceTypes = null;
                 BlockedDomains = null;

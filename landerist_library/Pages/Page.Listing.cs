@@ -1,3 +1,4 @@
+using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Tools;
@@ -35,7 +36,37 @@ namespace landerist_library.Pages
 
         public bool ListingParserInputHasNotChanged()
         {
-            return ListingParserInputNotChanged && (IsListing() || IsNotListingByParser() || IsNotListingByCache());
+            return ListingParserInputNotChanged && (IsListing() || IsNotListingByParser() || IsNotListingByCache() || IsNotListingByWebsiteRule());
+        }
+
+        public bool MatchesWebsiteListingUnavailableRule()
+        {
+            if (Website.MatchesListingUnavailableRegex(ListingParserInput))
+            {
+                return true;
+            }
+
+            return Website.MatchesListingUnavailableRegex(GetListingParserInputText());
+        }
+
+        private string? GetListingParserInputText()
+        {
+            if (string.IsNullOrWhiteSpace(ListingParserInput))
+            {
+                return null;
+            }
+
+            try
+            {
+                var htmlDocument = new HtmlDocument();
+                htmlDocument.LoadHtml(ListingParserInput);
+                return HtmlEntity.DeEntitize(htmlDocument.DocumentNode.InnerText);
+            }
+            catch (Exception exception)
+            {
+                Logs.Log.WriteError("Page GetListingParserInputText", Uri, exception);
+                return null;
+            }
         }
 
         public bool ListingParserInputIsError()

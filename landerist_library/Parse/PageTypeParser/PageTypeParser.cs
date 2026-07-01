@@ -1,4 +1,4 @@
-﻿using landerist_library.Pages;
+using landerist_library.Pages;
 using landerist_library.Parse.ListingParser;
 using landerist_library.Statistics;
 
@@ -74,6 +74,11 @@ namespace landerist_library.Parse.PageTypeParser
             }
 
             Page.SetListingParserInput();
+
+            if (Page.MatchesWebsiteListingUnavailableRule())
+            {
+                return (PageType.NotListingByWebsiteRule, null, false);
+            }
 
             if (Page.ListingParserInputIsTooShort())
             {

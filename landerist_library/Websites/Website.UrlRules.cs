@@ -19,10 +19,15 @@ namespace landerist_library.Websites
             return MatchesRegex(uri, ListingUrlRegex, "ListingUrlRegex");
         }
 
+        public bool MatchesListingUnavailableRegex(string? content)
+        {
+            return MatchesRegex(content, ListingUnavailableRegex, "ListingUnavailableRegex");
+        }
+
         public bool IsDiscardedBySitemapUrlRegex(Uri uri)
         {
             return IsDiscardedByRegex(uri, SitemapUrlRegex, "SitemapUrlRegex");
-        }       
+        }
 
         private bool IsDiscardedByRegex(Uri uri, string? regexPattern, string regexFieldName)
         {
@@ -39,8 +44,12 @@ namespace landerist_library.Websites
         private bool MatchesRegex(Uri uri, string? regexPattern, string regexFieldName)
         {
             ArgumentNullException.ThrowIfNull(uri);
+            return MatchesRegex(uri.AbsoluteUri, regexPattern, regexFieldName);
+        }
 
-            if (string.IsNullOrWhiteSpace(regexPattern))
+        private bool MatchesRegex(string? content, string? regexPattern, string regexFieldName)
+        {
+            if (string.IsNullOrWhiteSpace(content) || string.IsNullOrWhiteSpace(regexPattern))
             {
                 return false;
             }
@@ -48,7 +57,7 @@ namespace landerist_library.Websites
             try
             {
                 return Regex.IsMatch(
-                    uri.AbsoluteUri,
+                    content,
                     regexPattern,
                     RegexOptions.IgnoreCase,
                     TimeSpan.FromSeconds(1));
@@ -56,7 +65,7 @@ namespace landerist_library.Websites
             catch (ArgumentException exception)
             {
                 Logs.Log.WriteError(
-                    "Website IsDiscardedByRegex",
+                    "Website MatchesRegex",
                     $"{Host} {regexFieldName} {regexPattern}",
                     exception);
 

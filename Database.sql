@@ -411,6 +411,7 @@ CREATE TABLE [dbo].[WEBSITES](
 	[SitemapUrlRegex] [nvarchar](500) NULL,
 	[HtmlIndexingEnabled] [bit] NOT NULL,
 	[ListingHtmlRemoveXPath] [nvarchar](max) NULL,
+	[ListingUnavailableRegex] [nvarchar](max) NULL,
 	[NavigationWaitSelector] [nvarchar](500) NULL,
 	[AllowedResourceTypes] [nvarchar](500) NULL,
 	[BlockedDomains] [nvarchar](max) NULL,

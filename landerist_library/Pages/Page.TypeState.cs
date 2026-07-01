@@ -99,6 +99,12 @@ namespace landerist_library.Pages
             return PageType == landerist_library.Pages.PageType.NotListingByCache;
         }
 
+
+        public bool IsNotListingByWebsiteRule()
+        {
+            return PageType == landerist_library.Pages.PageType.NotListingByWebsiteRule;
+        }
+
         public bool IsNotCanonical()
         {
             return PageType == landerist_library.Pages.PageType.NotCanonical;
