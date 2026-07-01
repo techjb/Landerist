@@ -4,6 +4,7 @@ namespace landerist_library.Pages
         bool ShouldUnpublish,
         ListingUnpublishDecisionReason Reason,
         PageType? PageType,
+        short? HttpStatusCode,
         int ActualEvidenceCount,
         int? RequiredEvidenceCount);
 
@@ -14,7 +15,8 @@ namespace landerist_library.Pages
         PageTypeMayBeListing,
         NoUnpublishEvidence,
         EvidenceCounterBelowRequired,
-        EvidenceCounterReachedRequired
+        EvidenceCounterReachedRequired,
+        MovedListingDestinationPublished
     }
 
     public class ListingUnpublishEvaluator
@@ -75,6 +77,7 @@ namespace landerist_library.Pages
                 shouldUnpublish,
                 reason,
                 _page.PageType,
+                _page.HttpStatusCode,
                 GetActualEvidenceCount(),
                 requiredEvidenceCount);
         }

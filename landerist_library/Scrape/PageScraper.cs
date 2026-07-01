@@ -169,9 +169,10 @@ namespace landerist_library.Scrape
                 HandleMovedListing(newListing);
             }
 
-            if (_page.HaveToUnpublishListing())
+            var unpublishDecision = _page.GetListingUnpublishDecision();
+            if (unpublishDecision.ShouldUnpublish)
             {
-                UnpublishListing(newListing);
+                UnpublishListing(newListing, unpublishDecision);
             }
         }
 
@@ -192,7 +193,18 @@ namespace landerist_library.Scrape
                 return;
             }
 
-            UnpublishListing(newListing);
+            UnpublishListing(newListing, CreateMovedListingUnpublishDecision());
+        }
+
+        private ListingUnpublishDecision CreateMovedListingUnpublishDecision()
+        {
+            return new ListingUnpublishDecision(
+                true,
+                ListingUnpublishDecisionReason.MovedListingDestinationPublished,
+                _page.PageType,
+                _page.HttpStatusCode,
+                _page.PageTypeCounter ?? 0,
+                null);
         }
 
         private Uri? GetListingDestinationUri()
@@ -210,7 +222,6 @@ namespace landerist_library.Scrape
             return null;
         }
 
-
         private void PublishListing(Listing? newListing)
         {
             newListing ??= _page.GetListing(true, true);
@@ -227,7 +238,7 @@ namespace landerist_library.Scrape
             _page.SetListingStatusPublished();
         }
 
-        private void UnpublishListing(Listing? newListing)
+        private void UnpublishListing(Listing? newListing, ListingUnpublishDecision? unpublishDecision = null)
         {
             newListing ??= _page.GetListing(true, true);
             if (newListing == null)
@@ -237,7 +248,7 @@ namespace landerist_library.Scrape
             }
 
             newListing.SetUnpublished();
-            ES_Listings.InsertUpdate(_page.Website, newListing);
+            ES_Listings.InsertUpdate(_page.Website, newListing, unpublishDecision);
             _page.SetListingStatusUnpublished();
         }
     }

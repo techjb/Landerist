@@ -10,14 +10,14 @@ namespace landerist_library.Database
     {
         public const string TABLE_ES_LISTINGS = "[ES_LISTINGS]";
 
-        public static void InsertUpdate(Website website, Listing newListing)
+        public static void InsertUpdate(Website website, Listing newListing, ListingUnpublishDecision? unpublishDecision = null)
         {
             Listing? oldListing = GetListing(newListing.guid, true, true);
             if (oldListing != null)
             {
                 if (!oldListing.Equals(newListing))
                 {
-                    if (Update(oldListing, newListing))
+                    if (Update(oldListing, newListing, unpublishDecision))
                     {
                         GlobalStatistics.InsertDailyCounter(StatisticsKey.ListingUpdate);
                     }
@@ -25,16 +25,16 @@ namespace landerist_library.Database
             }
             else
             {
-                if (Insert(website, newListing))
+                if (Insert(website, newListing, unpublishDecision))
                 {
                     GlobalStatistics.InsertDailyCounter(StatisticsKey.ListingInsert);
                 }
             }
         }
 
-        private static bool Insert(Website website, Listing listing)
+        private static bool Insert(Website website, Listing listing, ListingUnpublishDecision? unpublishDecision)
         {
-            if (Insert(listing, website.Host))
+            if (Insert(listing, website.Host, unpublishDecision))
             {
                 ES_Media.Insert(listing);
                 ES_Sources.Insert(listing);
@@ -47,11 +47,12 @@ namespace landerist_library.Database
             }
         }
 
-        private static bool Insert(Listing listing, string host)
+        private static bool Insert(Listing listing, string host, ListingUnpublishDecision? unpublishDecision)
         {
             string query =
                 "INSERT INTO " + TABLE_ES_LISTINGS + " " +
-                "([guid], [listingStatus], [listingDate], [updated], [unlistingDate], [operation], [propertyType], " +
+                "([guid], [listingStatus], [listingDate], [updated], [unlistingDate], [unlistingReason], [unlistingPageType], " +
+                "[unlistingHttpStatusCode], [unlistingEvidenceCount], [unlistingRequiredEvidenceCount], [operation], [propertyType], " +
                 "[propertySubtype], [priceAmount], [priceCurrency], [description], " +
                 "[contactName], [contactPhone], [contactEmail], [contactUrl], [contactOther], [address], [lauId], [lauName], [latitude], [longitude], " +
                 "[locationIsAccurate], [cadastralReference], [propertySize], [landSize], [constructionYear], " +
@@ -59,7 +60,8 @@ namespace landerist_library.Database
                 "[garage], [motorbikeGarage], [pool], [lift], [disabledAccess], [storageRoom], [furnished], " +
                 "[nonFurnished], [heating], [airConditioning], [petsAllowed], [securitySystems], [host]) " +
                 "VALUES( " +
-                "@guid, @listingStatus, @listingDate, @updated, @unlistingDate, @operation, @propertyType, " +
+                "@guid, @listingStatus, @listingDate, @updated, @unlistingDate, @unlistingReason, @unlistingPageType, " +
+                "@unlistingHttpStatusCode, @unlistingEvidenceCount, @unlistingRequiredEvidenceCount, @operation, @propertyType, " +
                 "@propertySubtype, @priceAmount, @priceCurrency, @description, " +
                 "@contactName, @contactPhone, @contactEmail, @contactUrl, @contactOther, @address, @lauId, @lauName, @latitude, @longitude, " +
                 "@locationIsAccurate, @cadastralReference, @propertySize, @landSize, @constructionYear, " +
@@ -68,7 +70,7 @@ namespace landerist_library.Database
                 "@nonFurnished, @heating, @airConditioning, @petsAllowed, @securitySystems, @host " +
                 ")";
 
-            var queryParameters = GetQueryParameters(listing);
+            var queryParameters = GetQueryParameters(listing, unpublishDecision);
             queryParameters.Add("host", host);
             bool inserted = new DataBase().Query(query, queryParameters, out Exception? exception);
             if (!inserted && exception != null)
@@ -195,7 +197,7 @@ namespace landerist_library.Database
             });
         }
 
-        private static Dictionary<string, object?> GetQueryParameters(Listing listing)
+        private static Dictionary<string, object?> GetQueryParameters(Listing listing, ListingUnpublishDecision? unpublishDecision = null)
         {
             return new Dictionary<string, object?> {
                 {"guid", listing.guid },
@@ -203,6 +205,11 @@ namespace landerist_library.Database
                 {"listingDate", listing.listingDate},
                 {"updated", DateTime.Now},
                 {"unlistingDate", listing.unlistingDate},
+                {"unlistingReason", GetUnlistingReason(listing, unpublishDecision)},
+                {"unlistingPageType", GetUnlistingPageType(listing, unpublishDecision)},
+                {"unlistingHttpStatusCode", GetUnlistingHttpStatusCode(listing, unpublishDecision)},
+                {"unlistingEvidenceCount", GetUnlistingEvidenceCount(listing, unpublishDecision)},
+                {"unlistingRequiredEvidenceCount", GetUnlistingRequiredEvidenceCount(listing, unpublishDecision)},
                 {"operation", listing.operation.ToString() },
                 {"propertyType", listing.propertyType.ToString() },
                 {"propertySubtype", listing.propertySubtype?.ToString()},
@@ -248,9 +255,45 @@ namespace landerist_library.Database
             };
         }
 
-        private static bool Update(Listing oldListing, Listing newListing)
+
+        private static string? GetUnlistingReason(Listing listing, ListingUnpublishDecision? unpublishDecision)
         {
-            if (!Update(newListing))
+            return listing.listingStatus == ListingStatus.unpublished
+                ? unpublishDecision?.Reason.ToString()
+                : null;
+        }
+
+        private static string? GetUnlistingPageType(Listing listing, ListingUnpublishDecision? unpublishDecision)
+        {
+            return listing.listingStatus == ListingStatus.unpublished
+                ? unpublishDecision?.PageType?.ToString()
+                : null;
+        }
+
+        private static short? GetUnlistingHttpStatusCode(Listing listing, ListingUnpublishDecision? unpublishDecision)
+        {
+            return listing.listingStatus == ListingStatus.unpublished
+                ? unpublishDecision?.HttpStatusCode
+                : null;
+        }
+
+        private static short? GetUnlistingEvidenceCount(Listing listing, ListingUnpublishDecision? unpublishDecision)
+        {
+            return listing.listingStatus == ListingStatus.unpublished && unpublishDecision is not null
+                ? (short)unpublishDecision.ActualEvidenceCount
+                : null;
+        }
+
+        private static short? GetUnlistingRequiredEvidenceCount(Listing listing, ListingUnpublishDecision? unpublishDecision)
+        {
+            return listing.listingStatus == ListingStatus.unpublished && unpublishDecision?.RequiredEvidenceCount is not null
+                ? (short)unpublishDecision.RequiredEvidenceCount.Value
+                : null;
+        }
+
+        private static bool Update(Listing oldListing, Listing newListing, ListingUnpublishDecision? unpublishDecision)
+        {
+            if (!Update(newListing, unpublishDecision))
             {
                 Logs.Log.WriteError("ES_Listings", "Update error");
                 return false;
@@ -280,13 +323,18 @@ namespace landerist_library.Database
                 (oldListing.sources != null && newListing.sources != null && oldListing.sources.SetEquals(newListing.sources));
         }
 
-        public static bool Update(Listing listing)
+        public static bool Update(Listing listing, ListingUnpublishDecision? unpublishDecision = null)
         {
             string query =
                 "UPDATE " + TABLE_ES_LISTINGS + " SET " +
                 "[listingStatus] = @listingStatus, " +
                 "[updated] = @updated, " +
                 "[unlistingDate] = @unlistingDate, " +
+                "[unlistingReason] = CASE WHEN @listingStatus = 'published' THEN NULL ELSE COALESCE(@unlistingReason, [unlistingReason]) END, " +
+                "[unlistingPageType] = CASE WHEN @listingStatus = 'published' THEN NULL ELSE COALESCE(@unlistingPageType, [unlistingPageType]) END, " +
+                "[unlistingHttpStatusCode] = CASE WHEN @listingStatus = 'published' THEN NULL ELSE COALESCE(@unlistingHttpStatusCode, [unlistingHttpStatusCode]) END, " +
+                "[unlistingEvidenceCount] = CASE WHEN @listingStatus = 'published' THEN NULL ELSE COALESCE(@unlistingEvidenceCount, [unlistingEvidenceCount]) END, " +
+                "[unlistingRequiredEvidenceCount] = CASE WHEN @listingStatus = 'published' THEN NULL ELSE COALESCE(@unlistingRequiredEvidenceCount, [unlistingRequiredEvidenceCount]) END, " +
                 "[operation] = @operation, " +
                 "[propertyType] = @propertyType, " +
                 "[propertySubtype] = @propertySubtype, " +
@@ -331,7 +379,7 @@ namespace landerist_library.Database
                 "[securitySystems] = @securitySystems " +                
                 "WHERE [guid] = @guid";
 
-            var queryParameters = GetQueryParameters(listing);
+            var queryParameters = GetQueryParameters(listing, unpublishDecision);
             return new DataBase().Query(query, queryParameters);
         }
 
