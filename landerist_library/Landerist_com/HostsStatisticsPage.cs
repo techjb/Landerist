@@ -21,6 +21,8 @@ namespace landerist_library.Landerist_com
         private const int RecentScrapedPagesDays = 3;
         private const int RecentInsertedPagesDays = 3;
         private const int RecentParseListingPagesDays = 3;
+        private const int StaleWebsiteDateAlertDays = 3;
+        private const decimal LowScrapedPagesAlertThreshold = 0.01m;
 
         public static void Update()
         {
@@ -73,22 +75,51 @@ namespace landerist_library.Landerist_com
             return
                 "                        <tr>" + Environment.NewLine +
                 $"                            {FormatTableCell(FormatHostLink(website.Host), website.Host)}" + Environment.NewLine +
-                $"                            {FormatTableCell(FormatWebsiteDate(website.RobotsTxtUpdated), FormatDateSortValue(website.RobotsTxtUpdated))}" + Environment.NewLine +
-                $"                            {FormatTableCell(FormatWebsiteDate(website.SitemapUpdated), FormatDateSortValue(website.SitemapUpdated))}" + Environment.NewLine +
+                $"                            {FormatTableCell(FormatWebsiteDate(website.RobotsTxtUpdated), FormatDateSortValue(website.RobotsTxtUpdated), IsStaleWebsiteDate(website.RobotsTxtUpdated))}" + Environment.NewLine +
+                $"                            {FormatTableCell(FormatWebsiteDate(website.SitemapUpdated), FormatDateSortValue(website.SitemapUpdated), IsStaleWebsiteDate(website.SitemapUpdated))}" + Environment.NewLine +
                 $"                            {FormatTableCell(FormatNumber(totalPages), FormatNumberSortValue(totalPages))}" + Environment.NewLine +
-                $"                            {FormatTableCell(FormatPercentage(recentScrapedPages, totalPages), FormatPercentageSortValue(recentScrapedPages, totalPages))}" + Environment.NewLine +
-                $"                            {FormatTableCell(FormatPercentage(recentInsertedPages, totalPages), FormatPercentageSortValue(recentInsertedPages, totalPages))}" + Environment.NewLine +
-                $"                            {FormatTableCell(FormatPercentage(recentParseListingPages, totalPages), FormatPercentageSortValue(recentParseListingPages, totalPages))}" + Environment.NewLine +
+                $"                            {FormatTableCell(FormatPercentage(recentScrapedPages, totalPages), FormatPercentageSortValue(recentScrapedPages, totalPages), IsLowScrapedPagesPercentage(recentScrapedPages, totalPages), FormatPercentageTitle(recentScrapedPages, totalPages))}" + Environment.NewLine +
+                $"                            {FormatTableCell(FormatPercentage(recentInsertedPages, totalPages), FormatPercentageSortValue(recentInsertedPages, totalPages), title: FormatPercentageTitle(recentInsertedPages, totalPages))}" + Environment.NewLine +
+                $"                            {FormatTableCell(FormatPercentage(recentParseListingPages, totalPages), FormatPercentageSortValue(recentParseListingPages, totalPages), IsFullPercentage(recentParseListingPages, totalPages), FormatPercentageTitle(recentParseListingPages, totalPages))}" + Environment.NewLine +
                 $"                            {FormatTableCell(FormatNumber(totalListings), FormatNumberSortValue(totalListings))}" + Environment.NewLine +
-                $"                            {FormatTableCell(FormatPercentage(recentListings, totalListings), FormatPercentageSortValue(recentListings, totalListings))}" + Environment.NewLine +
-                $"                            {FormatTableCell(FormatPercentage(publishedListings, totalListings), FormatPercentageSortValue(publishedListings, totalListings))}" + Environment.NewLine +
-                $"                            {FormatTableCell(FormatPercentage(unpublishedListings, totalListings), FormatPercentageSortValue(unpublishedListings, totalListings))}" + Environment.NewLine +
+                $"                            {FormatTableCell(FormatPercentage(recentListings, totalListings), FormatPercentageSortValue(recentListings, totalListings), title: FormatPercentageTitle(recentListings, totalListings))}" + Environment.NewLine +
+                $"                            {FormatTableCell(FormatPercentage(publishedListings, totalListings), FormatPercentageSortValue(publishedListings, totalListings), title: FormatPercentageTitle(publishedListings, totalListings))}" + Environment.NewLine +
+                $"                            {FormatTableCell(FormatPercentage(unpublishedListings, totalListings), FormatPercentageSortValue(unpublishedListings, totalListings), IsZeroPercentage(unpublishedListings, totalListings), FormatPercentageTitle(unpublishedListings, totalListings))}" + Environment.NewLine +
                 "                        </tr>";
         }
 
-        private static string FormatTableCell(string html, string sortValue)
+        private static string FormatTableCell(string html, string sortValue, bool alert = false, string? title = null)
         {
-            return $"<td data-sort=\"{WebUtility.HtmlEncode(sortValue)}\">{html}</td>";
+            if (alert)
+            {
+                html = $"<span class=\"stat-alert\">{html}</span>";
+            }
+
+            string titleAttribute = title == null
+                ? string.Empty
+                : $" title=\"{WebUtility.HtmlEncode(title)}\"";
+
+            return $"<td data-sort=\"{WebUtility.HtmlEncode(sortValue)}\"{titleAttribute}>{html}</td>";
+        }
+
+        private static bool IsStaleWebsiteDate(DateTime? dateTime)
+        {
+            return dateTime < DateTime.Now.AddDays(-StaleWebsiteDateAlertDays);
+        }
+
+        private static bool IsLowScrapedPagesPercentage(int value, int total)
+        {
+            return total > 0 && (decimal)value / total <= LowScrapedPagesAlertThreshold;
+        }
+
+        private static bool IsFullPercentage(int value, int total)
+        {
+            return total > 0 && value >= total;
+        }
+
+        private static bool IsZeroPercentage(int value, int total)
+        {
+            return total > 0 && value == 0;
         }
 
         private static string FormatDateSortValue(DateTime? dateTime)
@@ -109,6 +140,11 @@ namespace landerist_library.Landerist_com
             }
 
             return ((decimal)value / total).ToString(CultureInfo.InvariantCulture);
+        }
+
+        private static string FormatPercentageTitle(int value, int total)
+        {
+            return $"{FormatNumber(value)} / {FormatNumber(total)}";
         }
 
         private static string FormatHostLink(string host)

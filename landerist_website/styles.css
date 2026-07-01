@@ -365,6 +365,11 @@ tbody tr:hover {
     text-align: right;
 }
 
+.stat-alert {
+    color: var(--ship-red);
+    font-weight: 600;
+}
+
 .dt-container {
     color: var(--color-text-secondary);
     font-family: var(--font-sans);
