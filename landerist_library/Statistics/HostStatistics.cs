@@ -392,6 +392,23 @@ namespace landerist_library.Statistics
             });
         }
 
+        public static DataTable GetUnpublishedListingsByUnlistingReason(string host)
+        {
+            string query =
+                "SELECT COALESCE([unlistingReason], 'NULL') AS [Key], COUNT(*) AS [Counter] " +
+                "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+                "WHERE [Host] = @Host " +
+                "AND [listingStatus] = @ListingStatus " +
+                "GROUP BY [unlistingReason] " +
+                "ORDER BY [Counter] DESC, [Key] ASC";
+
+            return new DataBase().QueryTable(query, new Dictionary<string, object?>
+            {
+                { "Host", host },
+                { "ListingStatus", ListingStatus.unpublished.ToString() }
+            });
+        }
+
         public static List<string> GetKeysLike(string host, HostStatisticsKey key)
         {
             string query =

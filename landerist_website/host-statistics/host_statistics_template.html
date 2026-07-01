@@ -107,7 +107,8 @@ const palette = [
                 pageType: (GetObjectProperty(charts, 'pageType', 'PageType') || []).map(NormalizeSeries),
                 httpStatusCode: (GetObjectProperty(charts, 'httpStatusCode', 'HttpStatusCode') || []).map(NormalizeSeries),
                 publishedListingsByOperation: (GetObjectProperty(charts, 'publishedListingsByOperation', 'PublishedListingsByOperation') || []).map(NormalizeSeries),
-                publishedListingsByPropertyType: (GetObjectProperty(charts, 'publishedListingsByPropertyType', 'PublishedListingsByPropertyType') || []).map(NormalizeSeries)
+                publishedListingsByPropertyType: (GetObjectProperty(charts, 'publishedListingsByPropertyType', 'PublishedListingsByPropertyType') || []).map(NormalizeSeries),
+                unpublishedListingsByUnlistingReason: (GetObjectProperty(charts, 'unpublishedListingsByUnlistingReason', 'UnpublishedListingsByUnlistingReason') || []).map(NormalizeSeries)
             };
         }
 
@@ -382,7 +383,8 @@ const palette = [
                 { title: 'Pages by PageType', values: hostData.charts.pageType, type: PieChart },
                 { title: 'Pages by HttpStatusCode', values: hostData.charts.httpStatusCode, type: PieChart },
                 { title: 'Published Listings by Operation', values: hostData.charts.publishedListingsByOperation, type: PieChart },
-                { title: 'Published Listings by PropertyType', values: hostData.charts.publishedListingsByPropertyType, type: PieChart }
+                { title: 'Published Listings by PropertyType', values: hostData.charts.publishedListingsByPropertyType, type: PieChart },
+                { title: 'Unpublished Listings by UnlistingReason', values: hostData.charts.unpublishedListingsByUnlistingReason, type: PieChart }
             ];
 
             let renderedCharts = 0;
