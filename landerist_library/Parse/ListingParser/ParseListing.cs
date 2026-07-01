@@ -2,6 +2,7 @@
 using landerist_library.Pages;
 using landerist_library.Parse.ListingParser.LocalAI;
 using landerist_library.Parse.ListingParser.OpenAI;
+using landerist_library.Parse.ListingParser.UserInput;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
 using landerist_library.Parse.ListingParser.VertexAI;
 using landerist_library.Statistics;
@@ -86,7 +87,8 @@ namespace landerist_library.Parse.ListingParser
         {
             return ParseWithRetry(page, () =>
             {
-                var response = new LocalAIRequest().GetResponse(text).GetAwaiter().GetResult();
+                var requestText = ListingImageUrlPlaceholders.ReplaceLongImageUrls(text);
+                var response = new LocalAIRequest().GetResponse(requestText).GetAwaiter().GetResult();
                 if (response == null)
                 {
                     Console.WriteLine("ParseListing ParseLocalAI response is null.");
@@ -146,6 +148,7 @@ namespace landerist_library.Parse.ListingParser
                     throw new Exception("StructuredOutputEs is null");
                 }
 
+                ListingImageUrlPlaceholders.Resolve(page, structuredOutputEs);
                 return new StructuredOutputEsParser(structuredOutputEs).Parse(page);
             }
             catch (Exception exception)

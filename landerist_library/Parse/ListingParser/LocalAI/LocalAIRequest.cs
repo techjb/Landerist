@@ -113,6 +113,7 @@ namespace landerist_library.Parse.ListingParser.LocalAI
                 "Responde SIEMPRE y ÚNICAMENTE con un objeto JSON válido. No añadas texto antes ni después del JSON. " +
                 "En todos los valores string, escapa siempre los caracteres especiales de JSON: las comillas dobles interiores deben ir precedidas por una barra invertida, y también deben escaparse barras invertidas, saltos de línea y tabuladores. " +
                 "Nunca incluyas comillas dobles literales sin escapar dentro de un valor string. " +
+                "Si el input contiene marcadores de imagen como LANDERIST_IMAGE_A1B2C3D4E5F60708, úsalos exactamente como valor de url_de_la_imagen cuando correspondan a imágenes del anuncio; no intentes reconstruir, expandir ni inventar la URL original. " +
                 "El objeto JSON debe tener la siguiente estructura exacta: " + OpenAIRequest.OpenAIJsonSchema + " " +
                 "Si no encuentras algún dato, usa 'null'. No incluyas texto adicional fuera del JSON.";
         }

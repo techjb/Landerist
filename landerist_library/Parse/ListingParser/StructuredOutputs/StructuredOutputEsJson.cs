@@ -232,7 +232,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         [Description(ImagenesDelAnuncio)]
         public string? imágenes_del_anuncio { get; set; } = null;
 
-        public const string UrlDeLaImagen = "Url de la imagen";
+        public const string UrlDeLaImagen = "Url de la imagen. Si el input contiene un marcador LANDERIST_IMAGE_A1B2C3D4E5F60708 en lugar de una URL larga, devuelve ese marcador exacto";
         [Description(UrlDeLaImagen)]
         public string? url_de_la_imagen { get; set; } = null;
 
