@@ -2,7 +2,7 @@ namespace landerist_library.Pages
 {
     public enum PageType
     {
-        Timeout,
+        HttpStatusCodeNull,
         HttpStatusCodeNotOK,        
         DiscardedByListingUrlRegex,
         IncorrectLanguage,

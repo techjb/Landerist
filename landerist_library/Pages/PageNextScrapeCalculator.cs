@@ -73,7 +73,7 @@ namespace landerist_library.Pages
         private static bool IsTransientErrorPageType(PageType pageType)
         {
             return pageType == PageType.HttpStatusCodeNotOK ||
-                pageType == PageType.Timeout ||
+                pageType == PageType.HttpStatusCodeNull ||                
                 pageType == PageType.ResponseBodyNullOrEmpty;
         }
 

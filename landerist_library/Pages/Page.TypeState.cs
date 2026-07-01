@@ -8,15 +8,32 @@ namespace landerist_library.Pages
         {
             SetTransientErrorCounter(newPageType);
 
-            if (PageType == newPageType)
+            if (IsSamePageType(PageType, newPageType))
             {
                 PageTypeCounter = (short)Math.Min((PageTypeCounter ?? 0) + 1, Config.MAX_PAGETYPE_COUNTER);
+                PageType = newPageType;
             }
             else
             {
                 PageTypeCounter = 1;
                 PageType = newPageType;
             }
+        }
+
+        private static bool IsSamePageType(PageType? currentPageType, PageType? newPageType)
+        {
+            if (currentPageType == newPageType)
+            {
+                return true;
+            }
+
+            return IsHttpStatusCodeNullPageType(currentPageType) &&
+                IsHttpStatusCodeNullPageType(newPageType);
+        }
+
+        private static bool IsHttpStatusCodeNullPageType(PageType? pageType)
+        {
+            return pageType == landerist_library.Pages.PageType.HttpStatusCodeNull;
         }
 
         public void SetWaitingStatusAIRequest()
@@ -123,6 +140,7 @@ namespace landerist_library.Pages
         private void SetTransientErrorCounter(PageType? newPageType)
         {
             if (newPageType == landerist_library.Pages.PageType.HttpStatusCodeNotOK ||
+                newPageType == landerist_library.Pages.PageType.HttpStatusCodeNull ||                
                 newPageType == landerist_library.Pages.PageType.ResponseBodyNullOrEmpty)
             {
                 TransientErrorCounter = (short)Math.Min((TransientErrorCounter ?? 0) + 1, Config.MAX_PAGETYPE_COUNTER);

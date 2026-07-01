@@ -23,7 +23,7 @@ namespace landerist_library.Parse.PageTypeParser
 
             if (Page.HttpStatusCode is null)
             {
-                return (PageType.Timeout, null, false);
+                return (PageType.HttpStatusCodeNull, null, false);
             }
 
             if (Page.HttpStatusCode != 200)
