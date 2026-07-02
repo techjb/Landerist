@@ -19,7 +19,7 @@ namespace landerist_tests
             //new Scraper().Start();
             //new Scraper().Scrape(page, false);
 
-            //new landerist_library.Scrape.Scraper().Scrape("https://www.inmobiliarianucleo.com/comprar/piso/torrevieja-calle-los-gases-curva-del-palangre-playa-del-cura-da577", false);
+            //new landerist_library.Scrape.Scraper().Scrape("https://www.redpiso.es/inmueble/piso-en-venta-en-calle-de-villafranca-guindalera-salamanca-madrid-RP1262026153340", false);
             //new landerist_library.Scrape.Scraper().TryApplyPreClassificationBeforeDownload(new landerist_library.Pages.Page("https://www.iadespana.es/anuncios/aspe-03680/venta/casa"));
             //new Scraper().TestSinglePage();
             //landerist_library.Scrape.PageSelector.SelectTop1();

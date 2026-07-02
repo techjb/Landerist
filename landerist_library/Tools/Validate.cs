@@ -65,7 +65,7 @@ namespace landerist_library.Tools
             return digitCount >= 6;
         }
 
-        [GeneratedRegex(@"^[0-9]{7}[A-Z]{2}[0-9]{4}[A-Z]([0-9]{4}[A-Z]{2})?$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+        [GeneratedRegex(@"^([0-9]{7}[A-Z]{2}[0-9]{4}[A-Z]|[0-9]{5}[A-Z][0-9]{8})([0-9]{4}[A-Z]{2})?$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
         private static partial Regex RegexCadastralReference();
     }
 }

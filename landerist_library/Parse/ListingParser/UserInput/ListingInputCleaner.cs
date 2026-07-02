@@ -44,7 +44,7 @@ namespace landerist_library.Parse.ListingParser.UserInput
             "ul",
         ];
 
-        public static string CleanHtml(HtmlDocument htmlDocument)
+        public static string Clean(HtmlDocument htmlDocument)
         {
             string html = htmlDocument.DocumentNode.OuterHtml;
             html = HttpUtility.HtmlDecode(html);
@@ -53,7 +53,7 @@ namespace landerist_library.Parse.ListingParser.UserInput
             return NormalizeLines(html);
         }
 
-        public static string CleanText(string text)
+        public static string Clean(string text)
         {
             text = HttpUtility.HtmlDecode(text);
             return NormalizeLines(text);

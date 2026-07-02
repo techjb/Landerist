@@ -93,7 +93,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         public string? email_de_contacto { get; set; } = null;
 
 
-        public const string DirecciónDelInmuebleDescription = "dirección postal completa en la que se encuentra ubicado el inmueble (no confundir con la dirección postal del anunciante). Máximo 500 caracteres";
+        public const string DirecciónDelInmuebleDescription = "dirección postal completa en la que se encuentra ubicado el inmueble. No confundir con la dirección del anunciante. Máximo 500 caracteres";
 
         [Description(DirecciónDelInmuebleDescription)]
         public string? dirección_del_inmueble { get; set; } = null;

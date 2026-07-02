@@ -5,7 +5,7 @@ namespace landerist_tests
         public static void Run()
         {
             //Console.WriteLine(landerist_library.Tools.Validate.Email("simone.messinese@iadespana.es"));
-            //Console.WriteLine(landerist_library.Tools.Validate.CadastralReference("36063A9VK3730F"));
+            //Console.WriteLine(landerist_library.Tools.Validate.CadastralReference("4242103VK2844S"));
         }
     }
 }
