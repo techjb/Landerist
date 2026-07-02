@@ -83,8 +83,8 @@ namespace landerist_library.Landerist_com
                 $"                            {FormatTableCell(FormatPercentage(recentParseListingPages, totalPages), FormatPercentageSortValue(recentParseListingPages, totalPages), IsFullPercentage(recentParseListingPages, totalPages), FormatPercentageTitle(recentParseListingPages, totalPages))}" + Environment.NewLine +
                 $"                            {FormatTableCell(FormatNumber(totalListings), FormatNumberSortValue(totalListings))}" + Environment.NewLine +
                 $"                            {FormatTableCell(FormatPercentage(recentListings, totalListings), FormatPercentageSortValue(recentListings, totalListings), title: FormatPercentageTitle(recentListings, totalListings))}" + Environment.NewLine +
-                $"                            {FormatTableCell(FormatPercentage(publishedListings, totalListings), FormatPercentageSortValue(publishedListings, totalListings), title: FormatPercentageTitle(publishedListings, totalListings))}" + Environment.NewLine +
-                $"                            {FormatTableCell(FormatPercentage(unpublishedListings, totalListings), FormatPercentageSortValue(unpublishedListings, totalListings), IsZeroPercentage(unpublishedListings, totalListings), FormatPercentageTitle(unpublishedListings, totalListings))}" + Environment.NewLine +
+                $"                            {FormatTableCell(FormatPercentage(publishedListings, totalListings), FormatPercentageSortValue(publishedListings, totalListings), IsZeroOrFullPercentage(publishedListings, totalListings), FormatPercentageTitle(publishedListings, totalListings))}" + Environment.NewLine +
+                $"                            {FormatTableCell(FormatPercentage(unpublishedListings, totalListings), FormatPercentageSortValue(unpublishedListings, totalListings), IsZeroOrFullPercentage(unpublishedListings, totalListings), FormatPercentageTitle(unpublishedListings, totalListings))}" + Environment.NewLine +
                 "                        </tr>";
         }
 
@@ -117,9 +117,9 @@ namespace landerist_library.Landerist_com
             return total > 0 && value >= total;
         }
 
-        private static bool IsZeroPercentage(int value, int total)
+        private static bool IsZeroOrFullPercentage(int value, int total)
         {
-            return total > 0 && value == 0;
+            return total > 0 && (value == 0 || value >= total);
         }
 
         private static string FormatDateSortValue(DateTime? dateTime)
