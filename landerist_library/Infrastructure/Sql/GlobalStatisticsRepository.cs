@@ -1,0 +1,269 @@
+﻿using landerist_library.Database;
+using landerist_library.Pages;
+using landerist_library.Statistics;
+using landerist_orels.ES;
+using System.Data;
+
+namespace landerist_library.Infrastructure.Sql
+{
+    public class GlobalStatisticsRepository
+    {
+        private const string GlobalStatisticsTable = "[GLOBAL_STATISTICS]";
+
+        public int CountWebsites()
+        {
+            return QueryInt("SELECT COUNT(*) FROM " + Websites.Websites.WEBSITES);
+        }
+
+        public int CountUpdatedRobotsTxtYesterday()
+        {
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + Websites.Websites.WEBSITES + " " +
+                "WHERE CONVERT(date, [RobotsTxtUpdated]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
+
+            return QueryInt(query);
+        }
+
+        public int CountUpdatedSitemapsYesterday()
+        {
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + Websites.Websites.WEBSITES + " " +
+                "WHERE CONVERT(date, [SitemapUpdated]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
+
+            return QueryInt(query);
+        }
+
+        public int CountUpdatedIpAddressYesterday()
+        {
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + Websites.Websites.WEBSITES + " " +
+                "WHERE CONVERT(date, [IpAddressUpdated]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
+
+            return QueryInt(query);
+        }
+
+        public int CountPages()
+        {
+            return QueryInt("SELECT COUNT(*) FROM " + Pages.Pages.PAGES);
+        }
+
+        public int CountLastScrapePagesYesterday()
+        {
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + Pages.Pages.PAGES + " " +
+                "WHERE CONVERT(date, [LastScrape]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
+
+            return QueryInt(query);
+        }
+
+        public int CountNeedUpdatePages()
+        {
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + Pages.Pages.PAGES + " " +
+                "WHERE [NextScrape] < GETDATE()";
+
+            return QueryInt(query);
+        }
+
+        public int CountWaitingAIRequestPages()
+        {
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + Pages.Pages.PAGES + " " +
+                "WHERE [WaitingStatus] = @WaitingStatus";
+
+            return QueryInt(query, new Dictionary<string, object?>
+            {
+                { "WaitingStatus", WaitingStatus.waiting_ai_request.ToString() }
+            });
+        }
+
+        public int CountUnknownPageTypePages()
+        {
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + Pages.Pages.PAGES + " " +
+                "WHERE [PageType] IS NULL";
+
+            return QueryInt(query);
+        }
+
+        public int CountListings()
+        {
+            return QueryInt("SELECT COUNT(*) FROM " + ES_Listings.TABLE_ES_LISTINGS);
+        }
+
+        public int CountListings(ListingStatus listingStatus)
+        {
+            string query =
+                "SELECT COUNT(*) " +
+                "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+                "WHERE [listingStatus] = @ListingStatus";
+
+            return QueryInt(query, new Dictionary<string, object?>
+            {
+                { "ListingStatus", listingStatus.ToString() }
+            });
+        }
+
+        public int CountMedia()
+        {
+            return QueryInt("SELECT COUNT(*) FROM " + ES_Media.TABLE_ES_MEDIA);
+        }
+
+        public DataTable GetHttpStatusCodeCounts(DateTime date)
+        {
+            string query =
+                "SELECT [HttpStatusCode], COUNT(*) AS [Counter] " +
+                "FROM " + Pages.Pages.PAGES + " " +
+                "WHERE CAST([LastScrape] AS date) = CAST(@Date AS date) " +
+                "GROUP BY [HttpStatusCode] ";
+
+            return new DataBase().QueryTable(query, new Dictionary<string, object?>
+            {
+                { "Date", date }
+            });
+        }
+
+        public DataTable GetPageTypeCounts(DateTime date)
+        {
+            string query =
+                "SELECT [PageType], COUNT(*) AS [Counter] " +
+                "FROM " + Pages.Pages.PAGES + " " +
+                "WHERE CAST([LastScrape] AS date) = CAST(@Date AS date) " +
+                "AND [PageType] IS NOT NULL " +
+                "GROUP BY [PageType] ";
+
+            return new DataBase().QueryTable(query, new Dictionary<string, object?>
+            {
+                { "Date", date }
+            });
+        }
+
+        public List<string> GetKeysLike(StatisticsKey key)
+        {
+            string query =
+                "SELECT DISTINCT [Key] " +
+                "FROM " + GlobalStatisticsTable + " " +
+                "WHERE [Key] LIKE @Key";
+
+            return new DataBase().QueryListString(query, new Dictionary<string, object?>
+            {
+                { "Key", key + "%" }
+            });
+        }
+
+        public bool DeleteByKeyPrefixAndDate(DateTime date, string keyPrefix)
+        {
+            string query =
+                "DELETE FROM " + GlobalStatisticsTable + " " +
+                "WHERE [Key] LIKE @KeyPrefix " +
+                "AND CAST([Date] AS date) = CAST(@Date AS date)";
+
+            return new DataBase().Query(query, new Dictionary<string, object?>
+            {
+                { "Date", date },
+                { "KeyPrefix", keyPrefix + "_%" }
+            });
+        }
+
+        public bool Insert(DateTime date, string key, int counter)
+        {
+            string query =
+                "DELETE FROM " + GlobalStatisticsTable + " " +
+                "WHERE [Key] = @Key AND CAST([Date] AS date) = CAST(@Date AS date); " +
+                "INSERT INTO " + GlobalStatisticsTable + " ([Date], [Key], [Counter]) " +
+                "VALUES (@Date, @Key, @Counter);";
+
+            return new DataBase().Query(query, new Dictionary<string, object?>
+            {
+                { "Date", date },
+                { "Key", key },
+                { "Counter", counter }
+            });
+        }
+
+        public bool InsertDailyCounter(string key, int counter)
+        {
+            string query =
+                "MERGE " + GlobalStatisticsTable + " AS target " +
+                "USING (" +
+                "   SELECT " +
+                "       CAST(@Date AS DATE) AS DateOnly, " +
+                "       @Key AS [Key], " +
+                "       @Counter AS [Counter] " +
+                "   ) AS source " +
+                "ON " +
+                "   CAST(target.[Date] AS DATE) = source.DateOnly " +
+                "   AND target.[Key] = source.[Key] " +
+                "WHEN MATCHED THEN " +
+                "   UPDATE SET target.[Counter] = target.[Counter] + source.[Counter] " +
+                "WHEN NOT MATCHED THEN " +
+                "   INSERT ([Date], [Key], [Counter]) " +
+                "   VALUES (source.DateOnly, source.[Key], source.[Counter]);";
+
+            return new DataBase().Query(query, new Dictionary<string, object?>
+            {
+                { "Date", DateTime.Now },
+                { "Key", key },
+                { "Counter", counter }
+            });
+        }
+
+        public DataTable GetStatisticsKeys()
+        {
+            string query =
+                "SELECT DISTINCT [Key] " +
+                "FROM " + GlobalStatisticsTable + " ";
+
+            return new DataBase().QueryTable(query);
+        }
+
+        public DataTable GetStatistics(string key, int months)
+        {
+            string query =
+                "SELECT [Date], [Key], [Counter] " +
+                "FROM " + GlobalStatisticsTable + " " +
+                "WHERE [Key] = @Key AND " +
+                "[Date] > DATEADD(MONTH, @Months, GETDATE()) " +
+                "ORDER BY [Date] ASC";
+
+            return new DataBase().QueryTable(query, new Dictionary<string, object?>
+            {
+                { "Key", key },
+                { "Months", months }
+            });
+        }
+
+        public DataTable GetLatestStatistics(string statisticsKey, int top)
+        {
+            string query =
+                "SELECT TOP (@Top) [Date], [Counter] " +
+                "FROM " + GlobalStatisticsTable + " " +
+                "WHERE [Key] = @Key " +
+                "ORDER BY [Date] DESC";
+
+            return new DataBase().QueryTable(query, new Dictionary<string, object?>
+            {
+                { "Top", top },
+                { "Key", statisticsKey }
+            });
+        }
+
+        private static int QueryInt(string query)
+        {
+            return new DataBase().QueryInt(query);
+        }
+
+        private static int QueryInt(string query, Dictionary<string, object?> parameters)
+        {
+            DataTable dataTable = new DataBase().QueryTable(query, parameters);
+            return Convert.ToInt32(dataTable.Rows[0][0]);
+        }
+    }
+}

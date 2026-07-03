@@ -1,4 +1,4 @@
-using landerist_library.Database;
+﻿using landerist_library.Infrastructure.Sql;
 using landerist_orels.ES;
 using System.Data;
 
@@ -6,6 +6,8 @@ namespace landerist_library.Websites
 {
     public partial class Website
     {
+        private static readonly WebsiteRepository WebsiteRepository = new();
+
         private void LoadDataRow()
         {
             var dataRow = GetDataRow();
@@ -17,21 +19,7 @@ namespace landerist_library.Websites
 
         private DataRow? GetDataRow()
         {
-            string query =
-                "SELECT * " +
-                "FROM " + Websites.WEBSITES + " " +
-                "WHERE [Host] = @Host";
-
-            var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"Host", Host }
-            });
-
-            if (dataTable.Rows.Count > 0)
-            {
-                return dataTable.Rows[0];
-            }
-
-            return null;
+            return WebsiteRepository.GetDataRow(Host);
         }
 
         private void Load(DataRow dataRow)
@@ -89,47 +77,14 @@ namespace landerist_library.Websites
 
         public bool Insert()
         {
-            string query =
-                "INSERT INTO " + Websites.WEBSITES + " (" +
-                "[MainUri], [Host], [LanguageCode], [CountryCode], [RobotsTxt], [RobotsTxtUpdated], " +
-                "[SitemapUpdated], [IpAddress], [IpAddressUpdated], [IndexUrlRegex], [SitemapUrlRegex], [ListingUrlRegex], [ListingCoordinateRegex], [ListingHtmlRemoveXPath], [ListingUnavailableRegex], [NavigationWaitSelector], [AllowedResourceTypes], [BlockedDomains], [UserAgent], [HttpRequestHeaders], [HtmlIndexingEnabled], [UseProxy], [MinimumRequestIntervalMilliseconds]) VALUES (" +
-                "@MainUri, @Host, @LanguageCode, @CountryCode, @RobotsTxt, @RobotsTxtUpdated, " +
-                "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @IndexUrlRegex, @SitemapUrlRegex, @ListingUrlRegex, @ListingCoordinateRegex, @ListingHtmlRemoveXPath, @ListingUnavailableRegex, @NavigationWaitSelector, @AllowedResourceTypes, @BlockedDomains, @UserAgent, @HttpRequestHeaders, @HtmlIndexingEnabled, @UseProxy, @MinimumRequestIntervalMilliseconds)";
-
             var parameters = GetQueryParameters();
-            return new DataBase().Query(query, parameters);
+            return WebsiteRepository.Insert(parameters);
         }
 
         public bool Update()
         {
-            string query =
-                "UPDATE " + Websites.WEBSITES + " SET " +
-                "[MainUri] = @MainUri, " +
-                "[LanguageCode] = @LanguageCode, " +
-                "[CountryCode] = @CountryCode, " +
-                "[RobotsTxt] = @RobotsTxt, " +
-                "[RobotsTxtUpdated] = @RobotsTxtUpdated, " +
-                "[SitemapUpdated] = @SitemapUpdated, " +
-                "[IpAddress] = @IpAddress, " +
-                "[IpAddressUpdated] = @IpAddressUpdated, " +
-                "[IndexUrlRegex] = @IndexUrlRegex, " +
-                "[SitemapUrlRegex] = @SitemapUrlRegex, " +
-                "[ListingUrlRegex] = @ListingUrlRegex, " +
-                "[ListingCoordinateRegex] = @ListingCoordinateRegex, " +
-                "[ListingHtmlRemoveXPath] = @ListingHtmlRemoveXPath, " +
-                "[ListingUnavailableRegex] = @ListingUnavailableRegex, " +
-                "[NavigationWaitSelector] = @NavigationWaitSelector, " +
-                "[AllowedResourceTypes] = @AllowedResourceTypes, " +
-                "[BlockedDomains] = @BlockedDomains, " +
-                "[UserAgent] = @UserAgent, " +
-                "[HttpRequestHeaders] = @HttpRequestHeaders, " +
-                "[HtmlIndexingEnabled] = @HtmlIndexingEnabled, " +
-                "[UseProxy] = @UseProxy, " +
-                "[MinimumRequestIntervalMilliseconds] = @MinimumRequestIntervalMilliseconds " +
-                "WHERE [Host] = @Host";
-
             var parameters = GetQueryParameters();
-            return new DataBase().Query(query, parameters);
+            return WebsiteRepository.Update(parameters);
         }
 
         private Dictionary<string, object?> GetQueryParameters()
@@ -163,13 +118,7 @@ namespace landerist_library.Websites
 
         private bool DeleteWebsite()
         {
-            string query =
-               "DELETE FROM " + Websites.WEBSITES + " " +
-               "WHERE [Host] = @Host";
-
-            return new DataBase().Query(query, new Dictionary<string, object?> {
-                {"Host", Host }
-            });
+            return WebsiteRepository.Delete(Host);
         }
     }
 }

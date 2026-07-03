@@ -1,4 +1,5 @@
-﻿using landerist_library.Pages;
+﻿using landerist_library.Infrastructure.Sql;
+using landerist_library.Pages;
 using landerist_library.Statistics;
 using landerist_library.Websites;
 using landerist_orels.ES;
@@ -9,6 +10,7 @@ namespace landerist_library.Database
     public class ES_Listings
     {
         public const string TABLE_ES_LISTINGS = "[ES_LISTINGS]";
+        private static readonly ListingRepository Repository = new();
 
         public static void InsertUpdate(Website website, Listing newListing, ListingUnpublishDecision? unpublishDecision = null)
         {
@@ -40,39 +42,14 @@ namespace landerist_library.Database
                 ES_Sources.Insert(listing);
                 return true;
             }
-            else
-            {
-                Logs.Log.WriteError("ES_Listings", "Insert error");
-                return false;
-            }
+
+            Logs.Log.WriteError("ES_Listings", "Insert error");
+            return false;
         }
 
         private static bool Insert(Listing listing, string host, ListingUnpublishDecision? unpublishDecision)
         {
-            string query =
-                "INSERT INTO " + TABLE_ES_LISTINGS + " " +
-                "([guid], [listingStatus], [listingDate], [updated], [unlistingDate], [unlistingReason], [unlistingPageType], " +
-                "[unlistingHttpStatusCode], [unlistingEvidenceCount], [unlistingRequiredEvidenceCount], [operation], [propertyType], " +
-                "[propertySubtype], [priceAmount], [priceCurrency], [description], " +
-                "[contactName], [contactPhone], [contactEmail], [contactUrl], [contactOther], [address], [lauId], [lauName], [latitude], [longitude], " +
-                "[locationIsAccurate], [cadastralReference], [propertySize], [landSize], [constructionYear], " +
-                "[constructionStatus], [energyEfficiencyRating], [floors], [floor], [bedrooms], [bathrooms], [parkings], [terrace], [garden], " +
-                "[garage], [motorbikeGarage], [pool], [lift], [disabledAccess], [storageRoom], [furnished], " +
-                "[nonFurnished], [heating], [airConditioning], [petsAllowed], [securitySystems], [host]) " +
-                "VALUES( " +
-                "@guid, @listingStatus, @listingDate, @updated, @unlistingDate, @unlistingReason, @unlistingPageType, " +
-                "@unlistingHttpStatusCode, @unlistingEvidenceCount, @unlistingRequiredEvidenceCount, @operation, @propertyType, " +
-                "@propertySubtype, @priceAmount, @priceCurrency, @description, " +
-                "@contactName, @contactPhone, @contactEmail, @contactUrl, @contactOther, @address, @lauId, @lauName, @latitude, @longitude, " +
-                "@locationIsAccurate, @cadastralReference, @propertySize, @landSize, @constructionYear, " +
-                "@constructionStatus, @energyEfficiencyRating, @floors, @floor, @bedrooms, @bathrooms, @parkings, @terrace, @garden, " +
-                "@garage, @motorbikeGarage, @pool, @lift, @disabledAccess, @storageRoom, @furnished, " +
-                "@nonFurnished, @heating, @airConditioning, @petsAllowed, @securitySystems, @host " +
-                ")";
-
-            var queryParameters = GetQueryParameters(listing, unpublishDecision);
-            queryParameters.Add("host", host);
-            bool inserted = new DataBase().Query(query, queryParameters, out Exception? exception);
+            bool inserted = Repository.Insert(listing, host, unpublishDecision, out Exception? exception);
             if (!inserted && exception != null)
             {
                 Logs.Log.WriteError("ES_Listings Insert", "Guid: " + listing.guid + " Host: " + host, exception);
@@ -82,213 +59,37 @@ namespace landerist_library.Database
 
         public static int Count(string host)
         {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + TABLE_ES_LISTINGS + " " +
-                "WHERE [host] = @Host";
-
-            return new DataBase().QueryInt(query, new Dictionary<string, object?>
-            {
-                { "Host", host }
-            });
+            return Repository.Count(host);
         }
 
         public static int Count(string host, ListingStatus listingStatus)
         {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + TABLE_ES_LISTINGS + " " +
-                "WHERE [host] = @Host AND [listingStatus] = @ListingStatus";
-
-            return new DataBase().QueryInt(query, new Dictionary<string, object?>
-            {
-                { "Host", host },
-                { "ListingStatus", listingStatus.ToString() }
-            });
+            return Repository.Count(host, listingStatus);
         }
 
         public static int CountSinceListingDate(string host, DateTime listingDateFrom)
         {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + TABLE_ES_LISTINGS + " " +
-                "WHERE [host] = @Host " +
-                "AND [listingDate] >= @ListingDateFrom";
-
-            return new DataBase().QueryInt(query, new Dictionary<string, object?>
-            {
-                { "Host", host },
-                { "ListingDateFrom", listingDateFrom }
-            });
+            return Repository.CountSinceListingDate(host, listingDateFrom);
         }
 
         public static int CountWithAddress(string host, ListingStatus listingStatus)
         {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + TABLE_ES_LISTINGS + " " +
-                "WHERE [host] = @Host " +
-                "AND [listingStatus] = @ListingStatus " +
-                "AND NULLIF(LTRIM(RTRIM([address])), '') IS NOT NULL";
-
-            return new DataBase().QueryInt(query, new Dictionary<string, object?>
-            {
-                { "Host", host },
-                { "ListingStatus", listingStatus.ToString() }
-            });
+            return Repository.CountWithAddress(host, listingStatus);
         }
 
         public static int CountWithCoordinates(string host, ListingStatus listingStatus)
         {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + TABLE_ES_LISTINGS + " " +
-                "WHERE [host] = @Host " +
-                "AND [listingStatus] = @ListingStatus " +
-                "AND [latitude] IS NOT NULL " +
-                "AND [longitude] IS NOT NULL";
-
-            return new DataBase().QueryInt(query, new Dictionary<string, object?>
-            {
-                { "Host", host },
-                { "ListingStatus", listingStatus.ToString() }
-            });
+            return Repository.CountWithCoordinates(host, listingStatus);
         }
 
         public static int CountWithImages(string host, ListingStatus listingStatus)
         {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + TABLE_ES_LISTINGS + " AS L " +
-                "WHERE L.[host] = @Host " +
-                "AND L.[listingStatus] = @ListingStatus " +
-                "AND EXISTS (" +
-                "   SELECT 1 " +
-                "   FROM " + ES_Media.TABLE_ES_MEDIA + " AS M " +
-                "   WHERE M.[listingGuid] = L.[guid] " +
-                "   AND M.[mediaType] = @MediaType" +
-                ")";
-
-            return new DataBase().QueryInt(query, new Dictionary<string, object?>
-            {
-                { "Host", host },
-                { "ListingStatus", listingStatus.ToString() },
-                { "MediaType", landerist_orels.MediaType.image.ToString() }
-            });
+            return Repository.CountWithImages(host, listingStatus);
         }
 
-        public static int Count(
-            ListingStatus listingStatus,
-            Operation operation,
-            PropertyType propertyType)
+        public static int Count(ListingStatus listingStatus, Operation operation, PropertyType propertyType)
         {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + TABLE_ES_LISTINGS + " AS L " +
-                "WHERE L.[listingStatus] = @ListingStatus AND " +
-                "L.[operation] = @Operation AND " +
-                "L.[propertyType] = @PropertyType";
-
-            return new DataBase().QueryInt(query, new Dictionary<string, object?>
-            {
-                { "ListingStatus", listingStatus.ToString() },
-                { "Operation", operation.ToString() },
-                { "PropertyType", propertyType.ToString() }
-            });
-        }
-
-        private static Dictionary<string, object?> GetQueryParameters(Listing listing, ListingUnpublishDecision? unpublishDecision = null)
-        {
-            return new Dictionary<string, object?> {
-                {"guid", listing.guid },
-                {"listingStatus", listing.listingStatus.ToString() },
-                {"listingDate", listing.listingDate},
-                {"updated", DateTime.Now},
-                {"unlistingDate", listing.unlistingDate},
-                {"unlistingReason", GetUnlistingReason(listing, unpublishDecision)},
-                {"unlistingPageType", GetUnlistingPageType(listing, unpublishDecision)},
-                {"unlistingHttpStatusCode", GetUnlistingHttpStatusCode(listing, unpublishDecision)},
-                {"unlistingEvidenceCount", GetUnlistingEvidenceCount(listing, unpublishDecision)},
-                {"unlistingRequiredEvidenceCount", GetUnlistingRequiredEvidenceCount(listing, unpublishDecision)},
-                {"operation", listing.operation.ToString() },
-                {"propertyType", listing.propertyType.ToString() },
-                {"propertySubtype", listing.propertySubtype?.ToString()},
-                {"priceAmount", listing.price?.amount },
-                {"priceCurrency", listing.price?.currency.ToString()},
-                {"description", listing.description },
-                {"contactName", listing.contactName },
-                {"contactPhone", listing.contactPhone },
-                {"contactEmail", listing.contactEmail },
-                {"contactUrl", listing.contactUrl?.ToString() },
-                {"contactOther", listing.contactOther },
-                {"address", listing.address },
-                {"lauId", listing.lauId},
-                {"lauName", listing.lauName},
-                {"latitude", listing.latitude},
-                {"longitude", listing.longitude},
-                {"locationIsAccurate", listing.locationIsAccurate},
-                {"cadastralReference", listing.cadastralReference },
-                {"propertySize", listing.propertySize},
-                {"landSize", listing.landSize},
-                {"constructionYear", listing.constructionYear},
-                {"constructionStatus", listing.constructionStatus?.ToString()},
-                {"energyEfficiencyRating", listing.energyEfficiencyRating?.ToString()},
-                {"floors", listing.floors},
-                {"floor", listing.floor },
-                {"bedrooms", listing.bedrooms },
-                {"bathrooms", listing.bathrooms },
-                {"parkings", listing.parkings },
-                {"terrace", listing.terrace },
-                {"garden", listing.garden },
-                {"garage", listing.garage },
-                {"motorbikeGarage", listing.motorbikeGarage },
-                {"pool", listing.pool },
-                {"lift", listing.lift },
-                {"disabledAccess", listing.disabledAccess },
-                {"storageRoom", listing.storageRoom },
-                {"furnished", listing.furnished },
-                {"nonFurnished", listing.nonFurnished },
-                {"heating", listing.heating },
-                {"airConditioning", listing.airConditioning },
-                {"petsAllowed", listing.petsAllowed },
-                {"securitySystems", listing.securitySystems },
-            };
-        }
-
-
-        private static string? GetUnlistingReason(Listing listing, ListingUnpublishDecision? unpublishDecision)
-        {
-            return listing.listingStatus == ListingStatus.unpublished
-                ? unpublishDecision?.Reason.ToString()
-                : null;
-        }
-
-        private static string? GetUnlistingPageType(Listing listing, ListingUnpublishDecision? unpublishDecision)
-        {
-            return listing.listingStatus == ListingStatus.unpublished
-                ? unpublishDecision?.PageType?.ToString()
-                : null;
-        }
-
-        private static short? GetUnlistingHttpStatusCode(Listing listing, ListingUnpublishDecision? unpublishDecision)
-        {
-            return listing.listingStatus == ListingStatus.unpublished
-                ? unpublishDecision?.HttpStatusCode
-                : null;
-        }
-
-        private static short? GetUnlistingEvidenceCount(Listing listing, ListingUnpublishDecision? unpublishDecision)
-        {
-            return listing.listingStatus == ListingStatus.unpublished && unpublishDecision is not null
-                ? (short)unpublishDecision.ActualEvidenceCount
-                : null;
-        }
-
-        private static short? GetUnlistingRequiredEvidenceCount(Listing listing, ListingUnpublishDecision? unpublishDecision)
-        {
-            return listing.listingStatus == ListingStatus.unpublished && unpublishDecision?.RequiredEvidenceCount is not null
-                ? (short)unpublishDecision.RequiredEvidenceCount.Value
-                : null;
+            return Repository.Count(listingStatus, operation, propertyType);
         }
 
         private static bool Update(Listing oldListing, Listing newListing, ListingUnpublishDecision? unpublishDecision)
@@ -325,72 +126,12 @@ namespace landerist_library.Database
 
         public static bool Update(Listing listing, ListingUnpublishDecision? unpublishDecision = null)
         {
-            string query =
-                "UPDATE " + TABLE_ES_LISTINGS + " SET " +
-                "[listingStatus] = @listingStatus, " +
-                "[updated] = @updated, " +
-                "[unlistingDate] = @unlistingDate, " +
-                "[unlistingReason] = CASE WHEN @listingStatus = 'published' THEN NULL ELSE COALESCE(@unlistingReason, [unlistingReason]) END, " +
-                "[unlistingPageType] = CASE WHEN @listingStatus = 'published' THEN NULL ELSE COALESCE(@unlistingPageType, [unlistingPageType]) END, " +
-                "[unlistingHttpStatusCode] = CASE WHEN @listingStatus = 'published' THEN NULL ELSE COALESCE(@unlistingHttpStatusCode, [unlistingHttpStatusCode]) END, " +
-                "[unlistingEvidenceCount] = CASE WHEN @listingStatus = 'published' THEN NULL ELSE COALESCE(@unlistingEvidenceCount, [unlistingEvidenceCount]) END, " +
-                "[unlistingRequiredEvidenceCount] = CASE WHEN @listingStatus = 'published' THEN NULL ELSE COALESCE(@unlistingRequiredEvidenceCount, [unlistingRequiredEvidenceCount]) END, " +
-                "[operation] = @operation, " +
-                "[propertyType] = @propertyType, " +
-                "[propertySubtype] = @propertySubtype, " +
-                "[priceAmount] = @priceAmount, " +
-                "[priceCurrency] = @priceCurrency, " +
-                "[description] = @description, " +
-                "[contactName] = @contactName, " +
-                "[contactPhone] = @contactPhone, " +
-                "[contactEmail] = @contactEmail, " +
-                "[contactUrl] = @contactUrl, " +
-                "[contactOther] = @contactOther, " +
-                "[address] = @address, " +
-                "[lauId] = @lauId, " +
-                "[lauName] = @lauName, " +
-                "[latitude] = @latitude, " +
-                "[longitude] = @longitude, " +
-                "[locationIsAccurate] = @locationIsAccurate, " +
-                "[cadastralReference] = @cadastralReference, " +
-                "[propertySize] = @propertySize, " +
-                "[landSize] = @landSize, " +
-                "[constructionYear] = @constructionYear, " +
-                "[constructionStatus] = @constructionStatus, " +
-                "[energyEfficiencyRating] = @energyEfficiencyRating, " +
-                "[floors] = @floors, " +
-                "[floor] = @floor, " +
-                "[bedrooms] = @bedrooms, " +
-                "[bathrooms] = @bathrooms, " +
-                "[parkings] = @parkings, " +
-                "[terrace] = @terrace, " +
-                "[garden] = @garden, " +
-                "[garage] = @garage, " +
-                "[motorbikeGarage] = @motorbikeGarage, " +
-                "[pool] = @pool, " +
-                "[lift] = @lift, " +
-                "[disabledAccess] = @disabledAccess, " +
-                "[storageRoom] = @storageRoom, " +
-                "[furnished] = @furnished, " +
-                "[nonFurnished] = @nonFurnished, " +
-                "[heating] = @heating, " +
-                "[airConditioning] = @airConditioning, " +
-                "[petsAllowed] = @petsAllowed, " +
-                "[securitySystems] = @securitySystems " +                
-                "WHERE [guid] = @guid";
-
-            var queryParameters = GetQueryParameters(listing, unpublishDecision);
-            return new DataBase().Query(query, queryParameters);
+            return Repository.Update(listing, unpublishDecision);
         }
 
         public static SortedSet<Listing> GetAll(bool loadMedia, bool loadSources)
         {
-            string query =
-                "SELECT * " +
-                "FROM " + TABLE_ES_LISTINGS;
-
-            DataTable dataTable = new DataBase().QueryTable(query);
-            return GetAll(dataTable, loadMedia, loadSources);
+            return GetAll(Repository.GetAll(), loadMedia, loadSources);
         }
 
         public static SortedSet<Listing> GetPublished()
@@ -405,15 +146,7 @@ namespace landerist_library.Database
 
         public static SortedSet<Listing> GetListings(ListingStatus listingStatus)
         {
-            string query =
-                "SELECT * " +
-                "FROM " + TABLE_ES_LISTINGS + " " +
-                "WHERE [listingStatus] = @listingStatus";
-
-            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"listingStatus", listingStatus.ToString() },
-            });
-            return GetAll(dataTable, true, true);
+            return GetAll(Repository.GetListings(listingStatus), true, true);
         }
 
         public static SortedSet<Listing> GetListings(
@@ -423,149 +156,52 @@ namespace landerist_library.Database
             bool loadMedia,
             bool loadSources)
         {
-            string query =
-                "SELECT L.* " +
-                "FROM " + TABLE_ES_LISTINGS + " AS L " +
-                "WHERE L.[listingStatus] = @listingStatus AND " +
-                "L.[operation] = @operation AND " +
-                "L.[propertyType] = @propertyType";
-
-            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"listingStatus", listingStatus.ToString() },
-                {"operation", operation.ToString() },
-                {"propertyType", propertyType.ToString() },
-            });
-            return GetAll(dataTable, loadMedia, loadSources);
+            return GetAll(Repository.GetListings(listingStatus, operation, propertyType), loadMedia, loadSources);
         }
 
         public static SortedSet<Listing> GetListings(string host, ListingStatus? listingStatus = null)
         {
-            string query =
-                "SELECT * " +
-                "FROM " + TABLE_ES_LISTINGS + " " +
-                "WHERE [Host] = @Host " +
-                (listingStatus is null ? string.Empty : "AND [ListingStatus] = @ListingStatus");
-
-            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>
-            {
-                { "Host", host },
-                { "ListingStatus", listingStatus?.ToString() }
-            });
-            return GetAll(dataTable, true, true);
+            return GetAll(Repository.GetListings(host, listingStatus), true, true);
         }
 
         public static SortedSet<Listing> GetListingWithCatastralReference()
         {
-            string query =
-                "SELECT * " +
-                "FROM " + TABLE_ES_LISTINGS + " " +
-                "WHERE [cadastralReference] IS NOT NULL";
-
-            DataTable dataTable = new DataBase().QueryTable(query);
-            return GetAll(dataTable, false, false);
+            return GetAll(Repository.GetListingWithCatastralReference(), false, false);
         }
 
         public static SortedSet<Listing> GetListingsWithoutLauName()
         {
-            string query =
-                "SELECT * " +
-                "FROM " + TABLE_ES_LISTINGS + " " +
-                "WHERE [lauName] IS NULL AND " +
-                "[latitude] IS NOT NULL AND " +
-                "[longitude] IS NOT NULL";
-
-            DataTable dataTable = new DataBase().QueryTable(query);
-            return GetAll(dataTable, false, false);
+            return GetAll(Repository.GetListingsWithoutLauName(), false, false);
         }
 
         public static SortedSet<Listing> GetListingWithCatastralReferenceAndNoAddress()
         {
-            string query =
-                "SELECT * " +
-                "FROM " + TABLE_ES_LISTINGS + " " +
-                "WHERE [cadastralReference] IS NOT NULL " +
-                "AND [address] IS NULL";
-
-            DataTable dataTable = new DataBase().QueryTable(query);
-            return GetAll(dataTable, false, false);
+            return GetAll(Repository.GetListingWithCatastralReferenceAndNoAddress(), false, false);
         }
 
         public static SortedSet<Listing> GetListingsWithoutCatastralReferenceAndLocationIsAccurate()
         {
-            string query =
-                "SELECT * " +
-                "FROM " + TABLE_ES_LISTINGS + " " +
-                "WHERE [cadastralReference] IS NULL " +
-                "AND [locationIsAccurate] = 1";
-
-            DataTable dataTable = new DataBase().QueryTable(query);
-            return GetAll(dataTable, false, true);
+            return GetAll(Repository.GetListingsWithoutCatastralReferenceAndLocationIsAccurate(), false, true);
         }
 
         public static SortedSet<Listing> GetListingsLocationIsAccurateNoCadastralReference()
         {
-            string query =
-                "SELECT * " +
-                "FROM " + TABLE_ES_LISTINGS + " " +
-                "WHERE [locationIsAccurate] = 1 AND " +
-                " [cadastralReference] IS NULL";
-
-            DataTable dataTable = new DataBase().QueryTable(query);
-            return GetAll(dataTable, false, false);
+            return GetAll(Repository.GetListingsLocationIsAccurateNoCadastralReference(), false, false);
         }
 
         public static SortedSet<Listing> GetUnpublishedListings(DateTime unlistingDate)
         {
-            string query =
-                "SELECT * " +
-                "FROM " + TABLE_ES_LISTINGS + " " +
-                "WHERE [listingStatus] = @listingStatus AND " +
-                "[unlistingDate] < @unlistingDate";
-
-            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"listingStatus", ListingStatus.unpublished.ToString() },
-                {"unlistingDate", unlistingDate }
-            });
-
-            return ParseListings(dataTable, false, true);
+            return ParseListings(Repository.GetUnpublishedListings(unlistingDate), false, true);
         }
 
         public static SortedSet<Listing> GetListings(bool loadMedia, bool loadSources, DateOnly dateFrom, DateOnly dateTo)
         {
-            string query =
-                "SELECT * " +
-                "FROM " + TABLE_ES_LISTINGS + " " +
-                "WHERE " +
-                "   CAST([updated] AS DATE) >= CAST(@DateFrom AS DATE) AND " +
-                "   CAST([updated] AS DATE) <= CAST(@DateTo AS DATE)";
-
-            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>()
-            {
-                { "DateFrom", dateFrom },
-                { "DateTo", dateTo },
-            });
-
-            return GetAll(dataTable, loadMedia, loadSources);
+            return GetAll(Repository.GetListings(dateFrom, dateTo), loadMedia, loadSources);
         }
 
         public static SortedSet<Listing> GetListings(ListingStatus listingStatus, bool loadMedia, bool loadSources, DateOnly dateFrom, DateOnly dateTo)
         {
-            string query =
-                "SELECT * " +
-                "FROM " + TABLE_ES_LISTINGS + " " +
-                "WHERE " +
-                "   [listingStatus] = @ListingStatus AND " +
-                "   CAST([updated] AS DATE) >= CAST(@DateFrom AS DATE) AND " +
-                "   CAST([updated] AS DATE) <= CAST(@DateTo AS DATE)";
-
-            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>()
-            {
-                { "ListingStatus", listingStatus.ToString() },
-                { "DateFrom", dateFrom },
-                { "DateTo", dateTo },
-            });
-
-            return GetAll(dataTable, loadMedia, loadSources);
+            return GetAll(Repository.GetListings(listingStatus, dateFrom, dateTo), loadMedia, loadSources);
         }
 
         private static SortedSet<Listing> ParseListings(DataTable dataTable, bool loadMedia, bool loadSources)
@@ -608,14 +244,7 @@ namespace landerist_library.Database
 
         public static Listing? GetListing(string guid, bool loadMedia, bool loadSources)
         {
-            string query =
-                "SELECT * " +
-                "FROM " + TABLE_ES_LISTINGS + " " +
-                "WHERE [Guid] = @Guid";
-
-            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"Guid", guid }
-            });
+            DataTable dataTable = Repository.GetListing(guid);
 
             if (dataTable.Rows.Count.Equals(1))
             {
@@ -735,38 +364,17 @@ namespace landerist_library.Database
 
         public static bool Delete(string guid)
         {
-            string query =
-                "DELETE FROM " + TABLE_ES_LISTINGS + " " +
-                "WHERE [guid] = @guid";
-
-            return new DataBase().Query(query, new Dictionary<string, object?> {
-                {"guid", guid }
-            });
+            return Repository.Delete(guid);
         }
 
         public static bool Delete()
         {
-            string query =
-                "DELETE FROM " + TABLE_ES_LISTINGS;
-
-            return new DataBase().Query(query);
+            return Repository.Delete();
         }
 
         public bool UpdateAddress(string guid, double? latitude, double? longitude, bool? locationIsAccurate)
         {
-            string query =
-                "UPDATE " + TABLE_ES_LISTINGS + " SET " +
-                "[latitude] = @latitude, " +
-                "[longitude] = @longitude, " +
-                "[locationIsAccurate] = @locationIsAccurate " +
-                "WHERE [guid] = @guid";
-
-            return new DataBase().Query(query, new Dictionary<string, object?> {
-                {"guid", guid },
-                {"latitude", latitude },
-                {"longitude", longitude },
-                {"locationIsAccurate", locationIsAccurate }
-            });
+            return Repository.UpdateAddress(guid, latitude, longitude, locationIsAccurate);
         }
     }
 }

@@ -1,5 +1,4 @@
-using landerist_library.Database;
-using landerist_library.Pages;
+﻿using landerist_library.Infrastructure.Sql;
 using landerist_orels.ES;
 using System.Data;
 
@@ -44,7 +43,7 @@ namespace landerist_library.Statistics
 
     public class GlobalStatistics
     {
-        private const string GLOBAL_STATISTICS = "[GLOBAL_STATISTICS]";
+        private static readonly GlobalStatisticsRepository Repository = new();
 
         public static void TakeSnapshots()
         {
@@ -67,102 +66,52 @@ namespace landerist_library.Statistics
 
         private static void Websites()
         {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + landerist_library.Websites.Websites.WEBSITES;
-
-            InsertDaily(StatisticsKey.Websites, query);
+            InsertDaily(StatisticsKey.Websites, Repository.CountWebsites());
         }
 
         private static void UpdatedRobotsTxt()
         {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + landerist_library.Websites.Websites.WEBSITES + " " +
-                "WHERE CONVERT(date, [RobotsTxtUpdated]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
-
-            InsertDaily(StatisticsKey.UpdatedRobotsTxt, query);
+            InsertDaily(StatisticsKey.UpdatedRobotsTxt, Repository.CountUpdatedRobotsTxtYesterday());
         }
 
         private static void UpdatedSitemaps()
         {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + landerist_library.Websites.Websites.WEBSITES + " " +
-                "WHERE CONVERT(date, [SitemapUpdated]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
-
-            InsertDaily(StatisticsKey.UpdatedSitemaps, query);
+            InsertDaily(StatisticsKey.UpdatedSitemaps, Repository.CountUpdatedSitemapsYesterday());
         }
 
         private static void UpdatedIpAddress()
         {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + landerist_library.Websites.Websites.WEBSITES + " " +
-                "WHERE CONVERT(date, [IpAddressUpdated]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
-
-            InsertDaily(StatisticsKey.UpdatedIpAddress, query);
+            InsertDaily(StatisticsKey.UpdatedIpAddress, Repository.CountUpdatedIpAddressYesterday());
         }
 
         private static void Pages()
         {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + landerist_library.Pages.Pages.PAGES;
-
-            InsertDaily(StatisticsKey.Pages, query);
+            InsertDaily(StatisticsKey.Pages, Repository.CountPages());
         }
 
         private static void LastScrapePages()
         {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + landerist_library.Pages.Pages.PAGES + " " +
-                "WHERE CONVERT(date, [LastScrape]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
-
-            InsertDaily(StatisticsKey.LastScrapePages, query);
+            InsertDaily(StatisticsKey.LastScrapePages, Repository.CountLastScrapePagesYesterday());
         }
 
         private static void NeedUpdate()
         {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + landerist_library.Pages.Pages.PAGES + " " +
-                "WHERE [NextScrape] < GETDATE()";
-
-            InsertDaily(StatisticsKey.NeedUpdate, query);
+            InsertDaily(StatisticsKey.NeedUpdate, Repository.CountNeedUpdatePages());
         }
 
         private static void WaitingAIRequest()
         {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + landerist_library.Pages.Pages.PAGES + " " +
-                "WHERE [WaitingStatus] = @WaitingStatus";
-
-            InsertDaily(StatisticsKey.WaitingAIRequest, query, new Dictionary<string, object?>
-            {
-                { "WaitingStatus", WaitingStatus.waiting_ai_request.ToString() }
-            });
+            InsertDaily(StatisticsKey.WaitingAIRequest, Repository.CountWaitingAIRequestPages());
         }
 
         private static void UnknownPageType()
         {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + landerist_library.Pages.Pages.PAGES + " " +
-                "WHERE [PageType] IS NULL";
-
-            InsertDaily(StatisticsKey.UnknownPageType, query);
+            InsertDaily(StatisticsKey.UnknownPageType, Repository.CountUnknownPageTypePages());
         }
 
         private static void Listings()
         {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + ES_Listings.TABLE_ES_LISTINGS;
-
-            InsertDaily(StatisticsKey.Listings, query);
+            InsertDaily(StatisticsKey.Listings, Repository.CountListings());
         }
 
         private static void PublishedListings()
@@ -177,24 +126,12 @@ namespace landerist_library.Statistics
 
         private static void SnapshotListings(StatisticsKey statisticsKey, ListingStatus listingStatus)
         {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
-                "WHERE [listingStatus] = @ListingStatus";
-
-            InsertDaily(statisticsKey, query, new Dictionary<string, object?>
-            {
-                { "ListingStatus", listingStatus.ToString() }
-            });
+            InsertDaily(statisticsKey, Repository.CountListings(listingStatus));
         }
 
         private static void Media()
         {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + ES_Media.TABLE_ES_MEDIA;
-
-            InsertDaily(StatisticsKey.Media, query);
+            InsertDaily(StatisticsKey.Media, Repository.CountMedia());
         }
 
         public static void SnapshotHttpStatusCode7Days()
@@ -213,26 +150,14 @@ namespace landerist_library.Statistics
         public static void SnapshotHttpStatusCode(int days)
         {
             DateTime date = DateTime.Today.AddDays(days);
+            Repository.DeleteByKeyPrefixAndDate(date, StatisticsKey.HttpStatusCode.ToString());
 
-            DeleteByKeyPrefixAndDate(date, StatisticsKey.HttpStatusCode.ToString());
-
-            string query =
-                "SELECT [HttpStatusCode], COUNT(*) AS [Counter] " +
-                "FROM " + landerist_library.Pages.Pages.PAGES + " " +
-                "WHERE CAST([LastScrape] AS date) = CAST(@Date AS date) " +
-                "GROUP BY [HttpStatusCode] ";
-
-            var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>
-            {
-                { "Date", date }
-            });
-
-            foreach (DataRow dataRow in dataTable.Rows)
+            foreach (DataRow dataRow in Repository.GetHttpStatusCodeCounts(date).Rows)
             {
                 short? httpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
                 int counter = (int)dataRow["Counter"];
                 string key = StatisticsKey.HttpStatusCode + "_" + (httpStatusCode?.ToString() ?? "NULL");
-                Insert(date, key, counter);
+                Repository.Insert(date, key, counter);
             }
         }
 
@@ -248,15 +173,7 @@ namespace landerist_library.Statistics
 
         public static List<string> GetKeysLike(StatisticsKey key)
         {
-            string query =
-                "SELECT DISTINCT [Key] " +
-                "FROM " + GLOBAL_STATISTICS + " " +
-                "WHERE [Key] LIKE @Key";
-
-            return new DataBase().QueryListString(query, new Dictionary<string, object?>
-            {
-                { "Key", key + "%" }
-            });
+            return Repository.GetKeysLike(key);
         }
 
         public static void PageType()
@@ -275,76 +192,20 @@ namespace landerist_library.Statistics
         public static void SnapshotPageType(int days)
         {
             DateTime date = DateTime.Today.AddDays(days);
+            Repository.DeleteByKeyPrefixAndDate(date, StatisticsKey.PageType.ToString());
 
-            DeleteByKeyPrefixAndDate(date, StatisticsKey.PageType.ToString());
-
-            string query =
-                "SELECT [PageType], COUNT(*) AS [Counter] " +
-                "FROM " + landerist_library.Pages.Pages.PAGES + " " +
-                "WHERE CAST([LastScrape] AS date) = CAST(@Date AS date) " +
-                "AND [PageType] IS NOT NULL " +
-                "GROUP BY [PageType] ";
-
-            var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>
-            {
-                { "Date", date }
-            });
-
-            foreach (DataRow dataRow in dataTable.Rows)
+            foreach (DataRow dataRow in Repository.GetPageTypeCounts(date).Rows)
             {
                 string pageType = (string)dataRow["PageType"];
                 int counter = (int)dataRow["Counter"];
                 string key = StatisticsKey.PageType + "_" + pageType;
-                Insert(date, key, counter);
+                Repository.Insert(date, key, counter);
             }
         }
 
-        private static bool InsertDaily(StatisticsKey key, string queryInt)
+        private static bool InsertDaily(StatisticsKey key, int counter)
         {
-            int counter = new DataBase().QueryInt(queryInt);
-            return Insert(DateTime.Now, key.ToString(), counter);
-        }
-
-        private static bool InsertDaily(StatisticsKey key, string queryInt, Dictionary<string, object?> parameters)
-        {
-            int counter = QueryInt(queryInt, parameters);
-            return Insert(DateTime.Now, key.ToString(), counter);
-        }
-
-        private static int QueryInt(string query, Dictionary<string, object?> parameters)
-        {
-            DataTable dataTable = new DataBase().QueryTable(query, parameters);
-            return Convert.ToInt32(dataTable.Rows[0][0]);
-        }
-
-        private static bool DeleteByKeyPrefixAndDate(DateTime date, string keyPrefix)
-        {
-            string query =
-                "DELETE FROM " + GLOBAL_STATISTICS + " " +
-                "WHERE [Key] LIKE @KeyPrefix " +
-                "AND CAST([Date] AS date) = CAST(@Date AS date)";
-
-            return new DataBase().Query(query, new Dictionary<string, object?>
-            {
-                { "Date", date },
-                { "KeyPrefix", keyPrefix + "_%" }
-            });
-        }
-
-        private static bool Insert(DateTime date, string key, int counter)
-        {
-            string query =
-                "DELETE FROM " + GLOBAL_STATISTICS + " " +
-                "WHERE [Key] = @Key AND CAST([Date] AS date) = CAST(@Date AS date); " +
-                "INSERT INTO " + GLOBAL_STATISTICS + " ([Date], [Key], [Counter]) " +
-                "VALUES (@Date, @Key, @Counter);";
-
-            return new DataBase().Query(query, new Dictionary<string, object?>
-            {
-                { "Date", date },
-                { "Key", key },
-                { "Counter", counter }
-            });
+            return Repository.Insert(DateTime.Now, key.ToString(), counter);
         }
 
         public static bool InsertDailyCounter(StatisticsKey key)
@@ -369,38 +230,12 @@ namespace landerist_library.Statistics
                 return true;
             }
 
-            string query =
-                "MERGE " + GLOBAL_STATISTICS + " AS target " +
-                "USING (" +
-                "   SELECT " +
-                "       CAST(@Date AS DATE) AS DateOnly, " +
-                "       @Key AS [Key], " +
-                "       @Counter AS [Counter] " +
-                "   ) AS source " +
-                "ON " +
-                "   CAST(target.[Date] AS DATE) = source.DateOnly " +
-                "   AND target.[Key] = source.[Key] " +
-                "WHEN MATCHED THEN " +
-                "   UPDATE SET target.[Counter] = target.[Counter] + source.[Counter] " +
-                "WHEN NOT MATCHED THEN " +
-                "   INSERT ([Date], [Key], [Counter]) " +
-                "   VALUES (source.DateOnly, source.[Key], source.[Counter]);";
-
-            return new DataBase().Query(query, new Dictionary<string, object?>
-            {
-                { "Date", DateTime.Now },
-                { "Key", key },
-                { "Counter", counter }
-            });
+            return Repository.InsertDailyCounter(key, counter);
         }
 
         public static DataSet GetStatistics(int lastMonths)
         {
-            string query =
-                "SELECT DISTINCT [Key] " +
-                "FROM " + GLOBAL_STATISTICS + " ";
-
-            DataTable dataTable = new DataBase().QueryTable(query);
+            DataTable dataTable = Repository.GetStatisticsKeys();
 
             DataSet dataSet = new();
             foreach (DataRow dataRow in dataTable.Rows)
@@ -415,33 +250,12 @@ namespace landerist_library.Statistics
 
         private static DataTable GetStatistics(string key, int months)
         {
-            string query =
-                "SELECT [Date], [Key], [Counter] " +
-                "FROM " + GLOBAL_STATISTICS + " " +
-                "WHERE [Key] = @Key AND " +
-                "[Date] > DATEADD(MONTH, @Months, GETDATE()) " +
-                "ORDER BY [Date] ASC";
-
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>
-            {
-                { "Key", key },
-                { "Months", months }
-            });
+            return Repository.GetStatistics(key, months);
         }
 
         public static DataTable GetLatestStatistics(string statisticsKey, int top)
         {
-            string query =
-                "SELECT TOP (@Top) [Date], [Counter] " +
-                "FROM " + GLOBAL_STATISTICS + " " +
-                "WHERE [Key] = @Key " +
-                "ORDER BY [Date] DESC";
-
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>
-            {
-                { "Top", top },
-                { "Key", statisticsKey }
-            });
+            return Repository.GetLatestStatistics(statisticsKey, top);
         }
     }
 }

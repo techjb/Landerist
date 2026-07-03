@@ -1,5 +1,6 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Configuration;
 using landerist_library.Database;
+using landerist_library.Infrastructure.Sql;
 using landerist_library.Pages;
 using System.Data;
 
@@ -8,6 +9,7 @@ namespace landerist_library.Websites
     public class Websites
     {
         public const string WEBSITES = "[WEBSITES]";
+        private static readonly WebsiteQueryRepository WebsiteQueries = new();
 
         public static HashSet<Website> GetAll()
         {
@@ -17,10 +19,7 @@ namespace landerist_library.Websites
 
         public static HashSet<string> GetHosts()
         {
-            string query =
-                "SELECT [Host] " +
-                "FROM " + WEBSITES;
-            return new DataBase().QueryHashSet(query);
+            return WebsiteQueries.GetHosts();
         }
 
         public static Dictionary<string, Website> GetDicionaryStatusCodeOk()
@@ -54,45 +53,27 @@ namespace landerist_library.Websites
 
         public static DataTable GetDataTableAll()
         {
-            string query =
-                "SELECT * " +
-                "FROM " + WEBSITES;
-            return new DataBase().QueryTable(query);
+            return WebsiteQueries.GetAll();
         }
 
         public static DataTable GetDataTableHostMainUri()
         {
-            string query =
-                "SELECT [Host], [MainUri] " +
-                "FROM " + WEBSITES;
-            return new DataBase().QueryTable(query);
+            return WebsiteQueries.GetHostMainUri();
         }
 
         private static DataTable ToDataTableHttpStatusCodeOk()
         {
-            string query =
-                "SELECT * " +
-                "FROM " + WEBSITES + " " +
-                "WHERE [HttpStatusCode] = 200";
-            return new DataBase().QueryTable(query);
+            return WebsiteQueries.GetHttpStatusCodeOk();
         }
 
         private static DataTable ToDataTableHttpStatusCodeNotOk()
         {
-            string query =
-                "SELECT * " +
-                "FROM " + WEBSITES + " " +
-                "WHERE [HttpStatusCode] <> 200 AND [HttpStatusCode] IS NOT NULL";
-            return new DataBase().QueryTable(query);
+            return WebsiteQueries.GetHttpStatusCodeNotOk();
         }
 
         private static DataTable ToDataTableHttpStatusCodeNull()
         {
-            string query =
-                "SELECT * " +
-                "FROM " + WEBSITES + " " +
-                "WHERE [HttpStatusCode] IS NULL";
-            return new DataBase().QueryTable(query);
+            return WebsiteQueries.GetHttpStatusCodeNull();
         }
 
         public static Website GetWebsite(Page page)
@@ -105,14 +86,7 @@ namespace landerist_library.Websites
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(host);
 
-            string query =
-                "SELECT TOP 1 * " +
-                "FROM " + WEBSITES + " " +
-                "WHERE [Host] = @Host";
-
-            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"Host", host }
-            });
+            DataTable dataTable = WebsiteQueries.GetWebsite(host);
 
             if (dataTable.Rows.Count == 0)
             {
@@ -125,14 +99,7 @@ namespace landerist_library.Websites
 
         public static bool Exists(string host)
         {
-            string query =
-                "SELECT 1 " +
-                "FROM " + WEBSITES + " " +
-                "WHERE Host = @Host";
-
-            return new DataBase().QueryExists(query, new Dictionary<string, object?> {
-                {"Host", host }
-            });
+            return WebsiteQueries.Exists(host);
         }
 
         private static HashSet<Website> GetWebsites(DataTable dataTable)
@@ -148,10 +115,7 @@ namespace landerist_library.Websites
 
         public static HashSet<string> GetUrls()
         {
-            string query =
-                "SELECT [Uri] " +
-                "FROM " + WEBSITES;
-            return new DataBase().QueryHashSet(query);
+            return WebsiteQueries.GetUrls();
         }
 
         public static void SetHttpStatusCodesToAll()
@@ -373,10 +337,7 @@ namespace landerist_library.Websites
 
         private static bool Delete()
         {
-            string query =
-             "DELETE FROM " + WEBSITES;
-
-            return new DataBase().Query(query);
+            return WebsiteQueries.DeleteAll();
         }
 
         public static void DeleteAll()
@@ -427,15 +388,7 @@ namespace landerist_library.Websites
         {
             DateTime robotsTxtUpdatedSpecialRules = DateTime.Now.AddDays(-1);
 
-            string query =
-                "SELECT * " +
-                "FROM " + WEBSITES + " " +
-                "WHERE ([RobotsTxtUpdated] IS NULL OR [RobotsTxtUpdated] < @RobotsTxtUpdatedSpecialRules)";
-
-            var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"RobotsTxtUpdatedSpecialRules", robotsTxtUpdatedSpecialRules },
-            });
-
+            var dataTable = WebsiteQueries.GetNeedToUpdateRobotsTxt(robotsTxtUpdatedSpecialRules);
             return GetWebsites(dataTable);
         }
 
@@ -472,15 +425,7 @@ namespace landerist_library.Websites
         {
             DateTime sitemapUpdatedSpecialRules = DateTime.Now.AddDays(-1);
 
-            string query =
-                "SELECT * " +
-                "FROM " + WEBSITES + " " +
-                "WHERE ([SitemapUpdated] IS NULL OR [SitemapUpdated] < @SitemapUpdatedSpecialRules)";
-
-            var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"SitemapUpdatedSpecialRules", sitemapUpdatedSpecialRules },
-            });
-
+            var dataTable = WebsiteQueries.GetNeedToUpdateSitemaps(sitemapUpdatedSpecialRules);
             return GetWebsites(dataTable);
         }
 
@@ -518,15 +463,7 @@ namespace landerist_library.Websites
         {
             DateTime ipAddressUpdated = DateTime.Now.AddDays(-1);
 
-            string query =
-                "SELECT * " +
-                "FROM " + WEBSITES + " " +
-                "WHERE ([IpAddressUpdated] < @IpAddressUpdated OR [IpAddressUpdated] IS NULL)";
-
-            var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"IpAddressUpdated", ipAddressUpdated },
-            });
-
+            var dataTable = WebsiteQueries.GetNeedToUpdateIpAddress(ipAddressUpdated);
             return GetWebsites(dataTable);
         }
 

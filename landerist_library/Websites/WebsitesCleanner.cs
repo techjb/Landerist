@@ -1,12 +1,12 @@
-﻿using landerist_library.Database;
+using landerist_library.Infrastructure.Sql;
 using landerist_library.Pages;
-using landerist_orels.ES;
 
 namespace landerist_library.Websites
 {
     public class WebsitesCleanner
     {
         private const string EngelVoelkersHost = "www.engelvoelkers.com";
+        private static readonly WebsitePageMetricsRepository PageMetrics = new();
 
         public static void DeleteEngelVoelkersPagesDiscardedByIndexUrlRegex()
         {
@@ -207,29 +207,12 @@ namespace landerist_library.Websites
 
         private static bool HasPageTypeListing(Website website)
         {
-            string query =
-                "SELECT 1 " +
-                "FROM " + Pages.Pages.PAGES + " " +
-                "WHERE [Host] = @Host AND [PageType] = @PageType";
-
-            return new DataBase().QueryExists(query, new Dictionary<string, object?> {
-                { "Host", website.Host },
-                { "PageType", PageType.Listing.ToString() }
-            });
+            return PageMetrics.HasPageTypeListing(website.Host);
         }
 
         private static bool HasPublishedListings(Website website)
         {
-            string query =
-                "SELECT 1 " +
-                "FROM " + Pages.Pages.PAGES + " " +
-                "WHERE [Host] = @Host AND [PageType] = @PageType AND [ListingStatus] = @ListingStatus";
-
-            return new DataBase().QueryExists(query, new Dictionary<string, object?> {
-                { "Host", website.Host },
-                { "PageType", PageType.Listing.ToString() },
-                { "ListingStatus", ListingStatus.published.ToString() }
-            });
+            return PageMetrics.HasPublishedListings(website.Host);
         }
 
 

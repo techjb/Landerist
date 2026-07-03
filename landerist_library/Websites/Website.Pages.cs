@@ -1,5 +1,6 @@
 using landerist_library.Configuration;
 using landerist_library.Database;
+using landerist_library.Infrastructure.Sql;
 using landerist_library.Pages;
 using landerist_orels.ES;
 
@@ -7,6 +8,7 @@ namespace landerist_library.Websites
 {
     public partial class Website
     {
+        private static readonly WebsitePageMetricsRepository PageMetrics = new();
         public bool Delete()
         {
             DeleteListings();
@@ -51,14 +53,7 @@ namespace landerist_library.Websites
 
         public int GetNumPages()
         {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + Pages.Pages.PAGES + " " +
-                "WHERE [Host] = @Host";
-
-            return new DataBase().QueryInt(query, new Dictionary<string, object?> {
-                {"Host", Host }
-            });
+            return PageMetrics.CountPages(Host);
         }       
 
         public int GetNumPagesScrapedSince(DateTime lastScrapeFrom)
@@ -78,21 +73,7 @@ namespace landerist_library.Websites
 
         private int GetNumPagesSince(string dateColumn, DateTime dateFrom)
         {
-            if (dateColumn != "LastScrape" && dateColumn != "Inserted" && dateColumn != "LastParseListing")
-            {
-                throw new ArgumentException("Unexpected date column.", nameof(dateColumn));
-            }
-
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + Pages.Pages.PAGES + " " +
-                "WHERE [Host] = @Host " +
-                $"AND [{dateColumn}] >= @DateFrom";
-
-            return new DataBase().QueryInt(query, new Dictionary<string, object?> {
-                {"Host", Host },
-                {"DateFrom", dateFrom }
-            });
+            return PageMetrics.CountPagesSince(Host, dateColumn, dateFrom);
         }
 
         public bool AchievedMaxNumberOfPages()

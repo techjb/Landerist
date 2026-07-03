@@ -1,5 +1,6 @@
-﻿using landerist_orels.ES;
+﻿using landerist_library.Infrastructure.Sql;
 using landerist_orels;
+using landerist_orels.ES;
 using System.Data;
 
 namespace landerist_library.Database
@@ -7,27 +8,11 @@ namespace landerist_library.Database
     public class ES_Media
     {
         public const string TABLE_ES_MEDIA = "[ES_MEDIA]";
+        private static readonly MediaRepository Repository = new();
 
         public static void Insert(Listing listing)
         {
-            if (listing.media == null)
-            {
-                return;
-            }
-
-            foreach (var media in listing.media)
-            {
-                string query =
-                    "INSERT INTO " + TABLE_ES_MEDIA + " " +
-                    "VALUES(@ListingGuid ,@MediaType ,@Title ,@Url)";
-
-                new DataBase().Query(query, new Dictionary<string, object?> {
-                    {"listingGuid", listing.guid },
-                    {"mediaType", media.mediaType?.ToString() },
-                    {"title", media.title },
-                    {"url", media.url.ToString()},
-                });
-            }
+            Repository.Insert(listing);
         }
 
         public static void Update(Listing listing)
@@ -43,35 +28,17 @@ namespace landerist_library.Database
 
         public static bool Delete(string guid)
         {
-            string query =
-                "DELETE FROM " + TABLE_ES_MEDIA + " " +
-                "WHERE [listingGuid] = @listingGuid";
-
-            return new DataBase().Query(query, new Dictionary<string, object?>()
-            {
-                { "listingGuid", guid }
-            });
+            return Repository.Delete(guid);
         }
 
         public static bool Delete()
         {
-            string query =
-                "DELETE FROM " + TABLE_ES_MEDIA;
-
-            return new DataBase().Query(query);
+            return Repository.Delete();
         }
 
         public static SortedSet<Media> GetMedia(Listing listing)
         {
-            string query =
-                "SELECT * " +
-                "FROM " + TABLE_ES_MEDIA + " " +
-                "WHERE [listingGuid] = @listingGuid";
-
-            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>()
-            {
-                { "listingGuid", listing.guid }
-            });
+            DataTable dataTable = Repository.GetMedia(listing);
 
             SortedSet<Media> medias = new(new MediaComparer());
             foreach (DataRow dataRow in dataTable.Rows)

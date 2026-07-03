@@ -1,4 +1,5 @@
-using landerist_library.Database;
+﻿using landerist_library.Database;
+using landerist_library.Infrastructure.Sql;
 using landerist_library.Pages;
 using landerist_orels.ES;
 using System.Data;
@@ -7,6 +8,8 @@ namespace landerist_library.Pages
 {
     public partial class Page
     {
+        private static readonly PageRepository PageRepository = new();
+
         private void Load(DataRow dataRow)
         {
             Host = dataRow["Host"].ToString()!;
@@ -52,34 +55,12 @@ namespace landerist_library.Pages
 
         public DataRow? GetDataRow()
         {
-            string query =
-                "SELECT * " +
-                "FROM " + Pages.PAGES + " " +
-                "WHERE [UriHash] = @UriHash";
-
-            var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"UriHash", UriHash }
-            });
-
-            if (dataTable.Rows.Count > 0)
-            {
-                return dataTable.Rows[0];
-            }
-            return null;
+            return PageRepository.GetDataRow(UriHash);
         }
 
         public bool Insert()
         {
-            string query =
-                "INSERT INTO " + Pages.PAGES + " (" +
-                "[Host], [Uri], [UriHash], [Inserted], [LastScrape], [LastParseListing], [NextScrape], [HttpStatusCode], [Etag], [LastModified], [PageType], " +
-                "[PageTypeCounter], [ListingStatus], [LockedBy], [WaitingStatus], [ListingParserInputHash], " +
-                "[ListingParserInputNotChangedCounter], [TransientErrorCounter], [ResponseBodyZipped], [TokenCount]) " +
-                "VALUES(@Host, @Uri, @UriHash, @Inserted, @LastScrape, @LastParseListing, @NextScrape, @HttpStatusCode, @Etag, @LastModified, @PageType, " +
-                "@PageTypeCounter, @ListingStatus, @LockedBy, @WaitingStatus, @ListingParserInputHash, " +
-                "@ListingParserInputNotChangedCounter, @TransientErrorCounter, CONVERT(varbinary(max), @ResponseBodyZipped), @TokenCount)";
-
-            bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
+            return PageRepository.Insert(new Dictionary<string, object?> {
                 {"Host", Host },
                 {"Uri", Uri.ToString() },
                 {"UriHash", UriHash },
@@ -101,7 +82,6 @@ namespace landerist_library.Pages
                 {"ResponseBodyZipped", null  },
                 {"TokenCount", null  },
             });
-            return sucess;
         }
 
         public bool SetPageTypeAndNextScrape(PageType? pageType)
@@ -118,27 +98,7 @@ namespace landerist_library.Pages
             //    return true;
             //}
 
-            string query =
-                "UPDATE " + Pages.PAGES + " SET " +
-                "[LastScrape] = @LastScrape, " +
-                "[LastParseListing] = @LastParseListing, " +
-                "[NextScrape] = @NextScrape, " +
-                "[HttpStatusCode] = @HttpStatusCode, " +
-                "[Etag] = @Etag, " +
-                "[LastModified] = @LastModified, " +
-                "[PageType] = @PageType, " +
-                "[PageTypeCounter] = @PageTypeCounter, " +
-                "[ListingStatus] = @ListingStatus, " +
-                "[LockedBy] = @LockedBy, " +
-                "[WaitingStatus] = @WaitingStatus, " +
-                "[ListingParserInputHash] = @ListingParserInputHash, " +
-                "[ListingParserInputNotChangedCounter] = @ListingParserInputNotChangedCounter, " +
-                "[TransientErrorCounter] = @TransientErrorCounter, " +
-                "[ResponseBodyZipped] = CASE WHEN @ResponseBodyZipped IS NULL THEN NULL ELSE CONVERT(varbinary(max), @ResponseBodyZipped) END," +
-                "[TokenCount] = @TokenCount " +
-                "WHERE [UriHash] = @UriHash";
-
-            var updated = new DataBase().Query(query, new Dictionary<string, object?> {
+            var updated = PageRepository.Update(new Dictionary<string, object?> {
                 {"LastScrape", LastScrape },
                 {"LastParseListing", LastParseListing },
                 {"NextScrape", NextScrape },
@@ -193,27 +153,13 @@ namespace landerist_library.Pages
 
         public bool UpdateNextScrape()
         {
-            string query =
-               "UPDATE " + Pages.PAGES + " SET " +
-               "[NextScrape] = @NextScrape " +
-               "WHERE [UriHash] = @UriHash";
-
-            return new DataBase().Query(query, new Dictionary<string, object?> {
-                {"UriHash", UriHash },
-                {"NextScrape", NextScrape },
-            });
+            return PageRepository.UpdateNextScrape(UriHash, NextScrape);
         }
 
         public bool Delete()
         {
-            string query =
-                "DELETE FROM " + Pages.PAGES + " " +
-                "WHERE [UriHash] = @UriHash";
-
-            bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
-                {"UriHash", UriHash }
-            });
-            return sucess &&
+            bool success = PageRepository.Delete(UriHash);
+            return success &&
                 ES_Listings.Delete(UriHash) &&
                 ES_Media.Delete(UriHash) &&
                 ES_Sources.Delete(UriHash);

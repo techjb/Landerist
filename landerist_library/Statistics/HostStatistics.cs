@@ -1,4 +1,4 @@
-using landerist_library.Database;
+﻿using landerist_library.Infrastructure.Sql;
 using landerist_orels.ES;
 using System.Data;
 
@@ -24,6 +24,7 @@ namespace landerist_library.Statistics
     public static class HostStatistics
     {
         public const string HOST_STATISTICS = "[HOST_STATISTICS]";
+        private static readonly HostStatisticsRepository Repository = new();
 
         public static void TakeSnapshots()
         {
@@ -56,44 +57,22 @@ namespace landerist_library.Statistics
 
         private static void Pages(string host)
         {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + landerist_library.Pages.Pages.PAGES + " " +
-                "WHERE [Host] = @Host";
-
-            InsertDaily(host, HostStatisticsKey.Pages, query);
+            InsertDaily(host, HostStatisticsKey.Pages, Repository.CountPages(host));
         }
 
         private static void Inserted(string host)
         {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + landerist_library.Pages.Pages.PAGES + " " +
-                "WHERE [Host] = @Host " +
-                "AND CONVERT(date, [Inserted]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
-
-            InsertDaily(host, HostStatisticsKey.Inserted, query);
+            InsertDaily(host, HostStatisticsKey.Inserted, Repository.CountInsertedYesterday(host));
         }
 
         private static void LastScrape(string host)
         {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + landerist_library.Pages.Pages.PAGES + " " +
-                "WHERE [Host] = @Host " +
-                "AND CONVERT(date, [LastScrape]) = CONVERT(date, DATEADD(DAY, -1, GETDATE()))";
-
-            InsertDaily(host, HostStatisticsKey.LastScrape, query);
+            InsertDaily(host, HostStatisticsKey.LastScrape, Repository.CountLastScrapeYesterday(host));
         }
 
         private static void Listings(string host)
         {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
-                "WHERE [Host] = @Host";
-
-            InsertDaily(host, HostStatisticsKey.Listings, query);
+            InsertDaily(host, HostStatisticsKey.Listings, Repository.CountListings(host));
         }
 
         private static void PublishedListings(string host)
@@ -108,118 +87,40 @@ namespace landerist_library.Statistics
 
         private static void SnapshotListings(string host, HostStatisticsKey statisticsKey, ListingStatus listingStatus)
         {
-            string query =
-                "SELECT COUNT(*) " +
-                "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
-                "WHERE [Host] = @Host AND [listingStatus] = @ListingStatus";
-
-            InsertDaily(host, statisticsKey, query, new Dictionary<string, object?>
-            {
-                { "Host", host },
-                { "ListingStatus", listingStatus.ToString() }
-            });
+            InsertDaily(host, statisticsKey, Repository.CountListings(host, listingStatus));
         }
 
         private static void HttpStatusCode(string host)
         {
             DateTime date = DateTime.Now;
+            Repository.DeleteByHostKeyPrefixAndDate(date, host, HostStatisticsKey.HttpStatusCode.ToString());
 
-            DeleteByHostKeyPrefixAndDate(date, host, HostStatisticsKey.HttpStatusCode.ToString());
-
-            string query =
-                "SELECT [HttpStatusCode], COUNT(*) AS [Counter] " +
-                "FROM " + landerist_library.Pages.Pages.PAGES + " " +
-                "WHERE [Host] = @Host " +
-                "GROUP BY [HttpStatusCode]";
-
-            var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>
-            {
-                { "Host", host }
-            });
-
-            foreach (DataRow dataRow in dataTable.Rows)
+            foreach (DataRow dataRow in Repository.GetHttpStatusCodeCounts(host).Rows)
             {
                 short? httpStatusCode = dataRow["HttpStatusCode"] is DBNull ? null : (short)dataRow["HttpStatusCode"];
                 int counter = Convert.ToInt32(dataRow["Counter"]);
                 string key = HostStatisticsKey.HttpStatusCode + "_" + (httpStatusCode?.ToString() ?? "NULL");
-                Insert(date, host, key, counter);
+                Repository.Insert(date, host, key, counter);
             }
         }
 
         private static void PageType(string host)
         {
             DateTime date = DateTime.Now;
+            Repository.DeleteByHostKeyPrefixAndDate(date, host, HostStatisticsKey.PageType.ToString());
 
-            DeleteByHostKeyPrefixAndDate(date, host, HostStatisticsKey.PageType.ToString());
-
-            string query =
-                "SELECT [PageType], COUNT(*) AS [Counter] " +
-                "FROM " + landerist_library.Pages.Pages.PAGES + " " +
-                "WHERE [Host] = @Host " +
-                "AND [PageType] IS NOT NULL " +
-                "GROUP BY [PageType]";
-
-            var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>
-            {
-                { "Host", host }
-            });
-
-            foreach (DataRow dataRow in dataTable.Rows)
+            foreach (DataRow dataRow in Repository.GetPageTypeCounts(host).Rows)
             {
                 string pageType = (string)dataRow["PageType"];
                 int counter = Convert.ToInt32(dataRow["Counter"]);
                 string key = HostStatisticsKey.PageType + "_" + pageType;
-                Insert(date, host, key, counter);
+                Repository.Insert(date, host, key, counter);
             }
         }
 
-        private static void InsertDaily(string host, HostStatisticsKey key, string queryInt)
+        private static bool InsertDaily(string host, HostStatisticsKey key, int counter)
         {
-            InsertDaily(host, key, queryInt, new Dictionary<string, object?>
-            {
-                { "Host", host }
-            });
-        }
-
-        private static void InsertDaily(string host, HostStatisticsKey key, string queryInt, Dictionary<string, object?> parameters)
-        {
-            int counter = new DataBase().QueryInt(queryInt, parameters);
-            Insert(DateTime.Now, host, key.ToString(), counter);
-        }
-
-        private static bool DeleteByHostKeyPrefixAndDate(DateTime date, string host, string keyPrefix)
-        {
-            string query =
-                "DELETE FROM " + HOST_STATISTICS + " " +
-                "WHERE [Host] = @Host " +
-                "AND [Key] LIKE @KeyPrefix " +
-                "AND CAST([Date] AS date) = CAST(@Date AS date)";
-
-            return new DataBase().Query(query, new Dictionary<string, object?>
-            {
-                { "Date", date },
-                { "Host", host },
-                { "KeyPrefix", keyPrefix + "_%" }
-            });
-        }
-
-        private static bool Insert(DateTime date, string host, string key, int counter)
-        {
-            string query =
-                "DELETE FROM " + HOST_STATISTICS + " " +
-                "WHERE [Host] = @Host " +
-                "AND [Key] = @Key " +
-                "AND CAST([Date] AS date) = CAST(@Date AS date); " +
-                "INSERT INTO " + HOST_STATISTICS + " ([Date], [Host], [Key], [Counter]) " +
-                "VALUES (@Date, @Host, @Key, @Counter);";
-
-            return new DataBase().Query(query, new Dictionary<string, object?>
-            {
-                { "Date", date },
-                { "Host", host },
-                { "Key", key },
-                { "Counter", counter }
-            });
+            return Repository.Insert(DateTime.Now, host, key.ToString(), counter);
         }
 
         public static bool InsertDailyCounter(string host, HostStatisticsKey key)
@@ -247,197 +148,57 @@ namespace landerist_library.Statistics
                 return true;
             }
 
-            string query =
-                "MERGE " + HOST_STATISTICS + " AS target " +
-                "USING (" +
-                "   SELECT " +
-                "       CAST(@Date AS DATE) AS DateOnly, " +
-                "       @Host AS [Host], " +
-                "       @Key AS [Key], " +
-                "       @Counter AS [Counter] " +
-                "   ) AS source " +
-                "ON " +
-                "   CAST(target.[Date] AS DATE) = source.DateOnly " +
-                "   AND target.[Host] = source.[Host] " +
-                "   AND target.[Key] = source.[Key] " +
-                "WHEN MATCHED THEN " +
-                "   UPDATE SET target.[Counter] = target.[Counter] + source.[Counter] " +
-                "WHEN NOT MATCHED THEN " +
-                "   INSERT ([Date], [Host], [Key], [Counter]) " +
-                "   VALUES (source.DateOnly, source.[Host], source.[Key], source.[Counter]);";
-
-            return new DataBase().Query(query, new Dictionary<string, object?>
-            {
-                { "Date", DateTime.Now },
-                { "Host", host },
-                { "Key", key },
-                { "Counter", counter }
-            });
+            return Repository.InsertDailyCounter(host, key, counter);
         }
 
         public static DataTable GetLatestStatistics(string host, string statisticsKey, int top)
         {
-            string query =
-                "SELECT TOP (@Top) [Date], [Counter] " +
-                "FROM " + HOST_STATISTICS + " " +
-                "WHERE [Host] = @Host AND [Key] = @Key " +
-                "ORDER BY [Date] DESC";
-
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>
-            {
-                { "Top", top },
-                { "Host", host },
-                { "Key", statisticsKey }
-            });
+            return Repository.GetLatestStatistics(host, statisticsKey, top);
         }
 
         public static DataTable GetLatestStatisticsByPrefix(string host, string keyPrefix)
         {
-            string query =
-                "SELECT [Key], [Counter] " +
-                "FROM " + HOST_STATISTICS + " " +
-                "WHERE [Host] = @Host " +
-                "AND [Key] LIKE @KeyPrefix " +
-                "AND CAST([Date] AS date) = (" +
-                "   SELECT MAX(CAST([Date] AS date)) " +
-                "   FROM " + HOST_STATISTICS + " " +
-                "   WHERE [Host] = @Host AND [Key] LIKE @KeyPrefix" +
-                ") " +
-                "ORDER BY [Counter] DESC, [Key] ASC";
-
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>
-            {
-                { "Host", host },
-                { "KeyPrefix", keyPrefix + "_%" }
-            });
+            return Repository.GetLatestStatisticsByPrefix(host, keyPrefix);
         }
 
         public static DataTable GetPagesByPageType(string host)
         {
-            string query =
-                "SELECT CONVERT(NVARCHAR(100), [PageType]) AS [Key], COUNT(*) AS [Counter] " +
-                "FROM " + landerist_library.Pages.Pages.PAGES + " " +
-                "WHERE [Host] = @Host " +
-                "AND [PageType] IS NOT NULL " +
-                "GROUP BY [PageType] " +
-                "ORDER BY [Counter] DESC, [Key] ASC";
-
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>
-            {
-                { "Host", host }
-            });
+            return Repository.GetPagesByPageType(host);
         }
 
         public static DataTable GetPagesByHttpStatusCode(string host)
         {
-            string query =
-                "SELECT COALESCE(CONVERT(NVARCHAR(10), [HttpStatusCode]), 'NULL') AS [Key], COUNT(*) AS [Counter] " +
-                "FROM " + landerist_library.Pages.Pages.PAGES + " " +
-                "WHERE [Host] = @Host " +
-                "GROUP BY [HttpStatusCode] " +
-                "ORDER BY [Counter] DESC, [Key] ASC";
-
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>
-            {
-                { "Host", host }
-            });
+            return Repository.GetPagesByHttpStatusCode(host);
         }
 
         public static DataTable GetPagesByNextScrape(string host)
         {
-            string query =
-                "SELECT COALESCE(CONVERT(VARCHAR, [NextScrape], 23), 'NULL') AS [Key], COUNT(*) AS [Counter] " +
-                "FROM " + landerist_library.Pages.Pages.PAGES + " " +
-                "WHERE [Host] = @Host " +
-                "GROUP BY CONVERT(VARCHAR, [NextScrape], 23) " +
-                "ORDER BY [Key] ASC";
-
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>
-            {
-                { "Host", host }
-            });
+            return Repository.GetPagesByNextScrape(host);
         }
 
         public static DataTable GetPublishedListingsByOperation(string host)
         {
-            string query =
-                "SELECT COALESCE([operation], 'NULL') AS [Key], COUNT(*) AS [Counter] " +
-                "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
-                "WHERE [Host] = @Host " +
-                "AND [listingStatus] = @ListingStatus " +
-                "GROUP BY [operation] " +
-                "ORDER BY [Counter] DESC, [Key] ASC";
-
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>
-            {
-                { "Host", host },
-                { "ListingStatus", ListingStatus.published.ToString() }
-            });
+            return Repository.GetPublishedListingsByOperation(host);
         }
 
         public static DataTable GetPublishedListingsByPropertyType(string host)
         {
-            string query =
-                "SELECT COALESCE([propertyType], 'NULL') AS [Key], COUNT(*) AS [Counter] " +
-                "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
-                "WHERE [Host] = @Host " +
-                "AND [listingStatus] = @ListingStatus " +
-                "GROUP BY [propertyType] " +
-                "ORDER BY [Counter] DESC, [Key] ASC";
-
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>
-            {
-                { "Host", host },
-                { "ListingStatus", ListingStatus.published.ToString() }
-            });
+            return Repository.GetPublishedListingsByPropertyType(host);
         }
 
         public static DataTable GetUnpublishedListingsByUnlistingReason(string host)
         {
-            string query =
-                "SELECT COALESCE([unlistingReason], 'NULL') AS [Key], COUNT(*) AS [Counter] " +
-                "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
-                "WHERE [Host] = @Host " +
-                "AND [listingStatus] = @ListingStatus " +
-                "GROUP BY [unlistingReason] " +
-                "ORDER BY [Counter] DESC, [Key] ASC";
-
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>
-            {
-                { "Host", host },
-                { "ListingStatus", ListingStatus.unpublished.ToString() }
-            });
+            return Repository.GetUnpublishedListingsByUnlistingReason(host);
         }
 
         public static List<string> GetKeysLike(string host, HostStatisticsKey key)
         {
-            string query =
-                "SELECT DISTINCT [Key] " +
-                "FROM " + HOST_STATISTICS + " " +
-                "WHERE [Host] = @Host " +
-                "AND [Key] LIKE @Key " +
-                "ORDER BY [Key] ASC";
-
-            return new DataBase().QueryListString(query, new Dictionary<string, object?>
-            {
-                { "Host", host },
-                { "Key", key + "_%" }
-            });
+            return Repository.GetKeysLike(host, key);
         }
 
         public static DateTime? GetLatestDate(string host)
         {
-            string query =
-                "SELECT MAX([Date]) " +
-                "FROM " + HOST_STATISTICS + " " +
-                "WHERE [Host] = @Host";
-
-            var value = new DataBase().QueryTable(query, new Dictionary<string, object?>
-            {
-                { "Host", host }
-            }).Rows[0][0];
-
-            return value is DBNull ? null : (DateTime)value;
+            return Repository.GetLatestDate(host);
         }
     }
 }

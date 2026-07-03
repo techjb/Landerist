@@ -1,4 +1,5 @@
-﻿using landerist_orels;
+﻿using landerist_library.Infrastructure.Sql;
+using landerist_orels;
 using landerist_orels.ES;
 using System.Data;
 
@@ -6,28 +7,11 @@ namespace landerist_library.Database
 {
     public class ES_Sources
     {
-        private const string TABLE_ES_SOURCES = "[ES_SOURCES]";
+        private static readonly SourceRepository Repository = new();
 
         public static void Insert(Listing listing)
         {
-            if (listing.sources == null)
-            {
-                return;
-            }
-
-            foreach (var source in listing.sources)
-            {
-                string query =
-                    "INSERT INTO " + TABLE_ES_SOURCES + " " +
-                    "VALUES(@ListingGuid ,@SourceName ,@SourceUrl ,@SourceGuid)";
-
-                new DataBase().Query(query, new Dictionary<string, object?> {
-                    {"ListingGuid", listing.guid },
-                    {"SourceName", source.sourceName?.ToString() },
-                    {"SourceUrl", source.sourceUrl.ToString()},
-                    {"SourceGuid", source.sourceGuid?.ToString()},
-                });
-            }
+            Repository.Insert(listing);
         }
 
         public static void Update(Listing listing)
@@ -35,7 +19,7 @@ namespace landerist_library.Database
             if (Delete(listing))
             {
                 Insert(listing);
-            }            
+            }
         }
 
         public static bool Delete(Listing listing)
@@ -45,35 +29,17 @@ namespace landerist_library.Database
 
         public static bool Delete(string guid)
         {
-            string query =
-                "DELETE FROM " + TABLE_ES_SOURCES + " " +
-                "WHERE [listingGuid] = @listingGuid";
-
-            return new DataBase().Query(query, new Dictionary<string, object?>()
-            {
-                { "listingGuid", guid }
-            });
+            return Repository.Delete(guid);
         }
 
         public static bool Delete()
         {
-            string query =
-                "DELETE FROM " + TABLE_ES_SOURCES;
-
-            return new DataBase().Query(query);
+            return Repository.Delete();
         }
 
         public static SortedSet<Source> GetSources(Listing listing)
         {
-            string query =
-                "SELECT * " +
-                "FROM " + TABLE_ES_SOURCES + " " +
-                "WHERE [listingGuid] = @listingGuid";
-
-            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?>()
-            {
-                { "listingGuid", listing.guid }
-            });
+            DataTable dataTable = Repository.GetSources(listing);
 
             SortedSet<Source> sources = new(new SourceComparer());
             foreach (DataRow dataRow in dataTable.Rows)
@@ -89,7 +55,6 @@ namespace landerist_library.Database
 
         private static Source? GetSource(DataRow dataRow)
         {
-
             var sourceName = dataRow["sourceName"] is DBNull ? null : (string)dataRow["sourceName"];
             if (!Uri.TryCreate((string)dataRow["sourceUrl"], UriKind.Absolute, out Uri? uri))
             {
@@ -107,13 +72,7 @@ namespace landerist_library.Database
 
         public static void FixListingsWhitoutSource()
         {
-            string query =
-                "SELECT * FROM PAGES " +
-                "WHERE UriHash in (  " +
-                "   SELECT guid FROM [Landerist].[dbo].[ES_LISTINGS]  " +
-                "   WHERE guid NOT IN (SELECT listingGuid FROM ES_SOURCES)  " +
-                ")";
-            DataTable dataTable = new DataBase().QueryTable(query);
+            DataTable dataTable = Repository.GetListingsWithoutSourcePages();
             int total = dataTable.Rows.Count;
             int counter = 0;
             int errors = 0;
