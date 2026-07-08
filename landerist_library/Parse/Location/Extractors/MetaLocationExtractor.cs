@@ -37,15 +37,15 @@ namespace landerist_library.Parse.Location.Extractors
                     values[key] = content;
                     if (CoordinateKeyMatcher.IsLatitudeKey(key) && TryFindLongitude(values, out var longitude))
                     {
-                        return CandidateFactory.TryCreate(content, longitude, false, LocationCandidateSources.Html, out candidate);
+                        return CandidateFactory.TryCreate(content, longitude, false, LocationCandidateSources.HtmlMeta, out candidate);
                     }
                     if (CoordinateKeyMatcher.IsLongitudeKey(key) && TryFindLatitude(values, out var latitude))
                     {
-                        return CandidateFactory.TryCreate(latitude, content, false, LocationCandidateSources.Html, out candidate);
+                        return CandidateFactory.TryCreate(latitude, content, false, LocationCandidateSources.HtmlMeta, out candidate);
                     }
                     if (CoordinateKeyMatcher.IsGeoPositionKey(key) && TrySplitGeoPosition(content, out var lat, out var lng))
                     {
-                        return CandidateFactory.TryCreate(lat, lng, false, LocationCandidateSources.Html, out candidate);
+                        return CandidateFactory.TryCreate(lat, lng, false, LocationCandidateSources.HtmlMeta, out candidate);
                     }
                 }
             }

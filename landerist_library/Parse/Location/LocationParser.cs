@@ -39,14 +39,32 @@ namespace landerist_library.Parse.Location
 
         private void EnsureLatLng()
         {
-            if (Listing.latitude.HasValue &&
-                Listing.longitude.HasValue &&
-                CoordinateValidator.Contains(Listing.latitude.Value, Listing.longitude.Value))
+            if (Listing.latitude.HasValue || Listing.longitude.HasValue)
             {
-                return;
+                if (ExistingLatLngIsValid())
+                {
+                    return;
+                }
+
+                ClearLatLng();
             }
 
             SetLatLngToListing(FindLatLng());
+        }
+
+        private bool ExistingLatLngIsValid()
+        {
+            return Listing.latitude.HasValue &&
+                Listing.longitude.HasValue &&
+                CoordinateValidator.Contains(Listing.latitude.Value, Listing.longitude.Value);
+        }
+
+        private void ClearLatLng()
+        {
+            Listing.latitude = null;
+            Listing.longitude = null;
+            Listing.locationIsAccurate = null;
+            Listing.locationResolver = null;
         }
 
         private LocationCandidate? FindLatLng()

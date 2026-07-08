@@ -87,7 +87,7 @@ namespace landerist_library.Parse.Location.Extractors
                 TryGetDouble(array[0], out var longitude) &&
                 TryGetDouble(array[1], out var latitude))
             {
-                return CandidateFactory.TryCreate(latitude, longitude, false, LocationCandidateSources.Html, out candidate);
+                return CandidateFactory.TryCreate(latitude, longitude, false, LocationCandidateSources.HtmlJson, out candidate);
             }
 
             return false;
@@ -117,7 +117,7 @@ namespace landerist_library.Parse.Location.Extractors
 
             return latitude.HasValue &&
                 longitude.HasValue &&
-                CandidateFactory.TryCreate(latitude.Value, longitude.Value, false, LocationCandidateSources.Html, out candidate);
+                CandidateFactory.TryCreate(latitude.Value, longitude.Value, false, LocationCandidateSources.HtmlJson, out candidate);
         }
 
         private static bool IsJsonScriptType(string type)

@@ -35,7 +35,7 @@ namespace landerist_library.Parse.Location.Extractors
 
             foreach (var regex in listRegex)
             {
-                if (TryExtract(text, regex, LocationCandidateSources.Html, out candidate))
+                if (TryExtract(text, regex, LocationCandidateSources.HtmlRegex, out candidate))
                 {
                     return true;
                 }

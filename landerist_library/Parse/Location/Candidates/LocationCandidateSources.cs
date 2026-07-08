@@ -5,7 +5,9 @@ namespace landerist_library.Parse.Location.Candidates
         public const string CadastralReference = "CadastralReference";
         public const string GoogleMapsAddress = "GoogleMapsAddress";
         public const string GoogleMapsIframe = "GoogleMapsIframe";
-        public const string Html = "Html";
+        public const string HtmlJson = "HtmlJson";
+        public const string HtmlMeta = "HtmlMeta";
+        public const string HtmlRegex = "HtmlRegex";
         public const string ListingCoordinateRegex = "ListingCoordinateRegex";
     }
 }
