@@ -14,10 +14,10 @@ namespace landerist_library.Parse.Location.Resolvers
             CoordinateValidator = coordinateValidator;
         }
 
-        public bool TryResolve(Listing listing, out LocationCandidate? candidate)
+        public bool TryResolve(Listing listing, out CadastralLocationResolution? resolution)
         {
-            candidate = null;
-            if (string.IsNullOrEmpty(listing.cadastralReference))
+            resolution = null;
+            if (string.IsNullOrWhiteSpace(listing.cadastralReference))
             {
                 return false;
             }
@@ -36,20 +36,19 @@ namespace landerist_library.Parse.Location.Resolvers
             {
                 return false;
             }
-            if (string.IsNullOrEmpty(listing.address))
+
+            string? resolvedAddress = null;
+            if (string.IsNullOrWhiteSpace(listing.address))
             {
-                var address = goolzoomApi.GetAddress(listing.cadastralReference);
-                if (!string.IsNullOrEmpty(address))
-                {
-                    listing.address = address;
-                }
+                resolvedAddress = goolzoomApi.GetAddress(listing.cadastralReference);
             }
 
-            candidate = new LocationCandidate(
+            var candidate = new LocationCandidate(
                 result.Latitude.Value,
                 result.Longitude.Value,
                 true,
                 LocationCandidateSources.CadastralReference);
+            resolution = new CadastralLocationResolution(candidate, resolvedAddress);
             return true;
         }
     }

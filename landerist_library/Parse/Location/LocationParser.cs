@@ -11,6 +11,7 @@ namespace landerist_library.Parse.Location
     {
         private readonly Page Page;
         private readonly landerist_orels.ES.Listing Listing;
+        private readonly CountryCoordinateValidator CoordinateValidator;
         private readonly HtmlLocationExtractor HtmlLocationExtractor;
         private readonly GoogleMapsAddressLocationResolver GoogleMapsAddressLocationResolver;
         private readonly CadastralLocationResolver CadastralLocationResolver;
@@ -21,16 +22,14 @@ namespace landerist_library.Parse.Location
             Page = page;
             Listing = listing;
 
-            var coordinateValidator = new CountryCoordinateValidator(page.Website.CountryCode);
-            HtmlLocationExtractor = new HtmlLocationExtractor(coordinateValidator);
+            CoordinateValidator = new CountryCoordinateValidator(page.Website.CountryCode);
+            HtmlLocationExtractor = new HtmlLocationExtractor(CoordinateValidator);
             GoogleMapsAddressLocationResolver = new GoogleMapsAddressLocationResolver(
                 page.Website.CountryCode,
-                coordinateValidator);
-            CadastralLocationResolver = new CadastralLocationResolver(coordinateValidator);
+                CoordinateValidator);
+            CadastralLocationResolver = new CadastralLocationResolver(CoordinateValidator);
             AddressCadastralReferenceResolver = new AddressCadastralReferenceResolver();
         }
-
-        private LocationCandidate? LocationCandidate;
 
         public void SetLocation()
         {
@@ -40,109 +39,102 @@ namespace landerist_library.Parse.Location
 
         private void EnsureLatLng()
         {
-            if (Listing.latitude != null && Listing.longitude != null)
+            if (Listing.latitude.HasValue &&
+                Listing.longitude.HasValue &&
+                CoordinateValidator.Contains(Listing.latitude.Value, Listing.longitude.Value))
             {
                 return;
             }
 
-            FindLatLng();
-            SetLatLngToListing();
+            SetLatLngToListing(FindLatLng());
         }
 
-        private void FindLatLng()
+        private LocationCandidate? FindLatLng()
         {
-            if (AddCatastralReferenceLatLng())
+            var cadastralReferenceCandidate = GetCadastralReferenceLatLng();
+            if (cadastralReferenceCandidate != null)
             {
-                return;
+                return cadastralReferenceCandidate;
             }
 
             var htmlDocument = Page.GetHtmlDocument();
-            if (htmlDocument != null && AddListingCoordinateRegexLatLng(htmlDocument))
+            if (htmlDocument != null)
             {
-                return;
+                var listingCoordinateRegexCandidate = GetListingCoordinateRegexLatLng(htmlDocument);
+                if (listingCoordinateRegexCandidate != null)
+                {
+                    return listingCoordinateRegexCandidate;
+                }
+
+                var htmlCandidate = GetHtmlLatLng(htmlDocument);
+                if (htmlCandidate != null)
+                {
+                    return htmlCandidate;
+                }
             }
 
-            if (AddAddressLatLng())
-            {
-                return;
-            }
-
-            if (htmlDocument != null && AddHtmlLatLng(htmlDocument))
-            {
-                return;
-            }
+            return GetAddressLatLng();
         }
 
-        private void SetLatLngToListing()
+        private void SetLatLngToListing(LocationCandidate? candidate)
         {
-            if (LocationCandidate == null)
+            if (candidate == null)
             {
                 return;
             }
 
-            Listing.latitude = LocationCandidate.latitude;
-            Listing.longitude = LocationCandidate.longitude;
-            Listing.locationIsAccurate = LocationCandidate.isAccurate;
+            Listing.latitude = candidate.latitude;
+            Listing.longitude = candidate.longitude;
+            Listing.locationIsAccurate = candidate.isAccurate;
+            Listing.locationResolver = candidate.source;
         }
 
-        private bool AddHtmlLatLng(HtmlDocument htmlDocument)
+        private LocationCandidate? GetHtmlLatLng(HtmlDocument htmlDocument)
         {
-            return HtmlLocationExtractor.TryExtract(htmlDocument, out var candidate) &&
-                AddLocationCandidate(candidate);
+            return HtmlLocationExtractor.TryExtract(htmlDocument, out var candidate)
+                ? candidate
+                : null;
         }
 
-        private bool AddListingCoordinateRegexLatLng(HtmlDocument htmlDocument)
+        private LocationCandidate? GetListingCoordinateRegexLatLng(HtmlDocument htmlDocument)
         {
             var regexPattern = Page.Website.ListingCoordinateRegex;
             if (string.IsNullOrWhiteSpace(regexPattern))
             {
-                return false;
+                return null;
             }
 
             return HtmlLocationExtractor.TryExtractRegex(
                 htmlDocument.DocumentNode.InnerHtml,
                 regexPattern,
                 LocationCandidateSources.ListingCoordinateRegex,
-                out var candidate) &&
-                AddLocationCandidate(candidate);
+                out var candidate)
+                ? candidate
+                : null;
         }
 
-        public bool LatLngIframeGoogleMaps(string src)
+        private LocationCandidate? GetAddressLatLng()
         {
-            return HtmlLocationExtractor.TryExtractGoogleMapsIframe(src, out var candidate) &&
-                AddLocationCandidate(candidate);
+            return GoogleMapsAddressLocationResolver.TryResolve(Listing.address, out var candidate)
+                ? candidate
+                : null;
         }
 
-        public bool LatLngRegex(
-            string text,
-            string regexPattern,
-            string source = LocationCandidateSources.Html)
+        private LocationCandidate? GetCadastralReferenceLatLng()
         {
-            return HtmlLocationExtractor.TryExtractRegex(text, regexPattern, source, out var candidate) &&
-                AddLocationCandidate(candidate);
-        }
-
-        private bool AddAddressLatLng()
-        {
-            return GoogleMapsAddressLocationResolver.TryResolve(Listing.address, out var candidate) &&
-                AddLocationCandidate(candidate);
-        }
-
-        public bool AddCatastralReferenceLatLng()
-        {
-            return CadastralLocationResolver.TryResolve(Listing, out var candidate) &&
-                AddLocationCandidate(candidate);
-        }
-
-        private bool AddLocationCandidate(LocationCandidate? candidate)
-        {
-            if (candidate == null)
+            if (!CadastralLocationResolver.TryResolve(Listing, out var resolution) ||
+                resolution == null)
             {
-                return false;
+                return null;
             }
 
-            LocationCandidate = candidate;
-            return true;
+            if (string.IsNullOrWhiteSpace(Listing.address) &&
+                !string.IsNullOrWhiteSpace(resolution.ResolvedAddress))
+            {
+                Listing.address = resolution.ResolvedAddress;
+            }
+
+            return resolution.Candidate;
         }
 
         private void SetCadastralReferenceFromAddress()
@@ -163,9 +155,11 @@ namespace landerist_library.Parse.Location
 
         private bool CanResolveCadastralReferenceFromAddress()
         {
-            return string.IsNullOrEmpty(Listing.cadastralReference) &&
+            return string.IsNullOrWhiteSpace(Listing.cadastralReference) &&
                 Listing.locationIsAccurate == true &&
-                !string.IsNullOrEmpty(Listing.address);
+                Listing.latitude.HasValue &&
+                Listing.longitude.HasValue &&
+                !string.IsNullOrWhiteSpace(Listing.address);
         }
     }
 }

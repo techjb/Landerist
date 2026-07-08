@@ -1,4 +1,5 @@
 using landerist_library.Database;
+using landerist_library.Parse.Location.Candidates;
 
 namespace landerist_library.Parse.Location.Providers.Goolzoom
 {
@@ -24,6 +25,7 @@ namespace landerist_library.Parse.Location.Providers.Goolzoom
                     listing.latitude = latitude;
                     listing.longitude = longitude;
                     listing.locationIsAccurate = true;
+                    listing.locationResolver = LocationCandidateSources.CadastralReference;
 
                     if (ES_Listings.Update(listing))
                     {
@@ -81,4 +83,3 @@ namespace landerist_library.Parse.Location.Providers.Goolzoom
         }
     }
 }
-

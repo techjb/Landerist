@@ -16,7 +16,7 @@ namespace landerist_library.Infrastructure.Sql
                 "[unlistingHttpStatusCode], [unlistingEvidenceCount], [unlistingRequiredEvidenceCount], [operation], [propertyType], " +
                 "[propertySubtype], [priceAmount], [priceCurrency], [description], " +
                 "[contactName], [contactPhone], [contactEmail], [contactUrl], [contactOther], [address], [lauId], [lauName], [latitude], [longitude], " +
-                "[locationIsAccurate], [cadastralReference], [propertySize], [landSize], [constructionYear], " +
+                "[locationIsAccurate], [locationResolver], [cadastralReference], [propertySize], [landSize], [constructionYear], " +
                 "[constructionStatus], [energyEfficiencyRating], [floors], [floor], [bedrooms], [bathrooms], [parkings], [terrace], [garden], " +
                 "[garage], [motorbikeGarage], [pool], [lift], [disabledAccess], [storageRoom], [furnished], " +
                 "[nonFurnished], [heating], [airConditioning], [petsAllowed], [securitySystems], [host]) " +
@@ -25,7 +25,7 @@ namespace landerist_library.Infrastructure.Sql
                 "@unlistingHttpStatusCode, @unlistingEvidenceCount, @unlistingRequiredEvidenceCount, @operation, @propertyType, " +
                 "@propertySubtype, @priceAmount, @priceCurrency, @description, " +
                 "@contactName, @contactPhone, @contactEmail, @contactUrl, @contactOther, @address, @lauId, @lauName, @latitude, @longitude, " +
-                "@locationIsAccurate, @cadastralReference, @propertySize, @landSize, @constructionYear, " +
+                "@locationIsAccurate, @locationResolver, @cadastralReference, @propertySize, @landSize, @constructionYear, " +
                 "@constructionStatus, @energyEfficiencyRating, @floors, @floor, @bedrooms, @bathrooms, @parkings, @terrace, @garden, " +
                 "@garage, @motorbikeGarage, @pool, @lift, @disabledAccess, @storageRoom, @furnished, " +
                 "@nonFurnished, @heating, @airConditioning, @petsAllowed, @securitySystems, @host " +
@@ -65,6 +65,7 @@ namespace landerist_library.Infrastructure.Sql
                 "[latitude] = @latitude, " +
                 "[longitude] = @longitude, " +
                 "[locationIsAccurate] = @locationIsAccurate, " +
+                "[locationResolver] = @locationResolver, " +
                 "[cadastralReference] = @cadastralReference, " +
                 "[propertySize] = @propertySize, " +
                 "[landSize] = @landSize, " +
@@ -382,20 +383,22 @@ namespace landerist_library.Infrastructure.Sql
             return new DataBase().Query("DELETE FROM " + ES_Listings.TABLE_ES_LISTINGS);
         }
 
-        public bool UpdateAddress(string guid, double? latitude, double? longitude, bool? locationIsAccurate)
+        public bool UpdateAddress(string guid, double? latitude, double? longitude, bool? locationIsAccurate, string? locationResolver = null)
         {
             string query =
                 "UPDATE " + ES_Listings.TABLE_ES_LISTINGS + " SET " +
                 "[latitude] = @latitude, " +
                 "[longitude] = @longitude, " +
-                "[locationIsAccurate] = @locationIsAccurate " +
+                "[locationIsAccurate] = @locationIsAccurate, " +
+                "[locationResolver] = @locationResolver " +
                 "WHERE [guid] = @guid";
 
             return new DataBase().Query(query, new Dictionary<string, object?> {
                 {"guid", guid },
                 {"latitude", latitude },
                 {"longitude", longitude },
-                {"locationIsAccurate", locationIsAccurate }
+                {"locationIsAccurate", locationIsAccurate },
+                {"locationResolver", locationResolver }
             });
         }
 
@@ -429,6 +432,7 @@ namespace landerist_library.Infrastructure.Sql
                 {"latitude", listing.latitude},
                 {"longitude", listing.longitude},
                 {"locationIsAccurate", listing.locationIsAccurate},
+                {"locationResolver", listing.locationResolver },
                 {"cadastralReference", listing.cadastralReference },
                 {"propertySize", listing.propertySize},
                 {"landSize", listing.landSize},

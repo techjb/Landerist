@@ -297,6 +297,7 @@ namespace landerist_library.Database
                 latitude = GetDouble(dataRow, "latitude"),
                 longitude = GetDouble(dataRow, "longitude"),
                 locationIsAccurate = GetBoolean(dataRow, "locationIsAccurate"),
+                locationResolver = GetOptionalString(dataRow, "locationResolver"),
                 cadastralReference = GetString(dataRow, "cadastralReference"),
                 propertySize = GetDouble(dataRow, "propertySize"),
                 landSize = GetDouble(dataRow, "landSize"),
@@ -337,6 +338,13 @@ namespace landerist_library.Database
             return dataRow[columnName] is DBNull ? null : (string)dataRow[columnName];
         }
 
+        private static string? GetOptionalString(DataRow dataRow, string columnName)
+        {
+            return dataRow.Table.Columns.Contains(columnName)
+                ? GetString(dataRow, columnName)
+                : null;
+        }
+
         private static short? GetShort(DataRow dataRow, string columnName)
         {
             return dataRow[columnName] is DBNull ? null : (short)dataRow[columnName];
@@ -372,9 +380,9 @@ namespace landerist_library.Database
             return Repository.Delete();
         }
 
-        public bool UpdateAddress(string guid, double? latitude, double? longitude, bool? locationIsAccurate)
+        public bool UpdateAddress(string guid, double? latitude, double? longitude, bool? locationIsAccurate, string? locationResolver = null)
         {
-            return Repository.UpdateAddress(guid, latitude, longitude, locationIsAccurate);
+            return Repository.UpdateAddress(guid, latitude, longitude, locationIsAccurate, locationResolver);
         }
     }
 }

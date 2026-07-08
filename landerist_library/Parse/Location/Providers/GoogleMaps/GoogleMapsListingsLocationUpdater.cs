@@ -1,4 +1,5 @@
 using landerist_library.Database;
+using landerist_library.Parse.Location.Candidates;
 using landerist_library.Websites;
 
 namespace landerist_library.Parse.Location.Providers.GoogleMaps
@@ -30,6 +31,7 @@ namespace landerist_library.Parse.Location.Providers.GoogleMaps
                 double? lat = null;
                 double? lng = null;
                 bool? locationIsAccurate = null;
+                string? locationResolver = null;
                 bool updateAddress = true;
 
                 if (listing.address != null)
@@ -40,6 +42,7 @@ namespace landerist_library.Parse.Location.Providers.GoogleMaps
                         lat = result.Coordinates.Value.Latitude;
                         lng = result.Coordinates.Value.Longitude;
                         locationIsAccurate = result.Coordinates.Value.IsAccurate;
+                        locationResolver = LocationCandidateSources.GoogleMapsAddress;
                     }
                     else if (result.Status == GoogleMapsLatLngLookupStatus.Error)
                     {
@@ -47,7 +50,7 @@ namespace landerist_library.Parse.Location.Providers.GoogleMaps
                     }
                 }
 
-                if (!updateAddress || !new ES_Listings().UpdateAddress(listing.guid, lat, lng, locationIsAccurate))
+                if (!updateAddress || !new ES_Listings().UpdateAddress(listing.guid, lat, lng, locationIsAccurate, locationResolver))
                 {
                     Interlocked.Increment(ref errors);
                 }
@@ -89,4 +92,3 @@ namespace landerist_library.Parse.Location.Providers.GoogleMaps
         }
     }
 }
-

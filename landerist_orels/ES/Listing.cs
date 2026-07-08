@@ -139,6 +139,9 @@ namespace landerist_orels.ES
         [JsonProperty(Order = 22)]
         public bool? locationIsAccurate { get; set; }
 
+        [JsonIgnore]
+        public string locationResolver { get; set; }
+
         [JsonProperty(Order = 23)]
         public string cadastralReference { get; set; }
 
@@ -346,6 +349,7 @@ namespace landerist_orels.ES
                 latitude == other.latitude &&
                 longitude == other.longitude &&
                 locationIsAccurate == other.locationIsAccurate &&
+                locationResolver == other.locationResolver &&
                 cadastralReference == other.cadastralReference &&
                 propertySize == other.propertySize &&
                 landSize == other.landSize &&
@@ -398,6 +402,7 @@ namespace landerist_orels.ES
             hash ^= latitude?.GetHashCode() ?? 0;
             hash ^= longitude?.GetHashCode() ?? 0;
             hash ^= locationIsAccurate?.GetHashCode() ?? 0;
+            hash ^= locationResolver?.GetHashCode() ?? 0;
             hash ^= cadastralReference?.GetHashCode() ?? 0;
             hash ^= propertySize?.GetHashCode() ?? 0;
             hash ^= landSize?.GetHashCode() ?? 0;

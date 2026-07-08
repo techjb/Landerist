@@ -21,7 +21,7 @@ namespace landerist_library.Parse.Location.Resolvers
         public bool TryResolve(string? address, out LocationCandidate? candidate)
         {
             candidate = null;
-            if (string.IsNullOrEmpty(address))
+            if (string.IsNullOrWhiteSpace(address))
             {
                 return false;
             }

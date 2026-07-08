@@ -129,6 +129,7 @@ CREATE TABLE [dbo].[ES_LISTINGS](
 	[latitude] [float] NULL,
 	[longitude] [float] NULL,
 	[locationIsAccurate] [bit] NULL,
+	[locationResolver] [nvarchar](100) NULL,
 	[cadastralReference] [nvarchar](500) NULL,
 	[propertySize] [float] NULL,
 	[landSize] [float] NULL,

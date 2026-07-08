@@ -6,7 +6,7 @@ namespace landerist_library.Parse.Location.Resolvers
     {
         public string? Resolve(double? latitude, double? longitude, string? address)
         {
-            if (string.IsNullOrEmpty(address))
+            if (string.IsNullOrWhiteSpace(address))
             {
                 return null;
             }
