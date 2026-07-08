@@ -108,6 +108,7 @@ const palette = [
                 httpStatusCode: (GetObjectProperty(charts, 'httpStatusCode', 'HttpStatusCode') || []).map(NormalizeSeries),
                 publishedListingsByOperation: (GetObjectProperty(charts, 'publishedListingsByOperation', 'PublishedListingsByOperation') || []).map(NormalizeSeries),
                 publishedListingsByPropertyType: (GetObjectProperty(charts, 'publishedListingsByPropertyType', 'PublishedListingsByPropertyType') || []).map(NormalizeSeries),
+                listingsByLocationResolver: (GetObjectProperty(charts, 'listingsByLocationResolver', 'ListingsByLocationResolver') || []).map(NormalizeSeries),
                 unpublishedListingsByUnlistingReason: (GetObjectProperty(charts, 'unpublishedListingsByUnlistingReason', 'UnpublishedListingsByUnlistingReason') || []).map(NormalizeSeries)
             };
         }
@@ -384,6 +385,7 @@ const palette = [
                 { title: 'Pages by HttpStatusCode', values: hostData.charts.httpStatusCode, type: PieChart },
                 { title: 'Published Listings by Operation', values: hostData.charts.publishedListingsByOperation, type: PieChart },
                 { title: 'Published Listings by PropertyType', values: hostData.charts.publishedListingsByPropertyType, type: PieChart },
+                { title: 'Listings by LocationResolver', values: hostData.charts.listingsByLocationResolver, type: PieChart },
                 { title: 'Unpublished Listings by UnlistingReason', values: hostData.charts.unpublishedListingsByUnlistingReason, type: PieChart }
             ];
 

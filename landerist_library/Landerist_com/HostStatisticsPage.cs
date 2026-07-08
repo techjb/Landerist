@@ -101,6 +101,7 @@ namespace landerist_library.Landerist_com
                     HttpStatusCode = GetDistribution(HostStatistics.GetPagesByHttpStatusCode(website.Host), "HttpStatusCode"),
                     PublishedListingsByOperation = GetDistribution(HostStatistics.GetPublishedListingsByOperation(website.Host), "Operation"),
                     PublishedListingsByPropertyType = GetDistribution(HostStatistics.GetPublishedListingsByPropertyType(website.Host), "PropertyType"),
+                    ListingsByLocationResolver = GetDistribution(HostStatistics.GetListingsByLocationResolver(website.Host), "LocationResolver"),
                     UnpublishedListingsByUnlistingReason = GetDistribution(HostStatistics.GetUnpublishedListingsByUnlistingReason(website.Host), "UnlistingReason"),
                 }
             };
@@ -246,6 +247,7 @@ namespace landerist_library.Landerist_com
             public required List<ChartSeriesModel> HttpStatusCode { get; init; }
             public required List<ChartSeriesModel> PublishedListingsByOperation { get; init; }
             public required List<ChartSeriesModel> PublishedListingsByPropertyType { get; init; }
+            public required List<ChartSeriesModel> ListingsByLocationResolver { get; init; }
             public required List<ChartSeriesModel> UnpublishedListingsByUnlistingReason { get; init; }
         }
 

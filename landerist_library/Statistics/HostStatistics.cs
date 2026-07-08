@@ -186,6 +186,11 @@ namespace landerist_library.Statistics
             return Repository.GetPublishedListingsByPropertyType(host);
         }
 
+        public static DataTable GetListingsByLocationResolver(string host)
+        {
+            return Repository.GetListingsByLocationResolver(host);
+        }
+
         public static DataTable GetUnpublishedListingsByUnlistingReason(string host)
         {
             return Repository.GetUnpublishedListingsByUnlistingReason(host);

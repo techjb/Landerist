@@ -252,6 +252,18 @@ namespace landerist_library.Infrastructure.Sql
             return QueryPublishedListingsDistribution(host, query);
         }
 
+        public DataTable GetListingsByLocationResolver(string host)
+        {
+            string query =
+                "SELECT COALESCE(NULLIF(LTRIM(RTRIM([locationResolver])), ''), 'NULL') AS [Key], COUNT(*) AS [Counter] " +
+                "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+                "WHERE [Host] = @Host " +
+                "GROUP BY COALESCE(NULLIF(LTRIM(RTRIM([locationResolver])), ''), 'NULL') " +
+                "ORDER BY [Counter] DESC, [Key] ASC";
+
+            return QueryHostTable(query, host);
+        }
+
         public DataTable GetUnpublishedListingsByUnlistingReason(string host)
         {
             string query =
