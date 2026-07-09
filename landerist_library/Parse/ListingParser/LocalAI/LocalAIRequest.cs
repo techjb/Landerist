@@ -12,6 +12,7 @@ namespace landerist_library.Parse.ListingParser.LocalAI
     {
         private const string SERVER_PORT = "8000";
         private const float TEMPERATURE = 0.0f;
+        private const int MAX_COMPLETION_TOKENS = 8192;
         public const int MAX_CONTEXT_WINDOW = 65536;
 
         private static readonly HttpClient HttpClient = new()
@@ -86,7 +87,7 @@ namespace landerist_library.Parse.ListingParser.LocalAI
             return new
             {
                 temperature = TEMPERATURE,
-                //max_completion_tokens = 3000,
+                max_completion_tokens = MAX_COMPLETION_TOKENS,
                 top_p = 1.0,
                 top_k = -1,
                 messages = new[]

@@ -50,7 +50,7 @@ namespace landerist_library.Parse.ListingParser
 
         public ListingParserClientResult GetResponse(Page page, string userInput)
         {
-            var requestText = ListingImageUrlPlaceholders.ReplaceLongImageUrls(userInput);
+            var requestText = ListingImageUrlPlaceholders.ReplaceImageUrls(userInput);
             var response = new LocalAIRequest().GetResponse(requestText).GetAwaiter().GetResult();
             if (response == null)
             {

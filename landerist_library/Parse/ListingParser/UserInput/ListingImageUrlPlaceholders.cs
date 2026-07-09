@@ -9,7 +9,6 @@ namespace landerist_library.Parse.ListingParser.UserInput
 {
     internal static class ListingImageUrlPlaceholders
     {
-        private const int MinUrlLengthToReplace = 500;
         private const string PlaceholderPrefix = "LANDERIST_IMAGE_";
         private const int HashHexLength = 16;
 
@@ -21,7 +20,7 @@ namespace landerist_library.Parse.ListingParser.UserInput
             PlaceholderPrefix + "[0-9A-F]{" + HashHexLength + "}",
             RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
-        public static string ReplaceLongImageUrls(string text)
+        public static string ReplaceImageUrls(string text)
         {
             if (string.IsNullOrWhiteSpace(text))
             {
@@ -31,7 +30,7 @@ namespace landerist_library.Parse.ListingParser.UserInput
             return UrlRegex.Replace(text, match =>
             {
                 var url = match.Value;
-                return ShouldReplace(url) ? GetPlaceholder(url) : url;
+                return IsImageUrl(url) ? GetPlaceholder(url) : url;
             });
         }
 
@@ -89,7 +88,7 @@ namespace landerist_library.Parse.ListingParser.UserInput
             foreach (Match match in UrlRegex.Matches(source))
             {
                 var url = match.Value;
-                if (!ShouldReplace(url))
+                if (!IsImageUrl(url))
                 {
                     continue;
                 }
@@ -119,13 +118,8 @@ namespace landerist_library.Parse.ListingParser.UserInput
             return PlaceholderPrefix + Convert.ToHexString(hash)[..HashHexLength];
         }
 
-        private static bool ShouldReplace(string url)
+        private static bool IsImageUrl(string url)
         {
-            if (url.Length < MinUrlLengthToReplace)
-            {
-                return false;
-            }
-
             if (!Uri.TryCreate(WebUtility.HtmlDecode(url), UriKind.Absolute, out var uri))
             {
                 return false;

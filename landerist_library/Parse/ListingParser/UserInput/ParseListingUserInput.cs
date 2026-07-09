@@ -81,7 +81,7 @@ namespace landerist_library.Parse.ListingParser.UserInput
                 ListingHtmlAttributeCleaner.Clean(workingDocument);
                 ListingEmptyElementRemover.Remove(workingDocument);
                 text = ListingInputCleaner.Clean(workingDocument);
-                return ListingImageUrlPlaceholders.ReplaceLongImageUrls(text);
+                return ListingImageUrlPlaceholders.ReplaceImageUrls(text);
             }
             catch (Exception exception)
             {
@@ -113,7 +113,7 @@ namespace landerist_library.Parse.ListingParser.UserInput
                     text = structuredData + Environment.NewLine + text;
                 }
 
-                return ListingImageUrlPlaceholders.ReplaceLongImageUrls(ListingInputCleaner.Clean(text));
+                return ListingImageUrlPlaceholders.ReplaceImageUrls(ListingInputCleaner.Clean(text));
             }
             catch (Exception exception)
             {
