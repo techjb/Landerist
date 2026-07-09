@@ -14,7 +14,7 @@ namespace landerist_library.Tasks
             DeleteLocalFiles();
 
             VertexAIBatchCleaner.RemoveFiles();
-            OpenAIBatchCleaner.RemoveFiles();
+            //OpenAIBatchCleaner.RemoveFiles();
         }
 
         private static void DeleteDownloadedBatches()
