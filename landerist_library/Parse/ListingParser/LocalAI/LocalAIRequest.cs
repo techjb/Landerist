@@ -1,5 +1,4 @@
 ﻿using landerist_library.Configuration;
-using landerist_library.Parse.ListingParser.OpenAI;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
 using System.Net;
 using System.Net.Sockets;
@@ -11,9 +10,11 @@ namespace landerist_library.Parse.ListingParser.LocalAI
     public class LocalAIRequest
     {
         private const string SERVER_PORT = "8000";
+        private const string MODEL_NAME = "cyankiwi/Qwen3.6-35B-A3B-AWQ-4bit";
         private const float TEMPERATURE = 0.0f;
-        private const int MAX_COMPLETION_TOKENS = 8192;
-        public const int MAX_CONTEXT_WINDOW = 65536;
+        private const int SERVER_MAX_MODEL_LEN = 60000;
+        private const int MAX_COMPLETION_TOKENS = 12000;
+        public const int MAX_CONTEXT_WINDOW = SERVER_MAX_MODEL_LEN - MAX_COMPLETION_TOKENS;
 
         private static readonly HttpClient HttpClient = new()
         {
@@ -84,12 +85,19 @@ namespace landerist_library.Parse.ListingParser.LocalAI
 
         private object GetRequestBody(string text)
         {
+            var jsonSchema = GetJsonSchema();
+
             return new
             {
+                model = MODEL_NAME,
                 temperature = TEMPERATURE,
-                max_completion_tokens = MAX_COMPLETION_TOKENS,
+                max_tokens = MAX_COMPLETION_TOKENS,
                 top_p = 1.0,
                 top_k = -1,
+                chat_template_kwargs = new
+                {
+                    enable_thinking = false
+                },
                 messages = new[]
                 {
                     new { role = "system", content = GetExtendedSystemPrompt() },
@@ -98,9 +106,25 @@ namespace landerist_library.Parse.ListingParser.LocalAI
                 response_format = new
                 {
                     type = "json_schema",
-                    json_schema = OpenAIRequest.OpenAIJsonSchema
-                }
+                    json_schema = new
+                    {
+                        name = "esquema_de_respuesta",
+                        schema = jsonSchema,
+                        strict = true
+                    }
+                },
+                //structured_outputs = new
+                //{
+                //    json = jsonSchema
+                //},
+                //guided_json = jsonSchema
             };
+        }
+
+        private static JsonElement GetJsonSchema()
+        {
+            using var jsonDocument = JsonDocument.Parse(StructuredOutputSchema.GetJsonSchemaString());
+            return jsonDocument.RootElement.Clone();
         }
 
         private static string NormalizeUserInput(string text)
@@ -115,7 +139,7 @@ namespace landerist_library.Parse.ListingParser.LocalAI
                 "En todos los valores string, escapa siempre los caracteres especiales de JSON: las comillas dobles interiores deben ir precedidas por una barra invertida, y también deben escaparse barras invertidas, saltos de línea y tabuladores. " +
                 "Nunca incluyas comillas dobles literales sin escapar dentro de un valor string. " +
                 "Si el input contiene marcadores de imagen como LANDERIST_IMAGE_A1B2C3D4E5F60708, úsalos exactamente como valor de url_de_la_imagen cuando correspondan a imágenes del anuncio; no intentes reconstruir, expandir ni inventar la URL original. " +
-                "El objeto JSON debe tener la siguiente estructura exacta: " + OpenAIRequest.OpenAIJsonSchema + " " +
+                "El objeto JSON debe tener la siguiente estructura exacta: " + StructuredOutputSchema.GetJsonSchemaString() + " " +
                 "Si no encuentras algún dato, usa 'null'. No incluyas texto adicional fuera del JSON.";
         }
 

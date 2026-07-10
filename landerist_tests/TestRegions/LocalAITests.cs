@@ -14,7 +14,7 @@ namespace landerist_tests
             //Console.WriteLine(ParseListingSystem.GetSystemPrompt());
             //new landerist_library.Tasks.TaskLocalAIParsing();
             //new landerist_library.Tasks.TaskLocalAIParsing().ProcessPages();
-            //new landerist_library.Tasks.TaskLocalAIParsing().ProcessPage("7774C6909BA2A4BD285089AFEA09D37B9CD0F0E580F7629069F1A17006F69BA3");
+            //landerist_library.Tasks.TaskLocalAIParsing.ProcessPage("06733B0466E54AC3DD64333443A75A3323B04C9BC709C89C1187D36C6993F406");
 
             //Console.WriteLine(TaskLocalAIParsing.GetMaxTokenCount());
 

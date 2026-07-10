@@ -57,14 +57,21 @@ namespace landerist_library.Parse.ListingParser
                 return new ListingParserClientResult(null, true, "response is null.");
             }
 
+            var finishReason = response.GetFinishReason();
             var responseText = response.GetResponseText();
             if (string.IsNullOrWhiteSpace(responseText))
             {
-                var diagnostic = "responseText is null or empty. Finish Reason: " + response.GetFinishReason() + " TokenCount: " + page.TokenCount;
+                var diagnostic = "responseText is null or empty. Finish Reason: " + finishReason + " TokenCount: " + page.TokenCount;
                 return new ListingParserClientResult(null, true, diagnostic);
             }
 
-            var successDiagnostic = "Finish Reason: " + response.GetFinishReason() + " TokenCount " + page.TokenCount + " Uri: " + page.Uri;
+            if (finishReason == "length")
+            {
+                var diagnostic = "response was truncated by max_tokens. TokenCount: " + page.TokenCount + " Uri: " + page.Uri;
+                return new ListingParserClientResult(null, true, diagnostic);
+            }
+
+            var successDiagnostic = "Finish Reason: " + finishReason + " TokenCount " + page.TokenCount + " Uri: " + page.Uri;
             return new ListingParserClientResult(responseText, false, successDiagnostic);
         }
     }
