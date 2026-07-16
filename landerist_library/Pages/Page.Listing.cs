@@ -115,7 +115,7 @@ namespace landerist_library.Pages
                 "WHERE [HOST] = @Host AND " +
                 "[UriHash] <> @UriHash AND " +
                 "[ListingParserInputHash] = @ListingParserInputHash AND " +
-                "[ListingStatus] IS NOT NULL";
+                "EXISTS (SELECT 1 FROM " + ES_Listings.TABLE_ES_LISTINGS + " L WHERE L.[guid] = " + Pages.PAGES + ".[UriHash])";
 
             return new DataBase().QueryExists(query, new Dictionary<string, object?> {
                 {"Host", Host},
@@ -149,29 +149,14 @@ namespace landerist_library.Pages
             return listing is not null;
         }
 
-        public void SetListingStatusPublished()
-        {
-            ListingStatus = landerist_orels.ES.ListingStatus.published;
-        }
-
-        public void SetListingStatusUnpublished()
-        {
-            ListingStatus = landerist_orels.ES.ListingStatus.unpublished;
-        }
-
         public bool IsListingStatusPublished()
         {
-            return ListingStatus == landerist_orels.ES.ListingStatus.published;
+            return GetListing(false, false)?.listingStatus == landerist_orels.ES.ListingStatus.published;
         }
 
         public bool IsListingStatusUnPublished()
         {
-            return ListingStatus == landerist_orels.ES.ListingStatus.unpublished;
-        }
-
-        public bool ContainsListingStatus()
-        {
-            return ListingStatus is not null;
+            return GetListing(false, false)?.listingStatus == landerist_orels.ES.ListingStatus.unpublished;
         }
 
         public bool HaveToUnpublishListing()
@@ -186,12 +171,12 @@ namespace landerist_library.Pages
 
         public bool IsNotCanonicalListing()
         {
-            return IsNotCanonical() && ContainsListingStatus();
+            return IsNotCanonical() && ContainsListing();
         }
 
         public bool IsRedirectToAnotherUrlListing()
         {
-            return IsRedirectToAnotherUrl() && ContainsListingStatus();
+            return IsRedirectToAnotherUrl() && ContainsListing();
         }
     }
 }

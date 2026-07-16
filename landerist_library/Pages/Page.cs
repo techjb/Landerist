@@ -35,8 +35,6 @@ namespace landerist_library.Pages
 
         public short? PageTypeCounter { get; private set; }
 
-        private ListingStatus? ListingStatus { get; set; }
-
         public string? LockedBy { get; set; }
 
         public WaitingStatus? WaitingStatus { get; private set; }

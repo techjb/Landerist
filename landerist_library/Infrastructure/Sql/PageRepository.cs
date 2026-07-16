@@ -48,7 +48,6 @@ namespace landerist_library.Infrastructure.Sql
                 "[LastModified] = @LastModified, " +
                 "[PageType] = @PageType, " +
                 "[PageTypeCounter] = @PageTypeCounter, " +
-                "[ListingStatus] = @ListingStatus, " +
                 "[LockedBy] = @LockedBy, " +
                 "[WaitingStatus] = @WaitingStatus, " +
                 "[ListingParserInputHash] = @ListingParserInputHash, " +

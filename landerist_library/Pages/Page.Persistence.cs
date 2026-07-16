@@ -29,7 +29,6 @@ namespace landerist_library.Pages
             LastModified = dataRow["LastModified"] is DBNull ? null : dataRow["LastModified"].ToString();
             PageType = dataRow["PageType"] is DBNull ? null : ParsePageType(dataRow["PageType"].ToString()!);
             PageTypeCounter = dataRow["PageTypeCounter"] is DBNull ? null : (short)dataRow["PageTypeCounter"];
-            ListingStatus = dataRow["ListingStatus"] is DBNull ? null : (ListingStatus)Enum.Parse(typeof(ListingStatus), dataRow["ListingStatus"].ToString()!);
             LockedBy = dataRow["LockedBy"] is DBNull ? null : dataRow["LockedBy"].ToString();
             WaitingStatus = dataRow["WaitingStatus"] is DBNull ? null : (global::landerist_library.Pages.WaitingStatus)Enum.Parse(typeof(global::landerist_library.Pages.WaitingStatus), dataRow["WaitingStatus"].ToString()!);
             ListingParserInputHash = dataRow["ListingParserInputHash"] is DBNull ? null : dataRow["ListingParserInputHash"].ToString();
@@ -107,7 +106,6 @@ namespace landerist_library.Pages
                 {"LastModified", LastModified},
                 {"PageType", PageType?.ToString()},
                 {"PageTypeCounter", PageTypeCounter},
-                {"ListingStatus", ListingStatus?.ToString()},
                 {"LockedBy", LockedBy?.ToString()},
                 {"WaitingStatus", WaitingStatus?.ToString()},
                 {"ListingParserInputHash", ListingParserInputHash},

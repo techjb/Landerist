@@ -156,7 +156,6 @@ namespace landerist_library.Scrape
             new LocationParser(page, newListing).SetLocation();
             new LauIdParser(page.Website.CountryCode, newListing).SetLauIdAndLauName();
             ES_Listings.InsertUpdate(page.Website, newListing);
-            page.SetListingStatusPublished();
         }
 
         private void UnpublishListing(Listing? newListing, ListingUnpublishDecision? unpublishDecision = null)
@@ -170,7 +169,6 @@ namespace landerist_library.Scrape
 
             newListing.SetUnpublished();
             ES_Listings.InsertUpdate(page.Website, newListing, unpublishDecision);
-            page.SetListingStatusUnpublished();
         }
     }
 }

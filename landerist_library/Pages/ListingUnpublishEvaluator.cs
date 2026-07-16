@@ -10,7 +10,7 @@ namespace landerist_library.Pages
 
     public enum ListingUnpublishDecisionReason
     {
-        ListingStatusIsNotPublished,
+        ListingDoesNotExist,
         PageTypeIsListing,
         PageTypeMayBeListing,
         NoUnpublishEvidence,
@@ -39,9 +39,9 @@ namespace landerist_library.Pages
 
         public ListingUnpublishDecision Evaluate()
         {
-            if (!_page.IsListingStatusPublished())
+            if (!_page.ContainsListing())
             {
-                return CreateDecision(false, ListingUnpublishDecisionReason.ListingStatusIsNotPublished, null);
+                return CreateDecision(false, ListingUnpublishDecisionReason.ListingDoesNotExist, null);
             }
 
             if (_page.IsListing())
@@ -55,11 +55,6 @@ namespace landerist_library.Pages
             }
 
             var requiredEvidenceCount = GetRequiredEvidenceCount();
-            if (requiredEvidenceCount is null)
-            {
-                return CreateDecision(false, ListingUnpublishDecisionReason.NoUnpublishEvidence, null);
-            }
-
             if (GetActualEvidenceCount() < requiredEvidenceCount)
             {
                 return CreateDecision(false, ListingUnpublishDecisionReason.EvidenceCounterBelowRequired, requiredEvidenceCount);
@@ -87,7 +82,7 @@ namespace landerist_library.Pages
             return _page.PageTypeCounter ?? 0;
         }
 
-        private int? GetRequiredEvidenceCount()
+        private int GetRequiredEvidenceCount()
         {
             return _page.PageType switch
             {
@@ -97,7 +92,7 @@ namespace landerist_library.Pages
                 PageType.DiscardedByListingUrlRegex => RequiredDefaultEvidenceCount,
                 PageType.NotListingByParser => RequiredDefaultEvidenceCount,
                 PageType.NotListingByCache => RequiredDefaultEvidenceCount,
-                _ => null
+                _ => RequiredDefaultEvidenceCount
             };
         }
     }
