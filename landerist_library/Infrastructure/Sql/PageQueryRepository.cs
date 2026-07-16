@@ -152,7 +152,6 @@ namespace landerist_library.Infrastructure.Sql
                 "[LastModified], " +
                 "[PageType], " +
                 "[PageTypeCounter], " +
-                "[ListingStatus], " +
                 "[LockedBy], " +
                 "[WaitingStatus], " +
                 "[ListingParserInputNotChangedCounter], " +
@@ -234,7 +233,6 @@ namespace landerist_library.Infrastructure.Sql
                     pagesAlias + ".[LastModified], " +
                     pagesAlias + ".[PageType], " +
                     pagesAlias + ".[PageTypeCounter], " +
-                    pagesAlias + ".[ListingStatus], " +
                     pagesAlias + ".[LockedBy], " +
                     pagesAlias + ".[WaitingStatus], " +
                     pagesAlias + ".[ListingParserInputHash], " +
@@ -285,7 +283,6 @@ namespace landerist_library.Infrastructure.Sql
                 pagesTableName + ".[LastModified], " +
                 pagesTableName + ".[PageType], " +
                 pagesTableName + ".[PageTypeCounter], " +
-                pagesTableName + ".[ListingStatus], " +
                 pagesTableName + ".[LockedBy], " +
                 pagesTableName + ".[WaitingStatus], " +
                 pagesTableName + ".[ListingParserInputHash], " +

@@ -8,13 +8,14 @@ namespace landerist_library.Pages
         public static Dictionary<string, object?> GroupByPageType(ListingStatus? listingStatus = null)
         {
             string where = listingStatus != null
-                ? "WHERE [listingStatus] = @listingStatus "
+                ? "WHERE L.[listingStatus] = @listingStatus "
                 : string.Empty;
             string query =
-                "SELECT [PageType], COUNT(*) " +
-                "FROM " + PAGES + " " +
+                "SELECT P.[PageType], COUNT(*) " +
+                "FROM " + PAGES + " AS P " +
+                "LEFT JOIN " + ES_Listings.TABLE_ES_LISTINGS + " AS L ON L.[guid] = P.[UriHash] " +
                 where + " " +
-                "GROUP BY [PageType] " +
+                "GROUP BY P.[PageType] " +
                 "ORDER BY COUNT(*) DESC";
 
             return new DataBase().QueryDictionary(query, new Dictionary<string, object?>
@@ -26,13 +27,14 @@ namespace landerist_library.Pages
         public static Dictionary<string, object?> GroupByHttpStatusCode(ListingStatus? listingStatus = null)
         {
             string where = listingStatus != null
-                ? "WHERE [listingStatus] = @listingStatus "
+                ? "WHERE L.[listingStatus] = @listingStatus "
                 : string.Empty;
             string query =
-                "SELECT CONVERT(VARCHAR,  [HttpStatusCode], 23), COUNT(*) " +
-                "FROM " + PAGES + " " +
+                "SELECT CONVERT(VARCHAR, P.[HttpStatusCode], 23), COUNT(*) " +
+                "FROM " + PAGES + " AS P " +
+                "LEFT JOIN " + ES_Listings.TABLE_ES_LISTINGS + " AS L ON L.[guid] = P.[UriHash] " +
                 where + " " +
-                "GROUP BY CONVERT(VARCHAR,  [HttpStatusCode], 23) " +
+                "GROUP BY CONVERT(VARCHAR, P.[HttpStatusCode], 23) " +
                 "ORDER BY COUNT(*) DESC";
 
             return new DataBase().QueryDictionary(query, new Dictionary<string, object?>

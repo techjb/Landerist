@@ -106,22 +106,7 @@ namespace landerist_library.Database
                 return 0;
             }
 
-            success = new DataBase().Query(
-                "UPDATE P " +
-                "SET P.[ListingStatus] = @unpublished " +
-                "FROM " + Pages.Pages.PAGES + " AS P " +
-                "WHERE P.[Host] = @host AND " +
-                "P.[PageType] = @pageType AND " +
-                "EXISTS (" +
-                "   SELECT 1 " +
-                "   FROM " + ES_Listings.TABLE_ES_LISTINGS + " AS L " +
-                "   WHERE L.[guid] = P.[UriHash] AND " +
-                "   L.[Host] = @host AND " +
-                "   L.[listingStatus] = @unpublished" +
-                ")",
-                updateParameters);
-
-            return success ? listingsToUnpublish : 0;
+            return listingsToUnpublish;
         }
     }
 }

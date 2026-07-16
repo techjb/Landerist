@@ -27,10 +27,10 @@ namespace landerist_library.Infrastructure.Sql
             string query =
                 "INSERT INTO " + Pages.Pages.PAGES + " (" +
                 "[Host], [Uri], [UriHash], [Inserted], [LastScrape], [LastParseListing], [NextScrape], [HttpStatusCode], [Etag], [LastModified], [PageType], " +
-                "[PageTypeCounter], [ListingStatus], [LockedBy], [WaitingStatus], [ListingParserInputHash], " +
+                "[PageTypeCounter], [LockedBy], [WaitingStatus], [ListingParserInputHash], " +
                 "[ListingParserInputNotChangedCounter], [TransientErrorCounter], [ResponseBodyZipped], [TokenCount]) " +
                 "VALUES(@Host, @Uri, @UriHash, @Inserted, @LastScrape, @LastParseListing, @NextScrape, @HttpStatusCode, @Etag, @LastModified, @PageType, " +
-                "@PageTypeCounter, @ListingStatus, @LockedBy, @WaitingStatus, @ListingParserInputHash, " +
+                "@PageTypeCounter, @LockedBy, @WaitingStatus, @ListingParserInputHash, " +
                 "@ListingParserInputNotChangedCounter, @TransientErrorCounter, CONVERT(varbinary(max), @ResponseBodyZipped), @TokenCount)";
 
             return new DataBase().Query(query, parameters);

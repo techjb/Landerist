@@ -61,12 +61,11 @@ namespace landerist_library.Infrastructure.Sql
         {
             string query =
                 "SELECT 1 " +
-                "FROM " + Pages.Pages.PAGES + " " +
-                "WHERE [Host] = @Host AND [PageType] = @PageType AND [ListingStatus] = @ListingStatus";
+                "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+                "WHERE [Host] = @Host AND [listingStatus] = @ListingStatus";
 
             return new DataBase().QueryExists(query, new Dictionary<string, object?> {
                 { "Host", host },
-                { "PageType", PageType.Listing.ToString() },
                 { "ListingStatus", ListingStatus.published.ToString() }
             });
         }

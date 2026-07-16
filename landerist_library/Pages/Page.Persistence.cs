@@ -72,7 +72,6 @@ namespace landerist_library.Pages
                 {"LastModified", null },
                 {"PageType", null },
                 {"PageTypeCounter", null },
-                {"ListingStatus", null },
                 {"LockedBy", null },
                 {"WaitingStatus", null },
                 {"ListingParserInputHash", null },
