@@ -122,7 +122,7 @@ namespace landerist_library.Parse.ListingParser.Gemini
         {
             var listingService = new ListingService();
             var notListingService = new NotListingService();
-            var model = new GenerativeModel(PrivateConfig.GEMINI_API_KEY, ModelParams);
+            var model = new GenerativeModel(AppConfig.GEMINI_API_KEY, ModelParams);
 
             model.AddGlobalFunctions(listingService.AsGoogleFunctions(), listingService.AsGoogleCalls());
             model.AddGlobalFunctions(notListingService.AsGoogleFunctions(), notListingService.AsGoogleCalls());
@@ -132,7 +132,7 @@ namespace landerist_library.Parse.ListingParser.Gemini
 
         public static void Test()
         {
-            var service = new ModelInfoService(PrivateConfig.GEMINI_API_KEY);
+            var service = new ModelInfoService(AppConfig.GEMINI_API_KEY);
             var models = Task.Run(async () => await service.GetModelsAsync()).Result;
             foreach (var model in models)
             {

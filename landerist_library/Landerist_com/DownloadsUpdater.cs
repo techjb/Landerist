@@ -448,7 +448,7 @@ namespace landerist_library.Landerist_com
             {
                 foreach (string objectKey in GetObjectKeysForMetadata(exportType))
                 {
-                    var metaDataValue = s3.GetMetadataValue(PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey, METADATA_KEY_DATETO);
+                    var metaDataValue = s3.GetMetadataValue(AppConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey, METADATA_KEY_DATETO);
                     if (metaDataValue != null &&
                         DateOnly.TryParseExact(metaDataValue, METADATA_DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly dateTo))
                     {

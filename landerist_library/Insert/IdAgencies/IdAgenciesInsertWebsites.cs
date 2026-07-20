@@ -9,7 +9,7 @@ namespace landerist_library.Insert.IdAgencies
     {
         public static void Start()
         {
-            string file = PrivateConfig.INSERT_DIRECTORY + @"IdAgencies\Entrega.csv";
+            string file = AppConfig.INSERT_DIRECTORY + @"IdAgencies\Entrega.csv";
             DataTable dataTable = Csv.ToDataTable(file);
             var uris = ToList(dataTable, "ListingExample");
             Insert(uris);

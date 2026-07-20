@@ -21,7 +21,7 @@ namespace landerist_library.Parse.ListingParser.Anthropic
 
         public static MessageResponse? GetResponse(Page page, string text)
         {
-            var apiAutentication = new APIAuthentication(PrivateConfig.ANTHROPIC_API_KEY);
+            var apiAutentication = new APIAuthentication(AppConfig.ANTHROPIC_API_KEY);
             var client = new AnthropicClient(apiAutentication);
             var message = GetMessage(page, text);
             List<SystemMessage> systemMessages = [new SystemMessage(SystemPrompt)];

@@ -84,21 +84,21 @@ namespace landerist_library.Landerist_com
             var s3 = new S3();
             string objectKey = GetObjectKey(countryCode, exportType, "json");
 
-            var (lastModified, contentLength) = s3.GetFileInfo(PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey);
+            var (lastModified, contentLength) = s3.GetFileInfo(AppConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey);
             if (lastModified is null || contentLength is null)
             {
                 return;
             }
 
             var counter = s3.GetMetadataValue(
-                PrivateConfig.AWS_S3_DOWNLOADS_BUCKET,
+                AppConfig.AWS_S3_DOWNLOADS_BUCKET,
                 objectKey,
                 DownloadsUpdater.METADATA_KEY_COUNTER);
 
             string sizeString = FormatBytes((long)contentLength);
             Replace(Comment(countryCode, exportType, "Size"), sizeString);
 
-            var url = $"https://{PrivateConfig.AWS_S3_DOWNLOADS_BUCKET}.s3.amazonaws.com/{objectKey}";
+            var url = $"https://{AppConfig.AWS_S3_DOWNLOADS_BUCKET}.s3.amazonaws.com/{objectKey}";
             string fileName = GetFileName(countryCode, exportType, "json");
             string counterText = counter ?? "-";
             string counterHyperlink = $"<a title=\"Download\" href=\"{WebUtility.HtmlEncode(url)}\" download=\"{WebUtility.HtmlEncode(fileName)}\">{WebUtility.HtmlEncode(counterText)}</a>";
@@ -192,14 +192,14 @@ namespace landerist_library.Landerist_com
             ListingStatus listingStatus)
         {
             string objectKey = GetListingsByOperationPropertyTypeObjectKey(countryCode, operation, propertyType, listingStatus, "json");
-            var (lastModified, contentLength) = new S3().GetFileInfo(PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey);
+            var (lastModified, contentLength) = new S3().GetFileInfo(AppConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey);
 
             if (lastModified is null || contentLength is null)
             {
                 return null;
             }
 
-            return $"https://{PrivateConfig.AWS_S3_DOWNLOADS_BUCKET}.s3.amazonaws.com/{objectKey}";
+            return $"https://{AppConfig.AWS_S3_DOWNLOADS_BUCKET}.s3.amazonaws.com/{objectKey}";
         }
 
         private static string GetListingsByOperationPropertyTypeObjectKey(
@@ -268,14 +268,14 @@ namespace landerist_library.Landerist_com
         private static string? GetHostDownloadUrl(CountryCode countryCode, string host, ListingStatus listingStatus, string extension)
         {
             string objectKey = GetHostObjectKey(countryCode, host, listingStatus, extension);
-            var (lastModified, contentLength) = new S3().GetFileInfo(PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey);
+            var (lastModified, contentLength) = new S3().GetFileInfo(AppConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey);
 
             if (lastModified is null || contentLength is null)
             {
                 return null;
             }
 
-            return $"https://{PrivateConfig.AWS_S3_DOWNLOADS_BUCKET}.s3.amazonaws.com/{objectKey}";
+            return $"https://{AppConfig.AWS_S3_DOWNLOADS_BUCKET}.s3.amazonaws.com/{objectKey}";
         }
 
         private static string GetHostObjectKey(CountryCode countryCode, string host, ListingStatus listingStatus, string extension)

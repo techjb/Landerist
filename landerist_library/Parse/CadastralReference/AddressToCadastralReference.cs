@@ -1,4 +1,4 @@
-using landerist_library.Database;
+﻿using landerist_library.Database;
 using landerist_library.Parse.Location.Providers.Goolzoom;
 using landerist_library.Statistics;
 using Newtonsoft.Json;
@@ -155,8 +155,8 @@ namespace landerist_library.Parse.CadastralReference
                     Console.WriteLine($"Processed {currentProcessed}/{total} ({processedPercentage}%) Found: {found}  Not Found: {notFound}");
                 });
 
-            Tools.Csv.Write(dataTableFound, Configuration.PrivateConfig.EXPORT_DIRECTORY_LOCAL + "Found.csv", true);
-            Tools.Csv.Write(dataTableNotFound, Configuration.PrivateConfig.EXPORT_DIRECTORY_LOCAL + "NotFound.csv", true);
+            Tools.Csv.Write(dataTableFound, Configuration.AppConfig.EXPORT_DIRECTORY_LOCAL + "Found.csv", true);
+            Tools.Csv.Write(dataTableNotFound, Configuration.AppConfig.EXPORT_DIRECTORY_LOCAL + "NotFound.csv", true);
         }
     }
 }

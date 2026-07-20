@@ -23,7 +23,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                         InstancesFormat = "jsonl",
                         GcsSource = new GcsSource()
                         {
-                            Uris = { "gs://" + PrivateConfig.GOOGLE_CLOUD_BUCKET_NAME + "/" + name }
+                            Uris = { "gs://" + AppConfig.GOOGLE_CLOUD_BUCKET_NAME + "/" + name }
                         }
                     },
                     OutputConfig = new BatchPredictionJob.Types.OutputConfig()
@@ -31,7 +31,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                         PredictionsFormat = "jsonl",
                         GcsDestination = new GcsDestination()
                         {
-                            OutputUriPrefix = "gs://" + PrivateConfig.GOOGLE_CLOUD_BUCKET_NAME + "/" + outputName,
+                            OutputUriPrefix = "gs://" + AppConfig.GOOGLE_CLOUD_BUCKET_NAME + "/" + outputName,
                         },
                     },
                 },
@@ -121,14 +121,14 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
 
         private static string GetParent()
         {
-            return $"projects/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PROJECTID}/locations/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}";
+            return $"projects/{AppConfig.GOOGLE_CLOUD_VERTEX_AI_PROJECTID}/locations/{AppConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}";
         }
         private static JobServiceClient GetJobServiceClient()
         {
             return new JobServiceClientBuilder
             {
-                Endpoint = $"{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}-aiplatform.googleapis.com",
-                GoogleCredential = CredentialFactory.FromJson<ServiceAccountCredential>(PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_CREDENTIAL).ToGoogleCredential(),
+                Endpoint = $"{AppConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}-aiplatform.googleapis.com",
+                GoogleCredential = CredentialFactory.FromJson<ServiceAccountCredential>(AppConfig.GOOGLE_CLOUD_VERTEX_AI_CREDENTIAL).ToGoogleCredential(),
             }.Build();
         }
     }

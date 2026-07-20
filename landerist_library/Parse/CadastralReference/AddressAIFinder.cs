@@ -50,8 +50,8 @@ namespace landerist_library.Parse.CadastralReference
         {
             return new PredictionServiceClientBuilder
             {
-                Endpoint = $"{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}-aiplatform.googleapis.com",
-                GoogleCredential = CredentialFactory.FromJson<ServiceAccountCredential>(PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_CREDENTIAL).ToGoogleCredential(),
+                Endpoint = $"{AppConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}-aiplatform.googleapis.com",
+                GoogleCredential = CredentialFactory.FromJson<ServiceAccountCredential>(AppConfig.GOOGLE_CLOUD_VERTEX_AI_CREDENTIAL).ToGoogleCredential(),
             }.Build();
         }
 
@@ -60,7 +60,7 @@ namespace landerist_library.Parse.CadastralReference
 
             return new GenerateContentRequest
             {
-                Model = $"projects/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PROJECTID}/locations/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}/publishers/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PUBLISHER}/models/{Config.VERTEX_AI_MODEL_NAME_GEMINI_FLASH}",
+                Model = $"projects/{AppConfig.GOOGLE_CLOUD_VERTEX_AI_PROJECTID}/locations/{AppConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}/publishers/{AppConfig.GOOGLE_CLOUD_VERTEX_AI_PUBLISHER}/models/{Config.VERTEX_AI_MODEL_NAME_GEMINI_FLASH}",
                 Contents =
                 {
                     new Content()

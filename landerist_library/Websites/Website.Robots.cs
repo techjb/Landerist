@@ -1,4 +1,4 @@
-using Com.Bekijkhet.RobotsTxt;
+﻿using Com.Bekijkhet.RobotsTxt;
 using landerist_library.Configuration;
 using System.Net;
 using System.Text;
@@ -131,11 +131,11 @@ namespace landerist_library.Websites
             HttpClientHandler handler = new()
             {
                 UseProxy = true,
-                Proxy = new WebProxy(PrivateConfig.PROXY_HOST, GetProxyPort())
+                Proxy = new WebProxy(AppConfig.PROXY_HOST, GetProxyPort())
                 {
                     Credentials = new NetworkCredential(
-                        PrivateConfig.PROXY_USERNAME,
-                        PrivateConfig.PROXY_PASSWORD)
+                        AppConfig.PROXY_USERNAME,
+                        AppConfig.PROXY_PASSWORD)
                 }
             };
 
@@ -144,15 +144,15 @@ namespace landerist_library.Websites
 
         private static int GetProxyPort()
         {
-            if (!PrivateConfig.PROXY_RANDOMIZE_STICKY_PORTS ||
-                PrivateConfig.PROXY_STICKY_PORT_MIN > PrivateConfig.PROXY_STICKY_PORT_MAX)
+            if (!AppConfig.PROXY_RANDOMIZE_STICKY_PORTS ||
+                AppConfig.PROXY_STICKY_PORT_MIN > AppConfig.PROXY_STICKY_PORT_MAX)
             {
-                return int.Parse(PrivateConfig.PROXY_PORT);
+                return int.Parse(AppConfig.PROXY_PORT);
             }
 
             return Random.Shared.Next(
-                PrivateConfig.PROXY_STICKY_PORT_MIN,
-                PrivateConfig.PROXY_STICKY_PORT_MAX + 1);
+                AppConfig.PROXY_STICKY_PORT_MIN,
+                AppConfig.PROXY_STICKY_PORT_MAX + 1);
         }
     }
 }

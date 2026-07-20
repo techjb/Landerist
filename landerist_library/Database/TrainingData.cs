@@ -126,16 +126,16 @@ namespace landerist_library.Database
         private static void WriteFiles(DataTable dataTableTrain, DataTable dataTableValid, DataTable dataTableTest)
         {
             Console.WriteLine("Writing files ..");
-            Tools.Csv.Write(dataTableTrain, Configuration.PrivateConfig.TRAININGDATA_DIRECTORY_LOCAL + "train.csv", true);
-            Tools.Csv.Write(dataTableValid, Configuration.PrivateConfig.TRAININGDATA_DIRECTORY_LOCAL + "valid.csv", true);
-            Tools.Csv.Write(dataTableTest, Configuration.PrivateConfig.TRAININGDATA_DIRECTORY_LOCAL + "test.csv", true);
+            Tools.Csv.Write(dataTableTrain, Configuration.AppConfig.TRAININGDATA_DIRECTORY_LOCAL + "train.csv", true);
+            Tools.Csv.Write(dataTableValid, Configuration.AppConfig.TRAININGDATA_DIRECTORY_LOCAL + "valid.csv", true);
+            Tools.Csv.Write(dataTableTest, Configuration.AppConfig.TRAININGDATA_DIRECTORY_LOCAL + "test.csv", true);
         }
 
         private static void WriteFile(DataTable dataTable, bool html)
         {
             Console.WriteLine("Writing file ..");
             string fileName = html ? "data_html.csv" : "data_text.csv";
-            Tools.Csv.Write(dataTable, Configuration.PrivateConfig.TRAININGDATA_DIRECTORY_LOCAL + fileName, true);
+            Tools.Csv.Write(dataTable, Configuration.AppConfig.TRAININGDATA_DIRECTORY_LOCAL + fileName, true);
         }
     }
 }

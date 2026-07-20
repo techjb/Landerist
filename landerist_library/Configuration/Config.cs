@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "5.83";
+        public static readonly string VERSION = "5.84";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -44,11 +44,11 @@ namespace landerist_library.Configuration
 
         public static readonly double MINIMUM_PERCENTAGE_TO_BE_SIMILAR_PAGE = 0.85;
 
-        public const string DATABASE_NAME = PrivateConfig.DATABASE_NAME;
+        public static string DATABASE_NAME => AppConfig.DATABASE_NAME;
 
-        public const string DATABASE_USER = PrivateConfig.DATABASE_USER;
+        public static string DATABASE_USER => AppConfig.DATABASE_USER;
 
-        public const string DATABASE_PW = PrivateConfig.DATABASE_PW;
+        public static string DATABASE_PW => AppConfig.DATABASE_PW;
 
         public static string? DATASOURCE { get; set; }
 
@@ -147,12 +147,12 @@ namespace landerist_library.Configuration
 
         public static bool IsPrincipalMachine()
         {
-            return MACHINE_NAME.Equals(PrivateConfig.MACHINE_NAME_LANDERIST_01);
+            return MACHINE_NAME.Equals(AppConfig.MACHINE_NAME_LANDERIST_01);
         }
 
         public static bool IsLocalAIMachine()
         {
-            return MACHINE_NAME.Equals(PrivateConfig.MACHINE_NAME_LANDERIST_03);
+            return MACHINE_NAME.Equals(AppConfig.MACHINE_NAME_LANDERIST_03);
         }
 
         public static void SetToProduction()
@@ -163,6 +163,7 @@ namespace landerist_library.Configuration
         public static void SetOnlyDatabaseToProduction()
         {
             SetToLocal();
+            ValidateDatabaseConfiguration(true);
             InitDatabase(true);
         }
 
@@ -175,35 +176,40 @@ namespace landerist_library.Configuration
         {
             ConfigurationProduction = configurationProduction;
 
-            Newtonsoft.Json.Schema.License.RegisterLicense(PrivateConfig.NEWTONSOFT_LICENSE_KEY);
+            ValidateDatabaseConfiguration(configurationProduction);
+
+            if (!string.IsNullOrWhiteSpace(AppConfig.NEWTONSOFT_LICENSE_KEY))
+            {
+                Newtonsoft.Json.Schema.License.RegisterLicense(AppConfig.NEWTONSOFT_LICENSE_KEY);
+            }
 
             InitDatabase(configurationProduction);
 
             EXPORT_DIRECTORY = ConfigurationProduction ?
-                PrivateConfig.EXPORT_DIRECTORY_PRODUCTION :
-                PrivateConfig.EXPORT_DIRECTORY_LOCAL;
+                AppConfig.EXPORT_DIRECTORY_PRODUCTION :
+                AppConfig.EXPORT_DIRECTORY_LOCAL;
 
             LANDERIST_COM_OUTPUT = ConfigurationProduction ?
-                PrivateConfig.LANDERIST_COM_OUTPUT_PRODUCTION :
-                PrivateConfig.LANDERIST_COM_OUTPUT_LOCAL;
+                AppConfig.LANDERIST_COM_OUTPUT_PRODUCTION :
+                AppConfig.LANDERIST_COM_OUTPUT_LOCAL;
 
             LANDERIST_COM_TEMPLATES = configurationProduction ?
-                PrivateConfig.LANDERIST_COM_TEMPLATES_PRODUCTION :
-                PrivateConfig.LANDERIST_COM_TEMPLATES_LOCAL;
+                AppConfig.LANDERIST_COM_TEMPLATES_PRODUCTION :
+                AppConfig.LANDERIST_COM_TEMPLATES_LOCAL;
 
             BACKUPS_DIRECTORY = ConfigurationProduction ?
-                PrivateConfig.BACKUPS_DIRECTORY_PRODUCTION :
-                PrivateConfig.BACKUPS_DIRECTORY_LOCAL;
+                AppConfig.BACKUPS_DIRECTORY_PRODUCTION :
+                AppConfig.BACKUPS_DIRECTORY_LOCAL;
 
             SCREENSHOTS_DIRECTORY = ConfigurationProduction ?
-                PrivateConfig.SCREENSHOTS_DIRECTORY_PRODUCTION :
-                PrivateConfig.SCREENSHOTS_DIRECTORY_LOCAL;
+                AppConfig.SCREENSHOTS_DIRECTORY_PRODUCTION :
+                AppConfig.SCREENSHOTS_DIRECTORY_LOCAL;
 
             SAVE_SCREENSHOT_FILE = !ConfigurationProduction;
 
             CHROME_EXTENSIONS_DIRECTORY = ConfigurationProduction ?
-                PrivateConfig.CHROME_EXTENSIONS_DIRECTORY_PRODUCTION :
-                PrivateConfig.CHROME_EXTENSIONS_DIRECTORY_LOCAL;
+                AppConfig.CHROME_EXTENSIONS_DIRECTORY_PRODUCTION :
+                AppConfig.CHROME_EXTENSIONS_DIRECTORY_LOCAL;
 
 
             TIMERS_ENABLED = !ConfigurationProduction;
@@ -218,8 +224,8 @@ namespace landerist_library.Configuration
             MIN_PAGES_PER_BATCH = ConfigurationProduction ? 500 : 1;
 
             BATCH_DIRECTORY = ConfigurationProduction ?
-                PrivateConfig.BATCH_DIRECTORY_PRODUCTION :
-                PrivateConfig.BATCH_DIRECTORY_LOCAL;
+                AppConfig.BATCH_DIRECTORY_PRODUCTION :
+                AppConfig.BATCH_DIRECTORY_LOCAL;
 
             DAYS_TO_REMOVE_BATCH_FILES = -30;
 
@@ -242,8 +248,17 @@ namespace landerist_library.Configuration
         private static void InitDatabase(bool configurationProduction)
         {
             DATASOURCE = configurationProduction ?
-                PrivateConfig.DATASOURCE_PRODUCTION :
-                PrivateConfig.DATASOURCE_LOCAL;
+                AppConfig.DATASOURCE_PRODUCTION :
+                AppConfig.DATASOURCE_LOCAL;
+        }
+
+        private static void ValidateDatabaseConfiguration(bool configurationProduction)
+        {
+            LanderistSettings.Current.Validate(
+                "DATABASE_NAME",
+                "DATABASE_USER",
+                "DATABASE_PW",
+                configurationProduction ? "DATASOURCE_PRODUCTION" : "DATASOURCE_LOCAL");
         }
 
         public static void SetLLMProviderLocalAI()

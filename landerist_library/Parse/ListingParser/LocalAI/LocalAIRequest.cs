@@ -31,7 +31,7 @@ namespace landerist_library.Parse.ListingParser.LocalAI
             {
                 try
                 {
-                    var hostEntry = Dns.GetHostEntry(PrivateConfig.MACHINE_NAME_LANDERIST_03);
+                    var hostEntry = Dns.GetHostEntry(AppConfig.MACHINE_NAME_LANDERIST_03);
                     ip = hostEntry.AddressList
                         .FirstOrDefault(x => x.AddressFamily == AddressFamily.InterNetwork)?
                         .ToString() ?? "localhost";

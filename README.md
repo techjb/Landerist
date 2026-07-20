@@ -11,8 +11,15 @@ Visit [landerist.com](https://landerist.com)
 
 ## Installation
 
-Download the project and open it in Visual Studio. In the file /landerist_library/Configuration/Config.cs, set the value of the PrivateConfig variables.
-Open Database.sql file, update local paths, and run in Sql Server to initalize the Database.
+Download the project and open it in Visual Studio. Copy `appsettings.example.json` to
+`appsettings.Local.json` and fill in the settings needed by your environment. The local
+file is ignored by Git and must not be committed.
+
+Settings can also be supplied with environment variables prefixed with `LANDERIST__`.
+For example, `LANDERIST__DATABASE_NAME` overrides `DATABASE_NAME` from the JSON files.
+Environment variables take precedence over local JSON settings.
+
+Open `Database.sql`, update its local paths, and run it in SQL Server to initialize the database.
 
 ## Contributing
 

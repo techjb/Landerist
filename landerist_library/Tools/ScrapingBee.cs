@@ -18,7 +18,7 @@ namespace landerist_library.Tools
             url = HttpUtility.UrlEncode(url);
 
             return "https://app.scrapingbee.com/api/v1/?" +
-                "api_key=" + PrivateConfig.SCRAPPINGBEE_APIKEY +
+                "api_key=" + AppConfig.SCRAPPINGBEE_APIKEY +
                 "&url=" + url +
                 "&render_js=false" +// true => 5 credits,  false => 1 credit.
                 "&premium_proxy=true"  // 10-25 credits

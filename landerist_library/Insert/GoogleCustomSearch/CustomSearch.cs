@@ -41,7 +41,7 @@ namespace landerist_library.Insert.GoogleCustomSearch
 
             var initializer = new BaseClientService.Initializer
             {
-                ApiKey = PrivateConfig.GOOGLE_CLOUD_LANDERIST_API_KEY,
+                ApiKey = AppConfig.GOOGLE_CLOUD_LANDERIST_API_KEY,
             };
 
             int totalResultsObtained = 0;
@@ -53,7 +53,7 @@ namespace landerist_library.Insert.GoogleCustomSearch
                 var listRequest = customSearchAPIService.Cse.List();
                 listRequest.Q = query;
                 listRequest.Start = startIndex;
-                listRequest.Cx = PrivateConfig.GOOGLE_SEARCH_ENGINE_ID;
+                listRequest.Cx = AppConfig.GOOGLE_SEARCH_ENGINE_ID;
                 listRequest.Gl = "es";
 
                 var items = ExecuteRequest(listRequest, ref totalResultsObtained);

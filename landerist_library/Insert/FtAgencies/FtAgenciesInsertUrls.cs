@@ -17,7 +17,7 @@ namespace landerist_library.Insert.FtAgencies
 
         public static void GetProvincesList()
         {
-            var fileName = PrivateConfig.INSERT_DIRECTORY + @"FtAgencies\index.html";
+            var fileName = AppConfig.INSERT_DIRECTORY + @"FtAgencies\index.html";
             var html = File.ReadAllText(fileName);
 
             var htmlDocument = new HtmlDocument();
@@ -59,7 +59,7 @@ namespace landerist_library.Insert.FtAgencies
 
         private static void ScrapePage(string province, bool rent, int page)
         {
-            string url = PrivateConfig.FT_AGENCIES_URL + province +
+            string url = AppConfig.FT_AGENCIES_URL + province +
                 "-provincia/todas-las-zonas/l?" +
                 (rent ? "tipo=alquiler&" : "") +
                 "pagina=" + page;

@@ -35,7 +35,7 @@ namespace landerist_library.Insert.IdAgencies
                 "Already inserted: " + alreadyInserted + " " +
                 "Uris: " + uris.Count);
 
-            string fileName = PrivateConfig.INSERT_DIRECTORY + @"IdAgencies\Urls.csv";
+            string fileName = AppConfig.INSERT_DIRECTORY + @"IdAgencies\Urls.csv";
             Tools.Csv.Write(uris, fileName);
         }
     }

@@ -14,7 +14,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
             try
             {
                 using FileStream fileStream = File.OpenRead(filePath);
-                var dataObject = storageClient.UploadObject(PrivateConfig.GOOGLE_CLOUD_BUCKET_NAME, objectName, "text/html", fileStream);
+                var dataObject = storageClient.UploadObject(AppConfig.GOOGLE_CLOUD_BUCKET_NAME, objectName, "text/html", fileStream);
                 return dataObject.Name;
             }
             catch (Exception exception)
@@ -30,7 +30,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
             try
             {
                 using var fileStream = File.OpenWrite(localPath);
-                var dataObject = storageClient.DownloadObject(PrivateConfig.GOOGLE_CLOUD_BUCKET_NAME, objectName, fileStream);
+                var dataObject = storageClient.DownloadObject(AppConfig.GOOGLE_CLOUD_BUCKET_NAME, objectName, fileStream);
                 return true;
             }
             catch (Exception exception)
@@ -43,7 +43,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
         public static void DeleteFiles(DateTime dateTime)
         {
             var storageClient = GetStorageClient();
-            var objects = storageClient.ListObjects(PrivateConfig.GOOGLE_CLOUD_BUCKET_NAME);
+            var objects = storageClient.ListObjects(AppConfig.GOOGLE_CLOUD_BUCKET_NAME);
             int total = objects.Count();
             int deleted = 0;
             int errors = 0;             
@@ -53,7 +53,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                 {
                     try
                     {
-                        storageClient.DeleteObject(PrivateConfig.GOOGLE_CLOUD_BUCKET_NAME, obj.Name);
+                        storageClient.DeleteObject(AppConfig.GOOGLE_CLOUD_BUCKET_NAME, obj.Name);
                         deleted++;
                     }
                     catch
@@ -67,7 +67,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
 
         private static StorageClient GetStorageClient()
         {
-            var credentials = CredentialFactory.FromJson<ServiceAccountCredential>(PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_CREDENTIAL).ToGoogleCredential();
+            var credentials = CredentialFactory.FromJson<ServiceAccountCredential>(AppConfig.GOOGLE_CLOUD_VERTEX_AI_CREDENTIAL).ToGoogleCredential();
             return StorageClient.Create(credentials);
         }
     }

@@ -1,4 +1,4 @@
-using HtmlAgilityPack;
+﻿using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Pages;
 using landerist_library.Websites;
@@ -41,8 +41,8 @@ namespace landerist_library.Downloaders.Puppeteer
             {
                 ProxyCredentials = new Credentials
                 {
-                    Username = PrivateConfig.PROXY_USERNAME,
-                    Password = PrivateConfig.PROXY_PASSWORD
+                    Username = AppConfig.PROXY_USERNAME,
+                    Password = AppConfig.PROXY_PASSWORD
                 };
             }
 

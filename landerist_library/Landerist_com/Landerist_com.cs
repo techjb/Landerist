@@ -174,7 +174,7 @@ namespace landerist_library.Landerist_com
 
         public static bool InvalidateCloudFront()
         {
-            var client = new AmazonCloudFrontClient(PrivateConfig.AWS_ACESSKEYID, PrivateConfig.AWS_SECRETACCESSKEY, RegionEndpoint.EUWest3);
+            var client = new AmazonCloudFrontClient(AppConfig.AWS_ACESSKEYID, AppConfig.AWS_SECRETACCESSKEY, RegionEndpoint.EUWest3);
             var invalidationBatch = new InvalidationBatch
             {
                 CallerReference = DateTime.UtcNow.Ticks.ToString(),
@@ -187,7 +187,7 @@ namespace landerist_library.Landerist_com
 
             var request = new CreateInvalidationRequest
             {
-                DistributionId = PrivateConfig.AWS_CLOUDFRONT_DISTRIBUTION_ID_WEBSITE,
+                DistributionId = AppConfig.AWS_CLOUDFRONT_DISTRIBUTION_ID_WEBSITE,
                 InvalidationBatch = invalidationBatch
             };
 

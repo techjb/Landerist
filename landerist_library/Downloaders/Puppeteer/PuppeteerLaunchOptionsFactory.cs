@@ -1,4 +1,4 @@
-using landerist_library.Configuration;
+﻿using landerist_library.Configuration;
 using PuppeteerSharp;
 
 namespace landerist_library.Downloaders.Puppeteer
@@ -63,19 +63,19 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private static string BuildProxyServerArgument()
         {
-            return "--proxy-server=" + PrivateConfig.PROXY_HOST + ":" + GetProxyPort();
+            return "--proxy-server=" + AppConfig.PROXY_HOST + ":" + GetProxyPort();
         }
 
         private static string GetProxyPort()
         {
-            if (!PrivateConfig.PROXY_RANDOMIZE_STICKY_PORTS ||
-                PrivateConfig.PROXY_STICKY_PORT_MIN > PrivateConfig.PROXY_STICKY_PORT_MAX)
+            if (!AppConfig.PROXY_RANDOMIZE_STICKY_PORTS ||
+                AppConfig.PROXY_STICKY_PORT_MIN > AppConfig.PROXY_STICKY_PORT_MAX)
             {
-                return PrivateConfig.PROXY_PORT;
+                return AppConfig.PROXY_PORT;
             }
 
             return Random.Shared
-                .Next(PrivateConfig.PROXY_STICKY_PORT_MIN, PrivateConfig.PROXY_STICKY_PORT_MAX + 1)
+                .Next(AppConfig.PROXY_STICKY_PORT_MIN, AppConfig.PROXY_STICKY_PORT_MAX + 1)
                 .ToString();
         }
     }

@@ -15,7 +15,7 @@ namespace landerist_library.Export
 
         public S3()
         {
-            AmazonS3Client = new AmazonS3Client(PrivateConfig.AWS_ACESSKEYID, PrivateConfig.AWS_SECRETACCESSKEY, RegionEndpoint.EUWest3);
+            AmazonS3Client = new AmazonS3Client(AppConfig.AWS_ACESSKEYID, AppConfig.AWS_SECRETACCESSKEY, RegionEndpoint.EUWest3);
         }
 
 
@@ -26,12 +26,12 @@ namespace landerist_library.Export
             List<(string, string)>? metadata = null,
             string? contentDisposition = null)
         {
-            return UploadFile(file, key, PrivateConfig.AWS_S3_DOWNLOADS_BUCKET, subdirectoryInBucket, metadata, contentDisposition);
+            return UploadFile(file, key, AppConfig.AWS_S3_DOWNLOADS_BUCKET, subdirectoryInBucket, metadata, contentDisposition);
         }
 
         public bool UploadToWebsiteBucket(string file, string key, string subdirectoryInBucket)
         {
-            return UploadFile(file, key, PrivateConfig.AWS_S3_WEBSITE_BUCKET, subdirectoryInBucket);
+            return UploadFile(file, key, AppConfig.AWS_S3_WEBSITE_BUCKET, subdirectoryInBucket);
         }
 
         public bool UploadFile(string file, string key, string bucketName)

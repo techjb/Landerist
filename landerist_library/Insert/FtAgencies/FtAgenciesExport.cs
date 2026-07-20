@@ -35,7 +35,7 @@ namespace landerist_library.Insert.FtAgencies
                 "Already inserted: " + alreadyInserted + " " +
                 "Uris: " + uris.Count);
 
-            string fileName = PrivateConfig.INSERT_DIRECTORY + @"FtAgencies\Urls.csv";
+            string fileName = AppConfig.INSERT_DIRECTORY + @"FtAgencies\Urls.csv";
             Tools.Csv.Write(uris, fileName);
         }
     }

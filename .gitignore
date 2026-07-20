@@ -363,6 +363,8 @@ MigrationBackup/
 FodyWeavers.xsd
 /landerist_library/Configuration/PrivateConfig.cs
 /landerist_library/Configuration/GoogleApplicationCredentials.json
+appsettings.Local.json
+**/appsettings.Local.json
 
 
 **/bin/

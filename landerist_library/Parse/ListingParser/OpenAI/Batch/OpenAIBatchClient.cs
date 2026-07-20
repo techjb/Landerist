@@ -8,7 +8,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
 {
     public class OpenAIBatchClient
     {
-        private static readonly OpenAIClient OpenAIClient = new(PrivateConfig.OPENAI_API_KEY);
+        private static readonly OpenAIClient OpenAIClient = new(AppConfig.OPENAI_API_KEY);
 
         public static bool DeleteFile(string fileId)
         {

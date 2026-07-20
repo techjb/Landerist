@@ -48,7 +48,7 @@ namespace landerist_library.Insert.IdAgencies
                 pageNumber = page
             };
 
-            var request = new HttpRequestMessage(HttpMethod.Post, Configuration.PrivateConfig.IDAGENCIES_URL)
+            var request = new HttpRequestMessage(HttpMethod.Post, Configuration.AppConfig.IDAGENCIES_URL)
             {
                 Content = new StringContent(System.Text.Json.JsonSerializer.Serialize(postData), Encoding.UTF8, "application/json")
             };

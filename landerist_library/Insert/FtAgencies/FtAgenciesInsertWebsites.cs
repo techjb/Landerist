@@ -10,7 +10,7 @@ namespace landerist_library.Insert.FtAgencies
     {
         public static void Start()
         {
-            string file = PrivateConfig.INSERT_DIRECTORY + @"FtAgencies\ListingExamples.csv";
+            string file = AppConfig.INSERT_DIRECTORY + @"FtAgencies\ListingExamples.csv";
             DataTable dataTable = Csv.ToDataTable(file);
             dataTable.Columns[0].ColumnName = "ListingExample";
             var uris = ToList(dataTable, "ListingExample");

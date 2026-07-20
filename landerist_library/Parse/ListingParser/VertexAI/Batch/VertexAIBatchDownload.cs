@@ -27,14 +27,14 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                     if (batchPredictionJob.State.Equals(JobState.Succeeded))
                     {
                         string file = batchPredictionJob.OutputInfo.GcsOutputDirectory.
-                            Replace("gs://" + PrivateConfig.GOOGLE_CLOUD_BUCKET_NAME + "/", "") + "/predictions.jsonl";
+                            Replace("gs://" + AppConfig.GOOGLE_CLOUD_BUCKET_NAME + "/", "") + "/predictions.jsonl";
 
                         return (file, null);
                     }
                     if (batchPredictionJob.State.Equals(JobState.Failed))
                     {
                         string file = batchPredictionJob.InputConfig.GcsSource.Uris[0].
-                           Replace("gs://" + PrivateConfig.GOOGLE_CLOUD_BUCKET_NAME + "/", "");
+                           Replace("gs://" + AppConfig.GOOGLE_CLOUD_BUCKET_NAME + "/", "");
 
                         return (null, file);
                     }

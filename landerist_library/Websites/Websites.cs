@@ -1,4 +1,4 @@
-using landerist_library.Configuration;
+﻿using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Pages;
@@ -469,7 +469,7 @@ namespace landerist_library.Websites
 
         public static void DeleteFromFile()
         {
-            string file = PrivateConfig.INSERT_DIRECTORY + "HostMainUri.csv";
+            string file = AppConfig.INSERT_DIRECTORY + "HostMainUri.csv";
             DataTable dataTable = Tools.Csv.ToDataTable(file);
 
             HashSet<string> hosts = [];

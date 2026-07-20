@@ -16,7 +16,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI
 
         public static readonly double TEMPERATURE = 0f;
 
-        private static readonly OpenAIClient OpenAIClient = new(PrivateConfig.OPENAI_API_KEY);
+        private static readonly OpenAIClient OpenAIClient = new(AppConfig.OPENAI_API_KEY);
 
         public static readonly string? TOOL_CHOICE = "required";        
 

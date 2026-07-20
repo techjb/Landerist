@@ -1,4 +1,4 @@
-using landerist_library.Configuration;
+﻿using landerist_library.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Globalization;
@@ -226,9 +226,9 @@ namespace landerist_library.Parse.Location.Providers.Goolzoom
                 Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT)
             };
 
-            if (!string.IsNullOrWhiteSpace(PrivateConfig.GOOLZOOM_API))
+            if (!string.IsNullOrWhiteSpace(AppConfig.GOOLZOOM_API))
             {
-                client.DefaultRequestHeaders.Add("x-api-key", PrivateConfig.GOOLZOOM_API);
+                client.DefaultRequestHeaders.Add("x-api-key", AppConfig.GOOLZOOM_API);
             }
 
             return client;

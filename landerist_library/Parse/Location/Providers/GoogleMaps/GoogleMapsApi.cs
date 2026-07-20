@@ -1,4 +1,4 @@
-using landerist_library.Configuration;
+﻿using landerist_library.Configuration;
 using landerist_library.Websites;
 using Newtonsoft.Json;
 
@@ -100,7 +100,7 @@ namespace landerist_library.Parse.Location.Providers.GoogleMaps
             "address=" + Uri.EscapeDataString(address) +
             "&region=" + GoogleMapsCountry.GetRegion(countryCode) +
             GetComponents(countryCode) +
-            "&key=" + PrivateConfig.GOOGLE_CLOUD_LANDERIST_API_KEY;
+            "&key=" + AppConfig.GOOGLE_CLOUD_LANDERIST_API_KEY;
 
         private static string GetComponents(CountryCode countryCode)
         {
