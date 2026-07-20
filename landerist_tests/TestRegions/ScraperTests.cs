@@ -2,7 +2,7 @@ using landerist_library.Scrape;
 
 namespace landerist_tests
 {
-    internal static class ScrapperTests
+    internal static class ScraperTests
     {
         public static void Run()
         {

@@ -7,7 +7,7 @@ using landerist_library.Parse.ListingParser.VertexAI;
 
 namespace landerist_library.Parse.ListingParser
 {
-    public class SytemPrompt
+    public class SystemPrompt
     {
         public static readonly string Text =
             "Tu tarea es analizar el código HTML proporcionado por el usuario y extraer los datos del anuncio inmobiliario principal. " +

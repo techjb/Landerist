@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace landerist_library.Downloaders.Puppeteer
 {
-    public static class CromeKiller
+    public static class ChromeKiller
     {
         public static void KillChrome()
         {

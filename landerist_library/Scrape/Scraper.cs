@@ -94,7 +94,7 @@ namespace landerist_library.Scrape
 
             DownloadersPool.Clear();
             Pages.Pages.CleanLockedBy();
-            CromeKiller.KillChrome();
+            ChromeKiller.KillChrome();
         }
 
         public bool Scrape(Website website)
@@ -154,7 +154,7 @@ namespace landerist_library.Scrape
             InsertStatistics();
 
             DownloadersPool.Clear();
-            CromeKiller.KillChrome();
+            ChromeKiller.KillChrome();
             return true;
         }
 

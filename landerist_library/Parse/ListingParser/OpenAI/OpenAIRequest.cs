@@ -8,7 +8,7 @@ using System.Text.Json.Nodes;
 
 namespace landerist_library.Parse.ListingParser.OpenAI
 {
-    public class OpenAIRequest : SytemPrompt
+    public class OpenAIRequest : SystemPrompt
     {
         public static readonly int MAX_CONTEXT_WINDOW = 128000;
 

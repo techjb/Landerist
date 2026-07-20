@@ -10,7 +10,7 @@ using static Google.Cloud.AIPlatform.V1.SafetySetting.Types;
 
 namespace landerist_library.Parse.ListingParser.VertexAI
 {
-    public class VertexAIRequest : SytemPrompt
+    public class VertexAIRequest : SystemPrompt
     {
 
         public const int MAX_CONTEXT_WINDOW = 128000;
@@ -63,7 +63,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI
         {
             return new GenerateContentRequest
             {
-                Model = $"projects/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PROJECTID}/locations/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}/publishers/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PUBLISHER}/models/{Config.VERTEXT_AI_MODEL_NAME_GEMINI_FLASH_LITE}",
+                Model = $"projects/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PROJECTID}/locations/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}/publishers/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PUBLISHER}/models/{Config.VERTEX_AI_MODEL_NAME_GEMINI_FLASH_LITE}",
                 Contents =
                 {
                     new Content()
@@ -135,7 +135,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI
         {
             return new GenerateContentRequest
             {
-                Model = $"projects/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PROJECTID}/locations/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}/publishers/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PUBLISHER}/models/{Config.VERTEXT_AI_MODEL_NAME_GEMINI_FLASH}",
+                Model = $"projects/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PROJECTID}/locations/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}/publishers/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PUBLISHER}/models/{Config.VERTEX_AI_MODEL_NAME_GEMINI_FLASH}",
                 Contents =
                 {
                     new Content()

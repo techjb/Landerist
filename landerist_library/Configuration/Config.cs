@@ -121,11 +121,11 @@ namespace landerist_library.Configuration
 
         public readonly static string MACHINE_NAME = Environment.MachineName;
 
-        public static readonly string VERTEXT_AI_MODEL_NAME_GEMINI_PRO = "gemini-2.5-pro";
+        public static readonly string VERTEX_AI_MODEL_NAME_GEMINI_PRO = "gemini-2.5-pro";
 
-        public static readonly string VERTEXT_AI_MODEL_NAME_GEMINI_FLASH = "gemini-2.5-flash";
+        public static readonly string VERTEX_AI_MODEL_NAME_GEMINI_FLASH = "gemini-2.5-flash";
 
-        public static readonly string VERTEXT_AI_MODEL_NAME_GEMINI_FLASH_LITE = "gemini-2.5-flash-lite";
+        public static readonly string VERTEX_AI_MODEL_NAME_GEMINI_FLASH_LITE = "gemini-2.5-flash-lite";
        
 
         public const int LOCAL_AI_MAX_MODEL_LEN = 30000; 

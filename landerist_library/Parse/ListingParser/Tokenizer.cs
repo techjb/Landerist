@@ -17,7 +17,7 @@ namespace landerist_library.Parse.ListingParser
         public static int CountSystemTokens()
         {
             var encoding = GptEncoding.GetEncoding(LOCAL_AI_TOKENIZER);
-            return encoding.CountTokens(SytemPrompt.Text);
+            return encoding.CountTokens(SystemPrompt.Text);
         }
 
         public static (int, int) CountPageAndSystemTokens(Page page)
@@ -25,7 +25,7 @@ namespace landerist_library.Parse.ListingParser
             var encoding = GptEncoding.GetEncoding(LOCAL_AI_TOKENIZER);
 
             string? userInput = page.GetListingParserInput();
-            int systemTokens = encoding.CountTokens(SytemPrompt.Text);
+            int systemTokens = encoding.CountTokens(SystemPrompt.Text);
             int pageTokens = 0;
             if (!string.IsNullOrWhiteSpace(userInput))
             {

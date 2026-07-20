@@ -134,7 +134,7 @@ namespace landerist_library.Parse.ListingParser.LocalAI
 
         private static string GetExtendedSystemPrompt()
         {
-            return SytemPrompt.Text + " " +
+            return SystemPrompt.Text + " " +
                 "Responde SIEMPRE y ÚNICAMENTE con un objeto JSON válido. No añadas texto antes ni después del JSON. " +
                 "En todos los valores string, escapa siempre los caracteres especiales de JSON: las comillas dobles interiores deben ir precedidas por una barra invertida, y también deben escaparse barras invertidas, saltos de línea y tabuladores. " +
                 "Nunca incluyas comillas dobles literales sin escapar dentro de un valor string. " +

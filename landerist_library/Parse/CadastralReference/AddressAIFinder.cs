@@ -60,7 +60,7 @@ namespace landerist_library.Parse.CadastralReference
 
             return new GenerateContentRequest
             {
-                Model = $"projects/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PROJECTID}/locations/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}/publishers/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PUBLISHER}/models/{Config.VERTEXT_AI_MODEL_NAME_GEMINI_FLASH}",
+                Model = $"projects/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PROJECTID}/locations/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_LOCATION}/publishers/{PrivateConfig.GOOGLE_CLOUD_VERTEX_AI_PUBLISHER}/models/{Config.VERTEX_AI_MODEL_NAME_GEMINI_FLASH}",
                 Contents =
                 {
                     new Content()

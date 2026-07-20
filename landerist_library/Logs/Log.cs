@@ -11,7 +11,7 @@ namespace landerist_library.Logs
 
         public const string LogKeyError = "error";
         public const string LogKeyInfo = "info";
-        public const string LogKeyScrapper = "scrapper";
+        public const string LogKeyScraper = "scraper";
         public const string LogKeyBatch = "batch";
         public const string LogKeyLocalAI = "localai";
 

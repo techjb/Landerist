@@ -72,30 +72,30 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
             }
             if (vertexAIBatchResponse is null)
             {
-                Log.WriteError("VertextAIBatchDownload ReadLine", "vertexAIBatchResponse is null");
+                Log.WriteError("VertexAIBatchDownload ReadLine", "vertexAIBatchResponse is null");
                 return null;
             }
             Page? page = GetPage(vertexAIBatchResponse);
             if (page == null)
             {
-                Log.WriteError("VertextAIBatchDownload ReadLine", "Page is null  Id: " + id);
+                Log.WriteError("VertexAIBatchDownload ReadLine", "Page is null  Id: " + id);
                 return null;
             }
             var candidate = GetCandidate(vertexAIBatchResponse);
             if (candidate == null)
             {
-                Log.WriteError("VertextAIBatchDownload ReadLine", "candidate is null");
+                Log.WriteError("VertexAIBatchDownload ReadLine", "candidate is null");
                 return (page, null);
             }
             if (!IsValidResponse(candidate))
             {
-                Log.WriteError("VertextAIBatchDownload ReadLine", "Invalid response. FinishReason: " + candidate.FinishReason);
+                Log.WriteError("VertexAIBatchDownload ReadLine", "Invalid response. FinishReason: " + candidate.FinishReason);
                 return (page, null);
             }
             string? text = GetText(candidate);
             if (string.IsNullOrEmpty(text))
             {
-                Log.WriteError("VertextAIBatchDownload ReadLine", "text is null finishReason: " + candidate.FinishReason + "  Id: " + id);
+                Log.WriteError("VertexAIBatchDownload ReadLine", "text is null finishReason: " + candidate.FinishReason + "  Id: " + id);
             }
             return (page, text);
         }
