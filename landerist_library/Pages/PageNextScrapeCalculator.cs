@@ -60,7 +60,7 @@ namespace landerist_library.Pages
             {
                 PageType.MainPage => 3d,
                 PageType.MayBeListing => 3d,
-                PageType.Listing => 3d,
+                PageType.Listing => 2d,
                 PageType.HttpStatusCodeGone => 7d,
                 PageType.HttpStatusCodeNotFound => 7d,
                 PageType.NotListingByParser => 21d,
