@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Reflection;
 using System.Text.Json;
 
 namespace landerist_library.Configuration;
@@ -27,17 +26,39 @@ public sealed class LanderistSettings
         var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         LoadJsonFile(values, FindFile("appsettings.json"));
         LoadJsonFile(values, FindFile("appsettings.Local.json"));
-        LoadLegacyPrivateConfig(values);
         LoadEnvironmentVariables(values);
         return new LanderistSettings(values);
     }
 
     private static string? FindFile(string fileName)
     {
-        var currentDirectoryFile = Path.Combine(Directory.GetCurrentDirectory(), fileName);
-        if (File.Exists(currentDirectoryFile)) return currentDirectoryFile;
-        var applicationDirectoryFile = Path.Combine(AppContext.BaseDirectory, fileName);
-        return File.Exists(applicationDirectoryFile) ? applicationDirectoryFile : null;
+        var explicitConfigPath = Environment.GetEnvironmentVariable("LANDERIST_CONFIG_PATH");
+        if (!string.IsNullOrWhiteSpace(explicitConfigPath))
+        {
+            var explicitFile = Directory.Exists(explicitConfigPath)
+                ? Path.Combine(explicitConfigPath, fileName)
+                : explicitConfigPath;
+
+            if (File.Exists(explicitFile)
+                && string.Equals(Path.GetFileName(explicitFile), fileName, StringComparison.OrdinalIgnoreCase))
+            {
+                return Path.GetFullPath(explicitFile);
+            }
+        }
+
+        foreach (var startDirectory in new[] { Directory.GetCurrentDirectory(), AppContext.BaseDirectory })
+        {
+            for (var directory = new DirectoryInfo(startDirectory); directory is not null; directory = directory.Parent)
+            {
+                var candidate = Path.Combine(directory.FullName, fileName);
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
+            }
+        }
+
+        return null;
     }
 
     private static void LoadJsonFile(Dictionary<string, string> values, string? path)
@@ -60,18 +81,6 @@ public sealed class LanderistSettings
         }
     }
 
-    // Temporary migration aid. A clean checkout does not need this legacy type.
-    private static void LoadLegacyPrivateConfig(Dictionary<string, string> values)
-    {
-        var type = typeof(LanderistSettings).Assembly.GetType("landerist_library.Configuration.PrivateConfig", throwOnError: false);
-        if (type is null) return;
-        const BindingFlags flags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
-        foreach (var field in type.GetFields(flags))
-        {
-            var value = field.GetValue(null)?.ToString();
-            if (!string.IsNullOrEmpty(value)) values.TryAdd(field.Name, value);
-        }
-    }
 }
 
 internal static class AppConfig
