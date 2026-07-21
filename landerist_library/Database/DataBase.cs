@@ -1,256 +1,172 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Configuration;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 
 namespace landerist_library.Database
 {
-    public class DataBase(string connectionString)
+    public class DataBase
     {
-        #region Private Variables
+        private const int DefaultCommandTimeoutSeconds = 120;
+        private const int DefaultConnectionTimeoutSeconds = 30;
 
-        private SqlConnection SqlConnection = new();
-        private SqlCommand SqlCommand = new();
-        private readonly SqlDataAdapter SqlDataAdapter = new();
-        private readonly StringBuilder StringBuilder = new();
-        private int StackCounter = 0;
-        private int TimeOut = 120;
-        public string ConnectionString = connectionString;
+        private readonly StringBuilder _stackBuilder = new();
+        private readonly object _stackLock = new();
+        private readonly string _connectionString;
+        private int _stackCounter;
+        private int _commandTimeout = DefaultCommandTimeoutSeconds;
 
-        #endregion Private Variables
-
-        #region Constructors
 
         public DataBase() : this(Config.DATABASE_USER, Config.DATABASE_PW, Config.DATABASE_NAME)
         {
-
         }
 
-        public DataBase(string userId, string pw, string databaseName) :
-            this("User ID=" + userId + ";" +
-                "Password=" + pw + ";" +
-                "Initial Catalog=" + databaseName + ";" +
-                "Connect Timeout=100000;" +
-                "Data Source=" + Config.DATASOURCE + ";" +
-                "TrustServerCertificate=True;Encrypt=false;")
+        public DataBase(string userId, string password, string databaseName)
+            : this(BuildConnectionString(userId, password, databaseName))
         {
-
         }
 
-        #endregion Constructors
-
-        #region Private Methods
-
-        private void InitialiceConnection()
+        public DataBase(string connectionString)
         {
-            SqlConnection = new SqlConnection(ConnectionString);
-            SqlCommand = new SqlCommand
+            ArgumentException.ThrowIfNullOrWhiteSpace(connectionString);
+            _connectionString = connectionString;
+        }
+
+        private static string BuildConnectionString(string userId, string password, string databaseName)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(userId);
+            ArgumentException.ThrowIfNullOrWhiteSpace(password);
+            ArgumentException.ThrowIfNullOrWhiteSpace(databaseName);
+            ArgumentException.ThrowIfNullOrWhiteSpace(Config.DATASOURCE);
+
+            return new SqlConnectionStringBuilder
             {
-                Connection = SqlConnection,
-                CommandTimeout = TimeOut
-            };
+                UserID = userId,
+                Password = password,
+                InitialCatalog = databaseName,
+                DataSource = Config.DATASOURCE,
+                ConnectTimeout = DefaultConnectionTimeoutSeconds,
+                Encrypt = true,
+                TrustServerCertificate = true
+            }.ConnectionString;
         }
-
-        private void CloseConnection()
-        {
-            if (SqlConnection.State == ConnectionState.Open)
-            {
-                SqlConnection.Close();
-            }
-
-            SqlConnection.Dispose();
-            SqlCommand.Dispose();
-        }
-
-        private void AddParameters(IDictionary<string, object?>? parameters = null)
-        {
-            if (parameters != null)
-            {
-                foreach (KeyValuePair<string, object?> item in parameters)
-                {
-                    string key = item.Key;
-                    SqlCommand.Parameters.AddWithValue("@" + key, item.Value ?? DBNull.Value);
-                }
-            }
-        }
-
-        private void AddParameters(SqlParameter[]? sqlParameters = null)
-        {
-            if (sqlParameters != null)
-            {
-                SqlCommand.Parameters.AddRange(sqlParameters);
-            }
-        }
-
-        private void InitConnectionAndComand(string query)
-        {
-            InitialiceConnection();
-            SqlCommand.CommandText = query;
-        }
-
-        private void Init(string query)
-        {
-            InitConnectionAndComand(query);
-            SqlConnection.Open();
-        }
-
-        private void Init(string query, IDictionary<string, object?>? parameters = null)
-        {
-            InitConnectionAndComand(query);
-            AddParameters(parameters);
-            SqlConnection.Open();
-        }
-
-        private void Init(string query, IDictionary<string, object?>? parameters = null,
-            SqlParameter[]? sqlParameters = null)
-        {
-            InitConnectionAndComand(query);
-            AddParameters(parameters);
-            AddParameters(sqlParameters);
-            SqlConnection.Open();
-        }
-
-        private void Init(string query, SqlParameter[]? sqlParameters = null)
-        {
-            InitConnectionAndComand(query);
-            AddParameters(sqlParameters);
-            SqlConnection.Open();
-        }
-
-        #endregion Private Methods
-
-        #region Modify connection
 
         /// <summary>
-        /// Sets the database timeout in secconds.
+        /// Sets the command timeout in seconds for subsequent operations.
         /// </summary>
-        /// <param name="timeOut">Timeout in seconds</param>
         public void SetTimeout(int timeOut)
         {
-            TimeOut = timeOut;
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(timeOut);
+            _commandTimeout = timeOut;
         }
-
-        #endregion
-
-        #region Queries
 
         public static List<SqlParameter> ParseParameters(Dictionary<string, object?> parameters)
         {
-            List<SqlParameter> list = [];
-            foreach (KeyValuePair<string, object?> item in parameters)
-            {
-                var parameter = new SqlParameter("@" + item.Key, item.Value ?? DBNull.Value);
-                list.Add(parameter);
-            }
-            return list;
+            ArgumentNullException.ThrowIfNull(parameters);
+            return parameters
+                .Select(item => CreateParameter(item.Key, item.Value))
+                .ToList();
         }
+
         public bool Query(string query)
         {
-            bool result = false;
-            try
-            {
-                Init(query);
-                SqlCommand.ExecuteNonQuery();
-                result = true;
-            }
-            catch
-            {
-
-            }
-            CloseConnection();
-            return result;
+            return Execute(
+                operationName: nameof(Query),
+                query,
+                parameters: null,
+                sqlParameters: null,
+                command =>
+                {
+                    command.ExecuteNonQuery();
+                    return true;
+                },
+                failureResult: false,
+                out _);
         }
 
         public bool Query(string query, string parameterName, object parameterValue)
         {
-            var dictionary = new Dictionary<string, object?> {
-                {
-                    parameterName, parameterValue
-                }
-            };
-            return Query(query, dictionary);
+            return Query(query, new Dictionary<string, object?>
+            {
+                { parameterName, parameterValue }
+            });
         }
 
         public bool Query(string query, IDictionary<string, object?>? parameters = null)
         {
-            bool result = false;
-            try
-            {
-                Init(query, parameters);
-                SqlCommand.ExecuteNonQuery();
-                result = true;
-            }
-            catch (Exception exception)
-            {
-                exception.ToString();
-            }
-            CloseConnection();
-            return result;
+            return Execute(
+                operationName: nameof(Query),
+                query,
+                parameters,
+                sqlParameters: null,
+                command =>
+                {
+                    command.ExecuteNonQuery();
+                    return true;
+                },
+                failureResult: false,
+                out _);
         }
 
-        public bool Query(string query, IDictionary<string, object?>? parameters, out Exception? exception)
+        public bool Query(
+            string query,
+            IDictionary<string, object?>? parameters,
+            out Exception? exception)
         {
-            bool result = false;
-            exception = null;
-            try
-            {
-                Init(query, parameters);
-                SqlCommand.ExecuteNonQuery();
-                result = true;
-            }
-            catch (Exception ex)
-            {
-                exception = ex;
-            }
-            CloseConnection();
-            return result;
+            return Execute(
+                operationName: nameof(Query),
+                query,
+                parameters,
+                sqlParameters: null,
+                command =>
+                {
+                    command.ExecuteNonQuery();
+                    return true;
+                },
+                failureResult: false,
+                out exception);
         }
 
         public bool Query(string query, List<SqlParameter> sqlParameters)
         {
+            ArgumentNullException.ThrowIfNull(sqlParameters);
             return Query(query, sqlParameters.ToArray());
         }
 
-
         public bool Query(string query, SqlParameter[] sqlParameters)
         {
-            bool result = false;
-            try
-            {
-                Init(query, sqlParameters);
-                SqlCommand.ExecuteNonQuery();
-                result = true;
-            }
-            catch (Exception exception)
-            {
-                exception.ToString();
-            }
-            CloseConnection();
-            return result;
+            ArgumentNullException.ThrowIfNull(sqlParameters);
+            return Execute(
+                operationName: nameof(Query),
+                query,
+                parameters: null,
+                sqlParameters,
+                command =>
+                {
+                    command.ExecuteNonQuery();
+                    return true;
+                },
+                failureResult: false,
+                out _);
         }
 
         public bool QueryBool(string query, IDictionary<string, object?>? parameters = null)
         {
-            bool result = false;
-            try
-            {
-                Init(query, parameters);
-                var value = SqlCommand.ExecuteScalar();
-                if (value != null)
-                {
-                    _ = bool.TryParse(value.ToString(), out result);
-                }
-            }
-            catch (Exception exception)
-            {
-                exception.ToString();
-            }
-            CloseConnection();
-            return result;
+            return ExecuteScalar(
+                nameof(QueryBool),
+                query,
+                parameters,
+                defaultValue: false,
+                value => Convert.ToBoolean(value, CultureInfo.InvariantCulture));
         }
 
-        public bool QueryExists(string querySelect1, IDictionary<string, object?>? parameters = null)
+        public bool QueryExists(
+            string querySelect1,
+            IDictionary<string, object?>? parameters = null)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(querySelect1);
             string query =
                 "SELECT CASE " +
                 $"WHEN EXISTS ({querySelect1}) THEN CAST(1 AS BIT) " +
@@ -262,256 +178,311 @@ namespace landerist_library.Database
 
         public int QueryInt(string query, IDictionary<string, object?>? parameters = null)
         {
-            int result = 0;
-            try
-            {
-                Init(query, parameters);
-                var value = SqlCommand.ExecuteScalar();
-                if (value != null)
-                {
-                    _ = int.TryParse(value.ToString(), out result);
-                }
-            }
-            catch (Exception exception)
-            {
-                exception.ToString();
-            }
-            CloseConnection();
-            return result;
+            return ExecuteScalar(
+                nameof(QueryInt),
+                query,
+                parameters,
+                defaultValue: 0,
+                value => Convert.ToInt32(value, CultureInfo.InvariantCulture));
         }
 
         public long QueryLong(string query, IDictionary<string, object?>? parameters = null)
         {
-            long result = 0;
-            try
-            {
-                Init(query, parameters);
-                var value = SqlCommand.ExecuteScalar();
-                if (value != null)
-                {
-                    _ = long.TryParse(value.ToString(), out result);
-                }
-            }
-            catch (Exception exception)
-            {
-                exception.ToString();
-            }
-            CloseConnection();
-            return result;
+            return ExecuteScalar(
+                nameof(QueryLong),
+                query,
+                parameters,
+                defaultValue: 0L,
+                value => Convert.ToInt64(value, CultureInfo.InvariantCulture));
         }
 
-        public string? QueryString(string query, IDictionary<string, object?>? parameters = null)
+        public string? QueryString(
+            string query,
+            IDictionary<string, object?>? parameters = null)
         {
-            string? result = null;
-            try
-            {
-                Init(query, parameters);
-                var value = SqlCommand.ExecuteScalar();
-                if (value != null)
-                {
-                    result = (string)value;
-                }
-            }
-            catch (Exception exception)
-            {
-                exception.ToString();
-            }
-            CloseConnection();
-            return result;
+            return ExecuteScalar<string?>(
+                nameof(QueryString),
+                query,
+                parameters,
+                defaultValue: null,
+                value => Convert.ToString(value, CultureInfo.InvariantCulture));
         }
 
         public Guid QueryGuid(string query, IDictionary<string, object?>? parameters = null)
         {
-            Guid result = Guid.Empty;
-            try
-            {
-                Init(query, parameters);
-                var value = SqlCommand.ExecuteScalar();
-                if (value != null)
-                {
-                    _ = Guid.TryParse(value.ToString(), out result);
-                }
-            }
-            catch (Exception exception)
-            {
-                exception.ToString();
-            }
-            CloseConnection();
-            return result;
+            return ExecuteScalar(
+                nameof(QueryGuid),
+                query,
+                parameters,
+                defaultValue: Guid.Empty,
+                value => value is Guid guid ? guid : Guid.Parse(value.ToString()!));
         }
 
         public DataTable QueryTable(string query, string parameterName, object? parameterValue)
         {
-            return QueryTable(query, new Dictionary<string, object?> {
-                { parameterName, parameterValue } }
-            );
+            return QueryTable(query, new Dictionary<string, object?>
+            {
+                { parameterName, parameterValue }
+            });
         }
 
-        public DataTable QueryTable(string query,
-            IDictionary<string, object?>? parameters = null, SqlParameter[]? sqlParameters = null)
-        {
-            DataTable dataTable = new();
-            try
-            {
-                Init(query, parameters, sqlParameters);
-                SqlDataAdapter.SelectCommand = SqlCommand;
-                SqlDataAdapter.Fill(dataTable);
-            }
-            catch
-            (Exception exception)
-            {
-                exception.ToString();
-            }
-            CloseConnection();
-            return dataTable;
-        }
-
-        public DataSet QueryDataSet(string query,
-            IDictionary<string, object?>? parameters = null, SqlParameter[]? sqlParameters = null)
-        {
-            DataSet dataSet = new();
-            try
-            {
-                Init(query, parameters, sqlParameters);
-                SqlDataAdapter.SelectCommand = SqlCommand;
-                SqlDataAdapter.Fill(dataSet);
-            }
-            catch (Exception exception)
-            {
-                exception.ToString();
-            }
-
-            CloseConnection();
-
-            return dataSet;
-        }
-
-        public List<string> QueryListString(string query, IDictionary<string, object?>? parameters = null, SqlParameter[]? sqlParameters = null)
-        {
-            List<string> list = [];
-            try
-            {
-                Init(query, parameters, sqlParameters);
-                SqlDataAdapter.SelectCommand = SqlCommand;
-
-                using SqlDataReader reader = SqlCommand.ExecuteReader();
-                while (reader.Read())
-                {
-                    list.Add(reader.GetString(0));
-                }
-            }
-            catch (Exception exception)
-            {
-                exception.ToString();
-            }
-
-            CloseConnection();
-            return list;
-        }
-
-        public List<int> QueryListInt(string query,
+        public DataTable QueryTable(
+            string query,
             IDictionary<string, object?>? parameters = null,
             SqlParameter[]? sqlParameters = null)
         {
-            List<int> list = [];
-            try
-            {
-                Init(query, parameters, sqlParameters);
-                SqlDataAdapter.SelectCommand = SqlCommand;
-
-                using SqlDataReader reader = SqlCommand.ExecuteReader();
-                while (reader.Read())
+            return Execute(
+                operationName: nameof(QueryTable),
+                query,
+                parameters,
+                sqlParameters,
+                command =>
                 {
-                    list.Add(reader.GetInt32(0));
-                }
-            }
-            catch (Exception exception)
-            {
-                exception.ToString();
-            }
-
-            CloseConnection();
-            return list;
+                    DataTable dataTable = new();
+                    using SqlDataAdapter adapter = new(command);
+                    adapter.Fill(dataTable);
+                    return dataTable;
+                },
+                failureResult: new DataTable(),
+                out _);
         }
 
-        public HashSet<string> QueryHashSet(string query,
-            IDictionary<string, object?>? parameters = null, SqlParameter[]? sqlParameters = null)
+        public DataSet QueryDataSet(
+            string query,
+            IDictionary<string, object?>? parameters = null,
+            SqlParameter[]? sqlParameters = null)
         {
-            HashSet<string> hashSet = [];
-            try
-            {
-                Init(query, parameters, sqlParameters);
-                SqlDataAdapter.SelectCommand = SqlCommand;
-
-                using SqlDataReader reader = SqlCommand.ExecuteReader();
-                while (reader.Read())
+            return Execute(
+                operationName: nameof(QueryDataSet),
+                query,
+                parameters,
+                sqlParameters,
+                command =>
                 {
-                    hashSet.Add(reader.GetString(0));
-                }
-            }
-            catch (Exception exception)
-            {
-                exception.ToString();
-            }
-
-            CloseConnection();
-            return hashSet;
+                    DataSet dataSet = new();
+                    using SqlDataAdapter adapter = new(command);
+                    adapter.Fill(dataSet);
+                    return dataSet;
+                },
+                failureResult: new DataSet(),
+                out _);
         }
 
-        public Dictionary<string, object?> QueryDictionary(string query, IDictionary<string, object?>? parameters = null, SqlParameter[]? sqlParameters = null)
+        public List<string> QueryListString(
+            string query,
+            IDictionary<string, object?>? parameters = null,
+            SqlParameter[]? sqlParameters = null)
         {
+            return ExecuteReader(
+                nameof(QueryListString),
+                query,
+                parameters,
+                sqlParameters,
+                reader => reader.GetString(0));
+        }
+
+        public List<int> QueryListInt(
+            string query,
+            IDictionary<string, object?>? parameters = null,
+            SqlParameter[]? sqlParameters = null)
+        {
+            return ExecuteReader(
+                nameof(QueryListInt),
+                query,
+                parameters,
+                sqlParameters,
+                reader => reader.GetInt32(0));
+        }
+
+        public HashSet<string> QueryHashSet(
+            string query,
+            IDictionary<string, object?>? parameters = null,
+            SqlParameter[]? sqlParameters = null)
+        {
+            var values = ExecuteReader(
+                nameof(QueryHashSet),
+                query,
+                parameters,
+                sqlParameters,
+                reader => reader.GetString(0));
+
+            return values.ToHashSet(StringComparer.Ordinal);
+        }
+
+        public Dictionary<string, object?> QueryDictionary(
+            string query,
+            IDictionary<string, object?>? parameters = null,
+            SqlParameter[]? sqlParameters = null)
+        {
+            var pairs = ExecuteReader(
+                nameof(QueryDictionary),
+                query,
+                parameters,
+                sqlParameters,
+                reader => new KeyValuePair<string, object?>(
+                    reader.IsDBNull(0) ? "null" : reader.GetString(0),
+                    reader.IsDBNull(1) ? null : reader.GetValue(1)));
+
             Dictionary<string, object?> dictionary = [];
-            try
+            foreach (var pair in pairs)
             {
-                Init(query, parameters, sqlParameters);
-                SqlDataAdapter.SelectCommand = SqlCommand;
-
-                using SqlDataReader reader = SqlCommand.ExecuteReader();
-                while (reader.Read())
-                {
-                    string key = reader.IsDBNull(0) ? "null" : reader.GetString(0);
-                    object? value = reader.IsDBNull(1) ? null : reader.GetValue(1);
-                    dictionary.Add(key, value);
-                }
-            }
-            catch (Exception exception)
-            {
-                exception.ToString();
+                dictionary[pair.Key] = pair.Value;
             }
 
-            CloseConnection();
             return dictionary;
         }
 
-
-        #endregion Public Methods
-
-        #region Stack
-
         public bool StackQuery(string query, int maxQueries = 1000)
         {
-            StringBuilder.Append(query + " ");
-            StackCounter++;
+            ArgumentException.ThrowIfNullOrWhiteSpace(query);
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxQueries);
 
-            if (StackCounter.Equals(maxQueries))
+            string? queryToFlush = null;
+            lock (_stackLock)
             {
-                return StackFlush();
+                _stackBuilder.Append(query).Append(' ');
+                _stackCounter++;
+
+                if (_stackCounter >= maxQueries)
+                {
+                    queryToFlush = TakeStackQuery();
+                }
             }
-            return true;
+
+            return queryToFlush is null || Query(queryToFlush);
         }
 
         public bool StackFlush()
         {
-            if (StackCounter.Equals(0))
+            string? query;
+            lock (_stackLock)
             {
-                return true;
+                query = TakeStackQuery();
             }
-            bool result = Query(StringBuilder.ToString());
-            StringBuilder.Clear();
-            StackCounter = 0;
-            return result;
+
+            return query is null || Query(query);
         }
 
-        #endregion Stack
+        private string? TakeStackQuery()
+        {
+            if (_stackCounter == 0)
+            {
+                return null;
+            }
+
+            string query = _stackBuilder.ToString();
+            _stackBuilder.Clear();
+            _stackCounter = 0;
+            return query;
+        }
+
+        private T ExecuteScalar<T>(
+            string operationName,
+            string query,
+            IDictionary<string, object?>? parameters,
+            T defaultValue,
+            Func<object, T> convert)
+        {
+            return Execute(
+                operationName,
+                query,
+                parameters,
+                sqlParameters: null,
+                command =>
+                {
+                    object? value = command.ExecuteScalar();
+                    return value is null or DBNull ? defaultValue : convert(value);
+                },
+                failureResult: defaultValue,
+                out _);
+        }
+
+        private List<T> ExecuteReader<T>(
+            string operationName,
+            string query,
+            IDictionary<string, object?>? parameters,
+            SqlParameter[]? sqlParameters,
+            Func<SqlDataReader, T> map)
+        {
+            return Execute(
+                operationName,
+                query,
+                parameters,
+                sqlParameters,
+                command =>
+                {
+                    List<T> values = [];
+                    using SqlDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        values.Add(map(reader));
+                    }
+
+                    return values;
+                },
+                failureResult: [],
+                out _);
+        }
+
+        private T Execute<T>(
+            string operationName,
+            string query,
+            IDictionary<string, object?>? parameters,
+            SqlParameter[]? sqlParameters,
+            Func<SqlCommand, T> operation,
+            T failureResult,
+            out Exception? exception)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(query);
+            ArgumentNullException.ThrowIfNull(operation);
+
+            exception = null;
+            try
+            {
+                using SqlConnection connection = new(_connectionString);
+                using SqlCommand command = connection.CreateCommand();
+                command.CommandText = query;
+                command.CommandTimeout = _commandTimeout;
+                AddParameters(command, parameters, sqlParameters);
+
+                connection.Open();
+                return operation(command);
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+                Trace.TraceError("Database operation {0} failed: {1}", operationName, ex);
+                return failureResult;
+            }
+        }
+
+        private static void AddParameters(
+            SqlCommand command,
+            IDictionary<string, object?>? parameters,
+            SqlParameter[]? sqlParameters)
+        {
+            if (parameters is not null)
+            {
+                foreach (var item in parameters)
+                {
+                    command.Parameters.Add(CreateParameter(item.Key, item.Value));
+                }
+            }
+
+            if (sqlParameters is not null)
+            {
+                foreach (SqlParameter parameter in sqlParameters)
+                {
+                    command.Parameters.Add((SqlParameter)((ICloneable)parameter).Clone());
+                }
+            }
+        }
+
+        private static SqlParameter CreateParameter(string name, object? value)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(name);
+            string parameterName = name.StartsWith('@') ? name : "@" + name;
+            return new SqlParameter(parameterName, value ?? DBNull.Value);
+        }
     }
 }

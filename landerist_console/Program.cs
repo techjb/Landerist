@@ -7,7 +7,9 @@ namespace landerist_console
     partial class Program
     {
         private static DateTime? DateStart = null;
-        private static readonly TasksService ServiceTasks = new();
+        private static TasksService? _serviceTasks;
+        private static TasksService ServiceTasks =>
+            _serviceTasks ?? throw new InvalidOperationException("Tasks service has not been initialized.");
 
         private delegate bool ConsoleEventDelegate(int eventType);
         private static readonly ManualResetEvent ManualResetEvent = new(false);
@@ -16,6 +18,8 @@ namespace landerist_console
 
         static void Main()
         {
+            Config.SetToProduction();
+            _serviceTasks = new TasksService();
             Console.Title = "Landerist Console " + Config.VERSION;
             Start();
             Run();
@@ -36,7 +40,6 @@ namespace landerist_console
             };
             Console.WriteLine("Press Ctrl+C to exit.");
             //DateStart = DateTime.Now; // not working in linux            
-            Config.SetToProduction();
             Console.WriteLine("Deleting logs..");
             Log.DeleteCurentMachineLogs();
             Log.WriteInfo("landerist_console", "Started. Machine: " + Config.MACHINE_NAME + " Version: " + Config.VERSION);
