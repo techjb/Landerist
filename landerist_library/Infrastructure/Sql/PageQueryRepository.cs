@@ -220,6 +220,122 @@ namespace landerist_library.Infrastructure.Sql
             return Database.QueryTable(query, parameters);
         }
 
+        public DataTable GetPageByUriHash(string uriHash)
+        {
+            return QueryPages(
+                SelectQuery() + "WHERE " + Pages.Pages.PAGES + ".[UriHash] = @UriHash",
+                new Dictionary<string, object?> { ["UriHash"] = uriHash });
+        }
+
+        public DataTable GetPagesByPageType(PageType pageType)
+        {
+            return QueryPages(
+                SelectQuery() + "WHERE " + Pages.Pages.PAGES + ".[PageType] = @PageType",
+                new Dictionary<string, object?> { ["PageType"] = pageType.ToString() });
+        }
+
+        public DataTable GetUnknownPageType()
+        {
+            return QueryPages(
+                SelectQuery() +
+                "WHERE " + Pages.Pages.PAGES + ".[PageType] IS NULL " +
+                "AND " + Pages.Pages.PAGES + ".[WaitingStatus] IS NULL");
+        }
+
+        public DataTable GetUnknownPageTypeForUpdate(int topRows)
+        {
+            return GetPagesForUpdate(topRows, "P.[PageType] IS NULL");
+        }
+
+        public DataTable GetNextScrapeForUpdate(int topRows, bool extendToFillTopRows)
+        {
+            string where = extendToFillTopRows
+                ? string.Empty
+                : "P.[NextScrape] < GETDATE()";
+            return GetPagesForUpdate(topRows, where);
+        }
+
+        public DataTable GetNextScrapeFutureForUpdate(int topRows)
+        {
+            return GetPagesForUpdate(topRows, "P.[NextScrape] >= GETDATE()");
+        }
+
+        public DataTable GetRecentlyUnpublishedListingsPages(int topRows)
+        {
+            string where =
+                "P.[UriHash] IN (" +
+                "SELECT [Guid] FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+                "WHERE [ListingStatus] = 'unpublished' " +
+                "AND [UnlistingDate] > DATEADD(day, -2, GETDATE()))";
+
+            return GetPagesForUpdate(topRows, where);
+        }
+
+        public DataTable GetUnknownHttpStatusCode()
+        {
+            return QueryPages(
+                SelectQuery() +
+                "WHERE " + Pages.Pages.PAGES + ".[HttpStatusCode] IS NULL");
+        }
+
+        public DataTable GetAllUrisDataTable()
+        {
+            const string query = "SELECT [Uri] FROM " + Pages.Pages.PAGES;
+            return Database.QueryTable(query);
+        }
+
+        public DataTable GetListingsWithHttpStatusCodeError()
+        {
+            return QueryPages(
+                SelectQuery() +
+                "WHERE " + Pages.Pages.PAGES + ".[PageType] = 'Listing' " +
+                "AND " + Pages.Pages.PAGES + ".[HttpStatusCode] <> 200");
+        }
+
+        public DataTable GetListingsWithParserInputHash()
+        {
+            return QueryPages(
+                SelectQuery() +
+                "WHERE " + Pages.Pages.PAGES + ".[PageType] = 'Listing' " +
+                "AND " + Pages.Pages.PAGES + ".[ListingParserInputHash] IS NOT NULL");
+        }
+
+        public DataTable GetUrisLikePrint()
+        {
+            return QueryPages(
+                SelectQuery() +
+                "WHERE " + Pages.Pages.PAGES + ".[Uri] LIKE '%print%' " +
+                "OR " + Pages.Pages.PAGES + ".[Uri] LIKE '%imprimi%'");
+        }
+
+        public DataTable GetPagesWithProhibitedUris(IEnumerable<string> prohibitedUriFragments)
+        {
+            ArgumentNullException.ThrowIfNull(prohibitedUriFragments);
+
+            string[] fragments = prohibitedUriFragments
+                .Where(fragment => !string.IsNullOrWhiteSpace(fragment))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+
+            if (fragments.Length == 0)
+            {
+                return new DataTable();
+            }
+
+            Dictionary<string, object?> parameters = [];
+            string[] conditions = new string[fragments.Length];
+            for (int index = 0; index < fragments.Length; index++)
+            {
+                string parameterName = "UriFragment" + index;
+                conditions[index] = Pages.Pages.PAGES + ".[Uri] LIKE @" + parameterName;
+                parameters[parameterName] = "%" + fragments[index] + "%";
+            }
+
+            return QueryPages(
+                SelectQuery() + "WHERE " + string.Join(" OR ", conditions),
+                parameters);
+        }
+
         public string SelectQuery(int? topRows = null)
         {
             string top = topRows != null ? "TOP " + topRows : "";

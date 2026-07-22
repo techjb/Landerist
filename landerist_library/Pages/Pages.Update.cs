@@ -72,23 +72,12 @@ namespace landerist_library.Pages
 
         public static bool RemoveListingParserInputHash(PageType pageType)
         {
-            string query =
-                "UPDATE " + PAGES + " " +
-                "SET [ListingParserInputHash] = NULL " +
-                "WHERE [PageType] = @PageType";
-
-            return new DataBase().Query(query, new Dictionary<string, object?> {
-                {"PageType", pageType.ToString() }
-            });
+            return MaintenanceRepository.RemoveListingParserInputHash(pageType);
         }
 
         public static bool RemoveListingParserInputHashToAll()
         {
-            string query =
-                "UPDATE " + PAGES + " " +
-                "SET [ListingParserInputHash] = NULL";
-
-            return new DataBase().Query(query);
+            return MaintenanceRepository.RemoveListingParserInputHash();
         }
     }
 }

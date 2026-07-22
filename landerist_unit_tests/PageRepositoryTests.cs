@@ -1,5 +1,7 @@
 using landerist_library.Database;
 using landerist_library.Infrastructure.Sql;
+using landerist_library.Pages;
+using landerist_orels.ES;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
@@ -70,6 +72,69 @@ public sealed class PageRepositoryTests
         Assert.Contains("COUNT(*)", database.LastQuery);
     }
 
+    [Fact]
+    public void SelectWaitingStatus_ParameterizesLimits()
+    {
+        RecordingDatabase database = new();
+        PageMaintenanceRepository repository = new(database);
+
+        repository.SelectWaitingStatus(
+            5,
+            WaitingStatus.waiting_ai_request,
+            WaitingStatus.waiting_ai_response,
+            100,
+            isMaxTokenCount: true);
+
+        Assert.Contains("TOP (@TopRows)", database.LastQuery);
+        Assert.Contains("[TokenCount] <= @TokenCount", database.LastQuery);
+        Assert.Equal(5, database.LastParameters!["TopRows"]);
+        Assert.Equal(100, database.LastParameters["TokenCount"]);
+    }
+
+    [Fact]
+    public void GroupByPageType_DelegatesListingStatus()
+    {
+        RecordingDatabase database = new();
+        database.DictionaryResult["Listing"] = 3;
+        PageStatisticsRepository repository = new(database);
+
+        Dictionary<string, object?> result = repository.GroupByPageType(ListingStatus.published);
+
+        Assert.Same(database.DictionaryResult, result);
+        Assert.Equal("published", database.LastParameters!["ListingStatus"]);
+    }
+
+    [Fact]
+    public void GetPagesWithProhibitedUris_ParameterizesFragments()
+    {
+        RecordingDatabase database = new();
+        PageQueryRepository repository = new(database);
+        const string fragment = "unsafe'fragment";
+
+        repository.GetPagesWithProhibitedUris([fragment]);
+
+        Assert.DoesNotContain(fragment, database.LastQuery);
+        Assert.Contains("@UriFragment0", database.LastQuery);
+        Assert.Equal("%" + fragment + "%", database.LastParameters!["UriFragment0"]);
+    }
+
+    [Fact]
+    public void ListingParserInputExists_UsesInjectedDatabase()
+    {
+        RecordingDatabase database = new() { QueryExistsResult = true };
+        PageRepository repository = new(database);
+
+        bool result = repository.ListingParserInputExistsOnAnotherListing(
+            "example.com",
+            "current-hash",
+            "content-hash");
+
+        Assert.True(result);
+        Assert.Equal("example.com", database.LastParameters!["Host"]);
+        Assert.Equal("current-hash", database.LastParameters["UriHash"]);
+        Assert.Equal("content-hash", database.LastParameters["ListingParserInputHash"]);
+    }
+
     private sealed class RecordingDatabase : IDatabase
     {
         public string LastQuery { get; private set; } = string.Empty;
@@ -78,6 +143,8 @@ public sealed class PageRepositoryTests
         public Exception? QueryException { get; init; }
         public int QueryIntResult { get; init; }
         public DataTable TableResult { get; } = new();
+        public bool QueryExistsResult { get; init; }
+        public Dictionary<string, object?> DictionaryResult { get; } = [];
 
         public bool Query(string query, IDictionary<string, object?>? parameters = null)
         {
@@ -93,6 +160,14 @@ public sealed class PageRepositoryTests
             Record(query, parameters);
             exception = QueryException;
             return QueryResult;
+        }
+
+        public bool QueryExists(
+            string query,
+            IDictionary<string, object?>? parameters = null)
+        {
+            Record(query, parameters);
+            return QueryExistsResult;
         }
 
         public int QueryInt(string query, IDictionary<string, object?>? parameters = null)
@@ -117,6 +192,15 @@ public sealed class PageRepositoryTests
         {
             Record(query, parameters);
             return [];
+        }
+
+        public Dictionary<string, object?> QueryDictionary(
+            string query,
+            IDictionary<string, object?>? parameters = null,
+            SqlParameter[]? sqlParameters = null)
+        {
+            Record(query, parameters);
+            return DictionaryResult;
         }
 
         private void Record(string query, IDictionary<string, object?>? parameters)

@@ -1,6 +1,5 @@
 ﻿using landerist_library.Infrastructure.Sql;
 using landerist_library.Websites;
-using landerist_orels.ES;
 using System.Data;
 
 namespace landerist_library.Pages
@@ -11,13 +10,7 @@ namespace landerist_library.Pages
 
         public static Page? GetPage(string uriHash)
         {
-            string query =
-                SelectQuery() +
-                "WHERE [UriHash] = @UriHash";
-
-            var pages = GetPages(query, new Dictionary<string, object?> {
-                {"UriHash", uriHash }
-            });
+            var pages = GetPages(QueryRepository.GetPageByUriHash(uriHash));
             if (pages.Count.Equals(1))
             {
                 return pages[0];
@@ -49,50 +42,32 @@ namespace landerist_library.Pages
 
         public static List<Page> GetPages(PageType pageType)
         {
-            string query =
-                SelectQuery() +
-                "WHERE [PageType] = @PageType";
-
-            return GetPages(query, new Dictionary<string, object?> {
-                {"PageType", pageType.ToString() }
-            });
+            return GetPages(QueryRepository.GetPagesByPageType(pageType));
         }
 
         public static List<Page> GetUnknownPageType()
         {
-            string query =
-                SelectQuery() +
-                "WHERE [PageType] IS NULL AND [WaitingStatus] IS NULL ";
-
-            return GetPages(query);
+            return GetPages(QueryRepository.GetUnknownPageType());
         }
 
         public static List<Page> GetUnknownPageType(int topRows)
         {
-            string where = "P.[PageType] IS NULL";
-            return GetPages(topRows, where);
+            return GetPages(QueryRepository.GetUnknownPageTypeForUpdate(topRows));
         }
 
         public static List<Page> GetNextScrape(int topRows, bool extendToFillTopRows)
         {
-            string where = extendToFillTopRows ? string.Empty : "P.[NextScrape] < GETDATE()";
-            return GetPages(topRows, where);
+            return GetPages(QueryRepository.GetNextScrapeForUpdate(topRows, extendToFillTopRows));
         }
 
         public static List<Page> GetNextScrapeFuture(int topRows)
         {
-            string where = "P.[NextScrape] >= GETDATE()";
-            return GetPages(topRows, where);
+            return GetPages(QueryRepository.GetNextScrapeFutureForUpdate(topRows));
         }
 
         public static List<Page> GetRecentlyUnpublishedListingsPages(int topRows)
         {
-            string where =
-                "P.[UriHash] IN (" +
-                "   SELECT [Guid] FROM " + Database.ES_Listings.TABLE_ES_LISTINGS + " " +
-                "   WHERE [ListingStatus] = 'unpublished' AND [UnlistingDate] > DATEADD(day, -2, getdate())" +
-                ")";
-            return GetPages(topRows, where);
+            return GetPages(QueryRepository.GetRecentlyUnpublishedListingsPages(topRows));
         }
 
         public static List<Page> GetScrapePages(int topRows)
@@ -115,12 +90,7 @@ namespace landerist_library.Pages
 
         public static List<Page> GetUnknowHttpStatusCode()
         {
-            string query =
-                SelectQuery() +
-                "WHERE [HttpStatusCode] IS NULL";
-
-            DataTable dataTable = QueryRepository.QueryPages(query);
-            return GetPages(dataTable);
+            return GetPages(QueryRepository.GetUnknownHttpStatusCode());
         }
 
         public static List<string> GetUris(bool isListing)
@@ -138,16 +108,6 @@ namespace landerist_library.Pages
             return QueryRepository.GetHostPagesDataTable(website.Host);
         }
 
-        private static List<Page> GetPages(int topRows, string where)
-        {
-            DataTable dataTable = QueryRepository.GetPagesForUpdate(topRows, where);
-            return GetPages(dataTable);
-        }
-
-        private static string SelectQuery(int? topRows = null)
-        {
-            return QueryRepository.SelectQuery(topRows);
-        }
 
         private static int CountPages()
         {

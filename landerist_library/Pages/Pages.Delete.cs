@@ -13,22 +13,12 @@ namespace landerist_library.Pages
     {
         public static bool Delete(Website website)
         {
-            string query =
-               "DELETE FROM " + PAGES + " " +
-               "WHERE [Host] = @Host";
-
-            bool sucess = new DataBase().Query(query, new Dictionary<string, object?> {
-                {"Host", website.Host }
-            });
-            return sucess;
+            return MaintenanceRepository.DeleteByHost(website.Host);
         }
 
         public static bool DeleteAll()
         {
-            string query =
-               "DELETE FROM " + PAGES;
-
-            return new DataBase().Query(query);
+            return MaintenanceRepository.DeleteAll();
         }
 
        
@@ -40,11 +30,7 @@ namespace landerist_library.Pages
 
         public static void DeleteDuplicateUriQuery()
         {
-            string query =
-                "SELECT [Uri] " +
-                "FROM " + PAGES;
-
-            DataTable dataTable = new DataBase().QueryTable(query);
+            DataTable dataTable = QueryRepository.GetAllUrisDataTable();
             int counter = 0;
             int total = dataTable.Rows.Count;
             var pages = new ConcurrentBag<Page>();
@@ -71,21 +57,13 @@ namespace landerist_library.Pages
 
         public static void DeleteListingsHttpStatusCodeError()
         {
-            string query =
-               SelectQuery() +
-               "WHERE [PageType] = 'Listing' and [HttpStatusCode] <> 200";
-
-            var pages = GetPages(query);
+            var pages = GetPages(QueryRepository.GetListingsWithHttpStatusCodeError());
             Delete(pages);
         }
 
         public static void DeleteListingsResponseBodyRepeated()
         {
-            string query =
-               SelectQuery() +
-               "WHERE [PageType] = 'Listing' AND [ListingParserInputHash] IS NOT NULL";
-
-            var pages = GetPages(query);
+            var pages = GetPages(QueryRepository.GetListingsWithParserInputHash());
             HashSet<string> hashSet = [];
             List<Page> repeated = [];
             foreach (var page in pages)
@@ -104,25 +82,14 @@ namespace landerist_library.Pages
 
         public static void DeleteUrisLikePrint()
         {
-            string query =
-               SelectQuery() +
-               "WHERE " +
-               "    Uri like '%print%' OR " +
-               "    Uri like '%imprimi%' ";
-
-            var pages = GetPages(query);
+            var pages = GetPages(QueryRepository.GetUrisLikePrint());
             Delete(pages);
         }
 
         // Also removes url with prohibited host
         public static void DeleteProhibitedUris()
         {
-            string where = string.Join(" OR ", ProhibitedUrls.Prohibited_ES.Select(uri => $"Uri LIKE '%{uri}%'"));
-            string query =
-               SelectQuery() +
-               "WHERE " + where;
-
-            var pages = GetPages(query);
+            var pages = GetPages(QueryRepository.GetPagesWithProhibitedUris(ProhibitedUrls.Prohibited_ES));
             Delete(pages);
         }
 

@@ -1,5 +1,6 @@
 using landerist_library.Database;
 using landerist_library.Pages;
+using landerist_orels.ES;
 using System.Data;
 
 namespace landerist_library.Infrastructure.Sql
@@ -97,5 +98,27 @@ namespace landerist_library.Infrastructure.Sql
                 {"UriHash", uriHash }
             });
         }
+        public bool ListingParserInputExistsOnAnotherListing(
+            string host,
+            string uriHash,
+            string? listingParserInputHash)
+        {
+            string query =
+                "SELECT 1 " +
+                "FROM " + Pages.Pages.PAGES + " " +
+                "WHERE [Host] = @Host AND " +
+                "[UriHash] <> @UriHash AND " +
+                "[ListingParserInputHash] = @ListingParserInputHash AND " +
+                "EXISTS (SELECT 1 FROM " + ES_Listings.TABLE_ES_LISTINGS + " L " +
+                "WHERE L.[guid] = " + Pages.Pages.PAGES + ".[UriHash])";
+
+            return Database.QueryExists(query, new Dictionary<string, object?>
+            {
+                ["Host"] = host,
+                ["UriHash"] = uriHash,
+                ["ListingParserInputHash"] = listingParserInputHash
+            });
+        }
+
     }
 }

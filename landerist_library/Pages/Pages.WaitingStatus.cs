@@ -1,11 +1,12 @@
+using landerist_library.Infrastructure.Sql;
 using landerist_library.Configuration;
-using landerist_library.Database;
-using System.Data;
 
 namespace landerist_library.Pages
 {
     public partial class Pages
     {
+        private static readonly PageMaintenanceRepository MaintenanceRepository = new();
+
         public static List<Page> SelectWaitingStatusAIRequest(int topRows, WaitingStatus waitingStatusTo, int tokenCount, bool isMaxTokenCount)
         {
             return SelectWaitingStatus(topRows, WaitingStatus.waiting_ai_request, waitingStatusTo, tokenCount, isMaxTokenCount);
@@ -13,26 +14,7 @@ namespace landerist_library.Pages
 
         private static List<Page> SelectWaitingStatus(int topRows, WaitingStatus waitingStatusFrom, WaitingStatus waitingStatusTo, int tokenCount, bool isMaxTokenCount)
         {
-            string query =
-                "BEGIN TRANSACTION; " +
-                "WITH PagesToUpdate AS ( " +
-                "SELECT TOP (" + topRows + ") " + PAGES + ".[UriHash] " +
-                "FROM " + PAGES + " " +
-                "INNER JOIN " + Websites.Websites.WEBSITES + " ON " + PAGES + ".[Host] = " + Websites.Websites.WEBSITES + ".[Host] " +
-                "WHERE " + PAGES + ".[WaitingStatus] = @waitingStatusFrom AND [TokenCount] " + (isMaxTokenCount ? "<=" : ">") + " " + tokenCount + " " +
-                "ORDER BY " + PAGES + ".[LastScrape] ASC ) " +
-                "UPDATE " + PAGES + " " +
-                "SET [WaitingStatus] = @waitingStatusTo " +
-                "OUTPUT " + SelectColumns("INSERTED") + " " +
-                "FROM " + PAGES + " " +
-                "INNER JOIN PagesToUpdate ON " + PAGES + ".[UriHash] = PagesToUpdate.[UriHash] " +
-                "INNER JOIN " + Websites.Websites.WEBSITES + " ON " + PAGES + ".[Host] = " + Websites.Websites.WEBSITES + ".[Host] " +
-                "COMMIT TRANSACTION;";
-
-            DataTable dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
-                {"WaitingStatusFrom", waitingStatusFrom.ToString() },
-                {"waitingStatusTo", waitingStatusTo.ToString() },
-            });
+            var dataTable = MaintenanceRepository.SelectWaitingStatus(topRows, waitingStatusFrom, waitingStatusTo, tokenCount, isMaxTokenCount);
             return GetPages(dataTable);
         }
 
@@ -48,41 +30,17 @@ namespace landerist_library.Pages
 
         public static bool UpdateWaitingStatus(string uriHash, WaitingStatus waitingStatus)
         {
-            string query =
-                "UPDATE " + PAGES + " " +
-                "SET [WaitingStatus] = @WaitingStatus " +
-                "WHERE [UriHash] = @UriHash";
-
-            return new DataBase().Query(query, new Dictionary<string, object?> {
-                {"WaitingStatus", waitingStatus.ToString() },
-                {"UriHash", uriHash }
-            });
+            return MaintenanceRepository.UpdateWaitingStatus(uriHash, waitingStatus);
         }
 
         public static bool UpdateWaitingStatus(WaitingStatus waitingStatusFrom, WaitingStatus waitingStatusTo)
         {
-            string query =
-                "UPDATE " + PAGES + " " +
-                "SET [WaitingStatus] = @WaitingStatusTo " +
-                "WHERE [WaitingStatus] = @WaitingStatusFrom";
-
-            return new DataBase().Query(query, new Dictionary<string, object?> {
-                { "WaitingStatusFrom", waitingStatusFrom.ToString() },
-                { "WaitingStatusTo", waitingStatusTo.ToString() }
-            });
+            return MaintenanceRepository.UpdateWaitingStatus(waitingStatusFrom, waitingStatusTo);
         }
 
         public static void CleanLockedBy()
         {
-            string query =
-                "UPDATE " + PAGES + " " +
-                "SET [LockedBy] = NULL " +
-                "WHERE [LockedBy] = @LockedBy";
-
-            new DataBase().Query(query, new Dictionary<string, object?>()
-            {
-                { "LockedBy", Config.MACHINE_NAME }
-            });
+            MaintenanceRepository.CleanLockedBy(Config.MACHINE_NAME);
         }
     }
 }

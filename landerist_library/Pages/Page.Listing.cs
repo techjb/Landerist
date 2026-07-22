@@ -109,19 +109,7 @@ namespace landerist_library.Pages
                 return false;
             }
 
-            string query =
-                "SELECT 1 " +
-                "FROM " + Pages.PAGES + " " +
-                "WHERE [HOST] = @Host AND " +
-                "[UriHash] <> @UriHash AND " +
-                "[ListingParserInputHash] = @ListingParserInputHash AND " +
-                "EXISTS (SELECT 1 FROM " + ES_Listings.TABLE_ES_LISTINGS + " L WHERE L.[guid] = " + Pages.PAGES + ".[UriHash])";
-
-            return new DataBase().QueryExists(query, new Dictionary<string, object?> {
-                {"Host", Host},
-                {"UriHash", UriHash },
-                {"ListingParserInputHash", ListingParserInputHash },
-            });
+            return PageRepository.ListingParserInputExistsOnAnotherListing(Host, UriHash, ListingParserInputHash);
         }
 
         public bool IsNotListingCache()
