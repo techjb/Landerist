@@ -7,7 +7,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "5.85";
+        public static readonly string VERSION = "5.86";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -51,6 +51,10 @@ namespace landerist_library.Configuration
         public static string DATABASE_PW => AppConfig.DATABASE_PW;
 
         public static string? DATASOURCE { get; set; }
+
+        public static bool DATABASE_ENCRYPT { get; private set; }
+
+        public static bool DATABASE_TRUST_SERVER_CERTIFICATE { get; private set; }
 
         public static string? EXPORT_DIRECTORY { get; set; }
         public static string? LANDERIST_COM_OUTPUT { get; set; }
@@ -260,6 +264,14 @@ namespace landerist_library.Configuration
             DATASOURCE = configurationProduction ?
                 AppConfig.DATASOURCE_PRODUCTION :
                 AppConfig.DATASOURCE_LOCAL;
+
+            DATABASE_ENCRYPT = configurationProduction ?
+                AppConfig.DATABASE_ENCRYPT_PRODUCTION :
+                AppConfig.DATABASE_ENCRYPT_LOCAL;
+
+            DATABASE_TRUST_SERVER_CERTIFICATE = configurationProduction ?
+                AppConfig.DATABASE_TRUST_SERVER_CERTIFICATE_PRODUCTION :
+                AppConfig.DATABASE_TRUST_SERVER_CERTIFICATE_LOCAL;
         }
 
         private static void ValidateDatabaseConfiguration(bool configurationProduction)

@@ -100,6 +100,10 @@ internal static class AppConfig
     public static string DATABASE_PW => Settings["DATABASE_PW"];
     public static string DATASOURCE_LOCAL => Settings["DATASOURCE_LOCAL"];
     public static string DATASOURCE_PRODUCTION => Settings["DATASOURCE_PRODUCTION"];
+    public static bool DATABASE_ENCRYPT_LOCAL => Settings.GetBoolean("DATABASE_ENCRYPT_LOCAL", false);
+    public static bool DATABASE_ENCRYPT_PRODUCTION => Settings.GetBoolean("DATABASE_ENCRYPT_PRODUCTION", true);
+    public static bool DATABASE_TRUST_SERVER_CERTIFICATE_LOCAL => Settings.GetBoolean("DATABASE_TRUST_SERVER_CERTIFICATE_LOCAL", true);
+    public static bool DATABASE_TRUST_SERVER_CERTIFICATE_PRODUCTION => Settings.GetBoolean("DATABASE_TRUST_SERVER_CERTIFICATE_PRODUCTION", true);
     public static string INSERT_DIRECTORY => Settings["INSERT_DIRECTORY"];
     public static string EXPORT_DIRECTORY_LOCAL => Settings["EXPORT_DIRECTORY_LOCAL"];
     public static string EXPORT_DIRECTORY_PRODUCTION => Settings["EXPORT_DIRECTORY_PRODUCTION"];

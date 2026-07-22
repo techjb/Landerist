@@ -52,6 +52,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "hosts-statistics", "hosts-s
 		landerist_website\hosts-statistics\hosts_statistics_template.html = landerist_website\hosts-statistics\hosts_statistics_template.html
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "landerist_integration_tests", "landerist_integration_tests\landerist_integration_tests.csproj", "{518902D0-871C-4472-B80E-225C30C63D5B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +76,10 @@ Global
 		{862B91A5-AE29-4016-B0FD-DD024B320D23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{862B91A5-AE29-4016-B0FD-DD024B320D23}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{862B91A5-AE29-4016-B0FD-DD024B320D23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{518902D0-871C-4472-B80E-225C30C63D5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{518902D0-871C-4472-B80E-225C30C63D5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{518902D0-871C-4472-B80E-225C30C63D5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{518902D0-871C-4472-B80E-225C30C63D5B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

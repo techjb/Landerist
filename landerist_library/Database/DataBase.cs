@@ -48,8 +48,8 @@ namespace landerist_library.Database
                 InitialCatalog = databaseName,
                 DataSource = Config.DATASOURCE,
                 ConnectTimeout = DefaultConnectionTimeoutSeconds,
-                Encrypt = true,
-                TrustServerCertificate = true
+                Encrypt = Config.DATABASE_ENCRYPT,
+                TrustServerCertificate = Config.DATABASE_TRUST_SERVER_CERTIFICATE
             }.ConnectionString;
         }
 

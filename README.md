@@ -25,6 +25,18 @@ name and user. It refuses to start when `DATASOURCE_LOCAL` matches
 
 Open `Database.sql`, update its local paths, and run it in SQL Server to initialize the database.
 
+## Testing
+
+Run the automated SQL Server integration tests with:
+
+```powershell
+dotnet test .\landerist_integration_tests\landerist_integration_tests.csproj
+```
+
+These tests use only `DATASOURCE_LOCAL`, run serially, and perform CRUD checks
+inside a temporary SQL table. The legacy `landerist_tests` project remains a
+manual diagnostics runner and is not part of the automated test suite.
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first
