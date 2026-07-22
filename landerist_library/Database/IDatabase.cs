@@ -28,6 +28,11 @@ public interface IDatabase
         IDictionary<string, object?>? parameters = null,
         SqlParameter[]? sqlParameters = null);
 
+    HashSet<string> QueryHashSet(
+        string query,
+        IDictionary<string, object?>? parameters = null,
+        SqlParameter[]? sqlParameters = null);
+
     Dictionary<string, object?> QueryDictionary(
         string query,
         IDictionary<string, object?>? parameters = null,

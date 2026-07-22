@@ -6,6 +6,20 @@ namespace landerist_library.Infrastructure.Sql
 {
     public class WebsitePageMetricsRepository
     {
+        private readonly IDatabase? _database;
+
+        public WebsitePageMetricsRepository()
+        {
+        }
+
+        public WebsitePageMetricsRepository(IDatabase database)
+        {
+            ArgumentNullException.ThrowIfNull(database);
+            _database = database;
+        }
+
+        private IDatabase Database => _database ?? new DataBase();
+
         private static readonly HashSet<string> SupportedDateColumns =
         [
             "LastScrape",
@@ -20,7 +34,7 @@ namespace landerist_library.Infrastructure.Sql
                 "FROM " + Pages.Pages.PAGES + " " +
                 "WHERE [Host] = @Host";
 
-            return new DataBase().QueryInt(query, new Dictionary<string, object?> {
+            return Database.QueryInt(query, new Dictionary<string, object?> {
                 {"Host", host }
             });
         }
@@ -38,7 +52,7 @@ namespace landerist_library.Infrastructure.Sql
                 "WHERE [Host] = @Host " +
                 $"AND [{dateColumn}] >= @DateFrom";
 
-            return new DataBase().QueryInt(query, new Dictionary<string, object?> {
+            return Database.QueryInt(query, new Dictionary<string, object?> {
                 {"Host", host },
                 {"DateFrom", dateFrom }
             });
@@ -51,7 +65,7 @@ namespace landerist_library.Infrastructure.Sql
                 "FROM " + Pages.Pages.PAGES + " " +
                 "WHERE [Host] = @Host AND [PageType] = @PageType";
 
-            return new DataBase().QueryExists(query, new Dictionary<string, object?> {
+            return Database.QueryExists(query, new Dictionary<string, object?> {
                 { "Host", host },
                 { "PageType", PageType.Listing.ToString() }
             });
@@ -64,7 +78,7 @@ namespace landerist_library.Infrastructure.Sql
                 "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
                 "WHERE [Host] = @Host AND [listingStatus] = @ListingStatus";
 
-            return new DataBase().QueryExists(query, new Dictionary<string, object?> {
+            return Database.QueryExists(query, new Dictionary<string, object?> {
                 { "Host", host },
                 { "ListingStatus", ListingStatus.published.ToString() }
             });

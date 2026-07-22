@@ -6,6 +6,20 @@ namespace landerist_library.Infrastructure.Sql
 {
     public class WebsiteRepository
     {
+        private readonly IDatabase? _database;
+
+        public WebsiteRepository()
+        {
+        }
+
+        public WebsiteRepository(IDatabase database)
+        {
+            ArgumentNullException.ThrowIfNull(database);
+            _database = database;
+        }
+
+        private IDatabase Database => _database ?? new DataBase();
+
         public DataRow? GetDataRow(string host)
         {
             string query =
@@ -13,7 +27,7 @@ namespace landerist_library.Infrastructure.Sql
                 "FROM " + Websites.Websites.WEBSITES + " " +
                 "WHERE [Host] = @Host";
 
-            var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+            var dataTable = Database.QueryTable(query, new Dictionary<string, object?> {
                 {"Host", host }
             });
 
@@ -31,7 +45,7 @@ namespace landerist_library.Infrastructure.Sql
                 "@MainUri, @Host, @LanguageCode, @CountryCode, @RobotsTxt, @RobotsTxtUpdated, " +
                 "@SitemapUpdated, @IpAddress, @IpAddressUpdated, @IndexUrlRegex, @SitemapUrlRegex, @ListingUrlRegex, @ListingCoordinateRegex, @ListingHtmlRemoveXPath, @ListingUnavailableRegex, @NavigationWaitSelector, @AllowedResourceTypes, @BlockedDomains, @UserAgent, @HttpRequestHeaders, @HtmlIndexingEnabled, @UseProxy, @MinimumRequestIntervalMilliseconds)";
 
-            return new DataBase().Query(query, parameters);
+            return Database.Query(query, parameters);
         }
 
         public bool Update(IDictionary<string, object?> parameters)
@@ -62,7 +76,7 @@ namespace landerist_library.Infrastructure.Sql
                 "[MinimumRequestIntervalMilliseconds] = @MinimumRequestIntervalMilliseconds " +
                 "WHERE [Host] = @Host";
 
-            return new DataBase().Query(query, parameters);
+            return Database.Query(query, parameters);
         }
 
         public bool Delete(string host)
@@ -71,7 +85,7 @@ namespace landerist_library.Infrastructure.Sql
                "DELETE FROM " + Websites.Websites.WEBSITES + " " +
                "WHERE [Host] = @Host";
 
-            return new DataBase().Query(query, new Dictionary<string, object?> {
+            return Database.Query(query, new Dictionary<string, object?> {
                 {"Host", host }
             });
         }
