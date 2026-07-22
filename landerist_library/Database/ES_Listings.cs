@@ -11,6 +11,8 @@ namespace landerist_library.Database
     {
         public const string TABLE_ES_LISTINGS = "[ES_LISTINGS]";
         private static readonly ListingRepository Repository = new();
+        private static readonly ListingQueryRepository QueryRepository = new();
+        private static readonly ListingStatisticsRepository StatisticsRepository = new();
 
         public static void InsertUpdate(Website website, Listing newListing, ListingUnpublishDecision? unpublishDecision = null)
         {
@@ -59,37 +61,37 @@ namespace landerist_library.Database
 
         public static int Count(string host)
         {
-            return Repository.Count(host);
+            return StatisticsRepository.Count(host);
         }
 
         public static int Count(string host, ListingStatus listingStatus)
         {
-            return Repository.Count(host, listingStatus);
+            return StatisticsRepository.Count(host, listingStatus);
         }
 
         public static int CountSinceListingDate(string host, DateTime listingDateFrom)
         {
-            return Repository.CountSinceListingDate(host, listingDateFrom);
+            return StatisticsRepository.CountSinceListingDate(host, listingDateFrom);
         }
 
         public static int CountWithAddress(string host, ListingStatus listingStatus)
         {
-            return Repository.CountWithAddress(host, listingStatus);
+            return StatisticsRepository.CountWithAddress(host, listingStatus);
         }
 
         public static int CountWithCoordinates(string host, ListingStatus listingStatus)
         {
-            return Repository.CountWithCoordinates(host, listingStatus);
+            return StatisticsRepository.CountWithCoordinates(host, listingStatus);
         }
 
         public static int CountWithImages(string host, ListingStatus listingStatus)
         {
-            return Repository.CountWithImages(host, listingStatus);
+            return StatisticsRepository.CountWithImages(host, listingStatus);
         }
 
         public static int Count(ListingStatus listingStatus, Operation operation, PropertyType propertyType)
         {
-            return Repository.Count(listingStatus, operation, propertyType);
+            return StatisticsRepository.Count(listingStatus, operation, propertyType);
         }
 
         private static bool Update(Listing oldListing, Listing newListing, ListingUnpublishDecision? unpublishDecision)
@@ -131,7 +133,7 @@ namespace landerist_library.Database
 
         public static SortedSet<Listing> GetAll(bool loadMedia, bool loadSources)
         {
-            return GetAll(Repository.GetAll(), loadMedia, loadSources);
+            return GetAll(QueryRepository.GetAll(), loadMedia, loadSources);
         }
 
         public static SortedSet<Listing> GetPublished()
@@ -146,7 +148,7 @@ namespace landerist_library.Database
 
         public static SortedSet<Listing> GetListings(ListingStatus listingStatus)
         {
-            return GetAll(Repository.GetListings(listingStatus), true, true);
+            return GetAll(QueryRepository.GetListings(listingStatus), true, true);
         }
 
         public static SortedSet<Listing> GetListings(
@@ -156,52 +158,52 @@ namespace landerist_library.Database
             bool loadMedia,
             bool loadSources)
         {
-            return GetAll(Repository.GetListings(listingStatus, operation, propertyType), loadMedia, loadSources);
+            return GetAll(QueryRepository.GetListings(listingStatus, operation, propertyType), loadMedia, loadSources);
         }
 
         public static SortedSet<Listing> GetListings(string host, ListingStatus? listingStatus = null)
         {
-            return GetAll(Repository.GetListings(host, listingStatus), true, true);
+            return GetAll(QueryRepository.GetListings(host, listingStatus), true, true);
         }
 
         public static SortedSet<Listing> GetListingWithCatastralReference()
         {
-            return GetAll(Repository.GetListingWithCatastralReference(), false, false);
+            return GetAll(QueryRepository.GetListingWithCatastralReference(), false, false);
         }
 
         public static SortedSet<Listing> GetListingsWithoutLauName()
         {
-            return GetAll(Repository.GetListingsWithoutLauName(), false, false);
+            return GetAll(QueryRepository.GetListingsWithoutLauName(), false, false);
         }
 
         public static SortedSet<Listing> GetListingWithCatastralReferenceAndNoAddress()
         {
-            return GetAll(Repository.GetListingWithCatastralReferenceAndNoAddress(), false, false);
+            return GetAll(QueryRepository.GetListingWithCatastralReferenceAndNoAddress(), false, false);
         }
 
         public static SortedSet<Listing> GetListingsWithoutCatastralReferenceAndLocationIsAccurate()
         {
-            return GetAll(Repository.GetListingsWithoutCatastralReferenceAndLocationIsAccurate(), false, true);
+            return GetAll(QueryRepository.GetListingsWithoutCatastralReferenceAndLocationIsAccurate(), false, true);
         }
 
         public static SortedSet<Listing> GetListingsLocationIsAccurateNoCadastralReference()
         {
-            return GetAll(Repository.GetListingsLocationIsAccurateNoCadastralReference(), false, false);
+            return GetAll(QueryRepository.GetListingsLocationIsAccurateNoCadastralReference(), false, false);
         }
 
         public static SortedSet<Listing> GetUnpublishedListings(DateTime unlistingDate)
         {
-            return ParseListings(Repository.GetUnpublishedListings(unlistingDate), false, true);
+            return ParseListings(QueryRepository.GetUnpublishedListings(unlistingDate), false, true);
         }
 
         public static SortedSet<Listing> GetListings(bool loadMedia, bool loadSources, DateOnly dateFrom, DateOnly dateTo)
         {
-            return GetAll(Repository.GetListings(dateFrom, dateTo), loadMedia, loadSources);
+            return GetAll(QueryRepository.GetListings(dateFrom, dateTo), loadMedia, loadSources);
         }
 
         public static SortedSet<Listing> GetListings(ListingStatus listingStatus, bool loadMedia, bool loadSources, DateOnly dateFrom, DateOnly dateTo)
         {
-            return GetAll(Repository.GetListings(listingStatus, dateFrom, dateTo), loadMedia, loadSources);
+            return GetAll(QueryRepository.GetListings(listingStatus, dateFrom, dateTo), loadMedia, loadSources);
         }
 
         private static SortedSet<Listing> ParseListings(DataTable dataTable, bool loadMedia, bool loadSources)
@@ -244,7 +246,7 @@ namespace landerist_library.Database
 
         public static Listing? GetListing(string guid, bool loadMedia, bool loadSources)
         {
-            DataTable dataTable = Repository.GetListing(guid);
+            DataTable dataTable = QueryRepository.GetListing(guid);
 
             if (dataTable.Rows.Count.Equals(1))
             {
