@@ -1,4 +1,4 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Configuration;
 using landerist_library.Pages;
 using landerist_library.Tools;
 using landerist_library.Websites;
@@ -37,7 +37,7 @@ namespace landerist_library.Index
             }
 
 
-            if (Page.Website.AchievedMaxNumberOfPages())
+            if (global::landerist_library.Websites.Websites.AchievedMaxNumberOfPages(Page.Website))
             {
                 return;
             }
@@ -141,7 +141,7 @@ namespace landerist_library.Index
                 return false;
             }
 
-            if (website.AchievedMaxNumberOfPages())
+            if (global::landerist_library.Websites.Websites.AchievedMaxNumberOfPages(website))
             {
                 return false;
             }

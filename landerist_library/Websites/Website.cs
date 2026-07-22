@@ -1,7 +1,6 @@
 using Com.Bekijkhet.RobotsTxt;
 using landerist_library.Configuration;
 using landerist_orels.ES;
-using System.Data;
 
 namespace landerist_library.Websites
 {
@@ -69,25 +68,20 @@ namespace landerist_library.Websites
 
         public Website(string host) : this()
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(host);
             Host = host;
-            LoadDataRow();
+            MainUri = new Uri($"https://{host}");
         }
 
         public Website(Uri mainUri) : this()
         {
             SetMainUri(mainUri);
-            LoadDataRow();
         }
 
         private void SetMainUri(Uri mainUri)
         {
             MainUri = mainUri;
             Host = MainUri.Host;
-        }
-
-        public Website(DataRow dataRow) : this()
-        {
-            Load(dataRow);
         }
 
         private static string? NullIfWhiteSpace(string? value)

@@ -1,12 +1,13 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Infrastructure.Sql;
+using landerist_library.Infrastructure.Sql.Mapping;
 using landerist_library.Pages;
 using System.Data;
 
 namespace landerist_library.Websites
 {
-    public class Websites
+    public partial class Websites
     {
         public const string WEBSITES = "[WEBSITES]";
         private static readonly WebsiteQueryRepository WebsiteQueries = new();
@@ -94,7 +95,7 @@ namespace landerist_library.Websites
             }
 
             var dataRow = dataTable.Rows[0];
-            return new Website(dataRow);
+            return WebsiteDataMapper.Map(dataRow);
         }
 
         public static bool Exists(string host)
@@ -107,7 +108,7 @@ namespace landerist_library.Websites
             var hashSet = new HashSet<Website>();
             foreach (DataRow dataRow in dataTable.Rows)
             {
-                Website website = new(dataRow);
+                Website website = WebsiteDataMapper.Map(dataRow);
                 hashSet.Add(website);
             }
             return hashSet;
@@ -149,7 +150,7 @@ namespace landerist_library.Websites
                         bool success = website.SetMainUri();
                         if (success)
                         {
-                            website.Update();
+                            global::landerist_library.Websites.Websites.Update(website);
                         }
 
                         int current = Interlocked.Increment(ref counter);
@@ -198,7 +199,7 @@ namespace landerist_library.Websites
                         bool success = website.SetRobotsTxt();
                         if (success)
                         {
-                            website.Update();
+                            global::landerist_library.Websites.Websites.Update(website);
                         }
 
                         int current = Interlocked.Increment(ref counter);
@@ -247,7 +248,7 @@ namespace landerist_library.Websites
                         bool success = website.SetIpAddress();
                         if (success)
                         {
-                            website.Update();
+                            global::landerist_library.Websites.Websites.Update(website);
                         }
 
                         int current = Interlocked.Increment(ref counter);
@@ -309,7 +310,7 @@ namespace landerist_library.Websites
             int errors = 0;
             foreach (var website in websites)
             {
-                if (website.InsertMainPage())
+                if (global::landerist_library.Websites.Websites.InsertMainPage(website))
                 {
                     inserted++;
                 }
@@ -325,14 +326,14 @@ namespace landerist_library.Websites
         {
             ArgumentNullException.ThrowIfNull(uri);
 
-            var website = new Website(uri);
+            Website website = GetWebsite(uri.Host);
             Delete(website);
         }
 
         public static void Delete(Website website)
         {
             ArgumentNullException.ThrowIfNull(website);
-            website.Delete();
+            global::landerist_library.Websites.Websites.DeleteWithRelations(website);
         }
 
         private static bool Delete()
@@ -372,7 +373,7 @@ namespace landerist_library.Websites
                 try
                 {
                     website.SetRobotsTxt();
-                    website.Update();
+                    global::landerist_library.Websites.Websites.Update(website);
                     Interlocked.Increment(ref counter);
                 }
                 finally
@@ -409,7 +410,8 @@ namespace landerist_library.Websites
             {
                 try
                 {
-                    website.ReadSitemap();                    
+                    website.ReadSitemap();
+                    Update(website);
                     Interlocked.Increment(ref counter);
                 }
                 finally
@@ -447,7 +449,7 @@ namespace landerist_library.Websites
                 try
                 {
                     website.SetIpAddress();
-                    website.Update();
+                    global::landerist_library.Websites.Websites.Update(website);
                     Interlocked.Increment(ref counter);
                 }
                 finally
@@ -487,12 +489,12 @@ namespace landerist_library.Websites
 
             Parallel.ForEach(hosts.AsEnumerable(), host =>
             {
-                Website website = new(host);
+                Website website = GetWebsite(host);
                 try
                 {
-                    if (website.GetNumPages() > 0)
+                    if (global::landerist_library.Websites.Websites.GetNumPages(website) > 0)
                     {
-                        website.Delete();
+                        global::landerist_library.Websites.Websites.DeleteWithRelations(website);
                     }
                 }
                 finally

@@ -63,14 +63,14 @@ namespace landerist_library.Landerist_com
 
         private static string GetHostsStatisticsRow(Websites.Website website)
         {
-            int totalPages = website.GetNumPages();
-            int recentScrapedPages = website.GetNumPagesScrapedSince(DateTime.Now.AddDays(-RecentScrapedPagesDays));
-            int recentInsertedPages = website.GetNumPagesInsertedSince(DateTime.Now.AddDays(-RecentInsertedPagesDays));
-            int recentParseListingPages = website.GetNumPagesParseListingSince(DateTime.Now.AddDays(-RecentParseListingPagesDays));
-            int totalListings = website.GetNumListings();
-            int recentListings = website.GetNumListingsSinceListingDate(DateTime.Now.AddDays(-RecentListingsDays));
-            int publishedListings = website.GetNumPublishedListings();
-            int unpublishedListings = website.GetNumUnpublishedListings();
+            int totalPages = global::landerist_library.Websites.Websites.GetNumPages(website);
+            int recentScrapedPages = global::landerist_library.Websites.Websites.GetNumPagesScrapedSince(website, DateTime.Now.AddDays(-RecentScrapedPagesDays));
+            int recentInsertedPages = global::landerist_library.Websites.Websites.GetNumPagesInsertedSince(website, DateTime.Now.AddDays(-RecentInsertedPagesDays));
+            int recentParseListingPages = global::landerist_library.Websites.Websites.GetNumPagesParseListingSince(website, DateTime.Now.AddDays(-RecentParseListingPagesDays));
+            int totalListings = global::landerist_library.Websites.Websites.GetNumListings(website);
+            int recentListings = global::landerist_library.Websites.Websites.GetNumListingsSinceListingDate(website, DateTime.Now.AddDays(-RecentListingsDays));
+            int publishedListings = global::landerist_library.Websites.Websites.GetNumPublishedListings(website);
+            int unpublishedListings = global::landerist_library.Websites.Websites.GetNumUnpublishedListings(website);
 
             return
                 "                        <tr>" + Environment.NewLine +

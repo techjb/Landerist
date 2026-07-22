@@ -1,4 +1,4 @@
-﻿using landerist_library.Insert;
+using landerist_library.Insert;
 using landerist_library.Logs;
 using System.Data;
 
@@ -76,7 +76,7 @@ namespace landerist_library.Websites
 
         public static void DeleteAndInsert(Website website)
         {
-            website.Delete();
+            global::landerist_library.Websites.Websites.DeleteWithRelations(website);
             Insert(website.MainUri);
         }
 
@@ -160,7 +160,7 @@ namespace landerist_library.Websites
             {
                 Console.WriteLine("Error setting IP address for " + website.MainUri);
             }
-            if (!website.Insert())
+            if (!Websites.Insert(website))
             {
                 Console.WriteLine("Error inserting website " + website.MainUri);
                 return false;
@@ -286,7 +286,7 @@ namespace landerist_library.Websites
                 Interlocked.Increment(ref ErrorsIpAddress);
                 return false;
             }
-            if (!website.Insert())
+            if (!Websites.Insert(website))
             {
                 Interlocked.Increment(ref ErrorsInsert);
                 return false;
@@ -300,8 +300,9 @@ namespace landerist_library.Websites
 
             try
             {
-                website.InsertMainPage();
+                global::landerist_library.Websites.Websites.InsertMainPage(website);
                 website.ReadSitemap();
+                Websites.Update(website);
             }
             catch (Exception exception)
             {

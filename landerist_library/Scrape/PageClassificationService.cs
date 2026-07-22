@@ -1,4 +1,4 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Index;
 using landerist_library.Pages;
@@ -33,8 +33,8 @@ namespace landerist_library.Scrape
             }
 
             UpdatePageTypeAndListing(pageType, null);
-            page.SetNextScrapeFromNow();
-            return page.Update();
+            Pages.Pages.SetNextScrapeFromNow(page);
+            return global::landerist_library.Pages.Pages.Update(page);
         }
 
         public bool ApplyClassificationResultAfterDownload(PageType? newPageType, Listing? newListing, bool waitingAIRequest)
@@ -52,8 +52,8 @@ namespace landerist_library.Scrape
 
             UpdatePageTypeAndListing(newPageType, newListing);
             page.SetLastScrape();
-            page.SetNextScrape();
-            return page.Update();
+            Pages.Pages.SetNextScrape(page);
+            return global::landerist_library.Pages.Pages.Update(page);
         }
 
         public bool ApplyParsedClassificationAfterParsing(PageType newPageType, Listing? listing)
@@ -67,7 +67,7 @@ namespace landerist_library.Scrape
             page.SetResponseBodyFromZipped();
             UpdatePageTypeAndListing(newPageType, listing);
             page.RemoveResponseBodyZipped();
-            return page.Update();
+            return global::landerist_library.Pages.Pages.Update(page);
         }
 
         private void UpdatePageTypeAndListing(PageType? newPageType, Listing? newListing)
@@ -82,15 +82,15 @@ namespace landerist_library.Scrape
 
             if (page.IsNotListingByParser())
             {
-                page.InsertToNotListingCache();
+                global::landerist_library.Pages.Pages.InsertToNotListingCache(page);
             }
 
-            if (page.IsNotCanonicalListing() || page.IsRedirectToAnotherUrlListing())
+            if (global::landerist_library.Pages.Pages.IsNotCanonicalListing(page) || global::landerist_library.Pages.Pages.IsRedirectToAnotherUrlListing(page))
             {
                 HandleMovedListing(newListing);
             }
 
-            var unpublishDecision = page.GetListingUnpublishDecision();
+            var unpublishDecision = global::landerist_library.Pages.Pages.GetListingUnpublishDecision(page);
             if (unpublishDecision.ShouldUnpublish)
             {
                 UnpublishListing(newListing, unpublishDecision);
@@ -109,7 +109,7 @@ namespace landerist_library.Scrape
             new Indexer(page).Insert(destinationUri);
 
             using var destinationPage = new Page(page.Website, destinationUri);
-            if (!destinationPage.IsListingStatusPublished())
+            if (!global::landerist_library.Pages.Pages.IsListingStatusPublished(destinationPage))
             {
                 return;
             }
@@ -145,7 +145,7 @@ namespace landerist_library.Scrape
 
         private void PublishListing(Listing? newListing)
         {
-            newListing ??= page.GetListing(true, true);
+            newListing ??= global::landerist_library.Pages.Pages.GetListing(page, true, true);
             if (newListing == null)
             {
                 Logs.Log.WriteError("PageScraper HandlePublishedListing", "NewListing is null");
@@ -160,7 +160,7 @@ namespace landerist_library.Scrape
 
         private void UnpublishListing(Listing? newListing, ListingUnpublishDecision? unpublishDecision = null)
         {
-            newListing ??= page.GetListing(true, true);
+            newListing ??= global::landerist_library.Pages.Pages.GetListing(page, true, true);
             if (newListing == null)
             {
                 Logs.Log.WriteError("PageScraper HandleUnpublishedListing", "NewListing is null");

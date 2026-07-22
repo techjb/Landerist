@@ -1,4 +1,4 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Configuration;
 using landerist_library.Logs;
 using landerist_library.Pages;
 using landerist_library.Parse.ListingParser;
@@ -263,7 +263,7 @@ namespace landerist_library.Tasks
         {
             page.RemoveWaitingStatus();
             page.RemoveResponseBodyZipped();
-            return page.Update();
+            return global::landerist_library.Pages.Pages.Update(page);
         }
     }
 }

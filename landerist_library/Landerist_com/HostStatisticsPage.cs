@@ -79,13 +79,13 @@ namespace landerist_library.Landerist_com
                 IpAddressUpdated = FormatWebsiteDate(website.IpAddressUpdated),
                 Summary = new HostStatisticsSummary
                 {
-                    TotalPages = website.GetNumPages(),
-                    TotalListings = website.GetNumListings(),
-                    PublishedListings = website.GetNumPublishedListings(),
-                    PublishedListingsWithAddress = website.GetNumPublishedListingsWithAddress(),
-                    PublishedListingsWithCoordinates = website.GetNumPublishedListingsWithCoordinates(),
-                    PublishedListingsWithImages = website.GetNumPublishedListingsWithImages(),
-                    UnpublishedListings = website.GetNumUnpublishedListings()
+                    TotalPages = global::landerist_library.Websites.Websites.GetNumPages(website),
+                    TotalListings = global::landerist_library.Websites.Websites.GetNumListings(website),
+                    PublishedListings = global::landerist_library.Websites.Websites.GetNumPublishedListings(website),
+                    PublishedListingsWithAddress = global::landerist_library.Websites.Websites.GetNumPublishedListingsWithAddress(website),
+                    PublishedListingsWithCoordinates = global::landerist_library.Websites.Websites.GetNumPublishedListingsWithCoordinates(website),
+                    PublishedListingsWithImages = global::landerist_library.Websites.Websites.GetNumPublishedListingsWithImages(website),
+                    UnpublishedListings = global::landerist_library.Websites.Websites.GetNumUnpublishedListings(website)
                 },
                 Charts = new HostStatisticsCharts
                 {

@@ -10,7 +10,7 @@ namespace landerist_library.Pages
         public static bool Insert(Website website, Uri uri)
         {
             var page = new Page(website, uri);
-            return page.Insert();
+            return global::landerist_library.Pages.Pages.Insert(page);
         }
 
         public static void UpdateInvalidCadastastralReferences()
@@ -23,7 +23,7 @@ namespace landerist_library.Pages
             foreach (var page in pages)
             {
                 Console.WriteLine(counter++ + "/" + total);
-                var listing = page.GetListing(false, false);
+                var listing = global::landerist_library.Pages.Pages.GetListing(page, false, false);
                 if (listing != null && listing.cadastralReference != null)
                 {
                     if (!Validate.CadastralReference(listing.cadastralReference))
@@ -53,9 +53,9 @@ namespace landerist_library.Pages
                 {
                     Interlocked.Increment(ref counter);
                     DateTime calculationDate = page.LastScrape ?? page.Inserted;
-                    page.NextScrape = PageNextScrapeCalculator.Calculate(page, calculationDate);
+                    page.NextScrape = PageNextScrapeCalculator.Calculate(page, calculationDate, GetListingStatus(page));
 
-                    if (page.UpdateNextScrape())
+                    if (global::landerist_library.Pages.Pages.UpdateNextScrape(page))
                     {
                         Interlocked.Increment(ref updated);
                     }

@@ -44,7 +44,7 @@ namespace landerist_library.Pages
 
                 if (newUri != uri)
                 {
-                    Page page = new(uri);
+                    Page page = LoadOrCreate(uri);
                     new Indexer(page).Insert(page.Uri);
                     pages.Add(page);
                 }
@@ -104,7 +104,7 @@ namespace landerist_library.Pages
                 page =>
             {
                 Console.WriteLine(page.Uri);
-                if (page.Delete())
+                if (global::landerist_library.Pages.Pages.Delete(page))
                 {
                     Interlocked.Increment(ref counter);
                 }
@@ -138,8 +138,8 @@ namespace landerist_library.Pages
                     Interlocked.Increment(ref counter);
                     foreach (var source in listing.sources)
                     {
-                        var page = new Page(source.sourceUrl);
-                        if (page.DeleteListing())
+                        Page page = LoadOrCreate(source.sourceUrl);
+                        if (global::landerist_library.Pages.Pages.DeleteListing(page))
                         {
                             Interlocked.Increment(ref deleted);
                         }

@@ -17,7 +17,7 @@ namespace landerist_library.Websites
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(host);
 
-            Website website = new(host);
+            Website website = Websites.GetWebsite(host);
             try
             {
                 if (string.IsNullOrWhiteSpace(website.IndexUrlRegex))
@@ -25,7 +25,7 @@ namespace landerist_library.Websites
                     throw new InvalidOperationException("IndexUrlRegex is empty for host: " + host);
                 }
 
-                List<Page> pages = website.GetPages();
+                List<Page> pages = global::landerist_library.Websites.Websites.GetPages(website);
                 int total = pages.Count;
                 int processed = 0;
                 int deleted = 0;
@@ -42,7 +42,7 @@ namespace landerist_library.Websites
                             continue;
                         }
 
-                        if (page.Delete())
+                        if (global::landerist_library.Pages.Pages.Delete(page))
                         {
                             deleted++;
                         }
@@ -91,13 +91,13 @@ namespace landerist_library.Websites
             {
                 try
                 {
-                    if (SpecialRulesApplyToAllWebsites() || website.GetNumListings() > 0)
+                    if (SpecialRulesApplyToAllWebsites() || global::landerist_library.Websites.Websites.GetNumListings(website) > 0)
                     {
                         Interlocked.Increment(ref skipped);
                         return;
                     }
 
-                    if (website.Delete())
+                    if (global::landerist_library.Websites.Websites.DeleteWithRelations(website))
                     {
                         Interlocked.Increment(ref deleted);
                     }
@@ -136,7 +136,7 @@ namespace landerist_library.Websites
                         return;
                     }
 
-                    if (website.Delete())
+                    if (global::landerist_library.Websites.Websites.DeleteWithRelations(website))
                     {
                         Interlocked.Increment(ref deleted);
                     }
@@ -179,7 +179,7 @@ namespace landerist_library.Websites
                         return;
                     }
 
-                    if (website.Delete())
+                    if (global::landerist_library.Websites.Websites.DeleteWithRelations(website))
                     {
                         Interlocked.Increment(ref deleted);
                     }
@@ -234,13 +234,13 @@ namespace landerist_library.Websites
             {
                 try
                 {
-                    if (SpecialRulesApplyToAllWebsites() || website.GetNumPages() >= minimumPages || website.GetNumListings() > 0)
+                    if (SpecialRulesApplyToAllWebsites() || global::landerist_library.Websites.Websites.GetNumPages(website) >= minimumPages || global::landerist_library.Websites.Websites.GetNumListings(website) > 0)
                     {
                         Interlocked.Increment(ref skipped);
                         return;
                     }
 
-                    if (website.Delete())
+                    if (global::landerist_library.Websites.Websites.DeleteWithRelations(website))
                     {
                         Interlocked.Increment(ref deleted);
                     }

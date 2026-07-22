@@ -67,11 +67,11 @@ namespace landerist_library.Scrape
         {
             ScraperLog.WriteTestStart();
             PuppeteerDownloader.UpdateChrome();
-            var page = new Page("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/");
+            Page page = Pages.Pages.LoadOrCreate(new Uri("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/"));
             var pageScraper = new PageScraper(page);
             pageScraper.Scrape();
             ScraperLog.WriteTestPageType(page);
-            var listing =  page.GetListing(true, true);
+            var listing =  global::landerist_library.Pages.Pages.GetListing(page, true, true);
             ScraperLog.WriteTestListing(listing);
             Stop();
         }
@@ -99,7 +99,7 @@ namespace landerist_library.Scrape
 
         public bool Scrape(Website website)
         {
-            _pageQueue = website.GetPages();
+            _pageQueue = global::landerist_library.Websites.Websites.GetPages(website);
             return Scrape();
         }
 
@@ -231,14 +231,16 @@ namespace landerist_library.Scrape
         {
             if (!page.Website.IsAllowedByRobotsTxt(page.Uri))
             {
-                page.SetPageTypeAndNextScrape(PageType.BlockedByRobotsTxt);
+                Pages.Pages.SetPageTypeAndNextScrape(page, PageType.BlockedByRobotsTxt);
+                Pages.Pages.Update(page);
                 Interlocked.Increment(ref SkippedByRobotsTxt);
                 return;
             }
 
             if (page.Website.CrawlDelayTooBig())
             {
-                page.SetPageTypeAndNextScrape(PageType.CrawlDelayTooBig);
+                Pages.Pages.SetPageTypeAndNextScrape(page, PageType.CrawlDelayTooBig);
+                Pages.Pages.Update(page);
                 Interlocked.Increment(ref SkippedByCrawlDelay);
                 return;
             }
@@ -336,7 +338,7 @@ namespace landerist_library.Scrape
 
         public void Scrape(string url, bool useProxy)
         {
-            var page = new Page(url);
+            Page page = Pages.Pages.LoadOrCreate(new Uri(url));
             Scrape(page, useProxy);
         }
 

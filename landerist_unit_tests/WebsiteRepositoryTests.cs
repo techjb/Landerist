@@ -1,4 +1,6 @@
 using landerist_library.Infrastructure.Sql;
+using landerist_library.Infrastructure.Sql.Mapping;
+using landerist_library.Websites;
 using System.Data;
 
 namespace landerist_unit_tests;
@@ -6,34 +8,33 @@ namespace landerist_unit_tests;
 public sealed class WebsiteRepositoryTests
 {
     [Fact]
-    public void GetDataRow_UsesInjectedDatabase()
+    public void Mapper_RestoresWebsiteWithoutEntityDatabaseAccess()
     {
-        RecordingDatabase database = new();
-        database.TableResult.Columns.Add("Host", typeof(string));
-        database.TableResult.Rows.Add("example.com");
-        WebsiteRepository repository = new(database);
+        DataTable table = new();
+        table.Columns.Add("MainUri", typeof(string));
+        table.Columns.Add("Host", typeof(string));
+        table.Columns.Add("LanguageCode", typeof(string));
+        table.Columns.Add("CountryCode", typeof(string));
+        table.Rows.Add("https://example.com", "example.com", "es", "ES");
 
-        DataRow? result = repository.GetDataRow("example.com");
+        Website result = WebsiteDataMapper.Map(table.Rows[0]);
 
-        Assert.NotNull(result);
-        Assert.Equal("example.com", result["Host"]);
-        Assert.Equal("example.com", database.LastParameters!["Host"]);
+        Assert.Equal("example.com", result.Host);
+        Assert.Equal(new Uri("https://example.com"), result.MainUri);
     }
 
     [Fact]
-    public void Insert_DelegatesParametersAndResult()
+    public void Insert_MapsEntityAndDelegatesResult()
     {
         RecordingDatabase database = new() { QueryResult = true };
         WebsiteRepository repository = new(database);
-        Dictionary<string, object?> parameters = new()
-        {
-            ["Host"] = "example.com"
-        };
+        Website website = new(new Uri("https://example.com"));
 
-        bool result = repository.Insert(parameters);
+        bool result = repository.Insert(website);
 
         Assert.True(result);
-        Assert.Same(parameters, database.LastParameters);
+        Assert.Equal("example.com", database.LastParameters!["Host"]);
+        Assert.Equal("https://example.com/", database.LastParameters["MainUri"]);
         Assert.Contains("INSERT INTO", database.LastQuery);
     }
 
@@ -95,9 +96,7 @@ public sealed class WebsiteRepositoryTests
         RecordingDatabase database = new();
         WebsitePageMetricsRepository repository = new(database);
 
-        Assert.Throws<ArgumentException>(() =>
-            repository.CountPagesSince("example.com", "Unexpected]Column", DateTime.UtcNow));
-
+        Assert.Throws<ArgumentException>(() => repository.CountPagesSince("example.com", "Unexpected]Column", DateTime.UtcNow));
         Assert.Equal(string.Empty, database.LastQuery);
     }
 }

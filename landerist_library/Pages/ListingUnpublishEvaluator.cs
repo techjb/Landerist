@@ -39,7 +39,7 @@ namespace landerist_library.Pages
 
         public ListingUnpublishDecision Evaluate()
         {
-            if (!_page.ContainsListing())
+            if (!global::landerist_library.Pages.Pages.ContainsListing(_page))
             {
                 return CreateDecision(false, ListingUnpublishDecisionReason.ListingDoesNotExist, null);
             }

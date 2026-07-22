@@ -1,5 +1,7 @@
 using landerist_library.Infrastructure.Sql;
+using landerist_library.Infrastructure.Sql.Mapping;
 using landerist_library.Pages;
+using landerist_library.Websites;
 using landerist_orels.ES;
 using System.Data;
 
@@ -8,35 +10,31 @@ namespace landerist_unit_tests;
 public sealed class PageRepositoryTests
 {
     [Fact]
-    public void GetDataRow_UsesInjectedDatabaseAndReturnsFirstRow()
+    public void Mapper_RestoresPageWithoutEntityDatabaseAccess()
     {
-        RecordingDatabase database = new();
-        database.TableResult.Columns.Add("UriHash", typeof(string));
-        database.TableResult.Rows.Add("expected-hash");
-        PageRepository repository = new(database);
+        DataTable table = CreatePageTable();
+        table.Rows.Add("example.com", "https://example.com/listing/1", "expected-hash", new DateTime(2026, 1, 1));
+        Website website = new(new Uri("https://example.com"));
 
-        DataRow? result = repository.GetDataRow("expected-hash");
+        Page result = PageDataMapper.Map(table.Rows[0], website);
 
-        Assert.NotNull(result);
-        Assert.Equal("expected-hash", result["UriHash"]);
-        Assert.Contains("WHERE [UriHash] = @UriHash", database.LastQuery);
-        Assert.Equal("expected-hash", database.LastParameters!["UriHash"]);
+        Assert.Equal("expected-hash", result.UriHash);
+        Assert.Equal(website, result.Website);
+        Assert.Equal(new DateTime(2026, 1, 1), result.Inserted);
     }
 
     [Fact]
-    public void Insert_DelegatesParametersAndResult()
+    public void Insert_MapsEntityAndDelegatesResult()
     {
         RecordingDatabase database = new() { QueryResult = true };
         PageRepository repository = new(database);
-        Dictionary<string, object?> parameters = new()
-        {
-            ["UriHash"] = "expected-hash"
-        };
+        Page page = CreatePage();
 
-        bool result = repository.Insert(parameters);
+        bool result = repository.Insert(page);
 
         Assert.True(result);
-        Assert.Same(parameters, database.LastParameters);
+        Assert.Equal(page.UriHash, database.LastParameters!["UriHash"]);
+        Assert.Equal(page.Uri.ToString(), database.LastParameters["Uri"]);
         Assert.Contains("INSERT INTO", database.LastQuery);
     }
 
@@ -44,14 +42,10 @@ public sealed class PageRepositoryTests
     public void Update_PropagatesDatabaseException()
     {
         InvalidOperationException expectedException = new("Expected failure");
-        RecordingDatabase database = new()
-        {
-            QueryResult = false,
-            QueryException = expectedException
-        };
+        RecordingDatabase database = new() { QueryResult = false, QueryException = expectedException };
         PageRepository repository = new(database);
 
-        bool result = repository.Update(new Dictionary<string, object?>(), out Exception? exception);
+        bool result = repository.Update(CreatePage(), out Exception? exception);
 
         Assert.False(result);
         Assert.Same(expectedException, exception);
@@ -76,12 +70,7 @@ public sealed class PageRepositoryTests
         RecordingDatabase database = new();
         PageMaintenanceRepository repository = new(database);
 
-        repository.SelectWaitingStatus(
-            5,
-            WaitingStatus.waiting_ai_request,
-            WaitingStatus.waiting_ai_response,
-            100,
-            isMaxTokenCount: true);
+        repository.SelectWaitingStatus(5, WaitingStatus.waiting_ai_request, WaitingStatus.waiting_ai_response, 100, isMaxTokenCount: true);
 
         Assert.Contains("TOP (@TopRows)", database.LastQuery);
         Assert.Contains("[TokenCount] <= @TokenCount", database.LastQuery);
@@ -122,10 +111,7 @@ public sealed class PageRepositoryTests
         RecordingDatabase database = new() { QueryExistsResult = true };
         PageRepository repository = new(database);
 
-        bool result = repository.ListingParserInputExistsOnAnotherListing(
-            "example.com",
-            "current-hash",
-            "content-hash");
+        bool result = repository.ListingParserInputExistsOnAnotherListing("example.com", "current-hash", "content-hash");
 
         Assert.True(result);
         Assert.Equal("example.com", database.LastParameters!["Host"]);
@@ -133,4 +119,19 @@ public sealed class PageRepositoryTests
         Assert.Equal("content-hash", database.LastParameters["ListingParserInputHash"]);
     }
 
+    private static Page CreatePage()
+    {
+        Website website = new(new Uri("https://example.com"));
+        return new Page(website, new Uri("https://example.com/listing/1"));
+    }
+
+    private static DataTable CreatePageTable()
+    {
+        DataTable table = new();
+        table.Columns.Add("Host", typeof(string));
+        table.Columns.Add("Uri", typeof(string));
+        table.Columns.Add("UriHash", typeof(string));
+        table.Columns.Add("Inserted", typeof(DateTime));
+        return table;
+    }
 }

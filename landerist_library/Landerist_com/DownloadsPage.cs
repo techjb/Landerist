@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Net;
 using System.Text;
 using landerist_library.Configuration;
@@ -220,8 +220,8 @@ namespace landerist_library.Landerist_com
                 .Where(website => website.CountryCode == countryCode)
                 .OrderBy(website => website.Host, StringComparer.OrdinalIgnoreCase))
             {
-                int publishedListingsCount = website.GetNumPublishedListings();
-                int unpublishedListingsCount = website.GetNumUnpublishedListings();
+                int publishedListingsCount = global::landerist_library.Websites.Websites.GetNumPublishedListings(website);
+                int unpublishedListingsCount = global::landerist_library.Websites.Websites.GetNumUnpublishedListings(website);
 
                 rows.AppendLine(GetHostTableRow(
                     countryCode,

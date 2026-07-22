@@ -1,4 +1,5 @@
-﻿using landerist_library.Infrastructure.Sql;
+using landerist_library.Infrastructure.Sql;
+using landerist_library.Infrastructure.Sql.Mapping;
 using landerist_library.Websites;
 using System.Data;
 
@@ -7,6 +8,19 @@ namespace landerist_library.Pages
     public partial class Pages
     {
         private static readonly PageQueryRepository QueryRepository = new();
+
+        public static Page LoadOrCreate(Uri uri)
+        {
+            ArgumentNullException.ThrowIfNull(uri);
+            Page? existing = GetPage(Tools.Strings.GetHash(uri.ToString()));
+            if (existing is not null)
+            {
+                return existing;
+            }
+
+            Website website = Websites.Websites.GetWebsite(uri.Host);
+            return new Page(website, uri);
+        }
 
         public static Page? GetPage(string uriHash)
         {
@@ -164,8 +178,8 @@ namespace landerist_library.Pages
             List<Page> pages = [];
             foreach (DataRow dataRow in dataTable.Rows)
             {
-                Website website = new(dataRow);
-                Page page = new(website, dataRow);
+                Website website = WebsiteDataMapper.Map(dataRow);
+                Page page = PageDataMapper.Map(dataRow, website);
                 pages.Add(page);
             }
             return pages;
@@ -176,7 +190,7 @@ namespace landerist_library.Pages
             List<Page> pages = [];
             foreach (DataRow dataRow in dataTable.Rows)
             {
-                Page page = new(website, dataRow);
+                Page page = PageDataMapper.Map(dataRow, website);
                 pages.Add(page);
             }
             return pages;

@@ -1,3 +1,5 @@
+using landerist_orels.ES;
+
 namespace landerist_library.Pages
 {
     public static class PageNextScrapeCalculator
@@ -12,7 +14,7 @@ namespace landerist_library.Pages
             Default,
         }
 
-        public static DateTime? Calculate(Page page, DateTime now)
+        public static DateTime? Calculate(Page page, DateTime now, ListingStatus? listingStatus)
         {
             if (page.PageType is not PageType pageType || page.PageTypeCounter == null)
             {
@@ -34,11 +36,11 @@ namespace landerist_library.Pages
                 addDays = addDays * GetStabilityMultiplier(page.ListingParserInputNotChangedCounter);
             }
 
-            if (page.IsListingStatusPublished())
+            if (listingStatus == ListingStatus.published)
             {
                 addDays = Math.Min(addDays, 3d);
             }
-            else if (page.IsListingStatusUnPublished())
+            else if (listingStatus == ListingStatus.unpublished)
             {
                 addDays = Math.Max(addDays, 45d);
             }

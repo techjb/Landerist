@@ -2,7 +2,6 @@ using HtmlAgilityPack;
 using landerist_library.Tools;
 using landerist_library.Websites;
 using landerist_orels.ES;
-using System.Data;
 
 namespace landerist_library.Pages
 {
@@ -31,13 +30,13 @@ namespace landerist_library.Pages
 
         public string? LastModified { get; set; } = null;
 
-        public PageType? PageType { get; private set; }
+        public PageType? PageType { get; internal set; }
 
-        public short? PageTypeCounter { get; private set; }
+        public short? PageTypeCounter { get; internal set; }
 
         public string? LockedBy { get; set; }
 
-        public WaitingStatus? WaitingStatus { get; private set; }
+        public WaitingStatus? WaitingStatus { get; internal set; }
 
         private string? ResponseBody { get; set; }
 
@@ -45,11 +44,11 @@ namespace landerist_library.Pages
 
         public string? ListingParserInputHash { get; set; }
 
-        public short? ListingParserInputNotChangedCounter { get; private set; }
+        public short? ListingParserInputNotChangedCounter { get; internal set; }
 
-        public short? TransientErrorCounter { get; private set; }
+        public short? TransientErrorCounter { get; internal set; }
 
-        public byte[]? ResponseBodyZipped { get; private set; }
+        public byte[]? ResponseBodyZipped { get; internal set; }
 
         public int? TokenCount { get; set; } = null;
 
@@ -83,7 +82,7 @@ namespace landerist_library.Pages
 
         }
 
-        public Page(Uri uri) : this(Websites.Websites.GetWebsite(uri.Host), uri)
+        public Page(Uri uri) : this(CreateWebsite(uri), uri)
         {
 
         }
@@ -100,24 +99,18 @@ namespace landerist_library.Pages
             Uri = uri;
             UriHash = GetUriHash();
             Inserted = DateTime.Now;
+        }
 
-            var dataRow = GetDataRow();
-            if (dataRow != null)
-            {
-                Load(dataRow);
-            }
+        private static Website CreateWebsite(Uri uri)
+        {
+            ArgumentNullException.ThrowIfNull(uri);
+            return new Website(new Uri(uri.GetLeftPart(UriPartial.Authority)));
         }
 
         public string GetUriHash()
         {
             var uriString = Uri.ToString();
             return Strings.GetHash(uriString);
-        }
-
-        public Page(Website website, DataRow dataRow)
-        {
-            Website = website;
-            Load(dataRow);
         }
 
         public void Dispose()

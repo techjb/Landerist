@@ -1,4 +1,4 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Logs;
 using landerist_library.Pages;
@@ -229,7 +229,7 @@ namespace landerist_library.Tasks
                 {
                     _invalidPages.Add(page.UriHash);
                     page.RemoveWaitingStatus();
-                    page.Update();
+                    global::landerist_library.Pages.Pages.Update(page);
                     return FileWriteResult.Error;
                 }
 

@@ -35,10 +35,6 @@ namespace landerist_library.Websites
             {
                 Logs.Log.WriteError("Website InsertPagesFromSiteMap", Host, exception);
             }
-            finally
-            {
-                Update();
-            }
         }
 
         private Uri? GetDefaultSiteMap()

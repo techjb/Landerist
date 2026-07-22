@@ -1,6 +1,5 @@
 using HtmlAgilityPack;
 using landerist_library.Configuration;
-using landerist_library.Database;
 using landerist_library.Tools;
 using landerist_orels.ES;
 
@@ -102,69 +101,5 @@ namespace landerist_library.Pages
             return ListingParserInput.Length < Config.MIN_LISTINGPARSERINPUT_LENGTH;
         }
 
-        public bool ListingParserInputIsAnotherListingInHost()
-        {
-            if (string.IsNullOrEmpty(ListingParserInput))
-            {
-                return false;
-            }
-
-            return PageRepository.ListingParserInputExistsOnAnotherListing(Host, UriHash, ListingParserInputHash);
-        }
-
-        public bool IsNotListingCache()
-        {
-            if (!Config.NOT_LISTING_CACHE_ENABLED || string.IsNullOrEmpty(ListingParserInputHash))
-            {
-                return false;
-            }
-            return NotListingsCache.IsNotListing(Host, ListingParserInputHash);
-        }
-
-        public bool InsertToNotListingCache()
-        {
-            return (ListingParserInputHash != null) && NotListingsCache.Insert(Host, ListingParserInputHash);
-        }
-
-        public Listing? GetListing(bool loadMedia, bool loadSources)
-        {
-            return ES_Listings.GetListing(this, loadMedia, loadSources);
-        }
-
-        public bool ContainsListing()
-        {
-            var listing = GetListing(false, false);
-            return listing is not null;
-        }
-
-        public bool IsListingStatusPublished()
-        {
-            return GetListing(false, false)?.listingStatus == landerist_orels.ES.ListingStatus.published;
-        }
-
-        public bool IsListingStatusUnPublished()
-        {
-            return GetListing(false, false)?.listingStatus == landerist_orels.ES.ListingStatus.unpublished;
-        }
-
-        public bool HaveToUnpublishListing()
-        {
-            return GetListingUnpublishDecision().ShouldUnpublish;
-        }
-
-        public ListingUnpublishDecision GetListingUnpublishDecision()
-        {
-            return new ListingUnpublishEvaluator(this).Evaluate();
-        }
-
-        public bool IsNotCanonicalListing()
-        {
-            return IsNotCanonical() && ContainsListing();
-        }
-
-        public bool IsRedirectToAnotherUrlListing()
-        {
-            return IsRedirectToAnotherUrl() && ContainsListing();
-        }
     }
 }

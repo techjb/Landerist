@@ -1,4 +1,4 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Logs;
 using landerist_library.Pages;
@@ -211,7 +211,7 @@ namespace landerist_library.Tasks
                     page.RemoveWaitingStatus();
                     page.RemoveResponseBodyZipped();
 
-                    if (page.Update())
+                    if (global::landerist_library.Pages.Pages.Update(page))
                     {
                         Interlocked.Increment(ref counter);
                     }

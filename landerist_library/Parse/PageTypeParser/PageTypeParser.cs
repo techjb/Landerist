@@ -105,7 +105,7 @@ namespace landerist_library.Parse.PageTypeParser
                 return (PageType.ResponseBodyIsError, null, false);
             }
 
-            if (Page.IsNotListingCache() && isProduction)
+            if (global::landerist_library.Pages.Pages.IsNotListingCache(Page) && isProduction)
             {
                 GlobalStatistics.InsertDailyCounter(StatisticsKey.NotListingCache);
                 HostStatistics.InsertDailyCounter(Page.Host, HostStatisticsKey.NotListingCache);
