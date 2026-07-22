@@ -9,6 +9,19 @@ namespace landerist_library.Infrastructure.Sql
     public class GlobalStatisticsRepository
     {
         private const string GlobalStatisticsTable = "[GLOBAL_STATISTICS]";
+        private readonly IDatabase? _database;
+
+        public GlobalStatisticsRepository()
+        {
+        }
+
+        public GlobalStatisticsRepository(IDatabase database)
+        {
+            ArgumentNullException.ThrowIfNull(database);
+            _database = database;
+        }
+
+        private IDatabase Database => _database ?? new DataBase();
 
         public int CountWebsites()
         {
@@ -124,7 +137,7 @@ namespace landerist_library.Infrastructure.Sql
                 "WHERE CAST([LastScrape] AS date) = CAST(@Date AS date) " +
                 "GROUP BY [HttpStatusCode] ";
 
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>
+            return Database.QueryTable(query, new Dictionary<string, object?>
             {
                 { "Date", date }
             });
@@ -139,7 +152,7 @@ namespace landerist_library.Infrastructure.Sql
                 "AND [PageType] IS NOT NULL " +
                 "GROUP BY [PageType] ";
 
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>
+            return Database.QueryTable(query, new Dictionary<string, object?>
             {
                 { "Date", date }
             });
@@ -152,7 +165,7 @@ namespace landerist_library.Infrastructure.Sql
                 "FROM " + GlobalStatisticsTable + " " +
                 "WHERE [Key] LIKE @Key";
 
-            return new DataBase().QueryListString(query, new Dictionary<string, object?>
+            return Database.QueryListString(query, new Dictionary<string, object?>
             {
                 { "Key", key + "%" }
             });
@@ -165,7 +178,7 @@ namespace landerist_library.Infrastructure.Sql
                 "WHERE [Key] LIKE @KeyPrefix " +
                 "AND CAST([Date] AS date) = CAST(@Date AS date)";
 
-            return new DataBase().Query(query, new Dictionary<string, object?>
+            return Database.Query(query, new Dictionary<string, object?>
             {
                 { "Date", date },
                 { "KeyPrefix", keyPrefix + "_%" }
@@ -180,7 +193,7 @@ namespace landerist_library.Infrastructure.Sql
                 "INSERT INTO " + GlobalStatisticsTable + " ([Date], [Key], [Counter]) " +
                 "VALUES (@Date, @Key, @Counter);";
 
-            return new DataBase().Query(query, new Dictionary<string, object?>
+            return Database.Query(query, new Dictionary<string, object?>
             {
                 { "Date", date },
                 { "Key", key },
@@ -207,7 +220,7 @@ namespace landerist_library.Infrastructure.Sql
                 "   INSERT ([Date], [Key], [Counter]) " +
                 "   VALUES (source.DateOnly, source.[Key], source.[Counter]);";
 
-            return new DataBase().Query(query, new Dictionary<string, object?>
+            return Database.Query(query, new Dictionary<string, object?>
             {
                 { "Date", DateTime.Now },
                 { "Key", key },
@@ -221,7 +234,7 @@ namespace landerist_library.Infrastructure.Sql
                 "SELECT DISTINCT [Key] " +
                 "FROM " + GlobalStatisticsTable + " ";
 
-            return new DataBase().QueryTable(query);
+            return Database.QueryTable(query);
         }
 
         public DataTable GetStatistics(string key, int months)
@@ -233,7 +246,7 @@ namespace landerist_library.Infrastructure.Sql
                 "[Date] > DATEADD(MONTH, @Months, GETDATE()) " +
                 "ORDER BY [Date] ASC";
 
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>
+            return Database.QueryTable(query, new Dictionary<string, object?>
             {
                 { "Key", key },
                 { "Months", months }
@@ -248,21 +261,21 @@ namespace landerist_library.Infrastructure.Sql
                 "WHERE [Key] = @Key " +
                 "ORDER BY [Date] DESC";
 
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>
+            return Database.QueryTable(query, new Dictionary<string, object?>
             {
                 { "Top", top },
                 { "Key", statisticsKey }
             });
         }
 
-        private static int QueryInt(string query)
+        private int QueryInt(string query)
         {
-            return new DataBase().QueryInt(query);
+            return Database.QueryInt(query);
         }
 
-        private static int QueryInt(string query, Dictionary<string, object?> parameters)
+        private int QueryInt(string query, Dictionary<string, object?> parameters)
         {
-            DataTable dataTable = new DataBase().QueryTable(query, parameters);
+            DataTable dataTable = Database.QueryTable(query, parameters);
             return Convert.ToInt32(dataTable.Rows[0][0]);
         }
     }

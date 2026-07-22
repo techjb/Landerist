@@ -12,6 +12,7 @@ internal sealed class RecordingDatabase : IDatabase
     public Exception? QueryException { get; init; }
     public int QueryIntResult { get; init; }
     public DataTable TableResult { get; } = new();
+    public List<string> ListStringResult { get; } = [];
     public bool QueryExistsResult { get; init; }
     public Dictionary<string, object?> DictionaryResult { get; } = [];
     public HashSet<string> HashSetResult { get; } = [];
@@ -61,7 +62,7 @@ internal sealed class RecordingDatabase : IDatabase
         SqlParameter[]? sqlParameters = null)
     {
         Record(query, parameters);
-        return [];
+        return ListStringResult;
     }
 
     public HashSet<string> QueryHashSet(

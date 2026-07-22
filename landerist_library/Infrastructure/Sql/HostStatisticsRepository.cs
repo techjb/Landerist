@@ -8,6 +8,20 @@ namespace landerist_library.Infrastructure.Sql
 {
     public class HostStatisticsRepository
     {
+        private readonly IDatabase? _database;
+
+        public HostStatisticsRepository()
+        {
+        }
+
+        public HostStatisticsRepository(IDatabase database)
+        {
+            ArgumentNullException.ThrowIfNull(database);
+            _database = database;
+        }
+
+        private IDatabase Database => _database ?? new DataBase();
+
         public int CountPages(string host)
         {
             string query =
@@ -57,7 +71,7 @@ namespace landerist_library.Infrastructure.Sql
                 "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
                 "WHERE [Host] = @Host AND [listingStatus] = @ListingStatus";
 
-            return new DataBase().QueryInt(query, new Dictionary<string, object?>
+            return Database.QueryInt(query, new Dictionary<string, object?>
             {
                 { "Host", host },
                 { "ListingStatus", listingStatus.ToString() }
@@ -95,7 +109,7 @@ namespace landerist_library.Infrastructure.Sql
                 "AND [Key] LIKE @KeyPrefix " +
                 "AND CAST([Date] AS date) = CAST(@Date AS date)";
 
-            return new DataBase().Query(query, new Dictionary<string, object?>
+            return Database.Query(query, new Dictionary<string, object?>
             {
                 { "Date", date },
                 { "Host", host },
@@ -113,7 +127,7 @@ namespace landerist_library.Infrastructure.Sql
                 "INSERT INTO " + HostStatistics.HOST_STATISTICS + " ([Date], [Host], [Key], [Counter]) " +
                 "VALUES (@Date, @Host, @Key, @Counter);";
 
-            return new DataBase().Query(query, new Dictionary<string, object?>
+            return Database.Query(query, new Dictionary<string, object?>
             {
                 { "Date", date },
                 { "Host", host },
@@ -143,7 +157,7 @@ namespace landerist_library.Infrastructure.Sql
                 "   INSERT ([Date], [Host], [Key], [Counter]) " +
                 "   VALUES (source.DateOnly, source.[Host], source.[Key], source.[Counter]);";
 
-            return new DataBase().Query(query, new Dictionary<string, object?>
+            return Database.Query(query, new Dictionary<string, object?>
             {
                 { "Date", DateTime.Now },
                 { "Host", host },
@@ -160,7 +174,7 @@ namespace landerist_library.Infrastructure.Sql
                 "WHERE [Host] = @Host AND [Key] = @Key " +
                 "ORDER BY [Date] DESC";
 
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>
+            return Database.QueryTable(query, new Dictionary<string, object?>
             {
                 { "Top", top },
                 { "Host", host },
@@ -182,7 +196,7 @@ namespace landerist_library.Infrastructure.Sql
                 ") " +
                 "ORDER BY [Counter] DESC, [Key] ASC";
 
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>
+            return Database.QueryTable(query, new Dictionary<string, object?>
             {
                 { "Host", host },
                 { "KeyPrefix", keyPrefix + "_%" }
@@ -274,7 +288,7 @@ namespace landerist_library.Infrastructure.Sql
                 "GROUP BY [unlistingReason] " +
                 "ORDER BY [Counter] DESC, [Key] ASC";
 
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>
+            return Database.QueryTable(query, new Dictionary<string, object?>
             {
                 { "Host", host },
                 { "ListingStatus", ListingStatus.unpublished.ToString() }
@@ -290,7 +304,7 @@ namespace landerist_library.Infrastructure.Sql
                 "AND [Key] LIKE @Key " +
                 "ORDER BY [Key] ASC";
 
-            return new DataBase().QueryListString(query, new Dictionary<string, object?>
+            return Database.QueryListString(query, new Dictionary<string, object?>
             {
                 { "Host", host },
                 { "Key", key + "_%" }
@@ -304,7 +318,7 @@ namespace landerist_library.Infrastructure.Sql
                 "FROM " + HostStatistics.HOST_STATISTICS + " " +
                 "WHERE [Host] = @Host";
 
-            var value = new DataBase().QueryTable(query, new Dictionary<string, object?>
+            var value = Database.QueryTable(query, new Dictionary<string, object?>
             {
                 { "Host", host }
             }).Rows[0][0];
@@ -312,25 +326,25 @@ namespace landerist_library.Infrastructure.Sql
             return value is DBNull ? null : (DateTime)value;
         }
 
-        private static int QueryHostInt(string query, string host)
+        private int QueryHostInt(string query, string host)
         {
-            return new DataBase().QueryInt(query, new Dictionary<string, object?>
+            return Database.QueryInt(query, new Dictionary<string, object?>
             {
                 { "Host", host }
             });
         }
 
-        private static DataTable QueryHostTable(string query, string host)
+        private DataTable QueryHostTable(string query, string host)
         {
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>
+            return Database.QueryTable(query, new Dictionary<string, object?>
             {
                 { "Host", host }
             });
         }
 
-        private static DataTable QueryPublishedListingsDistribution(string host, string query)
+        private DataTable QueryPublishedListingsDistribution(string host, string query)
         {
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>
+            return Database.QueryTable(query, new Dictionary<string, object?>
             {
                 { "Host", host },
                 { "ListingStatus", ListingStatus.published.ToString() }
