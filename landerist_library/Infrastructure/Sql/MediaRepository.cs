@@ -7,6 +7,20 @@ namespace landerist_library.Infrastructure.Sql
 {
     public class MediaRepository
     {
+        private readonly IDatabase? _database;
+
+        public MediaRepository()
+        {
+        }
+
+        public MediaRepository(IDatabase database)
+        {
+            ArgumentNullException.ThrowIfNull(database);
+            _database = database;
+        }
+
+        private IDatabase Database => _database ?? new DataBase();
+
         public void Insert(Listing listing)
         {
             if (listing.media == null)
@@ -20,7 +34,7 @@ namespace landerist_library.Infrastructure.Sql
                     "INSERT INTO " + ES_Media.TABLE_ES_MEDIA + " " +
                     "VALUES(@ListingGuid ,@MediaType ,@Title ,@Url)";
 
-                new DataBase().Query(query, new Dictionary<string, object?> {
+                Database.Query(query, new Dictionary<string, object?> {
                     {"listingGuid", listing.guid },
                     {"mediaType", media.mediaType?.ToString() },
                     {"title", media.title },
@@ -35,7 +49,7 @@ namespace landerist_library.Infrastructure.Sql
                 "DELETE FROM " + ES_Media.TABLE_ES_MEDIA + " " +
                 "WHERE [listingGuid] = @listingGuid";
 
-            return new DataBase().Query(query, new Dictionary<string, object?>()
+            return Database.Query(query, new Dictionary<string, object?>()
             {
                 { "listingGuid", guid }
             });
@@ -43,7 +57,7 @@ namespace landerist_library.Infrastructure.Sql
 
         public bool Delete()
         {
-            return new DataBase().Query("DELETE FROM " + ES_Media.TABLE_ES_MEDIA);
+            return Database.Query("DELETE FROM " + ES_Media.TABLE_ES_MEDIA);
         }
 
         public DataTable GetMedia(Listing listing)
@@ -53,7 +67,7 @@ namespace landerist_library.Infrastructure.Sql
                 "FROM " + ES_Media.TABLE_ES_MEDIA + " " +
                 "WHERE [listingGuid] = @listingGuid";
 
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>()
+            return Database.QueryTable(query, new Dictionary<string, object?>()
             {
                 { "listingGuid", listing.guid }
             });

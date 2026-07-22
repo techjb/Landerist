@@ -6,6 +6,20 @@ namespace landerist_library.Infrastructure.Sql
 {
     public class SourceRepository
     {
+        private readonly IDatabase? _database;
+
+        public SourceRepository()
+        {
+        }
+
+        public SourceRepository(IDatabase database)
+        {
+            ArgumentNullException.ThrowIfNull(database);
+            _database = database;
+        }
+
+        private IDatabase Database => _database ?? new DataBase();
+
         private const string TableEsSources = "[ES_SOURCES]";
 
         public void Insert(Listing listing)
@@ -21,7 +35,7 @@ namespace landerist_library.Infrastructure.Sql
                     "INSERT INTO " + TableEsSources + " " +
                     "VALUES(@ListingGuid ,@SourceName ,@SourceUrl ,@SourceGuid)";
 
-                new DataBase().Query(query, new Dictionary<string, object?> {
+                Database.Query(query, new Dictionary<string, object?> {
                     {"ListingGuid", listing.guid },
                     {"SourceName", source.sourceName?.ToString() },
                     {"SourceUrl", source.sourceUrl.ToString()},
@@ -36,7 +50,7 @@ namespace landerist_library.Infrastructure.Sql
                 "DELETE FROM " + TableEsSources + " " +
                 "WHERE [listingGuid] = @listingGuid";
 
-            return new DataBase().Query(query, new Dictionary<string, object?>()
+            return Database.Query(query, new Dictionary<string, object?>()
             {
                 { "listingGuid", guid }
             });
@@ -44,7 +58,7 @@ namespace landerist_library.Infrastructure.Sql
 
         public bool Delete()
         {
-            return new DataBase().Query("DELETE FROM " + TableEsSources);
+            return Database.Query("DELETE FROM " + TableEsSources);
         }
 
         public DataTable GetSources(Listing listing)
@@ -54,7 +68,7 @@ namespace landerist_library.Infrastructure.Sql
                 "FROM " + TableEsSources + " " +
                 "WHERE [listingGuid] = @listingGuid";
 
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>()
+            return Database.QueryTable(query, new Dictionary<string, object?>()
             {
                 { "listingGuid", listing.guid }
             });
@@ -69,7 +83,7 @@ namespace landerist_library.Infrastructure.Sql
                 "   WHERE guid NOT IN (SELECT listingGuid FROM ES_SOURCES)  " +
                 ")";
 
-            return new DataBase().QueryTable(query);
+            return Database.QueryTable(query);
         }
     }
 }
