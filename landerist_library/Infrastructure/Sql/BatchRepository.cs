@@ -7,9 +7,9 @@ namespace landerist_library.Infrastructure.Sql
     public class BatchRepository
     {
         private const string BatchesTable = "[BATCHES]";
-        private readonly IDatabase? _database;
+        private readonly IDatabase _database;
 
-        public BatchRepository()
+        public BatchRepository() : this(new DataBase())
         {
         }
 
@@ -19,7 +19,7 @@ namespace landerist_library.Infrastructure.Sql
             _database = database;
         }
 
-        private IDatabase Database => _database ?? new DataBase();
+        private IDatabase Database => _database;
 
         public bool Insert(
             string id,

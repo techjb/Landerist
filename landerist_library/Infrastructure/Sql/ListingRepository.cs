@@ -8,9 +8,9 @@ namespace landerist_library.Infrastructure.Sql
 {
     public class ListingRepository
     {
-        private readonly IDatabase? _database;
+        private readonly IDatabase _database;
 
-        public ListingRepository()
+        public ListingRepository() : this(new DataBase())
         {
         }
 
@@ -20,7 +20,7 @@ namespace landerist_library.Infrastructure.Sql
             _database = database;
         }
 
-        private IDatabase Database => _database ?? new DataBase();
+        private IDatabase Database => _database;
 
         public bool Insert(Listing listing, string host, ListingUnpublishDecision? unpublishDecision, out Exception? exception)
         {

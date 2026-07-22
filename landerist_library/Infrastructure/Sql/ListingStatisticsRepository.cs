@@ -6,9 +6,9 @@ namespace landerist_library.Infrastructure.Sql;
 
 public sealed class ListingStatisticsRepository
 {
-    private readonly IDatabase? _database;
+    private readonly IDatabase _database;
 
-    public ListingStatisticsRepository()
+    public ListingStatisticsRepository() : this(new DataBase())
     {
     }
 
@@ -18,7 +18,7 @@ public sealed class ListingStatisticsRepository
         _database = database;
     }
 
-    private IDatabase Database => _database ?? new DataBase();
+    private IDatabase Database => _database;
 
     public int Count(string host)
     {

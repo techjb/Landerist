@@ -6,9 +6,9 @@ namespace landerist_library.Infrastructure.Sql
 {
     public class WebsiteRepository
     {
-        private readonly IDatabase? _database;
+        private readonly IDatabase _database;
 
-        public WebsiteRepository()
+        public WebsiteRepository() : this(new DataBase())
         {
         }
 
@@ -18,7 +18,7 @@ namespace landerist_library.Infrastructure.Sql
             _database = database;
         }
 
-        private IDatabase Database => _database ?? new DataBase();
+        private IDatabase Database => _database;
 
         public DataRow? GetDataRow(string host)
         {

@@ -6,9 +6,9 @@ namespace landerist_library.Infrastructure.Sql
 {
     public class WebsitePageMetricsRepository
     {
-        private readonly IDatabase? _database;
+        private readonly IDatabase _database;
 
-        public WebsitePageMetricsRepository()
+        public WebsitePageMetricsRepository() : this(new DataBase())
         {
         }
 
@@ -18,7 +18,7 @@ namespace landerist_library.Infrastructure.Sql
             _database = database;
         }
 
-        private IDatabase Database => _database ?? new DataBase();
+        private IDatabase Database => _database;
 
         private static readonly HashSet<string> SupportedDateColumns =
         [

@@ -7,9 +7,9 @@ namespace landerist_library.Infrastructure.Sql;
 
 public sealed class ListingQueryRepository
 {
-    private readonly IDatabase? _database;
+    private readonly IDatabase _database;
 
-    public ListingQueryRepository()
+    public ListingQueryRepository() : this(new DataBase())
     {
     }
 
@@ -19,7 +19,7 @@ public sealed class ListingQueryRepository
         _database = database;
     }
 
-    private IDatabase Database => _database ?? new DataBase();
+    private IDatabase Database => _database;
 
     public DataTable GetAll()
     {

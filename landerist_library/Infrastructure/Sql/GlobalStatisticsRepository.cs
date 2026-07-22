@@ -9,9 +9,9 @@ namespace landerist_library.Infrastructure.Sql
     public class GlobalStatisticsRepository
     {
         private const string GlobalStatisticsTable = "[GLOBAL_STATISTICS]";
-        private readonly IDatabase? _database;
+        private readonly IDatabase _database;
 
-        public GlobalStatisticsRepository()
+        public GlobalStatisticsRepository() : this(new DataBase())
         {
         }
 
@@ -21,7 +21,7 @@ namespace landerist_library.Infrastructure.Sql
             _database = database;
         }
 
-        private IDatabase Database => _database ?? new DataBase();
+        private IDatabase Database => _database;
 
         public int CountWebsites()
         {

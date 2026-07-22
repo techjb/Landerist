@@ -8,9 +8,9 @@ namespace landerist_library.Infrastructure.Sql
 {
     public class HostStatisticsRepository
     {
-        private readonly IDatabase? _database;
+        private readonly IDatabase _database;
 
-        public HostStatisticsRepository()
+        public HostStatisticsRepository() : this(new DataBase())
         {
         }
 
@@ -20,7 +20,7 @@ namespace landerist_library.Infrastructure.Sql
             _database = database;
         }
 
-        private IDatabase Database => _database ?? new DataBase();
+        private IDatabase Database => _database;
 
         public int CountPages(string host)
         {

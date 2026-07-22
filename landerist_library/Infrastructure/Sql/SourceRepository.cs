@@ -6,9 +6,9 @@ namespace landerist_library.Infrastructure.Sql
 {
     public class SourceRepository
     {
-        private readonly IDatabase? _database;
+        private readonly IDatabase _database;
 
-        public SourceRepository()
+        public SourceRepository() : this(new DataBase())
         {
         }
 
@@ -18,7 +18,7 @@ namespace landerist_library.Infrastructure.Sql
             _database = database;
         }
 
-        private IDatabase Database => _database ?? new DataBase();
+        private IDatabase Database => _database;
 
         private const string TableEsSources = "[ES_SOURCES]";
 

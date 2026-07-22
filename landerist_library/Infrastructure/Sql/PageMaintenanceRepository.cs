@@ -6,9 +6,9 @@ namespace landerist_library.Infrastructure.Sql;
 
 public sealed class PageMaintenanceRepository
 {
-    private readonly IDatabase? _database;
+    private readonly IDatabase _database;
 
-    public PageMaintenanceRepository()
+    public PageMaintenanceRepository() : this(new DataBase())
     {
     }
 
@@ -18,7 +18,7 @@ public sealed class PageMaintenanceRepository
         _database = database;
     }
 
-    private IDatabase Database => _database ?? new DataBase();
+    private IDatabase Database => _database;
 
     public DataTable SelectWaitingStatus(
         int topRows,

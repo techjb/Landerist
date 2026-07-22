@@ -6,9 +6,9 @@ namespace landerist_library.Infrastructure.Sql;
 
 public sealed class PageStatisticsRepository
 {
-    private readonly IDatabase? _database;
+    private readonly IDatabase _database;
 
-    public PageStatisticsRepository()
+    public PageStatisticsRepository() : this(new DataBase())
     {
     }
 
@@ -18,7 +18,7 @@ public sealed class PageStatisticsRepository
         _database = database;
     }
 
-    private IDatabase Database => _database ?? new DataBase();
+    private IDatabase Database => _database;
 
     public Dictionary<string, object?> GroupByPageType(ListingStatus? listingStatus = null)
     {
