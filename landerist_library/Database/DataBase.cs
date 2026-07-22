@@ -70,6 +70,30 @@ namespace landerist_library.Database
                 .ToList();
         }
 
+        public static bool TestConnection(out Exception? exception)
+        {
+            try
+            {
+                DataBase database = new();
+                return database.Execute(
+                    operationName: nameof(TestConnection),
+                    query: "SELECT 1",
+                    parameters: null,
+                    sqlParameters: null,
+                    command => Convert.ToInt32(
+                        command.ExecuteScalar(),
+                        CultureInfo.InvariantCulture) == 1,
+                    failureResult: false,
+                    out exception);
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+                Trace.TraceError("Database connection test failed: {0}", ex);
+                return false;
+            }
+        }
+
         public bool Query(string query)
         {
             return Execute(

@@ -21,7 +21,7 @@ namespace landerist_tests
         static void Main()
         {
             Console.Title = "Landerist Tests";
-            Config.SetOnlyDatabaseToProduction();
+            Config.SetToTest();
             Start();
             Run();
             //ExitSignal.Wait();

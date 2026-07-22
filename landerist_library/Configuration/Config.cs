@@ -160,16 +160,26 @@ namespace landerist_library.Configuration
             Init(true);
         }
 
-        public static void SetOnlyDatabaseToProduction()
-        {
-            SetToLocal();
-            ValidateDatabaseConfiguration(true);
-            InitDatabase(true);
-        }
-
         public static void SetToLocal()
         {
             Init(false);
+        }
+
+        public static void SetToTest()
+        {
+            SetToLocal();
+
+            string productionDataSource = AppConfig.DATASOURCE_PRODUCTION;
+            if (!string.IsNullOrWhiteSpace(productionDataSource)
+                && string.Equals(
+                    DATASOURCE?.Trim(),
+                    productionDataSource.Trim(),
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException(
+                    "Test configuration points to the production datasource. " +
+                    "Set DATASOURCE_LOCAL to a separate SQL Server instance.");
+            }
         }
 
         private static void Init(bool configurationProduction)

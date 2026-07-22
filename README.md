@@ -19,6 +19,10 @@ Settings can also be supplied with environment variables prefixed with `LANDERIS
 For example, `LANDERIST__DATABASE_NAME` overrides `DATABASE_NAME` from the JSON files.
 Environment variables take precedence over local JSON settings.
 
+The test runner uses `DATASOURCE_LOCAL` while sharing the configured database
+name and user. It refuses to start when `DATASOURCE_LOCAL` matches
+`DATASOURCE_PRODUCTION`.
+
 Open `Database.sql`, update its local paths, and run it in SQL Server to initialize the database.
 
 ## Contributing
