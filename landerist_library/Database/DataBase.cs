@@ -7,7 +7,7 @@ using System.Text;
 
 namespace landerist_library.Database
 {
-    public class DataBase
+    public class DataBase : IDatabase
     {
         private const int DefaultCommandTimeoutSeconds = 120;
         private const int DefaultConnectionTimeoutSeconds = 30;

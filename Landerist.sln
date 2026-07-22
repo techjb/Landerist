@@ -54,6 +54,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "hosts-statistics", "hosts-s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "landerist_integration_tests", "landerist_integration_tests\landerist_integration_tests.csproj", "{518902D0-871C-4472-B80E-225C30C63D5B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "landerist_unit_tests", "landerist_unit_tests\landerist_unit_tests.csproj", "{D91A2E31-4F8B-4C5E-A17D-65A9B14F8F21}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -80,6 +82,10 @@ Global
 		{518902D0-871C-4472-B80E-225C30C63D5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{518902D0-871C-4472-B80E-225C30C63D5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{518902D0-871C-4472-B80E-225C30C63D5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D91A2E31-4F8B-4C5E-A17D-65A9B14F8F21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D91A2E31-4F8B-4C5E-A17D-65A9B14F8F21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D91A2E31-4F8B-4C5E-A17D-65A9B14F8F21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D91A2E31-4F8B-4C5E-A17D-65A9B14F8F21}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

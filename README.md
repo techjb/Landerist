@@ -27,6 +27,12 @@ Open `Database.sql`, update its local paths, and run it in SQL Server to initial
 
 ## Testing
 
+Run the unit tests, which do not require SQL Server, with:
+
+```powershell
+dotnet test .\landerist_unit_tests\landerist_unit_tests.csproj
+```
+
 Run the automated SQL Server integration tests with:
 
 ```powershell

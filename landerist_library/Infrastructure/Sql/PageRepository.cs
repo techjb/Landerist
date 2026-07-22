@@ -6,6 +6,20 @@ namespace landerist_library.Infrastructure.Sql
 {
     public class PageRepository
     {
+        private readonly IDatabase? _database;
+
+        public PageRepository()
+        {
+        }
+
+        public PageRepository(IDatabase database)
+        {
+            ArgumentNullException.ThrowIfNull(database);
+            _database = database;
+        }
+
+        private IDatabase Database => _database ?? new DataBase();
+
         public DataRow? GetDataRow(string uriHash)
         {
             string query =
@@ -13,7 +27,7 @@ namespace landerist_library.Infrastructure.Sql
                 "FROM " + Pages.Pages.PAGES + " " +
                 "WHERE [UriHash] = @UriHash";
 
-            var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+            var dataTable = Database.QueryTable(query, new Dictionary<string, object?> {
                 {"UriHash", uriHash }
             });
 
@@ -33,7 +47,7 @@ namespace landerist_library.Infrastructure.Sql
                 "@PageTypeCounter, @LockedBy, @WaitingStatus, @ListingParserInputHash, " +
                 "@ListingParserInputNotChangedCounter, @TransientErrorCounter, CONVERT(varbinary(max), @ResponseBodyZipped), @TokenCount)";
 
-            return new DataBase().Query(query, parameters);
+            return Database.Query(query, parameters);
         }
 
         public bool Update(IDictionary<string, object?> parameters, out Exception? exception)
@@ -57,7 +71,7 @@ namespace landerist_library.Infrastructure.Sql
                 "[TokenCount] = @TokenCount " +
                 "WHERE [UriHash] = @UriHash";
 
-            return new DataBase().Query(query, parameters, out exception);
+            return Database.Query(query, parameters, out exception);
         }
 
         public bool UpdateNextScrape(string uriHash, DateTime? nextScrape)
@@ -67,7 +81,7 @@ namespace landerist_library.Infrastructure.Sql
                "[NextScrape] = @NextScrape " +
                "WHERE [UriHash] = @UriHash";
 
-            return new DataBase().Query(query, new Dictionary<string, object?> {
+            return Database.Query(query, new Dictionary<string, object?> {
                 {"UriHash", uriHash },
                 {"NextScrape", nextScrape },
             });
@@ -79,7 +93,7 @@ namespace landerist_library.Infrastructure.Sql
                 "DELETE FROM " + Pages.Pages.PAGES + " " +
                 "WHERE [UriHash] = @UriHash";
 
-            return new DataBase().Query(query, new Dictionary<string, object?> {
+            return Database.Query(query, new Dictionary<string, object?> {
                 {"UriHash", uriHash }
             });
         }

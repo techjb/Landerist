@@ -7,6 +7,20 @@ namespace landerist_library.Infrastructure.Sql
 {
     public class PageQueryRepository
     {
+        private readonly IDatabase? _database;
+
+        public PageQueryRepository()
+        {
+        }
+
+        public PageQueryRepository(IDatabase database)
+        {
+            ArgumentNullException.ThrowIfNull(database);
+            _database = database;
+        }
+
+        private IDatabase Database => _database ?? new DataBase();
+
         public DataTable GetPagesByHost(string host)
         {
             string query =
@@ -14,7 +28,7 @@ namespace landerist_library.Infrastructure.Sql
                 "FROM " + Pages.Pages.PAGES + " " +
                 "WHERE [Host] = @Host";
 
-            return new DataBase().QueryTable(query, new Dictionary<string, object?> {
+            return Database.QueryTable(query, new Dictionary<string, object?> {
                 {"Host", host }
             });
         }
@@ -54,7 +68,7 @@ namespace landerist_library.Infrastructure.Sql
                 "INNER JOIN " + Websites.Websites.WEBSITES + " AS W ON P.[Host] = W.[Host] " +
                 "INNER JOIN TopPages AS TP ON P.[UriHash] = TP.[UriHash]";
 
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>(){
+            return Database.QueryTable(query, new Dictionary<string, object?>(){
                 { "LockedBy", Config.IsConfigurationLocal()? null: Config.MACHINE_NAME},
                 { "MaxPagesPerHost", Config.MAX_PAGES_PER_HOST_PER_SCRAPE}
             });
@@ -83,7 +97,7 @@ namespace landerist_library.Infrastructure.Sql
                 "INNER JOIN " + Websites.Websites.WEBSITES + " AS W ON P.[Host] = W.[Host] " +
                 "INNER JOIN TopPages AS TP ON P.[UriHash] = TP.[UriHash]";
 
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>(){
+            return Database.QueryTable(query, new Dictionary<string, object?>(){
                 { "LockedBy", Config.IsConfigurationLocal()? null: Config.MACHINE_NAME}
             });
         }
@@ -96,7 +110,7 @@ namespace landerist_library.Infrastructure.Sql
                 "WHERE [Host] = @Host AND " +
                 "[LastScrape] IS NULL";
 
-            return new DataBase().QueryTable(query, new Dictionary<string, object?> {
+            return Database.QueryTable(query, new Dictionary<string, object?> {
                 {"Host", host }
             });
         }
@@ -109,7 +123,7 @@ namespace landerist_library.Infrastructure.Sql
                 "WHERE [Host] = @Host AND " +
                 "[PageType] IS NULL";
 
-            return new DataBase().QueryTable(query, new Dictionary<string, object?> {
+            return Database.QueryTable(query, new Dictionary<string, object?> {
                 {"Host", host },
             });
         }
@@ -121,7 +135,7 @@ namespace landerist_library.Infrastructure.Sql
                 "FROM " + Pages.Pages.PAGES + " " +
                 "WHERE IsListing = @IsListing";
 
-            return new DataBase().QueryListString(query, new Dictionary<string, object?>()
+            return Database.QueryListString(query, new Dictionary<string, object?>()
             {
                 { "IsListing", isListing }
             });
@@ -133,7 +147,7 @@ namespace landerist_library.Infrastructure.Sql
                 "SELECT [Uri] " +
                 "FROM " + Pages.Pages.PAGES;
 
-            return new DataBase().QueryListString(query);
+            return Database.QueryListString(query);
         }
 
         public DataTable GetHostPagesDataTable(string host)
@@ -161,7 +175,7 @@ namespace landerist_library.Infrastructure.Sql
                 "WHERE [Host] = @Host " +
                 "ORDER BY [Uri]";
 
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>
+            return Database.QueryTable(query, new Dictionary<string, object?>
             {
                 { "Host", host }
             });
@@ -173,7 +187,7 @@ namespace landerist_library.Infrastructure.Sql
                 "SELECT COUNT(*) " +
                 "FROM " + Pages.Pages.PAGES;
 
-            return new DataBase().QueryInt(query);
+            return Database.QueryInt(query);
         }
 
         public DataTable GetPagesBatch(string? lastUriHash, int batchSize)
@@ -203,7 +217,7 @@ namespace landerist_library.Infrastructure.Sql
 
         public DataTable QueryPages(string query, Dictionary<string, object?> parameters)
         {
-            return new DataBase().QueryTable(query, parameters);
+            return Database.QueryTable(query, parameters);
         }
 
         public string SelectQuery(int? topRows = null)
