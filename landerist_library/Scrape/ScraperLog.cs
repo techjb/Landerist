@@ -1,5 +1,5 @@
 using landerist_library.Configuration;
-using landerist_library.Logs;
+using landerist_library.Application.Logging;
 using landerist_library.Pages;
 using landerist_orels.ES;
 
@@ -30,30 +30,38 @@ namespace landerist_library.Scrape
         public int Failed => Crashed + DownloadErrors + Skipped;
     }
 
-    internal static class ScraperLog
+    internal sealed class ScraperLog
     {
-        public static void WriteTestStart()
+        private readonly IApplicationLogger _logger;
+
+        public ScraperLog(IApplicationLogger logger)
         {
-            Log.WriteInfo("service", "Starting test..");
+            ArgumentNullException.ThrowIfNull(logger);
+            _logger = logger;
         }
 
-        public static void WriteTestPageType(Page page)
+        public void WriteTestStart()
         {
-            Log.WriteInfo("service", "PageType: " + page.PageType.ToString());
+            _logger.WriteInfo("service", "Starting test..");
         }
 
-        public static void WriteTestListing(Listing? listing)
+        public void WriteTestPageType(Page page)
+        {
+            _logger.WriteInfo("service", "PageType: " + page.PageType.ToString());
+        }
+
+        public void WriteTestListing(Listing? listing)
         {
             string json = new Schema(listing).Serialize();
-            Log.WriteInfo("service", "Listing: " + json);
+            _logger.WriteInfo("service", "Listing: " + json);
         }
 
-        public static void WriteStart(int counter)
+        public void WriteStart(int counter)
         {
             Console.WriteLine("Scrapping " + counter + " pages ..");
         }
 
-        public static void WritePage(ScraperLogCounters counters, Page page)
+        public void WritePage(ScraperLogCounters counters, Page page)
         {
             if (Config.IsConfigurationProduction())
             {
@@ -63,9 +71,9 @@ namespace landerist_library.Scrape
             Console.WriteLine(GetPageText(counters, page));
         }
 
-        public static void WriteTotals(ScraperLogCounters counters)
+        public void WriteTotals(ScraperLogCounters counters)
         {
-            Log.WriteInfo("scraper", GetTotalsText(counters));
+            _logger.WriteInfo("scraper", GetTotalsText(counters));
         }
 
         private static string GetPageText(ScraperLogCounters counters, Page page)

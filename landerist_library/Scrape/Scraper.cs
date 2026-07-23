@@ -1,5 +1,6 @@
 using landerist_library.Configuration;
 using landerist_library.Application;
+using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
 using landerist_library.Database;
 using landerist_library.Downloaders.Multiple;
@@ -57,31 +58,45 @@ namespace landerist_library.Scrape
         private int TotalSkippedByBlockedWebsite = 0;
 
         private readonly IPagePersistenceService _pagePersistence;
+        private readonly IApplicationLogger _logger;
+        private readonly ScraperLog _scraperLog;
         private CancellationTokenSource _cancellation = new();
 
         private List<Page> _pageQueue = [];
 
         public Scraper()
-            : this(LanderistApplication.Services.PagePersistence)
+            : this(
+                LanderistApplication.Services.PagePersistence,
+                LanderistApplication.Services.Logger)
         {
         }
 
         public Scraper(IPagePersistenceService pagePersistence)
+            : this(pagePersistence, LanderistApplication.Services.Logger)
+        {
+        }
+
+        public Scraper(
+            IPagePersistenceService pagePersistence,
+            IApplicationLogger logger)
         {
             ArgumentNullException.ThrowIfNull(pagePersistence);
+            ArgumentNullException.ThrowIfNull(logger);
             _pagePersistence = pagePersistence;
+            _logger = logger;
+            _scraperLog = new ScraperLog(logger);
         }
 
         public void TestSinglePage()
         {
-            ScraperLog.WriteTestStart();
+            _scraperLog.WriteTestStart();
             PuppeteerDownloader.UpdateChrome();
             Page page = Pages.Pages.LoadOrCreate(new Uri("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/"));
-            var pageScraper = new PageScraper(page, _pagePersistence);
+            var pageScraper = new PageScraper(page, _pagePersistence, _logger);
             pageScraper.Scrape();
-            ScraperLog.WriteTestPageType(page);
+            _scraperLog.WriteTestPageType(page);
             var listing =  global::landerist_library.Pages.Pages.GetListing(page, true, true);
-            ScraperLog.WriteTestListing(listing);
+            _scraperLog.WriteTestListing(listing);
             Stop();
         }
 
@@ -131,7 +146,7 @@ namespace landerist_library.Scrape
             SkippedByCrawlDelay = 0;
             SkippedByBlockedWebsite = 0;
 
-            ScraperLog.WriteStart(Counter);
+            _scraperLog.WriteStart(Counter);
             _pageQueue = SpreadPagesByHost(_pageQueue);
 
             try
@@ -146,7 +161,7 @@ namespace landerist_library.Scrape
                     (page, state) =>
                     {
                         ProcessThread(page);
-                        ScraperLog.WritePage(GetCurrentCounters(), page);
+                        _scraperLog.WritePage(GetCurrentCounters(), page);
                         page.Dispose();
                     });
             }
@@ -159,7 +174,7 @@ namespace landerist_library.Scrape
             }
 
             AccumulateTotals();
-            ScraperLog.WriteTotals(GetTotalCounters());
+            _scraperLog.WriteTotals(GetTotalCounters());
             InsertStatistics();
 
             DownloadersPool.Clear();
@@ -274,7 +289,7 @@ namespace landerist_library.Scrape
 
         public bool TryApplyPreClassificationBeforeDownload(Page page)
         {
-            var success = new PageScraper(page, _pagePersistence).TryApplyPreClassificationBeforeDownload();
+            var success = new PageScraper(page, _pagePersistence, _logger).TryApplyPreClassificationBeforeDownload();
             if (success)
             {
                 Interlocked.Increment(ref Processed);
@@ -396,7 +411,7 @@ namespace landerist_library.Scrape
                 return ScrapeAttemptResult.Blocked;
             }
 
-            var pageScraper = new PageScraper(page, useProxy, _pagePersistence);
+            var pageScraper = new PageScraper(page, useProxy, _pagePersistence, _logger);
             return pageScraper.Scrape()
                 ? ScrapeAttemptResult.Success
                 : ScrapeAttemptResult.Crashed;

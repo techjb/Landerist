@@ -1,5 +1,6 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Application;
+using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
 using landerist_library.Downloaders.Multiple;
 using landerist_library.Index;
@@ -17,23 +18,39 @@ namespace landerist_library.Scrape
         private readonly bool _useProxy;
 
         public PageScraper(Page page)
-            : this(page, LanderistApplication.Services.PagePersistence)
+            : this(
+                page,
+                LanderistApplication.Services.PagePersistence,
+                LanderistApplication.Services.Logger)
         {
         }
 
         public PageScraper(
             Page page,
             IPagePersistenceService pagePersistence)
+            : this(page, pagePersistence, LanderistApplication.Services.Logger)
+        {
+        }
+
+        public PageScraper(
+            Page page,
+            IPagePersistenceService pagePersistence,
+            IApplicationLogger logger)
         {
             ArgumentNullException.ThrowIfNull(page);
             ArgumentNullException.ThrowIfNull(pagePersistence);
+            ArgumentNullException.ThrowIfNull(logger);
             _page = page;
-            _classificationService = new PageClassificationService(page, pagePersistence);
+            _classificationService = new PageClassificationService(page, pagePersistence, logger);
             _useProxy = page.Website.UseProxy;
         }
 
         public PageScraper(Page page, bool useProxy)
-            : this(page, useProxy, LanderistApplication.Services.PagePersistence)
+            : this(
+                page,
+                useProxy,
+                LanderistApplication.Services.PagePersistence,
+                LanderistApplication.Services.Logger)
         {
         }
 
@@ -41,7 +58,16 @@ namespace landerist_library.Scrape
             Page page,
             bool useProxy,
             IPagePersistenceService pagePersistence)
-            : this(page, pagePersistence)
+            : this(page, useProxy, pagePersistence, LanderistApplication.Services.Logger)
+        {
+        }
+
+        public PageScraper(
+            Page page,
+            bool useProxy,
+            IPagePersistenceService pagePersistence,
+            IApplicationLogger logger)
+            : this(page, pagePersistence, logger)
         {
             _useProxy = useProxy;
         }

@@ -1,4 +1,5 @@
 using landerist_library.Application;
+using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
 using landerist_library.Pages;
 using landerist_library.Websites;
@@ -40,7 +41,8 @@ public sealed class PersistenceServiceTests
         FakeWebsiteRepository websiteRepository = new();
         LanderistApplication.Configure(new LanderistApplicationServices(
             new PagePersistenceService(pageRepository),
-            new WebsitePersistenceService(websiteRepository)));
+            new WebsitePersistenceService(websiteRepository),
+            new NullApplicationLogger()));
         Page page = new(
             new Website(new Uri("https://example.com")),
             new Uri("https://example.com/listing/2"));
@@ -71,5 +73,16 @@ public sealed class PersistenceServiceTests
         public bool Insert(Website website) => true;
         public bool Update(Website website) { UpdatedWebsite = website; return true; }
         public bool Delete(string host) => true;
+    }
+
+    private sealed class NullApplicationLogger : IApplicationLogger
+    {
+        public void WriteError(string source, string message)
+        {
+        }
+
+        public void WriteInfo(string source, string message)
+        {
+        }
     }
 }

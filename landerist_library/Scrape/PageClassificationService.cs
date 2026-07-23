@@ -1,4 +1,5 @@
 using landerist_library.Application.Persistence;
+using landerist_library.Application.Logging;
 using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Index;
@@ -12,15 +13,19 @@ namespace landerist_library.Scrape
     {
         private readonly Page page;
         private readonly IPagePersistenceService _pagePersistence;
+        private readonly IApplicationLogger _logger;
 
         public PageClassificationService(
             Page page,
-            IPagePersistenceService pagePersistence)
+            IPagePersistenceService pagePersistence,
+            IApplicationLogger logger)
         {
             ArgumentNullException.ThrowIfNull(page);
             ArgumentNullException.ThrowIfNull(pagePersistence);
+            ArgumentNullException.ThrowIfNull(logger);
             this.page = page;
             _pagePersistence = pagePersistence;
+            _logger = logger;
         }
 
         public bool TryApplyPreClassificationBeforeDownload()
@@ -57,7 +62,7 @@ namespace landerist_library.Scrape
             {
                 if (!page.SetResponseBodyZipped())
                 {
-                    Logs.Log.WriteError("PageScraper SetPageType", "Failed to set response body zipped");
+                    _logger.WriteError("PageScraper SetPageType", "Failed to set response body zipped");
                     return false;
                 }
 
@@ -116,7 +121,7 @@ namespace landerist_library.Scrape
             var destinationUri = GetListingDestinationUri();
             if (destinationUri is null)
             {
-                Logs.Log.WriteError("PageScraper HandleMovedListing", "Destination uri is null");
+                _logger.WriteError("PageScraper HandleMovedListing", "Destination uri is null");
                 return;
             }
 
@@ -162,7 +167,7 @@ namespace landerist_library.Scrape
             newListing ??= global::landerist_library.Pages.Pages.GetListing(page, true, true);
             if (newListing == null)
             {
-                Logs.Log.WriteError("PageScraper HandlePublishedListing", "NewListing is null");
+                _logger.WriteError("PageScraper HandlePublishedListing", "NewListing is null");
                 return;
             }
 
@@ -177,7 +182,7 @@ namespace landerist_library.Scrape
             newListing ??= global::landerist_library.Pages.Pages.GetListing(page, true, true);
             if (newListing == null)
             {
-                Logs.Log.WriteError("PageScraper HandleUnpublishedListing", "NewListing is null");
+                _logger.WriteError("PageScraper HandleUnpublishedListing", "NewListing is null");
                 return;
             }
 

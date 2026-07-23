@@ -2,6 +2,7 @@
 using landerist_library.Application;
 using landerist_library.Application.Persistence;
 using landerist_library.Database;
+using landerist_library.Infrastructure.Logging;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Logs;
 using landerist_library.Scrape;
@@ -38,7 +39,8 @@ namespace landerist_tests
         {
             LanderistApplication.Configure(new LanderistApplicationServices(
                 new PagePersistenceService(new PageRepository(new DataBase())),
-                new WebsitePersistenceService(new WebsiteRepository(new DataBase()))));
+                new WebsitePersistenceService(new WebsiteRepository(new DataBase())),
+                new LegacyApplicationLogger()));
         }
 
         private static void Start()

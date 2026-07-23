@@ -1,3 +1,4 @@
+using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
 
 namespace landerist_library.Application;
@@ -10,18 +11,23 @@ public sealed class LanderistApplicationServices
 {
     public LanderistApplicationServices(
         IPagePersistenceService pagePersistence,
-        IWebsitePersistenceService websitePersistence)
+        IWebsitePersistenceService websitePersistence,
+        IApplicationLogger logger)
     {
         ArgumentNullException.ThrowIfNull(pagePersistence);
         ArgumentNullException.ThrowIfNull(websitePersistence);
+        ArgumentNullException.ThrowIfNull(logger);
 
         PagePersistence = pagePersistence;
         WebsitePersistence = websitePersistence;
+        Logger = logger;
     }
 
     public IPagePersistenceService PagePersistence { get; }
 
     public IWebsitePersistenceService WebsitePersistence { get; }
+
+    public IApplicationLogger Logger { get; }
 }
 
 /// <summary>
