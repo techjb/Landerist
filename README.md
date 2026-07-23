@@ -43,6 +43,14 @@ These tests use only `DATASOURCE_LOCAL`, run serially, and perform CRUD checks
 inside a temporary SQL table. The legacy `landerist_tests` project remains a
 manual diagnostics runner and is not part of the automated test suite.
 
+Run the architecture fitness tests with:
+
+```powershell
+dotnet test .\landerist_architecture_tests\landerist_architecture_tests.csproj
+```
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the dependency rules and migration baseline.
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first
