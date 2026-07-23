@@ -1,5 +1,6 @@
 using landerist_library.Configuration;
 using landerist_library.Database;
+using landerist_library.Infrastructure.Sql;
 
 namespace landerist_integration_tests;
 
@@ -16,7 +17,7 @@ public sealed class DatabaseIntegrationTests
     {
         EnsureTestConfiguration();
 
-        bool connected = DataBase.TestConnection(out Exception? exception);
+        bool connected = CreateDatabase().Query("SELECT 1", null, out Exception? exception);
 
         Assert.True(connected, exception?.ToString() ?? "Database connection failed.");
     }
@@ -26,7 +27,7 @@ public sealed class DatabaseIntegrationTests
     {
         EnsureTestConfiguration();
 
-        DataBase database = new();
+        IDatabase database = CreateDatabase();
         var parameters = new Dictionary<string, object?>
         {
             ["Id"] = Guid.NewGuid(),
@@ -85,6 +86,21 @@ public sealed class DatabaseIntegrationTests
         bool succeeded = database.Query(query, parameters, out Exception? exception);
 
         Assert.True(succeeded, exception?.ToString() ?? "Database CRUD test failed.");
+    }
+
+    private static IDatabase CreateDatabase()
+    {
+        EnsureTestConfiguration();
+        SqlDatabaseFactory factory = new(
+            new SqlDatabaseOptions(
+                Config.DATASOURCE
+                    ?? throw new InvalidOperationException("Database data source is not configured."),
+                Config.DATABASE_USER,
+                Config.DATABASE_PW,
+                Config.DATABASE_NAME,
+                Config.DATABASE_ENCRYPT,
+                Config.DATABASE_TRUST_SERVER_CERTIFICATE));
+        return factory.Create();
     }
 
     private static void EnsureTestConfiguration()

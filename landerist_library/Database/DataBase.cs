@@ -1,4 +1,3 @@
-using landerist_library.Configuration;
 using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Diagnostics;
@@ -10,47 +9,22 @@ namespace landerist_library.Database
     public class DataBase : IDatabase
     {
         private const int DefaultCommandTimeoutSeconds = 120;
-        private const int DefaultConnectionTimeoutSeconds = 30;
 
         private readonly StringBuilder _stackBuilder = new();
         private readonly object _stackLock = new();
         private readonly string _connectionString;
         private int _stackCounter;
-        private int _commandTimeout = DefaultCommandTimeoutSeconds;
+        private int _commandTimeout;
 
 
-        public DataBase() : this(Config.DATABASE_USER, Config.DATABASE_PW, Config.DATABASE_NAME)
-        {
-        }
-
-        public DataBase(string userId, string password, string databaseName)
-            : this(BuildConnectionString(userId, password, databaseName))
-        {
-        }
-
-        public DataBase(string connectionString)
+        public DataBase(
+            string connectionString,
+            int commandTimeoutSeconds = DefaultCommandTimeoutSeconds)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(connectionString);
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(commandTimeoutSeconds);
             _connectionString = connectionString;
-        }
-
-        private static string BuildConnectionString(string userId, string password, string databaseName)
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(userId);
-            ArgumentException.ThrowIfNullOrWhiteSpace(password);
-            ArgumentException.ThrowIfNullOrWhiteSpace(databaseName);
-            ArgumentException.ThrowIfNullOrWhiteSpace(Config.DATASOURCE);
-
-            return new SqlConnectionStringBuilder
-            {
-                UserID = userId,
-                Password = password,
-                InitialCatalog = databaseName,
-                DataSource = Config.DATASOURCE,
-                ConnectTimeout = DefaultConnectionTimeoutSeconds,
-                Encrypt = Config.DATABASE_ENCRYPT,
-                TrustServerCertificate = Config.DATABASE_TRUST_SERVER_CERTIFICATE
-            }.ConnectionString;
+            _commandTimeout = commandTimeoutSeconds;
         }
 
         /// <summary>
@@ -68,30 +42,6 @@ namespace landerist_library.Database
             return parameters
                 .Select(item => CreateParameter(item.Key, item.Value))
                 .ToList();
-        }
-
-        public static bool TestConnection(out Exception? exception)
-        {
-            try
-            {
-                DataBase database = new();
-                return database.Execute(
-                    operationName: nameof(TestConnection),
-                    query: "SELECT 1",
-                    parameters: null,
-                    sqlParameters: null,
-                    command => Convert.ToInt32(
-                        command.ExecuteScalar(),
-                        CultureInfo.InvariantCulture) == 1,
-                    failureResult: false,
-                    out exception);
-            }
-            catch (Exception ex)
-            {
-                exception = ex;
-                Trace.TraceError("Database connection test failed: {0}", ex);
-                return false;
-            }
         }
 
         public bool Query(string query)

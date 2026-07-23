@@ -56,7 +56,7 @@ namespace landerist_library.Export
                "EXEC xp_cmdshell " +
                "'bcp \"SELECT * FROM " + tableName + ";\" queryout \"" + fileName + "\" -T -c -t,';  ";
 
-            return new DataBase().Query(query);
+            return LegacyDatabase.Create().Query(query);
         }
 
         public static void ExportHostsMainUri()

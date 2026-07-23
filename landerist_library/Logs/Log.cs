@@ -46,7 +46,7 @@ namespace landerist_library.Logs
                 "INSERT INTO " + TABLE_LOGS + " ([Date], [MachineName], [LogKey], [Source], [Text]) " +
                 "VALUES(@Date, @MachineName, @LogKey, @Source, @Text)";
 
-            return new DataBase().Query(query, new Dictionary<string, object?> {
+            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?> {
                 { "Date", DateTime.Now },
                 { "MachineName", Config.MACHINE_NAME },
                 { "LogKey", logKey },
@@ -65,7 +65,7 @@ namespace landerist_library.Logs
                 "WHERE LogKey = @LogKey " +
                 "ORDER BY [Date] DESC";
 
-            return new DataBase().QueryTable(query, new Dictionary<string, object?> {
+            return LegacyDatabase.Create().QueryTable(query, new Dictionary<string, object?> {
                 { "LogKey", logKey }
             });
         }
@@ -76,7 +76,7 @@ namespace landerist_library.Logs
                 "SELECT DISTINCT LogKey " +
                 "FROM " + TABLE_LOGS;
 
-            return new DataBase().QueryListString(query);
+            return LegacyDatabase.Create().QueryListString(query);
         }
 
         public static void Delete(string logKey)
@@ -85,7 +85,7 @@ namespace landerist_library.Logs
                 "DELETE FROM " + TABLE_LOGS + " " +
                 "WHERE LogKey = @LogKey";
 
-            new DataBase().Query(query, new Dictionary<string, object?> {
+            LegacyDatabase.Create().Query(query, new Dictionary<string, object?> {
                 { "LogKey", logKey }
             });
         }
@@ -195,7 +195,7 @@ namespace landerist_library.Logs
             string query =
                 "DELETE FROM " + TABLE_LOGS + " WHERE [MachineName] = @MachineName";
 
-            return new DataBase().Query(query, new Dictionary<string, object?> {
+            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?> {
                 { "MachineName", Config.MACHINE_NAME }
             });
         }
@@ -206,7 +206,7 @@ namespace landerist_library.Logs
                 "DELETE FROM " + TABLE_LOGS + " " +
                 "WHERE [Date] < DATEADD(YEAR, -1, GETDATE())";
 
-            return new DataBase().Query(query);
+            return LegacyDatabase.Create().Query(query);
         }
     }
 }

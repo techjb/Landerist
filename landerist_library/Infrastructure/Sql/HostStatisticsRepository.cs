@@ -9,11 +9,6 @@ namespace landerist_library.Infrastructure.Sql
     public class HostStatisticsRepository
     {
         private readonly IDatabase _database;
-
-        public HostStatisticsRepository() : this(new DataBase())
-        {
-        }
-
         public HostStatisticsRepository(IDatabase database)
         {
             ArgumentNullException.ThrowIfNull(database);

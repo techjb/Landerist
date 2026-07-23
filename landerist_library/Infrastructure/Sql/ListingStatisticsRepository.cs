@@ -7,11 +7,6 @@ namespace landerist_library.Infrastructure.Sql;
 public sealed class ListingStatisticsRepository
 {
     private readonly IDatabase _database;
-
-    public ListingStatisticsRepository() : this(new DataBase())
-    {
-    }
-
     public ListingStatisticsRepository(IDatabase database)
     {
         ArgumentNullException.ThrowIfNull(database);

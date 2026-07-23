@@ -14,7 +14,7 @@
                 "ELSE " +
                 "   INSERT INTO " + TABLE_WORDS + " VALUES(@word, 1)";
 
-            return new DataBase().Query(query, new Dictionary<string, object?> {
+            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?> {
                 {"word", word },
             });
         }

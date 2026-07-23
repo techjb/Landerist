@@ -13,7 +13,7 @@ namespace landerist_library.Database
                 { "unpublished", ListingStatus.unpublished.ToString() },
             };
 
-            int listingsToUnpublish = new DataBase().QueryInt(
+            int listingsToUnpublish = LegacyDatabase.Create().QueryInt(
                 "SELECT COUNT(*) " +
                 "FROM " + ES_Listings.TABLE_ES_LISTINGS + " AS L " +
                 "WHERE L.[listingStatus] = @published AND " +
@@ -35,7 +35,7 @@ namespace landerist_library.Database
                 { "unlistingDate", DateTime.Now },
             };
 
-            bool success = new DataBase().Query(
+            bool success = LegacyDatabase.Create().Query(
                 "UPDATE L " +
                 "SET " +
                 "   L.[listingStatus] = @unpublished, " +
@@ -74,7 +74,7 @@ namespace landerist_library.Database
                 "   P.[PageType] = @pageType" +
                 ")";
 
-            int listingsToUnpublish = new DataBase().QueryInt(
+            int listingsToUnpublish = LegacyDatabase.Create().QueryInt(
                 "SELECT COUNT(*) " +
                 "FROM " + ES_Listings.TABLE_ES_LISTINGS + " AS L " +
                 "WHERE " + where,
@@ -91,7 +91,7 @@ namespace landerist_library.Database
                 { "unlistingDate", DateTime.Now },
             };
 
-            bool success = new DataBase().Query(
+            bool success = LegacyDatabase.Create().Query(
                 "UPDATE L " +
                 "SET " +
                 "   L.[listingStatus] = @unpublished, " +

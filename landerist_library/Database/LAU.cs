@@ -9,7 +9,7 @@ namespace landerist_library.Database
         public static bool DeleteAll()
         {
             string query = "DELETE FROM " + TABLE_LAU;
-            return new DataBase().Query(query);
+            return LegacyDatabase.Create().Query(query);
         }
 
         public static bool Insert(string the_geom, string gisco_id, string lau_id, string lau_name)
@@ -18,7 +18,7 @@ namespace landerist_library.Database
             string query =
                 "INSERT INTO " + TABLE_LAU + " VALUES(" + geom + ",@gisco_id, @lau_id, @lau_name)";
 
-            return new DataBase().Query(query, new Dictionary<string, object?> {
+            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?> {
                 {"gisco_id", gisco_id },
                 {"lau_id", lau_id },
                 {"lau_name", lau_name },

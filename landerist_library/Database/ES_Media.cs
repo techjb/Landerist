@@ -8,7 +8,7 @@ namespace landerist_library.Database
     public class ES_Media
     {
         public const string TABLE_ES_MEDIA = "[ES_MEDIA]";
-        private static readonly MediaRepository Repository = new();
+        private static readonly MediaRepository Repository = new(global::landerist_library.Database.LegacyDatabase.Create());
 
         public static void Insert(Listing listing)
         {

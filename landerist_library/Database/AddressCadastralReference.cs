@@ -23,7 +23,7 @@ namespace landerist_library.Database
                 "([DateInsert], [Address], [CadastralReference]) " +
                 "VALUES (GETDATE(), @Address, @CadastralReference)";
 
-            return new DataBase().Query(query, new Dictionary<string, object?>
+            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?>
             {
                 { "Address", normalizedAddress },
                 { "CadastralReference", normalizedCadastralReference }
@@ -43,7 +43,7 @@ namespace landerist_library.Database
                 "FROM " + TableAddressCadastralReference + " " +
                 "WHERE [Address] = @Address";
 
-            return new DataBase().QueryString(query, new Dictionary<string, object?>
+            return LegacyDatabase.Create().QueryString(query, new Dictionary<string, object?>
             {
                 { "Address", normalizedAddress }
             });
@@ -55,7 +55,7 @@ namespace landerist_library.Database
                 "DELETE FROM " + TableAddressCadastralReference + " " +
                 "WHERE [DateInsert] < DATEADD(YEAR, -1, GETDATE())";
 
-            return new DataBase().Query(query);
+            return LegacyDatabase.Create().Query(query);
         }
 
         private static string? NormalizeAddress(string? address)

@@ -8,11 +8,6 @@ namespace landerist_library.Infrastructure.Sql
     public class MediaRepository
     {
         private readonly IDatabase _database;
-
-        public MediaRepository() : this(new DataBase())
-        {
-        }
-
         public MediaRepository(IDatabase database)
         {
             ArgumentNullException.ThrowIfNull(database);

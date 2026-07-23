@@ -6,11 +6,6 @@ namespace landerist_library.Infrastructure.Sql
     public class WebsiteQueryRepository
     {
         private readonly IDatabase _database;
-
-        public WebsiteQueryRepository() : this(new DataBase())
-        {
-        }
-
         public WebsiteQueryRepository(IDatabase database)
         {
             ArgumentNullException.ThrowIfNull(database);

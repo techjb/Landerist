@@ -36,7 +36,7 @@ namespace landerist_library.Database
                 "DISK = N'" + filePath + "' WITH NOFORMAT, INIT, " +
                 "NAME = N'" + Config.DATABASE_NAME + "-Full Database Backup', SKIP, NOREWIND, NOUNLOAD,  STATS = 10";
 
-            var dataBase = new DataBase();
+            var dataBase = LegacyDatabase.Create();
             dataBase.SetTimeout(60 * 10); // 10 minutos
             return dataBase.Query(query);
         }

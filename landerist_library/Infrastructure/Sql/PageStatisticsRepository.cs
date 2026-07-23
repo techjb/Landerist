@@ -7,11 +7,6 @@ namespace landerist_library.Infrastructure.Sql;
 public sealed class PageStatisticsRepository
 {
     private readonly IDatabase _database;
-
-    public PageStatisticsRepository() : this(new DataBase())
-    {
-    }
-
     public PageStatisticsRepository(IDatabase database)
     {
         ArgumentNullException.ThrowIfNull(database);

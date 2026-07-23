@@ -6,7 +6,7 @@ namespace landerist_library.Websites
     public class WebsitesCleanner
     {
         private const string EngelVoelkersHost = "www.engelvoelkers.com";
-        private static readonly WebsitePageMetricsRepository PageMetrics = new();
+        private static readonly WebsitePageMetricsRepository PageMetrics = new(global::landerist_library.Database.LegacyDatabase.Create());
 
         public static void DeleteEngelVoelkersPagesDiscardedByIndexUrlRegex()
         {

@@ -7,7 +7,7 @@ namespace landerist_library.Pages
 {
     public partial class Pages
     {
-        private static readonly PageQueryRepository QueryRepository = new();
+        private static readonly PageQueryRepository QueryRepository = new(global::landerist_library.Database.LegacyDatabase.Create());
 
         public static Page LoadOrCreate(Uri uri)
         {

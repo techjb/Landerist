@@ -8,7 +8,7 @@ namespace landerist_library.Websites;
 
 public partial class Websites
 {
-    private static readonly WebsitePageMetricsRepository PageMetrics = new();
+    private static readonly WebsitePageMetricsRepository PageMetrics = new(global::landerist_library.Database.LegacyDatabase.Create());
 
     public static bool DeleteWithRelations(Website website)
     {

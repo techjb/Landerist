@@ -10,7 +10,7 @@ namespace landerist_library.Websites
     public partial class Websites
     {
         public const string WEBSITES = "[WEBSITES]";
-        private static readonly WebsiteQueryRepository WebsiteQueries = new();
+        private static readonly WebsiteQueryRepository WebsiteQueries = new(global::landerist_library.Database.LegacyDatabase.Create());
 
         public static HashSet<Website> GetAll()
         {

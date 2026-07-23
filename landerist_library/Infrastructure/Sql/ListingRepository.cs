@@ -9,11 +9,6 @@ namespace landerist_library.Infrastructure.Sql
     public class ListingRepository
     {
         private readonly IDatabase _database;
-
-        public ListingRepository() : this(new DataBase())
-        {
-        }
-
         public ListingRepository(IDatabase database)
         {
             ArgumentNullException.ThrowIfNull(database);

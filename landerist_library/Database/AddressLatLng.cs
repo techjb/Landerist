@@ -10,7 +10,7 @@
                 "INSERT INTO " + ADDRESS_LAT_LNG + " " +
                 "([DateInsert], [Address], [Region], [Lat], [Lng], [IsAccurate]) " +
                 "VALUES (GETDATE(), @Address, @Region, @Lat, @Lng, @IsAccurate)";
-            return new DataBase().Query(query, new Dictionary<string, object?> {
+            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?> {
                 {"Address", address },
                 {"Region", region },
                 {"Lat", lat },
@@ -26,7 +26,7 @@
                 "FROM " + ADDRESS_LAT_LNG + " " +
                 "WHERE Address = @Address AND Region = @Region";
 
-            var dataTable = new DataBase().QueryTable(query, new Dictionary<string, object?> {
+            var dataTable = LegacyDatabase.Create().QueryTable(query, new Dictionary<string, object?> {
                 {"Address", address },
                 {"Region", region },
             });
@@ -49,7 +49,7 @@
                 "DELETE FROM " + ADDRESS_LAT_LNG + " " +
                 "WHERE [DateInsert] < DATEADD(YEAR, -1, GETDATE())";
 
-            return new DataBase().Query(query);
+            return LegacyDatabase.Create().Query(query);
         }
     }
 }

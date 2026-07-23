@@ -8,11 +8,6 @@ namespace landerist_library.Infrastructure.Sql
     public class PageQueryRepository
     {
         private readonly IDatabase _database;
-
-        public PageQueryRepository() : this(new DataBase())
-        {
-        }
-
         public PageQueryRepository(IDatabase database)
         {
             ArgumentNullException.ThrowIfNull(database);

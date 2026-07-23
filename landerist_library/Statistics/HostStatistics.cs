@@ -24,7 +24,7 @@ namespace landerist_library.Statistics
     public static class HostStatistics
     {
         public const string HOST_STATISTICS = "[HOST_STATISTICS]";
-        private static readonly HostStatisticsRepository Repository = new();
+        private static readonly HostStatisticsRepository Repository = new(global::landerist_library.Database.LegacyDatabase.Create());
 
         public static void TakeSnapshots()
         {

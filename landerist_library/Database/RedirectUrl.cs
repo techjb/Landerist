@@ -9,7 +9,7 @@
             string query =
                 "INSERT INTO " + REDIRECT_URL+ " VALUES(GETDATE(), @originalUrl, @redirectUrl)";
 
-            return new DataBase().Query(query, new Dictionary<string, object?> {
+            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?> {
                 {"originalUrl", originalUrl },
                 {"redirectUrl", redirectUrl },
             });

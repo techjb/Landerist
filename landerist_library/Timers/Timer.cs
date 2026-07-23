@@ -42,7 +42,7 @@ namespace landerist_library.Timers
                 "INSERT INTO " + TABLE_TIMERS + " " +
                 "VALUES(GETDATE(), @TimerKey, @Source, @Milliseconds)";
 
-            return new DataBase().Query(query, new Dictionary<string, object?> {
+            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?> {
                 { "TimerKey", timerKey },
                 { "Source", source },
                 { "Milliseconds", milliseconds }
@@ -57,7 +57,7 @@ namespace landerist_library.Timers
                 "DELETE FROM " + TABLE_TIMERS + " " +
                 "WHERE TimerKey = @TimerKey";
 
-            new DataBase().Query(query, new Dictionary<string, object?> {
+            LegacyDatabase.Create().Query(query, new Dictionary<string, object?> {
                 { "TimerKey", timerKey }
             });
         }

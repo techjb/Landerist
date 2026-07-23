@@ -43,7 +43,7 @@ namespace landerist_library.Statistics
 
     public class GlobalStatistics
     {
-        private static readonly GlobalStatisticsRepository Repository = new();
+        private static readonly GlobalStatisticsRepository Repository = new(global::landerist_library.Database.LegacyDatabase.Create());
 
         public static void TakeSnapshots()
         {

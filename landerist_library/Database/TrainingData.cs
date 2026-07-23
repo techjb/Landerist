@@ -23,7 +23,7 @@ namespace landerist_library.Database
             string query =
                 "INSERT INTO " + TRAINING_DATA + " " +
                 "VALUES (@UriHash, @ListingParserInputHash, CONVERT(varbinary(max), @ResponseBodyZipped),  @IsListing)";
-            return new DataBase().Query(query, new Dictionary<string, object?> {
+            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?> {
                 {"UriHash", page.UriHash},
                 {"ListingParserInputHash", page.ListingParserInputHash},
                 {"ResponseBodyZipped", page.ResponseBodyZipped },
@@ -57,7 +57,7 @@ namespace landerist_library.Database
                "WHERE [IsListing] = @IsListing " +
                "ORDER BY NEWID()";
 
-            return new DataBase().QueryTable(query, new Dictionary<string, object?>()
+            return LegacyDatabase.Create().QueryTable(query, new Dictionary<string, object?>()
             {
                 { "IsListing", isListing }
             });

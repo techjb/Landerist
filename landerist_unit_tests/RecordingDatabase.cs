@@ -11,11 +11,16 @@ internal sealed class RecordingDatabase : IDatabase
     public bool QueryResult { get; init; }
     public Exception? QueryException { get; init; }
     public int QueryIntResult { get; init; }
+    public bool QueryBoolResult { get; init; }
+    public string? QueryStringResult { get; init; }
+    public int? TimeoutSeconds { get; private set; }
     public DataTable TableResult { get; } = new();
     public List<string> ListStringResult { get; } = [];
     public bool QueryExistsResult { get; init; }
     public Dictionary<string, object?> DictionaryResult { get; } = [];
     public HashSet<string> HashSetResult { get; } = [];
+
+    public void SetTimeout(int timeOut) => TimeoutSeconds = timeOut;
 
     public bool Query(string query, IDictionary<string, object?>? parameters = null)
     {
@@ -33,6 +38,14 @@ internal sealed class RecordingDatabase : IDatabase
         return QueryResult;
     }
 
+    public bool QueryBool(
+        string query,
+        IDictionary<string, object?>? parameters = null)
+    {
+        Record(query, parameters);
+        return QueryBoolResult;
+    }
+
     public bool QueryExists(
         string query,
         IDictionary<string, object?>? parameters = null)
@@ -45,6 +58,14 @@ internal sealed class RecordingDatabase : IDatabase
     {
         Record(query, parameters);
         return QueryIntResult;
+    }
+
+    public string? QueryString(
+        string query,
+        IDictionary<string, object?>? parameters = null)
+    {
+        Record(query, parameters);
+        return QueryStringResult;
     }
 
     public DataTable QueryTable(

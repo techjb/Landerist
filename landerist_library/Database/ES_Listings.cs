@@ -10,9 +10,9 @@ namespace landerist_library.Database
     public class ES_Listings
     {
         public const string TABLE_ES_LISTINGS = "[ES_LISTINGS]";
-        private static readonly ListingRepository Repository = new();
-        private static readonly ListingQueryRepository QueryRepository = new();
-        private static readonly ListingStatisticsRepository StatisticsRepository = new();
+        private static readonly ListingRepository Repository = new(global::landerist_library.Database.LegacyDatabase.Create());
+        private static readonly ListingQueryRepository QueryRepository = new(global::landerist_library.Database.LegacyDatabase.Create());
+        private static readonly ListingStatisticsRepository StatisticsRepository = new(global::landerist_library.Database.LegacyDatabase.Create());
 
         public static void InsertUpdate(Website website, Listing newListing, ListingUnpublishDecision? unpublishDecision = null)
         {

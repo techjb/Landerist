@@ -16,7 +16,7 @@
                 "([Inserted], [Host], [ListingParserInputHash]) " +
                 "VALUES (GETDATE(), @Host, @ListingParserInputHash)";
 
-            return new DataBase().Query(query, new Dictionary<string, object?> {
+            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?> {
                 {"Host", host },
                 {"ListingParserInputHash", listingParserInputHash }
             });
@@ -34,7 +34,7 @@
                 "FROM " + TableName + " " +
                 "WHERE [Host] = @Host AND " +
                 "[ListingParserInputHash] = @ListingParserInputHash";
-            return new DataBase().QueryExists(query, new Dictionary<string, object?> {
+            return LegacyDatabase.Create().QueryExists(query, new Dictionary<string, object?> {
                 {"Host", host },
                 {"ListingParserInputHash", listingParserInputHash }
             });
@@ -51,7 +51,7 @@
                 "DELETE FROM " + TableName + " " +
                 "WHERE [Host] = @Host AND " +
                 "[ListingParserInputHash] = @ListingParserInputHash";
-            return new DataBase().Query(query, new Dictionary<string, object?> {
+            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?> {
                 {"Host", host },
                 {"ListingParserInputHash", listingParserInputHash }
             });
@@ -61,7 +61,7 @@
         {
             string query =
                 "DELETE FROM " + TableName;
-            return new DataBase().Query(query);
+            return LegacyDatabase.Create().Query(query);
         }
 
         public static bool Clean()
@@ -69,7 +69,7 @@
             string query =
                 "DELETE FROM " + TableName + " " +
                 "WHERE [Inserted] < DATEADD(DAY, -30, GETDATE())";
-            return new DataBase().Query(query);
+            return LegacyDatabase.Create().Query(query);
         }
     }
 }

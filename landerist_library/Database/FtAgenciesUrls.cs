@@ -10,7 +10,7 @@
                 "INSERT INTO " + TABLE_FT_AGENCIES_URLS + " " +
                 "VALUES(@Url, NULL)";
 
-            return new DataBase().Query(query, new Dictionary<string, object?>() {
+            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?>() {
                 {"Url", url },
             });
         }
@@ -21,7 +21,7 @@
                 "DELETE FROM " + TABLE_FT_AGENCIES_URLS + " " +
                 "WHERE Url = @Url";
 
-            return new DataBase().Query(query, new Dictionary<string, object?>() {
+            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?>() {
                 {"Url", url },
             });
         }
@@ -32,7 +32,7 @@
                 "SELECT [Url] FROM " + TABLE_FT_AGENCIES_URLS + " " +
                 "WHERE [AgencyUrl] IS NULL";
 
-            return new DataBase().QueryHashSet(query);
+            return LegacyDatabase.Create().QueryHashSet(query);
         }
 
 
@@ -42,7 +42,7 @@
                 "SELECT [Url] FROM " + TABLE_FT_AGENCIES_URLS + " " +
                 "WHERE [AgencyUrl] = ''";
 
-            return new DataBase().QueryHashSet(query);
+            return LegacyDatabase.Create().QueryHashSet(query);
         }
 
         public static HashSet<string> GetAgencies()
@@ -51,7 +51,7 @@
                 "SELECT [AgencyUrl] FROM " + TABLE_FT_AGENCIES_URLS + " " +
                 "WHERE [AgencyUrl] <> '' AND [AgencyUrl] IS NOT NULL";
 
-            return new DataBase().QueryHashSet(query);
+            return LegacyDatabase.Create().QueryHashSet(query);
         }
 
         public static bool Update(string url, string? agencyUrl)
@@ -61,7 +61,7 @@
                 "SET [AgencyUrl] = @AgencyUrl " +
                 "WHERE [Url] = @Url";
 
-            return new DataBase().Query(query, new Dictionary<string, object?>() {
+            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?>() {
                 {"AgencyUrl", agencyUrl },
                 {"Url", url },
             });

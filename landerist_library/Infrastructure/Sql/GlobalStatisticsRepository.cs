@@ -10,11 +10,6 @@ namespace landerist_library.Infrastructure.Sql
     {
         private const string GlobalStatisticsTable = "[GLOBAL_STATISTICS]";
         private readonly IDatabase _database;
-
-        public GlobalStatisticsRepository() : this(new DataBase())
-        {
-        }
-
         public GlobalStatisticsRepository(IDatabase database)
         {
             ArgumentNullException.ThrowIfNull(database);

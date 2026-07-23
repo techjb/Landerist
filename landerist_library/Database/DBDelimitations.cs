@@ -8,7 +8,7 @@ namespace landerist_library.Database
         protected static bool DeleteAll(string tableName)
         {
             string query = "DELETE FROM " + tableName;
-            return new DataBase().Query(query);
+            return LegacyDatabase.Create().Query(query);
         }
 
         protected static bool MakeValidTheGeom(string tableName)
@@ -17,7 +17,7 @@ namespace landerist_library.Database
                 "UPDATE " + tableName + " " +
                 "SET [the_geom] = [the_geom].MakeValid()";
 
-            return new DataBase().Query(query);
+            return LegacyDatabase.Create().Query(query);
         }
 
         protected static bool ReorientTheGeomIfNeccesary(string tableName)
@@ -27,7 +27,7 @@ namespace landerist_library.Database
                 "SET [the_geom] = [the_geom].ReorientObject().MakeValid() " +
                 "WHERE [the_geom].EnvelopeAngle() > 90";
 
-            return new DataBase().Query(query);
+            return LegacyDatabase.Create().Query(query);
         }
 
         protected static string? GetString(string tableName, string columnName, double latitude, double longitude)
@@ -42,7 +42,7 @@ namespace landerist_library.Database
                 "WITH(INDEX([SpatialIndex-the_geom])) " +
                 "WHERE [the_geom].STIntersects(geography::STGeomFromText('" + point + "', 4326)) = 1";
 
-            return new DataBase().QueryString(query);
+            return LegacyDatabase.Create().QueryString(query);
         }
 
         protected static DataRow? GetdDataRow(string tableName, string columns, double latitude, double longitude)
@@ -57,7 +57,7 @@ namespace landerist_library.Database
                 "WITH(INDEX([SpatialIndex-the_geom])) " +
                 "WHERE [the_geom].STIntersects(geography::STGeomFromText('" + point + "', 4326)) = 1";
 
-            DataTable dataTable = new DataBase().QueryTable(query);
+            DataTable dataTable = LegacyDatabase.Create().QueryTable(query);
             if (dataTable.Rows.Count > 0)
             {
                 return dataTable.Rows[0];

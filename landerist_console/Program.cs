@@ -39,6 +39,16 @@ namespace landerist_console
 
         private static TasksService ConfigureApplicationServices()
         {
+            SqlDatabaseFactory databaseFactory = new(
+                new SqlDatabaseOptions(
+                    Config.DATASOURCE
+                        ?? throw new InvalidOperationException("Database data source is not configured."),
+                    Config.DATABASE_USER,
+                    Config.DATABASE_PW,
+                    Config.DATABASE_NAME,
+                    Config.DATABASE_ENCRYPT,
+                    Config.DATABASE_TRUST_SERVER_CERTIFICATE));
+            LegacyDatabase.Configure(databaseFactory);
             LegacyApplicationLogger logger = new();
             ListingLifecycleService listingLifecycle = new(
                 new LegacyListingStore(),
@@ -72,8 +82,8 @@ namespace landerist_console
                     Config.IsConfigurationProduction(),
                     Config.IsConfigurationLocal(),
                     Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER));
-            PagePersistenceService pagePersistence = new(new PageRepository(new DataBase()));
-            WebsitePersistenceService websitePersistence = new(new WebsiteRepository(new DataBase()));
+            PagePersistenceService pagePersistence = new(new PageRepository(databaseFactory.Create()));
+            WebsitePersistenceService websitePersistence = new(new WebsiteRepository(databaseFactory.Create()));
             ParsedPageClassificationService parsedClassification = new(
                 pagePersistence,
                 listingLifecycle);

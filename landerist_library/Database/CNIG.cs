@@ -17,7 +17,7 @@ namespace landerist_library.Database
             string query =
                 "INSERT INTO " + TABLE_CNIG + " VALUES(" + geom + ",@inspireId, @natCode, @nameUnit)";
 
-            return new DataBase().Query(query, new Dictionary<string, object?> {
+            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?> {
                 {"inspireId", inspireId },
                 {"natCode", natCode },
                 {"nameUnit", nameUnit },

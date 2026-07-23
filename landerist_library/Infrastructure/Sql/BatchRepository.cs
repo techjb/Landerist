@@ -8,11 +8,6 @@ namespace landerist_library.Infrastructure.Sql
     {
         private const string BatchesTable = "[BATCHES]";
         private readonly IDatabase _database;
-
-        public BatchRepository() : this(new DataBase())
-        {
-        }
-
         public BatchRepository(IDatabase database)
         {
             ArgumentNullException.ThrowIfNull(database);

@@ -8,11 +8,6 @@ namespace landerist_library.Infrastructure.Sql;
 public sealed class ListingQueryRepository
 {
     private readonly IDatabase _database;
-
-    public ListingQueryRepository() : this(new DataBase())
-    {
-    }
-
     public ListingQueryRepository(IDatabase database)
     {
         ArgumentNullException.ThrowIfNull(database);

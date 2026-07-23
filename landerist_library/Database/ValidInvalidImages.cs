@@ -28,7 +28,7 @@ namespace landerist_library.Database
                 "FROM " + tableName + " " +
                 "WHERE UriHash = @UriHash";
 
-            return new DataBase().QueryExists(query, new Dictionary<string, object?> {
+            return LegacyDatabase.Create().QueryExists(query, new Dictionary<string, object?> {
                 {"UriHash", uriHash }
             });
         }
@@ -51,7 +51,7 @@ namespace landerist_library.Database
                 "INSERT INTO " + tableName + " " +
                 "VALUES (GETDATE(), @UriHash)";
 
-            return new DataBase().Query(query, new Dictionary<string, object?> {
+            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?> {
                 {"UriHash", uriHash }
             });
         }

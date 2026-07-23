@@ -7,7 +7,7 @@ namespace landerist_library.Database
 {
     public class ES_Sources
     {
-        private static readonly SourceRepository Repository = new();
+        private static readonly SourceRepository Repository = new(global::landerist_library.Database.LegacyDatabase.Create());
 
         public static void Insert(Listing listing)
         {

@@ -31,7 +31,7 @@ namespace landerist_library.Database
                 "FROM " + WEBSITES_THROTTLE + " " +
                 "WHERE Host = @Host";
 
-            return new DataBase().QueryBool(query, new Dictionary<string, object?>()
+            return LegacyDatabase.Create().QueryBool(query, new Dictionary<string, object?>()
             {
                 {"Host", website.Host}
             });
@@ -97,7 +97,7 @@ namespace landerist_library.Database
                 "END; " +
                 "COMMIT TRANSACTION";
 
-            return new DataBase().Query(query, new Dictionary<string, object?>()
+            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?>()
             {
                 {"Host", website.Host},
                 {"MaxForbiddenBackoffLevel", MAX_FORBIDDEN_BACKOFF_LEVEL},
@@ -148,7 +148,7 @@ namespace landerist_library.Database
                 "END; " +
                 "COMMIT TRANSACTION";
 
-            return new DataBase().Query(query, new Dictionary<string, object?>()
+            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?>()
             {
                 {"Host", website.Host},
                 {"SuccessesToDecreaseForbiddenBackoff", SUCCESSES_TO_DECREASE_FORBIDDEN_BACKOFF},
@@ -188,7 +188,7 @@ namespace landerist_library.Database
                 "COMMIT TRANSACTION; " +
                 "SELECT @Acquired";
 
-            return new DataBase().QueryBool(query, new Dictionary<string, object?>()
+            return LegacyDatabase.Create().QueryBool(query, new Dictionary<string, object?>()
             {
                 {"Host", website.Host},
                 {"HostBlockDelayMilliseconds", hostBlockDelayMilliseconds},
@@ -202,7 +202,7 @@ namespace landerist_library.Database
                 "WHERE BlockUntil < GETDATE() " +
                 "AND ISNULL(ForbiddenBackoffLevel, 0) = 0 " +
                 "AND ISNULL(ForbiddenCounter, 0) = 0";
-            return new DataBase().Query(query);
+            return LegacyDatabase.Create().Query(query);
         }
 
         private static int CalculateHostBlockDelayMilliseconds(Website website)

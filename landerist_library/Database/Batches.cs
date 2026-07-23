@@ -6,7 +6,7 @@ namespace landerist_library.Database
 {
     public class Batches
     {
-        private static readonly BatchRepository Repository = new();
+        private static readonly BatchRepository Repository = new(global::landerist_library.Database.LegacyDatabase.Create());
 
         public static bool Insert(string id, HashSet<string> pagesUriHashes)
         {

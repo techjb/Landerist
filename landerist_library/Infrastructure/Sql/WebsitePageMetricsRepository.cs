@@ -7,11 +7,6 @@ namespace landerist_library.Infrastructure.Sql
     public class WebsitePageMetricsRepository
     {
         private readonly IDatabase _database;
-
-        public WebsitePageMetricsRepository() : this(new DataBase())
-        {
-        }
-
         public WebsitePageMetricsRepository(IDatabase database)
         {
             ArgumentNullException.ThrowIfNull(database);

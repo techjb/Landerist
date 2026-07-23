@@ -5,7 +5,7 @@ namespace landerist_library.Pages
 {
     public partial class Pages
     {
-        private static readonly PageStatisticsRepository StatisticsRepository = new();
+        private static readonly PageStatisticsRepository StatisticsRepository = new(global::landerist_library.Database.LegacyDatabase.Create());
 
         public static Dictionary<string, object?> GroupByPageType(ListingStatus? listingStatus = null)
         {

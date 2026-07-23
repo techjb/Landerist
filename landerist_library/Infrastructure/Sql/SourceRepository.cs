@@ -7,11 +7,6 @@ namespace landerist_library.Infrastructure.Sql
     public class SourceRepository
     {
         private readonly IDatabase _database;
-
-        public SourceRepository() : this(new DataBase())
-        {
-        }
-
         public SourceRepository(IDatabase database)
         {
             ArgumentNullException.ThrowIfNull(database);

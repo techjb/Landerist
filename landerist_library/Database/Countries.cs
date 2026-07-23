@@ -15,7 +15,7 @@
             string query =
                 "INSERT INTO " + TABLE_COUNTRIES + " VALUES(" + geom + ", @iso_a3)";
 
-            return new DataBase().Query(query, new Dictionary<string, object?> {
+            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?> {
                 {"iso_a3", iso_a3 },
             });
         }

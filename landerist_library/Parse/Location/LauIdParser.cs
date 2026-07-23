@@ -87,7 +87,7 @@ namespace landerist_library.Parse.Location
                 "SET [lauId] = @lauId, [lauName] = @lauName " +
                 "WHERE [guid] = @guid";
 
-            return new DataBase().Query(query, new Dictionary<string, object?>
+            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?>
             {
                 { "lauId", _listing.lauId },
                 { "lauName", _listing.lauName },

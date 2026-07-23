@@ -5,6 +5,8 @@ namespace landerist_library.Database;
 
 public interface IDatabase
 {
+    void SetTimeout(int timeOut);
+
     bool Query(string query, IDictionary<string, object?>? parameters = null);
 
     bool Query(
@@ -12,11 +14,19 @@ public interface IDatabase
         IDictionary<string, object?>? parameters,
         out Exception? exception);
 
+    bool QueryBool(
+        string query,
+        IDictionary<string, object?>? parameters = null);
+
     bool QueryExists(
         string querySelect1,
         IDictionary<string, object?>? parameters = null);
 
     int QueryInt(string query, IDictionary<string, object?>? parameters = null);
+
+    string? QueryString(
+        string query,
+        IDictionary<string, object?>? parameters = null);
 
     DataTable QueryTable(
         string query,
