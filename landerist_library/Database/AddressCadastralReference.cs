@@ -1,85 +1,76 @@
 using System.Text.RegularExpressions;
 
-namespace landerist_library.Database
+namespace landerist_library.Database;
+
+public sealed class AddressCadastralReference
 {
-    public class AddressCadastralReference
+    private const string TableName = "[ADDRESS_CADASTRAL_REFERENCE]";
+    private const int AddressMaxLength = 200;
+    private const int CadastralReferenceMaxLength = 50;
+    private readonly IDatabase _database;
+
+    public AddressCadastralReference(IDatabase database)
     {
-        private const string TableAddressCadastralReference = "[ADDRESS_CADASTRAL_REFERENCE]";
-        private const int AddressMaxLength = 200;
-        private const int CadastralReferenceMaxLength = 50;
+        ArgumentNullException.ThrowIfNull(database);
+        _database = database;
+    }
 
-        public static bool Insert(string address, string? cadastralReference)
+    public bool Insert(string address, string? cadastralReference)
+    {
+        string? normalizedAddress = NormalizeAddress(address);
+        string? normalizedReference = NormalizeCadastralReference(cadastralReference);
+        if (normalizedAddress is null || normalizedReference is null)
         {
-            string? normalizedAddress = NormalizeAddress(address);
-            string? normalizedCadastralReference = NormalizeCadastralReference(cadastralReference);
-
-            if (normalizedAddress is null || normalizedCadastralReference is null)
-            {
-                return false;
-            }
-
-            string query =
-                "INSERT INTO " + TableAddressCadastralReference + " " +
-                "([DateInsert], [Address], [CadastralReference]) " +
-                "VALUES (GETDATE(), @Address, @CadastralReference)";
-
-            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?>
-            {
-                { "Address", normalizedAddress },
-                { "CadastralReference", normalizedCadastralReference }
-            });
+            return false;
         }
-
-        public static string? Select(string address)
+        const string query =
+            "INSERT INTO " + TableName + " " +
+            "([DateInsert], [Address], [CadastralReference]) " +
+            "VALUES (GETDATE(), @Address, @CadastralReference)";
+        return _database.Query(query, new Dictionary<string, object?>
         {
-            string? normalizedAddress = NormalizeAddress(address);
-            if (normalizedAddress is null)
-            {
-                return null;
-            }
+            { "Address", normalizedAddress },
+            { "CadastralReference", normalizedReference }
+        });
+    }
 
-            string query =
-                "SELECT [CadastralReference] " +
-                "FROM " + TableAddressCadastralReference + " " +
-                "WHERE [Address] = @Address";
-
-            return LegacyDatabase.Create().QueryString(query, new Dictionary<string, object?>
-            {
-                { "Address", normalizedAddress }
-            });
-        }
-
-        public static bool Clean()
+    public string? Select(string address)
+    {
+        string? normalizedAddress = NormalizeAddress(address);
+        if (normalizedAddress is null)
         {
-            string query =
-                "DELETE FROM " + TableAddressCadastralReference + " " +
-                "WHERE [DateInsert] < DATEADD(YEAR, -1, GETDATE())";
-
-            return LegacyDatabase.Create().Query(query);
+            return null;
         }
-
-        private static string? NormalizeAddress(string? address)
+        const string query =
+            "SELECT [CadastralReference] FROM " + TableName + " " +
+            "WHERE [Address] = @Address";
+        return _database.QueryString(query, new Dictionary<string, object?>
         {
-            if (string.IsNullOrWhiteSpace(address))
-            {
-                return null;
-            }
+            { "Address", normalizedAddress }
+        });
+    }
 
-            string normalizedAddress = Regex.Replace(address.Trim(), @"\s+", " ");
-            return normalizedAddress.Length > AddressMaxLength ? null : normalizedAddress;
-        }
+    public bool Clean() => _database.Query(
+        "DELETE FROM " + TableName + " " +
+        "WHERE [DateInsert] < DATEADD(YEAR, -1, GETDATE())");
 
-        private static string? NormalizeCadastralReference(string? cadastralReference)
+    private static string? NormalizeAddress(string? address)
+    {
+        if (string.IsNullOrWhiteSpace(address))
         {
-            if (string.IsNullOrWhiteSpace(cadastralReference))
-            {
-                return null;
-            }
-
-            string normalizedCadastralReference = cadastralReference.Trim();
-            return normalizedCadastralReference.Length > CadastralReferenceMaxLength
-                ? null
-                : normalizedCadastralReference;
+            return null;
         }
+        string normalized = Regex.Replace(address.Trim(), @"\s+", " ");
+        return normalized.Length > AddressMaxLength ? null : normalized;
+    }
+
+    private static string? NormalizeCadastralReference(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+        string normalized = value.Trim();
+        return normalized.Length > CadastralReferenceMaxLength ? null : normalized;
     }
 }

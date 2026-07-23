@@ -1,4 +1,5 @@
-﻿using landerist_library.Database;
+using landerist_library.Database;
+using landerist_library.Infrastructure.Sql;
 using landerist_library.Parse.Location.Providers.Goolzoom;
 using landerist_library.Statistics;
 using Newtonsoft.Json;
@@ -8,6 +9,15 @@ namespace landerist_library.Parse.CadastralReference
 {
     public class AddressToCadastralReference
     {
+        private readonly AddressCadastralReference _cache;
+        private readonly GlobalStatisticsRepository _statistics;
+
+        public AddressToCadastralReference(IDatabase database)
+        {
+            ArgumentNullException.ThrowIfNull(database);
+            _cache = new AddressCadastralReference(database);
+            _statistics = new GlobalStatisticsRepository(database);
+        }
         public string? GetCadastralReference(double? latitude, double? longitude, string address, bool firstTry = true)
         {
             if (latitude == null || longitude == null || string.IsNullOrWhiteSpace(address))
@@ -17,7 +27,7 @@ namespace landerist_library.Parse.CadastralReference
 
             if (firstTry)
             {
-                string? cachedCadastralReference = AddressCadastralReference.Select(address);
+                string? cachedCadastralReference = _cache.Select(address);
                 if (!string.IsNullOrWhiteSpace(cachedCadastralReference))
                 {
                     return cachedCadastralReference;
@@ -28,7 +38,7 @@ namespace landerist_library.Parse.CadastralReference
 
             try
             {
-                GlobalStatistics.InsertDailyCounter("AddressToCadastralReferenceRequest");
+                _statistics.InsertDailyCounter("AddressToCadastralReferenceRequest", 1);
                 int radio = firstTry ? 50 : 100;
                 var content = new GoolzoomApi().GetAddresses(latitude.Value, longitude.Value, radio);
                 if (!string.IsNullOrEmpty(content))
@@ -43,7 +53,7 @@ namespace landerist_library.Parse.CadastralReference
 
                     if (!string.IsNullOrEmpty(cadastralReference))
                     {
-                        AddressCadastralReference.Insert(address, cadastralReference);
+                        _cache.Insert(address, cadastralReference);
                     }
                 }
             }
@@ -94,7 +104,7 @@ namespace landerist_library.Parse.CadastralReference
             return (false, null);
         }
 
-        public static void UpdateCadastralReferences()
+        public static void UpdateCadastralReferences(IDatabase database)
         {
             var listings = ES_Listings.GetListingsWithoutCatastralReferenceAndLocationIsAccurate();
             int total = listings.Count;
@@ -120,7 +130,7 @@ namespace landerist_library.Parse.CadastralReference
                 new ParallelOptions() { MaxDegreeOfParallelism = 6 },
                 listing =>
                 {
-                    var cadastralReference = new AddressToCadastralReference().GetCadastralReference(listing.latitude, listing.longitude, listing.address);
+                    var cadastralReference = new AddressToCadastralReference(database).GetCadastralReference(listing.latitude, listing.longitude, listing.address);
                     if (!string.IsNullOrEmpty(cadastralReference))
                     {
                         Interlocked.Increment(ref found);

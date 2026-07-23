@@ -4,10 +4,11 @@ using landerist_orels.ES;
 
 namespace landerist_library.Parse.Location
 {
-    public class LauIdParser(CountryCode countryCode, Listing listing)
+    public class LauIdParser(CountryCode countryCode, Listing listing, IDatabase? database = null)
     {
         private readonly CountryCode _countryCode = countryCode;
         private readonly Listing _listing = listing;
+        private readonly IDatabase? _database = database;
 
         public void SetLauIdAndLauName()
         {
@@ -38,7 +39,7 @@ namespace landerist_library.Parse.Location
             }
         }
 
-        public static void SetLauIdAndLauNameToListings()
+        public static void SetLauIdAndLauNameToListings(IDatabase database)
         {
             var listings = ES_Listings.GetListingsWithoutLauName();
             var total = listings.Count;
@@ -60,7 +61,7 @@ namespace landerist_library.Parse.Location
             {
                 var current = Interlocked.Increment(ref counter);
 
-                var lauIdParser = new LauIdParser(CountryCode.ES, listingItem);
+                var lauIdParser = new LauIdParser(CountryCode.ES, listingItem, database);
                 lauIdParser.SetLauIdAndLauName();
 
                 if (lauIdParser.UpdateLauIdAndLauName())
@@ -87,7 +88,9 @@ namespace landerist_library.Parse.Location
                 "SET [lauId] = @lauId, [lauName] = @lauName " +
                 "WHERE [guid] = @guid";
 
-            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?>
+            IDatabase database = _database
+                ?? throw new InvalidOperationException("Database is required to persist LAU data.");
+            return database.Query(query, new Dictionary<string, object?>
             {
                 { "lauId", _listing.lauId },
                 { "lauName", _listing.lauName },

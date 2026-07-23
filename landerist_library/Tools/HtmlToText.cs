@@ -1,5 +1,4 @@
 ﻿using HtmlAgilityPack;
-using landerist_library.Database;
 
 namespace landerist_library.Tools
 {
@@ -540,10 +539,6 @@ namespace landerist_library.Tools
 
                 cleanedLines.Add(decodedLine);
 
-                if (Configuration.Config.WORDS_ENABLED)
-                {
-                    InsertWords(decodedLine);
-                }
             }
 
             string text = string.Join(" ", cleanedLines);
@@ -563,23 +558,6 @@ namespace landerist_library.Tools
             return true;
         }
 
-        public static void InsertWords(string text)
-        {
-            string cleaned = Strings.Clean(text);
-            if (string.IsNullOrEmpty(cleaned))
-            {
-                return;
-            }
 
-            if (Strings.IsNumeric(text))
-            {
-                return;
-            }
-
-            if (Strings.CountWords(cleaned) <= 3)
-            {
-                Words.Insert(cleaned);
-            }
-        }
     }
 }

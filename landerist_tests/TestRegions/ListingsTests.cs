@@ -1,4 +1,4 @@
-using landerist_library.Database;
+﻿using landerist_library.Database;
 using landerist_orels.ES;
 
 namespace landerist_tests
@@ -25,8 +25,6 @@ namespace landerist_tests
             //var json = landerist_library.Export.Json.ExportListings(sordedSet, "C:\\Users\\Chus\\Downloads\\test.json");
             //Console.WriteLine(json);
 
-            //ListingsCleanner.UnpublishListingsWithoutPage();
-            //ListingsCleanner.UnpublishListingsByPageType("www.redpiso.es", landerist_library.Pages.PageType.NotIndexable);
 
             //Console.WriteLine(landerist_library.Tools.Validate.CadastralReference("002500800TP72G"))    ;
         }

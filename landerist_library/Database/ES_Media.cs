@@ -52,7 +52,7 @@ namespace landerist_library.Database
             return medias;
         }
 
-        private static Media? GetMedia(DataRow dataRow)
+        internal static Media? GetMedia(DataRow dataRow)
         {
             MediaType? mediaType = dataRow["mediaType"] is DBNull ? null : (MediaType)Enum.Parse(typeof(MediaType), dataRow["mediaType"].ToString()!);
             var title = dataRow["title"] is DBNull ? null : (string)dataRow["title"];

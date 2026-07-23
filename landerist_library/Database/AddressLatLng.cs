@@ -1,55 +1,56 @@
-﻿namespace landerist_library.Database
+using System.Data;
+
+namespace landerist_library.Database;
+
+public sealed class AddressLatLng
 {
-    public class AddressLatLng
+    private const string TableName = "[ADDRESS_LAT_LNG]";
+    private readonly IDatabase _database;
+
+    public AddressLatLng(IDatabase database)
     {
-        private const string ADDRESS_LAT_LNG = "[ADDRESS_LAT_LNG]";
-
-        public static bool Insert(string address, string region, double lat, double lng, bool isAccurate)
-        {
-            string query =
-                "INSERT INTO " + ADDRESS_LAT_LNG + " " +
-                "([DateInsert], [Address], [Region], [Lat], [Lng], [IsAccurate]) " +
-                "VALUES (GETDATE(), @Address, @Region, @Lat, @Lng, @IsAccurate)";
-            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?> {
-                {"Address", address },
-                {"Region", region },
-                {"Lat", lat },
-                {"Lng", lng },
-                {"IsAccurate", isAccurate }
-            });
-        }
-
-        public static (double lat, double lng, bool isAccurate)? Select(string address, string region)
-        {
-            string query =
-                "SELECT Lat, Lng, IsAccurate " +
-                "FROM " + ADDRESS_LAT_LNG + " " +
-                "WHERE Address = @Address AND Region = @Region";
-
-            var dataTable = LegacyDatabase.Create().QueryTable(query, new Dictionary<string, object?> {
-                {"Address", address },
-                {"Region", region },
-            });
-
-            if (dataTable.Rows.Count == 0)
-            {
-                return null;
-            }
-
-            var lat = (double)dataTable.Rows[0]["Lat"];
-            var lng = (double)dataTable.Rows[0]["Lng"];
-            var isAccurate = (bool)dataTable.Rows[0]["IsAccurate"];
-
-            return (lat, lng, isAccurate);
-        }
-
-        public static bool Clean()
-        {
-            string query =
-                "DELETE FROM " + ADDRESS_LAT_LNG + " " +
-                "WHERE [DateInsert] < DATEADD(YEAR, -1, GETDATE())";
-
-            return LegacyDatabase.Create().Query(query);
-        }
+        ArgumentNullException.ThrowIfNull(database);
+        _database = database;
     }
+
+    public bool Insert(string address, string region, double lat, double lng, bool isAccurate)
+    {
+        const string query =
+            "INSERT INTO " + TableName + " " +
+            "([DateInsert], [Address], [Region], [Lat], [Lng], [IsAccurate]) " +
+            "VALUES (GETDATE(), @Address, @Region, @Lat, @Lng, @IsAccurate)";
+        return _database.Query(query, new Dictionary<string, object?>
+        {
+            { "Address", address },
+            { "Region", region },
+            { "Lat", lat },
+            { "Lng", lng },
+            { "IsAccurate", isAccurate }
+        });
+    }
+
+    public (double lat, double lng, bool isAccurate)? Select(string address, string region)
+    {
+        const string query =
+            "SELECT Lat, Lng, IsAccurate " +
+            "FROM " + TableName + " " +
+            "WHERE Address = @Address AND Region = @Region";
+        DataTable rows = _database.QueryTable(query, new Dictionary<string, object?>
+        {
+            { "Address", address },
+            { "Region", region }
+        });
+        if (rows.Rows.Count == 0)
+        {
+            return null;
+        }
+        return (
+            (double)rows.Rows[0]["Lat"],
+            (double)rows.Rows[0]["Lng"],
+            (bool)rows.Rows[0]["IsAccurate"]);
+    }
+
+    public bool Clean() => _database.Query(
+        "DELETE FROM " + TableName + " " +
+        "WHERE [DateInsert] < DATEADD(YEAR, -1, GETDATE())");
 }

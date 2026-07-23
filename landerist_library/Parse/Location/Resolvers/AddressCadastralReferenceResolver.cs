@@ -4,6 +4,13 @@ namespace landerist_library.Parse.Location.Resolvers
 {
     internal sealed class AddressCadastralReferenceResolver
     {
+        private readonly AddressToCadastralReference Service;
+
+        public AddressCadastralReferenceResolver(AddressToCadastralReference service)
+        {
+            Service = service;
+        }
+
         public string? Resolve(double? latitude, double? longitude, string? address)
         {
             if (string.IsNullOrWhiteSpace(address))
@@ -11,7 +18,7 @@ namespace landerist_library.Parse.Location.Resolvers
                 return null;
             }
 
-            return new AddressToCadastralReference().GetCadastralReference(latitude, longitude, address);
+            return Service.GetCadastralReference(latitude, longitude, address);
         }
     }
 }

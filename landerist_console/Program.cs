@@ -1,10 +1,11 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Configuration;
 using landerist_library.Application;
 using landerist_library.Application.Listings;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Scraping;
 using landerist_library.Application.Tasks;
 using landerist_library.Database;
+using landerist_library.Infrastructure.Backup;
 using landerist_library.Infrastructure.Logging;
 using landerist_library.Infrastructure.Listings;
 using landerist_library.Infrastructure.Sql;
@@ -50,40 +51,52 @@ namespace landerist_console
                     Config.DATABASE_TRUST_SERVER_CERTIFICATE));
             LegacyDatabase.Configure(databaseFactory);
             LegacyApplicationLogger logger = new();
+            PagePersistenceService pagePersistence = new(new PageRepository(databaseFactory.Create()));
+            WebsitePersistenceService websitePersistence = new(new WebsiteRepository(databaseFactory.Create()));
+            SqlListingStore listingStore = new(databaseFactory.Create(), logger);
+            SqlNotListingCacheService notListingCache = new(
+                databaseFactory.Create(),
+                Config.NOT_LISTING_CACHE_ENABLED);
+            BatchRepository batches = new(databaseFactory.Create());
+            SqlPageLinkService pageLinks = new(
+                pagePersistence,
+                new WebsitePageMetricsRepository(databaseFactory.Create()),
+                Config.MAX_PAGES_PER_WEBSITE);
             ListingLifecycleService listingLifecycle = new(
-                new LegacyListingStore(),
-                new LegacyNotListingCacheService(),
-                new LegacyPageLinkService(),
-                new LegacyListingEnricher(),
+                listingStore,
+                notListingCache,
+                pageLinks,
+                new SqlListingEnricher(databaseFactory.Create()),
                 new LegacyListingUnpublishPolicy(),
                 logger);
             PageScrapePipelineServices pageScraping = new(
                 new PageAcquisitionService(
                     new LegacyPageDownloader(),
                     new LegacyConditionalPageHeaderService(),
-                    new LegacyScrapeMetrics(),
+                    new SqlScrapeMetrics(databaseFactory.Create()),
                     conditionalHeadersEnabled: !Config.IsConfigurationLocal()),
-                new LegacyPageContentClassifier(),
-                new LegacyPageIndexingService(),
-                new LegacyPageSchedulingService());
+                new PageContentClassifier(
+                    Config.IsConfigurationProduction(),
+                    notListingCache,
+                    new SqlPageClassificationMetrics(databaseFactory.Create())),
+                new PageIndexingService(Config.INDEXER_ENABLED, pageLinks),
+                new SqlPageSchedulingService(listingStore));
             PageBatchSelector pageBatchSelector = new(
-                new LegacyPageSelectionRepository(),
+                new SqlPageSelectionRepository(databaseFactory.Create(), Config.MACHINE_NAME),
                 new PageSelectionOptions(
                     Config.MAX_PAGES_PER_SCRAPE,
                     Config.MAX_PAGES_PER_HOST_PER_SCRAPE,
                     Config.MIN_PAGES_PER_SCRAPE,
                     enforceMinimumPages: Config.IsConfigurationProduction()));
             ScrapeBatchServices batchScraping = new(
-                new LegacyWebsiteThrottleService(),
-                new LegacyScrapeResourceManager(),
-                new LegacyScrapeBatchMetrics(),
-                new LegacyScrapePageSource(),
+                new SqlWebsiteThrottleService(databaseFactory.Create()),
+                new SqlScrapeResourceManager(databaseFactory.Create(), Config.MACHINE_NAME),
+                new SqlScrapeBatchMetrics(databaseFactory.Create()),
+                new SqlScrapePageSource(databaseFactory.Create(), listingStore),
                 new ScraperExecutionOptions(
                     Config.IsConfigurationProduction(),
                     Config.IsConfigurationLocal(),
                     Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER));
-            PagePersistenceService pagePersistence = new(new PageRepository(databaseFactory.Create()));
-            WebsitePersistenceService websitePersistence = new(new WebsiteRepository(databaseFactory.Create()));
             ParsedPageClassificationService parsedClassification = new(
                 pagePersistence,
                 listingLifecycle);
@@ -113,10 +126,13 @@ namespace landerist_console
                 new LegacyScrapeTaskJob(scraper, batchScraping.Resources),
                 new LegacyLocalAiTaskJob(() => new TaskLocalAIParsing(parsedClassification)),
                 new LegacyTenMinuteTaskJob(
-                    new TaskBatchDownload(parsedClassification),
-                    new TaskBatchUpload()),
-                new LegacyHourlyTaskJob(),
-                new LegacyDailyTaskJob(),
+                    new TaskBatchDownload(parsedClassification, batches),
+                    new TaskBatchUpload(batches)),
+                new LegacyHourlyTaskJob(new TaskBatchCleaner(batches)),
+                new LegacyDailyTaskJob(
+                    databaseFactory.Create(),
+                    notListingCache,
+                    new SqlDatabaseBackupService(databaseFactory.Create())),
                 TimeProvider.System);
         }
 

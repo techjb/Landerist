@@ -1,4 +1,4 @@
-namespace landerist_tests
+﻿namespace landerist_tests
 {
     internal static class DataBaseTests
     {
@@ -17,7 +17,6 @@ namespace landerist_tests
 
             //var h = landerist_library.Database.CountrySpain.Contains(-3.6886920000, 40.4199410000); // false
             //Console.WriteLine(h);
-            //landerist_library.Database.RedirectUrl.InsertWebsite("test1", "test2");
         }
     }
 }

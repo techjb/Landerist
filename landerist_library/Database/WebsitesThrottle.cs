@@ -3,9 +3,10 @@ using System.Text;
 
 namespace landerist_library.Database
 {
-    public class WebsitesThrottle
+    public sealed class WebsitesThrottle
     {
         public const string WEBSITES_THROTTLE = "[WEBSITES_THROTTLE]";
+        private readonly IDatabase _database;
 
         private static readonly int[] ForbiddenRetryDelaySecondsByLevel =
         [
@@ -18,7 +19,13 @@ namespace landerist_library.Database
         private const int MAX_FORBIDDEN_JITTER_SECONDS = 300;
         private const double FORBIDDEN_JITTER_RATIO = 0.2d;
 
-        public static bool IsBlocked(Website website)
+        public WebsitesThrottle(IDatabase database)
+        {
+            ArgumentNullException.ThrowIfNull(database);
+            _database = database;
+        }
+
+        public bool IsBlocked(Website website)
         {
             string query =
                 "SELECT " +
@@ -31,19 +38,19 @@ namespace landerist_library.Database
                 "FROM " + WEBSITES_THROTTLE + " " +
                 "WHERE Host = @Host";
 
-            return LegacyDatabase.Create().QueryBool(query, new Dictionary<string, object?>()
+            return _database.QueryBool(query, new Dictionary<string, object?>()
             {
                 {"Host", website.Host}
             });
         }
 
-        public static bool Block(Website website)
+        public bool Block(Website website)
         {
             var hostBlockDelayMilliseconds = CalculateHostBlockDelayMilliseconds(website);
             return Block(website, hostBlockDelayMilliseconds);
         }
 
-        public static bool ReportForbidden(Website website)
+        public bool ReportForbidden(Website website)
         {
             string query =
                 "SET XACT_ABORT ON; " +
@@ -97,7 +104,7 @@ namespace landerist_library.Database
                 "END; " +
                 "COMMIT TRANSACTION";
 
-            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?>()
+            return _database.Query(query, new Dictionary<string, object?>()
             {
                 {"Host", website.Host},
                 {"MaxForbiddenBackoffLevel", MAX_FORBIDDEN_BACKOFF_LEVEL},
@@ -106,7 +113,7 @@ namespace landerist_library.Database
             });
         }
 
-        public static bool ReportSuccess(Website website)
+        public bool ReportSuccess(Website website)
         {
             string query =
                 "SET XACT_ABORT ON; " +
@@ -148,7 +155,7 @@ namespace landerist_library.Database
                 "END; " +
                 "COMMIT TRANSACTION";
 
-            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?>()
+            return _database.Query(query, new Dictionary<string, object?>()
             {
                 {"Host", website.Host},
                 {"SuccessesToDecreaseForbiddenBackoff", SUCCESSES_TO_DECREASE_FORBIDDEN_BACKOFF},
@@ -156,7 +163,7 @@ namespace landerist_library.Database
             });
         }
 
-        private static bool Block(Website website, int hostBlockDelayMilliseconds)
+        private bool Block(Website website, int hostBlockDelayMilliseconds)
         {
             string query =
                 "SET XACT_ABORT ON; " +
@@ -188,21 +195,21 @@ namespace landerist_library.Database
                 "COMMIT TRANSACTION; " +
                 "SELECT @Acquired";
 
-            return LegacyDatabase.Create().QueryBool(query, new Dictionary<string, object?>()
+            return _database.QueryBool(query, new Dictionary<string, object?>()
             {
                 {"Host", website.Host},
                 {"HostBlockDelayMilliseconds", hostBlockDelayMilliseconds},
             });
         }
 
-        public static bool Clean()
+        public bool Clean()
         {
             string query =
                 "DELETE FROM " + WEBSITES_THROTTLE + " " +
                 "WHERE BlockUntil < GETDATE() " +
                 "AND ISNULL(ForbiddenBackoffLevel, 0) = 0 " +
                 "AND ISNULL(ForbiddenCounter, 0) = 0";
-            return LegacyDatabase.Create().Query(query);
+            return _database.Query(query);
         }
 
         private static int CalculateHostBlockDelayMilliseconds(Website website)

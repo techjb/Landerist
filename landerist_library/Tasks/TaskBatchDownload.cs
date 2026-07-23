@@ -2,6 +2,7 @@ using landerist_library.Configuration;
 using landerist_library.Application.Scraping;
 using landerist_library.Database;
 using landerist_library.Logs;
+using landerist_library.Infrastructure.Sql;
 using landerist_library.Pages;
 using landerist_library.Parse.ListingParser;
 using landerist_library.Parse.ListingParser.OpenAI.Batch;
@@ -13,18 +14,23 @@ namespace landerist_library.Tasks
     public class TaskBatchDownload
     {
         private readonly IParsedPageClassificationService _parsedClassification;
+        private readonly BatchRepository _batches;
 
-        public TaskBatchDownload(IParsedPageClassificationService parsedClassification)
+        public TaskBatchDownload(
+            IParsedPageClassificationService parsedClassification,
+            BatchRepository batches)
         {
             ArgumentNullException.ThrowIfNull(parsedClassification);
+            ArgumentNullException.ThrowIfNull(batches);
             _parsedClassification = parsedClassification;
+            _batches = batches;
         }
 
         public readonly HashSet<string> DownloadedPagesUriHashes = [];
 
         public void Start()
         {
-            var batches = Batches.SelectNonDownloaded();
+            var batches = _batches.Select(downloaded: false);
             foreach (var batch in batches)
             {
                 Download(batch);
@@ -48,7 +54,7 @@ namespace landerist_library.Tasks
             }
 
             RemoveWaitingStatus(batch);
-            Batches.UpdateToDownloaded(batch);
+            _batches.Update(batch.Id, downloaded: true);
         }
 
         private bool DownloadAndReadFile(Batch batch, string? file)

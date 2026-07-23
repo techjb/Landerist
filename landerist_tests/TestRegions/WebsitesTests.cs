@@ -1,4 +1,4 @@
-using landerist_library.Websites;
+﻿using landerist_library.Websites;
 
 namespace landerist_tests
 {
@@ -35,10 +35,6 @@ namespace landerist_tests
             //new Website("promoaguilera.com").DeleteCurentMachineLogs();
             //new Website("www.servihabitat.com").ReadSitemap();
 
-            //WebsitesCleanner.DeleteWebsitesWithLessThanPages(100);
-            //WebsitesCleanner.DeleteWebsitesWithoutListings();
-            //WebsitesCleanner.DeleteWebsitesWithoutPageTypeListing();
-            //WebsitesCleanner.DeleteWebsitesWithoutPublishedListings();
 
 
             //string mainUri = "https://www.inmobiliarianucleo.com/";

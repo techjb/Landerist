@@ -13,8 +13,6 @@ namespace landerist_library.Configuration
 
         public static readonly bool MEDIA_PARSER_ENABLED = true;
 
-        public static readonly bool WORDS_ENABLED = false;
-
         public static readonly int MAX_PAGES_PER_WEBSITE = 40000;
 
         public static readonly int MIN_PAGES_PER_SCRAPE = 10;

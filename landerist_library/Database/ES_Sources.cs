@@ -53,7 +53,7 @@ namespace landerist_library.Database
             return sources;
         }
 
-        private static Source? GetSource(DataRow dataRow)
+        internal static Source? GetSource(DataRow dataRow)
         {
             var sourceName = dataRow["sourceName"] is DBNull ? null : (string)dataRow["sourceName"];
             if (!Uri.TryCreate((string)dataRow["sourceUrl"], UriKind.Absolute, out Uri? uri))

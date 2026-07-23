@@ -9,13 +9,16 @@ namespace landerist_library.Parse.Location.Resolvers
     {
         private readonly CountryCode CountryCode;
         private readonly CountryCoordinateValidator CoordinateValidator;
+        private readonly GoogleMapsApi GoogleMapsApi;
 
         public GoogleMapsAddressLocationResolver(
             CountryCode countryCode,
-            CountryCoordinateValidator coordinateValidator)
+            CountryCoordinateValidator coordinateValidator,
+            GoogleMapsApi googleMapsApi)
         {
             CountryCode = countryCode;
             CoordinateValidator = coordinateValidator;
+            GoogleMapsApi = googleMapsApi;
         }
 
         public bool TryResolve(string? address, out LocationCandidate? candidate)
@@ -26,7 +29,7 @@ namespace landerist_library.Parse.Location.Resolvers
                 return false;
             }
 
-            var result = new GoogleMapsApi().GetLatLng(address, CountryCode);
+            var result = GoogleMapsApi.GetLatLng(address, CountryCode);
             if (result == null ||
                 !CoordinateValidator.Contains(result.Value.Latitude, result.Value.Longitude))
             {

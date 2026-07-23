@@ -19,6 +19,7 @@ internal sealed class RecordingDatabase : IDatabase
     public bool QueryExistsResult { get; init; }
     public Dictionary<string, object?> DictionaryResult { get; } = [];
     public HashSet<string> HashSetResult { get; } = [];
+    public List<(string Query, IDictionary<string, object?>? Parameters)> Calls { get; } = [];
 
     public void SetTimeout(int timeOut) => TimeoutSeconds = timeOut;
 
@@ -108,5 +109,8 @@ internal sealed class RecordingDatabase : IDatabase
     {
         LastQuery = query;
         LastParameters = parameters;
+        Calls.Add((query, parameters is null
+            ? null
+            : new Dictionary<string, object?>(parameters)));
     }
 }

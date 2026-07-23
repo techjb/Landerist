@@ -1,25 +1,35 @@
+﻿using landerist_library.Application.Listings;
+using landerist_library.Application.Scraping;
 using landerist_library.Pages;
 using landerist_library.Parse.ListingParser;
-using landerist_library.Statistics;
 
 namespace landerist_library.Parse.PageTypeParser
 {
     public class PageTypeParser
     {
         private Page Page { get; }
+        private readonly bool _isProduction;
+        private readonly INotListingCacheService _notListingCache;
+        private readonly IPageClassificationMetrics _metrics;
 
-        public PageTypeParser(Page page)
+        public PageTypeParser(
+            Page page,
+            bool isProduction,
+            INotListingCacheService notListingCache,
+            IPageClassificationMetrics metrics)
         {
             ArgumentNullException.ThrowIfNull(page);
+            ArgumentNullException.ThrowIfNull(notListingCache);
+            ArgumentNullException.ThrowIfNull(metrics);
             Page = page;
+            _isProduction = isProduction;
+            _notListingCache = notListingCache;
+            _metrics = metrics;
         }
 
         public (PageType? pageType, landerist_orels.ES.Listing? listing, bool waitingAIRequest)
             GetPageType()
         {
-
-            var isProduction = Configuration.Config.IsConfigurationProduction();
-            //isProduction = true;
 
             if (Page.HttpStatusCode is null)
             {
@@ -46,10 +56,9 @@ namespace landerist_library.Parse.PageTypeParser
                 return (PageType.RedirectToAnotherUrl, null, false);
             }
 
-            if (Page.PageType.HasValue && Page.DownloadedHeadersHaveNotChanged() && isProduction)
+            if (Page.PageType.HasValue && Page.DownloadedHeadersHaveNotChanged() && _isProduction)
             {
-                GlobalStatistics.InsertDailyCounter(StatisticsKey.PageNotModified);
-                HostStatistics.InsertDailyCounter(Page.Host, HostStatisticsKey.PageNotModified);
+                _metrics.RecordPageNotModified(Page);
                 return (Page.PageType, null, false);
             }
 
@@ -105,17 +114,15 @@ namespace landerist_library.Parse.PageTypeParser
                 return (PageType.ResponseBodyIsError, null, false);
             }
 
-            if (global::landerist_library.Pages.Pages.IsNotListingCache(Page) && isProduction)
+            if (_notListingCache.Contains(Page) && _isProduction)
             {
-                GlobalStatistics.InsertDailyCounter(StatisticsKey.NotListingCache);
-                HostStatistics.InsertDailyCounter(Page.Host, HostStatisticsKey.NotListingCache);
+                _metrics.RecordNotListingCache(Page);
                 return (PageType.NotListingByCache, null, false);
             }
 
-            if (Page.ListingParserInputHasNotChanged() && isProduction)
+            if (Page.ListingParserInputHasNotChanged() && _isProduction)
             {
-                GlobalStatistics.InsertDailyCounter(StatisticsKey.ListingParserInputAlreadyParsed);
-                HostStatistics.InsertDailyCounter(Page.Host, HostStatisticsKey.ListingParserInputAlreadyParsed);
+                _metrics.RecordListingInputAlreadyParsed(Page);
                 return (Page.PageType, null, false);
             }
 

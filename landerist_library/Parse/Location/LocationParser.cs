@@ -1,8 +1,10 @@
 using HtmlAgilityPack;
 using landerist_library.Pages;
+using landerist_library.Parse.CadastralReference;
 using landerist_library.Parse.Location.Candidates;
 using landerist_library.Parse.Location.Extractors;
 using landerist_library.Parse.Location.Resolvers;
+using landerist_library.Parse.Location.Providers.GoogleMaps;
 using landerist_library.Parse.Location.Validation;
 
 namespace landerist_library.Parse.Location
@@ -17,7 +19,11 @@ namespace landerist_library.Parse.Location
         private readonly CadastralLocationResolver CadastralLocationResolver;
         private readonly AddressCadastralReferenceResolver AddressCadastralReferenceResolver;
 
-        public LocationParser(Page page, landerist_orels.ES.Listing listing)
+        public LocationParser(
+            Page page,
+            landerist_orels.ES.Listing listing,
+            GoogleMapsApi googleMapsApi,
+            AddressToCadastralReference cadastralReference)
         {
             Page = page;
             Listing = listing;
@@ -26,9 +32,10 @@ namespace landerist_library.Parse.Location
             HtmlLocationExtractor = new HtmlLocationExtractor(CoordinateValidator);
             GoogleMapsAddressLocationResolver = new GoogleMapsAddressLocationResolver(
                 page.Website.CountryCode,
-                CoordinateValidator);
+                CoordinateValidator,
+                googleMapsApi);
             CadastralLocationResolver = new CadastralLocationResolver(CoordinateValidator);
-            AddressCadastralReferenceResolver = new AddressCadastralReferenceResolver();
+            AddressCadastralReferenceResolver = new AddressCadastralReferenceResolver(cadastralReference);
         }
 
         public void SetLocation()

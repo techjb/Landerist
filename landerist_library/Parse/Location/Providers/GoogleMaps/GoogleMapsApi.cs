@@ -1,4 +1,5 @@
 ﻿using landerist_library.Configuration;
+using landerist_library.Database;
 using landerist_library.Websites;
 using Newtonsoft.Json;
 
@@ -8,7 +9,13 @@ namespace landerist_library.Parse.Location.Providers.GoogleMaps
     {
         private const int GeocodeApiMaxAttempts = 3;
 
-        private readonly GoogleMapsLatLngCache latLngCache = new();
+        private readonly GoogleMapsLatLngCache latLngCache;
+
+        public GoogleMapsApi(IDatabase database)
+        {
+            ArgumentNullException.ThrowIfNull(database);
+            latLngCache = new GoogleMapsLatLngCache(new AddressLatLng(database));
+        }
 
         private static readonly HttpClient httpClient = new()
         {

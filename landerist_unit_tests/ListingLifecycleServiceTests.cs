@@ -1,4 +1,4 @@
-using landerist_library.Application.Listings;
+﻿using landerist_library.Application.Listings;
 using landerist_library.Application.Logging;
 using landerist_library.Pages;
 using landerist_library.Websites;
@@ -171,6 +171,8 @@ public sealed class ListingLifecycleServiceTests
         public int InsertCalls { get; private set; }
 
         public Page? LastPage { get; private set; }
+
+        public bool Contains(Page page) => false;
 
         public bool Insert(Page page)
         {

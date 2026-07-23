@@ -1,4 +1,3 @@
-using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_orels.ES;
 
@@ -6,20 +5,6 @@ namespace landerist_library.Pages;
 
 public partial class Pages
 {
-    public static bool IsNotListingCache(Page page)
-    {
-        ArgumentNullException.ThrowIfNull(page);
-        return Config.NOT_LISTING_CACHE_ENABLED &&
-            !string.IsNullOrEmpty(page.ListingParserInputHash) &&
-            NotListingsCache.IsNotListing(page.Host, page.ListingParserInputHash);
-    }
-
-    public static bool InsertToNotListingCache(Page page)
-    {
-        ArgumentNullException.ThrowIfNull(page);
-        return page.ListingParserInputHash is not null &&
-            NotListingsCache.Insert(page.Host, page.ListingParserInputHash);
-    }
 
     public static Listing? GetListing(Page page, bool loadMedia, bool loadSources)
     {

@@ -1,6 +1,7 @@
 using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Logs;
+using landerist_library.Infrastructure.Sql;
 using landerist_library.Pages;
 using landerist_library.Parse.ListingParser;
 using landerist_library.Parse.ListingParser.OpenAI.Batch;
@@ -19,6 +20,7 @@ namespace landerist_library.Tasks
 
         private static readonly object InitializeSync = new();
 
+        private readonly BatchRepository _batches;
         private readonly long _maxFileSizeInBytes;
         private readonly int _maxPagesPerBatch;
         private readonly List<Page> _pages = [];
@@ -27,8 +29,10 @@ namespace landerist_library.Tasks
 
         private static bool _firstTime = true;
 
-        public TaskBatchUpload()
+        public TaskBatchUpload(BatchRepository batches)
         {
+            ArgumentNullException.ThrowIfNull(batches);
+            _batches = batches;
             _maxFileSizeInBytes = SetMaxFileSize();
             _maxPagesPerBatch = GetMaxPagesPerBatch();
         }
@@ -143,7 +147,7 @@ namespace landerist_library.Tasks
                 return false;
             }
 
-            Batches.Insert(batchId, _waitingAIResponse);
+            _batches.Insert(batchId, _waitingAIResponse, Config.LLM_PROVIDER);
             SetWaitingAIResponse();
             SetWaitingAIRequest();
             return true;

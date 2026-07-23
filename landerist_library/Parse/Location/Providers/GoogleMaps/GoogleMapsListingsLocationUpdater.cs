@@ -6,7 +6,7 @@ namespace landerist_library.Parse.Location.Providers.GoogleMaps
 {
     public class GoogleMapsListingsLocationUpdater
     {
-        public static void UpdateListingsLocationIsAccurate()
+        public static void UpdateListingsLocationIsAccurate(IDatabase database)
         {
             var listings = ES_Listings.GetListingsLocationIsAccurateNoCadastralReference();
             if (listings == null || listings.Count == 0)
@@ -14,7 +14,7 @@ namespace landerist_library.Parse.Location.Providers.GoogleMaps
                 return;
             }
 
-            var googleMapsApi = new GoogleMapsApi();
+            var googleMapsApi = new GoogleMapsApi(database);
 
             int total = listings.Count;
             int processed = 0;

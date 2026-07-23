@@ -1,14 +1,23 @@
 ﻿using System.IO;
 using landerist_library.Configuration;
+using landerist_library.Infrastructure.Sql;
 using landerist_library.Database;
 using landerist_library.Parse.ListingParser.OpenAI.Batch;
 using landerist_library.Parse.ListingParser.VertexAI.Batch;
 
 namespace landerist_library.Tasks
 {
-    public static class TaskBatchCleaner
+    public sealed class TaskBatchCleaner
     {
-        public static void Start()
+        private readonly BatchRepository _batches;
+
+        public TaskBatchCleaner(BatchRepository batches)
+        {
+            ArgumentNullException.ThrowIfNull(batches);
+            _batches = batches;
+        }
+
+        public void Start()
         {
             DeleteDownloadedBatches();
             DeleteLocalFiles();
@@ -17,12 +26,12 @@ namespace landerist_library.Tasks
             //OpenAIBatchCleaner.RemoveFiles();
         }
 
-        private static void DeleteDownloadedBatches()
+        private void DeleteDownloadedBatches()
         {
-            var batches = Batches.SelectDownloaded();
+            var batches = _batches.Select(downloaded: true);
             foreach (var batch in batches)
             {
-                Batches.Delete(batch.Id);
+                _batches.Delete(batch.Id);
             }
         }
 

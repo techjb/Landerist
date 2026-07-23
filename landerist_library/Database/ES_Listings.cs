@@ -271,7 +271,7 @@ namespace landerist_library.Database
             return listing;
         }
 
-        private static Listing GetListingData(DataRow dataRow)
+        internal static Listing GetListingData(DataRow dataRow)
         {
             Listing listing = new()
             {

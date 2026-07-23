@@ -1,0 +1,175 @@
+using landerist_library.Application.Listings;
+using landerist_library.Database;
+using landerist_library.Infrastructure.Listings;
+using landerist_library.Infrastructure.Scraping;
+using landerist_library.Pages;
+using landerist_library.Websites;
+using landerist_orels.ES;
+using System.Data;
+
+namespace landerist_unit_tests;
+
+public sealed class SqlPersistenceAdaptersTests
+{
+    [Fact]
+    public void WebsiteThrottle_UsesInjectedDatabase()
+    {
+        RecordingDatabase database = new() { QueryBoolResult = true };
+        WebsitesThrottle throttle = new(database);
+        Website website = new(new Uri("https://example.com"));
+
+        bool blocked = throttle.IsBlocked(website);
+
+        Assert.True(blocked);
+        Assert.Equal("example.com", database.LastParameters!["Host"]);
+        Assert.Contains("BlockUntil", database.LastQuery);
+    }
+
+    [Fact]
+    public void NotListingCache_WhenEnabled_InsertsThroughInjectedDatabase()
+    {
+        RecordingDatabase database = new() { QueryResult = true };
+        SqlNotListingCacheService cache = new(database, enabled: true);
+        Page page = CreatePage();
+        page.ListingParserInputHash = "content-hash";
+
+        bool inserted = cache.Insert(page);
+
+        Assert.True(inserted);
+        Assert.Equal("example.com", database.LastParameters!["Host"]);
+        Assert.Equal("content-hash", database.LastParameters["ListingParserInputHash"]);
+    }
+
+    [Fact]
+    public void NotListingCache_WhenDisabled_DoesNotAccessDatabase()
+    {
+        RecordingDatabase database = new();
+        SqlNotListingCacheService cache = new(database, enabled: false);
+        Page page = CreatePage();
+        page.ListingParserInputHash = "content-hash";
+
+        Assert.False(cache.Insert(page));
+        Assert.Empty(database.Calls);
+    }
+
+    [Fact]
+    public void NotListingCache_Clean_RemovesExpiredEntriesThroughInjectedDatabase()
+    {
+        RecordingDatabase database = new() { QueryResult = true };
+        SqlNotListingCacheService cache = new(database, enabled: true);
+
+        bool cleaned = cache.Clean();
+
+        Assert.True(cleaned);
+        Assert.Contains("DATEADD(DAY, -30", database.LastQuery);
+        Assert.Contains("NOT_LISTINGS_CACHE", database.LastQuery);
+    }
+    [Fact]
+    public void PageSelection_MapsRowsAndCleansLocksThroughInjectedDatabase()
+    {
+        RecordingDatabase database = new();
+        AddPageRow(database.TableResult);
+        SqlPageSelectionRepository repository = new(database, "test-machine");
+
+        IReadOnlyList<Page> pages = repository.GetScrapePages(5);
+
+        Page page = Assert.Single(pages);
+        Assert.Equal("expected-hash", page.UriHash);
+        Assert.Equal(5, int.Parse(database.LastQuery.Split("SELECT TOP ")[1].Split(' ')[0]));
+
+        repository.CleanLockedPages();
+        Assert.Equal("test-machine", database.LastParameters!["LockedBy"]);
+    }
+
+    [Fact]
+    public void ScrapePageSource_LoadsExistingPageWithoutStaticFacade()
+    {
+        RecordingDatabase database = new();
+        AddPageRow(database.TableResult);
+        RecordingListingStore listings = new();
+        SqlScrapePageSource source = new(database, listings);
+
+        Page page = source.LoadOrCreate(new Uri("https://example.com/listing/1"));
+
+        Assert.Equal("expected-hash", page.UriHash);
+        Assert.Equal("example.com", page.Website.Host);
+    }
+
+    [Fact]
+    public void ScrapeMetrics_WriteGlobalAndHostCountersThroughInjectedDatabase()
+    {
+        RecordingDatabase database = new() { QueryResult = true };
+        SqlScrapeMetrics metrics = new(database);
+
+        metrics.RecordPageNotModified(CreatePage());
+
+        Assert.Equal(2, database.Calls.Count);
+        Assert.Equal("PageNotModified", database.Calls[0].Parameters!["Key"]);
+        Assert.Equal("example.com", database.Calls[1].Parameters!["Host"]);
+    }
+
+    [Fact]
+    public void PageScheduling_UsesInjectedListingStore()
+    {
+        Page page = CreatePage();
+        page.SetPageType(PageType.Listing);
+        RecordingListingStore listings = new()
+        {
+            Result = new Listing
+            {
+                guid = page.UriHash,
+                listingStatus = ListingStatus.published
+            }
+        };
+        SqlPageSchedulingService scheduling = new(listings);
+
+        scheduling.SetNextScrapeFromNow(page);
+
+        Assert.NotNull(page.NextScrape);
+        Assert.Equal(1, listings.GetCalls);
+    }
+
+    private static Page CreatePage()
+    {
+        Website website = new(new Uri("https://example.com"));
+        return new Page(website, new Uri("https://example.com/listing/1"));
+    }
+
+    private static void AddPageRow(DataTable table)
+    {
+        table.Columns.Add("MainUri", typeof(string));
+        table.Columns.Add("Host", typeof(string));
+        table.Columns.Add("LanguageCode", typeof(string));
+        table.Columns.Add("CountryCode", typeof(string));
+        table.Columns.Add("Uri", typeof(string));
+        table.Columns.Add("UriHash", typeof(string));
+        table.Columns.Add("Inserted", typeof(DateTime));
+        table.Rows.Add(
+            "https://example.com",
+            "example.com",
+            "es",
+            "ES",
+            "https://example.com/listing/1",
+            "expected-hash",
+            new DateTime(2026, 1, 1));
+    }
+
+    private sealed class RecordingListingStore : IListingStore
+    {
+        public Listing? Result { get; init; }
+        public int GetCalls { get; private set; }
+
+        public Listing? Get(Page page, bool loadMedia, bool loadSources)
+        {
+            GetCalls++;
+            return Result;
+        }
+
+        public void Upsert(
+            Page page,
+            Listing listing,
+            ListingUnpublishDecision? unpublishDecision = null)
+        {
+        }
+    }
+}

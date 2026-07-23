@@ -1,4 +1,4 @@
-using landerist_library.Database;
+﻿using landerist_library.Database;
 using landerist_library.Websites;
 
 namespace landerist_library.Parse.Location.Providers.GoogleMaps
@@ -9,6 +9,14 @@ namespace landerist_library.Parse.Location.Providers.GoogleMaps
 
         private static readonly object[] addressLookupLocks =
             [.. Enumerable.Range(0, AddressLookupLockCount).Select(_ => new object())];
+
+        private readonly AddressLatLng _cache;
+
+        public GoogleMapsLatLngCache(AddressLatLng cache)
+        {
+            ArgumentNullException.ThrowIfNull(cache);
+            _cache = cache;
+        }
 
         public GoogleMapsLatLngLookupResult GetOrAdd(
             string address,
@@ -26,7 +34,7 @@ namespace landerist_library.Parse.Location.Providers.GoogleMaps
 
             lock (addressLookupLock)
             {
-                if (AddressLatLng.Select(normalizedAddress, region) is (double lat, double lng, bool isAccurate))
+                if (_cache.Select(normalizedAddress, region) is (double lat, double lng, bool isAccurate))
                 {
                     return new GoogleMapsLatLngLookupResult(
                         GoogleMapsLatLngLookupStatus.Found,
@@ -36,7 +44,7 @@ namespace landerist_library.Parse.Location.Providers.GoogleMaps
                 var result = lookup(normalizedAddress, region, countryCode);
                 if (result.Status == GoogleMapsLatLngLookupStatus.Found && result.Coordinates.HasValue)
                 {
-                    AddressLatLng.Insert(
+                    _cache.Insert(
                         normalizedAddress,
                         region,
                         result.Coordinates.Value.Latitude,
