@@ -31,15 +31,14 @@ namespace landerist_tests
         {
             Console.Title = "Landerist Tests";
             Config.SetToTest();
-            ConfigureApplicationServices();
-            Scraper = new Scraper();
+            Scraper = ConfigureApplicationServices();
             Start();
             Run();
             //ExitSignal.Wait();
             End();
         }
 
-        private static void ConfigureApplicationServices()
+        private static Scraper ConfigureApplicationServices()
         {
             LegacyApplicationLogger logger = new();
             ListingLifecycleService listingLifecycle = new(
@@ -74,14 +73,20 @@ namespace landerist_tests
                     Config.IsConfigurationProduction(),
                     Config.IsConfigurationLocal(),
                     Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER));
+            PagePersistenceService pagePersistence = new(new PageRepository(new DataBase()));
+            WebsitePersistenceService websitePersistence = new(new WebsiteRepository(new DataBase()));
+
             LanderistApplication.Configure(new LanderistApplicationServices(
-                new PagePersistenceService(new PageRepository(new DataBase())),
-                new WebsitePersistenceService(new WebsiteRepository(new DataBase())),
+                pagePersistence,
+                websitePersistence));
+
+            return new Scraper(
+                pagePersistence,
                 logger,
                 listingLifecycle,
                 pageScraping,
                 pageBatchSelector,
-                batchScraping));
+                batchScraping);
         }
 
         private static void Start()

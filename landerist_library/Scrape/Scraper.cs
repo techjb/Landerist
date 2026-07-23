@@ -1,4 +1,3 @@
-using landerist_library.Application;
 using landerist_library.Application.Listings;
 using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
@@ -28,86 +27,6 @@ namespace landerist_library.Scrape
         private readonly ScraperLog _scraperLog;
         private CancellationTokenSource _cancellation = new();
         private List<Page> _pageQueue = [];
-
-        public Scraper()
-            : this(
-                LanderistApplication.Services.PagePersistence,
-                LanderistApplication.Services.Logger,
-                LanderistApplication.Services.ListingLifecycle,
-                LanderistApplication.Services.PageScraping,
-                LanderistApplication.Services.PageBatchSelector,
-                LanderistApplication.Services.BatchScraping)
-        {
-        }
-
-        public Scraper(IPagePersistenceService pagePersistence)
-            : this(
-                pagePersistence,
-                LanderistApplication.Services.Logger,
-                LanderistApplication.Services.ListingLifecycle,
-                LanderistApplication.Services.PageScraping,
-                LanderistApplication.Services.PageBatchSelector,
-                LanderistApplication.Services.BatchScraping)
-        {
-        }
-
-        public Scraper(
-            IPagePersistenceService pagePersistence,
-            IApplicationLogger logger)
-            : this(
-                pagePersistence,
-                logger,
-                LanderistApplication.Services.ListingLifecycle,
-                LanderistApplication.Services.PageScraping,
-                LanderistApplication.Services.PageBatchSelector,
-                LanderistApplication.Services.BatchScraping)
-        {
-        }
-
-        public Scraper(
-            IPagePersistenceService pagePersistence,
-            IApplicationLogger logger,
-            IListingLifecycleService listingLifecycle)
-            : this(
-                pagePersistence,
-                logger,
-                listingLifecycle,
-                LanderistApplication.Services.PageScraping,
-                LanderistApplication.Services.PageBatchSelector,
-                LanderistApplication.Services.BatchScraping)
-        {
-        }
-
-        public Scraper(
-            IPagePersistenceService pagePersistence,
-            IApplicationLogger logger,
-            IListingLifecycleService listingLifecycle,
-            PageScrapePipelineServices pageScraping)
-            : this(
-                pagePersistence,
-                logger,
-                listingLifecycle,
-                pageScraping,
-                LanderistApplication.Services.PageBatchSelector,
-                LanderistApplication.Services.BatchScraping)
-        {
-        }
-
-        public Scraper(
-            IPagePersistenceService pagePersistence,
-            IApplicationLogger logger,
-            IListingLifecycleService listingLifecycle,
-            PageScrapePipelineServices pageScraping,
-            IPageBatchSelector pageBatchSelector)
-            : this(
-                pagePersistence,
-                logger,
-                listingLifecycle,
-                pageScraping,
-                pageBatchSelector,
-                LanderistApplication.Services.BatchScraping)
-        {
-        }
 
         public Scraper(
             IPagePersistenceService pagePersistence,

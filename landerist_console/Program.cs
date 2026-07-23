@@ -74,15 +74,13 @@ namespace landerist_console
                     Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER));
             PagePersistenceService pagePersistence = new(new PageRepository(new DataBase()));
             WebsitePersistenceService websitePersistence = new(new WebsiteRepository(new DataBase()));
+            ParsedPageClassificationService parsedClassification = new(
+                pagePersistence,
+                listingLifecycle);
 
             LanderistApplication.Configure(new LanderistApplicationServices(
                 pagePersistence,
-                websitePersistence,
-                logger,
-                listingLifecycle,
-                pageScraping,
-                pageBatchSelector,
-                batchScraping));
+                websitePersistence));
 
             Scraper scraper = new(
                 pagePersistence,
@@ -103,9 +101,9 @@ namespace landerist_console
                 new SystemRecurringTaskScheduler(),
                 logger,
                 new LegacyScrapeTaskJob(scraper, batchScraping.Resources),
-                new LegacyLocalAiTaskJob(() => new TaskLocalAIParsing()),
+                new LegacyLocalAiTaskJob(() => new TaskLocalAIParsing(parsedClassification)),
                 new LegacyTenMinuteTaskJob(
-                    new TaskBatchDownload(),
+                    new TaskBatchDownload(parsedClassification),
                     new TaskBatchUpload()),
                 new LegacyHourlyTaskJob(),
                 new LegacyDailyTaskJob(),

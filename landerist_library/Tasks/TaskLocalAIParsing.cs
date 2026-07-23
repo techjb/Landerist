@@ -1,8 +1,8 @@
 using landerist_library.Configuration;
+using landerist_library.Application.Scraping;
 using landerist_library.Logs;
 using landerist_library.Pages;
 using landerist_library.Parse.ListingParser;
-using landerist_library.Scrape;
 using landerist_library.Statistics;
 using System.Collections.Concurrent;
 
@@ -14,6 +14,7 @@ namespace landerist_library.Tasks
         private const int MAX_NUM_SEQS = 4; // same as un vllm        
         private const int COMPLETION_TOKENS = 7000;  // structured output and completion tokens aproximately
         private readonly int MAX_TOKEN_COUNT;
+        private readonly IParsedPageClassificationService _parsedClassification;
 
         private int TotalProcessed = 0;
         private int TotalErrors = 0;
@@ -25,8 +26,10 @@ namespace landerist_library.Tasks
         private const int MAX_SIZE_BLOCKINGCOLLECTION = MAX_PAGES_PER_TASK * 10; 
 
 
-        public TaskLocalAIParsing()
+        public TaskLocalAIParsing(IParsedPageClassificationService parsedClassification)
         {
+            ArgumentNullException.ThrowIfNull(parsedClassification);
+            _parsedClassification = parsedClassification;
             Config.SetLLMProviderLocalAI();
             Config.EnableLogsErrorsInConsole();
             if (Config.IsConfigurationProduction())
@@ -203,7 +206,7 @@ namespace landerist_library.Tasks
             }
         }
 
-        public static void ProcessPage(string uriHash)
+        public void ProcessPage(string uriHash)
         {
             var page = Pages.Pages.GetPage(uriHash);
             if (page == null)
@@ -214,7 +217,7 @@ namespace landerist_library.Tasks
             ProcessPage(page);
         }
 
-        private static (bool Success, PageType? PageType) ProcessPage(Page page)
+        private (bool Success, PageType? PageType) ProcessPage(Page page)
         {
             bool success = false;
             PageType? newPageType = null;
@@ -232,7 +235,7 @@ namespace landerist_library.Tasks
                 {
                     var (pageType, listing, waitingAIRequest) = ParseListing.ParseLocalAI(page, userInput);
                     newPageType = pageType;
-                    success = new PageScraper(page).ApplyParsedClassificationAfterParsing(pageType, listing);
+                    success = _parsedClassification.Apply(page, pageType, listing);
                 }
             }
             catch (Exception exception)

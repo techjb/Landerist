@@ -1,17 +1,25 @@
 using landerist_library.Configuration;
+using landerist_library.Application.Scraping;
 using landerist_library.Database;
 using landerist_library.Logs;
 using landerist_library.Pages;
 using landerist_library.Parse.ListingParser;
 using landerist_library.Parse.ListingParser.OpenAI.Batch;
 using landerist_library.Parse.ListingParser.VertexAI.Batch;
-using landerist_library.Scrape;
 using landerist_library.Statistics;
 
 namespace landerist_library.Tasks
 {
     public class TaskBatchDownload
     {
+        private readonly IParsedPageClassificationService _parsedClassification;
+
+        public TaskBatchDownload(IParsedPageClassificationService parsedClassification)
+        {
+            ArgumentNullException.ThrowIfNull(parsedClassification);
+            _parsedClassification = parsedClassification;
+        }
+
         public readonly HashSet<string> DownloadedPagesUriHashes = [];
 
         public void Start()
@@ -163,7 +171,7 @@ namespace landerist_library.Tasks
             var text = result.Value.text;
 
             var (newPageType, listing) = ParseListing.ParseResponse(page, text);
-            bool success = new PageScraper(page).ApplyParsedClassificationAfterParsing(newPageType, listing);
+            bool success = _parsedClassification.Apply(page, newPageType, listing);
 
             if (success)
             {

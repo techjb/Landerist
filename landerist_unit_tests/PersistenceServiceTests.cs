@@ -1,8 +1,5 @@
 using landerist_library.Application;
-using landerist_library.Application.Listings;
-using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
-using landerist_library.Application.Scraping;
 using landerist_library.Pages;
 using landerist_library.Websites;
 
@@ -43,12 +40,7 @@ public sealed class PersistenceServiceTests
         FakeWebsiteRepository websiteRepository = new();
         LanderistApplication.Configure(new LanderistApplicationServices(
             new PagePersistenceService(pageRepository),
-            new WebsitePersistenceService(websiteRepository),
-            new NullApplicationLogger(),
-            new NullListingLifecycleService(),
-            CreateNullPageScraping(),
-            new NullPageBatchSelector(),
-            ScrapeBatchTestFactory.Create()));
+            new WebsitePersistenceService(websiteRepository)));
         Page page = new(
             new Website(new Uri("https://example.com")),
             new Uri("https://example.com/listing/2"));
@@ -81,62 +73,4 @@ public sealed class PersistenceServiceTests
         public bool Delete(string host) => true;
     }
 
-    private sealed class NullApplicationLogger : IApplicationLogger
-    {
-        public void WriteError(string source, string message)
-        {
-        }
-
-        public void WriteInfo(string source, string message)
-        {
-        }
-    }
-
-    private sealed class NullListingLifecycleService : IListingLifecycleService
-    {
-        public void Apply(Page page, landerist_orels.ES.Listing? listing)
-        {
-        }
-    }
-
-    private static PageScrapePipelineServices CreateNullPageScraping() =>
-        new(
-            new NullPageAcquisitionService(),
-            new NullPageContentClassifier(),
-            new NullPageIndexingService(),
-            new NullPageSchedulingService());
-
-    private sealed class NullPageAcquisitionService : IPageAcquisitionService
-    {
-        public PageAcquisitionStatus Acquire(Page page, bool useProxy) =>
-            PageAcquisitionStatus.DownloadFailed;
-    }
-
-    private sealed class NullPageContentClassifier : IPageContentClassifier
-    {
-        public PageClassificationResult Classify(Page page) =>
-            new(null, null, false);
-    }
-
-    private sealed class NullPageIndexingService : IPageIndexingService
-    {
-        public void Index(Page page)
-        {
-        }
-    }
-
-    private sealed class NullPageSchedulingService : IPageSchedulingService
-    {
-        public void SetNextScrape(Page page)
-        {
-        }
-
-        public void SetNextScrapeFromNow(Page page)
-        {
-        }
-    }
-    private sealed class NullPageBatchSelector : IPageBatchSelector
-    {
-        public IReadOnlyList<Page> Select() => [];
-    }
 }

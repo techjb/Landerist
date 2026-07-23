@@ -15,6 +15,7 @@ namespace landerist_library.Scrape
         private readonly IApplicationLogger _logger;
         private readonly IListingLifecycleService _listingLifecycle;
         private readonly IPageSchedulingService _scheduling;
+        private readonly IParsedPageClassificationService _parsedClassification;
 
         public PageClassificationService(
             Page page,
@@ -34,6 +35,9 @@ namespace landerist_library.Scrape
             _logger = logger;
             _listingLifecycle = listingLifecycle;
             _scheduling = scheduling;
+            _parsedClassification = new ParsedPageClassificationService(
+                pagePersistence,
+                listingLifecycle);
         }
 
         public bool TryApplyPreClassificationBeforeDownload()
@@ -83,19 +87,8 @@ namespace landerist_library.Scrape
             return _pagePersistence.Update(page);
         }
 
-        public bool ApplyParsedClassificationAfterParsing(PageType newPageType, Listing? listing)
-        {
-            if (newPageType.Equals(PageType.MayBeListing))
-            {
-                return false;
-            }
-
-            page.RemoveWaitingStatus();
-            page.SetResponseBodyFromZipped();
-            UpdatePageTypeAndListing(newPageType, listing);
-            page.RemoveResponseBodyZipped();
-            return _pagePersistence.Update(page);
-        }
+        public bool ApplyParsedClassificationAfterParsing(PageType newPageType, Listing? listing) =>
+            _parsedClassification.Apply(page, newPageType, listing);
 
         private void UpdatePageTypeAndListing(PageType? newPageType, Listing? newListing)
         {

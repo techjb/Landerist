@@ -1,55 +1,26 @@
-using landerist_library.Application.Listings;
-using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
-using landerist_library.Application.Scraping;
 
 namespace landerist_library.Application;
 
 /// <summary>
-/// Application services used by the legacy static facades.
-/// New code should receive these services through constructor injection.
+/// Persistence services used only by the legacy Pages and Websites facades.
+/// New code should receive persistence services through constructor injection.
 /// </summary>
 public sealed class LanderistApplicationServices
 {
     public LanderistApplicationServices(
         IPagePersistenceService pagePersistence,
-        IWebsitePersistenceService websitePersistence,
-        IApplicationLogger logger,
-        IListingLifecycleService listingLifecycle,
-        PageScrapePipelineServices pageScraping,
-        IPageBatchSelector pageBatchSelector,
-        ScrapeBatchServices batchScraping)
+        IWebsitePersistenceService websitePersistence)
     {
         ArgumentNullException.ThrowIfNull(pagePersistence);
         ArgumentNullException.ThrowIfNull(websitePersistence);
-        ArgumentNullException.ThrowIfNull(listingLifecycle);
-        ArgumentNullException.ThrowIfNull(logger);
-        ArgumentNullException.ThrowIfNull(pageScraping);
-        ArgumentNullException.ThrowIfNull(pageBatchSelector);
-        ArgumentNullException.ThrowIfNull(batchScraping);
-
         PagePersistence = pagePersistence;
         WebsitePersistence = websitePersistence;
-        ListingLifecycle = listingLifecycle;
-        Logger = logger;
-        PageScraping = pageScraping;
-        PageBatchSelector = pageBatchSelector;
-        BatchScraping = batchScraping;
     }
 
     public IPagePersistenceService PagePersistence { get; }
 
     public IWebsitePersistenceService WebsitePersistence { get; }
-
-    public IApplicationLogger Logger { get; }
-
-    public IListingLifecycleService ListingLifecycle { get; }
-
-    public PageScrapePipelineServices PageScraping { get; }
-
-    public IPageBatchSelector PageBatchSelector { get; }
-
-    public ScrapeBatchServices BatchScraping { get; }
 }
 
 /// <summary>

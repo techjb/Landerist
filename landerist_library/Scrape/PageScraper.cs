@@ -1,6 +1,4 @@
-﻿using landerist_library.Configuration;
-using landerist_library.Application;
-using landerist_library.Application.Listings;
+﻿using landerist_library.Application.Listings;
 using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Scraping;
@@ -15,55 +13,6 @@ namespace landerist_library.Scrape
         private readonly PageClassificationService _classificationService;
         private readonly PageScrapePipelineServices _pipeline;
         private readonly bool _useProxy;
-
-        public PageScraper(Page page)
-            : this(
-                page,
-                LanderistApplication.Services.PagePersistence,
-                LanderistApplication.Services.Logger,
-                LanderistApplication.Services.ListingLifecycle,
-                LanderistApplication.Services.PageScraping)
-        {
-        }
-
-        public PageScraper(
-            Page page,
-            IPagePersistenceService pagePersistence)
-            : this(
-                page,
-                pagePersistence,
-                LanderistApplication.Services.Logger,
-                LanderistApplication.Services.ListingLifecycle,
-                LanderistApplication.Services.PageScraping)
-        {
-        }
-
-        public PageScraper(
-            Page page,
-            IPagePersistenceService pagePersistence,
-            IApplicationLogger logger)
-            : this(
-                page,
-                pagePersistence,
-                logger,
-                LanderistApplication.Services.ListingLifecycle,
-                LanderistApplication.Services.PageScraping)
-        {
-        }
-
-        public PageScraper(
-            Page page,
-            IPagePersistenceService pagePersistence,
-            IApplicationLogger logger,
-            IListingLifecycleService listingLifecycle)
-            : this(
-                page,
-                pagePersistence,
-                logger,
-                listingLifecycle,
-                LanderistApplication.Services.PageScraping)
-        {
-        }
 
         public PageScraper(
             Page page,
@@ -87,62 +36,6 @@ namespace landerist_library.Scrape
                 pipeline.Scheduling);
             _pipeline = pipeline;
             _useProxy = page.Website.UseProxy;
-        }
-
-        public PageScraper(Page page, bool useProxy)
-            : this(
-                page,
-                useProxy,
-                LanderistApplication.Services.PagePersistence,
-                LanderistApplication.Services.Logger,
-                LanderistApplication.Services.ListingLifecycle,
-                LanderistApplication.Services.PageScraping)
-        {
-        }
-
-        public PageScraper(
-            Page page,
-            bool useProxy,
-            IPagePersistenceService pagePersistence)
-            : this(
-                page,
-                useProxy,
-                pagePersistence,
-                LanderistApplication.Services.Logger,
-                LanderistApplication.Services.ListingLifecycle,
-                LanderistApplication.Services.PageScraping)
-        {
-        }
-
-        public PageScraper(
-            Page page,
-            bool useProxy,
-            IPagePersistenceService pagePersistence,
-            IApplicationLogger logger)
-            : this(
-                page,
-                useProxy,
-                pagePersistence,
-                logger,
-                LanderistApplication.Services.ListingLifecycle,
-                LanderistApplication.Services.PageScraping)
-        {
-        }
-
-        public PageScraper(
-            Page page,
-            bool useProxy,
-            IPagePersistenceService pagePersistence,
-            IApplicationLogger logger,
-            IListingLifecycleService listingLifecycle)
-            : this(
-                page,
-                useProxy,
-                pagePersistence,
-                logger,
-                listingLifecycle,
-                LanderistApplication.Services.PageScraping)
-        {
         }
 
         public PageScraper(
