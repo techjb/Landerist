@@ -1,21 +1,29 @@
 using landerist_library.Configuration;
 using landerist_library.Export;
 using landerist_library.Logs;
+using landerist_library.Infrastructure.WebsiteServices;
 using System.Globalization;
 using System.Net;
 using System.Text;
 
 namespace landerist_library.Landerist_com
 {
-    public class HostsStatisticsPage : Landerist_com
+    public sealed class HostsStatisticsPage : Landerist_com
     {
-        private static readonly string HostsStatisticsTemplateHtmlFile =
+        private readonly WebsiteMetricsService _websiteMetrics;
+
+        public HostsStatisticsPage(WebsiteMetricsService websiteMetrics)
+        {
+            ArgumentNullException.ThrowIfNull(websiteMetrics);
+            _websiteMetrics = websiteMetrics;
+        }
+        private readonly string HostsStatisticsTemplateHtmlFile =
             Path.Combine(Config.LANDERIST_COM_TEMPLATES!, "hosts-statistics", "hosts_statistics_template.html");
 
-        private static readonly string HostsStatisticsHtmlFile =
+        private readonly string HostsStatisticsHtmlFile =
             Path.Combine(Config.LANDERIST_COM_OUTPUT!, "hosts_statistics.html");
 
-        private static readonly CultureInfo SummaryCulture = CultureInfo.GetCultureInfo("es-ES");
+        private readonly CultureInfo SummaryCulture = CultureInfo.GetCultureInfo("es-ES");
 
         private const int RecentListingsDays = 7;
         private const int RecentScrapedPagesDays = 3;
@@ -24,7 +32,7 @@ namespace landerist_library.Landerist_com
         private const int StaleWebsiteDateAlertDays = 3;
         private const decimal LowScrapedPagesAlertThreshold = 0.01m;
 
-        public static void Update()
+        public void Update()
         {
             try
             {
@@ -49,7 +57,7 @@ namespace landerist_library.Landerist_com
             }
         }
 
-        private static string GetHostsStatisticsRows(IEnumerable<Websites.Website> websites)
+        private string GetHostsStatisticsRows(IEnumerable<Websites.Website> websites)
         {
             StringBuilder rows = new();
 
@@ -61,16 +69,16 @@ namespace landerist_library.Landerist_com
             return rows.ToString();
         }
 
-        private static string GetHostsStatisticsRow(Websites.Website website)
+        private string GetHostsStatisticsRow(Websites.Website website)
         {
-            int totalPages = global::landerist_library.Websites.Websites.GetNumPages(website);
-            int recentScrapedPages = global::landerist_library.Websites.Websites.GetNumPagesScrapedSince(website, DateTime.Now.AddDays(-RecentScrapedPagesDays));
-            int recentInsertedPages = global::landerist_library.Websites.Websites.GetNumPagesInsertedSince(website, DateTime.Now.AddDays(-RecentInsertedPagesDays));
-            int recentParseListingPages = global::landerist_library.Websites.Websites.GetNumPagesParseListingSince(website, DateTime.Now.AddDays(-RecentParseListingPagesDays));
-            int totalListings = global::landerist_library.Websites.Websites.GetNumListings(website);
-            int recentListings = global::landerist_library.Websites.Websites.GetNumListingsSinceListingDate(website, DateTime.Now.AddDays(-RecentListingsDays));
-            int publishedListings = global::landerist_library.Websites.Websites.GetNumPublishedListings(website);
-            int unpublishedListings = global::landerist_library.Websites.Websites.GetNumUnpublishedListings(website);
+            int totalPages = _websiteMetrics.CountPages(website);
+            int recentScrapedPages = _websiteMetrics.CountPagesScrapedSince(website, DateTime.Now.AddDays(-RecentScrapedPagesDays));
+            int recentInsertedPages = _websiteMetrics.CountPagesInsertedSince(website, DateTime.Now.AddDays(-RecentInsertedPagesDays));
+            int recentParseListingPages = _websiteMetrics.CountPagesParsedSince(website, DateTime.Now.AddDays(-RecentParseListingPagesDays));
+            int totalListings = _websiteMetrics.CountListings(website);
+            int recentListings = _websiteMetrics.CountListingsSince(website, DateTime.Now.AddDays(-RecentListingsDays));
+            int publishedListings = _websiteMetrics.CountPublishedListings(website);
+            int unpublishedListings = _websiteMetrics.CountUnpublishedListings(website);
 
             return
                 "                        <tr>" + Environment.NewLine +
@@ -88,7 +96,7 @@ namespace landerist_library.Landerist_com
                 "                        </tr>";
         }
 
-        private static string FormatTableCell(string html, string sortValue, bool alert = false, string? title = null)
+        private string FormatTableCell(string html, string sortValue, bool alert = false, string? title = null)
         {
             if (alert)
             {
@@ -102,37 +110,37 @@ namespace landerist_library.Landerist_com
             return $"<td data-sort=\"{WebUtility.HtmlEncode(sortValue)}\"{titleAttribute}>{html}</td>";
         }
 
-        private static bool IsStaleWebsiteDate(DateTime? dateTime)
+        private bool IsStaleWebsiteDate(DateTime? dateTime)
         {
             return dateTime < DateTime.Now.AddDays(-StaleWebsiteDateAlertDays);
         }
 
-        private static bool IsLowScrapedPagesPercentage(int value, int total)
+        private bool IsLowScrapedPagesPercentage(int value, int total)
         {
             return total > 0 && (decimal)value / total <= LowScrapedPagesAlertThreshold;
         }
 
-        private static bool IsFullPercentage(int value, int total)
+        private bool IsFullPercentage(int value, int total)
         {
             return total > 0 && value >= total;
         }
 
-        private static bool IsZeroOrFullPercentage(int value, int total)
+        private bool IsZeroOrFullPercentage(int value, int total)
         {
             return total > 0 && (value == 0 || value >= total);
         }
 
-        private static string FormatDateSortValue(DateTime? dateTime)
+        private string FormatDateSortValue(DateTime? dateTime)
         {
             return dateTime?.ToString("yyyyMMdd", CultureInfo.InvariantCulture) ?? "0";
         }
 
-        private static string FormatNumberSortValue(int value)
+        private string FormatNumberSortValue(int value)
         {
             return value.ToString(CultureInfo.InvariantCulture);
         }
 
-        private static string FormatPercentageSortValue(int value, int total)
+        private string FormatPercentageSortValue(int value, int total)
         {
             if (total <= 0)
             {
@@ -142,28 +150,28 @@ namespace landerist_library.Landerist_com
             return ((decimal)value / total).ToString(CultureInfo.InvariantCulture);
         }
 
-        private static string FormatPercentageTitle(int value, int total)
+        private string FormatPercentageTitle(int value, int total)
         {
             return $"{FormatNumber(value)} / {FormatNumber(total)}";
         }
 
-        private static string FormatHostLink(string host)
+        private string FormatHostLink(string host)
         {
             string href = "/host-statistics/#" + Uri.EscapeDataString(host);
             return $"<a href=\"{WebUtility.HtmlEncode(href)}\">{WebUtility.HtmlEncode(host)}</a>";
         }
 
-        private static string FormatWebsiteDate(DateTime? dateTime)
+        private string FormatWebsiteDate(DateTime? dateTime)
         {
             return dateTime?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? string.Empty;
         }
 
-        private static string FormatNumber(int value)
+        private string FormatNumber(int value)
         {
             return value.ToString("N0", SummaryCulture);
         }
 
-        private static string FormatPercentage(int value, int total)
+        private string FormatPercentage(int value, int total)
         {
             if (total <= 0)
             {

@@ -1,4 +1,5 @@
 using landerist_library.Configuration;
+using landerist_library.Application.Pages;
 using landerist_library.Application.Scraping;
 using landerist_library.Logs;
 using landerist_library.Pages;
@@ -17,6 +18,7 @@ namespace landerist_library.Tasks
         private readonly IParsedPageClassificationService _parsedClassification;
         private readonly GlobalStatistics _globalStatistics;
         private readonly HostStatistics _hostStatistics;
+        private readonly IPageWaitingStatusService _waitingStatus;
 
         private int TotalProcessed = 0;
         private int TotalErrors = 0;
@@ -31,19 +33,22 @@ namespace landerist_library.Tasks
         public TaskLocalAIParsing(
             IParsedPageClassificationService parsedClassification,
             GlobalStatistics globalStatistics,
-            HostStatistics hostStatistics)
+            HostStatistics hostStatistics,
+            IPageWaitingStatusService waitingStatus)
         {
             ArgumentNullException.ThrowIfNull(parsedClassification);
             ArgumentNullException.ThrowIfNull(globalStatistics);
             ArgumentNullException.ThrowIfNull(hostStatistics);
+            ArgumentNullException.ThrowIfNull(waitingStatus);
             _parsedClassification = parsedClassification;
             _globalStatistics = globalStatistics;
             _hostStatistics = hostStatistics;
+            _waitingStatus = waitingStatus;
             Config.SetLLMProviderLocalAI();
             Config.EnableLogsErrorsInConsole();
             if (Config.IsConfigurationProduction())
             {
-                Pages.Pages.UpdateWaitingStatus(WaitingStatus.readed_by_localai, WaitingStatus.waiting_ai_request);
+                _waitingStatus.Update(WaitingStatus.readed_by_localai, WaitingStatus.waiting_ai_request);
             }
             MAX_TOKEN_COUNT = GetMaxTokenCount();
             Log.Console("TaskLocalAIParsing", "Started");
@@ -182,7 +187,7 @@ namespace landerist_library.Tasks
                 return true;
             }
 
-            var pages = Pages.Pages.SelectWaitingStatusAIRequest(MAX_PAGES_PER_TASK, WaitingStatus.readed_by_localai, MAX_TOKEN_COUNT, true);
+            var pages = _waitingStatus.SelectAIRequest(MAX_PAGES_PER_TASK, WaitingStatus.readed_by_localai, MAX_TOKEN_COUNT, true);
             if (pages.Count == 0)
             {
                 return false;
@@ -257,7 +262,7 @@ namespace landerist_library.Tasks
                 {
                     if (!success)
                     {
-                        Pages.Pages.UpdateWaitingStatusAIRequest(page.UriHash);
+                        _waitingStatus.UpdateAIRequest(page.UriHash);
                     }
                 }
                 catch (Exception exception)

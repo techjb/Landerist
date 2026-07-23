@@ -5,22 +5,30 @@ using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Export;
 using landerist_library.Logs;
+using landerist_library.Infrastructure.WebsiteServices;
 using landerist_library.Websites;
 using landerist_orels.ES;
 
 namespace landerist_library.Landerist_com
 {
-    public class DownloadsPage : Landerist_com
+    public sealed class DownloadsPage : Landerist_com
     {
-        private static readonly string DownloadsTemplateHtmlFile =
+        private readonly WebsiteMetricsService _websiteMetrics;
+
+        public DownloadsPage(WebsiteMetricsService websiteMetrics)
+        {
+            ArgumentNullException.ThrowIfNull(websiteMetrics);
+            _websiteMetrics = websiteMetrics;
+        }
+        private readonly string DownloadsTemplateHtmlFile =
             Path.Combine(Config.LANDERIST_COM_TEMPLATES!, "downloads", "downloads_template.html");
 
-        private static readonly string DownloadsIndexHtmlFile =
+        private readonly string DownloadsIndexHtmlFile =
             Path.Combine(Config.LANDERIST_COM_TEMPLATES!, "downloads", "index.html");
 
-        private static string DownloadsTemplate = string.Empty;
+        private string DownloadsTemplate = string.Empty;
 
-        public static void Update()
+        public void Update()
         {
             try
             {
@@ -57,18 +65,18 @@ namespace landerist_library.Landerist_com
             }
         }
 
-        private static void UpdateCountryName(Country country)
+        private void UpdateCountryName(Country country)
         {
             Replace("/*COUNTRY_NAME*/", WebUtility.HtmlEncode(country.CountryName));
         }
 
-        private static void UpdateUpdatedAt()
+        private void UpdateUpdatedAt()
         {
             string updatedAtText = DateTime.Now.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
             Replace("/*UPDATED_AT*/", updatedAtText);
         }
 
-        private static ExportType[] GetDownloadsExportTypes()
+        private ExportType[] GetDownloadsExportTypes()
         {
             return
             [
@@ -79,7 +87,7 @@ namespace landerist_library.Landerist_com
             ];
         }
 
-        private static void UpdateDownloadsTemplate(CountryCode countryCode, ExportType exportType)
+        private void UpdateDownloadsTemplate(CountryCode countryCode, ExportType exportType)
         {
             var s3 = new S3();
             string objectKey = GetObjectKey(countryCode, exportType, "json");
@@ -105,17 +113,17 @@ namespace landerist_library.Landerist_com
             Replace(Comment(countryCode, exportType, "Counter"), counterHyperlink);
         }
 
-        private static void UpdateHostsTemplate(CountryCode countryCode)
+        private void UpdateHostsTemplate(CountryCode countryCode)
         {
             Replace("/*HOSTS*/", GetHostsTableRows(countryCode));
         }
 
-        private static void UpdateListingsByOperationPropertyTypeTemplate(CountryCode countryCode)
+        private void UpdateListingsByOperationPropertyTypeTemplate(CountryCode countryCode)
         {
             Replace("/*LISTINGS_BY_OPERATION_PROPERTY_TYPE*/", GetListingsByOperationPropertyTypeTableRows(countryCode));
         }
 
-        private static string GetListingsByOperationPropertyTypeTableRows(CountryCode countryCode)
+        private string GetListingsByOperationPropertyTypeTableRows(CountryCode countryCode)
         {
             StringBuilder rows = new();
 
@@ -123,12 +131,12 @@ namespace landerist_library.Landerist_com
             {
                 foreach (PropertyType propertyType in Enum.GetValues<PropertyType>())
                 {
-                    int publishedListingsCount = ES_Listings.Count(
+                    int publishedListingsCount = _websiteMetrics.CountListings(
                         ListingStatus.published,
                         operation,
                         propertyType);
 
-                    int unpublishedListingsCount = ES_Listings.Count(
+                    int unpublishedListingsCount = _websiteMetrics.CountListings(
                         ListingStatus.unpublished,
                         operation,
                         propertyType);
@@ -145,7 +153,7 @@ namespace landerist_library.Landerist_com
             return rows.ToString();
         }
 
-        private static string GetListingsByOperationPropertyTypeTableRow(
+        private string GetListingsByOperationPropertyTypeTableRow(
             CountryCode countryCode,
             Operation operation,
             PropertyType propertyType,
@@ -162,7 +170,7 @@ namespace landerist_library.Landerist_com
                 "                </tr>";
         }
 
-        private static string GetListingsByOperationPropertyTypeDownloadCellText(
+        private string GetListingsByOperationPropertyTypeDownloadCellText(
             CountryCode countryCode,
             Operation operation,
             PropertyType propertyType,
@@ -185,7 +193,7 @@ namespace landerist_library.Landerist_com
             return $"<a title=\"Download\" href=\"{WebUtility.HtmlEncode(url)}\" download=\"{WebUtility.HtmlEncode(fileName)}\">{counterText}</a>";
         }
 
-        private static string? GetListingsByOperationPropertyTypeDownloadUrl(
+        private string? GetListingsByOperationPropertyTypeDownloadUrl(
             CountryCode countryCode,
             Operation operation,
             PropertyType propertyType,
@@ -202,7 +210,7 @@ namespace landerist_library.Landerist_com
             return $"https://{AppConfig.AWS_S3_DOWNLOADS_BUCKET}.s3.amazonaws.com/{objectKey}";
         }
 
-        private static string GetListingsByOperationPropertyTypeObjectKey(
+        private string GetListingsByOperationPropertyTypeObjectKey(
             CountryCode countryCode,
             Operation operation,
             PropertyType propertyType,
@@ -212,7 +220,7 @@ namespace landerist_library.Landerist_com
             return $"{countryCode}/OperationPropertyTypes/{GetListingsByOperationPropertyTypeFileName(countryCode, operation, propertyType, listingStatus, extension)}";
         }
 
-        private static string GetHostsTableRows(CountryCode countryCode)
+        private string GetHostsTableRows(CountryCode countryCode)
         {
             StringBuilder rows = new();
 
@@ -220,8 +228,8 @@ namespace landerist_library.Landerist_com
                 .Where(website => website.CountryCode == countryCode)
                 .OrderBy(website => website.Host, StringComparer.OrdinalIgnoreCase))
             {
-                int publishedListingsCount = global::landerist_library.Websites.Websites.GetNumPublishedListings(website);
-                int unpublishedListingsCount = global::landerist_library.Websites.Websites.GetNumUnpublishedListings(website);
+                int publishedListingsCount = _websiteMetrics.CountPublishedListings(website);
+                int unpublishedListingsCount = _websiteMetrics.CountUnpublishedListings(website);
 
                 rows.AppendLine(GetHostTableRow(
                     countryCode,
@@ -233,7 +241,7 @@ namespace landerist_library.Landerist_com
             return rows.ToString();
         }
 
-        private static string GetHostTableRow(
+        private string GetHostTableRow(
             CountryCode countryCode,
             Website website,
             int publishedListingsCount,
@@ -247,7 +255,7 @@ namespace landerist_library.Landerist_com
                 "                </tr>";
         }
 
-        private static string GetHostDownloadCellText(CountryCode countryCode, string host, ListingStatus listingStatus, string extension, int counter)
+        private string GetHostDownloadCellText(CountryCode countryCode, string host, ListingStatus listingStatus, string extension, int counter)
         {
             string counterText = counter.ToString(CultureInfo.InvariantCulture);
             if (counter <= 0)
@@ -265,7 +273,7 @@ namespace landerist_library.Landerist_com
             return $"<a title=\"Download\" href=\"{WebUtility.HtmlEncode(url)}\" download=\"{WebUtility.HtmlEncode(fileName)}\">{counterText}</a>";
         }
 
-        private static string? GetHostDownloadUrl(CountryCode countryCode, string host, ListingStatus listingStatus, string extension)
+        private string? GetHostDownloadUrl(CountryCode countryCode, string host, ListingStatus listingStatus, string extension)
         {
             string objectKey = GetHostObjectKey(countryCode, host, listingStatus, extension);
             var (lastModified, contentLength) = new S3().GetFileInfo(AppConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey);
@@ -278,17 +286,17 @@ namespace landerist_library.Landerist_com
             return $"https://{AppConfig.AWS_S3_DOWNLOADS_BUCKET}.s3.amazonaws.com/{objectKey}";
         }
 
-        private static string GetHostObjectKey(CountryCode countryCode, string host, ListingStatus listingStatus, string extension)
+        private string GetHostObjectKey(CountryCode countryCode, string host, ListingStatus listingStatus, string extension)
         {
             return $"{countryCode}/Hosts/{GetHostListingsFileName(countryCode, host, listingStatus, extension)}";
         }
 
-        private static string Comment(CountryCode countryCode, ExportType exportType, string key)
+        private string Comment(CountryCode countryCode, ExportType exportType, string key)
         {
             return $"<!--{countryCode}_{exportType}_{key}-->";
         }
 
-        private static void Replace(string comment, string? text)
+        private void Replace(string comment, string? text)
         {
             if (string.IsNullOrEmpty(comment))
             {
@@ -298,7 +306,7 @@ namespace landerist_library.Landerist_com
             DownloadsTemplate = DownloadsTemplate.Replace(comment, text ?? string.Empty);
         }
 
-        private static bool UploadDownloadsFile(CountryCode countryCode)
+        private bool UploadDownloadsFile(CountryCode countryCode)
         {
             string downloadsHtmlFile = GetDownloadsHtmlFile(countryCode);
             Directory.CreateDirectory(Path.GetDirectoryName(downloadsHtmlFile)!);
@@ -307,22 +315,22 @@ namespace landerist_library.Landerist_com
             return new S3().UploadToWebsiteBucket(downloadsHtmlFile, "index.html", GetDownloadsWebsiteDirectory(countryCode));
         }
 
-        private static bool UploadDownloadsIndexFile()
+        private bool UploadDownloadsIndexFile()
         {
             return new S3().UploadToWebsiteBucket(DownloadsIndexHtmlFile, "index.html", "downloads");
         }
 
-        private static string GetDownloadsHtmlFile(CountryCode countryCode)
+        private string GetDownloadsHtmlFile(CountryCode countryCode)
         {
             return Path.Combine(Config.LANDERIST_COM_OUTPUT!, GetDownloadsWebsiteDirectory(countryCode), "index.html");
         }
 
-        private static string GetDownloadsWebsiteDirectory(CountryCode countryCode)
+        private string GetDownloadsWebsiteDirectory(CountryCode countryCode)
         {
             return $"downloads/{countryCode.ToString().ToLowerInvariant()}";
         }
 
-        private static string FormatBytes(long bytes)
+        private string FormatBytes(long bytes)
         {
             string[] sizes = { "B", "KB", "MB", "GB", "TB", "PB", "EB" };
 

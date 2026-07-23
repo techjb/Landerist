@@ -1,6 +1,8 @@
 using landerist_library.Application.Listings;
 using landerist_library.Database;
 using landerist_library.Infrastructure.Listings;
+using landerist_library.Infrastructure.PageServices;
+using landerist_library.Infrastructure.WebsiteServices;
 using landerist_library.Infrastructure.Scraping;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Statistics;
@@ -138,6 +140,41 @@ public sealed class SqlPersistenceAdaptersTests
             call.Parameters?.TryGetValue("Host", out var host) == true &&
             Equals(host, "example.com"));
         Assert.DoesNotContain(database.Calls, call => call.Query.Contains("SELECT *", StringComparison.Ordinal));
+    }
+    [Fact]
+    public void PageWaitingStatus_SelectsAndMapsThroughInjectedRepository()
+    {
+        RecordingDatabase database = new();
+        AddPageRow(database.TableResult);
+        SqlPageWaitingStatusService waitingStatus = new(new PageMaintenanceRepository(database));
+
+        List<Page> pages = waitingStatus.SelectAIRequest(
+            5,
+            WaitingStatus.readed_by_localai,
+            7000,
+            isMaxTokenCount: true);
+
+        Assert.Single(pages);
+        Assert.Equal(5, database.LastParameters!["TopRows"]);
+        Assert.Equal("waiting_ai_request", database.LastParameters["WaitingStatusFrom"]);
+        Assert.Equal("readed_by_localai", database.LastParameters["WaitingStatusTo"]);
+    }
+
+    [Fact]
+    public void WebsiteMetrics_CountsThroughInjectedRepositories()
+    {
+        RecordingDatabase database = new() { QueryIntResult = 12 };
+        WebsiteMetricsService metrics = new(
+            new WebsitePageMetricsRepository(database),
+            new ListingStatisticsRepository(database),
+            maximumPagesPerWebsite: 100);
+        Website website = new(new Uri("https://example.com"));
+
+        int count = metrics.CountPublishedListings(website);
+
+        Assert.Equal(12, count);
+        Assert.Equal("example.com", database.LastParameters!["Host"]);
+        Assert.Equal("published", database.LastParameters["ListingStatus"]);
     }
     [Fact]
     public void PageScheduling_UsesInjectedListingStore()

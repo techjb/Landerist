@@ -3,6 +3,8 @@ using Amazon.CloudFront;
 using Amazon.CloudFront.Model;
 using landerist_library.Configuration;
 using landerist_library.Logs;
+using landerist_library.Infrastructure.Sql;
+using landerist_library.Infrastructure.WebsiteServices;
 using landerist_library.Statistics;
 using landerist_library.Websites;
 using landerist_orels.ES;
@@ -140,38 +142,44 @@ namespace landerist_library.Landerist_com
             return listingStatus.ToString().ToLowerInvariant();
         }
 
-        public static void UpdateDownloadsPage()
+        public static void UpdateDownloadsPage(WebsiteMetricsService websiteMetrics)
         {
-            DownloadsPage.Update();
+            new DownloadsPage(websiteMetrics).Update();
             InvalidateCloudFront();
         }
 
-        public static void UpdateStatisticsPage(GlobalStatistics globalStatistics)
+        public static void UpdateStatisticsPage(
+            GlobalStatistics globalStatistics,
+            PageStatisticsRepository pageStatistics)
         {
-            new StatisticsPage(globalStatistics).UpdateCharts();
+            new StatisticsPage(globalStatistics, pageStatistics).UpdateCharts();
             InvalidateCloudFront();
         }
 
-        public static void UpdateHostStatisticsPage(HostStatistics hostStatistics)
+        public static void UpdateHostStatisticsPage(
+            HostStatistics hostStatistics,
+            WebsiteMetricsService websiteMetrics)
         {
-            new HostStatisticsPage(hostStatistics).Update();
+            new HostStatisticsPage(hostStatistics, websiteMetrics).Update();
             InvalidateCloudFront();
         }
 
-        public static void UpdateHostsStatisticsPage()
+        public static void UpdateHostsStatisticsPage(WebsiteMetricsService websiteMetrics)
         {
-            HostsStatisticsPage.Update();
+            new HostsStatisticsPage(websiteMetrics).Update();
             InvalidateCloudFront();
         }
 
         public static void UpdateAllPages(
             GlobalStatistics globalStatistics,
-            HostStatistics hostStatistics)
+            HostStatistics hostStatistics,
+            PageStatisticsRepository pageStatistics,
+            WebsiteMetricsService websiteMetrics)
         {
-            DownloadsPage.Update();
-            new StatisticsPage(globalStatistics).UpdateCharts();
-            new HostStatisticsPage(hostStatistics).Update();
-            HostsStatisticsPage.Update();
+            new DownloadsPage(websiteMetrics).Update();
+            new StatisticsPage(globalStatistics, pageStatistics).UpdateCharts();
+            new HostStatisticsPage(hostStatistics, websiteMetrics).Update();
+            new HostsStatisticsPage(websiteMetrics).Update();
             InvalidateCloudFront();
         }
 

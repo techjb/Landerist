@@ -1,3 +1,4 @@
+using landerist_library.Application.Pages;
 using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Logs;
@@ -21,6 +22,7 @@ namespace landerist_library.Tasks
         private static readonly object InitializeSync = new();
 
         private readonly BatchRepository _batches;
+        private readonly IPageWaitingStatusService _waitingStatus;
         private readonly long _maxFileSizeInBytes;
         private readonly int _maxPagesPerBatch;
         private readonly List<Page> _pages = [];
@@ -29,10 +31,12 @@ namespace landerist_library.Tasks
 
         private static bool _firstTime = true;
 
-        public TaskBatchUpload(BatchRepository batches)
+        public TaskBatchUpload(BatchRepository batches, IPageWaitingStatusService waitingStatus)
         {
             ArgumentNullException.ThrowIfNull(batches);
+            ArgumentNullException.ThrowIfNull(waitingStatus);
             _batches = batches;
+            _waitingStatus = waitingStatus;
             _maxFileSizeInBytes = SetMaxFileSize();
             _maxPagesPerBatch = GetMaxPagesPerBatch();
         }
@@ -96,7 +100,7 @@ namespace landerist_library.Tasks
             }
         }
 
-        private static void Initialize()
+        private void Initialize()
         {
             if (!_firstTime)
             {
@@ -110,7 +114,7 @@ namespace landerist_library.Tasks
                     return;
                 }
 
-                Pages.Pages.UpdateWaitingStatus(WaitingStatus.readed_by_batch, WaitingStatus.waiting_ai_request);
+                _waitingStatus.Update(WaitingStatus.readed_by_batch, WaitingStatus.waiting_ai_request);
                 _firstTime = false;
             }
         }
@@ -118,7 +122,7 @@ namespace landerist_library.Tasks
         private bool BatchUpload()
         {
             var tokenCount = TaskLocalAIParsing.GetMaxTokenCount();
-            _pages.AddRange(Pages.Pages.SelectWaitingStatusAIRequest(_maxPagesPerBatch, WaitingStatus.readed_by_batch, tokenCount, false));
+            _pages.AddRange(_waitingStatus.SelectAIRequest(_maxPagesPerBatch, WaitingStatus.readed_by_batch, tokenCount, false));
 
             if (_pages.Count < Config.MIN_PAGES_PER_BATCH)
             {
@@ -324,7 +328,7 @@ namespace landerist_library.Tasks
             int counter = 0;
             Parallel.ForEach(_waitingAIResponse, Config.PARALLELOPTIONS1INLOCAL, uriHash =>
             {
-                if (Pages.Pages.UpdateWaitingStatusAIResponse(uriHash))
+                if (_waitingStatus.UpdateAIResponse(uriHash))
                 {
                     Interlocked.Increment(ref counter);
                 }
@@ -347,7 +351,7 @@ namespace landerist_library.Tasks
             int counter = 0;
             Parallel.ForEach(pages, Config.PARALLELOPTIONS1INLOCAL, page =>
             {
-                if (Pages.Pages.UpdateWaitingStatusAIRequest(page.UriHash))
+                if (_waitingStatus.UpdateAIRequest(page.UriHash))
                 {
                     Interlocked.Increment(ref counter);
                 }
@@ -370,7 +374,7 @@ namespace landerist_library.Tasks
             int counter = 0;
             Parallel.ForEach(pages, Config.PARALLELOPTIONS1INLOCAL, page =>
             {
-                if (Pages.Pages.UpdateWaitingStatusAIRequest(page.UriHash))
+                if (_waitingStatus.UpdateAIRequest(page.UriHash))
                 {
                     Interlocked.Increment(ref counter);
                 }

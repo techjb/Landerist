@@ -1,6 +1,7 @@
 using landerist_library.Configuration;
 using landerist_library.Export;
 using landerist_library.Logs;
+using landerist_library.Infrastructure.WebsiteServices;
 using landerist_library.Statistics;
 using System.Data;
 using System.Globalization;
@@ -12,11 +13,16 @@ namespace landerist_library.Landerist_com
     public sealed class HostStatisticsPage : Landerist_com
     {
         private readonly HostStatistics _statistics;
+        private readonly WebsiteMetricsService _websiteMetrics;
 
-        public HostStatisticsPage(HostStatistics statistics)
+        public HostStatisticsPage(
+            HostStatistics statistics,
+            WebsiteMetricsService websiteMetrics)
         {
             ArgumentNullException.ThrowIfNull(statistics);
+            ArgumentNullException.ThrowIfNull(websiteMetrics);
             _statistics = statistics;
+            _websiteMetrics = websiteMetrics;
         }
         private readonly string HostStatisticsTemplateHtmlFile =
             Path.Combine(Config.LANDERIST_COM_TEMPLATES!, "host-statistics", "host_statistics_template.html");
@@ -86,13 +92,13 @@ namespace landerist_library.Landerist_com
                 IpAddressUpdated = FormatWebsiteDate(website.IpAddressUpdated),
                 Summary = new HostStatisticsSummary
                 {
-                    TotalPages = global::landerist_library.Websites.Websites.GetNumPages(website),
-                    TotalListings = global::landerist_library.Websites.Websites.GetNumListings(website),
-                    PublishedListings = global::landerist_library.Websites.Websites.GetNumPublishedListings(website),
-                    PublishedListingsWithAddress = global::landerist_library.Websites.Websites.GetNumPublishedListingsWithAddress(website),
-                    PublishedListingsWithCoordinates = global::landerist_library.Websites.Websites.GetNumPublishedListingsWithCoordinates(website),
-                    PublishedListingsWithImages = global::landerist_library.Websites.Websites.GetNumPublishedListingsWithImages(website),
-                    UnpublishedListings = global::landerist_library.Websites.Websites.GetNumUnpublishedListings(website)
+                    TotalPages = _websiteMetrics.CountPages(website),
+                    TotalListings = _websiteMetrics.CountListings(website),
+                    PublishedListings = _websiteMetrics.CountPublishedListings(website),
+                    PublishedListingsWithAddress = _websiteMetrics.CountPublishedListingsWithAddress(website),
+                    PublishedListingsWithCoordinates = _websiteMetrics.CountPublishedListingsWithCoordinates(website),
+                    PublishedListingsWithImages = _websiteMetrics.CountPublishedListingsWithImages(website),
+                    UnpublishedListings = _websiteMetrics.CountUnpublishedListings(website)
                 },
                 Charts = new HostStatisticsCharts
                 {
