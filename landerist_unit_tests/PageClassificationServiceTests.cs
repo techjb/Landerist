@@ -1,6 +1,7 @@
 using landerist_library.Application.Listings;
 using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
+using landerist_library.Application.Scraping;
 using landerist_library.Pages;
 using landerist_library.Scrape;
 using landerist_library.Websites;
@@ -20,7 +21,8 @@ public sealed class PageClassificationServiceTests
                 page,
                 (IPagePersistenceService)null!,
                 new RecordingApplicationLogger(),
-                new RecordingListingLifecycleService()));
+                new RecordingListingLifecycleService(),
+                CreatePipeline()));
     }
 
     [Fact]
@@ -33,7 +35,8 @@ public sealed class PageClassificationServiceTests
                 page,
                 new RecordingPagePersistenceService(),
                 (IApplicationLogger)null!,
-                new RecordingListingLifecycleService()));
+                new RecordingListingLifecycleService(),
+                CreatePipeline()));
     }
 
     [Fact]
@@ -46,7 +49,22 @@ public sealed class PageClassificationServiceTests
                 page,
                 new RecordingPagePersistenceService(),
                 new RecordingApplicationLogger(),
-                (IListingLifecycleService)null!));
+                (IListingLifecycleService)null!,
+                CreatePipeline()));
+    }
+
+    [Fact]
+    public void Constructor_RejectsNullPipeline()
+    {
+        Page page = CreatePage();
+
+        Assert.Throws<ArgumentNullException>(() =>
+            new PageScraper(
+                page,
+                new RecordingPagePersistenceService(),
+                new RecordingApplicationLogger(),
+                new RecordingListingLifecycleService(),
+                (PageScrapePipelineServices)null!));
     }
 
     [Fact]
@@ -60,13 +78,20 @@ public sealed class PageClassificationServiceTests
         RecordingPagePersistenceService persistence = new();
         RecordingApplicationLogger logger = new();
         RecordingListingLifecycleService listingLifecycle = new();
-        PageScraper scraper = new(page, persistence, logger, listingLifecycle);
+        RecordingPageSchedulingService scheduling = new();
+        PageScraper scraper = new(
+            page,
+            persistence,
+            logger,
+            listingLifecycle,
+            CreatePipeline(scheduling));
 
         bool result = scraper.TryApplyPreClassificationBeforeDownload();
 
         Assert.False(result);
         Assert.Equal(0, persistence.UpdateCalls);
         Assert.Equal(0, listingLifecycle.ApplyCalls);
+        Assert.Equal(0, scheduling.TotalCalls);
     }
 
     [Fact]
@@ -76,7 +101,12 @@ public sealed class PageClassificationServiceTests
         RecordingPagePersistenceService persistence = new();
         RecordingApplicationLogger logger = new();
         RecordingListingLifecycleService listingLifecycle = new();
-        PageScraper scraper = new(page, persistence, logger, listingLifecycle);
+        PageScraper scraper = new(
+            page,
+            persistence,
+            logger,
+            listingLifecycle,
+            CreatePipeline());
 
         bool result = scraper.ApplyParsedClassificationAfterParsing(
             PageType.MayBeListing,
@@ -95,7 +125,12 @@ public sealed class PageClassificationServiceTests
         RecordingPagePersistenceService persistence = new();
         RecordingApplicationLogger logger = new();
         RecordingListingLifecycleService listingLifecycle = new();
-        PageScraper scraper = new(page, persistence, logger, listingLifecycle);
+        PageScraper scraper = new(
+            page,
+            persistence,
+            logger,
+            listingLifecycle,
+            CreatePipeline());
 
         bool result = scraper.ApplyParsedClassificationAfterParsing(
             PageType.Listing,
@@ -115,7 +150,12 @@ public sealed class PageClassificationServiceTests
         RecordingPagePersistenceService persistence = new();
         RecordingApplicationLogger logger = new();
         RecordingListingLifecycleService listingLifecycle = new();
-        PageScraper scraper = new(page, persistence, logger, listingLifecycle);
+        PageScraper scraper = new(
+            page,
+            persistence,
+            logger,
+            listingLifecycle,
+            CreatePipeline());
 
         bool result = scraper.ApplyClassificationResultAfterDownload(
             PageType.MayBeListing,
@@ -137,10 +177,22 @@ public sealed class PageClassificationServiceTests
         RecordingApplicationLogger logger = new();
         RecordingListingLifecycleService listingLifecycle = new();
 
-        Scraper scraper = new(persistence, logger, listingLifecycle);
+        Scraper scraper = new(
+            persistence,
+            logger,
+            listingLifecycle,
+            CreatePipeline());
 
         Assert.NotNull(scraper);
     }
+
+    private static PageScrapePipelineServices CreatePipeline(
+        IPageSchedulingService? scheduling = null) =>
+        new(
+            new NullPageAcquisitionService(),
+            new NullPageContentClassifier(),
+            new NullPageIndexingService(),
+            scheduling ?? new RecordingPageSchedulingService());
 
     private static Page CreatePage() =>
         new(
@@ -193,5 +245,33 @@ public sealed class PageClassificationServiceTests
             LastPage = page;
             LastListing = listing;
         }
+    }
+
+    private sealed class NullPageAcquisitionService : IPageAcquisitionService
+    {
+        public PageAcquisitionStatus Acquire(Page page, bool useProxy) =>
+            PageAcquisitionStatus.DownloadFailed;
+    }
+
+    private sealed class NullPageContentClassifier : IPageContentClassifier
+    {
+        public PageClassificationResult Classify(Page page) =>
+            new(null, null, false);
+    }
+
+    private sealed class NullPageIndexingService : IPageIndexingService
+    {
+        public void Index(Page page)
+        {
+        }
+    }
+
+    private sealed class RecordingPageSchedulingService : IPageSchedulingService
+    {
+        public int TotalCalls { get; private set; }
+
+        public void SetNextScrape(Page page) => TotalCalls++;
+
+        public void SetNextScrapeFromNow(Page page) => TotalCalls++;
     }
 }

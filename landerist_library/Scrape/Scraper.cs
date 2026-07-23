@@ -3,6 +3,7 @@ using landerist_library.Application;
 using landerist_library.Application.Listings;
 using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
+using landerist_library.Application.Scraping;
 using landerist_library.Database;
 using landerist_library.Downloaders.Multiple;
 using landerist_library.Downloaders.Puppeteer;
@@ -61,6 +62,7 @@ namespace landerist_library.Scrape
         private readonly IPagePersistenceService _pagePersistence;
         private readonly IApplicationLogger _logger;
         private readonly IListingLifecycleService _listingLifecycle;
+        private readonly PageScrapePipelineServices _pageScraping;
         private readonly ScraperLog _scraperLog;
         private CancellationTokenSource _cancellation = new();
 
@@ -70,7 +72,8 @@ namespace landerist_library.Scrape
             : this(
                 LanderistApplication.Services.PagePersistence,
                 LanderistApplication.Services.Logger,
-                LanderistApplication.Services.ListingLifecycle)
+                LanderistApplication.Services.ListingLifecycle,
+                LanderistApplication.Services.PageScraping)
         {
         }
 
@@ -78,7 +81,8 @@ namespace landerist_library.Scrape
             : this(
                 pagePersistence,
                 LanderistApplication.Services.Logger,
-                LanderistApplication.Services.ListingLifecycle)
+                LanderistApplication.Services.ListingLifecycle,
+                LanderistApplication.Services.PageScraping)
         {
         }
 
@@ -88,7 +92,8 @@ namespace landerist_library.Scrape
             : this(
                 pagePersistence,
                 logger,
-                LanderistApplication.Services.ListingLifecycle)
+                LanderistApplication.Services.ListingLifecycle,
+                LanderistApplication.Services.PageScraping)
         {
         }
 
@@ -96,14 +101,29 @@ namespace landerist_library.Scrape
             IPagePersistenceService pagePersistence,
             IApplicationLogger logger,
             IListingLifecycleService listingLifecycle)
+            : this(
+                pagePersistence,
+                logger,
+                listingLifecycle,
+                LanderistApplication.Services.PageScraping)
+        {
+        }
+
+        public Scraper(
+            IPagePersistenceService pagePersistence,
+            IApplicationLogger logger,
+            IListingLifecycleService listingLifecycle,
+            PageScrapePipelineServices pageScraping)
         {
             ArgumentNullException.ThrowIfNull(pagePersistence);
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(listingLifecycle);
+            ArgumentNullException.ThrowIfNull(pageScraping);
 
             _pagePersistence = pagePersistence;
             _logger = logger;
             _listingLifecycle = listingLifecycle;
+            _pageScraping = pageScraping;
             _scraperLog = new ScraperLog(logger);
         }
 
@@ -112,7 +132,7 @@ namespace landerist_library.Scrape
             _scraperLog.WriteTestStart();
             PuppeteerDownloader.UpdateChrome();
             Page page = Pages.Pages.LoadOrCreate(new Uri("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/"));
-            var pageScraper = new PageScraper(page, _pagePersistence, _logger, _listingLifecycle);
+            var pageScraper = new PageScraper(page, _pagePersistence, _logger, _listingLifecycle, _pageScraping);
             pageScraper.Scrape();
             _scraperLog.WriteTestPageType(page);
             var listing =  global::landerist_library.Pages.Pages.GetListing(page, true, true);
@@ -309,7 +329,7 @@ namespace landerist_library.Scrape
 
         public bool TryApplyPreClassificationBeforeDownload(Page page)
         {
-            var success = new PageScraper(page, _pagePersistence, _logger, _listingLifecycle).TryApplyPreClassificationBeforeDownload();
+            var success = new PageScraper(page, _pagePersistence, _logger, _listingLifecycle, _pageScraping).TryApplyPreClassificationBeforeDownload();
             if (success)
             {
                 Interlocked.Increment(ref Processed);
@@ -431,7 +451,7 @@ namespace landerist_library.Scrape
                 return ScrapeAttemptResult.Blocked;
             }
 
-            var pageScraper = new PageScraper(page, useProxy, _pagePersistence, _logger, _listingLifecycle);
+            var pageScraper = new PageScraper(page, useProxy, _pagePersistence, _logger, _listingLifecycle, _pageScraping);
             return pageScraper.Scrape()
                 ? ScrapeAttemptResult.Success
                 : ScrapeAttemptResult.Crashed;

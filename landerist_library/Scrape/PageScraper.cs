@@ -3,11 +3,8 @@ using landerist_library.Application;
 using landerist_library.Application.Listings;
 using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
-using landerist_library.Downloaders.Multiple;
-using landerist_library.Index;
+using landerist_library.Application.Scraping;
 using landerist_library.Pages;
-using landerist_library.Parse.PageTypeParser;
-using landerist_library.Statistics;
 using landerist_orels.ES;
 
 namespace landerist_library.Scrape
@@ -16,6 +13,7 @@ namespace landerist_library.Scrape
     {
         private readonly Page _page;
         private readonly PageClassificationService _classificationService;
+        private readonly PageScrapePipelineServices _pipeline;
         private readonly bool _useProxy;
 
         public PageScraper(Page page)
@@ -23,7 +21,8 @@ namespace landerist_library.Scrape
                 page,
                 LanderistApplication.Services.PagePersistence,
                 LanderistApplication.Services.Logger,
-                LanderistApplication.Services.ListingLifecycle)
+                LanderistApplication.Services.ListingLifecycle,
+                LanderistApplication.Services.PageScraping)
         {
         }
 
@@ -34,7 +33,8 @@ namespace landerist_library.Scrape
                 page,
                 pagePersistence,
                 LanderistApplication.Services.Logger,
-                LanderistApplication.Services.ListingLifecycle)
+                LanderistApplication.Services.ListingLifecycle,
+                LanderistApplication.Services.PageScraping)
         {
         }
 
@@ -42,7 +42,12 @@ namespace landerist_library.Scrape
             Page page,
             IPagePersistenceService pagePersistence,
             IApplicationLogger logger)
-            : this(page, pagePersistence, logger, LanderistApplication.Services.ListingLifecycle)
+            : this(
+                page,
+                pagePersistence,
+                logger,
+                LanderistApplication.Services.ListingLifecycle,
+                LanderistApplication.Services.PageScraping)
         {
         }
 
@@ -51,18 +56,36 @@ namespace landerist_library.Scrape
             IPagePersistenceService pagePersistence,
             IApplicationLogger logger,
             IListingLifecycleService listingLifecycle)
+            : this(
+                page,
+                pagePersistence,
+                logger,
+                listingLifecycle,
+                LanderistApplication.Services.PageScraping)
+        {
+        }
+
+        public PageScraper(
+            Page page,
+            IPagePersistenceService pagePersistence,
+            IApplicationLogger logger,
+            IListingLifecycleService listingLifecycle,
+            PageScrapePipelineServices pipeline)
         {
             ArgumentNullException.ThrowIfNull(page);
             ArgumentNullException.ThrowIfNull(pagePersistence);
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(listingLifecycle);
+            ArgumentNullException.ThrowIfNull(pipeline);
 
             _page = page;
             _classificationService = new PageClassificationService(
                 page,
                 pagePersistence,
                 logger,
-                listingLifecycle);
+                listingLifecycle,
+                pipeline.Scheduling);
+            _pipeline = pipeline;
             _useProxy = page.Website.UseProxy;
         }
 
@@ -72,7 +95,8 @@ namespace landerist_library.Scrape
                 useProxy,
                 LanderistApplication.Services.PagePersistence,
                 LanderistApplication.Services.Logger,
-                LanderistApplication.Services.ListingLifecycle)
+                LanderistApplication.Services.ListingLifecycle,
+                LanderistApplication.Services.PageScraping)
         {
         }
 
@@ -85,7 +109,8 @@ namespace landerist_library.Scrape
                 useProxy,
                 pagePersistence,
                 LanderistApplication.Services.Logger,
-                LanderistApplication.Services.ListingLifecycle)
+                LanderistApplication.Services.ListingLifecycle,
+                LanderistApplication.Services.PageScraping)
         {
         }
 
@@ -99,7 +124,8 @@ namespace landerist_library.Scrape
                 useProxy,
                 pagePersistence,
                 logger,
-                LanderistApplication.Services.ListingLifecycle)
+                LanderistApplication.Services.ListingLifecycle,
+                LanderistApplication.Services.PageScraping)
         {
         }
 
@@ -109,70 +135,53 @@ namespace landerist_library.Scrape
             IPagePersistenceService pagePersistence,
             IApplicationLogger logger,
             IListingLifecycleService listingLifecycle)
-            : this(page, pagePersistence, logger, listingLifecycle)
+            : this(
+                page,
+                useProxy,
+                pagePersistence,
+                logger,
+                listingLifecycle,
+                LanderistApplication.Services.PageScraping)
+        {
+        }
+
+        public PageScraper(
+            Page page,
+            bool useProxy,
+            IPagePersistenceService pagePersistence,
+            IApplicationLogger logger,
+            IListingLifecycleService listingLifecycle,
+            PageScrapePipelineServices pipeline)
+            : this(page, pagePersistence, logger, listingLifecycle, pipeline)
         {
             _useProxy = useProxy;
         }
 
         public bool Scrape()
         {
-            if (TryApplyNotModifiedBeforeDownload())
-            {
-                return true;
-            }
-
-            if (!DownloadersPool.Download(_page, _useProxy))
+            var acquisitionStatus = _pipeline.Acquisition.Acquire(_page, _useProxy);
+            if (acquisitionStatus == PageAcquisitionStatus.DownloadFailed)
             {
                 return false;
             }
 
-            (var newPageType, var newListing, var waitingAIRequest) = new PageTypeParser(_page).GetPageType();
-            var success = ApplyClassificationResultAfterDownload(newPageType, newListing, waitingAIRequest);
+            if (acquisitionStatus == PageAcquisitionStatus.NotModified)
+            {
+                return ApplyClassificationResultAfterDownload(_page.PageType, null, false);
+            }
+
+            var classification = _pipeline.Classifier.Classify(_page);
+            var success = ApplyClassificationResultAfterDownload(
+                classification.PageType,
+                classification.Listing,
+                classification.WaitingAiRequest);
 
             if (success)
             {
-                new Indexer(_page).IndexPages();
+                _pipeline.Indexing.Index(_page);
             }
 
             return success;
-        }
-
-        private bool TryApplyNotModifiedBeforeDownload()
-        {
-            if (!CanCheckConditionalHeaders() || Config.IsConfigurationLocal())
-            {
-                return false;
-            }
-
-            GlobalStatistics.InsertDailyCounter(StatisticsKey.PageConditionalHeadersCheck);
-
-            var result = new ConditionalPageHeaderChecker(_useProxy).Check(_page);
-            if (!result.NotModified)
-            {
-                return false;
-            }
-
-            if (!string.IsNullOrWhiteSpace(result.Etag))
-            {
-                _page.Etag = result.Etag;
-            }
-
-            if (!string.IsNullOrWhiteSpace(result.LastModified))
-            {
-                _page.LastModified = result.LastModified;
-            }
-
-            _page.RedirectUrl = result.RedirectUrl;
-
-            GlobalStatistics.InsertDailyCounter(StatisticsKey.PageNotModified);
-            HostStatistics.InsertDailyCounter(_page.Host, HostStatisticsKey.PageNotModified);
-            return ApplyClassificationResultAfterDownload(_page.PageType, null, false);
-        }
-
-        private bool CanCheckConditionalHeaders()
-        {
-            return _page.PageType.HasValue &&
-                (!string.IsNullOrWhiteSpace(_page.Etag) || !string.IsNullOrWhiteSpace(_page.LastModified));
         }
 
         public bool TryApplyPreClassificationBeforeDownload()

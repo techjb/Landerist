@@ -1,6 +1,7 @@
 using landerist_library.Application.Listings;
 using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
+using landerist_library.Application.Scraping;
 using landerist_library.Configuration;
 using landerist_library.Pages;
 using landerist_orels.ES;
@@ -13,22 +14,26 @@ namespace landerist_library.Scrape
         private readonly IPagePersistenceService _pagePersistence;
         private readonly IApplicationLogger _logger;
         private readonly IListingLifecycleService _listingLifecycle;
+        private readonly IPageSchedulingService _scheduling;
 
         public PageClassificationService(
             Page page,
             IPagePersistenceService pagePersistence,
             IApplicationLogger logger,
-            IListingLifecycleService listingLifecycle)
+            IListingLifecycleService listingLifecycle,
+            IPageSchedulingService scheduling)
         {
             ArgumentNullException.ThrowIfNull(page);
             ArgumentNullException.ThrowIfNull(pagePersistence);
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(listingLifecycle);
+            ArgumentNullException.ThrowIfNull(scheduling);
 
             this.page = page;
             _pagePersistence = pagePersistence;
             _logger = logger;
             _listingLifecycle = listingLifecycle;
+            _scheduling = scheduling;
         }
 
         public bool TryApplyPreClassificationBeforeDownload()
@@ -55,7 +60,7 @@ namespace landerist_library.Scrape
             }
 
             UpdatePageTypeAndListing(pageType, null);
-            Pages.Pages.SetNextScrapeFromNow(page);
+            _scheduling.SetNextScrapeFromNow(page);
             return _pagePersistence.Update(page);
         }
 
@@ -74,7 +79,7 @@ namespace landerist_library.Scrape
 
             UpdatePageTypeAndListing(newPageType, newListing);
             page.SetLastScrape();
-            Pages.Pages.SetNextScrape(page);
+            _scheduling.SetNextScrape(page);
             return _pagePersistence.Update(page);
         }
 

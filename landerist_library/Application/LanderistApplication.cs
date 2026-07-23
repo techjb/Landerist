@@ -1,6 +1,7 @@
 using landerist_library.Application.Listings;
 using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
+using landerist_library.Application.Scraping;
 
 namespace landerist_library.Application;
 
@@ -14,17 +15,20 @@ public sealed class LanderistApplicationServices
         IPagePersistenceService pagePersistence,
         IWebsitePersistenceService websitePersistence,
         IApplicationLogger logger,
-        IListingLifecycleService listingLifecycle)
+        IListingLifecycleService listingLifecycle,
+        PageScrapePipelineServices pageScraping)
     {
         ArgumentNullException.ThrowIfNull(pagePersistence);
         ArgumentNullException.ThrowIfNull(websitePersistence);
         ArgumentNullException.ThrowIfNull(listingLifecycle);
         ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(pageScraping);
 
         PagePersistence = pagePersistence;
         WebsitePersistence = websitePersistence;
         ListingLifecycle = listingLifecycle;
         Logger = logger;
+        PageScraping = pageScraping;
     }
 
     public IPagePersistenceService PagePersistence { get; }
@@ -34,6 +38,8 @@ public sealed class LanderistApplicationServices
     public IApplicationLogger Logger { get; }
 
     public IListingLifecycleService ListingLifecycle { get; }
+
+    public PageScrapePipelineServices PageScraping { get; }
 }
 
 /// <summary>

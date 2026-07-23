@@ -2,10 +2,12 @@
 using landerist_library.Application;
 using landerist_library.Application.Listings;
 using landerist_library.Application.Persistence;
+using landerist_library.Application.Scraping;
 using landerist_library.Database;
 using landerist_library.Infrastructure.Logging;
 using landerist_library.Infrastructure.Listings;
 using landerist_library.Infrastructure.Sql;
+using landerist_library.Infrastructure.Scraping;
 using landerist_library.Logs;
 using landerist_library.Scrape;
 using System.Runtime.InteropServices;
@@ -47,11 +49,21 @@ namespace landerist_tests
                 new LegacyListingEnricher(),
                 new LegacyListingUnpublishPolicy(),
                 logger);
+            PageScrapePipelineServices pageScraping = new(
+                new PageAcquisitionService(
+                    new LegacyPageDownloader(),
+                    new LegacyConditionalPageHeaderService(),
+                    new LegacyScrapeMetrics(),
+                    conditionalHeadersEnabled: !Config.IsConfigurationLocal()),
+                new LegacyPageContentClassifier(),
+                new LegacyPageIndexingService(),
+                new LegacyPageSchedulingService());
             LanderistApplication.Configure(new LanderistApplicationServices(
                 new PagePersistenceService(new PageRepository(new DataBase())),
                 new WebsitePersistenceService(new WebsiteRepository(new DataBase())),
                 logger,
-                listingLifecycle));
+                listingLifecycle,
+                pageScraping));
         }
 
         private static void Start()
