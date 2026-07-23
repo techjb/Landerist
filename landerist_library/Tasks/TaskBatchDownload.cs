@@ -1,4 +1,5 @@
 using landerist_library.Configuration;
+using landerist_library.Application.Pages;
 using landerist_library.Application.Scraping;
 using landerist_library.Database;
 using landerist_library.Logs;
@@ -16,18 +17,22 @@ namespace landerist_library.Tasks
         private readonly IParsedPageClassificationService _parsedClassification;
         private readonly BatchRepository _batches;
         private readonly GlobalStatistics _statistics;
+        private readonly IPageCatalog _pages;
 
         public TaskBatchDownload(
             IParsedPageClassificationService parsedClassification,
             BatchRepository batches,
-            GlobalStatistics statistics)
+            GlobalStatistics statistics,
+            IPageCatalog pages)
         {
             ArgumentNullException.ThrowIfNull(parsedClassification);
             ArgumentNullException.ThrowIfNull(batches);
             ArgumentNullException.ThrowIfNull(statistics);
+            ArgumentNullException.ThrowIfNull(pages);
             _parsedClassification = parsedClassification;
             _batches = batches;
             _statistics = statistics;
+            _pages = pages;
         }
 
         public readonly HashSet<string> DownloadedPagesUriHashes = [];
@@ -194,12 +199,12 @@ namespace landerist_library.Tasks
             return success;
         }
 
-        private static (Page page, string? text)? GetPageAndText(Batch batch, string line)
+        private (Page page, string? text)? GetPageAndText(Batch batch, string line)
         {
             return batch.LLMProvider switch
             {
-                LLMProvider.OpenAI => OpenAIBatchDownload.ReadLine(line),
-                LLMProvider.VertexAI => VertexAIBatchDownload.ReadLine(batch.Id, line),
+                LLMProvider.OpenAI => OpenAIBatchDownload.ReadLine(line, _pages),
+                LLMProvider.VertexAI => VertexAIBatchDownload.ReadLine(batch.Id, line, _pages),
                 _ => null,
             };
         }
@@ -220,7 +225,7 @@ namespace landerist_library.Tasks
             {
                 try
                 {
-                    using var page = Pages.Pages.GetPage(uriHash);
+                    using var page = _pages.GetByHash(uriHash);
                     if (page == null)
                     {
                         return;

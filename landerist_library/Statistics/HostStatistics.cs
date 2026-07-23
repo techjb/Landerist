@@ -1,3 +1,4 @@
+using landerist_library.Application.Websites;
 using landerist_library.Infrastructure.Sql;
 using landerist_orels.ES;
 using System.Data;
@@ -24,21 +25,21 @@ namespace landerist_library.Statistics
     public sealed class HostStatistics
     {
         private readonly HostStatisticsRepository Repository;
-        private readonly WebsiteQueryRepository WebsiteQueries;
+        private readonly IWebsiteCatalog WebsiteCatalog;
 
         public HostStatistics(
             HostStatisticsRepository repository,
-            WebsiteQueryRepository websiteQueries)
+            IWebsiteCatalog websiteCatalog)
         {
             ArgumentNullException.ThrowIfNull(repository);
-            ArgumentNullException.ThrowIfNull(websiteQueries);
+            ArgumentNullException.ThrowIfNull(websiteCatalog);
             Repository = repository;
-            WebsiteQueries = websiteQueries;
+            WebsiteCatalog = websiteCatalog;
         }
 
         public void TakeSnapshots()
         {
-            foreach (string host in WebsiteQueries.GetHosts())
+            foreach (string host in WebsiteCatalog.GetHosts())
             {
                 TakeSnapshot(host);
             }

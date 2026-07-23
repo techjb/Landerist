@@ -61,9 +61,13 @@ namespace landerist_console
                 databaseFactory.Create(),
                 Config.NOT_LISTING_CACHE_ENABLED);
             BatchRepository batches = new(databaseFactory.Create());
+            SqlPageCatalog pageCatalog = new(
+                new PageQueryRepository(databaseFactory.Create()));
             SqlPageWaitingStatusService waitingStatus = new(
                 new PageMaintenanceRepository(databaseFactory.Create()));
             PageStatisticsRepository pageStatistics = new(databaseFactory.Create());
+            WebsiteQueryRepository websiteQueries = new(databaseFactory.Create());
+            SqlWebsiteCatalog websiteCatalog = new(websiteQueries);
             WebsiteMetricsService websiteMetrics = new(
                 new WebsitePageMetricsRepository(databaseFactory.Create()),
                 new ListingStatisticsRepository(databaseFactory.Create()),
@@ -72,7 +76,7 @@ namespace landerist_console
                 new GlobalStatisticsRepository(databaseFactory.Create()));
             HostStatistics hostStatistics = new(
                 new HostStatisticsRepository(databaseFactory.Create()),
-                new WebsiteQueryRepository(databaseFactory.Create()));
+                websiteCatalog);
             SqlPageLinkService pageLinks = new(
                 pagePersistence,
                 new WebsitePageMetricsRepository(databaseFactory.Create()),
@@ -140,9 +144,9 @@ namespace landerist_console
                 new SystemRecurringTaskScheduler(),
                 logger,
                 new LegacyScrapeTaskJob(scraper, batchScraping.Resources),
-                new LegacyLocalAiTaskJob(() => new TaskLocalAIParsing(parsedClassification, globalStatistics, hostStatistics, waitingStatus)),
+                new LegacyLocalAiTaskJob(() => new TaskLocalAIParsing(parsedClassification, globalStatistics, hostStatistics, waitingStatus, pageCatalog)),
                 new LegacyTenMinuteTaskJob(
-                    new TaskBatchDownload(parsedClassification, batches, globalStatistics),
+                    new TaskBatchDownload(parsedClassification, batches, globalStatistics, pageCatalog),
                     new TaskBatchUpload(batches, waitingStatus)),
                 new LegacyHourlyTaskJob(new TaskBatchCleaner(batches)),
                 new LegacyDailyTaskJob(
@@ -152,7 +156,9 @@ namespace landerist_console
                     globalStatistics,
                     hostStatistics,
                     pageStatistics,
-                    websiteMetrics),
+                    websiteMetrics,
+                    websiteCatalog,
+                    websiteQueries),
                 TimeProvider.System);
         }
 

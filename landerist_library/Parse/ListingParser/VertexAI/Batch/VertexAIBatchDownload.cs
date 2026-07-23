@@ -1,7 +1,8 @@
-﻿using Google.Cloud.AIPlatform.V1;
+using Google.Cloud.AIPlatform.V1;
 using landerist_library.Configuration;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using landerist_library.Application.Pages;
 using landerist_library.Logs;
 using landerist_library.Pages;
 
@@ -59,7 +60,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
             return null;
         }
 
-        public static (Page page, string? text)? ReadLine(string id, string line)
+        public static (Page page, string? text)? ReadLine(string id, string line, IPageCatalog pages)
         {
             VertexAIBatchResponse? vertexAIBatchResponse = null;
             try
@@ -75,7 +76,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                 Log.WriteError("VertexAIBatchDownload ReadLine", "vertexAIBatchResponse is null");
                 return null;
             }
-            Page? page = GetPage(vertexAIBatchResponse);
+            Page? page = GetPage(vertexAIBatchResponse, pages);
             if (page == null)
             {
                 Log.WriteError("VertexAIBatchDownload ReadLine", "Page is null  Id: " + id);
@@ -126,14 +127,14 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
             return null;
         }
 
-        private static Page? GetPage(VertexAIBatchResponse vertexAIBatchResponse)
+        private static Page? GetPage(VertexAIBatchResponse vertexAIBatchResponse, IPageCatalog pages)
         {
             if (vertexAIBatchResponse.Request != null)
             {
                 var labels = vertexAIBatchResponse.Request.labels;
                 if (labels.TryGetValue(VertexAIBatchUpload.LABEL_URIHASH, out string? uriHash))
                 {
-                    return Pages.Pages.GetPage(uriHash);
+                    return pages.GetByHash(uriHash);
                 }
             }
             return null;

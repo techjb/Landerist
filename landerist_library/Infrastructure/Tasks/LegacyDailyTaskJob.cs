@@ -1,5 +1,6 @@
 using landerist_library.Application.Listings;
 using landerist_library.Application.Tasks;
+using landerist_library.Application.Websites;
 using landerist_library.Database;
 using landerist_library.Landerist_com;
 using landerist_library.Statistics;
@@ -18,6 +19,8 @@ public sealed class LegacyDailyTaskJob : IRecurringTaskJob
     private readonly HostStatistics _hostStatistics;
     private readonly PageStatisticsRepository _pageStatistics;
     private readonly WebsiteMetricsService _websiteMetrics;
+    private readonly IWebsiteCatalog _websites;
+    private readonly WebsiteQueryRepository _websiteQueries;
 
     public LegacyDailyTaskJob(
         IDatabase database,
@@ -26,7 +29,9 @@ public sealed class LegacyDailyTaskJob : IRecurringTaskJob
         GlobalStatistics globalStatistics,
         HostStatistics hostStatistics,
         PageStatisticsRepository pageStatistics,
-        WebsiteMetricsService websiteMetrics)
+        WebsiteMetricsService websiteMetrics,
+        IWebsiteCatalog websites,
+        WebsiteQueryRepository websiteQueries)
     {
         ArgumentNullException.ThrowIfNull(database);
         ArgumentNullException.ThrowIfNull(notListingCache);
@@ -35,6 +40,8 @@ public sealed class LegacyDailyTaskJob : IRecurringTaskJob
         ArgumentNullException.ThrowIfNull(hostStatistics);
         ArgumentNullException.ThrowIfNull(pageStatistics);
         ArgumentNullException.ThrowIfNull(websiteMetrics);
+        ArgumentNullException.ThrowIfNull(websites);
+        ArgumentNullException.ThrowIfNull(websiteQueries);
         _addressLatLng = new AddressLatLng(database);
         _addressCadastralReference = new AddressCadastralReference(database);
         _notListingCache = notListingCache;
@@ -43,6 +50,8 @@ public sealed class LegacyDailyTaskJob : IRecurringTaskJob
         _hostStatistics = hostStatistics;
         _pageStatistics = pageStatistics;
         _websiteMetrics = websiteMetrics;
+        _websites = websites;
+        _websiteQueries = websiteQueries;
     }
 
     public void Run()
@@ -52,8 +61,8 @@ public sealed class LegacyDailyTaskJob : IRecurringTaskJob
         {
             _globalStatistics.TakeSnapshots();
             _hostStatistics.TakeSnapshots();
-            DownloadsUpdater.Update();
-            global::landerist_library.Landerist_com.Landerist_com.UpdateAllPages(_globalStatistics, _hostStatistics, _pageStatistics, _websiteMetrics);
+            DownloadsUpdater.Update(_websites, _websiteQueries);
+            global::landerist_library.Landerist_com.Landerist_com.UpdateAllPages(_globalStatistics, _hostStatistics, _pageStatistics, _websiteMetrics, _websites);
             _addressLatLng.Clean();
             _addressCadastralReference.Clean();
             _notListingCache.Clean();

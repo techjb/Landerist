@@ -1,3 +1,4 @@
+using landerist_library.Application.Websites;
 using landerist_library.Configuration;
 using landerist_library.Export;
 using landerist_library.Logs;
@@ -11,11 +12,16 @@ namespace landerist_library.Landerist_com
     public sealed class HostsStatisticsPage : Landerist_com
     {
         private readonly WebsiteMetricsService _websiteMetrics;
+        private readonly IWebsiteCatalog _websites;
 
-        public HostsStatisticsPage(WebsiteMetricsService websiteMetrics)
+        public HostsStatisticsPage(
+            WebsiteMetricsService websiteMetrics,
+            IWebsiteCatalog websites)
         {
             ArgumentNullException.ThrowIfNull(websiteMetrics);
+            ArgumentNullException.ThrowIfNull(websites);
             _websiteMetrics = websiteMetrics;
+            _websites = websites;
         }
         private readonly string HostsStatisticsTemplateHtmlFile =
             Path.Combine(Config.LANDERIST_COM_TEMPLATES!, "hosts-statistics", "hosts_statistics_template.html");
@@ -37,7 +43,7 @@ namespace landerist_library.Landerist_com
             try
             {
                 var template = File.ReadAllText(HostsStatisticsTemplateHtmlFile);
-                var websites = Websites.Websites.GetAll()
+                var websites = _websites.GetAll()
                     .OrderBy(website => website.Host, StringComparer.OrdinalIgnoreCase)
                     .ToList();
 

@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Net;
 using System.Text;
+using landerist_library.Application.Websites;
 using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Export;
@@ -14,11 +15,16 @@ namespace landerist_library.Landerist_com
     public sealed class DownloadsPage : Landerist_com
     {
         private readonly WebsiteMetricsService _websiteMetrics;
+        private readonly IWebsiteCatalog _websites;
 
-        public DownloadsPage(WebsiteMetricsService websiteMetrics)
+        public DownloadsPage(
+            WebsiteMetricsService websiteMetrics,
+            IWebsiteCatalog websites)
         {
             ArgumentNullException.ThrowIfNull(websiteMetrics);
+            ArgumentNullException.ThrowIfNull(websites);
             _websiteMetrics = websiteMetrics;
+            _websites = websites;
         }
         private readonly string DownloadsTemplateHtmlFile =
             Path.Combine(Config.LANDERIST_COM_TEMPLATES!, "downloads", "downloads_template.html");
@@ -224,7 +230,7 @@ namespace landerist_library.Landerist_com
         {
             StringBuilder rows = new();
 
-            foreach (var website in Websites.Websites.GetAll()
+            foreach (var website in _websites.GetAll()
                 .Where(website => website.CountryCode == countryCode)
                 .OrderBy(website => website.Host, StringComparer.OrdinalIgnoreCase))
             {

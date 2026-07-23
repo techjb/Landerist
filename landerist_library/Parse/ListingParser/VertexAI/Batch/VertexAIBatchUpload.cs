@@ -1,4 +1,4 @@
-﻿using Google.Cloud.AIPlatform.V1;
+using Google.Cloud.AIPlatform.V1;
 using landerist_library.Pages;
 using landerist_library.Parse.ListingParser.OpenAI.Batch;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
@@ -91,21 +91,6 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
             };
 
             return JsonSerializer.Serialize(structuredRequestData, JsonSerializerOptions);
-        }
-
-        public static Page? GetPage(string json)
-        {
-            var vertexAIBatchRequest = JsonSerializer.Deserialize<VertexAIBatchRequest>(json);
-            if (vertexAIBatchRequest is null || vertexAIBatchRequest.request is null)
-            {
-                return null;
-            }
-            var uriHash = vertexAIBatchRequest.request.labels[LABEL_URIHASH];
-            if (string.IsNullOrEmpty(uriHash))
-            {
-                return null;
-            }
-            return Pages.Pages.GetPage(uriHash);
         }
     }
 }

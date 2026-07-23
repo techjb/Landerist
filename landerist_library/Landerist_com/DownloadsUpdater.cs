@@ -1,4 +1,6 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Application.Websites;
+using landerist_library.Configuration;
+using landerist_library.Infrastructure.Sql;
 using landerist_library.Database;
 using landerist_library.Export;
 using landerist_library.Logs;
@@ -18,16 +20,18 @@ namespace landerist_library.Landerist_com
         private const string HOSTS_SUBDIRECTORY = "ES\\Hosts";
         private const string LISTINGS_BY_OPERATION_PROPERTY_TYPE_SUBDIRECTORY = "ES\\OperationPropertyTypes";
 
-        public static void Update()
+        public static void Update(
+            IWebsiteCatalog websites,
+            WebsiteQueryRepository websiteQueries)
         {
             try
             {
-                UpdateWebsites();
+                UpdateWebsites(websiteQueries);
                 UpdateFullDataSet(ListingStatus.published);
                 UpdateFullDataSet(ListingStatus.unpublished);
                 UpdateListingsUpdates();                
                 UpdateListingsByOperationPropertyType();
-                UpdateListingsByWebsite();
+                UpdateListingsByWebsite(websites);
             }
             catch (Exception exception)
             {
@@ -79,10 +83,10 @@ namespace landerist_library.Landerist_com
             }
         }
 
-        public static bool UpdateWebsites()
+        public static bool UpdateWebsites(WebsiteQueryRepository websiteQueries)
         {
             Console.WriteLine("Reading Websites ..");
-            var websites = Websites.Websites.GetDataTableAll();
+            var websites = websiteQueries.GetAll();
             if (websites.Rows.Count.Equals(0))
             {
                 return true;
@@ -110,14 +114,14 @@ namespace landerist_library.Landerist_com
             return UploadWebsitesFile(filePath, CountryCode.ES, websites.Rows.Count);
         }
 
-        public static bool UpdateListingsByWebsite()
+        public static bool UpdateListingsByWebsite(IWebsiteCatalog websites)
         {
             Console.WriteLine("Reading hosts ..");
-            var websites = Websites.Websites.GetAll()
+            var websiteList = websites.GetAll()
                 .OrderBy(website => website.Host, StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
-            if (websites.Count == 0)
+            if (websiteList.Count == 0)
             {
                 return true;
             }
@@ -128,7 +132,7 @@ namespace landerist_library.Landerist_com
                 Directory.CreateDirectory(directory);
             }
 
-            foreach (var website in websites)
+            foreach (var website in websiteList)
             {
                 if (!UpdateHostListings(website, ListingStatus.published) ||
                     !UpdateHostListings(website, ListingStatus.unpublished))

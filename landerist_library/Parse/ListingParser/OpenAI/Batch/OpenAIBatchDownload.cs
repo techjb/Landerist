@@ -1,4 +1,5 @@
-﻿using landerist_library.Logs;
+using landerist_library.Application.Pages;
+using landerist_library.Logs;
 using landerist_library.Pages;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -27,7 +28,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
             return (batchResponse.OutputFileId, batchResponse.ErrorFileId);
         }
 
-        public static (Page page, string? text)? ReadLine(string line)
+        public static (Page page, string? text)? ReadLine(string line, IPageCatalog pages)
         {
             OpenAIBatchResponse? batchResponseLine;
             try
@@ -46,7 +47,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
                 return null;
             }
 
-            var page = Pages.Pages.GetPage(batchResponseLine.CustomId);
+            var page = pages.GetByHash(batchResponseLine.CustomId);
             if (page == null)
             {
                 Log.WriteError("OpenAIBatchDownload ReadLine", "Page is null. CustomId: " + batchResponseLine.CustomId);

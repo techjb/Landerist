@@ -8,6 +8,7 @@ using landerist_library.Infrastructure.Logging;
 using landerist_library.Infrastructure.Listings;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Infrastructure.Scraping;
+using landerist_library.Infrastructure.WebsiteServices;
 using landerist_library.Logs;
 using landerist_library.Scrape;
 using landerist_library.Statistics;
@@ -60,7 +61,7 @@ namespace landerist_tests
                 Config.NOT_LISTING_CACHE_ENABLED);
             HostStatistics hostStatistics = new(
                 new HostStatisticsRepository(databaseFactory.Create()),
-                new WebsiteQueryRepository(databaseFactory.Create()));
+                new SqlWebsiteCatalog(new WebsiteQueryRepository(databaseFactory.Create())));
             SqlPageLinkService pageLinks = new(
                 pagePersistence,
                 new WebsitePageMetricsRepository(databaseFactory.Create()),

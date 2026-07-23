@@ -132,7 +132,7 @@ public sealed class SqlPersistenceAdaptersTests
         database.HashSetResult.Add("example.com");
         HostStatistics statistics = new(
             new HostStatisticsRepository(database),
-            new WebsiteQueryRepository(database));
+            new SqlWebsiteCatalog(new WebsiteQueryRepository(database)));
 
         statistics.TakeSnapshots();
 
@@ -160,6 +160,34 @@ public sealed class SqlPersistenceAdaptersTests
         Assert.Equal("readed_by_localai", database.LastParameters["WaitingStatusTo"]);
     }
 
+    [Fact]
+    public void WebsiteCatalog_MapsWebsitesThroughInjectedRepository()
+    {
+        RecordingDatabase database = new();
+        AddPageRow(database.TableResult);
+        SqlWebsiteCatalog catalog = new(new WebsiteQueryRepository(database));
+
+        IReadOnlyList<Website> websites = catalog.GetAll();
+
+        Website website = Assert.Single(websites);
+        Assert.Equal("example.com", website.Host);
+        Assert.Contains("FROM [WEBSITES]", database.LastQuery);
+    }
+
+    [Fact]
+    public void PageCatalog_MapsPageByHashThroughInjectedRepository()
+    {
+        RecordingDatabase database = new();
+        AddPageRow(database.TableResult);
+        SqlPageCatalog catalog = new(new PageQueryRepository(database));
+
+        Page? page = catalog.GetByHash("expected-hash");
+
+        Assert.NotNull(page);
+        Assert.Equal("expected-hash", page.UriHash);
+        Assert.Equal("example.com", page.Website.Host);
+        Assert.Equal("expected-hash", database.LastParameters!["UriHash"]);
+    }
     [Fact]
     public void WebsiteMetrics_CountsThroughInjectedRepositories()
     {

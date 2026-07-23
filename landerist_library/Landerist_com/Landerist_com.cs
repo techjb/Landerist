@@ -1,6 +1,7 @@
 using Amazon;
 using Amazon.CloudFront;
 using Amazon.CloudFront.Model;
+using landerist_library.Application.Websites;
 using landerist_library.Configuration;
 using landerist_library.Logs;
 using landerist_library.Infrastructure.Sql;
@@ -142,9 +143,11 @@ namespace landerist_library.Landerist_com
             return listingStatus.ToString().ToLowerInvariant();
         }
 
-        public static void UpdateDownloadsPage(WebsiteMetricsService websiteMetrics)
+        public static void UpdateDownloadsPage(
+            WebsiteMetricsService websiteMetrics,
+            IWebsiteCatalog websites)
         {
-            new DownloadsPage(websiteMetrics).Update();
+            new DownloadsPage(websiteMetrics, websites).Update();
             InvalidateCloudFront();
         }
 
@@ -158,15 +161,18 @@ namespace landerist_library.Landerist_com
 
         public static void UpdateHostStatisticsPage(
             HostStatistics hostStatistics,
-            WebsiteMetricsService websiteMetrics)
+            WebsiteMetricsService websiteMetrics,
+            IWebsiteCatalog websites)
         {
-            new HostStatisticsPage(hostStatistics, websiteMetrics).Update();
+            new HostStatisticsPage(hostStatistics, websiteMetrics, websites).Update();
             InvalidateCloudFront();
         }
 
-        public static void UpdateHostsStatisticsPage(WebsiteMetricsService websiteMetrics)
+        public static void UpdateHostsStatisticsPage(
+            WebsiteMetricsService websiteMetrics,
+            IWebsiteCatalog websites)
         {
-            new HostsStatisticsPage(websiteMetrics).Update();
+            new HostsStatisticsPage(websiteMetrics, websites).Update();
             InvalidateCloudFront();
         }
 
@@ -174,12 +180,13 @@ namespace landerist_library.Landerist_com
             GlobalStatistics globalStatistics,
             HostStatistics hostStatistics,
             PageStatisticsRepository pageStatistics,
-            WebsiteMetricsService websiteMetrics)
+            WebsiteMetricsService websiteMetrics,
+            IWebsiteCatalog websites)
         {
-            new DownloadsPage(websiteMetrics).Update();
+            new DownloadsPage(websiteMetrics, websites).Update();
             new StatisticsPage(globalStatistics, pageStatistics).UpdateCharts();
-            new HostStatisticsPage(hostStatistics, websiteMetrics).Update();
-            new HostsStatisticsPage(websiteMetrics).Update();
+            new HostStatisticsPage(hostStatistics, websiteMetrics, websites).Update();
+            new HostsStatisticsPage(websiteMetrics, websites).Update();
             InvalidateCloudFront();
         }
 

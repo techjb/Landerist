@@ -19,6 +19,7 @@ namespace landerist_library.Tasks
         private readonly GlobalStatistics _globalStatistics;
         private readonly HostStatistics _hostStatistics;
         private readonly IPageWaitingStatusService _waitingStatus;
+        private readonly IPageCatalog _pages;
 
         private int TotalProcessed = 0;
         private int TotalErrors = 0;
@@ -34,16 +35,19 @@ namespace landerist_library.Tasks
             IParsedPageClassificationService parsedClassification,
             GlobalStatistics globalStatistics,
             HostStatistics hostStatistics,
-            IPageWaitingStatusService waitingStatus)
+            IPageWaitingStatusService waitingStatus,
+            IPageCatalog pages)
         {
             ArgumentNullException.ThrowIfNull(parsedClassification);
             ArgumentNullException.ThrowIfNull(globalStatistics);
             ArgumentNullException.ThrowIfNull(hostStatistics);
             ArgumentNullException.ThrowIfNull(waitingStatus);
+            ArgumentNullException.ThrowIfNull(pages);
             _parsedClassification = parsedClassification;
             _globalStatistics = globalStatistics;
             _hostStatistics = hostStatistics;
             _waitingStatus = waitingStatus;
+            _pages = pages;
             Config.SetLLMProviderLocalAI();
             Config.EnableLogsErrorsInConsole();
             if (Config.IsConfigurationProduction())
@@ -222,7 +226,7 @@ namespace landerist_library.Tasks
 
         public void ProcessPage(string uriHash)
         {
-            var page = Pages.Pages.GetPage(uriHash);
+            var page = _pages.GetByHash(uriHash);
             if (page == null)
             {
                 Log.WriteError("TaskLocalAIParsing ProcessPage", "Page not found. UriHash: " + uriHash);
