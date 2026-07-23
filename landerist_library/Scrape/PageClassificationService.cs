@@ -1,3 +1,4 @@
+using landerist_library.Application.Persistence;
 using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Index;
@@ -7,8 +8,21 @@ using landerist_orels.ES;
 
 namespace landerist_library.Scrape
 {
-    internal sealed class PageClassificationService(Page page)
+    internal sealed class PageClassificationService
     {
+        private readonly Page page;
+        private readonly IPagePersistenceService _pagePersistence;
+
+        public PageClassificationService(
+            Page page,
+            IPagePersistenceService pagePersistence)
+        {
+            ArgumentNullException.ThrowIfNull(page);
+            ArgumentNullException.ThrowIfNull(pagePersistence);
+            this.page = page;
+            _pagePersistence = pagePersistence;
+        }
+
         public bool TryApplyPreClassificationBeforeDownload()
         {
             if (page.Website.HtmlIndexingEnabled && Config.INDEXER_ENABLED)
@@ -34,7 +48,7 @@ namespace landerist_library.Scrape
 
             UpdatePageTypeAndListing(pageType, null);
             Pages.Pages.SetNextScrapeFromNow(page);
-            return global::landerist_library.Pages.Pages.Update(page);
+            return _pagePersistence.Update(page);
         }
 
         public bool ApplyClassificationResultAfterDownload(PageType? newPageType, Listing? newListing, bool waitingAIRequest)
@@ -53,7 +67,7 @@ namespace landerist_library.Scrape
             UpdatePageTypeAndListing(newPageType, newListing);
             page.SetLastScrape();
             Pages.Pages.SetNextScrape(page);
-            return global::landerist_library.Pages.Pages.Update(page);
+            return _pagePersistence.Update(page);
         }
 
         public bool ApplyParsedClassificationAfterParsing(PageType newPageType, Listing? listing)
@@ -67,7 +81,7 @@ namespace landerist_library.Scrape
             page.SetResponseBodyFromZipped();
             UpdatePageTypeAndListing(newPageType, listing);
             page.RemoveResponseBodyZipped();
-            return global::landerist_library.Pages.Pages.Update(page);
+            return _pagePersistence.Update(page);
         }
 
         private void UpdatePageTypeAndListing(PageType? newPageType, Listing? newListing)

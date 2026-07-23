@@ -1,4 +1,6 @@
 ﻿using landerist_library.Configuration;
+using landerist_library.Application;
+using landerist_library.Application.Persistence;
 using landerist_library.Downloaders.Multiple;
 using landerist_library.Index;
 using landerist_library.Pages;
@@ -15,14 +17,31 @@ namespace landerist_library.Scrape
         private readonly bool _useProxy;
 
         public PageScraper(Page page)
+            : this(page, LanderistApplication.Services.PagePersistence)
+        {
+        }
+
+        public PageScraper(
+            Page page,
+            IPagePersistenceService pagePersistence)
         {
             ArgumentNullException.ThrowIfNull(page);
+            ArgumentNullException.ThrowIfNull(pagePersistence);
             _page = page;
-            _classificationService = new PageClassificationService(page);
+            _classificationService = new PageClassificationService(page, pagePersistence);
             _useProxy = page.Website.UseProxy;
         }
 
-        public PageScraper(Page page, bool useProxy) : this(page)
+        public PageScraper(Page page, bool useProxy)
+            : this(page, useProxy, LanderistApplication.Services.PagePersistence)
+        {
+        }
+
+        public PageScraper(
+            Page page,
+            bool useProxy,
+            IPagePersistenceService pagePersistence)
+            : this(page, pagePersistence)
         {
             _useProxy = useProxy;
         }

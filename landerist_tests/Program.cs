@@ -20,13 +20,14 @@ namespace landerist_tests
         private static readonly ConsoleEventDelegate Handler = new(ConsoleEventHandler);
         public delegate void KeyPressedHandler(ConsoleKeyInfo key);
         public static event KeyPressedHandler? OnKeyPressed;
-        private static readonly Scraper Scraper = new();
+        private static Scraper? Scraper;
 
         static void Main()
         {
             Console.Title = "Landerist Tests";
             Config.SetToTest();
             ConfigureApplicationServices();
+            Scraper = new Scraper();
             Start();
             Run();
             //ExitSignal.Wait();
@@ -118,7 +119,7 @@ namespace landerist_tests
             }
 
             //ServiceTasks.Stop();
-            Scraper.Stop();
+            Scraper?.Stop();
             var duration = (DateTime.Now - DateStart).ToString(@"dd\:hh\:mm\:ss\.fff");
             Log.Console("Stopped. Version: " + Config.VERSION + " Duration: " + duration);
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))

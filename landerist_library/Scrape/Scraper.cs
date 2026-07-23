@@ -1,4 +1,6 @@
 using landerist_library.Configuration;
+using landerist_library.Application;
+using landerist_library.Application.Persistence;
 using landerist_library.Database;
 using landerist_library.Downloaders.Multiple;
 using landerist_library.Downloaders.Puppeteer;
@@ -54,13 +56,20 @@ namespace landerist_library.Scrape
 
         private int TotalSkippedByBlockedWebsite = 0;
 
+        private readonly IPagePersistenceService _pagePersistence;
         private CancellationTokenSource _cancellation = new();
 
         private List<Page> _pageQueue = [];
 
         public Scraper()
+            : this(LanderistApplication.Services.PagePersistence)
         {
+        }
 
+        public Scraper(IPagePersistenceService pagePersistence)
+        {
+            ArgumentNullException.ThrowIfNull(pagePersistence);
+            _pagePersistence = pagePersistence;
         }
 
         public void TestSinglePage()
@@ -68,7 +77,7 @@ namespace landerist_library.Scrape
             ScraperLog.WriteTestStart();
             PuppeteerDownloader.UpdateChrome();
             Page page = Pages.Pages.LoadOrCreate(new Uri("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/"));
-            var pageScraper = new PageScraper(page);
+            var pageScraper = new PageScraper(page, _pagePersistence);
             pageScraper.Scrape();
             ScraperLog.WriteTestPageType(page);
             var listing =  global::landerist_library.Pages.Pages.GetListing(page, true, true);
@@ -232,7 +241,7 @@ namespace landerist_library.Scrape
             if (!page.Website.IsAllowedByRobotsTxt(page.Uri))
             {
                 Pages.Pages.SetPageTypeAndNextScrape(page, PageType.BlockedByRobotsTxt);
-                Pages.Pages.Update(page);
+                _pagePersistence.Update(page);
                 Interlocked.Increment(ref SkippedByRobotsTxt);
                 return;
             }
@@ -240,7 +249,7 @@ namespace landerist_library.Scrape
             if (page.Website.CrawlDelayTooBig())
             {
                 Pages.Pages.SetPageTypeAndNextScrape(page, PageType.CrawlDelayTooBig);
-                Pages.Pages.Update(page);
+                _pagePersistence.Update(page);
                 Interlocked.Increment(ref SkippedByCrawlDelay);
                 return;
             }
@@ -265,7 +274,7 @@ namespace landerist_library.Scrape
 
         public bool TryApplyPreClassificationBeforeDownload(Page page)
         {
-            var success = new PageScraper(page).TryApplyPreClassificationBeforeDownload();
+            var success = new PageScraper(page, _pagePersistence).TryApplyPreClassificationBeforeDownload();
             if (success)
             {
                 Interlocked.Increment(ref Processed);
@@ -379,7 +388,7 @@ namespace landerist_library.Scrape
             }
         }
 
-        private static ScrapeAttemptResult ScrapeAttempt(Page page, bool useProxy)
+        private ScrapeAttemptResult ScrapeAttempt(Page page, bool useProxy)
         {
             var acquired = WebsitesThrottle.Block(page.Website);
             if (!acquired && Config.IsConfigurationProduction())
@@ -387,7 +396,7 @@ namespace landerist_library.Scrape
                 return ScrapeAttemptResult.Blocked;
             }
 
-            var pageScraper = new PageScraper(page, useProxy);
+            var pageScraper = new PageScraper(page, useProxy, _pagePersistence);
             return pageScraper.Scrape()
                 ? ScrapeAttemptResult.Success
                 : ScrapeAttemptResult.Crashed;
