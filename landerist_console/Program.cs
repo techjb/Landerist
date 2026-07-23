@@ -61,13 +61,23 @@ namespace landerist_console
                     Config.MAX_PAGES_PER_HOST_PER_SCRAPE,
                     Config.MIN_PAGES_PER_SCRAPE,
                     enforceMinimumPages: Config.IsConfigurationProduction()));
+            ScrapeBatchServices batchScraping = new(
+                new LegacyWebsiteThrottleService(),
+                new LegacyScrapeResourceManager(),
+                new LegacyScrapeBatchMetrics(),
+                new LegacyScrapePageSource(),
+                new ScraperExecutionOptions(
+                    Config.IsConfigurationProduction(),
+                    Config.IsConfigurationLocal(),
+                    Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER));
             LanderistApplication.Configure(new LanderistApplicationServices(
                 new PagePersistenceService(new PageRepository(new DataBase())),
                 new WebsitePersistenceService(new WebsiteRepository(new DataBase())),
                 logger,
                 listingLifecycle,
                 pageScraping,
-                pageBatchSelector));
+                pageBatchSelector,
+                batchScraping));
         }
 
         private static void Start()

@@ -182,7 +182,8 @@ public sealed class PageClassificationServiceTests
             logger,
             listingLifecycle,
             CreatePipeline(),
-            new NullPageBatchSelector());
+            new NullPageBatchSelector(),
+            ScrapeBatchTestFactory.Create());
 
         Assert.NotNull(scraper);
     }

@@ -47,7 +47,8 @@ public sealed class PersistenceServiceTests
             new NullApplicationLogger(),
             new NullListingLifecycleService(),
             CreateNullPageScraping(),
-            new NullPageBatchSelector()));
+            new NullPageBatchSelector(),
+            ScrapeBatchTestFactory.Create()));
         Page page = new(
             new Website(new Uri("https://example.com")),
             new Uri("https://example.com/listing/2"));

@@ -1,43 +1,22 @@
-using landerist_library.Configuration;
 using landerist_library.Application.Logging;
+using landerist_library.Application.Scraping;
 using landerist_library.Pages;
 using landerist_orels.ES;
 
 namespace landerist_library.Scrape
 {
-    internal class ScraperLogCounters
-    {
-        public int Total { get; init; }
-
-        public int Processed { get; init; }
-
-        public int ScrapedSuccess { get; init; }
-
-        public int Crashed { get; init; }
-
-        public int DownloadErrors { get; init; }
-
-        public int SkippedByRobotsTxt { get; init; }
-
-        public int SkippedByCrawlDelay { get; init; }
-
-        public int SkippedByBlockedWebsite { get; init; }
-
-        public int Skipped => SkippedByRobotsTxt + SkippedByCrawlDelay + SkippedByBlockedWebsite;
-
-        public int Handled => Processed + Skipped;
-
-        public int Failed => Crashed + DownloadErrors + Skipped;
-    }
-
     internal sealed class ScraperLog
     {
         private readonly IApplicationLogger _logger;
+        private readonly bool _writePageProgress;
 
-        public ScraperLog(IApplicationLogger logger)
+        public ScraperLog(
+            IApplicationLogger logger,
+            bool writePageProgress)
         {
             ArgumentNullException.ThrowIfNull(logger);
             _logger = logger;
+            _writePageProgress = writePageProgress;
         }
 
         public void WriteTestStart()
@@ -61,9 +40,9 @@ namespace landerist_library.Scrape
             Console.WriteLine("Scrapping " + counter + " pages ..");
         }
 
-        public void WritePage(ScraperLogCounters counters, Page page)
+        public void WritePage(ScrapeBatchCounters counters, Page page)
         {
-            if (Config.IsConfigurationProduction())
+            if (!_writePageProgress)
             {
                 return;
             }
@@ -71,12 +50,12 @@ namespace landerist_library.Scrape
             Console.WriteLine(GetPageText(counters, page));
         }
 
-        public void WriteTotals(ScraperLogCounters counters)
+        public void WriteTotals(ScrapeBatchCounters counters)
         {
             _logger.WriteInfo("scraper", GetTotalsText(counters));
         }
 
-        private static string GetPageText(ScraperLogCounters counters, Page page)
+        private static string GetPageText(ScrapeBatchCounters counters, Page page)
         {
             var okPercentage = GetPercentage(counters.ScrapedSuccess, counters.Processed);
             var failedPercentage = GetPercentage(counters.Failed, counters.Total);
@@ -91,7 +70,7 @@ namespace landerist_library.Scrape
                 $"{page.PageType} {page.Uri}";
         }
 
-        private static string GetTotalsText(ScraperLogCounters counters)
+        private static string GetTotalsText(ScrapeBatchCounters counters)
         {
             var processedPercentage = GetPercentage(counters.Processed, counters.Total);
             var handledPercentage = GetPercentage(counters.Handled, counters.Total);

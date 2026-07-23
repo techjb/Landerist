@@ -1,0 +1,292 @@
+using landerist_library.Application.Listings;
+using landerist_library.Application.Logging;
+using landerist_library.Application.Persistence;
+using landerist_library.Application.Scraping;
+using landerist_library.Pages;
+using landerist_library.Scrape;
+using landerist_library.Websites;
+using landerist_orels.ES;
+
+namespace landerist_unit_tests;
+
+public sealed class ScraperBatchTests
+{
+    [Fact]
+    public void RunBatch_WhenPageSucceeds_RecordsMetricsAndReleasesResources()
+    {
+        TestContext context = CreateContext();
+
+        bool result = context.Scraper.RunBatch();
+
+        Assert.True(result);
+        Assert.Equal(
+            new ScrapeBatchCounters(1, 1, 1, 0, 0, 0, 0, 0),
+            Assert.Single(context.Metrics.Records));
+        Assert.Equal(1, context.Throttle.CleanCalls);
+        Assert.Equal(1, context.Throttle.AcquireCalls);
+        Assert.Equal(2, context.Resources.ClearDownloadersCalls);
+        Assert.Equal(1, context.Resources.KillChromeCalls);
+    }
+
+    [Fact]
+    public void RunBatch_WhenWebsiteIsBlocked_SkipsDownload()
+    {
+        TestContext context = CreateContext();
+        context.Throttle.Blocked = true;
+
+        context.Scraper.RunBatch();
+
+        ScrapeBatchCounters counters = Assert.Single(context.Metrics.Records);
+        Assert.Equal(1, counters.SkippedByBlockedWebsite);
+        Assert.Equal(0, counters.Processed);
+        Assert.Equal(0, context.Acquisition.Calls);
+        Assert.Equal(0, context.Throttle.AcquireCalls);
+    }
+
+    [Fact]
+    public void RunBatch_WhenThrottleCannotBeAcquiredInProduction_SkipsPage()
+    {
+        TestContext context = CreateContext(isProduction: true);
+        context.Throttle.CanAcquire = false;
+
+        context.Scraper.RunBatch();
+
+        ScrapeBatchCounters counters = Assert.Single(context.Metrics.Records);
+        Assert.Equal(1, counters.SkippedByBlockedWebsite);
+        Assert.Equal(0, counters.Processed);
+        Assert.Equal(0, context.Acquisition.Calls);
+    }
+
+    [Fact]
+    public void RunBatch_WhenDownloadFails_RecordsCrash()
+    {
+        TestContext context = CreateContext();
+        context.Acquisition.Status = PageAcquisitionStatus.DownloadFailed;
+
+        context.Scraper.RunBatch();
+
+        ScrapeBatchCounters counters = Assert.Single(context.Metrics.Records);
+        Assert.Equal(1, counters.Processed);
+        Assert.Equal(1, counters.Crashed);
+        Assert.Equal(0, counters.ScrapedSuccess);
+    }
+
+    [Fact]
+    public void RunBatch_WhenResponseIsForbidden_ReportsThrottleAndDownloadError()
+    {
+        TestContext context = CreateContext();
+        context.Acquisition.OnAcquire = page => page.HttpStatusCode = 403;
+        context.Classifier.PageType = PageType.HttpStatusCodeOtherNotOK;
+
+        context.Scraper.RunBatch();
+
+        ScrapeBatchCounters counters = Assert.Single(context.Metrics.Records);
+        Assert.Equal(1, counters.Processed);
+        Assert.Equal(1, counters.DownloadErrors);
+        Assert.Equal(1, context.Throttle.ReportForbiddenCalls);
+        Assert.Equal(0, context.Throttle.ReportSuccessCalls);
+    }
+
+    private static TestContext CreateContext(bool isProduction = false)
+    {
+        Page page = new(
+            new Website(new Uri("https://example.com")),
+            new Uri("https://example.com/listing/1"));
+        RecordingPageAcquisitionService acquisition = new();
+        RecordingPageContentClassifier classifier = new();
+        RecordingWebsiteThrottleService throttle = new();
+        RecordingScrapeResourceManager resources = new();
+        RecordingScrapeBatchMetrics metrics = new();
+        PageScrapePipelineServices pipeline = new(
+            acquisition,
+            classifier,
+            new NullPageIndexingService(),
+            new NullPageSchedulingService());
+        ScrapeBatchServices batchServices = new(
+            throttle,
+            resources,
+            metrics,
+            new NullScrapePageSource(),
+            new ScraperExecutionOptions(
+                isProduction,
+                isLocal: true,
+                maximumDegreeOfParallelism: 1));
+        Scraper scraper = new(
+            new RecordingPagePersistenceService(),
+            new NullApplicationLogger(),
+            new NullListingLifecycleService(),
+            pipeline,
+            new RecordingPageBatchSelector([page]),
+            batchServices);
+
+        return new TestContext(
+            scraper,
+            acquisition,
+            classifier,
+            throttle,
+            resources,
+            metrics);
+    }
+
+    private sealed record TestContext(
+        Scraper Scraper,
+        RecordingPageAcquisitionService Acquisition,
+        RecordingPageContentClassifier Classifier,
+        RecordingWebsiteThrottleService Throttle,
+        RecordingScrapeResourceManager Resources,
+        RecordingScrapeBatchMetrics Metrics);
+
+    private sealed class RecordingPageBatchSelector(IReadOnlyList<Page> pages) : IPageBatchSelector
+    {
+        public IReadOnlyList<Page> Select() => pages;
+    }
+
+    private sealed class RecordingPageAcquisitionService : IPageAcquisitionService
+    {
+        public PageAcquisitionStatus Status { get; set; } = PageAcquisitionStatus.Downloaded;
+
+        public Action<Page>? OnAcquire { get; set; }
+
+        public int Calls { get; private set; }
+
+        public PageAcquisitionStatus Acquire(Page page, bool useProxy)
+        {
+            Calls++;
+            OnAcquire?.Invoke(page);
+            return Status;
+        }
+    }
+
+    private sealed class RecordingPageContentClassifier : IPageContentClassifier
+    {
+        public PageType PageType { get; set; } = PageType.MainPage;
+
+        public PageClassificationResult Classify(Page page) =>
+            new(PageType, null, false);
+    }
+
+    private sealed class RecordingWebsiteThrottleService : IWebsiteThrottleService
+    {
+        public bool Blocked { get; set; }
+
+        public bool CanAcquire { get; set; } = true;
+
+        public int CleanCalls { get; private set; }
+
+        public int AcquireCalls { get; private set; }
+
+        public int ReportForbiddenCalls { get; private set; }
+
+        public int ReportSuccessCalls { get; private set; }
+
+        public bool Clean()
+        {
+            CleanCalls++;
+            return true;
+        }
+
+        public bool IsBlocked(Website website) => Blocked;
+
+        public bool TryAcquire(Website website)
+        {
+            AcquireCalls++;
+            return CanAcquire;
+        }
+
+        public bool ReportForbidden(Website website)
+        {
+            ReportForbiddenCalls++;
+            return true;
+        }
+
+        public bool ReportSuccess(Website website)
+        {
+            ReportSuccessCalls++;
+            return true;
+        }
+    }
+
+    private sealed class RecordingScrapeResourceManager : IScrapeResourceManager
+    {
+        public int ClearDownloadersCalls { get; private set; }
+
+        public int KillChromeCalls { get; private set; }
+
+        public void ClearDownloaders() => ClearDownloadersCalls++;
+
+        public void CleanPageLocks()
+        {
+        }
+
+        public void KillChrome() => KillChromeCalls++;
+
+        public void UpdateChrome()
+        {
+        }
+    }
+
+    private sealed class RecordingScrapeBatchMetrics : IScrapeBatchMetrics
+    {
+        public List<ScrapeBatchCounters> Records { get; } = [];
+
+        public void Record(ScrapeBatchCounters counters) => Records.Add(counters);
+    }
+
+    private sealed class RecordingPagePersistenceService : IPagePersistenceService
+    {
+        public bool Insert(Page page) => true;
+
+        public bool Update(Page page) => true;
+
+        public bool UpdateNextScrape(Page page) => true;
+
+        public bool Delete(Page page) => true;
+
+        public bool ListingParserInputExistsOnAnotherListing(Page page) => false;
+    }
+
+    private sealed class NullApplicationLogger : IApplicationLogger
+    {
+        public void WriteError(string source, string message)
+        {
+        }
+
+        public void WriteInfo(string source, string message)
+        {
+        }
+    }
+
+    private sealed class NullListingLifecycleService : IListingLifecycleService
+    {
+        public void Apply(Page page, Listing? listing)
+        {
+        }
+    }
+
+    private sealed class NullPageIndexingService : IPageIndexingService
+    {
+        public void Index(Page page)
+        {
+        }
+    }
+
+    private sealed class NullPageSchedulingService : IPageSchedulingService
+    {
+        public void SetNextScrape(Page page)
+        {
+        }
+
+        public void SetNextScrapeFromNow(Page page)
+        {
+        }
+    }
+
+    private sealed class NullScrapePageSource : IScrapePageSource
+    {
+        public Page LoadOrCreate(Uri uri) => new(uri);
+
+        public IReadOnlyList<Page> GetPages(Website website) => [];
+
+        public Listing? GetListing(Page page, bool loadMedia, bool loadSources) => null;
+    }
+}
