@@ -1,12 +1,12 @@
+using landerist_library.Application;
 using landerist_library.Application.Persistence;
-using landerist_library.Database;
-using landerist_library.Infrastructure.Sql;
 
 namespace landerist_library.Websites;
 
 public partial class Websites
 {
-    private static readonly WebsitePersistenceService Persistence = new(new WebsiteRepository(new DataBase()));
+    private static IWebsitePersistenceService Persistence =>
+        LanderistApplication.Services.WebsitePersistence;
 
     public static bool Insert(Website website) => Persistence.Insert(website);
 

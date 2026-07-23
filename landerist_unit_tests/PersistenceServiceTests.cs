@@ -1,3 +1,4 @@
+using landerist_library.Application;
 using landerist_library.Application.Persistence;
 using landerist_library.Pages;
 using landerist_library.Websites;
@@ -30,6 +31,28 @@ public sealed class PersistenceServiceTests
 
         Assert.True(result);
         Assert.Same(website, repository.UpdatedWebsite);
+    }
+
+    [Fact]
+    public void LegacyFacades_UseConfiguredApplicationServices()
+    {
+        FakePageRepository pageRepository = new();
+        FakeWebsiteRepository websiteRepository = new();
+        LanderistApplication.Configure(new LanderistApplicationServices(
+            new PagePersistenceService(pageRepository),
+            new WebsitePersistenceService(websiteRepository)));
+        Page page = new(
+            new Website(new Uri("https://example.com")),
+            new Uri("https://example.com/listing/2"));
+        Website website = new(new Uri("https://another-example.com"));
+
+        bool pageInserted = Pages.Insert(page);
+        bool websiteUpdated = Websites.Update(website);
+
+        Assert.True(pageInserted);
+        Assert.True(websiteUpdated);
+        Assert.Same(page, pageRepository.InsertedPage);
+        Assert.Same(website, websiteRepository.UpdatedWebsite);
     }
 
     private sealed class FakePageRepository : IPageRepository

@@ -2,7 +2,7 @@ using landerist_library.Pages;
 
 namespace landerist_library.Application.Persistence;
 
-public sealed class PagePersistenceService
+public sealed class PagePersistenceService : IPagePersistenceService
 {
     private readonly IPageRepository _repository;
 

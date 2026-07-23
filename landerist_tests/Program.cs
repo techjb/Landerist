@@ -1,4 +1,8 @@
 ﻿using landerist_library.Configuration;
+using landerist_library.Application;
+using landerist_library.Application.Persistence;
+using landerist_library.Database;
+using landerist_library.Infrastructure.Sql;
 using landerist_library.Logs;
 using landerist_library.Scrape;
 using System.Runtime.InteropServices;
@@ -22,10 +26,18 @@ namespace landerist_tests
         {
             Console.Title = "Landerist Tests";
             Config.SetToTest();
+            ConfigureApplicationServices();
             Start();
             Run();
             //ExitSignal.Wait();
             End();
+        }
+
+        private static void ConfigureApplicationServices()
+        {
+            LanderistApplication.Configure(new LanderistApplicationServices(
+                new PagePersistenceService(new PageRepository(new DataBase())),
+                new WebsitePersistenceService(new WebsiteRepository(new DataBase()))));
         }
 
         private static void Start()

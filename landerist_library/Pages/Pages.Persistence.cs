@@ -1,13 +1,14 @@
+using landerist_library.Application;
 using landerist_library.Application.Persistence;
 using landerist_library.Database;
-using landerist_library.Infrastructure.Sql;
 using landerist_orels.ES;
 
 namespace landerist_library.Pages;
 
 public partial class Pages
 {
-    private static readonly PagePersistenceService Persistence = new(new PageRepository(new DataBase()));
+    private static IPagePersistenceService Persistence =>
+        LanderistApplication.Services.PagePersistence;
 
     public static bool Insert(Page page) => Persistence.Insert(page);
 

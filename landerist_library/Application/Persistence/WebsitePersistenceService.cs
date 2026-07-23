@@ -2,7 +2,7 @@ using landerist_library.Websites;
 
 namespace landerist_library.Application.Persistence;
 
-public sealed class WebsitePersistenceService
+public sealed class WebsitePersistenceService : IWebsitePersistenceService
 {
     private readonly IWebsiteRepository _repository;
 
