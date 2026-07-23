@@ -3,12 +3,15 @@ using landerist_library.Application;
 using landerist_library.Application.Listings;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Scraping;
+using landerist_library.Application.Tasks;
 using landerist_library.Database;
 using landerist_library.Infrastructure.Logging;
 using landerist_library.Infrastructure.Listings;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Infrastructure.Scraping;
+using landerist_library.Infrastructure.Tasks;
 using landerist_library.Logs;
+using landerist_library.Scrape;
 using landerist_library.Tasks;
 
 namespace landerist_console
@@ -28,14 +31,13 @@ namespace landerist_console
         static void Main()
         {
             Config.SetToProduction();
-            ConfigureApplicationServices();
-            _serviceTasks = new TasksService();
+            _serviceTasks = ConfigureApplicationServices();
             Console.Title = "Landerist Console " + Config.VERSION;
             Start();
             Run();
         }
 
-        private static void ConfigureApplicationServices()
+        private static TasksService ConfigureApplicationServices()
         {
             LegacyApplicationLogger logger = new();
             ListingLifecycleService listingLifecycle = new(
@@ -70,14 +72,44 @@ namespace landerist_console
                     Config.IsConfigurationProduction(),
                     Config.IsConfigurationLocal(),
                     Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER));
+            PagePersistenceService pagePersistence = new(new PageRepository(new DataBase()));
+            WebsitePersistenceService websitePersistence = new(new WebsiteRepository(new DataBase()));
+
             LanderistApplication.Configure(new LanderistApplicationServices(
-                new PagePersistenceService(new PageRepository(new DataBase())),
-                new WebsitePersistenceService(new WebsiteRepository(new DataBase())),
+                pagePersistence,
+                websitePersistence,
                 logger,
                 listingLifecycle,
                 pageScraping,
                 pageBatchSelector,
                 batchScraping));
+
+            Scraper scraper = new(
+                pagePersistence,
+                logger,
+                listingLifecycle,
+                pageScraping,
+                pageBatchSelector,
+                batchScraping);
+            TasksExecutionMode executionMode =
+                Config.IsLocalAIMachine() || Config.IsConfigurationLocal()
+                    ? TasksExecutionMode.LocalAi
+                    : Config.IsPrincipalMachine()
+                        ? TasksExecutionMode.Principal
+                        : TasksExecutionMode.Scraper;
+
+            return new TasksService(
+                new TasksServiceOptions(executionMode),
+                new SystemRecurringTaskScheduler(),
+                logger,
+                new LegacyScrapeTaskJob(scraper, batchScraping.Resources),
+                new LegacyLocalAiTaskJob(() => new TaskLocalAIParsing()),
+                new LegacyTenMinuteTaskJob(
+                    new TaskBatchDownload(),
+                    new TaskBatchUpload()),
+                new LegacyHourlyTaskJob(),
+                new LegacyDailyTaskJob(),
+                TimeProvider.System);
         }
 
         private static void Start()
