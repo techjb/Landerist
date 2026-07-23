@@ -1,5 +1,6 @@
 using landerist_library.Application;
 using landerist_library.Application.Persistence;
+using landerist_library.Application.Websites;
 using landerist_library.Pages;
 using landerist_library.Websites;
 
@@ -40,7 +41,8 @@ public sealed class PersistenceServiceTests
         FakeWebsiteRepository websiteRepository = new();
         LanderistApplication.Configure(new LanderistApplicationServices(
             new PagePersistenceService(pageRepository),
-            new WebsitePersistenceService(websiteRepository)));
+            new WebsitePersistenceService(websiteRepository),
+            new FakeWebsiteDeletionService()));
         Page page = new(
             new Website(new Uri("https://example.com")),
             new Uri("https://example.com/listing/2"));
@@ -63,6 +65,11 @@ public sealed class PersistenceServiceTests
         public bool UpdateNextScrape(string uriHash, DateTime? nextScrape) => true;
         public bool Delete(string uriHash) => true;
         public bool ListingParserInputExistsOnAnotherListing(string host, string uriHash, string? listingParserInputHash) => false;
+    }
+
+    private sealed class FakeWebsiteDeletionService : IWebsiteDeletionService
+    {
+        public bool DeleteWithRelations(Website website) => true;
     }
 
     private sealed class FakeWebsiteRepository : IWebsiteRepository

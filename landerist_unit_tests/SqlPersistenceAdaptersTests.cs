@@ -188,6 +188,36 @@ public sealed class SqlPersistenceAdaptersTests
         Assert.Equal("example.com", page.Website.Host);
         Assert.Equal("expected-hash", database.LastParameters!["UriHash"]);
     }
+
+    [Fact]
+    public void PageCatalog_MapsPagesForWebsiteThroughInjectedRepository()
+    {
+        RecordingDatabase database = new();
+        AddPageRow(database.TableResult);
+        SqlPageCatalog catalog = new(new PageQueryRepository(database));
+        Website website = new(new Uri("https://example.com"));
+
+        IReadOnlyList<Page> pages = catalog.GetByWebsite(website);
+
+        Page page = Assert.Single(pages);
+        Assert.Equal("expected-hash", page.UriHash);
+        Assert.Same(website, page.Website);
+        Assert.Equal("example.com", database.LastParameters!["Host"]);
+    }
+
+    [Fact]
+    public void PageDeletion_DeletesPagesForHostThroughInjectedRepository()
+    {
+        RecordingDatabase database = new() { QueryResult = true };
+        SqlPageDeletionService deletion = new(new PageMaintenanceRepository(database));
+
+        bool deleted = deletion.DeleteByHost("example.com");
+
+        Assert.True(deleted);
+        Assert.Contains("DELETE FROM", database.LastQuery);
+        Assert.Equal("example.com", database.LastParameters!["Host"]);
+    }
+
     [Fact]
     public void WebsiteMetrics_CountsThroughInjectedRepositories()
     {

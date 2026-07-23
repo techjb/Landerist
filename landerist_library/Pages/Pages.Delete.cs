@@ -11,10 +11,6 @@ namespace landerist_library.Pages
 {
     public partial class Pages
     {
-        public static bool Delete(Website website)
-        {
-            return MaintenanceRepository.DeleteByHost(website.Host);
-        }
 
         public static bool DeleteAll()
         {

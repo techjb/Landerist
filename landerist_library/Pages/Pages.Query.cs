@@ -48,11 +48,6 @@ namespace landerist_library.Pages
             return pages;
         }
 
-        public static List<Page> GetPages(Website website)
-        {
-            DataTable dataTable = QueryRepository.GetPagesByHost(website.Host);
-            return GetPages(website, dataTable);
-        }
 
         public static List<Page> GetPages(PageType pageType)
         {

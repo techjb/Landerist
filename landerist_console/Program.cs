@@ -4,6 +4,7 @@ using landerist_library.Application.Listings;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Scraping;
 using landerist_library.Application.Tasks;
+using landerist_library.Application.Websites;
 using landerist_library.Database;
 using landerist_library.Infrastructure.Backup;
 using landerist_library.Infrastructure.Logging;
@@ -63,6 +64,11 @@ namespace landerist_console
             BatchRepository batches = new(databaseFactory.Create());
             SqlPageCatalog pageCatalog = new(
                 new PageQueryRepository(databaseFactory.Create()));
+            WebsiteDeletionService websiteDeletion = new(
+                pageCatalog,
+                new OrelsListingDeletionService(),
+                new SqlPageDeletionService(new PageMaintenanceRepository(databaseFactory.Create())),
+                websitePersistence);
             SqlPageWaitingStatusService waitingStatus = new(
                 new PageMaintenanceRepository(databaseFactory.Create()));
             PageStatisticsRepository pageStatistics = new(databaseFactory.Create());
@@ -123,7 +129,8 @@ namespace landerist_console
 
             LanderistApplication.Configure(new LanderistApplicationServices(
                 pagePersistence,
-                websitePersistence));
+                websitePersistence,
+                websiteDeletion));
 
             Scraper scraper = new(
                 pagePersistence,

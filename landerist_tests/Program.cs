@@ -3,9 +3,11 @@ using landerist_library.Application;
 using landerist_library.Application.Listings;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Scraping;
+using landerist_library.Application.Websites;
 using landerist_library.Database;
 using landerist_library.Infrastructure.Logging;
 using landerist_library.Infrastructure.Listings;
+using landerist_library.Infrastructure.PageServices;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Infrastructure.Scraping;
 using landerist_library.Infrastructure.WebsiteServices;
@@ -103,9 +105,17 @@ namespace landerist_tests
                     Config.IsConfigurationLocal(),
                     Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER));
 
+            SqlPageCatalog pageCatalog = new(
+                new PageQueryRepository(databaseFactory.Create()));
+            WebsiteDeletionService websiteDeletion = new(
+                pageCatalog,
+                new OrelsListingDeletionService(),
+                new SqlPageDeletionService(new PageMaintenanceRepository(databaseFactory.Create())),
+                websitePersistence);
             LanderistApplication.Configure(new LanderistApplicationServices(
                 pagePersistence,
-                websitePersistence));
+                websitePersistence,
+                websiteDeletion));
 
             return new Scraper(
                 pagePersistence,

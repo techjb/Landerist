@@ -1,4 +1,5 @@
 using landerist_library.Application.Persistence;
+using landerist_library.Application.Websites;
 
 namespace landerist_library.Application;
 
@@ -10,17 +11,22 @@ public sealed class LanderistApplicationServices
 {
     public LanderistApplicationServices(
         IPagePersistenceService pagePersistence,
-        IWebsitePersistenceService websitePersistence)
+        IWebsitePersistenceService websitePersistence,
+        IWebsiteDeletionService websiteDeletion)
     {
         ArgumentNullException.ThrowIfNull(pagePersistence);
         ArgumentNullException.ThrowIfNull(websitePersistence);
+        ArgumentNullException.ThrowIfNull(websiteDeletion);
         PagePersistence = pagePersistence;
         WebsitePersistence = websitePersistence;
+        WebsiteDeletion = websiteDeletion;
     }
 
     public IPagePersistenceService PagePersistence { get; }
 
     public IWebsitePersistenceService WebsitePersistence { get; }
+
+    public IWebsiteDeletionService WebsiteDeletion { get; }
 }
 
 /// <summary>
