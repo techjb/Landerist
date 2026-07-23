@@ -1,4 +1,5 @@
 using landerist_library.Application;
+using landerist_library.Application.Listings;
 using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
 using landerist_library.Pages;
@@ -42,7 +43,8 @@ public sealed class PersistenceServiceTests
         LanderistApplication.Configure(new LanderistApplicationServices(
             new PagePersistenceService(pageRepository),
             new WebsitePersistenceService(websiteRepository),
-            new NullApplicationLogger()));
+            new NullApplicationLogger(),
+            new NullListingLifecycleService()));
         Page page = new(
             new Website(new Uri("https://example.com")),
             new Uri("https://example.com/listing/2"));
@@ -82,6 +84,13 @@ public sealed class PersistenceServiceTests
         }
 
         public void WriteInfo(string source, string message)
+        {
+        }
+    }
+
+    private sealed class NullListingLifecycleService : IListingLifecycleService
+    {
+        public void Apply(Page page, landerist_orels.ES.Listing? listing)
         {
         }
     }

@@ -1,8 +1,10 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Application;
+using landerist_library.Application.Listings;
 using landerist_library.Application.Persistence;
 using landerist_library.Database;
 using landerist_library.Infrastructure.Logging;
+using landerist_library.Infrastructure.Listings;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Logs;
 using landerist_library.Tasks;
@@ -33,10 +35,19 @@ namespace landerist_console
 
         private static void ConfigureApplicationServices()
         {
+            LegacyApplicationLogger logger = new();
+            ListingLifecycleService listingLifecycle = new(
+                new LegacyListingStore(),
+                new LegacyNotListingCacheService(),
+                new LegacyPageLinkService(),
+                new LegacyListingEnricher(),
+                new LegacyListingUnpublishPolicy(),
+                logger);
             LanderistApplication.Configure(new LanderistApplicationServices(
                 new PagePersistenceService(new PageRepository(new DataBase())),
                 new WebsitePersistenceService(new WebsiteRepository(new DataBase())),
-                new LegacyApplicationLogger()));
+                logger,
+                listingLifecycle));
         }
 
         private static void Start()

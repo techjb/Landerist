@@ -1,5 +1,6 @@
 ﻿using landerist_library.Configuration;
 using landerist_library.Application;
+using landerist_library.Application.Listings;
 using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
 using landerist_library.Downloaders.Multiple;
@@ -21,14 +22,19 @@ namespace landerist_library.Scrape
             : this(
                 page,
                 LanderistApplication.Services.PagePersistence,
-                LanderistApplication.Services.Logger)
+                LanderistApplication.Services.Logger,
+                LanderistApplication.Services.ListingLifecycle)
         {
         }
 
         public PageScraper(
             Page page,
             IPagePersistenceService pagePersistence)
-            : this(page, pagePersistence, LanderistApplication.Services.Logger)
+            : this(
+                page,
+                pagePersistence,
+                LanderistApplication.Services.Logger,
+                LanderistApplication.Services.ListingLifecycle)
         {
         }
 
@@ -36,12 +42,27 @@ namespace landerist_library.Scrape
             Page page,
             IPagePersistenceService pagePersistence,
             IApplicationLogger logger)
+            : this(page, pagePersistence, logger, LanderistApplication.Services.ListingLifecycle)
+        {
+        }
+
+        public PageScraper(
+            Page page,
+            IPagePersistenceService pagePersistence,
+            IApplicationLogger logger,
+            IListingLifecycleService listingLifecycle)
         {
             ArgumentNullException.ThrowIfNull(page);
             ArgumentNullException.ThrowIfNull(pagePersistence);
             ArgumentNullException.ThrowIfNull(logger);
+            ArgumentNullException.ThrowIfNull(listingLifecycle);
+
             _page = page;
-            _classificationService = new PageClassificationService(page, pagePersistence, logger);
+            _classificationService = new PageClassificationService(
+                page,
+                pagePersistence,
+                logger,
+                listingLifecycle);
             _useProxy = page.Website.UseProxy;
         }
 
@@ -50,7 +71,8 @@ namespace landerist_library.Scrape
                 page,
                 useProxy,
                 LanderistApplication.Services.PagePersistence,
-                LanderistApplication.Services.Logger)
+                LanderistApplication.Services.Logger,
+                LanderistApplication.Services.ListingLifecycle)
         {
         }
 
@@ -58,7 +80,12 @@ namespace landerist_library.Scrape
             Page page,
             bool useProxy,
             IPagePersistenceService pagePersistence)
-            : this(page, useProxy, pagePersistence, LanderistApplication.Services.Logger)
+            : this(
+                page,
+                useProxy,
+                pagePersistence,
+                LanderistApplication.Services.Logger,
+                LanderistApplication.Services.ListingLifecycle)
         {
         }
 
@@ -67,7 +94,22 @@ namespace landerist_library.Scrape
             bool useProxy,
             IPagePersistenceService pagePersistence,
             IApplicationLogger logger)
-            : this(page, pagePersistence, logger)
+            : this(
+                page,
+                useProxy,
+                pagePersistence,
+                logger,
+                LanderistApplication.Services.ListingLifecycle)
+        {
+        }
+
+        public PageScraper(
+            Page page,
+            bool useProxy,
+            IPagePersistenceService pagePersistence,
+            IApplicationLogger logger,
+            IListingLifecycleService listingLifecycle)
+            : this(page, pagePersistence, logger, listingLifecycle)
         {
             _useProxy = useProxy;
         }
