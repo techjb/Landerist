@@ -1,4 +1,4 @@
-﻿# Landerist architecture
+# Landerist architecture
 
 Landerist is being migrated incrementally from a single legacy library to a layered modular monolith. New code follows this dependency direction:
 
