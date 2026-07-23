@@ -1,4 +1,4 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Configuration;
 using landerist_library.Application;
 using landerist_library.Application.Listings;
 using landerist_library.Application.Persistence;
@@ -10,6 +10,7 @@ using landerist_library.Infrastructure.Sql;
 using landerist_library.Infrastructure.Scraping;
 using landerist_library.Logs;
 using landerist_library.Scrape;
+using landerist_library.Statistics;
 using System.Runtime.InteropServices;
 
 
@@ -57,6 +58,9 @@ namespace landerist_tests
             SqlNotListingCacheService notListingCache = new(
                 databaseFactory.Create(),
                 Config.NOT_LISTING_CACHE_ENABLED);
+            HostStatistics hostStatistics = new(
+                new HostStatisticsRepository(databaseFactory.Create()),
+                new WebsiteQueryRepository(databaseFactory.Create()));
             SqlPageLinkService pageLinks = new(
                 pagePersistence,
                 new WebsitePageMetricsRepository(databaseFactory.Create()),
@@ -77,7 +81,8 @@ namespace landerist_tests
                 new PageContentClassifier(
                     Config.IsConfigurationProduction(),
                     notListingCache,
-                    new SqlPageClassificationMetrics(databaseFactory.Create())),
+                    new SqlPageClassificationMetrics(databaseFactory.Create()),
+                    hostStatistics),
                 new PageIndexingService(Config.INDEXER_ENABLED, pageLinks),
                 new SqlPageSchedulingService(listingStore));
             PageBatchSelector pageBatchSelector = new(

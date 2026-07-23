@@ -1,4 +1,4 @@
-﻿using landerist_library.Infrastructure.Sql;
+using landerist_library.Infrastructure.Sql;
 using landerist_orels.ES;
 using System.Data;
 
@@ -41,11 +41,17 @@ namespace landerist_library.Statistics
         PageNotModified,
     }
 
-    public class GlobalStatistics
+    public sealed class GlobalStatistics
     {
-        private static readonly GlobalStatisticsRepository Repository = new(global::landerist_library.Database.LegacyDatabase.Create());
+        private readonly GlobalStatisticsRepository Repository;
 
-        public static void TakeSnapshots()
+        public GlobalStatistics(GlobalStatisticsRepository repository)
+        {
+            ArgumentNullException.ThrowIfNull(repository);
+            Repository = repository;
+        }
+
+        public void TakeSnapshots()
         {
             Websites();
             UpdatedRobotsTxt();
@@ -64,77 +70,77 @@ namespace landerist_library.Statistics
             PageType();
         }
 
-        private static void Websites()
+        private void Websites()
         {
             InsertDaily(StatisticsKey.Websites, Repository.CountWebsites());
         }
 
-        private static void UpdatedRobotsTxt()
+        private void UpdatedRobotsTxt()
         {
             InsertDaily(StatisticsKey.UpdatedRobotsTxt, Repository.CountUpdatedRobotsTxtYesterday());
         }
 
-        private static void UpdatedSitemaps()
+        private void UpdatedSitemaps()
         {
             InsertDaily(StatisticsKey.UpdatedSitemaps, Repository.CountUpdatedSitemapsYesterday());
         }
 
-        private static void UpdatedIpAddress()
+        private void UpdatedIpAddress()
         {
             InsertDaily(StatisticsKey.UpdatedIpAddress, Repository.CountUpdatedIpAddressYesterday());
         }
 
-        private static void Pages()
+        private void Pages()
         {
             InsertDaily(StatisticsKey.Pages, Repository.CountPages());
         }
 
-        private static void LastScrapePages()
+        private void LastScrapePages()
         {
             InsertDaily(StatisticsKey.LastScrapePages, Repository.CountLastScrapePagesYesterday());
         }
 
-        private static void NeedUpdate()
+        private void NeedUpdate()
         {
             InsertDaily(StatisticsKey.NeedUpdate, Repository.CountNeedUpdatePages());
         }
 
-        private static void WaitingAIRequest()
+        private void WaitingAIRequest()
         {
             InsertDaily(StatisticsKey.WaitingAIRequest, Repository.CountWaitingAIRequestPages());
         }
 
-        private static void UnknownPageType()
+        private void UnknownPageType()
         {
             InsertDaily(StatisticsKey.UnknownPageType, Repository.CountUnknownPageTypePages());
         }
 
-        private static void Listings()
+        private void Listings()
         {
             InsertDaily(StatisticsKey.Listings, Repository.CountListings());
         }
 
-        private static void PublishedListings()
+        private void PublishedListings()
         {
             SnapshotListings(StatisticsKey.PublishedListings, ListingStatus.published);
         }
 
-        private static void UnPublishedListings()
+        private void UnPublishedListings()
         {
             SnapshotListings(StatisticsKey.UnpublishedListings, ListingStatus.unpublished);
         }
 
-        private static void SnapshotListings(StatisticsKey statisticsKey, ListingStatus listingStatus)
+        private void SnapshotListings(StatisticsKey statisticsKey, ListingStatus listingStatus)
         {
             InsertDaily(statisticsKey, Repository.CountListings(listingStatus));
         }
 
-        private static void Media()
+        private void Media()
         {
             InsertDaily(StatisticsKey.Media, Repository.CountMedia());
         }
 
-        public static void SnapshotHttpStatusCode7Days()
+        public void SnapshotHttpStatusCode7Days()
         {
             for (var days = -7; days <= -1; days++)
             {
@@ -142,12 +148,12 @@ namespace landerist_library.Statistics
             }
         }
 
-        public static void HttpStatusCode()
+        public void HttpStatusCode()
         {
             SnapshotHttpStatusCode(-1);
         }
 
-        public static void SnapshotHttpStatusCode(int days)
+        public void SnapshotHttpStatusCode(int days)
         {
             DateTime date = DateTime.Today.AddDays(days);
             Repository.DeleteByKeyPrefixAndDate(date, StatisticsKey.HttpStatusCode.ToString());
@@ -161,27 +167,27 @@ namespace landerist_library.Statistics
             }
         }
 
-        public static List<string> GetHttpStatusCodeKeys()
+        public List<string> GetHttpStatusCodeKeys()
         {
             return GetKeysLike(StatisticsKey.HttpStatusCode);
         }
 
-        public static List<string> GetPageTypeKeys()
+        public List<string> GetPageTypeKeys()
         {
             return GetKeysLike(StatisticsKey.PageType);
         }
 
-        public static List<string> GetKeysLike(StatisticsKey key)
+        public List<string> GetKeysLike(StatisticsKey key)
         {
             return Repository.GetKeysLike(key);
         }
 
-        public static void PageType()
+        public void PageType()
         {
             SnapshotPageType(-1);
         }
 
-        public static void SnapshotPageType7Days()
+        public void SnapshotPageType7Days()
         {
             for (var days = -7; days <= -1; days++)
             {
@@ -189,7 +195,7 @@ namespace landerist_library.Statistics
             }
         }
 
-        public static void SnapshotPageType(int days)
+        public void SnapshotPageType(int days)
         {
             DateTime date = DateTime.Today.AddDays(days);
             Repository.DeleteByKeyPrefixAndDate(date, StatisticsKey.PageType.ToString());
@@ -203,27 +209,27 @@ namespace landerist_library.Statistics
             }
         }
 
-        private static bool InsertDaily(StatisticsKey key, int counter)
+        private bool InsertDaily(StatisticsKey key, int counter)
         {
             return Repository.Insert(DateTime.Now, key.ToString(), counter);
         }
 
-        public static bool InsertDailyCounter(StatisticsKey key)
+        public bool InsertDailyCounter(StatisticsKey key)
         {
             return InsertDailyCounter(key.ToString());
         }
 
-        public static bool InsertDailyCounter(string key)
+        public bool InsertDailyCounter(string key)
         {
             return InsertDailyCounter(key, 1);
         }
 
-        public static bool InsertDailyCounter(StatisticsKey key, int counter)
+        public bool InsertDailyCounter(StatisticsKey key, int counter)
         {
             return InsertDailyCounter(key.ToString(), counter);
         }
 
-        public static bool InsertDailyCounter(string key, int counter)
+        public bool InsertDailyCounter(string key, int counter)
         {
             if (Configuration.Config.IsConfigurationLocal())
             {
@@ -233,7 +239,7 @@ namespace landerist_library.Statistics
             return Repository.InsertDailyCounter(key, counter);
         }
 
-        public static DataSet GetStatistics(int lastMonths)
+        public DataSet GetStatistics(int lastMonths)
         {
             DataTable dataTable = Repository.GetStatisticsKeys();
 
@@ -248,12 +254,12 @@ namespace landerist_library.Statistics
             return dataSet;
         }
 
-        private static DataTable GetStatistics(string key, int months)
+        private DataTable GetStatistics(string key, int months)
         {
             return Repository.GetStatistics(key, months);
         }
 
-        public static DataTable GetLatestStatistics(string statisticsKey, int top)
+        public DataTable GetLatestStatistics(string statisticsKey, int top)
         {
             return Repository.GetLatestStatistics(statisticsKey, top);
         }

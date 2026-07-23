@@ -15,15 +15,19 @@ namespace landerist_library.Tasks
     {
         private readonly IParsedPageClassificationService _parsedClassification;
         private readonly BatchRepository _batches;
+        private readonly GlobalStatistics _statistics;
 
         public TaskBatchDownload(
             IParsedPageClassificationService parsedClassification,
-            BatchRepository batches)
+            BatchRepository batches,
+            GlobalStatistics statistics)
         {
             ArgumentNullException.ThrowIfNull(parsedClassification);
             ArgumentNullException.ThrowIfNull(batches);
+            ArgumentNullException.ThrowIfNull(statistics);
             _parsedClassification = parsedClassification;
             _batches = batches;
+            _statistics = statistics;
         }
 
         public readonly HashSet<string> DownloadedPagesUriHashes = [];
@@ -161,8 +165,8 @@ namespace landerist_library.Tasks
 
             Log.WriteBatch("TaskBatchDownload", $"ReadSuccessFile {read}/{lines.Length} errors: {errors}");
 
-            GlobalStatistics.InsertDailyCounter(StatisticsKey.BatchReaded, read);
-            GlobalStatistics.InsertDailyCounter(StatisticsKey.BatchReadedErrors, errors);
+            _statistics.InsertDailyCounter(StatisticsKey.BatchReaded, read);
+            _statistics.InsertDailyCounter(StatisticsKey.BatchReadedErrors, errors);
         }
 
         private bool ReadSuccessLine(Batch batch, string line)

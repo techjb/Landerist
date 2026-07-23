@@ -1,7 +1,8 @@
-﻿using landerist_library.Application.Listings;
+using landerist_library.Application.Listings;
 using landerist_library.Application.Scraping;
 using landerist_library.Pages;
 using landerist_library.Parse.ListingParser;
+using landerist_library.Statistics;
 
 namespace landerist_library.Parse.PageTypeParser
 {
@@ -11,20 +12,24 @@ namespace landerist_library.Parse.PageTypeParser
         private readonly bool _isProduction;
         private readonly INotListingCacheService _notListingCache;
         private readonly IPageClassificationMetrics _metrics;
+        private readonly HostStatistics _hostStatistics;
 
         public PageTypeParser(
             Page page,
             bool isProduction,
             INotListingCacheService notListingCache,
-            IPageClassificationMetrics metrics)
+            IPageClassificationMetrics metrics,
+            HostStatistics hostStatistics)
         {
             ArgumentNullException.ThrowIfNull(page);
             ArgumentNullException.ThrowIfNull(notListingCache);
             ArgumentNullException.ThrowIfNull(metrics);
+            ArgumentNullException.ThrowIfNull(hostStatistics);
             Page = page;
             _isProduction = isProduction;
             _notListingCache = notListingCache;
             _metrics = metrics;
+            _hostStatistics = hostStatistics;
         }
 
         public (PageType? pageType, landerist_orels.ES.Listing? listing, bool waitingAIRequest)
@@ -125,19 +130,12 @@ namespace landerist_library.Parse.PageTypeParser
                 _metrics.RecordListingInputAlreadyParsed(Page);
                 return (Page.PageType, null, false);
             }
-
-            //if (Page.ListingParserInputIsAnotherListingInHost())
-            //{
-            //    GlobalStatistics.InsertDailyCounter(StatisticsKey.ListingParserInputIsAnotherListingInHost);
-            //    HostStatistics.InsertDailyCounter(Page.Host, HostStatisticsKey.ListingParserInputIsAnotherListingInHost);
-            //    return (PageType.ResponseBodyRepeatedInHost, null, false);
-            //}
             if (Tokenizer.TooManyTokens(Page))
             {
                 return (PageType.ResponseBodyTooManyTokens, null, false);
             }
 
-            return ParseListing.Parse(Page);
+            return ParseListing.Parse(Page, _hostStatistics);
         }
     }
 }

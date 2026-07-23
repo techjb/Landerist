@@ -15,6 +15,8 @@ namespace landerist_library.Tasks
         private const int COMPLETION_TOKENS = 7000;  // structured output and completion tokens aproximately
         private readonly int MAX_TOKEN_COUNT;
         private readonly IParsedPageClassificationService _parsedClassification;
+        private readonly GlobalStatistics _globalStatistics;
+        private readonly HostStatistics _hostStatistics;
 
         private int TotalProcessed = 0;
         private int TotalErrors = 0;
@@ -26,10 +28,17 @@ namespace landerist_library.Tasks
         private const int MAX_SIZE_BLOCKINGCOLLECTION = MAX_PAGES_PER_TASK * 10; 
 
 
-        public TaskLocalAIParsing(IParsedPageClassificationService parsedClassification)
+        public TaskLocalAIParsing(
+            IParsedPageClassificationService parsedClassification,
+            GlobalStatistics globalStatistics,
+            HostStatistics hostStatistics)
         {
             ArgumentNullException.ThrowIfNull(parsedClassification);
+            ArgumentNullException.ThrowIfNull(globalStatistics);
+            ArgumentNullException.ThrowIfNull(hostStatistics);
             _parsedClassification = parsedClassification;
+            _globalStatistics = globalStatistics;
+            _hostStatistics = hostStatistics;
             Config.SetLLMProviderLocalAI();
             Config.EnableLogsErrorsInConsole();
             if (Config.IsConfigurationProduction())
@@ -74,12 +83,12 @@ namespace landerist_library.Tasks
                         if (processPageResult.Success)
                         {
                             Interlocked.Increment(ref TotalSuccess);
-                            GlobalStatistics.InsertDailyCounter(StatisticsKey.LocalAIParsingSuccess);
+                            _globalStatistics.InsertDailyCounter(StatisticsKey.LocalAIParsingSuccess);
                         }
                         else
                         {
                             Interlocked.Increment(ref TotalErrors);
-                            GlobalStatistics.InsertDailyCounter(StatisticsKey.LocalAIParsingErrors);
+                            _globalStatistics.InsertDailyCounter(StatisticsKey.LocalAIParsingErrors);
                         }
 
                         int totalProcessed = Interlocked.Increment(ref TotalProcessed);
@@ -233,7 +242,7 @@ namespace landerist_library.Tasks
                 }
                 else
                 {
-                    var (pageType, listing, waitingAIRequest) = ParseListing.ParseLocalAI(page, userInput);
+                    var (pageType, listing, waitingAIRequest) = ParseListing.ParseLocalAI(page, userInput, _hostStatistics);
                     newPageType = pageType;
                     success = _parsedClassification.Apply(page, pageType, listing);
                 }

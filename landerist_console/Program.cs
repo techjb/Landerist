@@ -14,6 +14,7 @@ using landerist_library.Infrastructure.Tasks;
 using landerist_library.Logs;
 using landerist_library.Scrape;
 using landerist_library.Tasks;
+using landerist_library.Statistics;
 
 namespace landerist_console
 {
@@ -58,6 +59,11 @@ namespace landerist_console
                 databaseFactory.Create(),
                 Config.NOT_LISTING_CACHE_ENABLED);
             BatchRepository batches = new(databaseFactory.Create());
+            GlobalStatistics globalStatistics = new(
+                new GlobalStatisticsRepository(databaseFactory.Create()));
+            HostStatistics hostStatistics = new(
+                new HostStatisticsRepository(databaseFactory.Create()),
+                new WebsiteQueryRepository(databaseFactory.Create()));
             SqlPageLinkService pageLinks = new(
                 pagePersistence,
                 new WebsitePageMetricsRepository(databaseFactory.Create()),
@@ -78,7 +84,8 @@ namespace landerist_console
                 new PageContentClassifier(
                     Config.IsConfigurationProduction(),
                     notListingCache,
-                    new SqlPageClassificationMetrics(databaseFactory.Create())),
+                    new SqlPageClassificationMetrics(databaseFactory.Create()),
+                    hostStatistics),
                 new PageIndexingService(Config.INDEXER_ENABLED, pageLinks),
                 new SqlPageSchedulingService(listingStore));
             PageBatchSelector pageBatchSelector = new(
@@ -124,15 +131,17 @@ namespace landerist_console
                 new SystemRecurringTaskScheduler(),
                 logger,
                 new LegacyScrapeTaskJob(scraper, batchScraping.Resources),
-                new LegacyLocalAiTaskJob(() => new TaskLocalAIParsing(parsedClassification)),
+                new LegacyLocalAiTaskJob(() => new TaskLocalAIParsing(parsedClassification, globalStatistics, hostStatistics)),
                 new LegacyTenMinuteTaskJob(
-                    new TaskBatchDownload(parsedClassification, batches),
+                    new TaskBatchDownload(parsedClassification, batches, globalStatistics),
                     new TaskBatchUpload(batches)),
                 new LegacyHourlyTaskJob(new TaskBatchCleaner(batches)),
                 new LegacyDailyTaskJob(
                     databaseFactory.Create(),
                     notListingCache,
-                    new SqlDatabaseBackupService(databaseFactory.Create())),
+                    new SqlDatabaseBackupService(databaseFactory.Create()),
+                    globalStatistics,
+                    hostStatistics),
                 TimeProvider.System);
         }
 

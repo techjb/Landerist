@@ -9,20 +9,27 @@ using System.Text.Json;
 
 namespace landerist_library.Landerist_com
 {
-    public class HostStatisticsPage : Landerist_com
+    public sealed class HostStatisticsPage : Landerist_com
     {
-        private static readonly string HostStatisticsTemplateHtmlFile =
+        private readonly HostStatistics _statistics;
+
+        public HostStatisticsPage(HostStatistics statistics)
+        {
+            ArgumentNullException.ThrowIfNull(statistics);
+            _statistics = statistics;
+        }
+        private readonly string HostStatisticsTemplateHtmlFile =
             Path.Combine(Config.LANDERIST_COM_TEMPLATES!, "host-statistics", "host_statistics_template.html");
 
-        private static readonly string HostStatisticsHtmlFile =
+        private readonly string HostStatisticsHtmlFile =
             Path.Combine(Config.LANDERIST_COM_OUTPUT!, "host_statistics.html");
 
-        private static readonly JsonSerializerOptions JsonSerializerOptions = new()
+        private readonly JsonSerializerOptions JsonSerializerOptions = new()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
 
-        public static void Update()
+        public void Update()
         {
             try
             {
@@ -48,7 +55,7 @@ namespace landerist_library.Landerist_com
             }
         }
 
-        private static string GetHostOptions(IEnumerable<Websites.Website> websites)
+        private string GetHostOptions(IEnumerable<Websites.Website> websites)
         {
             return string.Join(
                 Environment.NewLine,
@@ -56,7 +63,7 @@ namespace landerist_library.Landerist_com
                     $"                        <option value=\"{WebUtility.HtmlEncode(website.Host)}\">{WebUtility.HtmlEncode(website.Host)}</option>"));
         }
 
-        private static Dictionary<string, HostStatisticsModel> GetHostStatistics(IEnumerable<Websites.Website> websites)
+        private Dictionary<string, HostStatisticsModel> GetHostStatistics(IEnumerable<Websites.Website> websites)
         {
             Dictionary<string, HostStatisticsModel> dictionary = new(StringComparer.OrdinalIgnoreCase);
 
@@ -68,12 +75,12 @@ namespace landerist_library.Landerist_com
             return dictionary;
         }
 
-        private static HostStatisticsModel GetHostStatistics(Websites.Website website)
+        private HostStatisticsModel GetHostStatistics(Websites.Website website)
         {
             return new HostStatisticsModel
             {
                 MainUri = website.MainUri.AbsoluteUri,
-                UpdatedAt = HostStatistics.GetLatestDate(website.Host)?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+                UpdatedAt = _statistics.GetLatestDate(website.Host)?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
                 RobotsTxtUpdated = FormatWebsiteDate(website.RobotsTxtUpdated),
                 SitemapUpdated = FormatWebsiteDate(website.SitemapUpdated),
                 IpAddressUpdated = FormatWebsiteDate(website.IpAddressUpdated),
@@ -96,25 +103,25 @@ namespace landerist_library.Landerist_com
                     ListingParserInputIsAnotherListingInHost = GetTimeSeries(website.Host, HostStatisticsKey.ListingParserInputIsAnotherListingInHost, "ListingParserInput is another listing in host"),
                     PageNotModified = GetTimeSeries(website.Host, HostStatisticsKey.PageNotModified, "Page not modified"),
                     ParseListingRetryNotListing = GetTimeSeries(website.Host, HostStatisticsKey.ParseListingRetryNotListing, "Parse listing retry not listing"),
-                    NextScrapeDistribution = GetDistribution(HostStatistics.GetPagesByNextScrape(website.Host), "NextScrape"),
-                    PageType = GetDistribution(HostStatistics.GetPagesByPageType(website.Host), "PageType"),
-                    HttpStatusCode = GetDistribution(HostStatistics.GetPagesByHttpStatusCode(website.Host), "HttpStatusCode"),
-                    PublishedListingsByOperation = GetDistribution(HostStatistics.GetPublishedListingsByOperation(website.Host), "Operation"),
-                    PublishedListingsByPropertyType = GetDistribution(HostStatistics.GetPublishedListingsByPropertyType(website.Host), "PropertyType"),
-                    ListingsByLocationResolver = GetDistribution(HostStatistics.GetListingsByLocationResolver(website.Host), "LocationResolver"),
-                    UnpublishedListingsByUnlistingReason = GetDistribution(HostStatistics.GetUnpublishedListingsByUnlistingReason(website.Host), "UnlistingReason"),
+                    NextScrapeDistribution = GetDistribution(_statistics.GetPagesByNextScrape(website.Host), "NextScrape"),
+                    PageType = GetDistribution(_statistics.GetPagesByPageType(website.Host), "PageType"),
+                    HttpStatusCode = GetDistribution(_statistics.GetPagesByHttpStatusCode(website.Host), "HttpStatusCode"),
+                    PublishedListingsByOperation = GetDistribution(_statistics.GetPublishedListingsByOperation(website.Host), "Operation"),
+                    PublishedListingsByPropertyType = GetDistribution(_statistics.GetPublishedListingsByPropertyType(website.Host), "PropertyType"),
+                    ListingsByLocationResolver = GetDistribution(_statistics.GetListingsByLocationResolver(website.Host), "LocationResolver"),
+                    UnpublishedListingsByUnlistingReason = GetDistribution(_statistics.GetUnpublishedListingsByUnlistingReason(website.Host), "UnlistingReason"),
                 }
             };
         }
 
-        private static string? FormatWebsiteDate(DateTime? dateTime)
+        private string? FormatWebsiteDate(DateTime? dateTime)
         {
             return dateTime?.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
         }
 
-        private static List<ChartSeriesModel> GetTimeSeries(string host, HostStatisticsKey key, string label)
+        private List<ChartSeriesModel> GetTimeSeries(string host, HostStatisticsKey key, string label)
         {
-            var dataTable = HostStatistics.GetLatestStatistics(host, key.ToString(), 15);
+            var dataTable = _statistics.GetLatestStatistics(host, key.ToString(), 15);
             List<ChartPointModel> values = [];
 
             foreach (DataRow dataRow in dataTable.Rows.Cast<DataRow>().Reverse())
@@ -131,9 +138,9 @@ namespace landerist_library.Landerist_com
                 : [new ChartSeriesModel { Label = label, Values = values }];
         }
 
-        private static List<ChartSeriesModel> GetLatestDistribution(string host, HostStatisticsKey keyPrefix, string label)
+        private List<ChartSeriesModel> GetLatestDistribution(string host, HostStatisticsKey keyPrefix, string label)
         {
-            var dataTable = HostStatistics.GetLatestStatisticsByPrefix(host, keyPrefix.ToString());
+            var dataTable = _statistics.GetLatestStatisticsByPrefix(host, keyPrefix.ToString());
             List<ChartPointModel> values = [];
 
             foreach (DataRow dataRow in dataTable.Rows)
@@ -150,7 +157,7 @@ namespace landerist_library.Landerist_com
                 : [new ChartSeriesModel { Label = label, Values = values }];
         }
 
-        private static List<ChartSeriesModel> GetDistribution(DataTable dataTable, string label)
+        private List<ChartSeriesModel> GetDistribution(DataTable dataTable, string label)
         {
             List<ChartPointModel> values = [];
 
@@ -168,11 +175,11 @@ namespace landerist_library.Landerist_com
                 : [new ChartSeriesModel { Label = label, Values = values }];
         }
 
-        private static List<ChartSeriesModel> GetHistoricalDistribution(string host, HostStatisticsKey keyPrefix)
+        private List<ChartSeriesModel> GetHistoricalDistribution(string host, HostStatisticsKey keyPrefix)
         {
             List<ChartSeriesModel> series = [];
 
-            foreach (var key in HostStatistics.GetKeysLike(host, keyPrefix))
+            foreach (var key in _statistics.GetKeysLike(host, keyPrefix))
             {
                 var values = GetTimeSeries(host, key, RemovePrefix(key, keyPrefix));
                 if (values.Count > 0)
@@ -184,9 +191,9 @@ namespace landerist_library.Landerist_com
             return series;
         }
 
-        private static List<ChartSeriesModel> GetTimeSeries(string host, string key, string label)
+        private List<ChartSeriesModel> GetTimeSeries(string host, string key, string label)
         {
-            var dataTable = HostStatistics.GetLatestStatistics(host, key, 15);
+            var dataTable = _statistics.GetLatestStatistics(host, key, 15);
             List<ChartPointModel> values = [];
 
             foreach (DataRow dataRow in dataTable.Rows.Cast<DataRow>().Reverse())
@@ -203,7 +210,7 @@ namespace landerist_library.Landerist_com
                 : [new ChartSeriesModel { Label = label, Values = values }];
         }
 
-        private static string RemovePrefix(string key, HostStatisticsKey keyPrefix)
+        private string RemovePrefix(string key, HostStatisticsKey keyPrefix)
         {
             string prefix = keyPrefix + "_";
             return key.StartsWith(prefix, StringComparison.Ordinal)

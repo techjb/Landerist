@@ -10,21 +10,28 @@ using System.Text.Json;
 
 namespace landerist_library.Landerist_com
 {
-    public class StatisticsPage : Landerist_com
+    public sealed class StatisticsPage : Landerist_com
     {
+        private readonly GlobalStatistics _statistics;
 
-        private static readonly string StatisticsTemplateHtmlFile =
+        public StatisticsPage(GlobalStatistics statistics)
+        {
+            ArgumentNullException.ThrowIfNull(statistics);
+            _statistics = statistics;
+        }
+
+        private readonly string StatisticsTemplateHtmlFile =
             Path.Combine(Config.LANDERIST_COM_TEMPLATES!, "statistics", "statistics_template.html");
 
-        private static readonly string StatisticsHtmlFile =
+        private readonly string StatisticsHtmlFile =
             Path.Combine(Config.LANDERIST_COM_OUTPUT!, "statistics.html");
 
 
-        private static readonly List<string> Charts = [];
+        private readonly List<string> Charts = [];
 
-        private static readonly CultureInfo SummaryCulture = CultureInfo.GetCultureInfo("es-ES");
+        private readonly CultureInfo SummaryCulture = CultureInfo.GetCultureInfo("es-ES");
 
-        public static void UpdateCharts()
+        public void UpdateCharts()
         {
             try
             {
@@ -64,51 +71,51 @@ namespace landerist_library.Landerist_com
             }
         }
 
-        private static void LastScrapePages()
+        private void LastScrapePages()
         {
             BarChart("Last Scrape Pages", StatisticsKey.LastScrapePages, false);
         }
 
-        private static void NextScrapeDistribution()
+        private void NextScrapeDistribution()
         {
             var dictionary = landerist_library.Pages.Pages.GroupByNextScrape();
             BarChart("Next Scrape Distribution", "NextScrape", dictionary);
         }
 
-        //private static void LastScrapeHttpStatusCodeNull()
+        //private void LastScrapeHttpStatusCodeNull()
         //{
         //    LineChart("Last Scrape HttpStatusCode null", StatisticsKey.HttpStatusCode_NULL, true);
         //}
 
-        //private static void LastScrapeHttpStatusCode200()
+        //private void LastScrapeHttpStatusCode200()
         //{
         //    LineChart("Last Scrape HttpStatusCode 200", StatisticsKey.HttpStatusCode_200, true);
         //}
-        //private static void LastScrapeHttpStatusCodeErrors()
+        //private void LastScrapeHttpStatusCodeErrors()
         //{
-        //    var keys = GlobalStatistics.GetHttpStatusCodeKeys();
+        //    var keys = _statistics.GetHttpStatusCodeKeys();
         //    keys.RemoveAll(code => code == StatisticsKey.HttpStatusCode_NULL.ToString() || code == StatisticsKey.HttpStatusCode_200.ToString());
         //    BarChart("Last Scrape HttpStatusCode errors", keys, false);
         //}
 
-        private static void LastScrapeHttpStatusCode()
+        private void LastScrapeHttpStatusCode()
         {
-            var keys = GlobalStatistics.GetHttpStatusCodeKeys();            
+            var keys = _statistics.GetHttpStatusCodeKeys();
             BarChart("Last Scrape by HttpStatusCode", keys, false);
         }
 
-        private static void LastScrapePageType()
+        private void LastScrapePageType()
         {
-            var keys = GlobalStatistics.GetPageTypeKeys();
+            var keys = _statistics.GetPageTypeKeys();
             BarChart("Last Scrape by PageType", keys, false);
         }
 
-        private static void ProcessedPages()
+        private void ProcessedPages()
         {
             BarChart("Processed Pages", StatisticsKey.Processed, false);
         }
 
-        private static void ScraperSuccessCrash()
+        private void ScraperSuccessCrash()
         {
             List<StatisticsKey> statisticsKeys =
             [
@@ -118,7 +125,7 @@ namespace landerist_library.Landerist_com
             BarChart("Scraper Success/Chrash", statisticsKeys, false);
         }
 
-        private static void BatchReaded()
+        private void BatchReaded()
         {
             List<StatisticsKey> statisticsKeys =
             [
@@ -128,7 +135,7 @@ namespace landerist_library.Landerist_com
             BarChart("AI Batch Readed", statisticsKeys, false);
         }
 
-        private static void LocalAIParsing()
+        private void LocalAIParsing()
         {
             List<StatisticsKey> statisticsKeys =
             [
@@ -138,32 +145,32 @@ namespace landerist_library.Landerist_com
             BarChart("LocalAI Parsing", statisticsKeys, false);
         }
 
-        private static void NotListingsCache()
+        private void NotListingsCache()
         {
             BarChart("Hit Not Listing Cache", StatisticsKey.NotListingCache, false);
         }
 
-        private static void ListingParserInputAlreadyParsed()
+        private void ListingParserInputAlreadyParsed()
         {
             BarChart("ListingParserInput already parsed", StatisticsKey.ListingParserInputAlreadyParsed, false);
         }
 
-        private static void PageNotModified()
+        private void PageNotModified()
         {
             BarChart("Page not modified", StatisticsKey.PageNotModified, false);
         }
 
-        private static void PageConditionalHeadersCheck()
+        private void PageConditionalHeadersCheck()
         {
             BarChart("Page conditional headers check", StatisticsKey.PageConditionalHeadersCheck, false);
         }
 
-        private static void ListingParserInputIsAnotherListingInHost()
+        private void ListingParserInputIsAnotherListingInHost()
         {
             BarChart("ListingParserInput is another listing in host", StatisticsKey.ListingParserInputIsAnotherListingInHost, false);
         }
 
-        private static void ListingInsertUpdate()
+        private void ListingInsertUpdate()
         {
             List<StatisticsKey> statisticsKeys =
             [
@@ -173,13 +180,13 @@ namespace landerist_library.Landerist_com
             BarChart("Listing Insert/Update", statisticsKeys, false);
         }
 
-        private static void PageType()
+        private void PageType()
         {
             var dictionary = landerist_library.Pages.Pages.GroupByPageType();
             PieChart("PageType", dictionary);
         }
 
-        private static void ListingsPageType()
+        private void ListingsPageType()
         {
             var dictionaryPublished = landerist_library.Pages.Pages.GroupByPageType(ListingStatus.published);
             var dictionaryUnPublished = landerist_library.Pages.Pages.GroupByPageType(ListingStatus.unpublished);
@@ -194,130 +201,130 @@ namespace landerist_library.Landerist_com
             BarChart("Listings PageType", string.Join(",", [.. data]));
         }
 
-        private static void PublishedPageType()
+        private void PublishedPageType()
         {
             var dictionary = landerist_library.Pages.Pages.GroupByPageType(ListingStatus.published);
             BarChart("Published Listings PageType", "published", dictionary);
         }
 
-        private static void UnPublishedPageType()
+        private void UnPublishedPageType()
         {
             var dictionary = landerist_library.Pages.Pages.GroupByPageType(ListingStatus.unpublished);
             BarChart("Unpublished Listings PageType", "unpublished", dictionary);
         }
 
-        private static void UnPublishedHttpStatusCode()
+        private void UnPublishedHttpStatusCode()
         {
             var dictionary = landerist_library.Pages.Pages.GroupByHttpStatusCode(ListingStatus.unpublished);
             BarChart("Unpublished Listings HttpStatusCode", "unpublished", dictionary);
         }
 
-        private static void HttpStatusCode()
+        private void HttpStatusCode()
         {
             var dictionary = landerist_library.Pages.Pages.CountByHttpStatusCode();
             PieChart("HttpStatusCode", dictionary);
         }
 
 
-        private static void AreaChart(string title, StatisticsKey statisticKey, bool yesterday)
+        private void AreaChart(string title, StatisticsKey statisticKey, bool yesterday)
         {
             var keys = new List<StatisticsKey> { statisticKey };
             AreaChart(title, keys, yesterday);
         }
 
-        private static void AreaChart(string title, List<StatisticsKey> keys, bool yesterday)
+        private void AreaChart(string title, List<StatisticsKey> keys, bool yesterday)
         {
             List<string> list = [.. keys.Select(key => key.ToString())];
             AreaChart(title, list, yesterday);
         }
 
-        private static void AreaChart(string title, List<string> keys, bool yesterday)
+        private void AreaChart(string title, List<string> keys, bool yesterday)
         {
             var dataString = GetDataString(keys, yesterday);
             AreaChart(title, dataString);
         }
 
-        private static void PieChart(string title, Dictionary<string, object?> dictionary)
+        private void PieChart(string title, Dictionary<string, object?> dictionary)
         {
             string dataString = GetValues(dictionary);
             PieChart(title, dataString);
         }
 
-        private static void LineChart(string title, StatisticsKey statisticsKey, bool yesterday)
+        private void LineChart(string title, StatisticsKey statisticsKey, bool yesterday)
         {
             List<string> keys = [statisticsKey.ToString()];
             LineChart(title, keys, yesterday);
         }
 
-        private static void LineChart(string title, List<StatisticsKey> keys, bool yesterday)
+        private void LineChart(string title, List<StatisticsKey> keys, bool yesterday)
         {
             List<string> list = [.. keys.Select(key => key.ToString())];
             LineChart(title, list, yesterday);
         }
 
-        private static void LineChart(string title, List<string> keys, bool yesterday)
+        private void LineChart(string title, List<string> keys, bool yesterday)
         {
             var data = GetDataString(keys, yesterday);
             LineChart(title, data);
         }
 
-        private static void BarChart(string title, StatisticsKey statisticsKey, bool yesterday)
+        private void BarChart(string title, StatisticsKey statisticsKey, bool yesterday)
         {
             List<string> keys = [statisticsKey.ToString()];
             BarChart(title, keys, yesterday);
         }
 
-        private static void BarChart(string title, List<StatisticsKey> keys, bool yesterday)
+        private void BarChart(string title, List<StatisticsKey> keys, bool yesterday)
         {
             List<string> list = [.. keys.Select(key => key.ToString())];
             BarChart(title, list, yesterday);
         }
-        private static void BarChart(string title, List<string> keys, bool yesterday)
+        private void BarChart(string title, List<string> keys, bool yesterday)
         {
             var data = GetDataString(keys, yesterday);
             BarChart(title, data);
         }
 
-        private static void BarChart(string title, string key, Dictionary<string, object?> dictionary)
+        private void BarChart(string title, string key, Dictionary<string, object?> dictionary)
         {
             string dataString = GetLabelValues(key, dictionary);
             BarChart(title, dataString);
         }
 
-        //private static void BarChart(string title, List<StatisticsKey> keys, bool yesterday)
+        //private void BarChart(string title, List<StatisticsKey> keys, bool yesterday)
         //{
         //    List<string> list = [.. keys.SelectTop1(key => key.ToString())];
         //    BarChart(title, list, yesterday);
         //}
 
-        private static void AreaChart(string title, string data)
+        private void AreaChart(string title, string data)
         {
             AddChart("AreaChart", title, data);
         }
 
-        private static void LineChart(string title, string data)
+        private void LineChart(string title, string data)
         {
             AddChart("LineChart", title, data);
         }
 
-        private static void BarChart(string title, string data)
+        private void BarChart(string title, string data)
         {
             AddChart("BarChart", title, data);
         }
 
-        private static void PieChart(string title, string data)
+        private void PieChart(string title, string data)
         {
             AddChart("PieChart", title, data);
         }
 
-        private static void AddChart(string charType, string title, string data)
+        private void AddChart(string charType, string title, string data)
         {
             var safeTitle = title.Replace("\\", "\\\\").Replace("'", "\\'");
             string chart = $"{charType}('{safeTitle}', [{data}])";
             Charts.Add(chart);
         }
 
-        private static string GetDataString(List<string> keys, bool yesterday)
+        private string GetDataString(List<string> keys, bool yesterday)
         {
             List<string> data = [];
             foreach (var key in keys)
@@ -330,10 +337,10 @@ namespace landerist_library.Landerist_com
             return string.Join(",", data);
         }
 
-        private static List<string> GetValues(string statisticKey, bool yesterday)
+        private List<string> GetValues(string statisticKey, bool yesterday)
         {
-            
-            var dataTable = GlobalStatistics.GetLatestStatistics(statisticKey, 15);
+
+            var dataTable = _statistics.GetLatestStatistics(statisticKey, 15);
             List<string> values = [];
 
             foreach (DataRow dataRow in dataTable.Rows.Cast<DataRow>().Reverse())
@@ -354,13 +361,13 @@ namespace landerist_library.Landerist_com
             return values;
         }
 
-        private static string GetLabelValues(string key, Dictionary<string, object?> dictionary)
+        private string GetLabelValues(string key, Dictionary<string, object?> dictionary)
         {
             var values = GetValues(dictionary);
             return $"{{\"label\": {JsonSerializer.Serialize(key)}, \"values\":[{values}]}}";
         }
 
-        private static string GetValues(Dictionary<string, object?> dictionary)
+        private string GetValues(Dictionary<string, object?> dictionary)
         {
             List<string> data = [];
 
@@ -380,7 +387,7 @@ namespace landerist_library.Landerist_com
             return string.Join(",", data);
         }
 
-        private static bool UpdateStatisticsHtmlPage()
+        private bool UpdateStatisticsHtmlPage()
         {
             var statisticsTemplate = File.ReadAllText(StatisticsTemplateHtmlFile);
             var charts = string.Join("; " + Environment.NewLine, Charts);
@@ -391,7 +398,7 @@ namespace landerist_library.Landerist_com
             return new S3().UploadToWebsiteBucket(StatisticsHtmlFile, "index.html", "statistics");
         }
 
-        private static string GetSummaryTable()
+        private string GetSummaryTable()
         {
             List<(string Label, StatisticsKey Key)> rows =
             [
@@ -427,9 +434,9 @@ namespace landerist_library.Landerist_com
                 "                </table>";
         }
 
-        private static int GetLatestCounter(StatisticsKey statisticsKey)
+        private int GetLatestCounter(StatisticsKey statisticsKey)
         {
-            var dataTable = GlobalStatistics.GetLatestStatistics(statisticsKey.ToString(), 1);
+            var dataTable = _statistics.GetLatestStatistics(statisticsKey.ToString(), 1);
             return dataTable.Rows.Count == 0
                 ? 0
                 : Convert.ToInt32(dataTable.Rows[0]["Counter"]);

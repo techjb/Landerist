@@ -1,4 +1,4 @@
-﻿using landerist_library.Infrastructure.Sql;
+using landerist_library.Infrastructure.Sql;
 using landerist_orels.ES;
 using System.Data;
 
@@ -21,27 +21,30 @@ namespace landerist_library.Statistics
         ParseListingRetryNotListing,
     }
 
-    public static class HostStatistics
+    public sealed class HostStatistics
     {
-        public const string HOST_STATISTICS = "[HOST_STATISTICS]";
-        private static readonly HostStatisticsRepository Repository = new(global::landerist_library.Database.LegacyDatabase.Create());
+        private readonly HostStatisticsRepository Repository;
+        private readonly WebsiteQueryRepository WebsiteQueries;
 
-        public static void TakeSnapshots()
+        public HostStatistics(
+            HostStatisticsRepository repository,
+            WebsiteQueryRepository websiteQueries)
         {
-            foreach (var website in Websites.Websites.GetAll())
+            ArgumentNullException.ThrowIfNull(repository);
+            ArgumentNullException.ThrowIfNull(websiteQueries);
+            Repository = repository;
+            WebsiteQueries = websiteQueries;
+        }
+
+        public void TakeSnapshots()
+        {
+            foreach (string host in WebsiteQueries.GetHosts())
             {
-                try
-                {
-                    TakeSnapshot(website.Host);
-                }
-                finally
-                {
-                    website.Dispose();
-                }
+                TakeSnapshot(host);
             }
         }
 
-        public static void TakeSnapshot(string host)
+        public void TakeSnapshot(string host)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(host);
 
@@ -55,42 +58,42 @@ namespace landerist_library.Statistics
             PageType(host);
         }
 
-        private static void Pages(string host)
+        private void Pages(string host)
         {
             InsertDaily(host, HostStatisticsKey.Pages, Repository.CountPages(host));
         }
 
-        private static void Inserted(string host)
+        private void Inserted(string host)
         {
             InsertDaily(host, HostStatisticsKey.Inserted, Repository.CountInsertedYesterday(host));
         }
 
-        private static void LastScrape(string host)
+        private void LastScrape(string host)
         {
             InsertDaily(host, HostStatisticsKey.LastScrape, Repository.CountLastScrapeYesterday(host));
         }
 
-        private static void Listings(string host)
+        private void Listings(string host)
         {
             InsertDaily(host, HostStatisticsKey.Listings, Repository.CountListings(host));
         }
 
-        private static void PublishedListings(string host)
+        private void PublishedListings(string host)
         {
             SnapshotListings(host, HostStatisticsKey.PublishedListings, ListingStatus.published);
         }
 
-        private static void UnpublishedListings(string host)
+        private void UnpublishedListings(string host)
         {
             SnapshotListings(host, HostStatisticsKey.UnpublishedListings, ListingStatus.unpublished);
         }
 
-        private static void SnapshotListings(string host, HostStatisticsKey statisticsKey, ListingStatus listingStatus)
+        private void SnapshotListings(string host, HostStatisticsKey statisticsKey, ListingStatus listingStatus)
         {
             InsertDaily(host, statisticsKey, Repository.CountListings(host, listingStatus));
         }
 
-        private static void HttpStatusCode(string host)
+        private void HttpStatusCode(string host)
         {
             DateTime date = DateTime.Now;
             Repository.DeleteByHostKeyPrefixAndDate(date, host, HostStatisticsKey.HttpStatusCode.ToString());
@@ -104,7 +107,7 @@ namespace landerist_library.Statistics
             }
         }
 
-        private static void PageType(string host)
+        private void PageType(string host)
         {
             DateTime date = DateTime.Now;
             Repository.DeleteByHostKeyPrefixAndDate(date, host, HostStatisticsKey.PageType.ToString());
@@ -118,27 +121,27 @@ namespace landerist_library.Statistics
             }
         }
 
-        private static bool InsertDaily(string host, HostStatisticsKey key, int counter)
+        private bool InsertDaily(string host, HostStatisticsKey key, int counter)
         {
             return Repository.Insert(DateTime.Now, host, key.ToString(), counter);
         }
 
-        public static bool InsertDailyCounter(string host, HostStatisticsKey key)
+        public bool InsertDailyCounter(string host, HostStatisticsKey key)
         {
             return InsertDailyCounter(host, key.ToString());
         }
 
-        public static bool InsertDailyCounter(string host, string key)
+        public bool InsertDailyCounter(string host, string key)
         {
             return InsertDailyCounter(host, key, 1);
         }
 
-        public static bool InsertDailyCounter(string host, HostStatisticsKey key, int counter)
+        public bool InsertDailyCounter(string host, HostStatisticsKey key, int counter)
         {
             return InsertDailyCounter(host, key.ToString(), counter);
         }
 
-        public static bool InsertDailyCounter(string host, string key, int counter)
+        public bool InsertDailyCounter(string host, string key, int counter)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(host);
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
@@ -151,57 +154,57 @@ namespace landerist_library.Statistics
             return Repository.InsertDailyCounter(host, key, counter);
         }
 
-        public static DataTable GetLatestStatistics(string host, string statisticsKey, int top)
+        public DataTable GetLatestStatistics(string host, string statisticsKey, int top)
         {
             return Repository.GetLatestStatistics(host, statisticsKey, top);
         }
 
-        public static DataTable GetLatestStatisticsByPrefix(string host, string keyPrefix)
+        public DataTable GetLatestStatisticsByPrefix(string host, string keyPrefix)
         {
             return Repository.GetLatestStatisticsByPrefix(host, keyPrefix);
         }
 
-        public static DataTable GetPagesByPageType(string host)
+        public DataTable GetPagesByPageType(string host)
         {
             return Repository.GetPagesByPageType(host);
         }
 
-        public static DataTable GetPagesByHttpStatusCode(string host)
+        public DataTable GetPagesByHttpStatusCode(string host)
         {
             return Repository.GetPagesByHttpStatusCode(host);
         }
 
-        public static DataTable GetPagesByNextScrape(string host)
+        public DataTable GetPagesByNextScrape(string host)
         {
             return Repository.GetPagesByNextScrape(host);
         }
 
-        public static DataTable GetPublishedListingsByOperation(string host)
+        public DataTable GetPublishedListingsByOperation(string host)
         {
             return Repository.GetPublishedListingsByOperation(host);
         }
 
-        public static DataTable GetPublishedListingsByPropertyType(string host)
+        public DataTable GetPublishedListingsByPropertyType(string host)
         {
             return Repository.GetPublishedListingsByPropertyType(host);
         }
 
-        public static DataTable GetListingsByLocationResolver(string host)
+        public DataTable GetListingsByLocationResolver(string host)
         {
             return Repository.GetListingsByLocationResolver(host);
         }
 
-        public static DataTable GetUnpublishedListingsByUnlistingReason(string host)
+        public DataTable GetUnpublishedListingsByUnlistingReason(string host)
         {
             return Repository.GetUnpublishedListingsByUnlistingReason(host);
         }
 
-        public static List<string> GetKeysLike(string host, HostStatisticsKey key)
+        public List<string> GetKeysLike(string host, HostStatisticsKey key)
         {
             return Repository.GetKeysLike(host, key);
         }
 
-        public static DateTime? GetLatestDate(string host)
+        public DateTime? GetLatestDate(string host)
         {
             return Repository.GetLatestDate(host);
         }

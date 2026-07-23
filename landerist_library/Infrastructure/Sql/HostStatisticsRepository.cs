@@ -1,4 +1,4 @@
-﻿using landerist_library.Database;
+using landerist_library.Database;
 using landerist_library.Pages;
 using landerist_library.Statistics;
 using landerist_orels.ES;
@@ -8,6 +8,7 @@ namespace landerist_library.Infrastructure.Sql
 {
     public class HostStatisticsRepository
     {
+        private const string HostStatisticsTable = "[HOST_STATISTICS]";
         private readonly IDatabase _database;
         public HostStatisticsRepository(IDatabase database)
         {
@@ -99,7 +100,7 @@ namespace landerist_library.Infrastructure.Sql
         public bool DeleteByHostKeyPrefixAndDate(DateTime date, string host, string keyPrefix)
         {
             string query =
-                "DELETE FROM " + HostStatistics.HOST_STATISTICS + " " +
+                "DELETE FROM " + HostStatisticsTable + " " +
                 "WHERE [Host] = @Host " +
                 "AND [Key] LIKE @KeyPrefix " +
                 "AND CAST([Date] AS date) = CAST(@Date AS date)";
@@ -115,11 +116,11 @@ namespace landerist_library.Infrastructure.Sql
         public bool Insert(DateTime date, string host, string key, int counter)
         {
             string query =
-                "DELETE FROM " + HostStatistics.HOST_STATISTICS + " " +
+                "DELETE FROM " + HostStatisticsTable + " " +
                 "WHERE [Host] = @Host " +
                 "AND [Key] = @Key " +
                 "AND CAST([Date] AS date) = CAST(@Date AS date); " +
-                "INSERT INTO " + HostStatistics.HOST_STATISTICS + " ([Date], [Host], [Key], [Counter]) " +
+                "INSERT INTO " + HostStatisticsTable + " ([Date], [Host], [Key], [Counter]) " +
                 "VALUES (@Date, @Host, @Key, @Counter);";
 
             return Database.Query(query, new Dictionary<string, object?>
@@ -134,7 +135,7 @@ namespace landerist_library.Infrastructure.Sql
         public bool InsertDailyCounter(string host, string key, int counter)
         {
             string query =
-                "MERGE " + HostStatistics.HOST_STATISTICS + " AS target " +
+                "MERGE " + HostStatisticsTable + " AS target " +
                 "USING (" +
                 "   SELECT " +
                 "       CAST(@Date AS DATE) AS DateOnly, " +
@@ -165,7 +166,7 @@ namespace landerist_library.Infrastructure.Sql
         {
             string query =
                 "SELECT TOP (@Top) [Date], [Counter] " +
-                "FROM " + HostStatistics.HOST_STATISTICS + " " +
+                "FROM " + HostStatisticsTable + " " +
                 "WHERE [Host] = @Host AND [Key] = @Key " +
                 "ORDER BY [Date] DESC";
 
@@ -181,12 +182,12 @@ namespace landerist_library.Infrastructure.Sql
         {
             string query =
                 "SELECT [Key], [Counter] " +
-                "FROM " + HostStatistics.HOST_STATISTICS + " " +
+                "FROM " + HostStatisticsTable + " " +
                 "WHERE [Host] = @Host " +
                 "AND [Key] LIKE @KeyPrefix " +
                 "AND CAST([Date] AS date) = (" +
                 "   SELECT MAX(CAST([Date] AS date)) " +
-                "   FROM " + HostStatistics.HOST_STATISTICS + " " +
+                "   FROM " + HostStatisticsTable + " " +
                 "   WHERE [Host] = @Host AND [Key] LIKE @KeyPrefix" +
                 ") " +
                 "ORDER BY [Counter] DESC, [Key] ASC";
@@ -294,7 +295,7 @@ namespace landerist_library.Infrastructure.Sql
         {
             string query =
                 "SELECT DISTINCT [Key] " +
-                "FROM " + HostStatistics.HOST_STATISTICS + " " +
+                "FROM " + HostStatisticsTable + " " +
                 "WHERE [Host] = @Host " +
                 "AND [Key] LIKE @Key " +
                 "ORDER BY [Key] ASC";
@@ -310,7 +311,7 @@ namespace landerist_library.Infrastructure.Sql
         {
             string query =
                 "SELECT MAX([Date]) " +
-                "FROM " + HostStatistics.HOST_STATISTICS + " " +
+                "FROM " + HostStatisticsTable + " " +
                 "WHERE [Host] = @Host";
 
             var value = Database.QueryTable(query, new Dictionary<string, object?>

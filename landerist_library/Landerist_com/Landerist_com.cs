@@ -1,8 +1,9 @@
-﻿using Amazon;
+using Amazon;
 using Amazon.CloudFront;
 using Amazon.CloudFront.Model;
 using landerist_library.Configuration;
 using landerist_library.Logs;
+using landerist_library.Statistics;
 using landerist_library.Websites;
 using landerist_orels.ES;
 using System.Globalization;
@@ -145,15 +146,15 @@ namespace landerist_library.Landerist_com
             InvalidateCloudFront();
         }
 
-        public static void UpdateStatisticsPage()
+        public static void UpdateStatisticsPage(GlobalStatistics globalStatistics)
         {
-            StatisticsPage.UpdateCharts();
+            new StatisticsPage(globalStatistics).UpdateCharts();
             InvalidateCloudFront();
         }
 
-        public static void UpdateHostStatisticsPage()
+        public static void UpdateHostStatisticsPage(HostStatistics hostStatistics)
         {
-            HostStatisticsPage.Update();
+            new HostStatisticsPage(hostStatistics).Update();
             InvalidateCloudFront();
         }
 
@@ -163,11 +164,13 @@ namespace landerist_library.Landerist_com
             InvalidateCloudFront();
         }
 
-        public static void UpdateAllPages()
+        public static void UpdateAllPages(
+            GlobalStatistics globalStatistics,
+            HostStatistics hostStatistics)
         {
             DownloadsPage.Update();
-            StatisticsPage.UpdateCharts();
-            HostStatisticsPage.Update();
+            new StatisticsPage(globalStatistics).UpdateCharts();
+            new HostStatisticsPage(hostStatistics).Update();
             HostsStatisticsPage.Update();
             InvalidateCloudFront();
         }

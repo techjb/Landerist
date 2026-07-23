@@ -12,19 +12,27 @@ public sealed class LegacyDailyTaskJob : IRecurringTaskJob
     private readonly AddressCadastralReference _addressCadastralReference;
     private readonly INotListingCacheMaintenance _notListingCache;
     private readonly IDatabaseBackupService _backup;
+    private readonly GlobalStatistics _globalStatistics;
+    private readonly HostStatistics _hostStatistics;
 
     public LegacyDailyTaskJob(
         IDatabase database,
         INotListingCacheMaintenance notListingCache,
-        IDatabaseBackupService backup)
+        IDatabaseBackupService backup,
+        GlobalStatistics globalStatistics,
+        HostStatistics hostStatistics)
     {
         ArgumentNullException.ThrowIfNull(database);
         ArgumentNullException.ThrowIfNull(notListingCache);
         ArgumentNullException.ThrowIfNull(backup);
+        ArgumentNullException.ThrowIfNull(globalStatistics);
+        ArgumentNullException.ThrowIfNull(hostStatistics);
         _addressLatLng = new AddressLatLng(database);
         _addressCadastralReference = new AddressCadastralReference(database);
         _notListingCache = notListingCache;
         _backup = backup;
+        _globalStatistics = globalStatistics;
+        _hostStatistics = hostStatistics;
     }
 
     public void Run()
@@ -32,10 +40,10 @@ public sealed class LegacyDailyTaskJob : IRecurringTaskJob
         Console.WriteLine("Daily task started ..");
         try
         {
-            GlobalStatistics.TakeSnapshots();
-            HostStatistics.TakeSnapshots();
+            _globalStatistics.TakeSnapshots();
+            _hostStatistics.TakeSnapshots();
             DownloadsUpdater.Update();
-            global::landerist_library.Landerist_com.Landerist_com.UpdateAllPages();
+            global::landerist_library.Landerist_com.Landerist_com.UpdateAllPages(_globalStatistics, _hostStatistics);
             _addressLatLng.Clean();
             _addressCadastralReference.Clean();
             _notListingCache.Clean();

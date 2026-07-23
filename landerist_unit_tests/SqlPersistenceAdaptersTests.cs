@@ -2,6 +2,8 @@ using landerist_library.Application.Listings;
 using landerist_library.Database;
 using landerist_library.Infrastructure.Listings;
 using landerist_library.Infrastructure.Scraping;
+using landerist_library.Infrastructure.Sql;
+using landerist_library.Statistics;
 using landerist_library.Pages;
 using landerist_library.Websites;
 using landerist_orels.ES;
@@ -108,6 +110,35 @@ public sealed class SqlPersistenceAdaptersTests
         Assert.Equal("example.com", database.Calls[1].Parameters!["Host"]);
     }
 
+    [Fact]
+    public void GlobalStatistics_ReadsThroughInjectedRepository()
+    {
+        RecordingDatabase database = new();
+        GlobalStatistics statistics = new(new GlobalStatisticsRepository(database));
+
+        statistics.GetLatestStatistics(StatisticsKey.Pages.ToString(), 15);
+
+        Assert.Contains("GLOBAL_STATISTICS", database.LastQuery);
+        Assert.Equal("Pages", database.LastParameters!["Key"]);
+        Assert.Equal(15, database.LastParameters["Top"]);
+    }
+
+    [Fact]
+    public void HostStatistics_SnapshotsHostsFromInjectedRepositories()
+    {
+        RecordingDatabase database = new();
+        database.HashSetResult.Add("example.com");
+        HostStatistics statistics = new(
+            new HostStatisticsRepository(database),
+            new WebsiteQueryRepository(database));
+
+        statistics.TakeSnapshots();
+
+        Assert.Contains(database.Calls, call =>
+            call.Parameters?.TryGetValue("Host", out var host) == true &&
+            Equals(host, "example.com"));
+        Assert.DoesNotContain(database.Calls, call => call.Query.Contains("SELECT *", StringComparison.Ordinal));
+    }
     [Fact]
     public void PageScheduling_UsesInjectedListingStore()
     {

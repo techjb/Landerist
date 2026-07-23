@@ -1,4 +1,4 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Configuration;
 using landerist_library.Pages;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
 using landerist_library.Parse.ListingParser.UserInput;
@@ -32,7 +32,7 @@ namespace landerist_library.Parse.ListingParser
             { LLMProvider.LocalAI, new LocalAIListingParserClient() },
         };
 
-        public static (PageType pageType, Listing? listing, bool waitingAIRequest) Parse(Page page)
+        public static (PageType pageType, Listing? listing, bool waitingAIRequest) Parse(Page page, HostStatistics statistics)
         {
             page.SetLastParseListing();
 
@@ -48,19 +48,20 @@ namespace landerist_library.Parse.ListingParser
             }
 
             return Clients.TryGetValue(Config.LLM_PROVIDER, out var client)
-                ? ParseWithClient(page, text, client)
+                ? ParseWithClient(page, text, client, statistics)
                 : (PageType.ResponseBodyTooShort, null, false);
         }
 
-        public static (PageType pageType, Listing? listing, bool waitingAIRequest) ParseLocalAI(Page page, string text)
+        public static (PageType pageType, Listing? listing, bool waitingAIRequest) ParseLocalAI(Page page, string text, HostStatistics statistics)
         {
-            return ParseWithClient(page, text, new LocalAIListingParserClient());
+            return ParseWithClient(page, text, new LocalAIListingParserClient(), statistics);
         }
 
         private static (PageType pageType, Listing? listing, bool waitingAIRequest) ParseWithClient(
             Page page,
             string userInput,
-            IListingParserClient client)
+            IListingParserClient client,
+            HostStatistics statistics)
         {
             return ParseWithRetry(page, () =>
             {
@@ -78,7 +79,7 @@ namespace landerist_library.Parse.ListingParser
                 }
 
                 return (pageType, listing, false);
-            });
+            }, statistics);
         }
 
         private static void WriteLocalAIDiagnostic(IListingParserClient client, string? diagnostic)
@@ -91,7 +92,8 @@ namespace landerist_library.Parse.ListingParser
 
         private static (PageType pageType, Listing? listing, bool waitingAIRequest) ParseWithRetry(
             Page page,
-            Func<(PageType pageType, Listing? listing, bool waitingAIRequest)> parse)
+            Func<(PageType pageType, Listing? listing, bool waitingAIRequest)> parse,
+            HostStatistics statistics)
         {
             var result = parse();
             if (!ShouldRetryNotListing(page, result.pageType))
@@ -99,7 +101,7 @@ namespace landerist_library.Parse.ListingParser
                 return result;
             }
 
-            HostStatistics.InsertDailyCounter(page.Website.Host, HostStatisticsKey.ParseListingRetryNotListing);
+            statistics.InsertDailyCounter(page.Website.Host, HostStatisticsKey.ParseListingRetryNotListing);
             return parse();
         }
 
