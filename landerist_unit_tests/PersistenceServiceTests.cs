@@ -46,7 +46,8 @@ public sealed class PersistenceServiceTests
             new WebsitePersistenceService(websiteRepository),
             new NullApplicationLogger(),
             new NullListingLifecycleService(),
-            CreateNullPageScraping()));
+            CreateNullPageScraping(),
+            new NullPageBatchSelector()));
         Page page = new(
             new Website(new Uri("https://example.com")),
             new Uri("https://example.com/listing/2"));
@@ -96,6 +97,7 @@ public sealed class PersistenceServiceTests
         {
         }
     }
+
     private static PageScrapePipelineServices CreateNullPageScraping() =>
         new(
             new NullPageAcquisitionService(),
@@ -131,5 +133,9 @@ public sealed class PersistenceServiceTests
         public void SetNextScrapeFromNow(Page page)
         {
         }
+    }
+    private sealed class NullPageBatchSelector : IPageBatchSelector
+    {
+        public IReadOnlyList<Page> Select() => [];
     }
 }

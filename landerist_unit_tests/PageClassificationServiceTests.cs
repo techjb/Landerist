@@ -181,7 +181,8 @@ public sealed class PageClassificationServiceTests
             persistence,
             logger,
             listingLifecycle,
-            CreatePipeline());
+            CreatePipeline(),
+            new NullPageBatchSelector());
 
         Assert.NotNull(scraper);
     }
@@ -273,5 +274,9 @@ public sealed class PageClassificationServiceTests
         public void SetNextScrape(Page page) => TotalCalls++;
 
         public void SetNextScrapeFromNow(Page page) => TotalCalls++;
+    }
+    private sealed class NullPageBatchSelector : IPageBatchSelector
+    {
+        public IReadOnlyList<Page> Select() => [];
     }
 }

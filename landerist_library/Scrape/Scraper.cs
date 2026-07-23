@@ -63,6 +63,7 @@ namespace landerist_library.Scrape
         private readonly IApplicationLogger _logger;
         private readonly IListingLifecycleService _listingLifecycle;
         private readonly PageScrapePipelineServices _pageScraping;
+        private readonly IPageBatchSelector _pageBatchSelector;
         private readonly ScraperLog _scraperLog;
         private CancellationTokenSource _cancellation = new();
 
@@ -73,7 +74,8 @@ namespace landerist_library.Scrape
                 LanderistApplication.Services.PagePersistence,
                 LanderistApplication.Services.Logger,
                 LanderistApplication.Services.ListingLifecycle,
-                LanderistApplication.Services.PageScraping)
+                LanderistApplication.Services.PageScraping,
+                LanderistApplication.Services.PageBatchSelector)
         {
         }
 
@@ -82,7 +84,8 @@ namespace landerist_library.Scrape
                 pagePersistence,
                 LanderistApplication.Services.Logger,
                 LanderistApplication.Services.ListingLifecycle,
-                LanderistApplication.Services.PageScraping)
+                LanderistApplication.Services.PageScraping,
+                LanderistApplication.Services.PageBatchSelector)
         {
         }
 
@@ -93,7 +96,8 @@ namespace landerist_library.Scrape
                 pagePersistence,
                 logger,
                 LanderistApplication.Services.ListingLifecycle,
-                LanderistApplication.Services.PageScraping)
+                LanderistApplication.Services.PageScraping,
+                LanderistApplication.Services.PageBatchSelector)
         {
         }
 
@@ -105,7 +109,8 @@ namespace landerist_library.Scrape
                 pagePersistence,
                 logger,
                 listingLifecycle,
-                LanderistApplication.Services.PageScraping)
+                LanderistApplication.Services.PageScraping,
+                LanderistApplication.Services.PageBatchSelector)
         {
         }
 
@@ -114,16 +119,33 @@ namespace landerist_library.Scrape
             IApplicationLogger logger,
             IListingLifecycleService listingLifecycle,
             PageScrapePipelineServices pageScraping)
+            : this(
+                pagePersistence,
+                logger,
+                listingLifecycle,
+                pageScraping,
+                LanderistApplication.Services.PageBatchSelector)
+        {
+        }
+
+        public Scraper(
+            IPagePersistenceService pagePersistence,
+            IApplicationLogger logger,
+            IListingLifecycleService listingLifecycle,
+            PageScrapePipelineServices pageScraping,
+            IPageBatchSelector pageBatchSelector)
         {
             ArgumentNullException.ThrowIfNull(pagePersistence);
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(listingLifecycle);
             ArgumentNullException.ThrowIfNull(pageScraping);
+            ArgumentNullException.ThrowIfNull(pageBatchSelector);
 
             _pagePersistence = pagePersistence;
             _logger = logger;
             _listingLifecycle = listingLifecycle;
             _pageScraping = pageScraping;
+            _pageBatchSelector = pageBatchSelector;
             _scraperLog = new ScraperLog(logger);
         }
 
@@ -145,7 +167,7 @@ namespace landerist_library.Scrape
             ResetCancellationTokenSource();
             WebsitesThrottle.Clean();
             DownloadersPool.Clear();
-            _pageQueue = PageSelector.Select();
+            _pageQueue = [.. _pageBatchSelector.Select()];
             Scrape();
         }
 

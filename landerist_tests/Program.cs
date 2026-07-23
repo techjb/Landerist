@@ -58,12 +58,20 @@ namespace landerist_tests
                 new LegacyPageContentClassifier(),
                 new LegacyPageIndexingService(),
                 new LegacyPageSchedulingService());
+            PageBatchSelector pageBatchSelector = new(
+                new LegacyPageSelectionRepository(),
+                new PageSelectionOptions(
+                    Config.MAX_PAGES_PER_SCRAPE,
+                    Config.MAX_PAGES_PER_HOST_PER_SCRAPE,
+                    Config.MIN_PAGES_PER_SCRAPE,
+                    enforceMinimumPages: Config.IsConfigurationProduction()));
             LanderistApplication.Configure(new LanderistApplicationServices(
                 new PagePersistenceService(new PageRepository(new DataBase())),
                 new WebsitePersistenceService(new WebsiteRepository(new DataBase())),
                 logger,
                 listingLifecycle,
-                pageScraping));
+                pageScraping,
+                pageBatchSelector));
         }
 
         private static void Start()

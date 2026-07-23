@@ -16,19 +16,22 @@ public sealed class LanderistApplicationServices
         IWebsitePersistenceService websitePersistence,
         IApplicationLogger logger,
         IListingLifecycleService listingLifecycle,
-        PageScrapePipelineServices pageScraping)
+        PageScrapePipelineServices pageScraping,
+        IPageBatchSelector pageBatchSelector)
     {
         ArgumentNullException.ThrowIfNull(pagePersistence);
         ArgumentNullException.ThrowIfNull(websitePersistence);
         ArgumentNullException.ThrowIfNull(listingLifecycle);
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(pageScraping);
+        ArgumentNullException.ThrowIfNull(pageBatchSelector);
 
         PagePersistence = pagePersistence;
         WebsitePersistence = websitePersistence;
         ListingLifecycle = listingLifecycle;
         Logger = logger;
         PageScraping = pageScraping;
+        PageBatchSelector = pageBatchSelector;
     }
 
     public IPagePersistenceService PagePersistence { get; }
@@ -40,6 +43,8 @@ public sealed class LanderistApplicationServices
     public IListingLifecycleService ListingLifecycle { get; }
 
     public PageScrapePipelineServices PageScraping { get; }
+
+    public IPageBatchSelector PageBatchSelector { get; }
 }
 
 /// <summary>
