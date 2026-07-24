@@ -86,7 +86,7 @@ public sealed class PageRepository : IPageRepository
             "WHERE [Host] = @Host AND " +
             "[UriHash] <> @UriHash AND " +
             "[ListingParserInputHash] = @ListingParserInputHash AND " +
-            "EXISTS (SELECT 1 FROM " + ES_Listings.TABLE_ES_LISTINGS + " L " +
+            "EXISTS (SELECT 1 FROM " + SqlTableNames.Listings + " L " +
             "WHERE L.[guid] = " + Pages.Pages.PAGES + ".[UriHash])";
 
         return _database.QueryExists(query, new Dictionary<string, object?>

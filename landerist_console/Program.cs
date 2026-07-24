@@ -186,7 +186,13 @@ namespace landerist_console
                         pageStatistics,
                         websiteMetrics,
                         websiteCatalog,
-                        websiteQueries)),
+                        websiteQueries,
+                        new SqlListingAdministrationService(
+                            new ListingRepository(databaseFactory.Create()),
+                            new ListingQueryRepository(databaseFactory.Create()),
+                            new ListingStatisticsRepository(databaseFactory.Create()),
+                            new MediaRepository(databaseFactory.Create()),
+                            new SourceRepository(databaseFactory.Create())))),
                 TimeProvider.System);
         }
 

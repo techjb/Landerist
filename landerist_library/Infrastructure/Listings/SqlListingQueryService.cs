@@ -11,13 +11,13 @@ namespace landerist_library.Infrastructure.Listings;
 public sealed class SqlListingQueryService : IListingQueryService
 {
     private readonly ListingQueryRepository _listings;
-    private readonly MediaRepository _media;
-    private readonly SourceRepository _sources;
+    private readonly IListingMediaRepository _media;
+    private readonly IListingSourceRepository _sources;
 
     public SqlListingQueryService(
         ListingQueryRepository listings,
-        MediaRepository media,
-        SourceRepository sources)
+        IListingMediaRepository media,
+        IListingSourceRepository sources)
     {
         ArgumentNullException.ThrowIfNull(listings);
         ArgumentNullException.ThrowIfNull(media);

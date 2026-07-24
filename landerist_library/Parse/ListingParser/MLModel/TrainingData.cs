@@ -1,5 +1,4 @@
-﻿using landerist_library.Configuration;
-using landerist_library.Database;
+using landerist_library.Configuration;
 using landerist_library.Tools;
 using landerist_library.Websites;
 using System.Data;
@@ -50,10 +49,9 @@ namespace landerist_library.Parse.Listing.MLModel
             CreateFile(dataTable, file);
         }
 
-        public static void CreateListings()
+        public static void CreateListings(DataTable dataTable)
         {
             Console.WriteLine("Reading Listings ..");
-            DataTable dataTable = ES_Listings.GetTrainingListings();
             string file = Config.MLMODEL_TRAINING_DATA_DIRECTORY + "Listings.csv";
             CreateFile(dataTable, file);
         }

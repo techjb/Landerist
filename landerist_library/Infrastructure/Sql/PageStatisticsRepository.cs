@@ -23,7 +23,7 @@ public sealed class PageStatisticsRepository
         string query =
             "SELECT P.[PageType], COUNT(*) " +
             "FROM " + Pages.Pages.PAGES + " AS P " +
-            "LEFT JOIN " + ES_Listings.TABLE_ES_LISTINGS + " AS L ON L.[guid] = P.[UriHash] " +
+            "LEFT JOIN " + SqlTableNames.Listings + " AS L ON L.[guid] = P.[UriHash] " +
             where +
             "GROUP BY P.[PageType] " +
             "ORDER BY COUNT(*) DESC";
@@ -39,7 +39,7 @@ public sealed class PageStatisticsRepository
         string query =
             "SELECT CONVERT(VARCHAR, P.[HttpStatusCode], 23), COUNT(*) " +
             "FROM " + Pages.Pages.PAGES + " AS P " +
-            "LEFT JOIN " + ES_Listings.TABLE_ES_LISTINGS + " AS L ON L.[guid] = P.[UriHash] " +
+            "LEFT JOIN " + SqlTableNames.Listings + " AS L ON L.[guid] = P.[UriHash] " +
             where +
             "GROUP BY CONVERT(VARCHAR, P.[HttpStatusCode], 23) " +
             "ORDER BY COUNT(*) DESC";

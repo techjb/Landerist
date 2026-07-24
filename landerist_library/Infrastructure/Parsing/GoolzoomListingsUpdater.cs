@@ -1,21 +1,22 @@
-using landerist_library.Database;
+using landerist_library.Application.Listings;
+using landerist_library.Parse.Location.Providers.Goolzoom;
 using landerist_library.Parse.Location.Candidates;
 
-namespace landerist_library.Parse.Location.Providers.Goolzoom
+namespace landerist_library.Infrastructure.Parsing
 {
-    public static class GoolzoomListingsUpdater
+    public sealed class GoolzoomListingsUpdater(IListingAdministrationService listings)
     {
-        public static void UpdateLocationFromCadastralRef()
+        public void UpdateLocationFromCadastralRef()
         {
-            var listings = ES_Listings.GetListingWithCatastralReference();
-            int total = listings.Count;
+            var items = listings.GetWithCadastralReference();
+            int total = items.Count;
             int processed = 0;
             int updated = 0;
             int errors = 0;
 
             var api = new GoolzoomApi();
 
-            foreach (var listing in listings)
+            foreach (var listing in items)
             {
                 processed++;
 
@@ -27,7 +28,7 @@ namespace landerist_library.Parse.Location.Providers.Goolzoom
                     listing.locationIsAccurate = true;
                     listing.locationResolver = LocationCandidateSources.CadastralReference;
 
-                    if (ES_Listings.Update(listing))
+                    if (listings.Update(listing))
                     {
                         updated++;
                     }
@@ -45,17 +46,17 @@ namespace landerist_library.Parse.Location.Providers.Goolzoom
             }
         }
 
-        public static void UpdateAddressFromCadastralRef()
+        public void UpdateAddressFromCadastralRef()
         {
-            var listings = ES_Listings.GetListingWithCatastralReferenceAndNoAddress();
-            int total = listings.Count;
+            var items = listings.GetWithCadastralReferenceAndNoAddress();
+            int total = items.Count;
             int processed = 0;
             int updated = 0;
             int errors = 0;
 
             var api = new GoolzoomApi();
 
-            foreach (var listing in listings)
+            foreach (var listing in items)
             {
                 processed++;
 
@@ -64,7 +65,7 @@ namespace landerist_library.Parse.Location.Providers.Goolzoom
                 {
                     listing.address = address;
 
-                    if (ES_Listings.Update(listing))
+                    if (listings.Update(listing))
                     {
                         updated++;
                     }

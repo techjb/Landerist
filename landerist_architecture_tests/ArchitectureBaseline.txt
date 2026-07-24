@@ -1,6 +1,3 @@
 # Existing legacy references to the new architectural boundaries.
 # Do not add entries. Move behavior behind Application ports and remove entries
 # as the legacy dependency is eliminated.
-Infrastructure|landerist_library/Database/ES_Listings.cs
-Infrastructure|landerist_library/Database/ES_Media.cs
-Infrastructure|landerist_library/Database/ES_Sources.cs

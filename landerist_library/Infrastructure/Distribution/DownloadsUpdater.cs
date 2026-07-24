@@ -1,4 +1,5 @@
 using landerist_library.Application.Websites;
+using landerist_library.Application.Listings;
 using landerist_library.Configuration;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Database;
@@ -13,6 +14,9 @@ namespace landerist_library.Infrastructure.Distribution
 {
     public class DownloadsUpdater : DistributionArtifacts
     {
+        private readonly IListingAdministrationService _listings;
+
+        public DownloadsUpdater(IListingAdministrationService listings) => _listings = listings;
         public const string METADATA_KEY_DATEFROM = "dateFrom";
         public const string METADATA_KEY_DATETO = "dateTo";
         public const string METADATA_KEY_COUNTER = "counter";
@@ -20,7 +24,7 @@ namespace landerist_library.Infrastructure.Distribution
         private const string HOSTS_SUBDIRECTORY = "ES\\Hosts";
         private const string LISTINGS_BY_OPERATION_PROPERTY_TYPE_SUBDIRECTORY = "ES\\OperationPropertyTypes";
 
-        public static void Update(
+        public void Update(
             IWebsiteCatalog websites,
             WebsiteQueryRepository websiteQueries)
         {
@@ -39,36 +43,36 @@ namespace landerist_library.Infrastructure.Distribution
             }
         }
 
-        public static void UpdateListings()
+        public void UpdateListings()
         {
             Console.WriteLine("Reading all listings ..");
-            var listings = ES_Listings.GetAll(true, true);
+            var listings = _listings.GetAll(true, true);
             if (!Update(listings, CountryCode.ES, ExportType.Listings, null, null))
             {
                 Log.WriteError("filesupdater", "Error updating all listings");
             }
         }
 
-        public static void UpdateListingsUpdates()
+        public void UpdateListingsUpdates()
         {
             Console.WriteLine("Reading updates ..");
             DateOnly dateFrom = GetDateFrom(ExportType.PublishedUpdates, ExportType.UnpublishedUpdates);
             DateOnly dateTo = Yesterday();
 
-            var publishedListings = ES_Listings.GetListings(ListingStatus.published, true, true, dateFrom, dateTo);
+            var publishedListings = _listings.GetByDateRange(ListingStatus.published, true, true, dateFrom, dateTo);
             if (!Update(publishedListings, CountryCode.ES, ExportType.PublishedUpdates, dateFrom, dateTo))
             {
                 Log.WriteError("filesupdater", "Error updating PublishedUpdates");
             }
 
-            var unpublishedListings = ES_Listings.GetListings(ListingStatus.unpublished, true, true, dateFrom, dateTo);
+            var unpublishedListings = _listings.GetByDateRange(ListingStatus.unpublished, true, true, dateFrom, dateTo);
             if (!Update(unpublishedListings, CountryCode.ES, ExportType.UnpublishedUpdates, dateFrom, dateTo))
             {
                 Log.WriteError("filesupdater", "Error updating UnpublishedUpdates");
             }
         }
 
-        public static void UpdateFullDataSet(ListingStatus listingStatus)
+        public void UpdateFullDataSet(ListingStatus listingStatus)
         {
             Console.WriteLine("Reading " + listingStatus + " ..");
 
@@ -76,14 +80,14 @@ namespace landerist_library.Infrastructure.Distribution
                 ? ExportType.Published
                 : ExportType.Unpublished;
 
-            var listings = ES_Listings.GetListings(listingStatus);
+            var listings = _listings.GetByStatus(listingStatus);
             if (!Update(listings, CountryCode.ES, exportType, null, null))
             {
                 Log.WriteError("filesupdater", "Error updating " + exportType);
             }
         }
 
-        public static bool UpdateWebsites(WebsiteQueryRepository websiteQueries)
+        public bool UpdateWebsites(WebsiteQueryRepository websiteQueries)
         {
             Console.WriteLine("Reading Websites ..");
             var websites = websiteQueries.GetAll();
@@ -114,7 +118,7 @@ namespace landerist_library.Infrastructure.Distribution
             return UploadWebsitesFile(filePath, CountryCode.ES, websites.Rows.Count);
         }
 
-        public static bool UpdateListingsByWebsite(IWebsiteCatalog websites)
+        public bool UpdateListingsByWebsite(IWebsiteCatalog websites)
         {
             Console.WriteLine("Reading hosts ..");
             var websiteList = websites.GetAll()
@@ -145,7 +149,7 @@ namespace landerist_library.Infrastructure.Distribution
             return true;
         }
 
-        public static bool UpdateListingsByOperationPropertyType()
+        public bool UpdateListingsByOperationPropertyType()
         {
             Console.WriteLine("Reading listings by operation and property type ..");
 
@@ -171,12 +175,12 @@ namespace landerist_library.Infrastructure.Distribution
             return true;
         }
 
-        private static bool UpdateListingsByOperationPropertyType(
+        private bool UpdateListingsByOperationPropertyType(
             Operation operation,
             PropertyType propertyType,
             ListingStatus listingStatus)
         {
-            var listings = ES_Listings.GetListings(
+            var listings = _listings.GetByStatus(
                 listingStatus,
                 operation,
                 propertyType,
@@ -199,9 +203,9 @@ namespace landerist_library.Infrastructure.Distribution
             return UploadListingsByOperationPropertyTypeFile(filePath, operation, propertyType, listingStatus, listings.Count, "json");
         }
 
-        private static bool UpdateHostListings(Website website, ListingStatus listingStatus)
+        private bool UpdateHostListings(Website website, ListingStatus listingStatus)
         {
-            var listings = ES_Listings.GetListings(website.Host, listingStatus);
+            var listings = _listings.GetByHost(website.Host, listingStatus);
             if (listings.Count == 0)
             {
                 return true;
@@ -218,7 +222,7 @@ namespace landerist_library.Infrastructure.Distribution
             return UploadHostFile(filePath, website.Host, listingStatus, listings.Count, "json");
         }
 
-        private static bool UploadListingsByOperationPropertyTypeFile(
+        private bool UploadListingsByOperationPropertyTypeFile(
             string filePath,
             Operation operation,
             PropertyType propertyType,
@@ -240,7 +244,7 @@ namespace landerist_library.Infrastructure.Distribution
             return true;
         }
 
-        private static bool UploadHostFile(string filePath, string host, ListingStatus listingStatus, int counter, string extension)
+        private bool UploadHostFile(string filePath, string host, ListingStatus listingStatus, int counter, string extension)
         {
             string fileName = GetHostListingsFileName(CountryCode.ES, host, listingStatus, extension);
             string subdirectoryInBucket = HOSTS_SUBDIRECTORY.Replace("\\", "/");
@@ -256,7 +260,7 @@ namespace landerist_library.Infrastructure.Distribution
             return true;
         }
 
-        private static bool Update(SortedSet<Listing> listings, CountryCode countryCode, ExportType exportType, DateOnly? dateFrom, DateOnly? dateTo)
+        private bool Update(SortedSet<Listing> listings, CountryCode countryCode, ExportType exportType, DateOnly? dateFrom, DateOnly? dateTo)
         {
             Console.WriteLine("Updating " + exportType + "..");
             if (listings.Count.Equals(0))
@@ -283,12 +287,12 @@ namespace landerist_library.Infrastructure.Distribution
             return UploadListingsFile(filePathJson, countryCode, exportType, listings.Count, dateFrom, dateTo);
         }
 
-        private static bool Update(string filePath, CountryCode countryCode, ExportType exportType, int counter)
+        private bool Update(string filePath, CountryCode countryCode, ExportType exportType, int counter)
         {
             return Update(filePath, countryCode, exportType, counter, null, null);
         }
 
-        private static bool Update(string filePath, CountryCode countryCode, ExportType exportType, int counter, DateOnly? dateFrom, DateOnly? dateTo)
+        private bool Update(string filePath, CountryCode countryCode, ExportType exportType, int counter, DateOnly? dateFrom, DateOnly? dateTo)
         {
             string subdirectory = GetLocalSubdirectory(countryCode, exportType);
             string fileNameZip = GetFileName(countryCode, exportType, "zip");
@@ -315,7 +319,7 @@ namespace landerist_library.Infrastructure.Distribution
             return true;
         }
 
-        private static bool UploadListingsFile(string filePath, CountryCode countryCode, ExportType exportType, int counter, DateOnly? dateFrom, DateOnly? dateTo)
+        private bool UploadListingsFile(string filePath, CountryCode countryCode, ExportType exportType, int counter, DateOnly? dateFrom, DateOnly? dateTo)
         {
             string subdirectory = GetLocalSubdirectory(countryCode, exportType);
             string fileNameJson = GetFileName(countryCode, exportType, "json");
@@ -337,7 +341,7 @@ namespace landerist_library.Infrastructure.Distribution
             return true;
         }
 
-        private static bool UploadWebsitesFile(string filePath, CountryCode countryCode, int counter)
+        private bool UploadWebsitesFile(string filePath, CountryCode countryCode, int counter)
         {
             ExportType exportType = ExportType.Websites;
             string subdirectory = GetLocalSubdirectory(countryCode, exportType);
@@ -360,7 +364,7 @@ namespace landerist_library.Infrastructure.Distribution
             return true;
         }
 
-        private static List<(string, string)> GetMetadata(int counter, DateOnly? dateFrom, DateOnly? dateTo)
+        private List<(string, string)> GetMetadata(int counter, DateOnly? dateFrom, DateOnly? dateTo)
         {
             List<(string, string)> metadata = [];
             metadata.Add((METADATA_KEY_COUNTER, counter.ToString(CultureInfo.InvariantCulture)));
@@ -378,7 +382,7 @@ namespace landerist_library.Infrastructure.Distribution
             return metadata;
         }
 
-        private static bool UploadHistoricFile(
+        private bool UploadHistoricFile(
             CountryCode countryCode,
             ExportType exportType,
             string filePath,
@@ -408,7 +412,7 @@ namespace landerist_library.Infrastructure.Distribution
             }
         }
 
-        private static string GetHistoricFileName(
+        private string GetHistoricFileName(
             CountryCode countryCode,
             ExportType exportType,
             DateOnly? dateFrom,
@@ -429,12 +433,12 @@ namespace landerist_library.Infrastructure.Distribution
             return GetLegacyFileNameWithDate(Yesterday(), fileNameWithoutExtension, extension);
         }
 
-        private static bool IsUpdatesExportType(ExportType exportType)
+        private bool IsUpdatesExportType(ExportType exportType)
         {
             return exportType is ExportType.PublishedUpdates or ExportType.UnpublishedUpdates;
         }
 
-        private static bool UsesModernHistoricFileName(ExportType exportType)
+        private bool UsesModernHistoricFileName(ExportType exportType)
         {
             return exportType is ExportType.Published
                 or ExportType.Unpublished
@@ -443,7 +447,7 @@ namespace landerist_library.Infrastructure.Distribution
                 or ExportType.Websites;
         }
 
-        private static DateOnly GetDateFrom(params ExportType[] exportTypes)
+        private DateOnly GetDateFrom(params ExportType[] exportTypes)
         {
             var dateFrom = Yesterday();
             var s3 = new S3();
@@ -469,7 +473,7 @@ namespace landerist_library.Infrastructure.Distribution
             return dateFrom;
         }
 
-        private static List<string> GetObjectKeysForMetadata(ExportType exportType)
+        private List<string> GetObjectKeysForMetadata(ExportType exportType)
         {
             List<string> objectKeys =
             [
@@ -482,7 +486,7 @@ namespace landerist_library.Infrastructure.Distribution
             return objectKeys.Distinct(StringComparer.Ordinal).ToList();
         }
 
-        private static DateOnly Yesterday()
+        private DateOnly Yesterday()
         {
             return DateOnly.FromDateTime(DateTime.Now.AddDays(-1));
         }

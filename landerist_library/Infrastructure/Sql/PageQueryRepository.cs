@@ -1,4 +1,4 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Pages;
 using System.Data;
@@ -259,7 +259,7 @@ namespace landerist_library.Infrastructure.Sql
         {
             string where =
                 "P.[UriHash] IN (" +
-                "SELECT [Guid] FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+                "SELECT [Guid] FROM " + SqlTableNames.Listings + " " +
                 "WHERE [ListingStatus] = 'unpublished' " +
                 "AND [UnlistingDate] > DATEADD(day, -2, GETDATE()))";
 

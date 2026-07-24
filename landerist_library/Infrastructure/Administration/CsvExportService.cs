@@ -1,10 +1,12 @@
+using landerist_library.Export;
+using landerist_library.Infrastructure.Sql;
 using landerist_library.Websites;
 using landerist_library.Configuration;
 using landerist_library.Database;
 
-namespace landerist_library.Export
+namespace landerist_library.Infrastructure.Administration
 {
-    public class Csv
+    public class CsvExportService
     {
         private const string FILE_NAME_LISTINGS = "ES_LISTINGS.csv";
 
@@ -34,7 +36,7 @@ namespace landerist_library.Export
         private static bool ExportListings()
         {
             string filePath = GetFilePath(FILE_NAME_LISTINGS);
-            return Export(ES_Listings.TABLE_ES_LISTINGS, filePath);
+            return Export(SqlTableNames.Listings, filePath);
         }
 
         private static string GetFilePath(string fileName)
@@ -45,7 +47,7 @@ namespace landerist_library.Export
         private static bool ExportMedia()
         {
             string filePath = GetFilePath(FILE_NAME_MEDIA);
-            return Export(ES_Media.TABLE_ES_MEDIA, filePath);
+            return Export(SqlTableNames.Media, filePath);
         }
 
         private static bool Export(string tableName, string fileName)

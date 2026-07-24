@@ -1,22 +1,24 @@
 using landerist_library.Database;
+using landerist_library.Application.Listings;
+using landerist_library.Parse.Location.Providers.GoogleMaps;
 using landerist_library.Parse.Location.Candidates;
 using landerist_library.Websites;
 
-namespace landerist_library.Parse.Location.Providers.GoogleMaps
+namespace landerist_library.Infrastructure.Parsing
 {
-    public class GoogleMapsListingsLocationUpdater
+    public sealed class GoogleMapsListingsLocationUpdater(IListingAdministrationService listings)
     {
-        public static void UpdateListingsLocationIsAccurate(IDatabase database)
+        public void UpdateListingsLocationIsAccurate(IDatabase database)
         {
-            var listings = ES_Listings.GetListingsLocationIsAccurateNoCadastralReference();
-            if (listings == null || listings.Count == 0)
+            var items = listings.GetAccurateLocationWithoutCadastralReference();
+            if (listings == null || items.Count == 0)
             {
                 return;
             }
 
             var googleMapsApi = new GoogleMapsApi(database);
 
-            int total = listings.Count;
+            int total = items.Count;
             int processed = 0;
             int latLngFound = 0;
             int latLngNotFound = 0;
@@ -24,7 +26,7 @@ namespace landerist_library.Parse.Location.Providers.GoogleMaps
             int notAccurate = 0;
             int errors = 0;
 
-            Parallel.ForEach(listings,
+            Parallel.ForEach(items,
                 new ParallelOptions() { MaxDegreeOfParallelism = 10 },
                 listing =>
             {
@@ -50,7 +52,7 @@ namespace landerist_library.Parse.Location.Providers.GoogleMaps
                     }
                 }
 
-                if (!updateAddress || !new ES_Listings().UpdateAddress(listing.guid, lat, lng, locationIsAccurate, locationResolver))
+                if (!updateAddress || !listings.UpdateAddress(listing.guid, lat, lng, locationIsAccurate, locationResolver))
                 {
                     Interlocked.Increment(ref errors);
                 }

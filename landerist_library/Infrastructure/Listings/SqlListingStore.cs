@@ -11,10 +11,10 @@ namespace landerist_library.Infrastructure.Listings;
 
 public sealed class SqlListingStore : IListingStore
 {
-    private readonly ListingRepository _listings;
+    private readonly IListingRecordRepository _listings;
     private readonly IListingQueryService _queries;
-    private readonly MediaRepository _media;
-    private readonly SourceRepository _sources;
+    private readonly IListingMediaRepository _media;
+    private readonly IListingSourceRepository _sources;
     private readonly GlobalStatisticsRepository _statistics;
     private readonly IApplicationLogger _logger;
 

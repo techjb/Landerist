@@ -1,3 +1,4 @@
+using landerist_library.Infrastructure.Sql;
 using landerist_library.Database;
 using landerist_library.Pages;
 using landerist_library.Application.Statistics;
@@ -103,14 +104,14 @@ namespace landerist_library.Infrastructure.Statistics
 
         public int CountListings()
         {
-            return QueryInt("SELECT COUNT(*) FROM " + ES_Listings.TABLE_ES_LISTINGS);
+            return QueryInt("SELECT COUNT(*) FROM " + SqlTableNames.Listings);
         }
 
         public int CountListings(ListingStatus listingStatus)
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+                "FROM " + SqlTableNames.Listings + " " +
                 "WHERE [listingStatus] = @ListingStatus";
 
             return QueryInt(query, new Dictionary<string, object?>
@@ -121,7 +122,7 @@ namespace landerist_library.Infrastructure.Statistics
 
         public int CountMedia()
         {
-            return QueryInt("SELECT COUNT(*) FROM " + ES_Media.TABLE_ES_MEDIA);
+            return QueryInt("SELECT COUNT(*) FROM " + SqlTableNames.Media);
         }
 
         public DataTable GetHttpStatusCodeCounts(DateTime date)

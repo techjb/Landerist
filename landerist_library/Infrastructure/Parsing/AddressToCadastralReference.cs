@@ -1,3 +1,4 @@
+using landerist_library.Application.Listings;
 using landerist_library.Infrastructure.Statistics;
 using landerist_library.Application.Parsing;
 using landerist_library.Parse.CadastralReference;
@@ -110,10 +111,10 @@ namespace landerist_library.Infrastructure.Parsing
             return (false, null);
         }
 
-        public static void UpdateCadastralReferences(IDatabase database)
+        public static void UpdateCadastralReferences(IDatabase database, IListingAdministrationService listings)
         {
-            var listings = ES_Listings.GetListingsWithoutCatastralReferenceAndLocationIsAccurate();
-            int total = listings.Count;
+            var items = listings.GetWithoutCadastralReferenceAndAccurateLocation();
+            int total = items.Count;
             int processed = 0;
             int found = 0;
             int notFound = 0;
@@ -132,7 +133,7 @@ namespace landerist_library.Infrastructure.Parsing
             DataTable dataTableNotFound = new();
             dataTableNotFound.Columns.Add("Address", typeof(string));
 
-            Parallel.ForEach(listings,
+            Parallel.ForEach(items,
                 new ParallelOptions() { MaxDegreeOfParallelism = 6 },
                 listing =>
                 {
@@ -141,7 +142,7 @@ namespace landerist_library.Infrastructure.Parsing
                     {
                         Interlocked.Increment(ref found);
                         listing.cadastralReference = cadastralReference;
-                        ES_Listings.Update(listing);
+                        listings.Update(listing);
 
                         lock (dataTableFound)
                         {

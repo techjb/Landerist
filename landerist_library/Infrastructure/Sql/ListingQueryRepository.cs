@@ -18,7 +18,7 @@ public sealed class ListingQueryRepository
 
     public DataTable GetAll()
     {
-        string query = "SELECT * FROM " + ES_Listings.TABLE_ES_LISTINGS;
+        string query = "SELECT * FROM " + SqlTableNames.Listings;
         return Database.QueryTable(query);
     }
 
@@ -26,7 +26,7 @@ public sealed class ListingQueryRepository
     {
         string query =
             "SELECT * " +
-            "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+            "FROM " + SqlTableNames.Listings + " " +
             "WHERE [listingStatus] = @listingStatus";
 
         return Database.QueryTable(query, new Dictionary<string, object?> {
@@ -38,7 +38,7 @@ public sealed class ListingQueryRepository
     {
         string query =
             "SELECT L.* " +
-            "FROM " + ES_Listings.TABLE_ES_LISTINGS + " AS L " +
+            "FROM " + SqlTableNames.Listings + " AS L " +
             "WHERE L.[listingStatus] = @listingStatus AND " +
             "L.[operation] = @operation AND " +
             "L.[propertyType] = @propertyType";
@@ -54,7 +54,7 @@ public sealed class ListingQueryRepository
     {
         string query =
             "SELECT * " +
-            "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+            "FROM " + SqlTableNames.Listings + " " +
             "WHERE [Host] = @Host " +
             (listingStatus is null ? string.Empty : "AND [ListingStatus] = @ListingStatus");
 
@@ -67,14 +67,14 @@ public sealed class ListingQueryRepository
 
     public DataTable GetListingWithCatastralReference()
     {
-        return Database.QueryTable("SELECT * FROM " + ES_Listings.TABLE_ES_LISTINGS + " WHERE [cadastralReference] IS NOT NULL");
+        return Database.QueryTable("SELECT * FROM " + SqlTableNames.Listings + " WHERE [cadastralReference] IS NOT NULL");
     }
 
     public DataTable GetListingsWithoutLauName()
     {
         string query =
             "SELECT * " +
-            "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+            "FROM " + SqlTableNames.Listings + " " +
             "WHERE [lauName] IS NULL AND " +
             "[latitude] IS NOT NULL AND " +
             "[longitude] IS NOT NULL";
@@ -86,7 +86,7 @@ public sealed class ListingQueryRepository
     {
         string query =
             "SELECT * " +
-            "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+            "FROM " + SqlTableNames.Listings + " " +
             "WHERE [cadastralReference] IS NOT NULL " +
             "AND [address] IS NULL";
 
@@ -97,7 +97,7 @@ public sealed class ListingQueryRepository
     {
         string query =
             "SELECT * " +
-            "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+            "FROM " + SqlTableNames.Listings + " " +
             "WHERE [cadastralReference] IS NULL " +
             "AND [locationIsAccurate] = 1";
 
@@ -108,7 +108,7 @@ public sealed class ListingQueryRepository
     {
         string query =
             "SELECT * " +
-            "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+            "FROM " + SqlTableNames.Listings + " " +
             "WHERE [locationIsAccurate] = 1 AND " +
             " [cadastralReference] IS NULL";
 
@@ -119,7 +119,7 @@ public sealed class ListingQueryRepository
     {
         string query =
             "SELECT * " +
-            "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+            "FROM " + SqlTableNames.Listings + " " +
             "WHERE [listingStatus] = @listingStatus AND " +
             "[unlistingDate] < @unlistingDate";
 
@@ -133,7 +133,7 @@ public sealed class ListingQueryRepository
     {
         string query =
             "SELECT * " +
-            "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+            "FROM " + SqlTableNames.Listings + " " +
             "WHERE " +
             "   CAST([updated] AS DATE) >= CAST(@DateFrom AS DATE) AND " +
             "   CAST([updated] AS DATE) <= CAST(@DateTo AS DATE)";
@@ -149,7 +149,7 @@ public sealed class ListingQueryRepository
     {
         string query =
             "SELECT * " +
-            "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+            "FROM " + SqlTableNames.Listings + " " +
             "WHERE " +
             "   [listingStatus] = @ListingStatus AND " +
             "   CAST([updated] AS DATE) >= CAST(@DateFrom AS DATE) AND " +
@@ -167,7 +167,7 @@ public sealed class ListingQueryRepository
     {
         string query =
             "SELECT * " +
-            "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+            "FROM " + SqlTableNames.Listings + " " +
             "WHERE [Guid] = @Guid";
 
         return Database.QueryTable(query, new Dictionary<string, object?> {

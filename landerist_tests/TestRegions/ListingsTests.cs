@@ -1,4 +1,4 @@
-﻿using landerist_library.Database;
+using landerist_library.Database;
 using landerist_orels.ES;
 
 namespace landerist_tests
@@ -17,10 +17,7 @@ namespace landerist_tests
             //    sourceGuid = "4196"
             //};
             //listing1.AddSource(source);
-            //ES_Listings.InsertUpdate(page.Website, listing1);
-            //ES_Sources.FixListingsWhitoutSource();
 
-            //var listing = ES_Listings.GetListing("17C1CD611F14DC67B237E36F76AB8A1F4D831719E3B07B58464017DD9D542366 ", true, true);
             //var sordedSet = new SortedSet<Listing> { listing };
             //var json = landerist_library.Export.Json.ExportListings(sordedSet, "C:\\Users\\Chus\\Downloads\\test.json");
             //Console.WriteLine(json);

@@ -1,3 +1,4 @@
+using landerist_library.Infrastructure.Sql;
 using landerist_library.Database;
 using landerist_library.Pages;
 using landerist_library.Application.Statistics;
@@ -54,7 +55,7 @@ namespace landerist_library.Infrastructure.Statistics
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+                "FROM " + SqlTableNames.Listings + " " +
                 "WHERE [Host] = @Host";
 
             return QueryHostInt(query, host);
@@ -64,7 +65,7 @@ namespace landerist_library.Infrastructure.Statistics
         {
             string query =
                 "SELECT COUNT(*) " +
-                "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+                "FROM " + SqlTableNames.Listings + " " +
                 "WHERE [Host] = @Host AND [listingStatus] = @ListingStatus";
 
             return Database.QueryInt(query, new Dictionary<string, object?>
@@ -240,7 +241,7 @@ namespace landerist_library.Infrastructure.Statistics
         {
             string query =
                 "SELECT COALESCE([operation], 'NULL') AS [Key], COUNT(*) AS [Counter] " +
-                "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+                "FROM " + SqlTableNames.Listings + " " +
                 "WHERE [Host] = @Host " +
                 "AND [listingStatus] = @ListingStatus " +
                 "GROUP BY [operation] " +
@@ -253,7 +254,7 @@ namespace landerist_library.Infrastructure.Statistics
         {
             string query =
                 "SELECT COALESCE([propertyType], 'NULL') AS [Key], COUNT(*) AS [Counter] " +
-                "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+                "FROM " + SqlTableNames.Listings + " " +
                 "WHERE [Host] = @Host " +
                 "AND [listingStatus] = @ListingStatus " +
                 "GROUP BY [propertyType] " +
@@ -266,7 +267,7 @@ namespace landerist_library.Infrastructure.Statistics
         {
             string query =
                 "SELECT COALESCE(NULLIF(LTRIM(RTRIM([locationResolver])), ''), 'NULL') AS [Key], COUNT(*) AS [Counter] " +
-                "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+                "FROM " + SqlTableNames.Listings + " " +
                 "WHERE [Host] = @Host " +
                 "GROUP BY COALESCE(NULLIF(LTRIM(RTRIM([locationResolver])), ''), 'NULL') " +
                 "ORDER BY [Counter] DESC, [Key] ASC";
@@ -278,7 +279,7 @@ namespace landerist_library.Infrastructure.Statistics
         {
             string query =
                 "SELECT COALESCE([unlistingReason], 'NULL') AS [Key], COUNT(*) AS [Counter] " +
-                "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+                "FROM " + SqlTableNames.Listings + " " +
                 "WHERE [Host] = @Host " +
                 "AND [listingStatus] = @ListingStatus " +
                 "GROUP BY [unlistingReason] " +

@@ -19,7 +19,7 @@ public sealed class ListingStatisticsRepository
     {
         string query =
             "SELECT COUNT(*) " +
-            "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+            "FROM " + SqlTableNames.Listings + " " +
             "WHERE [host] = @Host";
 
         return Database.QueryInt(query, new Dictionary<string, object?> { { "Host", host } });
@@ -29,7 +29,7 @@ public sealed class ListingStatisticsRepository
     {
         string query =
             "SELECT COUNT(*) " +
-            "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+            "FROM " + SqlTableNames.Listings + " " +
             "WHERE [host] = @Host AND [listingStatus] = @ListingStatus";
 
         return Database.QueryInt(query, new Dictionary<string, object?>
@@ -43,7 +43,7 @@ public sealed class ListingStatisticsRepository
     {
         string query =
             "SELECT COUNT(*) " +
-            "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+            "FROM " + SqlTableNames.Listings + " " +
             "WHERE [host] = @Host " +
             "AND [listingDate] >= @ListingDateFrom";
 
@@ -58,7 +58,7 @@ public sealed class ListingStatisticsRepository
     {
         string query =
             "SELECT COUNT(*) " +
-            "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+            "FROM " + SqlTableNames.Listings + " " +
             "WHERE [host] = @Host " +
             "AND [listingStatus] = @ListingStatus " +
             "AND NULLIF(LTRIM(RTRIM([address])), '') IS NOT NULL";
@@ -74,7 +74,7 @@ public sealed class ListingStatisticsRepository
     {
         string query =
             "SELECT COUNT(*) " +
-            "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+            "FROM " + SqlTableNames.Listings + " " +
             "WHERE [host] = @Host " +
             "AND [listingStatus] = @ListingStatus " +
             "AND [latitude] IS NOT NULL " +
@@ -91,12 +91,12 @@ public sealed class ListingStatisticsRepository
     {
         string query =
             "SELECT COUNT(*) " +
-            "FROM " + ES_Listings.TABLE_ES_LISTINGS + " AS L " +
+            "FROM " + SqlTableNames.Listings + " AS L " +
             "WHERE L.[host] = @Host " +
             "AND L.[listingStatus] = @ListingStatus " +
             "AND EXISTS (" +
             "   SELECT 1 " +
-            "   FROM " + ES_Media.TABLE_ES_MEDIA + " AS M " +
+            "   FROM " + SqlTableNames.Media + " AS M " +
             "   WHERE M.[listingGuid] = L.[guid] " +
             "   AND M.[mediaType] = @MediaType" +
             ")";
@@ -113,7 +113,7 @@ public sealed class ListingStatisticsRepository
     {
         string query =
             "SELECT COUNT(*) " +
-            "FROM " + ES_Listings.TABLE_ES_LISTINGS + " AS L " +
+            "FROM " + SqlTableNames.Listings + " AS L " +
             "WHERE L.[listingStatus] = @ListingStatus AND " +
             "L.[operation] = @Operation AND " +
             "L.[propertyType] = @PropertyType";

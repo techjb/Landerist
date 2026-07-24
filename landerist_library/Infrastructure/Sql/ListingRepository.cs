@@ -1,4 +1,5 @@
-﻿using landerist_library.Database;
+using landerist_library.Application.Listings;
+using landerist_library.Database;
 using landerist_library.Pages;
 using landerist_orels;
 using landerist_orels.ES;
@@ -6,7 +7,7 @@ using System.Data;
 
 namespace landerist_library.Infrastructure.Sql
 {
-    public class ListingRepository
+    public sealed class ListingRepository : IListingRecordRepository
     {
         private readonly IDatabase _database;
         public ListingRepository(IDatabase database)
@@ -20,7 +21,7 @@ namespace landerist_library.Infrastructure.Sql
         public bool Insert(Listing listing, string host, ListingUnpublishDecision? unpublishDecision, out Exception? exception)
         {
             string query =
-                "INSERT INTO " + ES_Listings.TABLE_ES_LISTINGS + " " +
+                "INSERT INTO " + SqlTableNames.Listings + " " +
                 "([guid], [listingStatus], [listingDate], [updated], [unlistingDate], [unlistingReason], [unlistingPageType], " +
                 "[unlistingHttpStatusCode], [unlistingEvidenceCount], [unlistingRequiredEvidenceCount], [operation], [propertyType], " +
                 "[propertySubtype], [priceAmount], [priceCurrency], [description], " +
@@ -48,7 +49,7 @@ namespace landerist_library.Infrastructure.Sql
         public bool Update(Listing listing, ListingUnpublishDecision? unpublishDecision = null)
         {
             string query =
-                "UPDATE " + ES_Listings.TABLE_ES_LISTINGS + " SET " +
+                "UPDATE " + SqlTableNames.Listings + " SET " +
                 "[listingStatus] = @listingStatus, " +
                 "[updated] = @updated, " +
                 "[unlistingDate] = @unlistingDate, " +
@@ -110,7 +111,7 @@ namespace landerist_library.Infrastructure.Sql
         public bool Delete(string guid)
         {
             string query =
-                "DELETE FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+                "DELETE FROM " + SqlTableNames.Listings + " " +
                 "WHERE [guid] = @guid";
 
             return Database.Query(query, new Dictionary<string, object?> {
@@ -118,15 +119,15 @@ namespace landerist_library.Infrastructure.Sql
             });
         }
 
-        public bool Delete()
+        public bool DeleteAll()
         {
-            return Database.Query("DELETE FROM " + ES_Listings.TABLE_ES_LISTINGS);
+            return Database.Query("DELETE FROM " + SqlTableNames.Listings);
         }
 
         public bool UpdateAddress(string guid, double? latitude, double? longitude, bool? locationIsAccurate, string? locationResolver = null)
         {
             string query =
-                "UPDATE " + ES_Listings.TABLE_ES_LISTINGS + " SET " +
+                "UPDATE " + SqlTableNames.Listings + " SET " +
                 "[latitude] = @latitude, " +
                 "[longitude] = @longitude, " +
                 "[locationIsAccurate] = @locationIsAccurate, " +

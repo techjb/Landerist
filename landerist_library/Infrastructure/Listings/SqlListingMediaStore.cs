@@ -1,43 +1,45 @@
+using landerist_library.Application.Listings;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Infrastructure.Sql.Mapping;
 using landerist_orels;
 using landerist_orels.ES;
 using System.Data;
 
-namespace landerist_library.Database
+namespace landerist_library.Infrastructure.Listings
 {
-    public class ES_Media
+    internal sealed class SqlListingMediaStore
     {
-        public const string TABLE_ES_MEDIA = "[ES_MEDIA]";
-        private static readonly MediaRepository Repository = new(global::landerist_library.Database.LegacyDatabase.Create());
+        private readonly IListingMediaRepository Repository;
 
-        public static void Insert(Listing listing)
+        public SqlListingMediaStore(IListingMediaRepository repository) => Repository = repository;
+
+        public void Insert(Listing listing)
         {
             Repository.Insert(listing);
         }
 
-        public static void Update(Listing listing)
+        public void Update(Listing listing)
         {
             Delete(listing);
             Insert(listing);
         }
 
-        public static bool Delete(Listing listing)
+        public bool Delete(Listing listing)
         {
             return Delete(listing.guid);
         }
 
-        public static bool Delete(string guid)
+        public bool Delete(string guid)
         {
             return Repository.Delete(guid);
         }
 
-        public static bool Delete()
+        public bool Delete()
         {
-            return Repository.Delete();
+            return Repository.DeleteAll();
         }
 
-        public static SortedSet<Media> GetMedia(Listing listing)
+        public SortedSet<Media> GetMedia(Listing listing)
         {
             DataTable dataTable = Repository.GetMedia(listing);
 
@@ -53,7 +55,7 @@ namespace landerist_library.Database
             return medias;
         }
 
-        internal static Media? GetMedia(DataRow dataRow) =>
+        internal Media? GetMedia(DataRow dataRow) =>
             MediaDataMapper.Map(dataRow);
     }
 }

@@ -1,14 +1,12 @@
-﻿using landerist_library.Database;
 using landerist_library.Websites;
 using landerist_orels.ES;
 
 namespace landerist_library.Parse.Location
 {
-    public class LauIdParser(CountryCode countryCode, Listing listing, IDatabase? database = null)
+    public class LauIdParser(CountryCode countryCode, Listing listing)
     {
         private readonly CountryCode _countryCode = countryCode;
         private readonly Listing _listing = listing;
-        private readonly IDatabase? _database = database;
 
         public void SetLauIdAndLauName()
         {
@@ -39,63 +37,5 @@ namespace landerist_library.Parse.Location
             }
         }
 
-        public static void SetLauIdAndLauNameToListings(IDatabase database)
-        {
-            var listings = ES_Listings.GetListingsWithoutLauName();
-            var total = listings.Count;
-
-            if (total == 0)
-            {
-                Console.WriteLine("0/0 (0%) Updated: 0 Errors: 0");
-                return;
-            }
-
-            var counter = 0;
-            var updated = 0;
-            var errors = 0;
-
-            Parallel.ForEach(listings, new ParallelOptions()
-            {
-                //MaxDegreeOfParallelism = 1
-            }, listingItem =>
-            {
-                var current = Interlocked.Increment(ref counter);
-
-                var lauIdParser = new LauIdParser(CountryCode.ES, listingItem, database);
-                lauIdParser.SetLauIdAndLauName();
-
-                if (lauIdParser.UpdateLauIdAndLauName())
-                {
-                    Interlocked.Increment(ref updated);
-                }
-                else
-                {
-                    Interlocked.Increment(ref errors);
-                }
-
-                var percentage = (int)((double)current / total * 100);
-                var updatedSnapshot = Volatile.Read(ref updated);
-                var errorsSnapshot = Volatile.Read(ref errors);
-
-                Console.WriteLine($"{current}/{total} ({percentage}%) Updated: {updatedSnapshot} Errors: {errorsSnapshot}");
-            });
-        }
-
-        public bool UpdateLauIdAndLauName()
-        {
-            string query =
-                "UPDATE " + ES_Listings.TABLE_ES_LISTINGS + " " +
-                "SET [lauId] = @lauId, [lauName] = @lauName " +
-                "WHERE [guid] = @guid";
-
-            IDatabase database = _database
-                ?? throw new InvalidOperationException("Database is required to persist LAU data.");
-            return database.Query(query, new Dictionary<string, object?>
-            {
-                { "lauId", _listing.lauId },
-                { "lauName", _listing.lauName },
-                { "guid", _listing.guid.ToString() }
-            });
-        }
     }
 }

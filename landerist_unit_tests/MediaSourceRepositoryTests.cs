@@ -48,7 +48,7 @@ public sealed class MediaSourceRepositoryTests
         RecordingDatabase database = new() { QueryResult = true };
         SourceRepository repository = new(database);
 
-        bool result = repository.Delete();
+        bool result = repository.DeleteAll();
 
         Assert.True(result);
         Assert.Null(database.LastParameters);
@@ -110,7 +110,7 @@ public sealed class MediaSourceRepositoryTests
         RecordingDatabase database = new() { QueryResult = true };
         MediaRepository repository = new(database);
 
-        bool result = repository.Delete();
+        bool result = repository.DeleteAll();
 
         Assert.True(result);
         Assert.Null(database.LastParameters);

@@ -70,7 +70,7 @@ namespace landerist_library.Infrastructure.Sql
         {
             string query =
                 "SELECT 1 " +
-                "FROM " + ES_Listings.TABLE_ES_LISTINGS + " " +
+                "FROM " + SqlTableNames.Listings + " " +
                 "WHERE [Host] = @Host AND [listingStatus] = @ListingStatus";
 
             return Database.QueryExists(query, new Dictionary<string, object?> {

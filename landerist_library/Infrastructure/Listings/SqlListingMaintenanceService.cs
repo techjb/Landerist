@@ -7,14 +7,14 @@ namespace landerist_library.Infrastructure.Listings;
 
 public sealed class SqlListingMaintenanceService : IListingMaintenanceService
 {
-    private readonly ListingRepository _listings;
-    private readonly MediaRepository _media;
-    private readonly SourceRepository _sources;
+    private readonly IListingRecordRepository _listings;
+    private readonly IListingMediaRepository _media;
+    private readonly IListingSourceRepository _sources;
 
     public SqlListingMaintenanceService(
         ListingRepository listings,
-        MediaRepository media,
-        SourceRepository sources)
+        IListingMediaRepository media,
+        IListingSourceRepository sources)
     {
         ArgumentNullException.ThrowIfNull(listings);
         ArgumentNullException.ThrowIfNull(media);
@@ -42,9 +42,9 @@ public sealed class SqlListingMaintenanceService : IListingMaintenanceService
 
     public bool DeleteAll()
     {
-        bool listingsDeleted = _listings.Delete();
-        bool mediaDeleted = _media.Delete();
-        bool sourcesDeleted = _sources.Delete();
+        bool listingsDeleted = _listings.DeleteAll();
+        bool mediaDeleted = _media.DeleteAll();
+        bool sourcesDeleted = _sources.DeleteAll();
         return listingsDeleted && mediaDeleted && sourcesDeleted;
     }
 }

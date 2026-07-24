@@ -1,10 +1,11 @@
-﻿using landerist_library.Database;
+using landerist_library.Application.Listings;
+using landerist_library.Database;
 using landerist_orels.ES;
 using System.Data;
 
 namespace landerist_library.Infrastructure.Sql
 {
-    public class SourceRepository
+    public sealed class SourceRepository : IListingSourceRepository
     {
         private readonly IDatabase _database;
         public SourceRepository(IDatabase database)
@@ -51,7 +52,7 @@ namespace landerist_library.Infrastructure.Sql
             });
         }
 
-        public bool Delete()
+        public bool DeleteAll()
         {
             return Database.Query("DELETE FROM " + TableEsSources);
         }

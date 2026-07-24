@@ -1,11 +1,12 @@
-﻿using landerist_library.Database;
+using landerist_library.Application.Listings;
+using landerist_library.Database;
 using landerist_orels;
 using landerist_orels.ES;
 using System.Data;
 
 namespace landerist_library.Infrastructure.Sql
 {
-    public class MediaRepository
+    public sealed class MediaRepository : IListingMediaRepository
     {
         private readonly IDatabase _database;
         public MediaRepository(IDatabase database)
@@ -26,7 +27,7 @@ namespace landerist_library.Infrastructure.Sql
             foreach (var media in listing.media)
             {
                 string query =
-                    "INSERT INTO " + ES_Media.TABLE_ES_MEDIA + " " +
+                    "INSERT INTO " + SqlTableNames.Media + " " +
                     "VALUES(@ListingGuid ,@MediaType ,@Title ,@Url)";
 
                 Database.Query(query, new Dictionary<string, object?> {
@@ -41,7 +42,7 @@ namespace landerist_library.Infrastructure.Sql
         public bool Delete(string guid)
         {
             string query =
-                "DELETE FROM " + ES_Media.TABLE_ES_MEDIA + " " +
+                "DELETE FROM " + SqlTableNames.Media + " " +
                 "WHERE [listingGuid] = @listingGuid";
 
             return Database.Query(query, new Dictionary<string, object?>()
@@ -50,16 +51,16 @@ namespace landerist_library.Infrastructure.Sql
             });
         }
 
-        public bool Delete()
+        public bool DeleteAll()
         {
-            return Database.Query("DELETE FROM " + ES_Media.TABLE_ES_MEDIA);
+            return Database.Query("DELETE FROM " + SqlTableNames.Media);
         }
 
         public DataTable GetMedia(Listing listing)
         {
             string query =
                 "SELECT * " +
-                "FROM " + ES_Media.TABLE_ES_MEDIA + " " +
+                "FROM " + SqlTableNames.Media + " " +
                 "WHERE [listingGuid] = @listingGuid";
 
             return Database.QueryTable(query, new Dictionary<string, object?>()
