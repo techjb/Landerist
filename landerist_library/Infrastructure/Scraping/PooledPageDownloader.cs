@@ -4,7 +4,7 @@ using landerist_library.Pages;
 
 namespace landerist_library.Infrastructure.Scraping;
 
-public sealed class LegacyPageDownloader : IPageDownloader
+public sealed class PooledPageDownloader : IPageDownloader
 {
     public bool Download(Page page, bool useProxy) =>
         DownloadersPool.Download(page, useProxy);

@@ -11,6 +11,7 @@ internal static class ScrapeBatchTestFactory
         new(
             new NullWebsiteThrottleService(),
             new NullScrapeResourceManager(),
+            new NullScrapeResourceManager(),
             new NullScrapeBatchMetrics(),
             new NullScrapePageSource(),
             new ScraperExecutionOptions(
@@ -31,7 +32,7 @@ internal static class ScrapeBatchTestFactory
         public bool ReportSuccess(Website website) => true;
     }
 
-    private sealed class NullScrapeResourceManager : IScrapeResourceManager
+    private sealed class NullScrapeResourceManager : IScrapeBrowserManager, IPageLockManager
     {
         public void ClearDownloaders()
         {

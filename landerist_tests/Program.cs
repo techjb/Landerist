@@ -84,8 +84,8 @@ namespace landerist_tests
                 logger);
             PageScrapePipelineServices pageScraping = new(
                 new PageAcquisitionService(
-                    new LegacyPageDownloader(),
-                    new LegacyConditionalPageHeaderService(),
+                    new PooledPageDownloader(),
+                    new HttpConditionalPageHeaderService(),
                     new SqlScrapeMetrics(databaseFactory.Create()),
                     conditionalHeadersEnabled: !Config.IsConfigurationLocal()),
                 new PageContentClassifier(
@@ -105,7 +105,8 @@ namespace landerist_tests
                     enforceMinimumPages: Config.IsConfigurationProduction()));
             ScrapeBatchServices batchScraping = new(
                 new SqlWebsiteThrottleService(databaseFactory.Create()),
-                new SqlScrapeResourceManager(databaseFactory.Create(), Config.MACHINE_NAME),
+                new ScrapeBrowserManager(),
+                new SqlPageLockManager(databaseFactory.Create(), Config.MACHINE_NAME),
                 new SqlScrapeBatchMetrics(databaseFactory.Create()),
                 new SqlScrapePageSource(databaseFactory.Create(), listingStore),
                 new ScraperExecutionOptions(

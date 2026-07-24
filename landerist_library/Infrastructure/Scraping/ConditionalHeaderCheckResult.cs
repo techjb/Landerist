@@ -1,4 +1,4 @@
-namespace landerist_library.Scrape
+namespace landerist_library.Infrastructure.Scraping
 {
     internal sealed record ConditionalHeaderCheckResult
     {

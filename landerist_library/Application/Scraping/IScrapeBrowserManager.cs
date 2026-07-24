@@ -1,10 +1,8 @@
 namespace landerist_library.Application.Scraping;
 
-public interface IScrapeResourceManager
+public interface IScrapeBrowserManager
 {
     void ClearDownloaders();
-
-    void CleanPageLocks();
 
     void KillChrome();
 

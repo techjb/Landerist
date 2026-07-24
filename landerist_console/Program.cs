@@ -108,8 +108,8 @@ namespace landerist_console
                 logger);
             PageScrapePipelineServices pageScraping = new(
                 new PageAcquisitionService(
-                    new LegacyPageDownloader(),
-                    new LegacyConditionalPageHeaderService(),
+                    new PooledPageDownloader(),
+                    new HttpConditionalPageHeaderService(),
                     new SqlScrapeMetrics(databaseFactory.Create()),
                     conditionalHeadersEnabled: !Config.IsConfigurationLocal()),
                 new PageContentClassifier(
@@ -129,7 +129,8 @@ namespace landerist_console
                     enforceMinimumPages: Config.IsConfigurationProduction()));
             ScrapeBatchServices batchScraping = new(
                 new SqlWebsiteThrottleService(databaseFactory.Create()),
-                new SqlScrapeResourceManager(databaseFactory.Create(), Config.MACHINE_NAME),
+                new ScrapeBrowserManager(),
+                new SqlPageLockManager(databaseFactory.Create(), Config.MACHINE_NAME),
                 new SqlScrapeBatchMetrics(databaseFactory.Create()),
                 new SqlScrapePageSource(databaseFactory.Create(), listingStore),
                 new ScraperExecutionOptions(
@@ -171,7 +172,7 @@ namespace landerist_console
                 new TasksServiceOptions(executionMode),
                 new SystemRecurringTaskScheduler(),
                 logger,
-                new LegacyScrapeTaskJob(scraper, batchScraping.Resources),
+                new ScrapeTaskJob(scraper, batchScraping.Browser),
                 new LegacyLocalAiTaskJob(() => new TaskLocalAIParsing(parsedClassification, globalStatistics, hostStatistics, waitingStatus, pageCatalog)),
                 new LegacyTenMinuteTaskJob(
                     new TaskBatchDownload(parsedClassification, batches, globalStatistics, pageCatalog),

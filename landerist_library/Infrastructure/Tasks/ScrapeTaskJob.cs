@@ -3,22 +3,22 @@ using landerist_library.Application.Tasks;
 
 namespace landerist_library.Infrastructure.Tasks;
 
-public sealed class LegacyScrapeTaskJob : IScrapeTaskJob
+public sealed class ScrapeTaskJob : IScrapeTaskJob
 {
     private readonly Scraper _scraper;
-    private readonly IScrapeResourceManager _resources;
+    private readonly IScrapeBrowserManager _browser;
 
-    public LegacyScrapeTaskJob(
+    public ScrapeTaskJob(
         Scraper scraper,
-        IScrapeResourceManager resources)
+        IScrapeBrowserManager browser)
     {
         ArgumentNullException.ThrowIfNull(scraper);
-        ArgumentNullException.ThrowIfNull(resources);
+        ArgumentNullException.ThrowIfNull(browser);
         _scraper = scraper;
-        _resources = resources;
+        _browser = browser;
     }
 
-    public void Prepare() => _resources.UpdateChrome();
+    public void Prepare() => _browser.UpdateChrome();
 
     public void Run() => _scraper.RunBatch();
 

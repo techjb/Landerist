@@ -1,10 +1,9 @@
 using landerist_library.Application.Scraping;
 using landerist_library.Pages;
-using landerist_library.Scrape;
 
 namespace landerist_library.Infrastructure.Scraping;
 
-public sealed class LegacyConditionalPageHeaderService : IConditionalPageHeaderService
+public sealed class HttpConditionalPageHeaderService : IConditionalPageHeaderService
 {
     public ConditionalPageHeaderResult Check(Page page, bool useProxy)
     {

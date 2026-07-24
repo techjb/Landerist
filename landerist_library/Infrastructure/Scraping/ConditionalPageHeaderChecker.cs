@@ -1,11 +1,11 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Configuration;
 using landerist_library.Pages;
 using landerist_library.Websites;
 using System.Globalization;
 using System.Net;
 using System.Net.Http.Headers;
 
-namespace landerist_library.Scrape
+namespace landerist_library.Infrastructure.Scraping
 {
     internal sealed class ConditionalPageHeaderChecker
     {

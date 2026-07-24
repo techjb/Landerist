@@ -4,19 +4,22 @@ public sealed class ScrapeBatchServices
 {
     public ScrapeBatchServices(
         IWebsiteThrottleService websiteThrottle,
-        IScrapeResourceManager resources,
+        IScrapeBrowserManager browser,
+        IPageLockManager pageLocks,
         IScrapeBatchMetrics metrics,
         IScrapePageSource pages,
         ScraperExecutionOptions options)
     {
         ArgumentNullException.ThrowIfNull(websiteThrottle);
-        ArgumentNullException.ThrowIfNull(resources);
+        ArgumentNullException.ThrowIfNull(browser);
+        ArgumentNullException.ThrowIfNull(pageLocks);
         ArgumentNullException.ThrowIfNull(metrics);
         ArgumentNullException.ThrowIfNull(pages);
         ArgumentNullException.ThrowIfNull(options);
 
         WebsiteThrottle = websiteThrottle;
-        Resources = resources;
+        Browser = browser;
+        PageLocks = pageLocks;
         Metrics = metrics;
         Pages = pages;
         Options = options;
@@ -25,7 +28,9 @@ public sealed class ScrapeBatchServices
 
     public IWebsiteThrottleService WebsiteThrottle { get; }
 
-    public IScrapeResourceManager Resources { get; }
+    public IScrapeBrowserManager Browser { get; }
+
+    public IPageLockManager PageLocks { get; }
 
     public IScrapeBatchMetrics Metrics { get; }
 

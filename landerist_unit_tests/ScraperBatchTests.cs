@@ -28,6 +28,17 @@ public sealed class ScraperBatchTests
     }
 
     [Fact]
+    public void Stop_ReleasesBrowserResourcesAndCleansPageLocks()
+    {
+        TestContext context = CreateContext();
+
+        context.Scraper.Stop();
+
+        Assert.Equal(1, context.Resources.ClearDownloadersCalls);
+        Assert.Equal(1, context.Resources.CleanPageLocksCalls);
+        Assert.Equal(1, context.Resources.KillChromeCalls);
+    }
+    [Fact]
     public void RunBatch_WhenWebsiteIsBlocked_SkipsDownload()
     {
         TestContext context = CreateContext();
@@ -104,6 +115,7 @@ public sealed class ScraperBatchTests
             indexerEnabled: true);
         ScrapeBatchServices batchServices = new(
             throttle,
+            resources,
             resources,
             metrics,
             new NullScrapePageSource(),
@@ -207,17 +219,17 @@ public sealed class ScraperBatchTests
         }
     }
 
-    private sealed class RecordingScrapeResourceManager : IScrapeResourceManager
+    private sealed class RecordingScrapeResourceManager : IScrapeBrowserManager, IPageLockManager
     {
         public int ClearDownloadersCalls { get; private set; }
 
         public int KillChromeCalls { get; private set; }
 
+        public int CleanPageLocksCalls { get; private set; }
+
         public void ClearDownloaders() => ClearDownloadersCalls++;
 
-        public void CleanPageLocks()
-        {
-        }
+        public void CleanPageLocks() => CleanPageLocksCalls++;
 
         public void KillChrome() => KillChromeCalls++;
 

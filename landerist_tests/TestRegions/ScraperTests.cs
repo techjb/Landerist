@@ -1,4 +1,4 @@
-using landerist_library.Scrape;
+using landerist_library.Application.Scraping;
 
 namespace landerist_tests
 {

@@ -59,7 +59,7 @@ namespace landerist_library.Application.Scraping
         public void TestSinglePage()
         {
             _scraperLog.WriteTestStart();
-            _batchServices.Resources.UpdateChrome();
+            _batchServices.Browser.UpdateChrome();
             Page page = _batchServices.Pages.LoadOrCreate(
                 new Uri("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/"));
             var pageScraper = new PageScraper(
@@ -81,7 +81,7 @@ namespace landerist_library.Application.Scraping
         {
             ResetCancellationTokenSource();
             _batchServices.WebsiteThrottle.Clean();
-            _batchServices.Resources.ClearDownloaders();
+            _batchServices.Browser.ClearDownloaders();
             _pageQueue = [.. _pageBatchSelector.Select()];
             return ScrapeBatch();
         }
@@ -93,9 +93,9 @@ namespace landerist_library.Application.Scraping
                 _cancellation.Cancel();
             }
 
-            _batchServices.Resources.ClearDownloaders();
-            _batchServices.Resources.CleanPageLocks();
-            _batchServices.Resources.KillChrome();
+            _batchServices.Browser.ClearDownloaders();
+            _batchServices.PageLocks.CleanPageLocks();
+            _batchServices.Browser.KillChrome();
         }
 
         public bool Scrape(Website website)
@@ -147,8 +147,8 @@ namespace landerist_library.Application.Scraping
             ScrapeBatchCounters totals = _state.AccumulateTotals();
             _scraperLog.WriteTotals(totals);
             _batchServices.Metrics.Record(current);
-            _batchServices.Resources.ClearDownloaders();
-            _batchServices.Resources.KillChrome();
+            _batchServices.Browser.ClearDownloaders();
+            _batchServices.Browser.KillChrome();
             return true;
         }
 
