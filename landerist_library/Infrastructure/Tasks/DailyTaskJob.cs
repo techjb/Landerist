@@ -2,7 +2,7 @@ using landerist_library.Application.Distribution;
 using landerist_library.Application.Listings;
 using landerist_library.Application.Tasks;
 using landerist_library.Database;
-using landerist_library.Statistics;
+using landerist_library.Application.Statistics;
 
 namespace landerist_library.Infrastructure.Tasks;
 

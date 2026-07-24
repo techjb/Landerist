@@ -1,3 +1,4 @@
+using landerist_library.Infrastructure.Statistics;
 using landerist_library.Application.Listings;
 using landerist_library.Database;
 using landerist_library.Infrastructure.Listings;
@@ -5,7 +6,7 @@ using landerist_library.Infrastructure.PageServices;
 using landerist_library.Infrastructure.WebsiteServices;
 using landerist_library.Infrastructure.Scraping;
 using landerist_library.Infrastructure.Sql;
-using landerist_library.Statistics;
+using landerist_library.Application.Statistics;
 using landerist_library.Pages;
 using landerist_library.Websites;
 using landerist_orels.ES;
@@ -116,7 +117,7 @@ public sealed class SqlPersistenceAdaptersTests
     public void GlobalStatistics_ReadsThroughInjectedRepository()
     {
         RecordingDatabase database = new();
-        GlobalStatistics statistics = new(new GlobalStatisticsRepository(database));
+        GlobalStatistics statistics = new(new GlobalStatisticsRepository(database), persistenceEnabled: true);
 
         statistics.GetLatestStatistics(StatisticsKey.Pages.ToString(), 15);
 
@@ -132,7 +133,8 @@ public sealed class SqlPersistenceAdaptersTests
         database.HashSetResult.Add("example.com");
         HostStatistics statistics = new(
             new HostStatisticsRepository(database),
-            new SqlWebsiteCatalog(new WebsiteQueryRepository(database)));
+            new SqlWebsiteCatalog(new WebsiteQueryRepository(database)),
+            persistenceEnabled: true);
 
         statistics.TakeSnapshots();
 

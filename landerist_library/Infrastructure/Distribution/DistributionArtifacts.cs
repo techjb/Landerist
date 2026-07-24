@@ -6,7 +6,7 @@ using landerist_library.Configuration;
 using landerist_library.Logs;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Infrastructure.WebsiteServices;
-using landerist_library.Statistics;
+using landerist_library.Application.Statistics;
 using landerist_library.Websites;
 using landerist_orels.ES;
 using System.Globalization;

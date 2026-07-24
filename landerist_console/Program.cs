@@ -1,3 +1,4 @@
+using landerist_library.Infrastructure.Statistics;
 using landerist_library.Infrastructure.Parsing.OpenAI;
 using landerist_library.Infrastructure.Parsing.VertexAI;
 using landerist_library.Infrastructure.Parsing;
@@ -18,7 +19,7 @@ using landerist_library.Infrastructure.Scraping;
 using landerist_library.Infrastructure.Tasks;
 using landerist_library.Infrastructure.WebsiteServices;
 using landerist_library.Logs;
-using landerist_library.Statistics;
+using landerist_library.Application.Statistics;
 
 namespace landerist_console
 {
@@ -93,10 +94,12 @@ namespace landerist_console
                 new ListingStatisticsRepository(databaseFactory.Create()),
                 Config.MAX_PAGES_PER_WEBSITE);
             GlobalStatistics globalStatistics = new(
-                new GlobalStatisticsRepository(databaseFactory.Create()));
+                new GlobalStatisticsRepository(databaseFactory.Create()),
+                persistenceEnabled: !Config.IsConfigurationLocal());
             HostStatistics hostStatistics = new(
                 new HostStatisticsRepository(databaseFactory.Create()),
-                websiteCatalog);
+                websiteCatalog,
+                persistenceEnabled: !Config.IsConfigurationLocal());
             SqlPageLinkService pageLinks = new(
                 pagePersistence,
                 new WebsitePageMetricsRepository(databaseFactory.Create()),

@@ -3,7 +3,7 @@ using landerist_library.Configuration;
 using landerist_library.Export;
 using landerist_library.Logs;
 using landerist_library.Infrastructure.WebsiteServices;
-using landerist_library.Statistics;
+using landerist_library.Application.Statistics;
 using System.Data;
 using System.Globalization;
 using System.Net;

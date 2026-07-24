@@ -1,3 +1,4 @@
+using landerist_library.Infrastructure.Parsing;
 using landerist_library.Configuration;
 using landerist_library.Application.Pages;
 using landerist_library.Application.Persistence;
@@ -5,7 +6,7 @@ using landerist_library.Application.Scraping;
 using landerist_library.Logs;
 using landerist_library.Pages;
 using landerist_library.Parse.ListingParser;
-using landerist_library.Statistics;
+using landerist_library.Application.Statistics;
 using System.Collections.Concurrent;
 
 namespace landerist_library.Infrastructure.Tasks

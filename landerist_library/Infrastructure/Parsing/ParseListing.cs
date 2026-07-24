@@ -1,22 +1,14 @@
+using landerist_library.Parse.ListingParser;
 using landerist_library.Configuration;
 using landerist_library.Pages;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
 using landerist_library.Parse.ListingParser.UserInput;
-using landerist_library.Statistics;
+using landerist_library.Application.Statistics;
 using landerist_orels.ES;
 using Newtonsoft.Json;
 
-namespace landerist_library.Parse.ListingParser
+namespace landerist_library.Infrastructure.Parsing
 {
-    public enum LLMProvider
-    {
-        OpenAI,
-        //Gemini,
-        VertexAI,
-        //Anthropic,
-        LocalAI,
-    }
-
     public class ParseListing
     {
         private static readonly JsonSerializerSettings JsonSerializerSettings = new()

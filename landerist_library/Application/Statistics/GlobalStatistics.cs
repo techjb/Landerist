@@ -1,8 +1,7 @@
-using landerist_library.Infrastructure.Sql;
 using landerist_orels.ES;
 using System.Data;
 
-namespace landerist_library.Statistics
+namespace landerist_library.Application.Statistics
 {
     public enum StatisticsKey
     {
@@ -43,12 +42,14 @@ namespace landerist_library.Statistics
 
     public sealed class GlobalStatistics
     {
-        private readonly GlobalStatisticsRepository Repository;
+        private readonly IGlobalStatisticsRepository Repository;
+        private readonly bool _persistenceEnabled;
 
-        public GlobalStatistics(GlobalStatisticsRepository repository)
+        public GlobalStatistics(IGlobalStatisticsRepository repository, bool persistenceEnabled)
         {
             ArgumentNullException.ThrowIfNull(repository);
             Repository = repository;
+            _persistenceEnabled = persistenceEnabled;
         }
 
         public void TakeSnapshots()
@@ -231,7 +232,7 @@ namespace landerist_library.Statistics
 
         public bool InsertDailyCounter(string key, int counter)
         {
-            if (Configuration.Config.IsConfigurationLocal())
+            if (!_persistenceEnabled)
             {
                 return true;
             }

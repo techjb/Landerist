@@ -1,9 +1,8 @@
 using landerist_library.Application.Websites;
-using landerist_library.Infrastructure.Sql;
 using landerist_orels.ES;
 using System.Data;
 
-namespace landerist_library.Statistics
+namespace landerist_library.Application.Statistics
 {
     public enum HostStatisticsKey
     {
@@ -24,17 +23,20 @@ namespace landerist_library.Statistics
 
     public sealed class HostStatistics
     {
-        private readonly HostStatisticsRepository Repository;
+        private readonly IHostStatisticsRepository Repository;
+        private readonly bool _persistenceEnabled;
         private readonly IWebsiteCatalog WebsiteCatalog;
 
         public HostStatistics(
-            HostStatisticsRepository repository,
-            IWebsiteCatalog websiteCatalog)
+            IHostStatisticsRepository repository,
+            IWebsiteCatalog websiteCatalog,
+            bool persistenceEnabled)
         {
             ArgumentNullException.ThrowIfNull(repository);
             ArgumentNullException.ThrowIfNull(websiteCatalog);
             Repository = repository;
             WebsiteCatalog = websiteCatalog;
+            _persistenceEnabled = persistenceEnabled;
         }
 
         public void TakeSnapshots()
@@ -147,7 +149,7 @@ namespace landerist_library.Statistics
             ArgumentException.ThrowIfNullOrWhiteSpace(host);
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
 
-            if (Configuration.Config.IsConfigurationLocal())
+            if (!_persistenceEnabled)
             {
                 return true;
             }

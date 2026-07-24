@@ -2,7 +2,7 @@ using landerist_library.Application.Distribution;
 using landerist_library.Application.Websites;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Infrastructure.WebsiteServices;
-using landerist_library.Statistics;
+using landerist_library.Application.Statistics;
 
 namespace landerist_library.Infrastructure.Distribution;
 

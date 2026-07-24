@@ -1,9 +1,10 @@
+using landerist_library.Infrastructure.Statistics;
 using landerist_library.Application.Parsing;
 using landerist_library.Parse.CadastralReference;
 using landerist_library.Database;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Parse.Location.Providers.Goolzoom;
-using landerist_library.Statistics;
+using landerist_library.Application.Statistics;
 using Newtonsoft.Json;
 using System.Data;
 

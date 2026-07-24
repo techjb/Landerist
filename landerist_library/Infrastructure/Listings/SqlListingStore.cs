@@ -1,9 +1,10 @@
+using landerist_library.Infrastructure.Statistics;
 using landerist_library.Application.Listings;
 using landerist_library.Application.Logging;
 using landerist_library.Database;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Pages;
-using landerist_library.Statistics;
+using landerist_library.Application.Statistics;
 using landerist_orels.ES;
 
 namespace landerist_library.Infrastructure.Listings;

@@ -1,3 +1,4 @@
+using landerist_library.Infrastructure.Statistics;
 using landerist_library.Infrastructure.Parsing;
 using landerist_library.Configuration;
 using landerist_library.Application;
@@ -13,7 +14,7 @@ using landerist_library.Infrastructure.Sql;
 using landerist_library.Infrastructure.Scraping;
 using landerist_library.Infrastructure.WebsiteServices;
 using landerist_library.Logs;
-using landerist_library.Statistics;
+using landerist_library.Application.Statistics;
 using System.Runtime.InteropServices;
 
 
@@ -71,7 +72,8 @@ namespace landerist_tests
                 Config.NOT_LISTING_CACHE_ENABLED);
             HostStatistics hostStatistics = new(
                 new HostStatisticsRepository(databaseFactory.Create()),
-                new SqlWebsiteCatalog(new WebsiteQueryRepository(databaseFactory.Create())));
+                new SqlWebsiteCatalog(new WebsiteQueryRepository(databaseFactory.Create())),
+                persistenceEnabled: !Config.IsConfigurationLocal());
             SqlPageLinkService pageLinks = new(
                 pagePersistence,
                 new WebsitePageMetricsRepository(databaseFactory.Create()),

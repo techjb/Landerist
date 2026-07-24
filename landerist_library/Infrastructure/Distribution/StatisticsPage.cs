@@ -3,7 +3,7 @@ using landerist_library.Database;
 using landerist_library.Export;
 using landerist_library.Logs;
 using landerist_library.Infrastructure.Sql;
-using landerist_library.Statistics;
+using landerist_library.Application.Statistics;
 using landerist_orels.ES;
 using System.Data;
 using System.Globalization;

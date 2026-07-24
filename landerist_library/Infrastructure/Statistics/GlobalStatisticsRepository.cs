@@ -1,12 +1,12 @@
-﻿using landerist_library.Database;
+using landerist_library.Database;
 using landerist_library.Pages;
-using landerist_library.Statistics;
+using landerist_library.Application.Statistics;
 using landerist_orels.ES;
 using System.Data;
 
-namespace landerist_library.Infrastructure.Sql
+namespace landerist_library.Infrastructure.Statistics
 {
-    public class GlobalStatisticsRepository
+    public sealed class GlobalStatisticsRepository : IGlobalStatisticsRepository
     {
         private const string GlobalStatisticsTable = "[GLOBAL_STATISTICS]";
         private readonly IDatabase _database;

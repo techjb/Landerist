@@ -1,3 +1,4 @@
+using landerist_library.Infrastructure.Parsing;
 using landerist_library.Configuration;
 using landerist_library.Application.Pages;
 using landerist_library.Application.Parsing;
@@ -10,7 +11,7 @@ using landerist_library.Pages;
 using landerist_library.Parse.ListingParser;
 using landerist_library.Infrastructure.Parsing.OpenAI;
 using landerist_library.Infrastructure.Parsing.VertexAI;
-using landerist_library.Statistics;
+using landerist_library.Application.Statistics;
 
 namespace landerist_library.Infrastructure.Tasks
 {
