@@ -194,7 +194,8 @@ public sealed class PageClassificationServiceTests
             new NullPageAcquisitionService(),
             new NullPageContentClassifier(),
             new NullPageIndexingService(),
-            scheduling ?? new RecordingPageSchedulingService());
+            scheduling ?? new RecordingPageSchedulingService(),
+            indexerEnabled: true);
 
     private static Page CreatePage() =>
         new(

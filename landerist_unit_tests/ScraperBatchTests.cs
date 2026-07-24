@@ -101,7 +101,8 @@ public sealed class ScraperBatchTests
             acquisition,
             classifier,
             new NullPageIndexingService(),
-            new NullPageSchedulingService());
+            new NullPageSchedulingService(),
+            indexerEnabled: true);
         ScrapeBatchServices batchServices = new(
             throttle,
             resources,

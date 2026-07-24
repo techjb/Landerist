@@ -95,7 +95,8 @@ namespace landerist_tests
                     new SqlPageClassificationMetrics(databaseFactory.Create()),
                     hostStatistics),
                 new PageIndexingService(Config.INDEXER_ENABLED, pageLinks),
-                new SqlPageSchedulingService(listingStore));
+                new SqlPageSchedulingService(listingStore),
+                Config.INDEXER_ENABLED);
             PageBatchSelector pageBatchSelector = new(
                 new SqlPageSelectionRepository(databaseFactory.Create(), Config.MACHINE_NAME),
                 new PageSelectionOptions(
@@ -170,7 +171,7 @@ namespace landerist_tests
                 if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0 &&
                     keyInfo.Key == ConsoleKey.D)
                 {
-                    Console.WriteLine("¡Ctrl + D detectado!");
+                    Console.WriteLine("Â¡Ctrl + D detectado!");
                     ExitSignal.Set();
                 }
             };

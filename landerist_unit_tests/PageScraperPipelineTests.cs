@@ -110,7 +110,8 @@ public sealed class PageScraperPipelineTests
                 Acquisition,
                 _classifier,
                 Indexing,
-                Scheduling);
+                Scheduling,
+                indexerEnabled: true);
             Scraper = new PageScraper(
                 Page,
                 Persistence,

@@ -1,11 +1,11 @@
-﻿using landerist_library.Application.Listings;
+using landerist_library.Application.Listings;
 using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Scraping;
 using landerist_library.Pages;
 using landerist_orels.ES;
 
-namespace landerist_library.Scrape
+namespace landerist_library.Application.Scraping
 {
     public class PageScraper
     {
@@ -33,7 +33,8 @@ namespace landerist_library.Scrape
                 pagePersistence,
                 logger,
                 listingLifecycle,
-                pipeline.Scheduling);
+                pipeline.Scheduling,
+                pipeline.IndexerEnabled);
             _pipeline = pipeline;
             _useProxy = page.Website.UseProxy;
         }
@@ -93,3 +94,4 @@ namespace landerist_library.Scrape
         }
     }
 }
+

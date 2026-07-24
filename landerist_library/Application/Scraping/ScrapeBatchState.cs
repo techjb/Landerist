@@ -1,8 +1,6 @@
-using landerist_library.Application.Scraping;
+namespace landerist_library.Application.Scraping;
 
-namespace landerist_library.Scrape;
-
-internal sealed class ScrapeBatchState
+public sealed class ScrapeBatchState
 {
     private int _total;
     private int _processed;
@@ -60,3 +58,4 @@ internal sealed class ScrapeBatchState
         return _totals;
     }
 }
+

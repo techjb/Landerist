@@ -2,11 +2,10 @@ using landerist_library.Application.Listings;
 using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Scraping;
-using landerist_library.Configuration;
 using landerist_library.Pages;
 using landerist_orels.ES;
 
-namespace landerist_library.Scrape
+namespace landerist_library.Application.Scraping
 {
     internal sealed class PageClassificationService
     {
@@ -16,13 +15,15 @@ namespace landerist_library.Scrape
         private readonly IListingLifecycleService _listingLifecycle;
         private readonly IPageSchedulingService _scheduling;
         private readonly IParsedPageClassificationService _parsedClassification;
+        private readonly bool _indexerEnabled;
 
         public PageClassificationService(
             Page page,
             IPagePersistenceService pagePersistence,
             IApplicationLogger logger,
             IListingLifecycleService listingLifecycle,
-            IPageSchedulingService scheduling)
+            IPageSchedulingService scheduling,
+            bool indexerEnabled)
         {
             ArgumentNullException.ThrowIfNull(page);
             ArgumentNullException.ThrowIfNull(pagePersistence);
@@ -35,6 +36,7 @@ namespace landerist_library.Scrape
             _logger = logger;
             _listingLifecycle = listingLifecycle;
             _scheduling = scheduling;
+            _indexerEnabled = indexerEnabled;
             _parsedClassification = new ParsedPageClassificationService(
                 pagePersistence,
                 listingLifecycle);
@@ -42,7 +44,7 @@ namespace landerist_library.Scrape
 
         public bool TryApplyPreClassificationBeforeDownload()
         {
-            if (page.Website.HtmlIndexingEnabled && Config.INDEXER_ENABLED)
+            if (page.Website.HtmlIndexingEnabled && _indexerEnabled)
             {
                 return false;
             }

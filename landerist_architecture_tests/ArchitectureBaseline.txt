@@ -10,9 +10,6 @@ Application|landerist_library/Pages/Pages.Persistence.cs
 Application|landerist_library/Parse/ListingParser/OpenAI/Batch/OpenAIBatchDownload.cs
 Application|landerist_library/Parse/ListingParser/VertexAI/Batch/VertexAIBatchDownload.cs
 Application|landerist_library/Parse/PageTypeParser/PageTypeParser.cs
-Application|landerist_library/Scrape/PageClassificationService.cs
-Application|landerist_library/Scrape/PageScraper.cs
-Application|landerist_library/Scrape/ScrapeBatchState.cs
 Application|landerist_library/Scrape/Scraper.cs
 Application|landerist_library/Scrape/ScraperLog.cs
 Application|landerist_library/Statistics/HostStatistics.cs

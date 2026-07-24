@@ -119,7 +119,8 @@ namespace landerist_console
                     new SqlPageClassificationMetrics(databaseFactory.Create()),
                     hostStatistics),
                 new PageIndexingService(Config.INDEXER_ENABLED, pageLinks),
-                new SqlPageSchedulingService(listingStore));
+                new SqlPageSchedulingService(listingStore),
+                Config.INDEXER_ENABLED);
             PageBatchSelector pageBatchSelector = new(
                 new SqlPageSelectionRepository(databaseFactory.Create(), Config.MACHINE_NAME),
                 new PageSelectionOptions(

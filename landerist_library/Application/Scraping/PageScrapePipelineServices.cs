@@ -6,7 +6,8 @@ public sealed class PageScrapePipelineServices
         IPageAcquisitionService acquisition,
         IPageContentClassifier classifier,
         IPageIndexingService indexing,
-        IPageSchedulingService scheduling)
+        IPageSchedulingService scheduling,
+        bool indexerEnabled)
     {
         ArgumentNullException.ThrowIfNull(acquisition);
         ArgumentNullException.ThrowIfNull(classifier);
@@ -17,6 +18,7 @@ public sealed class PageScrapePipelineServices
         Classifier = classifier;
         Indexing = indexing;
         Scheduling = scheduling;
+        IndexerEnabled = indexerEnabled;
     }
 
     public IPageAcquisitionService Acquisition { get; }
@@ -26,4 +28,6 @@ public sealed class PageScrapePipelineServices
     public IPageIndexingService Indexing { get; }
 
     public IPageSchedulingService Scheduling { get; }
+
+    public bool IndexerEnabled { get; }
 }
