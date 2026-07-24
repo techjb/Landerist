@@ -1,4 +1,5 @@
 using landerist_library.Infrastructure.Sql;
+using landerist_library.Infrastructure.Sql.Mapping;
 using landerist_library.Pages;
 using landerist_library.Websites;
 using landerist_orels.ES;
@@ -264,101 +265,8 @@ namespace landerist_library.Database
             return listing;
         }
 
-        internal static Listing GetListingData(DataRow dataRow)
-        {
-            Listing listing = new()
-            {
-                guid = (string)dataRow["guid"],
-                listingStatus = (ListingStatus)Enum.Parse(typeof(ListingStatus), dataRow["listingStatus"].ToString()!),
-                listingDate = GetDateTime(dataRow, "listingDate"),
-                unlistingDate = GetDateTime(dataRow, "unlistingDate"),
-                operation = (Operation)Enum.Parse(typeof(Operation), dataRow["operation"].ToString()!),
-                propertyType = (PropertyType)Enum.Parse(typeof(PropertyType), dataRow["propertyType"].ToString()!),
-                propertySubtype = dataRow["propertySubtype"] is DBNull ? null : (PropertySubtype)Enum.Parse(typeof(PropertySubtype), dataRow["propertySubtype"].ToString()!),
-                price = dataRow["priceAmount"] is DBNull ? null : new Price()
-                {
-                    amount = Convert.ToDecimal(dataRow["priceAmount"]),
-                    currency = (Currency)Enum.Parse(typeof(Currency), dataRow["priceCurrency"].ToString()!)
-                },
-                description = GetString(dataRow, "description"),
-                contactName = GetString(dataRow, "contactName"),
-                contactPhone = GetString(dataRow, "contactPhone"),
-                contactEmail = GetString(dataRow, "contactEmail"),
-                contactUrl = GetUri(dataRow, "contactUrl"),
-                contactOther = GetString(dataRow, "contactOther"),
-                address = GetString(dataRow, "address"),
-                lauId = GetString(dataRow, "lauId"),
-                lauName = GetString(dataRow, "lauName"),
-                latitude = GetDouble(dataRow, "latitude"),
-                longitude = GetDouble(dataRow, "longitude"),
-                locationIsAccurate = GetBoolean(dataRow, "locationIsAccurate"),
-                locationResolver = GetOptionalString(dataRow, "locationResolver"),
-                cadastralReference = GetString(dataRow, "cadastralReference"),
-                propertySize = GetDouble(dataRow, "propertySize"),
-                landSize = GetDouble(dataRow, "landSize"),
-                constructionYear = GetShort(dataRow, "constructionYear"),
-                constructionStatus = dataRow["constructionStatus"] is DBNull ? null : (ConstructionStatus)Enum.Parse(typeof(ConstructionStatus), dataRow["constructionStatus"].ToString()!),
-                energyEfficiencyRating = dataRow["energyEfficiencyRating"] is DBNull ? null : (EnergyEfficiencyRating)Enum.Parse(typeof(EnergyEfficiencyRating), dataRow["energyEfficiencyRating"].ToString()!),
-                floors = GetShort(dataRow, "floors"),
-                floor = GetString(dataRow, "floor"),
-                bedrooms = GetShort(dataRow, "bedrooms"),
-                bathrooms = GetShort(dataRow, "bathrooms"),
-                parkings = GetShort(dataRow, "parkings"),
-                terrace = GetBoolean(dataRow, "terrace"),
-                garden = GetBoolean(dataRow, "garden"),
-                garage = GetBoolean(dataRow, "garage"),
-                motorbikeGarage = GetBoolean(dataRow, "motorbikeGarage"),
-                pool = GetBoolean(dataRow, "pool"),
-                lift = GetBoolean(dataRow, "lift"),
-                disabledAccess = GetBoolean(dataRow, "disabledAccess"),
-                storageRoom = GetBoolean(dataRow, "storageRoom"),
-                furnished = GetBoolean(dataRow, "furnished"),
-                nonFurnished = GetBoolean(dataRow, "nonFurnished"),
-                heating = GetBoolean(dataRow, "heating"),
-                airConditioning = GetBoolean(dataRow, "airConditioning"),
-                petsAllowed = GetBoolean(dataRow, "petsAllowed"),
-                securitySystems = GetBoolean(dataRow, "securitySystems"),
-            };
-
-            return listing;
-        }
-
-        private static bool? GetBoolean(DataRow dataRow, string columnName)
-        {
-            return dataRow[columnName] is DBNull ? null : (bool)dataRow[columnName];
-        }
-
-        private static string? GetString(DataRow dataRow, string columnName)
-        {
-            return dataRow[columnName] is DBNull ? null : (string)dataRow[columnName];
-        }
-
-        private static string? GetOptionalString(DataRow dataRow, string columnName)
-        {
-            return dataRow.Table.Columns.Contains(columnName)
-                ? GetString(dataRow, columnName)
-                : null;
-        }
-
-        private static short? GetShort(DataRow dataRow, string columnName)
-        {
-            return dataRow[columnName] is DBNull ? null : (short)dataRow[columnName];
-        }
-
-        private static double? GetDouble(DataRow dataRow, string columnName)
-        {
-            return dataRow[columnName] is DBNull ? null : (double)dataRow[columnName];
-        }
-
-        private static DateTime? GetDateTime(DataRow dataRow, string columnName)
-        {
-            return dataRow[columnName] is DBNull ? null : (DateTime)dataRow[columnName];
-        }
-
-        private static Uri? GetUri(DataRow dataRow, string columnName)
-        {
-            return dataRow[columnName] is DBNull ? null : new Uri((string)dataRow[columnName]);
-        }
+        internal static Listing GetListingData(DataRow dataRow) =>
+            ListingDataMapper.Map(dataRow);
 
         public static bool Delete(Listing listing)
         {

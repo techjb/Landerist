@@ -1,4 +1,3 @@
-using landerist_library.Database;
 using landerist_orels.ES;
 
 namespace landerist_library.Pages;
@@ -9,7 +8,7 @@ public partial class Pages
     public static Listing? GetListing(Page page, bool loadMedia, bool loadSources)
     {
         ArgumentNullException.ThrowIfNull(page);
-        return ES_Listings.GetListing(page, loadMedia, loadSources);
+        return ListingQueries.Get(page, loadMedia, loadSources);
     }
 
     public static bool ContainsListing(Page page) => GetListing(page, false, false) is not null;

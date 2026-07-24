@@ -1,4 +1,5 @@
 using landerist_library.Application;
+using landerist_library.Application.Listings;
 using landerist_library.Application.Pages;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Websites;
@@ -24,6 +25,9 @@ public partial class Websites
 
     private static IPageQueryService PageQueries =>
         LanderistApplication.Services.PageQueries;
+
+    private static IListingMaintenanceService ListingMaintenance =>
+        LanderistApplication.Services.ListingMaintenance;
 
     public static bool Insert(Website website) => Persistence.Insert(website);
 

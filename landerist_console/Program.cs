@@ -58,6 +58,14 @@ namespace landerist_console
             PagePersistenceService pagePersistence = new(new PageRepository(databaseFactory.Create()));
             WebsitePersistenceService websitePersistence = new(new WebsiteRepository(databaseFactory.Create()));
             SqlListingStore listingStore = new(databaseFactory.Create(), logger);
+            SqlListingQueryService listingQueries = new(
+                new ListingQueryRepository(databaseFactory.Create()),
+                new MediaRepository(databaseFactory.Create()),
+                new SourceRepository(databaseFactory.Create()));
+            SqlListingMaintenanceService listingMaintenance = new(
+                new ListingRepository(databaseFactory.Create()),
+                new MediaRepository(databaseFactory.Create()),
+                new SourceRepository(databaseFactory.Create()));
             SqlNotListingCacheService notListingCache = new(
                 databaseFactory.Create(),
                 Config.NOT_LISTING_CACHE_ENABLED);
@@ -70,7 +78,7 @@ namespace landerist_console
                 new PageMaintenanceRepository(databaseFactory.Create()));
             WebsiteDeletionService websiteDeletion = new(
                 pageCatalog,
-                new OrelsListingDeletionService(),
+                new OrelsListingDeletionService(listingMaintenance),
                 new SqlPageDeletionService(new PageMaintenanceRepository(databaseFactory.Create())),
                 websitePersistence);
             SqlPageWaitingStatusService waitingStatus = new(
@@ -140,7 +148,9 @@ namespace landerist_console
                 pageMaintenance,
                 websiteCatalog,
                 websiteMaintenance,
-                websiteMetrics));
+                websiteMetrics,
+                listingQueries,
+                listingMaintenance));
 
             Scraper scraper = new(
                 pagePersistence,

@@ -1,3 +1,4 @@
+using landerist_library.Application.Listings;
 using landerist_library.Application.Pages;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Websites;
@@ -10,6 +11,8 @@ namespace landerist_library.Application;
 /// </summary>
 public sealed class LanderistApplicationServices
 {
+    private readonly IListingQueryService? _listingQueries;
+    private readonly IListingMaintenanceService? _listingMaintenance;
     private readonly IPageQueryService? _pageQueries;
     private readonly IPageMaintenanceService? _pageMaintenance;
     private readonly IWebsiteCatalog? _websiteCatalog;
@@ -24,7 +27,9 @@ public sealed class LanderistApplicationServices
         IPageMaintenanceService? pageMaintenance = null,
         IWebsiteCatalog? websiteCatalog = null,
         IWebsiteMaintenanceService? websiteMaintenance = null,
-        IWebsiteMetricsService? websiteMetrics = null)
+        IWebsiteMetricsService? websiteMetrics = null,
+        IListingQueryService? listingQueries = null,
+        IListingMaintenanceService? listingMaintenance = null)
     {
         ArgumentNullException.ThrowIfNull(pagePersistence);
         ArgumentNullException.ThrowIfNull(websitePersistence);
@@ -32,6 +37,8 @@ public sealed class LanderistApplicationServices
         PagePersistence = pagePersistence;
         WebsitePersistence = websitePersistence;
         WebsiteDeletion = websiteDeletion;
+        _listingQueries = listingQueries;
+        _listingMaintenance = listingMaintenance;
         _pageQueries = pageQueries;
         _pageMaintenance = pageMaintenance;
         _websiteCatalog = websiteCatalog;
@@ -42,6 +49,12 @@ public sealed class LanderistApplicationServices
     public IPagePersistenceService PagePersistence { get; }
     public IWebsitePersistenceService WebsitePersistence { get; }
     public IWebsiteDeletionService WebsiteDeletion { get; }
+
+    public IListingQueryService ListingQueries =>
+        GetRequiredService(_listingQueries, nameof(ListingQueries));
+
+    public IListingMaintenanceService ListingMaintenance =>
+        GetRequiredService(_listingMaintenance, nameof(ListingMaintenance));
 
     public IPageQueryService PageQueries =>
         GetRequiredService(_pageQueries, nameof(PageQueries));

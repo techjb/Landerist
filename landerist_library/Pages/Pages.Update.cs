@@ -1,4 +1,3 @@
-using landerist_library.Database;
 using landerist_library.Tools;
 using landerist_library.Websites;
 using landerist_orels.ES;
@@ -30,7 +29,7 @@ namespace landerist_library.Pages
                     {
                         listing.cadastralReference = null;
                         updated++;
-                        if (ES_Listings.Update(listing))
+                        if (ListingMaintenance.Update(listing))
                         {
                             Console.WriteLine("UPDATED: " + updated++);
                         }

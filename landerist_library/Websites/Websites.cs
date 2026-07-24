@@ -1,5 +1,4 @@
 using landerist_library.Configuration;
-using landerist_library.Database;
 using landerist_library.Pages;
 using System.Data;
 
@@ -273,9 +272,7 @@ namespace landerist_library.Websites
 
         public static void DeleteAllListings()
         {
-            ES_Listings.Delete();
-            ES_Media.Delete();
-            ES_Sources.Delete();
+            ListingMaintenance.DeleteAll();
         }
        
         public static void UpdateRobotsTxt()

@@ -64,7 +64,7 @@ public sealed partial class ArchitectureBoundaryTests
     [Theory]
     [InlineData("Pages")]
     [InlineData("Websites")]
-    public void DomainAreas_DoNotReachIntoInfrastructure(string area)
+    public void DomainAreas_DoNotReachIntoPersistenceOrInfrastructure(string area)
     {
         string areaRoot = Path.Combine(LibraryRoot, area);
         List<string> violations = [];
@@ -73,6 +73,7 @@ public sealed partial class ArchitectureBoundaryTests
         {
             string source = File.ReadAllText(file);
             if (source.Contains("landerist_library.Infrastructure", StringComparison.Ordinal) ||
+                source.Contains("landerist_library.Database", StringComparison.Ordinal) ||
                 source.Contains("LegacyDatabase", StringComparison.Ordinal))
             {
                 violations.Add(GetRelativePath(file));
@@ -81,7 +82,7 @@ public sealed partial class ArchitectureBoundaryTests
 
         Assert.True(
             violations.Count == 0,
-            $"{area} must use Application ports instead of SQL infrastructure " +
+            $"{area} must use Application ports instead of Infrastructure, Database " +
             "or the legacy database service locator." + Environment.NewLine +
             string.Join(Environment.NewLine, violations));
     }

@@ -1,4 +1,5 @@
-﻿using landerist_library.Infrastructure.Sql;
+using landerist_library.Infrastructure.Sql;
+using landerist_library.Infrastructure.Sql.Mapping;
 using landerist_orels;
 using landerist_orels.ES;
 using System.Data;
@@ -53,22 +54,8 @@ namespace landerist_library.Database
             return sources;
         }
 
-        internal static Source? GetSource(DataRow dataRow)
-        {
-            var sourceName = dataRow["sourceName"] is DBNull ? null : (string)dataRow["sourceName"];
-            if (!Uri.TryCreate((string)dataRow["sourceUrl"], UriKind.Absolute, out Uri? uri))
-            {
-                return null;
-            }
-            var sourceGuid = dataRow["sourceGuid"] is DBNull ? null : (string)dataRow["sourceGuid"];
-
-            return new Source()
-            {
-                sourceName = sourceName,
-                sourceUrl = uri,
-                sourceGuid = sourceGuid,
-            };
-        }
+        internal static Source? GetSource(DataRow dataRow) =>
+            SourceDataMapper.Map(dataRow);
 
         public static void FixListingsWhitoutSource()
         {

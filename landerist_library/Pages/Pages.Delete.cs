@@ -1,5 +1,4 @@
 using landerist_library.Configuration;
-using landerist_library.Database;
 using landerist_library.Index;
 using landerist_library.Tools;
 using landerist_library.Websites;
@@ -89,11 +88,12 @@ public partial class Pages
     public static void DeleteUnpublishedListings()
     {
         DateTime unlistingDate = DateTime.Now.AddDays(-Config.DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS);
-        var listings = ES_Listings.GetUnpublishedListings(unlistingDate);
+        IReadOnlyCollection<Listing> listings =
+            ListingQueries.GetUnpublishedBefore(unlistingDate);
         DeleteListings(listings);
     }
 
-    private static void DeleteListings(SortedSet<Listing> listings)
+    private static void DeleteListings(IReadOnlyCollection<Listing> listings)
     {
         int counter = 0;
         int deleted = 0;

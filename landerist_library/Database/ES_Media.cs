@@ -1,4 +1,5 @@
-﻿using landerist_library.Infrastructure.Sql;
+using landerist_library.Infrastructure.Sql;
+using landerist_library.Infrastructure.Sql.Mapping;
 using landerist_orels;
 using landerist_orels.ES;
 using System.Data;
@@ -52,21 +53,7 @@ namespace landerist_library.Database
             return medias;
         }
 
-        internal static Media? GetMedia(DataRow dataRow)
-        {
-            MediaType? mediaType = dataRow["mediaType"] is DBNull ? null : (MediaType)Enum.Parse(typeof(MediaType), dataRow["mediaType"].ToString()!);
-            var title = dataRow["title"] is DBNull ? null : (string)dataRow["title"];
-            if (!Uri.TryCreate((string)dataRow["url"], UriKind.Absolute, out Uri? uri))
-            {
-                return null;
-            }
-
-            return new Media()
-            {
-                mediaType = mediaType,
-                title = title,
-                url = uri
-            };
-        }
+        internal static Media? GetMedia(DataRow dataRow) =>
+            MediaDataMapper.Map(dataRow);
     }
 }
