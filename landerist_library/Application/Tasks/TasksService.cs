@@ -1,7 +1,6 @@
 using landerist_library.Application.Logging;
-using landerist_library.Application.Tasks;
 
-namespace landerist_library.Tasks;
+namespace landerist_library.Application.Tasks;
 
 public sealed class TasksService : IDisposable
 {

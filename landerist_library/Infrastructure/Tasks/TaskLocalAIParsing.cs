@@ -7,7 +7,7 @@ using landerist_library.Parse.ListingParser;
 using landerist_library.Statistics;
 using System.Collections.Concurrent;
 
-namespace landerist_library.Tasks
+namespace landerist_library.Infrastructure.Tasks
 {
     public class TaskLocalAIParsing
     {

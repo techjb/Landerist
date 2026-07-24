@@ -10,7 +10,7 @@ using landerist_library.Parse.ListingParser.OpenAI.Batch;
 using landerist_library.Parse.ListingParser.VertexAI.Batch;
 using landerist_library.Statistics;
 
-namespace landerist_library.Tasks
+namespace landerist_library.Infrastructure.Tasks
 {
     public class TaskBatchDownload
     {

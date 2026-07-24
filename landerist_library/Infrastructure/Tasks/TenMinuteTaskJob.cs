@@ -1,14 +1,13 @@
 using landerist_library.Application.Tasks;
-using landerist_library.Tasks;
 
 namespace landerist_library.Infrastructure.Tasks;
 
-public sealed class LegacyTenMinuteTaskJob : IRecurringTaskJob
+public sealed class TenMinuteTaskJob : IRecurringTaskJob
 {
     private readonly TaskBatchDownload _download;
     private readonly TaskBatchUpload _upload;
 
-    public LegacyTenMinuteTaskJob(
+    public TenMinuteTaskJob(
         TaskBatchDownload download,
         TaskBatchUpload upload)
     {

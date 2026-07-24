@@ -1,11 +1,11 @@
-﻿using System.IO;
+using System.IO;
 using landerist_library.Configuration;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Database;
 using landerist_library.Parse.ListingParser.OpenAI.Batch;
 using landerist_library.Parse.ListingParser.VertexAI.Batch;
 
-namespace landerist_library.Tasks
+namespace landerist_library.Infrastructure.Tasks
 {
     public sealed class TaskBatchCleaner
     {

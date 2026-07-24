@@ -8,7 +8,7 @@ using landerist_library.Parse.ListingParser;
 using landerist_library.Parse.ListingParser.OpenAI.Batch;
 using landerist_library.Parse.ListingParser.VertexAI.Batch;
 
-namespace landerist_library.Tasks
+namespace landerist_library.Infrastructure.Tasks
 {
     public class TaskBatchUpload
     {

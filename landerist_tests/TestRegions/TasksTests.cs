@@ -22,7 +22,7 @@ namespace landerist_tests
             //OpenAIBatchCleaner.RemoveFiles();
             //FilesUpdater.UpdateWebsites();
             //TaskBatchUpload.GetJson(page);
-            //new landerist_library.Tasks.TaskLocalAIParsing().ProcessPages();
+            //new landerist_library.Infrastructure.Tasks.TaskLocalAIParsing().ProcessPages();
         }
     }
 }

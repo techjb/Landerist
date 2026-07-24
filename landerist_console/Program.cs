@@ -15,7 +15,6 @@ using landerist_library.Infrastructure.Scraping;
 using landerist_library.Infrastructure.Tasks;
 using landerist_library.Infrastructure.WebsiteServices;
 using landerist_library.Logs;
-using landerist_library.Tasks;
 using landerist_library.Statistics;
 
 namespace landerist_console
@@ -173,12 +172,12 @@ namespace landerist_console
                 new SystemRecurringTaskScheduler(),
                 logger,
                 new ScrapeTaskJob(scraper, batchScraping.Browser),
-                new LegacyLocalAiTaskJob(() => new TaskLocalAIParsing(parsedClassification, globalStatistics, hostStatistics, waitingStatus, pageCatalog)),
-                new LegacyTenMinuteTaskJob(
+                new LocalAiTaskJob(() => new TaskLocalAIParsing(parsedClassification, globalStatistics, hostStatistics, waitingStatus, pageCatalog)),
+                new TenMinuteTaskJob(
                     new TaskBatchDownload(parsedClassification, batches, globalStatistics, pageCatalog),
                     new TaskBatchUpload(batches, waitingStatus)),
-                new LegacyHourlyTaskJob(new TaskBatchCleaner(batches)),
-                new LegacyDailyTaskJob(
+                new HourlyTaskJob(new TaskBatchCleaner(batches)),
+                new DailyTaskJob(
                     databaseFactory.Create(),
                     notListingCache,
                     new SqlDatabaseBackupService(databaseFactory.Create()),

@@ -1,5 +1,3 @@
-using landerist_library.Tasks;
-
 namespace landerist_tests
 {
     internal static class LocalAITests
@@ -12,9 +10,9 @@ namespace landerist_tests
 
             //landerist_library.Parse.ListingParser.LocalAI.LocalAIRequest.PrintOutputSchema();
             //Console.WriteLine(ParseListingSystem.GetSystemPrompt());
-            //new landerist_library.Tasks.TaskLocalAIParsing();
-            //new landerist_library.Tasks.TaskLocalAIParsing().ProcessPages();
-            //landerist_library.Tasks.TaskLocalAIParsing.ProcessPage("06733B0466E54AC3DD64333443A75A3323B04C9BC709C89C1187D36C6993F406");
+            //new landerist_library.Infrastructure.Tasks.TaskLocalAIParsing();
+            //new landerist_library.Infrastructure.Tasks.TaskLocalAIParsing().ProcessPages();
+            //landerist_library.Infrastructure.Tasks.TaskLocalAIParsing.ProcessPage("06733B0466E54AC3DD64333443A75A3323B04C9BC709C89C1187D36C6993F406");
 
             //Console.WriteLine(TaskLocalAIParsing.GetMaxTokenCount());
 

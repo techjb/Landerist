@@ -11,10 +11,6 @@ Application|landerist_library/Parse/ListingParser/OpenAI/Batch/OpenAIBatchDownlo
 Application|landerist_library/Parse/ListingParser/VertexAI/Batch/VertexAIBatchDownload.cs
 Application|landerist_library/Parse/PageTypeParser/PageTypeParser.cs
 Application|landerist_library/Statistics/HostStatistics.cs
-Application|landerist_library/Tasks/TaskBatchDownload.cs
-Application|landerist_library/Tasks/TaskBatchUpload.cs
-Application|landerist_library/Tasks/TaskLocalAIParsing.cs
-Application|landerist_library/Tasks/TasksService.cs
 Application|landerist_library/Websites/Websites.Persistence.cs
 Infrastructure|landerist_library/Database/ES_Listings.cs
 Infrastructure|landerist_library/Database/ES_Media.cs
@@ -28,6 +24,3 @@ Infrastructure|landerist_library/Landerist_com/StatisticsPage.cs
 Infrastructure|landerist_library/Parse/CadastralReference/AddressToCadastralReference.cs
 Infrastructure|landerist_library/Statistics/GlobalStatistics.cs
 Infrastructure|landerist_library/Statistics/HostStatistics.cs
-Infrastructure|landerist_library/Tasks/TaskBatchCleaner.cs
-Infrastructure|landerist_library/Tasks/TaskBatchDownload.cs
-Infrastructure|landerist_library/Tasks/TaskBatchUpload.cs

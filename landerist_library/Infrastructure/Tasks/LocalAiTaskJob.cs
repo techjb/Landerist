@@ -1,14 +1,13 @@
 using landerist_library.Application.Tasks;
-using landerist_library.Tasks;
 
 namespace landerist_library.Infrastructure.Tasks;
 
-public sealed class LegacyLocalAiTaskJob : ILocalAiTaskJob
+public sealed class LocalAiTaskJob : ILocalAiTaskJob
 {
     private readonly Func<TaskLocalAIParsing> _factory;
     private TaskLocalAIParsing? _task;
 
-    public LegacyLocalAiTaskJob(Func<TaskLocalAIParsing> factory)
+    public LocalAiTaskJob(Func<TaskLocalAIParsing> factory)
     {
         ArgumentNullException.ThrowIfNull(factory);
         _factory = factory;

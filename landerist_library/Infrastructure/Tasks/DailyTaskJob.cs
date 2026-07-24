@@ -9,7 +9,7 @@ using landerist_library.Infrastructure.WebsiteServices;
 
 namespace landerist_library.Infrastructure.Tasks;
 
-public sealed class LegacyDailyTaskJob : IRecurringTaskJob
+public sealed class DailyTaskJob : IRecurringTaskJob
 {
     private readonly AddressLatLng _addressLatLng;
     private readonly AddressCadastralReference _addressCadastralReference;
@@ -22,7 +22,7 @@ public sealed class LegacyDailyTaskJob : IRecurringTaskJob
     private readonly IWebsiteCatalog _websites;
     private readonly WebsiteQueryRepository _websiteQueries;
 
-    public LegacyDailyTaskJob(
+    public DailyTaskJob(
         IDatabase database,
         INotListingCacheMaintenance notListingCache,
         IDatabaseBackupService backup,

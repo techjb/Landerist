@@ -1,13 +1,12 @@
 using landerist_library.Application.Tasks;
-using landerist_library.Tasks;
 
 namespace landerist_library.Infrastructure.Tasks;
 
-public sealed class LegacyHourlyTaskJob : IRecurringTaskJob
+public sealed class HourlyTaskJob : IRecurringTaskJob
 {
     private readonly TaskBatchCleaner _batchCleaner;
 
-    public LegacyHourlyTaskJob(TaskBatchCleaner batchCleaner)
+    public HourlyTaskJob(TaskBatchCleaner batchCleaner)
     {
         ArgumentNullException.ThrowIfNull(batchCleaner);
         _batchCleaner = batchCleaner;
