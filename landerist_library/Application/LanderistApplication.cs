@@ -1,18 +1,30 @@
+using landerist_library.Application.Pages;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Websites;
 
 namespace landerist_library.Application;
 
 /// <summary>
-/// Persistence services used only by the legacy Pages and Websites facades.
-/// New code should receive persistence services through constructor injection.
+/// Services used only by legacy static facades. New code should receive these
+/// services through constructor injection.
 /// </summary>
 public sealed class LanderistApplicationServices
 {
+    private readonly IPageQueryService? _pageQueries;
+    private readonly IPageMaintenanceService? _pageMaintenance;
+    private readonly IWebsiteCatalog? _websiteCatalog;
+    private readonly IWebsiteMaintenanceService? _websiteMaintenance;
+    private readonly IWebsiteMetricsService? _websiteMetrics;
+
     public LanderistApplicationServices(
         IPagePersistenceService pagePersistence,
         IWebsitePersistenceService websitePersistence,
-        IWebsiteDeletionService websiteDeletion)
+        IWebsiteDeletionService websiteDeletion,
+        IPageQueryService? pageQueries = null,
+        IPageMaintenanceService? pageMaintenance = null,
+        IWebsiteCatalog? websiteCatalog = null,
+        IWebsiteMaintenanceService? websiteMaintenance = null,
+        IWebsiteMetricsService? websiteMetrics = null)
     {
         ArgumentNullException.ThrowIfNull(pagePersistence);
         ArgumentNullException.ThrowIfNull(websitePersistence);
@@ -20,18 +32,40 @@ public sealed class LanderistApplicationServices
         PagePersistence = pagePersistence;
         WebsitePersistence = websitePersistence;
         WebsiteDeletion = websiteDeletion;
+        _pageQueries = pageQueries;
+        _pageMaintenance = pageMaintenance;
+        _websiteCatalog = websiteCatalog;
+        _websiteMaintenance = websiteMaintenance;
+        _websiteMetrics = websiteMetrics;
     }
 
     public IPagePersistenceService PagePersistence { get; }
-
     public IWebsitePersistenceService WebsitePersistence { get; }
-
     public IWebsiteDeletionService WebsiteDeletion { get; }
+
+    public IPageQueryService PageQueries =>
+        GetRequiredService(_pageQueries, nameof(PageQueries));
+
+    public IPageMaintenanceService PageMaintenance =>
+        GetRequiredService(_pageMaintenance, nameof(PageMaintenance));
+
+    public IWebsiteCatalog WebsiteCatalog =>
+        GetRequiredService(_websiteCatalog, nameof(WebsiteCatalog));
+
+    public IWebsiteMaintenanceService WebsiteMaintenance =>
+        GetRequiredService(_websiteMaintenance, nameof(WebsiteMaintenance));
+
+    public IWebsiteMetricsService WebsiteMetrics =>
+        GetRequiredService(_websiteMetrics, nameof(WebsiteMetrics));
+
+    private static T GetRequiredService<T>(T? service, string name) where T : class =>
+        service ?? throw new InvalidOperationException(
+            $"Legacy application service {name} has not been configured.");
 }
 
 /// <summary>
 /// Transitional bridge for legacy static APIs. Executable projects must configure
-/// it at their composition root before invoking Pages or Websites persistence.
+/// it at their composition root before invoking legacy Pages or Websites facades.
 /// </summary>
 public static class LanderistApplication
 {

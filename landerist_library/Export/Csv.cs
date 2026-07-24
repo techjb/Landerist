@@ -1,4 +1,4 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Configuration;
 using landerist_library.Database;
 
 namespace landerist_library.Export
@@ -61,7 +61,13 @@ namespace landerist_library.Export
 
         public static void ExportHostsMainUri()
         {
-            var dataTable = Websites.Websites.GetDataTableHostMainUri();
+            var dataTable = new System.Data.DataTable();
+            dataTable.Columns.Add("Host", typeof(string));
+            dataTable.Columns.Add("MainUri", typeof(string));
+            foreach (var website in Websites.Websites.GetAll())
+            {
+                dataTable.Rows.Add(website.Host, website.MainUri.ToString());
+            }
             string fileName = Config.EXPORT_DIRECTORY + "HostMainUri.csv";
             Tools.Csv.Write(dataTable, fileName, true);
         }

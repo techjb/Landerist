@@ -20,7 +20,7 @@ Code outside `Application` and `Infrastructure` must not introduce new reference
 dotnet test .\landerist_architecture_tests\landerist_architecture_tests.csproj
 ```
 
-The tests verify that Application does not acquire outer-layer dependencies, folder namespaces match, the legacy dependency baseline cannot grow and resolved dependencies are removed from that baseline.
+The tests verify that Application does not acquire outer-layer dependencies, folder namespaces match, `Pages` and `Websites` do not reach into SQL infrastructure or `LegacyDatabase`, the legacy dependency baseline cannot grow and resolved dependencies are removed from that baseline.
 
 The baseline is a ratchet, not an allow-list for new work. When a dependency is removed from source, remove its line from the baseline in the same change.
 

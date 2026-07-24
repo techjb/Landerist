@@ -72,12 +72,12 @@ namespace landerist_library.Pages
 
         public static bool RemoveListingParserInputHash(PageType pageType)
         {
-            return MaintenanceRepository.RemoveListingParserInputHash(pageType);
+            return Maintenance.RemoveListingParserInputHash(pageType);
         }
 
         public static bool RemoveListingParserInputHashToAll()
         {
-            return MaintenanceRepository.RemoveListingParserInputHash();
+            return Maintenance.RemoveListingParserInputHash();
         }
     }
 }

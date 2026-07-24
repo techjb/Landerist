@@ -175,6 +175,47 @@ public sealed class SqlPersistenceAdaptersTests
     }
 
     [Fact]
+    public void PageQueryService_ReturnsMappedDomainPages()
+    {
+        RecordingDatabase database = new();
+        AddPageRow(database.TableResult);
+        SqlPageQueryService queries = new(new PageQueryRepository(database));
+
+        IReadOnlyList<Page> pages = queries.GetByType(PageType.Listing);
+
+        Page page = Assert.Single(pages);
+        Assert.Equal("expected-hash", page.UriHash);
+        Assert.Equal(PageType.Listing.ToString(), database.LastParameters!["PageType"]);
+    }
+
+    [Fact]
+    public void WebsiteCatalog_ReturnsMappedMaintenanceCandidates()
+    {
+        RecordingDatabase database = new();
+        AddPageRow(database.TableResult);
+        SqlWebsiteCatalog catalog = new(new WebsiteQueryRepository(database));
+        DateTime updatedBefore = new(2026, 1, 15);
+
+        IReadOnlyList<Website> websites =
+            catalog.GetNeedingRobotsTxtUpdate(updatedBefore);
+
+        Assert.Single(websites);
+        Assert.Equal(updatedBefore, database.LastParameters!["RobotsTxtUpdatedSpecialRules"]);
+    }
+
+    [Fact]
+    public void MaintenanceServices_DelegateCommandsToRepositories()
+    {
+        RecordingDatabase database = new() { QueryResult = true };
+        SqlPageMaintenanceService pages = new(new PageMaintenanceRepository(database));
+        SqlWebsiteMaintenanceService websites = new(new WebsiteQueryRepository(database));
+
+        Assert.True(pages.RemoveListingParserInputHash(PageType.Listing));
+        Assert.Equal(PageType.Listing.ToString(), database.LastParameters!["PageType"]);
+        Assert.True(websites.DeleteAll());
+        Assert.Contains("DELETE FROM [WEBSITES]", database.LastQuery);
+    }
+    [Fact]
     public void PageCatalog_MapsPageByHashThroughInjectedRepository()
     {
         RecordingDatabase database = new();

@@ -1,194 +1,81 @@
-using landerist_library.Infrastructure.Sql;
-using landerist_library.Infrastructure.Sql.Mapping;
 using landerist_library.Websites;
-using System.Data;
 
-namespace landerist_library.Pages
+namespace landerist_library.Pages;
+
+public partial class Pages
 {
-    public partial class Pages
+    public static Page LoadOrCreate(Uri uri)
     {
-        private static readonly PageQueryRepository QueryRepository = new(global::landerist_library.Database.LegacyDatabase.Create());
-
-        public static Page LoadOrCreate(Uri uri)
+        ArgumentNullException.ThrowIfNull(uri);
+        Page? existing = GetPage(Tools.Strings.GetHash(uri.ToString()));
+        if (existing is not null)
         {
-            ArgumentNullException.ThrowIfNull(uri);
-            Page? existing = GetPage(Tools.Strings.GetHash(uri.ToString()));
-            if (existing is not null)
-            {
-                return existing;
-            }
-
-            Website website = Websites.Websites.GetWebsite(uri.Host);
-            return new Page(website, uri);
+            return existing;
         }
 
-        public static Page? GetPage(string uriHash)
+        Website website = WebsiteCatalog.Get(uri.Host);
+        return new Page(website, uri);
+    }
+
+    public static Page? GetPage(string uriHash) => Queries.GetByHash(uriHash);
+
+    public static List<Page> GetPages()
+    {
+        Console.WriteLine("Reading all pages");
+        List<Page> pages = [];
+        int batchNumber = 0;
+        foreach (List<Page> batch in GetPageBatches())
         {
-            var pages = GetPages(QueryRepository.GetPageByUriHash(uriHash));
-            if (pages.Count.Equals(1))
-            {
-                return pages[0];
-            }
-            return null;
+            batchNumber++;
+            pages.AddRange(batch);
+            Console.WriteLine("Read batch " + batchNumber + ": " + batch.Count +
+                " pages. Total: " + pages.Count);
         }
+        return pages;
+    }
 
-        public static List<Page> GetPages()
+    public static List<Page> GetPages(PageType pageType) =>
+        [.. Queries.GetByType(pageType)];
+
+    public static List<Page> GetUnknownPageType() => [.. Queries.GetUnknown()];
+
+    public static List<Page> GetUnknownPageType(int topRows) =>
+        [.. Queries.GetUnknown(topRows)];
+
+    public static List<Page> GetNextScrape(int topRows, bool extendToFillTopRows) =>
+        [.. Queries.GetNextScrape(topRows, extendToFillTopRows)];
+
+    public static List<Page> GetNextScrapeFuture(int topRows) =>
+        [.. Queries.GetNextScrapeFuture(topRows)];
+
+    public static List<Page> GetRecentlyUnpublishedListingsPages(int topRows) =>
+        [.. Queries.GetRecentlyUnpublishedListings(topRows)];
+
+    public static List<Page> GetScrapePages(int topRows) =>
+        [.. Queries.GetScrapePages(topRows)];
+
+    public static List<Page> GetNonScrapedPages(Website website) =>
+        [.. Queries.GetNonScraped(website)];
+
+    public static List<Page> GetUnknowPageType(Website website) =>
+        [.. Queries.GetUnknown(website)];
+
+    public static List<Page> GetUnknowHttpStatusCode() =>
+        [.. Queries.GetUnknownHttpStatusCode()];
+
+    public static List<string> GetUris(bool isListing) =>
+        [.. Queries.GetUris(isListing)];
+
+    public static List<string> GetUris() => [.. Queries.GetUris()];
+
+    private static int CountPages() => Queries.Count();
+
+    private static IEnumerable<List<Page>> GetPageBatches(
+        int batchSize = GET_ALL_PAGES_BATCH_SIZE)
+    {
+        foreach (IReadOnlyList<Page> batch in Queries.GetBatches(batchSize))
         {
-            Console.WriteLine("Reading all pages");
-            List<Page> pages = [];
-            int batchNumber = 0;
-
-            foreach (var batch in GetPageBatches())
-            {
-                batchNumber++;
-                pages.AddRange(batch);
-                Console.WriteLine("Read batch " + batchNumber + ": " + batch.Count + " pages. Total: " + pages.Count);
-            }
-
-            return pages;
-        }
-
-
-        public static List<Page> GetPages(PageType pageType)
-        {
-            return GetPages(QueryRepository.GetPagesByPageType(pageType));
-        }
-
-        public static List<Page> GetUnknownPageType()
-        {
-            return GetPages(QueryRepository.GetUnknownPageType());
-        }
-
-        public static List<Page> GetUnknownPageType(int topRows)
-        {
-            return GetPages(QueryRepository.GetUnknownPageTypeForUpdate(topRows));
-        }
-
-        public static List<Page> GetNextScrape(int topRows, bool extendToFillTopRows)
-        {
-            return GetPages(QueryRepository.GetNextScrapeForUpdate(topRows, extendToFillTopRows));
-        }
-
-        public static List<Page> GetNextScrapeFuture(int topRows)
-        {
-            return GetPages(QueryRepository.GetNextScrapeFutureForUpdate(topRows));
-        }
-
-        public static List<Page> GetRecentlyUnpublishedListingsPages(int topRows)
-        {
-            return GetPages(QueryRepository.GetRecentlyUnpublishedListingsPages(topRows));
-        }
-
-        public static List<Page> GetScrapePages(int topRows)
-        {
-            DataTable dataTable = QueryRepository.GetScrapePages(topRows);
-            return GetPages(dataTable);
-        }
-
-        public static List<Page> GetNonScrapedPages(Website website)
-        {
-            DataTable dataTable = QueryRepository.GetNonScrapedPages(website.Host);
-            return GetPages(website, dataTable);
-        }
-
-        public static List<Page> GetUnknowPageType(Website website)
-        {
-            DataTable dataTable = QueryRepository.GetUnknownPageType(website.Host);
-            return GetPages(website, dataTable);
-        }
-
-        public static List<Page> GetUnknowHttpStatusCode()
-        {
-            return GetPages(QueryRepository.GetUnknownHttpStatusCode());
-        }
-
-        public static List<string> GetUris(bool isListing)
-        {
-            return QueryRepository.GetUris(isListing);
-        }
-
-        public static List<string> GetUris()
-        {
-            return QueryRepository.GetUris();
-        }
-
-        public static DataTable GetHostPagesDataTable(Website website)
-        {
-            return QueryRepository.GetHostPagesDataTable(website.Host);
-        }
-
-
-        private static int CountPages()
-        {
-            return QueryRepository.CountPages();
-        }
-
-        private static IEnumerable<List<Page>> GetPageBatches(int batchSize = GET_ALL_PAGES_BATCH_SIZE)
-        {
-            string? lastUriHash = null;
-
-            while (true)
-            {
-                var batch = GetPagesBatch(lastUriHash, batchSize);
-                if (batch.Count == 0)
-                {
-                    yield break;
-                }
-
-                yield return batch;
-
-                if (batch.Count < batchSize)
-                {
-                    yield break;
-                }
-
-                lastUriHash = batch[^1].UriHash;
-            }
-        }
-
-        private static List<Page> GetPagesBatch(string? lastUriHash, int batchSize)
-        {
-            DataTable dataTable = QueryRepository.GetPagesBatch(lastUriHash, batchSize);
-            return GetPages(dataTable);
-        }
-
-        private static string SelectColumns(string pagesTableName = "")
-        {
-            return PageQueryRepository.SelectColumns(pagesTableName);
-        }
-
-        public static List<Page> GetPages(string query)
-        {
-            return GetPages(query, []);
-        }
-
-        public static List<Page> GetPages(string query, Dictionary<string, object?> dictionary)
-        {
-            DataTable dataTable = QueryRepository.QueryPages(query, dictionary);
-            return GetPages(dataTable);
-        }
-
-        private static List<Page> GetPages(DataTable dataTable)
-        {
-            List<Page> pages = [];
-            foreach (DataRow dataRow in dataTable.Rows)
-            {
-                Website website = WebsiteDataMapper.Map(dataRow);
-                Page page = PageDataMapper.Map(dataRow, website);
-                pages.Add(page);
-            }
-            return pages;
-        }
-
-        private static List<Page> GetPages(Website website, DataTable dataTable)
-        {
-            List<Page> pages = [];
-            foreach (DataRow dataRow in dataTable.Rows)
-            {
-                Page page = PageDataMapper.Map(dataRow, website);
-                pages.Add(page);
-            }
-            return pages;
+            yield return [.. batch];
         }
     }
 }

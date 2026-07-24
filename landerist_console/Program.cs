@@ -64,6 +64,10 @@ namespace landerist_console
             BatchRepository batches = new(databaseFactory.Create());
             SqlPageCatalog pageCatalog = new(
                 new PageQueryRepository(databaseFactory.Create()));
+            SqlPageQueryService pageQueries = new(
+                new PageQueryRepository(databaseFactory.Create()));
+            SqlPageMaintenanceService pageMaintenance = new(
+                new PageMaintenanceRepository(databaseFactory.Create()));
             WebsiteDeletionService websiteDeletion = new(
                 pageCatalog,
                 new OrelsListingDeletionService(),
@@ -74,6 +78,7 @@ namespace landerist_console
             PageStatisticsRepository pageStatistics = new(databaseFactory.Create());
             WebsiteQueryRepository websiteQueries = new(databaseFactory.Create());
             SqlWebsiteCatalog websiteCatalog = new(websiteQueries);
+            SqlWebsiteMaintenanceService websiteMaintenance = new(websiteQueries);
             WebsiteMetricsService websiteMetrics = new(
                 new WebsitePageMetricsRepository(databaseFactory.Create()),
                 new ListingStatisticsRepository(databaseFactory.Create()),
@@ -130,7 +135,12 @@ namespace landerist_console
             LanderistApplication.Configure(new LanderistApplicationServices(
                 pagePersistence,
                 websitePersistence,
-                websiteDeletion));
+                websiteDeletion,
+                pageQueries,
+                pageMaintenance,
+                websiteCatalog,
+                websiteMaintenance,
+                websiteMetrics));
 
             Scraper scraper = new(
                 pagePersistence,

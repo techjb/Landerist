@@ -1,4 +1,4 @@
-﻿# Existing legacy references to the new architectural boundaries.
+# Existing legacy references to the new architectural boundaries.
 # Do not add entries. Move behavior behind Application ports and remove entries
 # as the legacy dependency is eliminated.
 Application|landerist_library/Landerist_com/DownloadsPage.cs
@@ -30,13 +30,9 @@ Infrastructure|landerist_library/Landerist_com/HostStatisticsPage.cs
 Infrastructure|landerist_library/Landerist_com/HostsStatisticsPage.cs
 Infrastructure|landerist_library/Landerist_com/Landerist_com.cs
 Infrastructure|landerist_library/Landerist_com/StatisticsPage.cs
-Infrastructure|landerist_library/Pages/Pages.Maintenance.cs
-Infrastructure|landerist_library/Pages/Pages.Query.cs
 Infrastructure|landerist_library/Parse/CadastralReference/AddressToCadastralReference.cs
 Infrastructure|landerist_library/Statistics/GlobalStatistics.cs
 Infrastructure|landerist_library/Statistics/HostStatistics.cs
 Infrastructure|landerist_library/Tasks/TaskBatchCleaner.cs
 Infrastructure|landerist_library/Tasks/TaskBatchDownload.cs
 Infrastructure|landerist_library/Tasks/TaskBatchUpload.cs
-Infrastructure|landerist_library/Websites/Websites.Pages.cs
-Infrastructure|landerist_library/Websites/Websites.cs

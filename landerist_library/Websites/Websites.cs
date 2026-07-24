@@ -1,7 +1,5 @@
 using landerist_library.Configuration;
 using landerist_library.Database;
-using landerist_library.Infrastructure.Sql;
-using landerist_library.Infrastructure.Sql.Mapping;
 using landerist_library.Pages;
 using System.Data;
 
@@ -10,115 +8,40 @@ namespace landerist_library.Websites
     public partial class Websites
     {
         public const string WEBSITES = "[WEBSITES]";
-        private static readonly WebsiteQueryRepository WebsiteQueries = new(global::landerist_library.Database.LegacyDatabase.Create());
+        public static HashSet<Website> GetAll() => [.. Catalog.GetAll()];
 
-        public static HashSet<Website> GetAll()
-        {
-            var dataTable = GetDataTableAll();
-            return GetWebsites(dataTable);
-        }
-
-        public static HashSet<string> GetHosts()
-        {
-            return WebsiteQueries.GetHosts();
-        }
+        public static HashSet<string> GetHosts() => [.. Catalog.GetHosts()];
 
         public static Dictionary<string, Website> GetDicionaryStatusCodeOk()
         {
             Dictionary<string, Website> dictionary = new(StringComparer.OrdinalIgnoreCase);
-            var websites = GetStatusCodeOk();
-            foreach (var website in websites)
+            foreach (Website website in GetStatusCodeOk())
             {
                 dictionary[website.Host] = website;
             }
             return dictionary;
         }
 
-        public static HashSet<Website> GetStatusCodeOk()
-        {
-            var dataTable = ToDataTableHttpStatusCodeOk();
-            return GetWebsites(dataTable);
-        }
+        public static HashSet<Website> GetStatusCodeOk() =>
+            [.. Catalog.GetWithSuccessfulStatus()];
 
-        public static HashSet<Website> GetStatusCodeNotOk()
-        {
-            var dataTable = ToDataTableHttpStatusCodeNotOk();
-            return GetWebsites(dataTable);
-        }
+        public static HashSet<Website> GetStatusCodeNotOk() =>
+            [.. Catalog.GetWithUnsuccessfulStatus()];
 
-        public static HashSet<Website> GetStatusCodeNull()
-        {
-            var dataTable = ToDataTableHttpStatusCodeNull();
-            return GetWebsites(dataTable);
-        }
-
-        public static DataTable GetDataTableAll()
-        {
-            return WebsiteQueries.GetAll();
-        }
-
-        public static DataTable GetDataTableHostMainUri()
-        {
-            return WebsiteQueries.GetHostMainUri();
-        }
-
-        private static DataTable ToDataTableHttpStatusCodeOk()
-        {
-            return WebsiteQueries.GetHttpStatusCodeOk();
-        }
-
-        private static DataTable ToDataTableHttpStatusCodeNotOk()
-        {
-            return WebsiteQueries.GetHttpStatusCodeNotOk();
-        }
-
-        private static DataTable ToDataTableHttpStatusCodeNull()
-        {
-            return WebsiteQueries.GetHttpStatusCodeNull();
-        }
+        public static HashSet<Website> GetStatusCodeNull() =>
+            [.. Catalog.GetWithoutStatus()];
 
         public static Website GetWebsite(Page page)
         {
             ArgumentNullException.ThrowIfNull(page);
-            return GetWebsite(page.Host);
+            return Catalog.Get(page.Host);
         }
 
-        public static Website GetWebsite(string host)
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(host);
+        public static Website GetWebsite(string host) => Catalog.Get(host);
 
-            DataTable dataTable = WebsiteQueries.GetWebsite(host);
+        public static bool Exists(string host) => Catalog.Exists(host);
 
-            if (dataTable.Rows.Count == 0)
-            {
-                throw new KeyNotFoundException("Website not found for host: " + host);
-            }
-
-            var dataRow = dataTable.Rows[0];
-            return WebsiteDataMapper.Map(dataRow);
-        }
-
-        public static bool Exists(string host)
-        {
-            return WebsiteQueries.Exists(host);
-        }
-
-        private static HashSet<Website> GetWebsites(DataTable dataTable)
-        {
-            var hashSet = new HashSet<Website>();
-            foreach (DataRow dataRow in dataTable.Rows)
-            {
-                Website website = WebsiteDataMapper.Map(dataRow);
-                hashSet.Add(website);
-            }
-            return hashSet;
-        }
-
-        public static HashSet<string> GetUrls()
-        {
-            return WebsiteQueries.GetUrls();
-        }
-
+        public static HashSet<string> GetUrls() => [.. Catalog.GetUrls()];
         public static void SetHttpStatusCodesToAll()
         {
             var websites = GetAll();
@@ -338,7 +261,7 @@ namespace landerist_library.Websites
 
         private static bool Delete()
         {
-            return WebsiteQueries.DeleteAll();
+            return Maintenance.DeleteAll();
         }
 
         public static void DeleteAll()
@@ -389,8 +312,7 @@ namespace landerist_library.Websites
         {
             DateTime robotsTxtUpdatedSpecialRules = DateTime.Now.AddDays(-1);
 
-            var dataTable = WebsiteQueries.GetNeedToUpdateRobotsTxt(robotsTxtUpdatedSpecialRules);
-            return GetWebsites(dataTable);
+            return [.. Catalog.GetNeedingRobotsTxtUpdate(robotsTxtUpdatedSpecialRules)];
         }
 
         public static void UpdateSitemaps()
@@ -427,8 +349,7 @@ namespace landerist_library.Websites
         {
             DateTime sitemapUpdatedSpecialRules = DateTime.Now.AddDays(-1);
 
-            var dataTable = WebsiteQueries.GetNeedToUpdateSitemaps(sitemapUpdatedSpecialRules);
-            return GetWebsites(dataTable);
+            return [.. Catalog.GetNeedingSitemapUpdate(sitemapUpdatedSpecialRules)];
         }
 
         public static void UpdateIpAddress()
@@ -465,8 +386,7 @@ namespace landerist_library.Websites
         {
             DateTime ipAddressUpdated = DateTime.Now.AddDays(-1);
 
-            var dataTable = WebsiteQueries.GetNeedToUpdateIpAddress(ipAddressUpdated);
-            return GetWebsites(dataTable);
+            return [.. Catalog.GetNeedingIpAddressUpdate(ipAddressUpdated)];
         }
 
         public static void DeleteFromFile()

@@ -37,6 +37,26 @@ public sealed class SqlWebsiteCatalog : IWebsiteCatalog
         return _repository.Exists(host);
     }
 
+    public IReadOnlySet<string> GetUrls() => _repository.GetUrls();
+
+    public IReadOnlyList<Website> GetWithSuccessfulStatus() =>
+        Map(_repository.GetHttpStatusCodeOk());
+
+    public IReadOnlyList<Website> GetWithUnsuccessfulStatus() =>
+        Map(_repository.GetHttpStatusCodeNotOk());
+
+    public IReadOnlyList<Website> GetWithoutStatus() =>
+        Map(_repository.GetHttpStatusCodeNull());
+
+    public IReadOnlyList<Website> GetNeedingRobotsTxtUpdate(DateTime updatedBefore) =>
+        Map(_repository.GetNeedToUpdateRobotsTxt(updatedBefore));
+
+    public IReadOnlyList<Website> GetNeedingSitemapUpdate(DateTime updatedBefore) =>
+        Map(_repository.GetNeedToUpdateSitemaps(updatedBefore));
+
+    public IReadOnlyList<Website> GetNeedingIpAddressUpdate(DateTime updatedBefore) =>
+        Map(_repository.GetNeedToUpdateIpAddress(updatedBefore));
+
     private static List<Website> Map(DataTable rows)
     {
         List<Website> websites = [];
@@ -46,4 +66,17 @@ public sealed class SqlWebsiteCatalog : IWebsiteCatalog
         }
         return websites;
     }
+}
+
+public sealed class SqlWebsiteMaintenanceService : IWebsiteMaintenanceService
+{
+    private readonly WebsiteQueryRepository _repository;
+
+    public SqlWebsiteMaintenanceService(WebsiteQueryRepository repository)
+    {
+        ArgumentNullException.ThrowIfNull(repository);
+        _repository = repository;
+    }
+
+    public bool DeleteAll() => _repository.DeleteAll();
 }

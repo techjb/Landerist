@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 
 namespace landerist_architecture_tests;
 
@@ -58,6 +58,31 @@ public sealed partial class ArchitectureBoundaryTests
         Assert.True(
             violations.Count == 0,
             $"Files under {boundary} must use its namespace." + Environment.NewLine +
+            string.Join(Environment.NewLine, violations));
+    }
+
+    [Theory]
+    [InlineData("Pages")]
+    [InlineData("Websites")]
+    public void DomainAreas_DoNotReachIntoInfrastructure(string area)
+    {
+        string areaRoot = Path.Combine(LibraryRoot, area);
+        List<string> violations = [];
+
+        foreach (string file in GetSourceFiles(areaRoot))
+        {
+            string source = File.ReadAllText(file);
+            if (source.Contains("landerist_library.Infrastructure", StringComparison.Ordinal) ||
+                source.Contains("LegacyDatabase", StringComparison.Ordinal))
+            {
+                violations.Add(GetRelativePath(file));
+            }
+        }
+
+        Assert.True(
+            violations.Count == 0,
+            $"{area} must use Application ports instead of SQL infrastructure " +
+            "or the legacy database service locator." + Environment.NewLine +
             string.Join(Environment.NewLine, violations));
     }
 

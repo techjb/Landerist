@@ -1,4 +1,4 @@
-﻿name: Architecture
+name: Build and architecture
 
 on:
   push:
@@ -9,9 +9,9 @@ permissions:
   contents: read
 
 jobs:
-  architecture-tests:
+  build-and-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
@@ -22,9 +22,21 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
+      - name: Build solution
+        run: dotnet build ./Landerist.sln --configuration Release --verbosity minimal
+
+      - name: Test unit suite
+        run: >-
+          dotnet test
+          ./landerist_unit_tests/landerist_unit_tests.csproj
+          --configuration Release
+          --no-build
+          --verbosity minimal
+
       - name: Test architecture boundaries
         run: >-
           dotnet test
           ./landerist_architecture_tests/landerist_architecture_tests.csproj
           --configuration Release
+          --no-build
           --verbosity minimal
