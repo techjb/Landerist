@@ -12,7 +12,6 @@ using landerist_library.Infrastructure.Sql;
 using landerist_library.Infrastructure.Scraping;
 using landerist_library.Infrastructure.WebsiteServices;
 using landerist_library.Logs;
-using landerist_library.Scrape;
 using landerist_library.Statistics;
 using System.Runtime.InteropServices;
 
@@ -134,7 +133,8 @@ namespace landerist_tests
                 listingLifecycle,
                 pageScraping,
                 pageBatchSelector,
-                batchScraping);
+                batchScraping,
+                new ConsoleScrapeProgressReporter());
         }
 
         private static void Start()
@@ -171,7 +171,7 @@ namespace landerist_tests
                 if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0 &&
                     keyInfo.Key == ConsoleKey.D)
                 {
-                    Console.WriteLine("Â¡Ctrl + D detectado!");
+                    Console.WriteLine("Ã‚Â¡Ctrl + D detectado!");
                     ExitSignal.Set();
                 }
             };

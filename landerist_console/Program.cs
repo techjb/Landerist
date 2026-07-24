@@ -15,7 +15,6 @@ using landerist_library.Infrastructure.Scraping;
 using landerist_library.Infrastructure.Tasks;
 using landerist_library.Infrastructure.WebsiteServices;
 using landerist_library.Logs;
-using landerist_library.Scrape;
 using landerist_library.Tasks;
 using landerist_library.Statistics;
 
@@ -159,7 +158,8 @@ namespace landerist_console
                 listingLifecycle,
                 pageScraping,
                 pageBatchSelector,
-                batchScraping);
+                batchScraping,
+                new ConsoleScrapeProgressReporter());
             TasksExecutionMode executionMode =
                 Config.IsLocalAIMachine() || Config.IsConfigurationLocal()
                     ? TasksExecutionMode.LocalAi

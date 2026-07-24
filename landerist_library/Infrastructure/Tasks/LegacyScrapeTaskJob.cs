@@ -1,6 +1,5 @@
 using landerist_library.Application.Scraping;
 using landerist_library.Application.Tasks;
-using landerist_library.Scrape;
 
 namespace landerist_library.Infrastructure.Tasks;
 

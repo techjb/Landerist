@@ -1,12 +1,11 @@
 using landerist_library.Application.Listings;
 using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
-using landerist_library.Application.Scraping;
 using landerist_library.Pages;
 using landerist_library.Websites;
 using System.Collections.Concurrent;
 
-namespace landerist_library.Scrape
+namespace landerist_library.Application.Scraping
 {
     public class Scraper
     {
@@ -34,7 +33,8 @@ namespace landerist_library.Scrape
             IListingLifecycleService listingLifecycle,
             PageScrapePipelineServices pageScraping,
             IPageBatchSelector pageBatchSelector,
-            ScrapeBatchServices batchServices)
+            ScrapeBatchServices batchServices,
+            IScrapeProgressReporter progress)
         {
             ArgumentNullException.ThrowIfNull(pagePersistence);
             ArgumentNullException.ThrowIfNull(logger);
@@ -42,6 +42,7 @@ namespace landerist_library.Scrape
             ArgumentNullException.ThrowIfNull(pageScraping);
             ArgumentNullException.ThrowIfNull(pageBatchSelector);
             ArgumentNullException.ThrowIfNull(batchServices);
+            ArgumentNullException.ThrowIfNull(progress);
 
             _pagePersistence = pagePersistence;
             _logger = logger;
@@ -51,6 +52,7 @@ namespace landerist_library.Scrape
             _batchServices = batchServices;
             _scraperLog = new ScraperLog(
                 logger,
+                progress,
                 writePageProgress: !batchServices.Options.IsProduction);
         }
 

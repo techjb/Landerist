@@ -1,21 +1,24 @@
 using landerist_library.Application.Logging;
-using landerist_library.Application.Scraping;
 using landerist_library.Pages;
 using landerist_orels.ES;
 
-namespace landerist_library.Scrape
+namespace landerist_library.Application.Scraping
 {
     internal sealed class ScraperLog
     {
         private readonly IApplicationLogger _logger;
         private readonly bool _writePageProgress;
+        private readonly IScrapeProgressReporter _progress;
 
         public ScraperLog(
             IApplicationLogger logger,
+            IScrapeProgressReporter progress,
             bool writePageProgress)
         {
             ArgumentNullException.ThrowIfNull(logger);
+            ArgumentNullException.ThrowIfNull(progress);
             _logger = logger;
+            _progress = progress;
             _writePageProgress = writePageProgress;
         }
 
@@ -37,7 +40,7 @@ namespace landerist_library.Scrape
 
         public void WriteStart(int counter)
         {
-            Console.WriteLine("Scrapping " + counter + " pages ..");
+            _progress.Write("Scrapping " + counter + " pages ..");
         }
 
         public void WritePage(ScrapeBatchCounters counters, Page page)
@@ -47,7 +50,7 @@ namespace landerist_library.Scrape
                 return;
             }
 
-            Console.WriteLine(GetPageText(counters, page));
+            _progress.Write(GetPageText(counters, page));
         }
 
         public void WriteTotals(ScrapeBatchCounters counters)

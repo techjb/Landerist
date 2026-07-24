@@ -3,7 +3,6 @@ using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Scraping;
 using landerist_library.Pages;
-using landerist_library.Scrape;
 using landerist_library.Websites;
 using landerist_orels.ES;
 
