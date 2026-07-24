@@ -1,10 +1,8 @@
 using landerist_library.Application.Listings;
 using landerist_library.Application.Scraping;
 using landerist_library.Pages;
-using landerist_library.Parse.ListingParser;
-using landerist_library.Statistics;
 
-namespace landerist_library.Parse.PageTypeParser
+namespace landerist_library.Application.Parsing
 {
     public class PageTypeParser
     {
@@ -12,24 +10,28 @@ namespace landerist_library.Parse.PageTypeParser
         private readonly bool _isProduction;
         private readonly INotListingCacheService _notListingCache;
         private readonly IPageClassificationMetrics _metrics;
-        private readonly HostStatistics _hostStatistics;
+        private readonly IListingPageParser _listingParser;
+        private readonly IPageTokenLimitPolicy _tokenLimitPolicy;
 
         public PageTypeParser(
             Page page,
             bool isProduction,
             INotListingCacheService notListingCache,
             IPageClassificationMetrics metrics,
-            HostStatistics hostStatistics)
+            IListingPageParser listingParser,
+            IPageTokenLimitPolicy tokenLimitPolicy)
         {
             ArgumentNullException.ThrowIfNull(page);
             ArgumentNullException.ThrowIfNull(notListingCache);
             ArgumentNullException.ThrowIfNull(metrics);
-            ArgumentNullException.ThrowIfNull(hostStatistics);
+            ArgumentNullException.ThrowIfNull(listingParser);
+            ArgumentNullException.ThrowIfNull(tokenLimitPolicy);
             Page = page;
             _isProduction = isProduction;
             _notListingCache = notListingCache;
             _metrics = metrics;
-            _hostStatistics = hostStatistics;
+            _listingParser = listingParser;
+            _tokenLimitPolicy = tokenLimitPolicy;
         }
 
         public (PageType? pageType, landerist_orels.ES.Listing? listing, bool waitingAIRequest)
@@ -130,12 +132,12 @@ namespace landerist_library.Parse.PageTypeParser
                 _metrics.RecordListingInputAlreadyParsed(Page);
                 return (Page.PageType, null, false);
             }
-            if (Tokenizer.TooManyTokens(Page))
+            if (_tokenLimitPolicy.TooManyTokens(Page))
             {
                 return (PageType.ResponseBodyTooManyTokens, null, false);
             }
 
-            return ParseListing.Parse(Page, _hostStatistics);
+            return _listingParser.Parse(Page);
         }
     }
 }

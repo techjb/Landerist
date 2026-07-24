@@ -1,3 +1,6 @@
+using landerist_library.Infrastructure.Parsing.OpenAI;
+using landerist_library.Infrastructure.Parsing.VertexAI;
+using landerist_library.Infrastructure.Parsing;
 using landerist_library.Configuration;
 using landerist_library.Application.Listings;
 using landerist_library.Application.Persistence;
@@ -115,7 +118,8 @@ namespace landerist_console
                     Config.IsConfigurationProduction(),
                     notListingCache,
                     new SqlPageClassificationMetrics(databaseFactory.Create()),
-                    hostStatistics),
+                    new LegacyListingPageParser(hostStatistics),
+                    new LegacyPageTokenLimitPolicy()),
                 new PageIndexingService(Config.INDEXER_ENABLED, pageLinks),
                 new SqlPageSchedulingService(listingStore),
                 Config.INDEXER_ENABLED);
@@ -162,7 +166,7 @@ namespace landerist_console
                 new ScrapeTaskJob(scraper, batchScraping.Browser),
                 new LocalAiTaskJob(() => new TaskLocalAIParsing(parsedClassification, globalStatistics, hostStatistics, waitingStatus, pageCatalog, pagePersistence)),
                 new TenMinuteTaskJob(
-                    new TaskBatchDownload(parsedClassification, batches, globalStatistics, pageCatalog, pagePersistence),
+                    new TaskBatchDownload(parsedClassification, batches, globalStatistics, pageCatalog, pagePersistence, new OpenAIBatchDownload(), new VertexAIBatchDownload()),
                     new TaskBatchUpload(batches, waitingStatus, pagePersistence)),
                 new HourlyTaskJob(
                     new WebsiteRefreshService(websiteCatalog, websitePersistence, pagePersistence, websiteMetrics),

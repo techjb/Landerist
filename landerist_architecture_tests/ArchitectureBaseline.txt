@@ -1,13 +1,9 @@
 # Existing legacy references to the new architectural boundaries.
 # Do not add entries. Move behavior behind Application ports and remove entries
 # as the legacy dependency is eliminated.
-Application|landerist_library/Parse/ListingParser/OpenAI/Batch/OpenAIBatchDownload.cs
-Application|landerist_library/Parse/ListingParser/VertexAI/Batch/VertexAIBatchDownload.cs
-Application|landerist_library/Parse/PageTypeParser/PageTypeParser.cs
 Application|landerist_library/Statistics/HostStatistics.cs
 Infrastructure|landerist_library/Database/ES_Listings.cs
 Infrastructure|landerist_library/Database/ES_Media.cs
 Infrastructure|landerist_library/Database/ES_Sources.cs
-Infrastructure|landerist_library/Parse/CadastralReference/AddressToCadastralReference.cs
 Infrastructure|landerist_library/Statistics/GlobalStatistics.cs
 Infrastructure|landerist_library/Statistics/HostStatistics.cs

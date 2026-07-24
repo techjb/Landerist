@@ -1,13 +1,13 @@
+using landerist_library.Application.Parsing;
+using landerist_library.Parse.Location.Resolvers;
 using HtmlAgilityPack;
 using landerist_library.Pages;
-using landerist_library.Parse.CadastralReference;
 using landerist_library.Parse.Location.Candidates;
 using landerist_library.Parse.Location.Extractors;
-using landerist_library.Parse.Location.Resolvers;
 using landerist_library.Parse.Location.Providers.GoogleMaps;
 using landerist_library.Parse.Location.Validation;
 
-namespace landerist_library.Parse.Location
+namespace landerist_library.Infrastructure.Parsing
 {
     public class LocationParser
     {
@@ -23,7 +23,7 @@ namespace landerist_library.Parse.Location
             Page page,
             landerist_orels.ES.Listing listing,
             GoogleMapsApi googleMapsApi,
-            AddressToCadastralReference cadastralReference)
+            ICadastralReferenceProvider cadastralReference)
         {
             Page = page;
             Listing = listing;

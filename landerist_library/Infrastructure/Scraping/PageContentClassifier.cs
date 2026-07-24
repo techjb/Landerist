@@ -1,8 +1,7 @@
 using landerist_library.Application.Listings;
 using landerist_library.Application.Scraping;
 using landerist_library.Pages;
-using landerist_library.Parse.PageTypeParser;
-using landerist_library.Statistics;
+using landerist_library.Application.Parsing;
 
 namespace landerist_library.Infrastructure.Scraping;
 
@@ -11,21 +10,25 @@ public sealed class PageContentClassifier : IPageContentClassifier
     private readonly bool _isProduction;
     private readonly INotListingCacheService _notListingCache;
     private readonly IPageClassificationMetrics _metrics;
-    private readonly HostStatistics _hostStatistics;
+    private readonly IListingPageParser _listingParser;
+    private readonly IPageTokenLimitPolicy _tokenLimitPolicy;
 
     public PageContentClassifier(
         bool isProduction,
         INotListingCacheService notListingCache,
         IPageClassificationMetrics metrics,
-        HostStatistics hostStatistics)
+        IListingPageParser listingParser,
+        IPageTokenLimitPolicy tokenLimitPolicy)
     {
         ArgumentNullException.ThrowIfNull(notListingCache);
         ArgumentNullException.ThrowIfNull(metrics);
-        ArgumentNullException.ThrowIfNull(hostStatistics);
+        ArgumentNullException.ThrowIfNull(listingParser);
+        ArgumentNullException.ThrowIfNull(tokenLimitPolicy);
         _isProduction = isProduction;
         _notListingCache = notListingCache;
         _metrics = metrics;
-        _hostStatistics = hostStatistics;
+        _listingParser = listingParser;
+        _tokenLimitPolicy = tokenLimitPolicy;
     }
 
     public PageClassificationResult Classify(Page page)
@@ -35,7 +38,8 @@ public sealed class PageContentClassifier : IPageContentClassifier
             _isProduction,
             _notListingCache,
             _metrics,
-            _hostStatistics).GetPageType();
+            _listingParser,
+            _tokenLimitPolicy).GetPageType();
         return new PageClassificationResult(result.pageType, result.listing, result.waitingAIRequest);
     }
 }

@@ -1,3 +1,5 @@
+using landerist_library.Application.Parsing;
+using landerist_library.Parse.ListingParser.OpenAI.Batch;
 using landerist_library.Application.Pages;
 using landerist_library.Logs;
 using landerist_library.Pages;
@@ -5,9 +7,9 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 
-namespace landerist_library.Parse.ListingParser.OpenAI.Batch
+namespace landerist_library.Infrastructure.Parsing.OpenAI
 {
-    public class OpenAIBatchDownload : OpenAIBatchClient
+    public sealed class OpenAIBatchDownload : OpenAIBatchClient, IListingBatchProvider
     {
 
         private static readonly JsonSerializerOptions JsonSerializerOptions = new()
@@ -17,7 +19,7 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
             ReferenceHandler = ReferenceHandler.IgnoreCycles
         };
 
-        public static (string? fileSucess, string? fileError)? GetFiles(string batchId)
+        public (string? fileSuccess, string? fileError)? GetFiles(string batchId)
         {
             var batchResponse = GetBatch(batchId);
             if (batchResponse == null || !BatchIsCompleted(batchResponse))
@@ -28,7 +30,9 @@ namespace landerist_library.Parse.ListingParser.OpenAI.Batch
             return (batchResponse.OutputFileId, batchResponse.ErrorFileId);
         }
 
-        public static (Page page, string? text)? ReadLine(string line, IPageCatalog pages)
+        string? IListingBatchProvider.DownloadFile(string file) => OpenAIBatchClient.DownloadFile(file);
+
+        public (Page page, string? text)? ReadLine(string batchId, string line, IPageCatalog pages)
         {
             OpenAIBatchResponse? batchResponseLine;
             try

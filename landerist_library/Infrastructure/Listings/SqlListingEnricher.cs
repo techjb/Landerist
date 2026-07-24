@@ -1,8 +1,7 @@
 using landerist_library.Application.Listings;
 using landerist_library.Database;
 using landerist_library.Pages;
-using landerist_library.Parse.CadastralReference;
-using landerist_library.Parse.Location;
+using landerist_library.Infrastructure.Parsing;
 using landerist_library.Parse.Location.Providers.GoogleMaps;
 using landerist_library.Websites;
 using landerist_orels.ES;

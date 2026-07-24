@@ -1,3 +1,4 @@
+using landerist_library.Infrastructure.Parsing;
 using landerist_library.Configuration;
 using landerist_library.Application;
 using landerist_library.Application.Listings;
@@ -92,7 +93,8 @@ namespace landerist_tests
                     Config.IsConfigurationProduction(),
                     notListingCache,
                     new SqlPageClassificationMetrics(databaseFactory.Create()),
-                    hostStatistics),
+                    new LegacyListingPageParser(hostStatistics),
+                    new LegacyPageTokenLimitPolicy()),
                 new PageIndexingService(Config.INDEXER_ENABLED, pageLinks),
                 new SqlPageSchedulingService(listingStore),
                 Config.INDEXER_ENABLED);

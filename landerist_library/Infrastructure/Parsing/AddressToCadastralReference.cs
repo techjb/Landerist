@@ -1,3 +1,5 @@
+using landerist_library.Application.Parsing;
+using landerist_library.Parse.CadastralReference;
 using landerist_library.Database;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Parse.Location.Providers.Goolzoom;
@@ -5,9 +7,9 @@ using landerist_library.Statistics;
 using Newtonsoft.Json;
 using System.Data;
 
-namespace landerist_library.Parse.CadastralReference
+namespace landerist_library.Infrastructure.Parsing
 {
-    public class AddressToCadastralReference
+    public sealed class AddressToCadastralReference : ICadastralReferenceProvider
     {
         private readonly AddressCadastralReference _cache;
         private readonly GlobalStatisticsRepository _statistics;
@@ -18,6 +20,9 @@ namespace landerist_library.Parse.CadastralReference
             _cache = new AddressCadastralReference(database);
             _statistics = new GlobalStatisticsRepository(database);
         }
+        string? ICadastralReferenceProvider.GetCadastralReference(double? latitude, double? longitude, string address) =>
+            GetCadastralReference(latitude, longitude, address);
+
         public string? GetCadastralReference(double? latitude, double? longitude, string address, bool firstTry = true)
         {
             if (latitude == null || longitude == null || string.IsNullOrWhiteSpace(address))

@@ -1,5 +1,6 @@
 using landerist_library.Configuration;
 using landerist_library.Application.Pages;
+using landerist_library.Application.Parsing;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Scraping;
 using landerist_library.Database;
@@ -7,8 +8,8 @@ using landerist_library.Logs;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Pages;
 using landerist_library.Parse.ListingParser;
-using landerist_library.Parse.ListingParser.OpenAI.Batch;
-using landerist_library.Parse.ListingParser.VertexAI.Batch;
+using landerist_library.Infrastructure.Parsing.OpenAI;
+using landerist_library.Infrastructure.Parsing.VertexAI;
 using landerist_library.Statistics;
 
 namespace landerist_library.Infrastructure.Tasks
@@ -20,24 +21,32 @@ namespace landerist_library.Infrastructure.Tasks
         private readonly GlobalStatistics _statistics;
         private readonly IPageCatalog _pages;
         private readonly IPagePersistenceService _pagePersistence;
+        private readonly IListingBatchProvider _openAi;
+        private readonly IListingBatchProvider _vertexAi;
 
         public TaskBatchDownload(
             IParsedPageClassificationService parsedClassification,
             BatchRepository batches,
             GlobalStatistics statistics,
             IPageCatalog pages,
-            IPagePersistenceService pagePersistence)
+            IPagePersistenceService pagePersistence,
+            IListingBatchProvider openAi,
+            IListingBatchProvider vertexAi)
         {
             ArgumentNullException.ThrowIfNull(parsedClassification);
             ArgumentNullException.ThrowIfNull(batches);
             ArgumentNullException.ThrowIfNull(statistics);
             ArgumentNullException.ThrowIfNull(pages);
             ArgumentNullException.ThrowIfNull(pagePersistence);
+            ArgumentNullException.ThrowIfNull(openAi);
+            ArgumentNullException.ThrowIfNull(vertexAi);
             _parsedClassification = parsedClassification;
             _batches = batches;
             _statistics = statistics;
             _pages = pages;
             _pagePersistence = pagePersistence;
+            _openAi = openAi;
+            _vertexAi = vertexAi;
         }
 
         public readonly HashSet<string> DownloadedPagesUriHashes = [];
@@ -106,17 +115,17 @@ namespace landerist_library.Infrastructure.Tasks
             }
         }
 
-        private static (string? fileSuccess, string? fileError)? GetFiles(Batch batch)
+        private (string? fileSuccess, string? fileError)? GetFiles(Batch batch)
         {
             return batch.LLMProvider switch
             {
-                LLMProvider.OpenAI => OpenAIBatchDownload.GetFiles(batch.Id),
-                LLMProvider.VertexAI => VertexAIBatchDownload.GetFiles(batch.Id),
+                LLMProvider.OpenAI => _openAi.GetFiles(batch.Id),
+                LLMProvider.VertexAI => _vertexAi.GetFiles(batch.Id),
                 _ => null,
             };
         }
 
-        private static string? DownloadBatchFile(LLMProvider llmProvider, string file)
+        private string? DownloadBatchFile(LLMProvider llmProvider, string file)
         {
             if (string.IsNullOrWhiteSpace(file))
             {
@@ -127,8 +136,8 @@ namespace landerist_library.Infrastructure.Tasks
 
             return llmProvider switch
             {
-                LLMProvider.OpenAI => OpenAIBatchClient.DownloadFile(file),
-                LLMProvider.VertexAI => VertexAIBatchDownload.DownloadFile(file),
+                LLMProvider.OpenAI => _openAi.DownloadFile(file),
+                LLMProvider.VertexAI => _vertexAi.DownloadFile(file),
                 _ => null,
             };
         }
@@ -208,8 +217,8 @@ namespace landerist_library.Infrastructure.Tasks
         {
             return batch.LLMProvider switch
             {
-                LLMProvider.OpenAI => OpenAIBatchDownload.ReadLine(line, _pages),
-                LLMProvider.VertexAI => VertexAIBatchDownload.ReadLine(batch.Id, line, _pages),
+                LLMProvider.OpenAI => _openAi.ReadLine(batch.Id, line, _pages),
+                LLMProvider.VertexAI => _vertexAi.ReadLine(batch.Id, line, _pages),
                 _ => null,
             };
         }

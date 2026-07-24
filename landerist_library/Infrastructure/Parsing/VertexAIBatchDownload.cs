@@ -1,3 +1,5 @@
+using landerist_library.Application.Parsing;
+using landerist_library.Parse.ListingParser.VertexAI.Batch;
 using Google.Cloud.AIPlatform.V1;
 using landerist_library.Configuration;
 using System.Text.Json.Serialization;
@@ -6,9 +8,9 @@ using landerist_library.Application.Pages;
 using landerist_library.Logs;
 using landerist_library.Pages;
 
-namespace landerist_library.Parse.ListingParser.VertexAI.Batch
+namespace landerist_library.Infrastructure.Parsing.VertexAI
 {
-    public class VertexAIBatchDownload
+    public sealed class VertexAIBatchDownload : IListingBatchProvider
     {
         private static readonly JsonSerializerOptions JsonSerializerOptions = new()
         {
@@ -18,7 +20,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
         };
 
 
-        public static (string? fileSucess, string? fileError)? GetFiles(string batchId)
+        public (string? fileSuccess, string? fileError)? GetFiles(string batchId)
         {
             try
             {
@@ -49,7 +51,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
             return null;
         }
 
-        public static string? DownloadFile(string file)
+        public string? DownloadFile(string file)
         {
             string outputFilePath = Config.BATCH_DIRECTORY + file.Split("/")[1];
             File.Delete(outputFilePath);
@@ -60,7 +62,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
             return null;
         }
 
-        public static (Page page, string? text)? ReadLine(string id, string line, IPageCatalog pages)
+        public (Page page, string? text)? ReadLine(string id, string line, IPageCatalog pages)
         {
             VertexAIBatchResponse? vertexAIBatchResponse = null;
             try

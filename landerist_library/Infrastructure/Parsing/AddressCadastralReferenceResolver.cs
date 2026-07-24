@@ -1,12 +1,13 @@
+using landerist_library.Application.Parsing;
 using landerist_library.Parse.CadastralReference;
 
-namespace landerist_library.Parse.Location.Resolvers
+namespace landerist_library.Infrastructure.Parsing
 {
     internal sealed class AddressCadastralReferenceResolver
     {
-        private readonly AddressToCadastralReference Service;
+        private readonly ICadastralReferenceProvider Service;
 
-        public AddressCadastralReferenceResolver(AddressToCadastralReference service)
+        public AddressCadastralReferenceResolver(ICadastralReferenceProvider service)
         {
             Service = service;
         }
