@@ -5,9 +5,10 @@ using landerist_library.Websites;
 
 namespace landerist_library.Index
 {
-    public class Indexer(Page page)
+    public class Indexer(Page page, Func<Page, bool>? insertPage = null)
     {
         protected Page Page { get; } = page;
+        private readonly Func<Page, bool>? _insertPage = insertPage;
 
         private readonly HashSet<Uri> Processed = [];
 
@@ -25,7 +26,7 @@ namespace landerist_library.Index
             ".razor"
         ];
 
-        public Indexer(Website website) : this(new Page(website))
+        public Indexer(Website website, Func<Page, bool>? insertPage = null) : this(new Page(website), insertPage)
         {
         }
 
@@ -188,7 +189,8 @@ namespace landerist_library.Index
                 return false;
             }
 
-            bool inserted = Pages.Pages.Insert(website, uri);
+            bool inserted = _insertPage?.Invoke(new Page(website, uri))
+                ?? Pages.Pages.Insert(website, uri);
             Processed.Add(uri);
             return inserted;
         }

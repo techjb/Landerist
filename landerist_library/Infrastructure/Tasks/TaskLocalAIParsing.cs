@@ -1,5 +1,6 @@
 using landerist_library.Configuration;
 using landerist_library.Application.Pages;
+using landerist_library.Application.Persistence;
 using landerist_library.Application.Scraping;
 using landerist_library.Logs;
 using landerist_library.Pages;
@@ -20,6 +21,7 @@ namespace landerist_library.Infrastructure.Tasks
         private readonly HostStatistics _hostStatistics;
         private readonly IPageWaitingStatusService _waitingStatus;
         private readonly IPageCatalog _pages;
+        private readonly IPagePersistenceService _pagePersistence;
 
         private int TotalProcessed = 0;
         private int TotalErrors = 0;
@@ -36,18 +38,21 @@ namespace landerist_library.Infrastructure.Tasks
             GlobalStatistics globalStatistics,
             HostStatistics hostStatistics,
             IPageWaitingStatusService waitingStatus,
-            IPageCatalog pages)
+            IPageCatalog pages,
+            IPagePersistenceService pagePersistence)
         {
             ArgumentNullException.ThrowIfNull(parsedClassification);
             ArgumentNullException.ThrowIfNull(globalStatistics);
             ArgumentNullException.ThrowIfNull(hostStatistics);
             ArgumentNullException.ThrowIfNull(waitingStatus);
             ArgumentNullException.ThrowIfNull(pages);
+            ArgumentNullException.ThrowIfNull(pagePersistence);
             _parsedClassification = parsedClassification;
             _globalStatistics = globalStatistics;
             _hostStatistics = hostStatistics;
             _waitingStatus = waitingStatus;
             _pages = pages;
+            _pagePersistence = pagePersistence;
             Config.SetLLMProviderLocalAI();
             Config.EnableLogsErrorsInConsole();
             if (Config.IsConfigurationProduction())
@@ -280,11 +285,11 @@ namespace landerist_library.Infrastructure.Tasks
             return (success, newPageType);
         }
 
-        private static bool ReturnPageToScrape(Page page)
+        private bool ReturnPageToScrape(Page page)
         {
             page.RemoveWaitingStatus();
             page.RemoveResponseBodyZipped();
-            return global::landerist_library.Pages.Pages.Update(page);
+            return _pagePersistence.Update(page);
         }
     }
 }

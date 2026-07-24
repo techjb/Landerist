@@ -1,5 +1,6 @@
 using landerist_library.Configuration;
 using landerist_library.Application.Pages;
+using landerist_library.Application.Persistence;
 using landerist_library.Application.Scraping;
 using landerist_library.Database;
 using landerist_library.Logs;
@@ -18,21 +19,25 @@ namespace landerist_library.Infrastructure.Tasks
         private readonly BatchRepository _batches;
         private readonly GlobalStatistics _statistics;
         private readonly IPageCatalog _pages;
+        private readonly IPagePersistenceService _pagePersistence;
 
         public TaskBatchDownload(
             IParsedPageClassificationService parsedClassification,
             BatchRepository batches,
             GlobalStatistics statistics,
-            IPageCatalog pages)
+            IPageCatalog pages,
+            IPagePersistenceService pagePersistence)
         {
             ArgumentNullException.ThrowIfNull(parsedClassification);
             ArgumentNullException.ThrowIfNull(batches);
             ArgumentNullException.ThrowIfNull(statistics);
             ArgumentNullException.ThrowIfNull(pages);
+            ArgumentNullException.ThrowIfNull(pagePersistence);
             _parsedClassification = parsedClassification;
             _batches = batches;
             _statistics = statistics;
             _pages = pages;
+            _pagePersistence = pagePersistence;
         }
 
         public readonly HashSet<string> DownloadedPagesUriHashes = [];
@@ -234,7 +239,7 @@ namespace landerist_library.Infrastructure.Tasks
                     page.RemoveWaitingStatus();
                     page.RemoveResponseBodyZipped();
 
-                    if (global::landerist_library.Pages.Pages.Update(page))
+                    if (_pagePersistence.Update(page))
                     {
                         Interlocked.Increment(ref counter);
                     }

@@ -1,5 +1,4 @@
 using landerist_library.Configuration;
-using landerist_library.Application;
 using landerist_library.Application.Listings;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Scraping;
@@ -141,18 +140,6 @@ namespace landerist_console
                 pagePersistence,
                 listingLifecycle);
 
-            LanderistApplication.Configure(new LanderistApplicationServices(
-                pagePersistence,
-                websitePersistence,
-                websiteDeletion,
-                pageQueries,
-                pageMaintenance,
-                websiteCatalog,
-                websiteMaintenance,
-                websiteMetrics,
-                listingQueries,
-                listingMaintenance));
-
             Scraper scraper = new(
                 pagePersistence,
                 logger,
@@ -173,11 +160,13 @@ namespace landerist_console
                 new SystemRecurringTaskScheduler(),
                 logger,
                 new ScrapeTaskJob(scraper, batchScraping.Browser),
-                new LocalAiTaskJob(() => new TaskLocalAIParsing(parsedClassification, globalStatistics, hostStatistics, waitingStatus, pageCatalog)),
+                new LocalAiTaskJob(() => new TaskLocalAIParsing(parsedClassification, globalStatistics, hostStatistics, waitingStatus, pageCatalog, pagePersistence)),
                 new TenMinuteTaskJob(
-                    new TaskBatchDownload(parsedClassification, batches, globalStatistics, pageCatalog),
-                    new TaskBatchUpload(batches, waitingStatus)),
-                new HourlyTaskJob(new TaskBatchCleaner(batches)),
+                    new TaskBatchDownload(parsedClassification, batches, globalStatistics, pageCatalog, pagePersistence),
+                    new TaskBatchUpload(batches, waitingStatus, pagePersistence)),
+                new HourlyTaskJob(
+                    new WebsiteRefreshService(websiteCatalog, websitePersistence, pagePersistence),
+                    new TaskBatchCleaner(batches)),
                 new DailyTaskJob(
                     databaseFactory.Create(),
                     notListingCache,

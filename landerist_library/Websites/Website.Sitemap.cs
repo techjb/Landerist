@@ -1,11 +1,12 @@
 using landerist_library.Configuration;
+using landerist_library.Pages;
 using landerist_library.Index;
 
 namespace landerist_library.Websites
 {
     public partial class Website
     {
-        public void ReadSitemap()
+        public void ReadSitemap(Func<Page, bool>? insertPage = null)
         {
             SitemapUpdated = DateTime.Now;
 
@@ -14,7 +15,7 @@ namespace landerist_library.Websites
                 if (Config.INDEXER_ENABLED)
                 {
                     bool indexedFromRobotsTxt = false;
-                    var sitemapIndexer = new SitemapIndexer(this);
+                    var sitemapIndexer = new SitemapIndexer(this, insertPage);
                     var sitemaps = GetSiteMapsFromRobotsTxt();
                     if (sitemaps != null && sitemaps.Count > 0)
                     {

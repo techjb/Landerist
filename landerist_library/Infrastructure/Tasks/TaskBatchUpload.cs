@@ -1,4 +1,5 @@
 using landerist_library.Application.Pages;
+using landerist_library.Application.Persistence;
 using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Logs;
@@ -23,6 +24,7 @@ namespace landerist_library.Infrastructure.Tasks
 
         private readonly BatchRepository _batches;
         private readonly IPageWaitingStatusService _waitingStatus;
+        private readonly IPagePersistenceService _pagePersistence;
         private readonly long _maxFileSizeInBytes;
         private readonly int _maxPagesPerBatch;
         private readonly List<Page> _pages = [];
@@ -31,12 +33,14 @@ namespace landerist_library.Infrastructure.Tasks
 
         private static bool _firstTime = true;
 
-        public TaskBatchUpload(BatchRepository batches, IPageWaitingStatusService waitingStatus)
+        public TaskBatchUpload(BatchRepository batches, IPageWaitingStatusService waitingStatus, IPagePersistenceService pagePersistence)
         {
             ArgumentNullException.ThrowIfNull(batches);
             ArgumentNullException.ThrowIfNull(waitingStatus);
+            ArgumentNullException.ThrowIfNull(pagePersistence);
             _batches = batches;
             _waitingStatus = waitingStatus;
+            _pagePersistence = pagePersistence;
             _maxFileSizeInBytes = SetMaxFileSize();
             _maxPagesPerBatch = GetMaxPagesPerBatch();
         }
@@ -237,7 +241,7 @@ namespace landerist_library.Infrastructure.Tasks
                 {
                     _invalidPages.Add(page.UriHash);
                     page.RemoveWaitingStatus();
-                    global::landerist_library.Pages.Pages.Update(page);
+                    _pagePersistence.Update(page);
                     return FileWriteResult.Error;
                 }
 
