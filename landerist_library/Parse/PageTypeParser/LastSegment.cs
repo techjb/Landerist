@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using landerist_library.Index;
 using landerist_library.Websites;
 
@@ -164,9 +164,8 @@ namespace landerist_library.Parse.PageTypeParser
             return segment;
         }
 
-        public static void FindProhibitedEndsSegments()
+        public static void FindProhibitedEndsSegments(IReadOnlyList<string> urls)
         {
-            var urls = Pages.Pages.GetUris();
             var dictionary = ToDictionary(urls);
             var count = dictionary.Count;
 

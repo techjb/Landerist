@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text;
 using landerist_library.Websites;
 
@@ -150,9 +150,8 @@ namespace landerist_library.Index
             };
         }
 
-        public static void FindNewProhibitedStartsWith()
+        public static void FindNewProhibitedStartsWith(IReadOnlyList<string> urls)
         {
-            var urls = Pages.Pages.GetUris(false);
             var dictionary = ToDictionary(urls);
 
             foreach (var entry in dictionary)
@@ -161,7 +160,7 @@ namespace landerist_library.Index
             }
         }
 
-        private static Dictionary<string, int> ToDictionary(List<string> urls)
+        private static Dictionary<string, int> ToDictionary(IReadOnlyList<string> urls)
         {
             Dictionary<string, int> dictionary = [];
 

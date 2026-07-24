@@ -103,7 +103,7 @@ namespace landerist_console
                 notListingCache,
                 pageLinks,
                 new SqlListingEnricher(databaseFactory.Create()),
-                new LegacyListingUnpublishPolicy(),
+                new LegacyListingUnpublishPolicy(listingQueries),
                 logger);
             PageScrapePipelineServices pageScraping = new(
                 new PageAcquisitionService(
@@ -165,7 +165,7 @@ namespace landerist_console
                     new TaskBatchDownload(parsedClassification, batches, globalStatistics, pageCatalog, pagePersistence),
                     new TaskBatchUpload(batches, waitingStatus, pagePersistence)),
                 new HourlyTaskJob(
-                    new WebsiteRefreshService(websiteCatalog, websitePersistence, pagePersistence),
+                    new WebsiteRefreshService(websiteCatalog, websitePersistence, pagePersistence, websiteMetrics),
                     new TaskBatchCleaner(batches)),
                 new DailyTaskJob(
                     databaseFactory.Create(),

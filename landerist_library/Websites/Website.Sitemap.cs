@@ -6,7 +6,7 @@ namespace landerist_library.Websites
 {
     public partial class Website
     {
-        public void ReadSitemap(Func<Page, bool>? insertPage = null)
+        public void ReadSitemap(Func<Page, bool>? insertPage = null, Func<Website, bool>? achievedMaxNumberOfPages = null)
         {
             SitemapUpdated = DateTime.Now;
 
@@ -15,7 +15,7 @@ namespace landerist_library.Websites
                 if (Config.INDEXER_ENABLED)
                 {
                     bool indexedFromRobotsTxt = false;
-                    var sitemapIndexer = new SitemapIndexer(this, insertPage);
+                    var sitemapIndexer = new SitemapIndexer(this, insertPage, achievedMaxNumberOfPages);
                     var sitemaps = GetSiteMapsFromRobotsTxt();
                     if (sitemaps != null && sitemaps.Count > 0)
                     {

@@ -1,3 +1,4 @@
+using landerist_library.Websites;
 using landerist_library.Configuration;
 using landerist_library.Database;
 
@@ -59,12 +60,12 @@ namespace landerist_library.Export
             return LegacyDatabase.Create().Query(query);
         }
 
-        public static void ExportHostsMainUri()
+        public static void ExportHostsMainUri(IEnumerable<Website> websites)
         {
             var dataTable = new System.Data.DataTable();
             dataTable.Columns.Add("Host", typeof(string));
             dataTable.Columns.Add("MainUri", typeof(string));
-            foreach (var website in Websites.Websites.GetAll())
+            foreach (var website in websites)
             {
                 dataTable.Rows.Add(website.Host, website.MainUri.ToString());
             }

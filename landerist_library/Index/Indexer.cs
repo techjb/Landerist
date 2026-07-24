@@ -5,10 +5,11 @@ using landerist_library.Websites;
 
 namespace landerist_library.Index
 {
-    public class Indexer(Page page, Func<Page, bool>? insertPage = null)
+    public class Indexer(Page page, Func<Page, bool>? insertPage = null, Func<Website, bool>? achievedMaxNumberOfPages = null)
     {
         protected Page Page { get; } = page;
         private readonly Func<Page, bool>? _insertPage = insertPage;
+        private readonly Func<Website, bool> _achievedMaxNumberOfPages = achievedMaxNumberOfPages ?? (_ => false);
 
         private readonly HashSet<Uri> Processed = [];
 
@@ -26,7 +27,7 @@ namespace landerist_library.Index
             ".razor"
         ];
 
-        public Indexer(Website website, Func<Page, bool>? insertPage = null) : this(new Page(website), insertPage)
+        public Indexer(Website website, Func<Page, bool>? insertPage = null, Func<Website, bool>? achievedMaxNumberOfPages = null) : this(new Page(website), insertPage, achievedMaxNumberOfPages)
         {
         }
 
@@ -38,7 +39,7 @@ namespace landerist_library.Index
             }
 
 
-            if (global::landerist_library.Websites.Websites.AchievedMaxNumberOfPages(Page.Website))
+            if (_achievedMaxNumberOfPages(Page.Website))
             {
                 return;
             }
@@ -142,7 +143,7 @@ namespace landerist_library.Index
                 return false;
             }
 
-            if (global::landerist_library.Websites.Websites.AchievedMaxNumberOfPages(website))
+            if (_achievedMaxNumberOfPages(website))
             {
                 return false;
             }
@@ -189,8 +190,7 @@ namespace landerist_library.Index
                 return false;
             }
 
-            bool inserted = _insertPage?.Invoke(new Page(website, uri))
-                ?? Pages.Pages.Insert(website, uri);
+            bool inserted = _insertPage?.Invoke(new Page(website, uri)) ?? false;
             Processed.Add(uri);
             return inserted;
         }

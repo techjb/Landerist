@@ -1,13 +1,14 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Application.Administration;
+using landerist_library.Configuration;
 using landerist_library.Tools;
 using landerist_library.Websites;
 using System.Data;
 
-namespace landerist_library.Insert.IdAgencies
+namespace landerist_library.Infrastructure.Administration
 {
-    public class IdAgenciesInsertWebsites() : WebsitesInserter(true)
+    public class IdAgenciesInsertWebsites(IWebsiteAdministrationService websites) : WebsitesInserter(true, websites)
     {
-        public static void Start()
+        public void Start()
         {
             string file = AppConfig.INSERT_DIRECTORY + @"IdAgencies\Entrega.csv";
             DataTable dataTable = Csv.ToDataTable(file);

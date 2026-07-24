@@ -1,14 +1,13 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Configuration;
 using landerist_library.Database;
 
 namespace landerist_library.Insert.FtAgencies
 {
     public class FtAgenciesExport
     {
-        public static void Start()
+        public static void Start(IReadOnlyCollection<string> hosts)
         {
             var urls = FtAgenciesUrls.GetAgencies();
-            var hosts = Websites.Websites.GetHosts();
             HashSet<string> uris = [];
             int errors = 0;
             int alreadyInserted = 0;

@@ -25,11 +25,13 @@ namespace landerist_library.Pages
         private const int RequiredStrongEvidenceCount = 2;
         private const int RequiredDefaultEvidenceCount = 3;
         private readonly Page _page;
+        private readonly Func<Page, bool> _containsListing;
 
-        public ListingUnpublishEvaluator(Page page)
+        public ListingUnpublishEvaluator(Page page, Func<Page, bool> containsListing)
         {
             ArgumentNullException.ThrowIfNull(page);
             _page = page;
+            _containsListing = containsListing;
         }
 
         public bool ShouldUnpublish()
@@ -39,7 +41,7 @@ namespace landerist_library.Pages
 
         public ListingUnpublishDecision Evaluate()
         {
-            if (!global::landerist_library.Pages.Pages.ContainsListing(_page))
+            if (!_containsListing(_page))
             {
                 return CreateDecision(false, ListingUnpublishDecisionReason.ListingDoesNotExist, null);
             }

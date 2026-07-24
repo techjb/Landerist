@@ -1,3 +1,4 @@
+using landerist_library.Pages;
 using landerist_library.Configuration;
 using landerist_library.Index;
 using landerist_library.Tools;
@@ -5,15 +6,15 @@ using landerist_library.Websites;
 using landerist_orels.ES;
 using System.Collections.Concurrent;
 
-namespace landerist_library.Pages;
+namespace landerist_library.Infrastructure.Administration;
 
-public partial class Pages
+public sealed partial class PageAdministrationService
 {
-    public static bool DeleteAll() => Maintenance.DeleteAll();
+    public bool DeleteAll() => Maintenance.DeleteAll();
 
-    public static void Delete(PageType pageType) => Delete(GetPages(pageType));
+    public void Delete(PageType pageType) => Delete([.. GetPages(pageType)]);
 
-    public static void DeleteDuplicateUriQuery()
+    public void DeleteDuplicateUriQuery()
     {
         IReadOnlyList<string> uris = Queries.GetUris();
         int counter = 0;
@@ -39,10 +40,10 @@ public partial class Pages
         Delete([.. pages]);
     }
 
-    public static void DeleteListingsHttpStatusCodeError() =>
+    public void DeleteListingsHttpStatusCodeError() =>
         Delete([.. Queries.GetListingsWithHttpStatusCodeError()]);
 
-    public static void DeleteListingsResponseBodyRepeated()
+    public void DeleteListingsResponseBodyRepeated()
     {
         IReadOnlyList<Page> pages = Queries.GetListingsWithParserInputHash();
         HashSet<string> hashes = [];
@@ -58,13 +59,13 @@ public partial class Pages
         Delete(repeated);
     }
 
-    public static void DeleteUrisLikePrint() =>
+    public void DeleteUrisLikePrint() =>
         Delete([.. Queries.GetUrisLikePrint()]);
 
-    public static void DeleteProhibitedUris() =>
+    public void DeleteProhibitedUris() =>
         Delete([.. Queries.GetPagesWithProhibitedUris(ProhibitedUrls.Prohibited_ES)]);
 
-    public static void Delete(List<Page> pages)
+    public void Delete(List<Page> pages)
     {
         Console.WriteLine("Deleting " + pages.Count + " pages..");
         int counter = 0;
@@ -73,7 +74,7 @@ public partial class Pages
         Parallel.ForEach(pages, page =>
         {
             Console.WriteLine(page.Uri);
-            if (global::landerist_library.Pages.Pages.Delete(page))
+            if (Delete(page))
             {
                 Interlocked.Increment(ref counter);
             }
@@ -85,7 +86,7 @@ public partial class Pages
         });
     }
 
-    public static void DeleteUnpublishedListings()
+    public void DeleteUnpublishedListings()
     {
         DateTime unlistingDate = DateTime.Now.AddDays(-Config.DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS);
         IReadOnlyCollection<Listing> listings =
@@ -93,7 +94,7 @@ public partial class Pages
         DeleteListings(listings);
     }
 
-    private static void DeleteListings(IReadOnlyCollection<Listing> listings)
+    private void DeleteListings(IReadOnlyCollection<Listing> listings)
     {
         int counter = 0;
         int deleted = 0;
@@ -104,7 +105,7 @@ public partial class Pages
             foreach (var source in listing.sources)
             {
                 Page page = LoadOrCreate(source.sourceUrl);
-                if (global::landerist_library.Pages.Pages.DeleteListing(page))
+                if (DeleteListing(page))
                 {
                     Interlocked.Increment(ref deleted);
                 }
@@ -118,3 +119,4 @@ public partial class Pages
         });
     }
 }
+

@@ -1,14 +1,13 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Configuration;
 using landerist_library.Database;
 
 namespace landerist_library.Insert.IdAgencies
 {
     public class IdAgenciesExport
     {
-        public static void Start()
+        public static void Start(IReadOnlyCollection<string> hosts)
         {
             var urls = IdAgenciesUrls.GetAgencies();
-            var hosts = Websites.Websites.GetHosts();
             HashSet<string> uris = [];
             int errors = 0;
             int alreadyInserted = 0;

@@ -1,34 +1,39 @@
+using landerist_library.Websites;
 using landerist_library.Insert;
+using landerist_library.Application.Administration;
 using landerist_library.Logs;
 using System.Data;
 
 
-namespace landerist_library.Websites
+namespace landerist_library.Infrastructure.Administration
 {
     public class WebsitesInserter
     {
-        private static int Inserted = 0;
-        private static int ErrorsMainUri = 0;
-        private static int ErrorsRobotsTxt = 0;
-        private static int ErrorsIpAddress = 0;
-        private static int ErrorsInsert = 0;
-        private static int ErrorsException = 0;
-        private static int Skipped = 0;
-        private static readonly object SyncHashSet = new();
+        private int Inserted = 0;
+        private int ErrorsMainUri = 0;
+        private int ErrorsRobotsTxt = 0;
+        private int ErrorsIpAddress = 0;
+        private int ErrorsInsert = 0;
+        private int ErrorsException = 0;
+        private int Skipped = 0;
+        private readonly object SyncHashSet = new();
 
-        private readonly static HashSet<Uri> InsertedUris = [];
+        private readonly HashSet<Uri> InsertedUris = [];
 
-        public WebsitesInserter(bool initialize)
+        private readonly IWebsiteAdministrationService _websites;
+
+        public WebsitesInserter(bool initialize, IWebsiteAdministrationService websites)
         {
+            _websites = websites;
             if (initialize)
             {
                 Init();
             }
         }
 
-        private static void Init()
+        private void Init()
         {
-            var urls = Websites.GetUrls();
+            var urls = _websites.GetUrls();
             foreach (var url in urls)
             {
                 Uri uri = new(url);
@@ -36,7 +41,7 @@ namespace landerist_library.Websites
             }
         }
 
-        protected static HashSet<Uri> ToList(DataTable dataTable, string columnName)
+        protected HashSet<Uri> ToList(DataTable dataTable, string columnName)
         {
             Console.WriteLine("Parsing to list ..");
             HashSet<Uri> uris = [];
@@ -68,19 +73,19 @@ namespace landerist_library.Websites
             return uris;
         }
 
-        public static void DeleteAndInsert(Uri uri)
+        public void DeleteAndInsert(Uri uri)
         {
             Website website = new(uri);
             DeleteAndInsert(website);
         }
 
-        public static void DeleteAndInsert(Website website)
+        public void DeleteAndInsert(Website website)
         {
-            global::landerist_library.Websites.Websites.DeleteWithRelations(website);
+            _websites.DeleteWithRelations(website);
             Insert(website.MainUri);
         }
 
-        public static bool Insert(string url)
+        public bool Insert(string url)
         {
             if (Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
             {
@@ -89,12 +94,12 @@ namespace landerist_library.Websites
             return false;
         }
 
-        public static bool Insert(Uri uri)
+        public bool Insert(Uri uri)
         {
             return InsertWebsite(uri);
         }
 
-        public static bool InsertWebsite(
+        public bool InsertWebsite(
             string mainUri,
             string? listingUrlRegex,
             string? sitemapUrlRegex)
@@ -116,7 +121,7 @@ namespace landerist_library.Websites
                 null);
         }
 
-        public static bool InsertWebsite(
+        public bool InsertWebsite(
             string mainUri,
             string host,
             string? listingUrlRegex,
@@ -160,7 +165,7 @@ namespace landerist_library.Websites
             {
                 Console.WriteLine("Error setting IP address for " + website.MainUri);
             }
-            if (!Websites.Insert(website))
+            if (!_websites.Insert(website))
             {
                 Console.WriteLine("Error inserting website " + website.MainUri);
                 return false;
@@ -169,13 +174,13 @@ namespace landerist_library.Websites
 
         }
 
-        public static void Insert(List<Uri> uris)
+        public void Insert(List<Uri> uris)
         {
             HashSet<Uri> hashSet = [.. uris];
             Insert(hashSet);
         }
 
-        public static void Insert(HashSet<Uri> uris)
+        public void Insert(HashSet<Uri> uris)
         {
             int total = uris.Count;
             int counter = 0;
@@ -201,7 +206,7 @@ namespace landerist_library.Websites
             });
         }
 
-        public static Uri? GetSuggestedMainUri(Uri sourceUri)
+        public Uri? GetSuggestedMainUri(Uri sourceUri)
         {
             string mainUriString = sourceUri.GetLeftPart(UriPartial.Authority);
             if (Uri.TryCreate(mainUriString, UriKind.Absolute, out Uri? uri))
@@ -211,7 +216,7 @@ namespace landerist_library.Websites
             return null;
         }
 
-        private static bool InsertWebsite(Uri? mainUri)
+        private bool InsertWebsite(Uri? mainUri)
         {
             if (mainUri == null)
             {
@@ -240,7 +245,7 @@ namespace landerist_library.Websites
             return false;
         }
 
-        public static bool CanInsert(Uri uri)
+        public bool CanInsert(Uri uri)
         {
             if (BlockedDomains.IsBlocked(uri))
             {
@@ -252,19 +257,19 @@ namespace landerist_library.Websites
                 return false;
             }
 
-            if (Websites.Exists(uri.Host))
+            if (_websites.Exists(uri.Host))
             {
                 return false;
             }
             return true;
         }
 
-        private static string? NullIfWhiteSpace(string? value)
+        private string? NullIfWhiteSpace(string? value)
         {
             return string.IsNullOrWhiteSpace(value) ? null : value;
         }
 
-        private static bool InsertWebsite(Website website)
+        private bool InsertWebsite(Website website)
         {
             if (!website.SetMainUri())
             {
@@ -286,7 +291,7 @@ namespace landerist_library.Websites
                 Interlocked.Increment(ref ErrorsIpAddress);
                 return false;
             }
-            if (!Websites.Insert(website))
+            if (!_websites.Insert(website))
             {
                 Interlocked.Increment(ref ErrorsInsert);
                 return false;
@@ -300,9 +305,9 @@ namespace landerist_library.Websites
 
             try
             {
-                global::landerist_library.Websites.Websites.InsertMainPage(website);
+                _websites.InsertMainPage(website);
                 website.ReadSitemap();
-                Websites.Update(website);
+                _websites.Update(website);
             }
             catch (Exception exception)
             {

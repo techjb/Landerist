@@ -80,7 +80,7 @@ namespace landerist_tests
                 notListingCache,
                 pageLinks,
                 new SqlListingEnricher(databaseFactory.Create()),
-                new LegacyListingUnpublishPolicy(),
+                new LegacyListingUnpublishPolicy(listingQueries),
                 logger);
             PageScrapePipelineServices pageScraping = new(
                 new PageAcquisitionService(
@@ -113,20 +113,6 @@ namespace landerist_tests
                     Config.IsConfigurationProduction(),
                     Config.IsConfigurationLocal(),
                     Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER));
-
-            SqlPageCatalog pageCatalog = new(
-                new PageQueryRepository(databaseFactory.Create()));
-            WebsiteDeletionService websiteDeletion = new(
-                pageCatalog,
-                new OrelsListingDeletionService(listingMaintenance),
-                new SqlPageDeletionService(new PageMaintenanceRepository(databaseFactory.Create())),
-                websitePersistence);
-            LanderistApplication.Configure(new LanderistApplicationServices(
-                pagePersistence,
-                websitePersistence,
-                websiteDeletion,
-                listingQueries: listingQueries,
-                listingMaintenance: listingMaintenance));
 
             return new Scraper(
                 pagePersistence,

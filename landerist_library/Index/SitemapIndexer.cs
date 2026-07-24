@@ -12,7 +12,7 @@ namespace landerist_library.Index
 
         private sealed record LoadedSitemap(Sitemap Sitemap, IReadOnlyList<Uri> AlternateUrls);
 
-        public SitemapIndexer(Website website, Func<Page, bool>? insertPage = null) : base(website, insertPage)
+        public SitemapIndexer(Website website, Func<Page, bool>? insertPage = null, Func<Website, bool>? achievedMaxNumberOfPages = null) : base(website, insertPage, achievedMaxNumberOfPages)
         {
             WebsiteSitemapFetcher = new GzipAwareSitemapFetcher(website);
         }

@@ -88,12 +88,15 @@ public sealed partial class ArchitectureBoundaryTests
     }
 
     [Fact]
-    public void ProductionComposition_DoesNotUseLegacyApplicationServiceLocator()
+    public void SourceCode_DoesNotUseLegacyApplicationServiceLocator()
     {
-        string infrastructureRoot = Path.Combine(LibraryRoot, "Infrastructure");
         string consoleRoot = Path.Combine(RepositoryRoot, "landerist_console");
-        string[] violations = GetSourceFiles(infrastructureRoot)
+        string manualToolsRoot = Path.Combine(RepositoryRoot, "landerist_tests");
+        string unitTestsRoot = Path.Combine(RepositoryRoot, "landerist_unit_tests");
+        string[] violations = GetSourceFiles(LibraryRoot)
             .Concat(GetSourceFiles(consoleRoot))
+            .Concat(GetSourceFiles(manualToolsRoot))
+            .Concat(GetSourceFiles(unitTestsRoot))
             .Where(file => File.ReadAllText(file).Contains("LanderistApplication", StringComparison.Ordinal))
             .Select(GetRelativePath)
             .Order()
@@ -101,7 +104,7 @@ public sealed partial class ArchitectureBoundaryTests
 
         Assert.True(
             violations.Length == 0,
-            "Production composition must use explicit dependencies instead of LanderistApplication." +
+            "All source code must use explicit dependencies instead of LanderistApplication." +
             Environment.NewLine +
             string.Join(Environment.NewLine, violations));
     }

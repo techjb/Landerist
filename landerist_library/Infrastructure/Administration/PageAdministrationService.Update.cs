@@ -1,18 +1,19 @@
+using landerist_library.Pages;
 using landerist_library.Tools;
 using landerist_library.Websites;
 using landerist_orels.ES;
 
-namespace landerist_library.Pages
+namespace landerist_library.Infrastructure.Administration
 {
-    public partial class Pages
+    public sealed partial class PageAdministrationService
     {
-        public static bool Insert(Website website, Uri uri)
+        public bool Insert(Website website, Uri uri)
         {
             var page = new Page(website, uri);
-            return global::landerist_library.Pages.Pages.Insert(page);
+            return Insert(page);
         }
 
-        public static void UpdateInvalidCadastastralReferences()
+        public void UpdateInvalidCadastralReferences()
         {
             var pages = GetPages();
             int total = pages.Count;
@@ -22,7 +23,7 @@ namespace landerist_library.Pages
             foreach (var page in pages)
             {
                 Console.WriteLine(counter++ + "/" + total);
-                var listing = global::landerist_library.Pages.Pages.GetListing(page, false, false);
+                var listing = GetListing(page, false, false);
                 if (listing != null && listing.cadastralReference != null)
                 {
                     if (!Validate.CadastralReference(listing.cadastralReference))
@@ -39,7 +40,7 @@ namespace landerist_library.Pages
             Console.WriteLine(updated + "/" + total);
         }
 
-        public static void UpdateNextScrape()
+        public void RecalculateNextScrape()
         {
             int total = CountPages();
             int updated = 0;
@@ -54,7 +55,7 @@ namespace landerist_library.Pages
                     DateTime calculationDate = page.LastScrape ?? page.Inserted;
                     page.NextScrape = PageNextScrapeCalculator.Calculate(page, calculationDate, GetListingStatus(page));
 
-                    if (global::landerist_library.Pages.Pages.UpdateNextScrape(page))
+                    if (UpdateNextScrape(page))
                     {
                         Interlocked.Increment(ref updated);
                     }
@@ -69,14 +70,15 @@ namespace landerist_library.Pages
             Console.WriteLine(counter + "/" + total + " updated: " + updated + " errors: " + errors);
         }
 
-        public static bool RemoveListingParserInputHash(PageType pageType)
+        public bool RemoveListingParserInputHash(PageType pageType)
         {
             return Maintenance.RemoveListingParserInputHash(pageType);
         }
 
-        public static bool RemoveListingParserInputHashToAll()
+        public bool RemoveListingParserInputHashFromAll()
         {
             return Maintenance.RemoveListingParserInputHash();
         }
     }
 }
+
