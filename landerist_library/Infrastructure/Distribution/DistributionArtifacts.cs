@@ -11,7 +11,7 @@ using landerist_library.Websites;
 using landerist_orels.ES;
 using System.Globalization;
 
-namespace landerist_library.Landerist_com
+namespace landerist_library.Infrastructure.Distribution
 {
     public enum ExportType
     {
@@ -24,7 +24,7 @@ namespace landerist_library.Landerist_com
         Websites
     }
 
-    public class Landerist_com
+    public class DistributionArtifacts
     {
 
         protected static string GetFilePath(string subdirectory)

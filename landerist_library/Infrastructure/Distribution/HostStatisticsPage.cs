@@ -9,9 +9,9 @@ using System.Globalization;
 using System.Net;
 using System.Text.Json;
 
-namespace landerist_library.Landerist_com
+namespace landerist_library.Infrastructure.Distribution
 {
-    public sealed class HostStatisticsPage : Landerist_com
+    public sealed class HostStatisticsPage : DistributionArtifacts
     {
         private readonly HostStatistics _statistics;
         private readonly WebsiteMetricsService _websiteMetrics;

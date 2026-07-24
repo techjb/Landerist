@@ -7,6 +7,7 @@ using landerist_library.Application.Tasks;
 using landerist_library.Application.Websites;
 using landerist_library.Database;
 using landerist_library.Infrastructure.Backup;
+using landerist_library.Infrastructure.Distribution;
 using landerist_library.Infrastructure.Logging;
 using landerist_library.Infrastructure.PageServices;
 using landerist_library.Infrastructure.Listings;
@@ -183,10 +184,13 @@ namespace landerist_console
                     new SqlDatabaseBackupService(databaseFactory.Create()),
                     globalStatistics,
                     hostStatistics,
-                    pageStatistics,
-                    websiteMetrics,
-                    websiteCatalog,
-                    websiteQueries),
+                    new DistributionPublisher(
+                        globalStatistics,
+                        hostStatistics,
+                        pageStatistics,
+                        websiteMetrics,
+                        websiteCatalog,
+                        websiteQueries)),
                 TimeProvider.System);
         }
 

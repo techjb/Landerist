@@ -240,7 +240,7 @@ namespace landerist_tests
             StatisticsTests.Run();
             ListingsTests.Run();
             InsertTests.Run();
-            LanderistComTests.Run();
+            DistributionTests.Run();
             DataBaseTests.Run();
             TasksTests.Run();
             ToolsTests.Run();

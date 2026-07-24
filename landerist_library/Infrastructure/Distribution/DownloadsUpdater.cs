@@ -9,9 +9,9 @@ using landerist_orels.ES;
 using System.Data;
 using System.Globalization;
 
-namespace landerist_library.Landerist_com
+namespace landerist_library.Infrastructure.Distribution
 {
-    public class DownloadsUpdater : Landerist_com
+    public class DownloadsUpdater : DistributionArtifacts
     {
         public const string METADATA_KEY_DATEFROM = "dateFrom";
         public const string METADATA_KEY_DATETO = "dateTo";

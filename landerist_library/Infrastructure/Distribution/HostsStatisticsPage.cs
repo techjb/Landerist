@@ -7,9 +7,9 @@ using System.Globalization;
 using System.Net;
 using System.Text;
 
-namespace landerist_library.Landerist_com
+namespace landerist_library.Infrastructure.Distribution
 {
-    public sealed class HostsStatisticsPage : Landerist_com
+    public sealed class HostsStatisticsPage : DistributionArtifacts
     {
         private readonly WebsiteMetricsService _websiteMetrics;
         private readonly IWebsiteCatalog _websites;

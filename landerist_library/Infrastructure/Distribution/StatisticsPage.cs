@@ -9,9 +9,9 @@ using System.Data;
 using System.Globalization;
 using System.Text.Json;
 
-namespace landerist_library.Landerist_com
+namespace landerist_library.Infrastructure.Distribution
 {
-    public sealed class StatisticsPage : Landerist_com
+    public sealed class StatisticsPage : DistributionArtifacts
     {
         private readonly GlobalStatistics _statistics;
         private readonly PageStatisticsRepository _pageStatistics;

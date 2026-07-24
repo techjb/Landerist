@@ -10,9 +10,9 @@ using landerist_library.Infrastructure.WebsiteServices;
 using landerist_library.Websites;
 using landerist_orels.ES;
 
-namespace landerist_library.Landerist_com
+namespace landerist_library.Infrastructure.Distribution
 {
-    public sealed class DownloadsPage : Landerist_com
+    public sealed class DownloadsPage : DistributionArtifacts
     {
         private readonly WebsiteMetricsService _websiteMetrics;
         private readonly IWebsiteCatalog _websites;

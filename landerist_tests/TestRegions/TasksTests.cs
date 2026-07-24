@@ -7,7 +7,7 @@ namespace landerist_tests
             //ServiceTasks.DailyTasks();
             //ServiceTasks.ProcessPages();
             //new ServiceTasks().UpdateAndScrape();
-            //landerist_library.Landerist_com.FilesUpdater.SetPageTypeAndNextScrape();
+            //landerist_library.Infrastructure.Distribution.FilesUpdater.SetPageTypeAndNextScrape();
             //ServiceTasks.UpdateAndScrape();
             //ServiceTasks.HourlyTasks();
             //new TasksService().Scrape();
