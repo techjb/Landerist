@@ -1,5 +1,4 @@
 using HtmlAgilityPack;
-using landerist_library.Configuration;
 using landerist_library.Tools;
 using landerist_orels.ES;
 
@@ -28,7 +27,7 @@ namespace landerist_library.Pages
             string hash = Strings.GetHash(ListingParserInput);
             ListingParserInputNotChanged = hash == ListingParserInputHash;
             ListingParserInputNotChangedCounter = ListingParserInputNotChanged
-                ? (short)Math.Min((ListingParserInputNotChangedCounter ?? 0) + 1, Config.MAX_PAGETYPE_COUNTER)
+                ? (short)Math.Min((ListingParserInputNotChangedCounter ?? 0) + 1, Rules.MaxPageTypeCounter)
                 : (short)0;
             ListingParserInputHash = hash;
         }
@@ -89,7 +88,7 @@ namespace landerist_library.Pages
             {
                 return false;
             }
-            return ListingParserInput.Length > Config.MAX_LISTINGPARSERINPUT_LENGTH;
+            return ListingParserInput.Length > Rules.MaxListingParserInputLength;
         }
 
         public bool ListingParserInputIsTooShort()
@@ -98,7 +97,7 @@ namespace landerist_library.Pages
             {
                 return true;
             }
-            return ListingParserInput.Length < Config.MIN_LISTINGPARSERINPUT_LENGTH;
+            return ListingParserInput.Length < Rules.MinListingParserInputLength;
         }
 
     }

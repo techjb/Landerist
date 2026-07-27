@@ -1,5 +1,4 @@
 using HtmlAgilityPack;
-using landerist_library.Configuration;
 using landerist_library.Downloaders;
 using System.IO.Compression;
 using System.Text;
@@ -87,7 +86,7 @@ namespace landerist_library.Pages
         {
             return Screenshot != null &&
                 Screenshot.Length > 0 &&
-                Screenshot.Length < Config.MAX_SCREENSHOT_SIZE;
+                Screenshot.Length < Rules.MaxScreenshotSize;
         }
 
         public void RemoveResponseBodyZipped()

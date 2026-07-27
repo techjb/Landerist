@@ -1,5 +1,3 @@
-using landerist_library.Configuration;
-
 namespace landerist_library.Pages
 {
     public partial class Page
@@ -10,7 +8,7 @@ namespace landerist_library.Pages
 
             if (IsSamePageType(PageType, newPageType))
             {
-                PageTypeCounter = (short)Math.Min((PageTypeCounter ?? 0) + 1, Config.MAX_PAGETYPE_COUNTER);
+                PageTypeCounter = (short)Math.Min((PageTypeCounter ?? 0) + 1, Rules.MaxPageTypeCounter);
                 PageType = newPageType;
             }
             else
@@ -145,7 +143,7 @@ namespace landerist_library.Pages
                 newPageType == landerist_library.Pages.PageType.HttpStatusCodeNull ||                
                 newPageType == landerist_library.Pages.PageType.ResponseBodyNullOrEmpty)
             {
-                TransientErrorCounter = (short)Math.Min((TransientErrorCounter ?? 0) + 1, Config.MAX_PAGETYPE_COUNTER);
+                TransientErrorCounter = (short)Math.Min((TransientErrorCounter ?? 0) + 1, Rules.MaxPageTypeCounter);
                 return;
             }
 

@@ -77,23 +77,50 @@ namespace landerist_library.Pages
 
         private bool Disposed;
 
-        public Page(string url) : this(new Uri(url))
+        private readonly PageRules Rules;
+
+        public Page(string url) : this(new Uri(url), PageRules.Default)
         {
 
         }
 
-        public Page(Uri uri) : this(CreateWebsite(uri), uri)
+        public Page(string url, PageRules rules) : this(new Uri(url), rules)
         {
 
         }
 
-        public Page(Website website) : this(website, website.MainUri)
+        public Page(Uri uri) : this(uri, PageRules.Default)
         {
 
         }
 
-        public Page(Website website, Uri uri)
+        public Page(Uri uri, PageRules rules) : this(CreateWebsite(uri), uri, rules)
         {
+
+        }
+
+        public Page(Website website) : this(website, PageRules.Default)
+        {
+
+        }
+
+        public Page(Website website, PageRules rules) : this(website, website.MainUri, rules)
+        {
+
+        }
+
+        public Page(Website website, Uri uri) : this(website, uri, PageRules.Default)
+        {
+
+        }
+
+        public Page(Website website, Uri uri, PageRules rules)
+        {
+            ArgumentNullException.ThrowIfNull(website);
+            ArgumentNullException.ThrowIfNull(uri);
+            ArgumentNullException.ThrowIfNull(rules);
+
+            Rules = rules;
             Website = website;
             Host = uri.Host;
             Uri = uri;
