@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+using HtmlAgilityPack;
+using landerist_library.Websites;
 using landerist_library.Pages;
 using landerist_library.Parse.Media.Image;
 using landerist_orels;
@@ -9,16 +10,19 @@ namespace landerist_library.Parse.Media
     public class MediaParser
     {
         public readonly Page Page;
+        public IWebsiteRobotsPolicy RobotsPolicy { get; }
 
         private readonly SortedSet<landerist_orels.Media> _media = new(new MediaComparer());
 
         public HtmlDocument? HtmlDocument { get; private set; }
 
-        public MediaParser(Page page)
+        public MediaParser(Page page, IWebsiteRobotsPolicy robotsPolicy)
         {
             ArgumentNullException.ThrowIfNull(page);
+            ArgumentNullException.ThrowIfNull(robotsPolicy);
 
             Page = page;
+            RobotsPolicy = robotsPolicy;
             InitHtmlDocument();
         }
 

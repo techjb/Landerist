@@ -1,9 +1,11 @@
+using landerist_library.Websites;
 using landerist_library.Parse.ListingParser;
 using landerist_library.Configuration;
 using landerist_library.Pages;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
 using landerist_library.Parse.ListingParser.UserInput;
 using landerist_library.Application.Statistics;
+using landerist_library.Application.Websites;
 using landerist_orels.ES;
 using Newtonsoft.Json;
 
@@ -24,7 +26,7 @@ namespace landerist_library.Infrastructure.Parsing
             { LLMProvider.LocalAI, new LocalAIListingParserClient() },
         };
 
-        public static (PageType pageType, Listing? listing, bool waitingAIRequest) Parse(Page page, HostStatistics statistics)
+        public static (PageType pageType, Listing? listing, bool waitingAIRequest) Parse(Page page, HostStatistics statistics, IWebsiteRobotsPolicy robotsPolicy)
         {
             page.SetLastParseListing();
 
@@ -40,20 +42,21 @@ namespace landerist_library.Infrastructure.Parsing
             }
 
             return Clients.TryGetValue(Config.LLM_PROVIDER, out var client)
-                ? ParseWithClient(page, text, client, statistics)
+                ? ParseWithClient(page, text, client, statistics, robotsPolicy)
                 : (PageType.ResponseBodyTooShort, null, false);
         }
 
-        public static (PageType pageType, Listing? listing, bool waitingAIRequest) ParseLocalAI(Page page, string text, HostStatistics statistics)
+        public static (PageType pageType, Listing? listing, bool waitingAIRequest) ParseLocalAI(Page page, string text, HostStatistics statistics, IWebsiteRobotsPolicy robotsPolicy)
         {
-            return ParseWithClient(page, text, new LocalAIListingParserClient(), statistics);
+            return ParseWithClient(page, text, new LocalAIListingParserClient(), statistics, robotsPolicy);
         }
 
         private static (PageType pageType, Listing? listing, bool waitingAIRequest) ParseWithClient(
             Page page,
             string userInput,
             IListingParserClient client,
-            HostStatistics statistics)
+            HostStatistics statistics,
+            IWebsiteRobotsPolicy robotsPolicy)
         {
             return ParseWithRetry(page, () =>
             {
@@ -64,7 +67,7 @@ namespace landerist_library.Infrastructure.Parsing
                     return (PageType.MayBeListing, null, true);
                 }
 
-                var (pageType, listing) = ParseResponse(page, response.ResponseText, client.Provider);
+                var (pageType, listing) = ParseResponse(page, response.ResponseText, client.Provider, robotsPolicy);
                 if (pageType == PageType.MayBeListing)
                 {
                     WriteLocalAIDiagnostic(client, "pageType is MayBeListing. " + response.Diagnostic);
@@ -103,12 +106,12 @@ namespace landerist_library.Infrastructure.Parsing
                 && page.Website.MatchesListingUrlRegex(page.Uri);
         }
 
-        public static (PageType pageType, Listing? listing) ParseResponse(Page page, string? text)
+        public static (PageType pageType, Listing? listing) ParseResponse(Page page, string? text, IWebsiteRobotsPolicy robotsPolicy)
         {
-            return ParseResponse(page, text, Config.LLM_PROVIDER);
+            return ParseResponse(page, text, Config.LLM_PROVIDER, robotsPolicy);
         }
 
-        private static (PageType pageType, Listing? listing) ParseResponse(Page page, string? text, LLMProvider provider)
+        private static (PageType pageType, Listing? listing) ParseResponse(Page page, string? text, LLMProvider provider, IWebsiteRobotsPolicy robotsPolicy)
         {
             if (string.IsNullOrWhiteSpace(text))
             {
@@ -124,7 +127,7 @@ namespace landerist_library.Infrastructure.Parsing
                 }
 
                 ListingImageUrlPlaceholders.Resolve(page, structuredOutputEs);
-                return new StructuredOutputEsParser(structuredOutputEs).Parse(page);
+                return new StructuredOutputEsParser(structuredOutputEs).Parse(page, robotsPolicy);
             }
             catch (Exception exception)
             {

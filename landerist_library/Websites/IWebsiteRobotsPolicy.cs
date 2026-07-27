@@ -1,6 +1,4 @@
-using landerist_library.Websites;
-
-namespace landerist_library.Application.Websites;
+namespace landerist_library.Websites;
 
 public interface IWebsiteRobotsPolicy
 {

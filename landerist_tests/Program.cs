@@ -97,7 +97,7 @@ namespace landerist_tests
                     Config.IsConfigurationProduction(),
                     notListingCache,
                     new SqlPageClassificationMetrics(databaseFactory.Create()),
-                    new LegacyListingPageParser(hostStatistics),
+                    new LegacyListingPageParser(hostStatistics, robotsPolicy),
                     new LegacyPageTokenLimitPolicy()),
                 new PageIndexingService(Config.INDEXER_ENABLED, pageLinks),
                 new SqlPageSchedulingService(listingStore),

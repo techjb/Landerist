@@ -1,4 +1,3 @@
-﻿using landerist_library.Configuration;
 using OpenCvSharp;
 
 namespace landerist_library.Parse.Media.Image
@@ -35,7 +34,9 @@ namespace landerist_library.Parse.Media.Image
 
         private void DownloadImage(landerist_orels.Media image)
         {
-            if (!ImageParser.MediaParser.Page.Website.IsAllowedByRobotsTxt(image.url))
+            if (!ImageParser.MediaParser.RobotsPolicy.IsAllowed(
+                    ImageParser.MediaParser.Page.Website,
+                    image.url))
             {
                 return;
             }

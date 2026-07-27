@@ -1,4 +1,3 @@
-using Com.Bekijkhet.RobotsTxt;
 using landerist_orels.ES;
 
 namespace landerist_library.Websites
@@ -52,7 +51,6 @@ namespace landerist_library.Websites
 
         public int? MinimumRequestIntervalMilliseconds { get; set; }
 
-        public Robots? Robots = null;
 
         public LanguageCode LanguageCode = LanguageCode.es;
 
@@ -111,7 +109,6 @@ namespace landerist_library.Websites
             {
                 Host = string.Empty;
                 IpAddress = null;
-                Robots = null;
                 RobotsTxt = null;
                 IndexUrlRegex = null;
                 SitemapUrlRegex = null;

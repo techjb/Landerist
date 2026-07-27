@@ -1,3 +1,4 @@
+using landerist_library.Websites;
 using landerist_library.Infrastructure.Parsing;
 using landerist_library.Configuration;
 using landerist_library.Application.Pages;
@@ -7,6 +8,7 @@ using landerist_library.Logs;
 using landerist_library.Pages;
 using landerist_library.Parse.ListingParser;
 using landerist_library.Application.Statistics;
+using landerist_library.Application.Websites;
 using System.Collections.Concurrent;
 
 namespace landerist_library.Infrastructure.Tasks
@@ -23,6 +25,7 @@ namespace landerist_library.Infrastructure.Tasks
         private readonly IPageWaitingStatusService _waitingStatus;
         private readonly IPageCatalog _pages;
         private readonly IPagePersistenceService _pagePersistence;
+        private readonly IWebsiteRobotsPolicy _robots;
 
         private int TotalProcessed = 0;
         private int TotalErrors = 0;
@@ -40,7 +43,8 @@ namespace landerist_library.Infrastructure.Tasks
             HostStatistics hostStatistics,
             IPageWaitingStatusService waitingStatus,
             IPageCatalog pages,
-            IPagePersistenceService pagePersistence)
+            IPagePersistenceService pagePersistence,
+            IWebsiteRobotsPolicy robots)
         {
             ArgumentNullException.ThrowIfNull(parsedClassification);
             ArgumentNullException.ThrowIfNull(globalStatistics);
@@ -48,12 +52,14 @@ namespace landerist_library.Infrastructure.Tasks
             ArgumentNullException.ThrowIfNull(waitingStatus);
             ArgumentNullException.ThrowIfNull(pages);
             ArgumentNullException.ThrowIfNull(pagePersistence);
+            ArgumentNullException.ThrowIfNull(robots);
             _parsedClassification = parsedClassification;
             _globalStatistics = globalStatistics;
             _hostStatistics = hostStatistics;
             _waitingStatus = waitingStatus;
             _pages = pages;
             _pagePersistence = pagePersistence;
+            _robots = robots;
             Config.SetLLMProviderLocalAI();
             Config.EnableLogsErrorsInConsole();
             if (Config.IsConfigurationProduction())
@@ -257,7 +263,7 @@ namespace landerist_library.Infrastructure.Tasks
                 }
                 else
                 {
-                    var (pageType, listing, waitingAIRequest) = ParseListing.ParseLocalAI(page, userInput, _hostStatistics);
+                    var (pageType, listing, waitingAIRequest) = ParseListing.ParseLocalAI(page, userInput, _hostStatistics, _robots);
                     newPageType = pageType;
                     success = _parsedClassification.Apply(page, pageType, listing);
                 }

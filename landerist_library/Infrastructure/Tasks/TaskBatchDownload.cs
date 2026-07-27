@@ -1,3 +1,4 @@
+using landerist_library.Websites;
 using landerist_library.Infrastructure.Parsing;
 using landerist_library.Configuration;
 using landerist_library.Application.Pages;
@@ -12,6 +13,7 @@ using landerist_library.Parse.ListingParser;
 using landerist_library.Infrastructure.Parsing.OpenAI;
 using landerist_library.Infrastructure.Parsing.VertexAI;
 using landerist_library.Application.Statistics;
+using landerist_library.Application.Websites;
 
 namespace landerist_library.Infrastructure.Tasks
 {
@@ -24,6 +26,7 @@ namespace landerist_library.Infrastructure.Tasks
         private readonly IPagePersistenceService _pagePersistence;
         private readonly IListingBatchProvider _openAi;
         private readonly IListingBatchProvider _vertexAi;
+        private readonly IWebsiteRobotsPolicy _robots;
 
         public TaskBatchDownload(
             IParsedPageClassificationService parsedClassification,
@@ -32,7 +35,8 @@ namespace landerist_library.Infrastructure.Tasks
             IPageCatalog pages,
             IPagePersistenceService pagePersistence,
             IListingBatchProvider openAi,
-            IListingBatchProvider vertexAi)
+            IListingBatchProvider vertexAi,
+            IWebsiteRobotsPolicy robots)
         {
             ArgumentNullException.ThrowIfNull(parsedClassification);
             ArgumentNullException.ThrowIfNull(batches);
@@ -41,6 +45,7 @@ namespace landerist_library.Infrastructure.Tasks
             ArgumentNullException.ThrowIfNull(pagePersistence);
             ArgumentNullException.ThrowIfNull(openAi);
             ArgumentNullException.ThrowIfNull(vertexAi);
+            ArgumentNullException.ThrowIfNull(robots);
             _parsedClassification = parsedClassification;
             _batches = batches;
             _statistics = statistics;
@@ -48,6 +53,7 @@ namespace landerist_library.Infrastructure.Tasks
             _pagePersistence = pagePersistence;
             _openAi = openAi;
             _vertexAi = vertexAi;
+            _robots = robots;
         }
 
         public readonly HashSet<string> DownloadedPagesUriHashes = [];
@@ -200,7 +206,7 @@ namespace landerist_library.Infrastructure.Tasks
             using var page = result.Value.page;
             var text = result.Value.text;
 
-            var (newPageType, listing) = ParseListing.ParseResponse(page, text);
+            var (newPageType, listing) = ParseListing.ParseResponse(page, text, _robots);
             bool success = _parsedClassification.Apply(page, newPageType, listing);
 
             if (success)

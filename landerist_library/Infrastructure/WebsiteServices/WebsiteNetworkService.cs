@@ -85,7 +85,7 @@ public sealed class WebsiteNetworkService : IWebsiteNetworkService
             using HttpResponseMessage response =
                 httpClient.SendAsync(request).GetAwaiter().GetResult();
             website.RobotsTxt = null;
-            website.ResetParsedRobots();
+
 
             if (response.StatusCode == HttpStatusCode.OK)
             {

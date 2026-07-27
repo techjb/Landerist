@@ -1,3 +1,4 @@
+using landerist_library.Websites;
 using landerist_library.Application.Websites;
 
 namespace landerist_library.Application.Scraping;

@@ -15,7 +15,7 @@ public sealed class WebsitePolicyArchitectureTests
         [
             "Website.cs",
             "Website.Http.cs",
-            "Website.Robots.cs"
+            "IWebsiteRobotsPolicy.cs"
         ];
         string[] violations = policyFiles
             .Where(file => Regex.IsMatch(

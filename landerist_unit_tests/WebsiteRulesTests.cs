@@ -1,4 +1,5 @@
 using landerist_library.Websites;
+using landerist_library.Infrastructure.WebsiteServices;
 
 namespace landerist_unit_tests;
 
@@ -39,6 +40,6 @@ public sealed class WebsiteRulesTests
                 """
         };
 
-        Assert.True(website.CrawlDelayTooBig());
+        Assert.True(new WebsiteRobotsPolicy().IsCrawlDelayTooBig(website));
     }
 }
