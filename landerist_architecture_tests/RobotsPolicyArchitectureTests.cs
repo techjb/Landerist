@@ -8,7 +8,7 @@ public sealed class RobotsPolicyArchitectureTests
         string repositoryRoot = FindRepositoryRoot();
         string applicationRoot = Path.Combine(
             repositoryRoot,
-            "landerist_library",
+            "landerist_application",
             "Application");
         string sitemapService = Path.Combine(
             repositoryRoot,

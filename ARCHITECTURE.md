@@ -10,9 +10,11 @@ Domain model (Pages, Websites) <- Application <- Infrastructure <- Console / hos
 
 `landerist_domain` physically owns the `Pages` and `Websites` domain areas.
 It depends only on the .NET base class library and `landerist_orels`. Parsing, downloaders, persistence, logging and other integration concerns remain outside the domain project.
+
+`landerist_application` physically owns use cases, policies and ports. It depends only on `landerist_domain`, `landerist_orels` and the .NET base class library.
 ## Boundaries
 
-`landerist_library/Application` contains use cases, policies and ports. It may depend only on `Application`, `Pages`, `Websites` and the .NET base class library. It must not depend on configuration, SQL, browser implementations, external providers or logging implementations.
+`landerist_application/Application` contains use cases, policies and ports. It may depend only on `Application`, `Pages`, `Websites` and the .NET base class library. It must not depend on configuration, SQL, browser implementations, external providers or logging implementations.
 
 `landerist_library/Infrastructure` implements Application ports. SQL Server, browser automation, cloud SDKs and legacy adapters belong on this side of the boundary.
 

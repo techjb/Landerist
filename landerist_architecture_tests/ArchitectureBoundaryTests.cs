@@ -6,13 +6,14 @@ public sealed partial class ArchitectureBoundaryTests
 {
     private static readonly string RepositoryRoot = FindRepositoryRoot();
     private static readonly string LibraryRoot = Path.Combine(RepositoryRoot, "landerist_library");
+    private static readonly string ApplicationRoot = Path.Combine(RepositoryRoot, "landerist_application", "Application");
     private static readonly HashSet<string> ApplicationAllowedDependencies =
         new(StringComparer.Ordinal) { "Application", "Pages", "Websites" };
 
     [Fact]
     public void Application_DoesNotDependOnOuterLayers()
     {
-        string applicationRoot = Path.Combine(LibraryRoot, "Application");
+        string applicationRoot = ApplicationRoot;
         List<string> violations = [];
 
         foreach (string file in GetSourceFiles(applicationRoot))
@@ -44,7 +45,9 @@ public sealed partial class ArchitectureBoundaryTests
     [InlineData("Infrastructure")]
     public void ArchitecturalFolders_UseMatchingNamespaces(string boundary)
     {
-        string boundaryRoot = Path.Combine(LibraryRoot, boundary);
+        string boundaryRoot = boundary == "Application"
+            ? ApplicationRoot
+            : Path.Combine(LibraryRoot, boundary);
         List<string> violations = [];
 
         foreach (string file in GetSourceFiles(boundaryRoot))
@@ -98,6 +101,7 @@ public sealed partial class ArchitectureBoundaryTests
         string manualToolsRoot = Path.Combine(RepositoryRoot, "landerist_tests");
         string unitTestsRoot = Path.Combine(RepositoryRoot, "landerist_unit_tests");
         string[] violations = GetSourceFiles(LibraryRoot)
+            .Concat(GetSourceFiles(ApplicationRoot))
             .Concat(GetSourceFiles(consoleRoot))
             .Concat(GetSourceFiles(manualToolsRoot))
             .Concat(GetSourceFiles(unitTestsRoot))
@@ -146,7 +150,7 @@ public sealed partial class ArchitectureBoundaryTests
     private static HashSet<string> FindLegacyBoundaryReferences()
     {
         var references = new HashSet<string>(StringComparer.Ordinal);
-        string applicationRoot = Path.Combine(LibraryRoot, "Application");
+        string applicationRoot = ApplicationRoot;
         string infrastructureRoot = Path.Combine(LibraryRoot, "Infrastructure");
 
         foreach (string file in GetSourceFiles(LibraryRoot))

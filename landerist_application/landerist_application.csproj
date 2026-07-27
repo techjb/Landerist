@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\landerist_domain\landerist_domain.csproj" />
+    <ProjectReference Include="..\landerist_orels\landerist_orels.csproj" />
+  </ItemGroup>
+
+</Project>

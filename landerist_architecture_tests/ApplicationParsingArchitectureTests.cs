@@ -7,7 +7,7 @@ public sealed class ApplicationParsingArchitectureTests
     {
         string source = File.ReadAllText(Path.Combine(
             FindRepositoryRoot(),
-            "landerist_library",
+            "landerist_application",
             "Application",
             "Parsing",
             "PageTypeParser.cs"));
@@ -30,7 +30,7 @@ public sealed class ApplicationParsingArchitectureTests
     {
         string source = File.ReadAllText(Path.Combine(
             FindRepositoryRoot(),
-            "landerist_library",
+            "landerist_application",
             "Application",
             "Listings",
             "ListingLifecycleService.cs"));
