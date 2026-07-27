@@ -5,6 +5,7 @@ using landerist_library.Pages;
 using landerist_library.Parse.Location.Candidates;
 using landerist_library.Parse.Location.Extractors;
 using landerist_library.Parse.Location.Providers.GoogleMaps;
+using landerist_library.Parse.Location.Providers.Goolzoom;
 using landerist_library.Parse.Location.Validation;
 
 namespace landerist_library.Infrastructure.Parsing
@@ -23,7 +24,8 @@ namespace landerist_library.Infrastructure.Parsing
             Page page,
             landerist_orels.ES.Listing listing,
             GoogleMapsApi googleMapsApi,
-            ICadastralReferenceProvider cadastralReference)
+            ICadastralReferenceProvider cadastralReference,
+            IGoolzoomClient goolzoom)
         {
             Page = page;
             Listing = listing;
@@ -34,7 +36,7 @@ namespace landerist_library.Infrastructure.Parsing
                 page.Website.CountryCode,
                 CoordinateValidator,
                 googleMapsApi);
-            CadastralLocationResolver = new CadastralLocationResolver(CoordinateValidator);
+            CadastralLocationResolver = new CadastralLocationResolver(CoordinateValidator, goolzoom);
             AddressCadastralReferenceResolver = new AddressCadastralReferenceResolver(cadastralReference);
         }
 

@@ -1,3 +1,4 @@
+using landerist_library.Parse.Location.Providers.Goolzoom;
 using landerist_library.Websites;
 using landerist_library.Infrastructure.Statistics;
 using landerist_library.Infrastructure.Parsing.OpenAI;
@@ -68,6 +69,12 @@ namespace landerist_console
                     settings.GetInt32("PROXY_STICKY_PORT_MAX"),
                     settings.GetString("PROXY_USERNAME"),
                     settings.GetString("PROXY_PASSWORD")));
+            GoolzoomApi goolzoom = new(
+                httpClients,
+                new GoolzoomOptions(
+                    settings.GetString("GOOLZOOM_API"),
+                    TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT),
+                    MaxRetryAttempts: 3));
             WebsiteNetworkService websiteNetwork = new(
                 httpClients,
                 TimeProvider.System);            LegacyApplicationLogger logger = new();
@@ -132,7 +139,7 @@ namespace landerist_console
                 listingStore,
                 notListingCache,
                 pageLinks,
-                new SqlListingEnricher(databaseFactory.Create()),
+                new SqlListingEnricher(databaseFactory.Create(), goolzoom),
                 new LegacyListingUnpublishPolicy(listingQueries),
                 logger);
             PageScrapePipelineServices pageScraping = new(

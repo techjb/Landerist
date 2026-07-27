@@ -15,12 +15,15 @@ namespace landerist_library.Infrastructure.Parsing
     {
         private readonly AddressCadastralReference _cache;
         private readonly GlobalStatisticsRepository _statistics;
+        private readonly IGoolzoomClient _goolzoom;
 
-        public AddressToCadastralReference(IDatabase database)
+        public AddressToCadastralReference(IDatabase database, IGoolzoomClient goolzoom)
         {
             ArgumentNullException.ThrowIfNull(database);
+            ArgumentNullException.ThrowIfNull(goolzoom);
             _cache = new AddressCadastralReference(database);
             _statistics = new GlobalStatisticsRepository(database);
+            _goolzoom = goolzoom;
         }
         string? ICadastralReferenceProvider.GetCadastralReference(double? latitude, double? longitude, string address) =>
             GetCadastralReference(latitude, longitude, address);
@@ -47,7 +50,7 @@ namespace landerist_library.Infrastructure.Parsing
             {
                 _statistics.InsertDailyCounter("AddressToCadastralReferenceRequest", 1);
                 int radio = firstTry ? 50 : 100;
-                var content = new GoolzoomApi().GetAddresses(latitude.Value, longitude.Value, radio);
+                var content = _goolzoom.GetAddresses(latitude.Value, longitude.Value, radio);
                 if (!string.IsNullOrEmpty(content))
                 {
                     var addressList = JsonConvert.DeserializeObject<AddressList>(content);
@@ -111,7 +114,7 @@ namespace landerist_library.Infrastructure.Parsing
             return (false, null);
         }
 
-        public static void UpdateCadastralReferences(IDatabase database, IListingAdministrationService listings)
+        public static void UpdateCadastralReferences(IDatabase database, IListingAdministrationService listings, IGoolzoomClient goolzoom)
         {
             var items = listings.GetWithoutCadastralReferenceAndAccurateLocation();
             int total = items.Count;
@@ -137,7 +140,7 @@ namespace landerist_library.Infrastructure.Parsing
                 new ParallelOptions() { MaxDegreeOfParallelism = 6 },
                 listing =>
                 {
-                    var cadastralReference = new AddressToCadastralReference(database).GetCadastralReference(listing.latitude, listing.longitude, listing.address);
+                    var cadastralReference = new AddressToCadastralReference(database, goolzoom).GetCadastralReference(listing.latitude, listing.longitude, listing.address);
                     if (!string.IsNullOrEmpty(cadastralReference))
                     {
                         Interlocked.Increment(ref found);

@@ -4,7 +4,7 @@ using landerist_library.Parse.Location.Candidates;
 
 namespace landerist_library.Infrastructure.Parsing
 {
-    public sealed class GoolzoomListingsUpdater(IListingAdministrationService listings)
+    public sealed class GoolzoomListingsUpdater(IListingAdministrationService listings, IGoolzoomClient goolzoom)
     {
         public void UpdateLocationFromCadastralRef()
         {
@@ -14,13 +14,12 @@ namespace landerist_library.Infrastructure.Parsing
             int updated = 0;
             int errors = 0;
 
-            var api = new GoolzoomApi();
 
             foreach (var listing in items)
             {
                 processed++;
 
-                var latLng = api.GetLatLng(listing.cadastralReference);
+                var latLng = goolzoom.GetLatLng(listing.cadastralReference);
                 if (latLng is { RequestSuccess: true, Latitude: double latitude, Longitude: double longitude })
                 {
                     listing.latitude = latitude;
@@ -54,13 +53,12 @@ namespace landerist_library.Infrastructure.Parsing
             int updated = 0;
             int errors = 0;
 
-            var api = new GoolzoomApi();
 
             foreach (var listing in items)
             {
                 processed++;
 
-                var address = api.GetAddress(listing.cadastralReference);
+                var address = goolzoom.GetAddress(listing.cadastralReference);
                 if (!string.IsNullOrWhiteSpace(address))
                 {
                     listing.address = address;

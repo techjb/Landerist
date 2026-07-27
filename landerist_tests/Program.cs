@@ -1,3 +1,4 @@
+using landerist_library.Parse.Location.Providers.Goolzoom;
 using landerist_library.Websites;
 using landerist_library.Infrastructure.Statistics;
 using landerist_library.Infrastructure.Parsing;
@@ -56,7 +57,8 @@ namespace landerist_tests
                     Config.DATABASE_NAME,
                     Config.DATABASE_ENCRYPT,
                     Config.DATABASE_TRUST_SERVER_CERTIFICATE));
-            LegacyDatabase.Configure(databaseFactory);            LanderistSettings settings = LanderistSettings.Current;
+            LegacyDatabase.Configure(databaseFactory);
+            LanderistSettings settings = LanderistSettings.Current;
             HttpClientTransportFactory httpClients = new(
                 new HttpTransportOptions(
                     settings.GetString("PROXY_HOST"),
@@ -66,6 +68,12 @@ namespace landerist_tests
                     settings.GetInt32("PROXY_STICKY_PORT_MAX"),
                     settings.GetString("PROXY_USERNAME"),
                     settings.GetString("PROXY_PASSWORD")));
+            GoolzoomApi goolzoom = new(
+                httpClients,
+                new GoolzoomOptions(
+                    settings.GetString("GOOLZOOM_API"),
+                    TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT),
+                    MaxRetryAttempts: 3));
             LegacyApplicationLogger logger = new();
             PagePersistenceService pagePersistence = new(new PageRepository(databaseFactory.Create()));
             WebsitePersistenceService websitePersistence = new(new WebsiteRepository(databaseFactory.Create()));
@@ -96,7 +104,7 @@ namespace landerist_tests
                 listingStore,
                 notListingCache,
                 pageLinks,
-                new SqlListingEnricher(databaseFactory.Create()),
+                new SqlListingEnricher(databaseFactory.Create(), goolzoom),
                 new LegacyListingUnpublishPolicy(listingQueries),
                 logger);
             PageScrapePipelineServices pageScraping = new(

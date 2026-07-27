@@ -1,4 +1,4 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Websites;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Globalization;
@@ -17,12 +17,30 @@ namespace landerist_library.Parse.Location.Providers.Goolzoom
 
     public sealed record GoolzoomLatLngResult(bool RequestSuccess, double? Latitude, double? Longitude);
 
-    public class GoolzoomApi
+    public class GoolzoomApi : IGoolzoomClient
     {
         private const string BaseUrl = "https://api.goolzoom.com/v1/cadastre/";
-        private const int MaxRetryAttempts = 3;
-        private static readonly HttpClient SharedHttpClient = CreateHttpClient();
+        private readonly HttpClient HttpClient;
+        private readonly GoolzoomOptions Options;
+        private readonly Func<TimeSpan, CancellationToken, Task> Delay;
 
+        public GoolzoomApi(
+            IHttpClientTransportFactory httpClients,
+            GoolzoomOptions options,
+            Func<TimeSpan, CancellationToken, Task>? delay = null)
+        {
+            ArgumentNullException.ThrowIfNull(httpClients);
+            ArgumentNullException.ThrowIfNull(options);
+            Options = options.Validate();
+            Delay = delay ?? Task.Delay;
+            HttpClient = httpClients.Create(useProxy: false, Options.Timeout);
+            if (!string.IsNullOrWhiteSpace(Options.ApiKey))
+            {
+                HttpClient.DefaultRequestHeaders.TryAddWithoutValidation(
+                    "x-api-key",
+                    Options.ApiKey.Trim());
+            }
+        }
         public GoolzoomLatLngResult? GetLatLng(string cadastralReference)
         {
             return GetLatLngAsync(cadastralReference).GetAwaiter().GetResult();
@@ -181,26 +199,26 @@ namespace landerist_library.Parse.Location.Providers.Goolzoom
             return null;
         }
 
-        private static async Task<HttpResponseMessage> GetWithRetryAsync(
+        private async Task<HttpResponseMessage> GetWithRetryAsync(
             string url,
             CancellationToken cancellationToken)
         {
-            for (int attempt = 1; attempt <= MaxRetryAttempts; attempt++)
+            for (int attempt = 1; attempt <= Options.MaxRetryAttempts; attempt++)
             {
                 try
                 {
-                    var response = await SharedHttpClient.GetAsync(url, cancellationToken);
-                    if (!ShouldRetry(response.StatusCode) || attempt == MaxRetryAttempts)
+                    var response = await HttpClient.GetAsync(url, cancellationToken);
+                    if (!ShouldRetry(response.StatusCode) || attempt == Options.MaxRetryAttempts)
                     {
                         return response;
                     }
 
                     response.Dispose();
-                    await Task.Delay(GetRetryDelay(attempt), cancellationToken);
+                    await Delay(GetRetryDelay(attempt), cancellationToken);
                 }
-                catch (HttpRequestException) when (attempt < MaxRetryAttempts)
+                catch (HttpRequestException) when (attempt < Options.MaxRetryAttempts)
                 {
-                    await Task.Delay(GetRetryDelay(attempt), cancellationToken);
+                    await Delay(GetRetryDelay(attempt), cancellationToken);
                 }
             }
 
@@ -217,21 +235,6 @@ namespace landerist_library.Parse.Location.Providers.Goolzoom
         private static TimeSpan GetRetryDelay(int attempt)
         {
             return TimeSpan.FromSeconds(attempt);
-        }
-
-        private static HttpClient CreateHttpClient()
-        {
-            var client = new HttpClient
-            {
-                Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT)
-            };
-
-            if (!string.IsNullOrWhiteSpace(AppConfig.GOOLZOOM_API))
-            {
-                client.DefaultRequestHeaders.Add("x-api-key", AppConfig.GOOLZOOM_API);
-            }
-
-            return client;
         }
 
         private static string? NormalizeReference(string cadastralReference)

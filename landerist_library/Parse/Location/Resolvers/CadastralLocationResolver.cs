@@ -8,10 +8,13 @@ namespace landerist_library.Parse.Location.Resolvers
     internal sealed class CadastralLocationResolver
     {
         private readonly CountryCoordinateValidator CoordinateValidator;
+        private readonly IGoolzoomClient Goolzoom;
 
-        public CadastralLocationResolver(CountryCoordinateValidator coordinateValidator)
+        public CadastralLocationResolver(CountryCoordinateValidator coordinateValidator, IGoolzoomClient goolzoom)
         {
+            ArgumentNullException.ThrowIfNull(goolzoom);
             CoordinateValidator = coordinateValidator;
+            Goolzoom = goolzoom;
         }
 
         public bool TryResolve(Listing listing, out CadastralLocationResolution? resolution)
@@ -22,8 +25,7 @@ namespace landerist_library.Parse.Location.Resolvers
                 return false;
             }
 
-            var goolzoomApi = new GoolzoomApi();
-            var result = goolzoomApi.GetLatLng(listing.cadastralReference);
+            var result = Goolzoom.GetLatLng(listing.cadastralReference);
             if (result == null || !result.RequestSuccess)
             {
                 return false;
@@ -40,7 +42,7 @@ namespace landerist_library.Parse.Location.Resolvers
             string? resolvedAddress = null;
             if (string.IsNullOrWhiteSpace(listing.address))
             {
-                resolvedAddress = goolzoomApi.GetAddress(listing.cadastralReference);
+                resolvedAddress = Goolzoom.GetAddress(listing.cadastralReference);
             }
 
             var candidate = new LocationCandidate(
