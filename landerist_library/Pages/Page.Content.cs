@@ -122,18 +122,6 @@ namespace landerist_library.Pages
             }
         }
 
-        public string? GetListingParserInput()
-        {
-            if (!string.IsNullOrEmpty(ListingParserInput))
-            {
-                return ListingParserInput;
-            }
-
-            ListingParserInput = Parse.ListingParser.UserInput.ParseListingUserInput.GetHtml(this);
-
-            return ListingParserInput;
-        }
-
         private void ResetResponseBodyDerivedData()
         {
             ListingParserInput = null;

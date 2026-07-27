@@ -125,6 +125,35 @@ public sealed class PagesArchitectureTests
             Environment.NewLine +
             string.Join(Environment.NewLine, violations));
     }
+    [Fact]
+    public void Pages_DoesNotDependOnHtmlOrListingParserImplementations()
+    {
+        string pagesRoot = Path.Combine(
+            FindRepositoryRoot(),
+            "landerist_library",
+            "Pages");
+        string[] forbiddenTokens =
+        [
+            "HtmlAgilityPack",
+            "HtmlDocument",
+            "Parse.ListingParser"
+        ];
+        string[] violations = Directory
+            .EnumerateFiles(pagesRoot, "*.cs", SearchOption.AllDirectories)
+            .Where(file => forbiddenTokens.Any(token =>
+                File.ReadAllText(file).Contains(
+                    token,
+                    StringComparison.Ordinal)))
+            .Select(file => Path.GetFileName(file)!)
+            .Order()
+            .ToArray();
+
+        Assert.True(
+            violations.Length == 0,
+            "Pages must contain state and pure rules, not HTML or listing parser implementations." +
+            Environment.NewLine +
+            string.Join(Environment.NewLine, violations));
+    }
     private static string FindRepositoryRoot()
     {
         DirectoryInfo? directory = new(AppContext.BaseDirectory);
