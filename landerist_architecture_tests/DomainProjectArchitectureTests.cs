@@ -47,6 +47,17 @@ public sealed class DomainProjectArchitectureTests
             project);
     }
 
+    [Fact]
+    public void DomainAreas_ArePhysicallyOwnedByDomainProject()
+    {
+        string root = FindRepositoryRoot();
+
+        Assert.True(Directory.Exists(Path.Combine(root, "landerist_domain", "Pages")));
+        Assert.True(Directory.Exists(Path.Combine(root, "landerist_domain", "Websites")));
+        Assert.False(Directory.Exists(Path.Combine(root, "landerist_library", "Pages")));
+        Assert.False(Directory.Exists(Path.Combine(root, "landerist_library", "Websites")));
+    }
+
     private static string FindRepositoryRoot()
     {
         DirectoryInfo? directory = new(AppContext.BaseDirectory);

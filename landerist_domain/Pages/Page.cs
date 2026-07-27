@@ -1,4 +1,5 @@
-using landerist_library.Tools;
+using System.Security.Cryptography;
+using System.Text;
 using landerist_library.Websites;
 using landerist_orels.ES;
 
@@ -132,7 +133,8 @@ namespace landerist_library.Pages
         public string GetUriHash()
         {
             var uriString = Uri.ToString();
-            return Strings.GetHash(uriString);
+            byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(uriString));
+            return Convert.ToHexString(hash);
         }
 
         public void Dispose()

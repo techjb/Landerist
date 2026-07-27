@@ -66,9 +66,7 @@ public sealed partial class ArchitectureBoundaryTests
     [InlineData("Websites")]
     public void DomainAreas_DoNotReachIntoPersistenceOrInfrastructure(string area)
     {
-        string areaRoot = area == "Websites"
-            ? Path.Combine(RepositoryRoot, "landerist_domain", area)
-            : Path.Combine(LibraryRoot, area);
+        string areaRoot = Path.Combine(RepositoryRoot, "landerist_domain", area);
         List<string> violations = [];
 
         foreach (string file in GetSourceFiles(areaRoot))

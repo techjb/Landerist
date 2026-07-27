@@ -7,7 +7,7 @@ public sealed class PagesArchitectureTests
     [Fact]
     public void Pages_DoesNotDependOnGlobalConfiguration()
     {
-        string pagesRoot = Path.Combine(FindRepositoryRoot(), "landerist_library", "Pages");
+        string pagesRoot = Path.Combine(FindRepositoryRoot(), "landerist_domain", "Pages");
         string[] violations = Directory
             .EnumerateFiles(pagesRoot, "*.cs", SearchOption.AllDirectories)
             .Where(file =>
@@ -32,7 +32,7 @@ public sealed class PagesArchitectureTests
     {
         string pagesRoot = Path.Combine(
             FindRepositoryRoot(),
-            "landerist_library",
+            "landerist_domain",
             "Pages");
         string[] violations = Directory
             .EnumerateFiles(pagesRoot, "*.cs", SearchOption.AllDirectories)
@@ -55,7 +55,7 @@ public sealed class PagesArchitectureTests
     {
         string pagesRoot = Path.Combine(
             FindRepositoryRoot(),
-            "landerist_library",
+            "landerist_domain",
             "Pages");
         string[] violations = Directory
             .EnumerateFiles(pagesRoot, "*.cs", SearchOption.AllDirectories)
@@ -78,7 +78,7 @@ public sealed class PagesArchitectureTests
     {
         string pagesRoot = Path.Combine(
             FindRepositoryRoot(),
-            "landerist_library",
+            "landerist_domain",
             "Pages");
         string[] stateFiles = ["Page.cs", "Page.Content.cs"];
         string[] forbiddenTokens = ["HtmlAgilityPack", "HtmlDocument"];
@@ -100,7 +100,7 @@ public sealed class PagesArchitectureTests
     {
         string pagesRoot = Path.Combine(
             FindRepositoryRoot(),
-            "landerist_library",
+            "landerist_domain",
             "Pages");
         string[] forbiddenDeclarations =
         [
@@ -130,7 +130,7 @@ public sealed class PagesArchitectureTests
     {
         string pagesRoot = Path.Combine(
             FindRepositoryRoot(),
-            "landerist_library",
+            "landerist_domain",
             "Pages");
         string[] forbiddenTokens =
         [
