@@ -1,3 +1,4 @@
+using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Websites;
 using landerist_library.Pages;
@@ -11,7 +12,7 @@ public sealed class PersistenceServiceTests
     public void PageService_UsesInjectedRepository()
     {
         FakePageRepository repository = new();
-        PagePersistenceService service = new(repository);
+        PagePersistenceService service = new(repository, new RecordingLogger());
         Page page = new(new Website(new Uri("https://example.com")), new Uri("https://example.com/listing/1"));
 
         bool result = service.Insert(page);
@@ -31,6 +32,12 @@ public sealed class PersistenceServiceTests
 
         Assert.True(result);
         Assert.Same(website, repository.UpdatedWebsite);
+    }
+
+    private sealed class RecordingLogger : IApplicationLogger
+    {
+        public void WriteError(string source, string message) { }
+        public void WriteInfo(string source, string message) { }
     }
 
     private sealed class FakePageRepository : IPageRepository

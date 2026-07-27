@@ -100,7 +100,7 @@ namespace landerist_tests
                     TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT),
                     MaxRetryAttempts: 3));
             LegacyApplicationLogger logger = new();
-            PagePersistenceService pagePersistence = new(new PageRepository(databaseFactory.Create()));
+            PagePersistenceService pagePersistence = new(new PageRepository(databaseFactory.Create()), logger);
             WebsitePersistenceService websitePersistence = new(new WebsiteRepository(databaseFactory.Create()));
             SqlListingStore listingStore = new(databaseFactory.Create(), logger);
             SqlListingQueryService listingQueries = new(

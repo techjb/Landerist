@@ -18,6 +18,10 @@ public sealed partial class ArchitectureBoundaryTests
         foreach (string file in GetSourceFiles(applicationRoot))
         {
             string source = File.ReadAllText(file);
+            if (source.Contains("Logs.Log", StringComparison.Ordinal))
+            {
+                violations.Add($"{GetRelativePath(file)} -> global Logs.Log" );
+            }
             foreach (Match match in LanderistNamespaceReferenceRegex().Matches(source))
             {
                 string dependency = match.Groups["root"].Value;

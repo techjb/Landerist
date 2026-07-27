@@ -1,3 +1,4 @@
+using landerist_library.Application.Logging;
 using landerist_library.Pages;
 
 namespace landerist_library.Application.Persistence;
@@ -5,11 +6,14 @@ namespace landerist_library.Application.Persistence;
 public sealed class PagePersistenceService : IPagePersistenceService
 {
     private readonly IPageRepository _repository;
+    private readonly IApplicationLogger _logger;
 
-    public PagePersistenceService(IPageRepository repository)
+    public PagePersistenceService(IPageRepository repository, IApplicationLogger logger)
     {
         ArgumentNullException.ThrowIfNull(repository);
+        ArgumentNullException.ThrowIfNull(logger);
         _repository = repository;
+        _logger = logger;
     }
 
     public bool Insert(Page page)
@@ -24,7 +28,7 @@ public sealed class PagePersistenceService : IPagePersistenceService
         bool updated = _repository.Update(page, out Exception? exception);
         if (!updated && exception is not null)
         {
-            Logs.Log.WriteError(nameof(PagePersistenceService), $"Failed to update page: {page.Uri}. Message: {exception.Message}");
+            _logger.WriteError(nameof(PagePersistenceService), $"Failed to update page: {page.Uri}. Message: {exception.Message}");
         }
         return updated;
     }
