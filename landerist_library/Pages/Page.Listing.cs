@@ -8,7 +8,7 @@ namespace landerist_library.Pages
     {
         public void SetListingParserInput()
         {
-            var htmlDocument = GetHtmlDocument();
+            var htmlDocument = this.GetHtmlDocument();
             if (htmlDocument == null)
             {
                 ListingParserInputNotChanged = false;

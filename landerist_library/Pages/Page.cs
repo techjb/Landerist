@@ -1,4 +1,3 @@
-using HtmlAgilityPack;
 using landerist_library.Tools;
 using landerist_library.Websites;
 using landerist_orels.ES;
@@ -67,10 +66,6 @@ namespace landerist_library.Pages
         private const string RemaxInvalidCanonicalPath = "/buscador-de-inmuebles/todos/todos/todos/todos/todos/todos";
 
 
-        private HtmlDocument? HtmlDocument = null;
-
-
-        private string? OriginalOuterHtml = null;
 
         public Website Website = new();
 
@@ -148,7 +143,6 @@ namespace landerist_library.Pages
             {
                 Host = string.Empty;
                 UriHash = string.Empty;
-                HtmlDocument = null;
                 ResponseBody = null;
                 ListingParserInput = null;
                 ListingParserInputHash = null;

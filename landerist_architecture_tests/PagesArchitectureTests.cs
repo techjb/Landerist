@@ -73,6 +73,28 @@ public sealed class PagesArchitectureTests
             string.Join(Environment.NewLine, violations));
     }
 
+    [Fact]
+    public void PageState_DoesNotStoreHtmlParserObjects()
+    {
+        string pagesRoot = Path.Combine(
+            FindRepositoryRoot(),
+            "landerist_library",
+            "Pages");
+        string[] stateFiles = ["Page.cs", "Page.Content.cs"];
+        string[] forbiddenTokens = ["HtmlAgilityPack", "HtmlDocument"];
+        string[] violations = stateFiles
+            .Where(file => forbiddenTokens.Any(token =>
+                File.ReadAllText(Path.Combine(pagesRoot, file)).Contains(
+                    token,
+                    StringComparison.Ordinal)))
+            .ToArray();
+
+        Assert.True(
+            violations.Length == 0,
+            "Page state must not store HTML parser implementation objects." +
+            Environment.NewLine +
+            string.Join(Environment.NewLine, violations));
+    }
     private static string FindRepositoryRoot()
     {
         DirectoryInfo? directory = new(AppContext.BaseDirectory);

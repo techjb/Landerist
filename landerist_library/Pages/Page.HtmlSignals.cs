@@ -46,7 +46,7 @@ namespace landerist_library.Pages
 
         public bool IncorrectLanguage()
         {
-            var htmlDocument = GetHtmlDocument();
+            var htmlDocument = this.GetHtmlDocument();
             if (htmlDocument != null)
             {
                 var htmlNode = htmlDocument.DocumentNode.SelectSingleNode("/html");
@@ -64,7 +64,7 @@ namespace landerist_library.Pages
 
         public Uri? GetCanonicalUri()
         {
-            var htmlDocument = GetHtmlDocument();
+            var htmlDocument = this.GetHtmlDocument();
             if (htmlDocument != null)
             {
                 var node = htmlDocument.DocumentNode.SelectSingleNode("//link[@rel='canonical']");
@@ -109,7 +109,7 @@ namespace landerist_library.Pages
 
         private bool ContainsMetaRobots(string content)
         {
-            var htmlDocument = GetHtmlDocument();
+            var htmlDocument = this.GetHtmlDocument();
             if (htmlDocument != null)
             {
                 var node = htmlDocument.DocumentNode.SelectSingleNode("//meta[@name='robots']");

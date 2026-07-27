@@ -1,4 +1,3 @@
-using HtmlAgilityPack;
 using System.IO.Compression;
 using System.Text;
 
@@ -6,34 +5,10 @@ namespace landerist_library.Pages
 {
     public partial class Page
     {
-        public HtmlDocument? GetHtmlDocument()
+        public string? GetResponseBody()
         {
-
-            if (HtmlDocument != null && OriginalOuterHtml != null &&
-                OriginalOuterHtml.Equals(HtmlDocument.DocumentNode.OuterHtml))
-            {
-                return HtmlDocument;
-            }
-            if (!string.IsNullOrEmpty(ResponseBody))
-            {
-                HtmlDocument = null;
-                OriginalOuterHtml = null;
-
-                try
-                {
-                    HtmlDocument = new();
-                    HtmlDocument.LoadHtml(ResponseBody);
-                    OriginalOuterHtml = HtmlDocument.DocumentNode.OuterHtml;
-                    return HtmlDocument;
-                }
-                catch (Exception)
-                {
-                    return null;
-                }
-            }
-            return null;
+            return ResponseBody;
         }
-
         public bool ResponseBodyIsNullOrEmpty()
         {
             return string.IsNullOrEmpty(ResponseBody);
@@ -162,8 +137,6 @@ namespace landerist_library.Pages
         private void ResetResponseBodyDerivedData()
         {
             ListingParserInput = null;
-            HtmlDocument = null;
-            OriginalOuterHtml = null;
         }
 
         
