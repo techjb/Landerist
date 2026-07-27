@@ -198,7 +198,13 @@ namespace landerist_library.Downloaders.Puppeteer
             SetContentAndScrenshot(page);
             if (PageInitialized() && !BrowserHasChrashed())
             {
-                page.SetDownloadedData(this);
+                page.SetDownloadedData(new PageDownloadResult(
+                    Content,
+                    Screenshot,
+                    HttpStatusCode,
+                    RedirectUrl,
+                    Etag,
+                    LastModified));
             }
         }
 

@@ -1,5 +1,4 @@
 using HtmlAgilityPack;
-using landerist_library.Downloaders;
 using System.IO.Compression;
 using System.Text;
 
@@ -40,12 +39,13 @@ namespace landerist_library.Pages
             return string.IsNullOrEmpty(ResponseBody);
         }
 
-        public void SetDownloadedData(IDownloader downloader)
+        public void SetDownloadedData(PageDownloadResult result)
         {
+            ArgumentNullException.ThrowIfNull(result);
             var previousEtag = NormalizeHeaderValue(Etag);
-            var downloadedEtag = NormalizeHeaderValue(downloader.Etag);
+            var downloadedEtag = NormalizeHeaderValue(result.Etag);
             var previousLastModified = NormalizeHeaderValue(LastModified);
-            var downloadedLastModified = NormalizeHeaderValue(downloader.LastModified);
+            var downloadedLastModified = NormalizeHeaderValue(result.LastModified);
 
             HasComparableEtag = !string.IsNullOrEmpty(previousEtag) && !string.IsNullOrEmpty(downloadedEtag);
             EtagNotChanged = HasComparableEtag && string.Equals(previousEtag, downloadedEtag, StringComparison.Ordinal);
@@ -55,11 +55,11 @@ namespace landerist_library.Pages
             LastModifiedNotChanged = HasComparableLastModified &&
                 string.Equals(previousLastModified, downloadedLastModified, StringComparison.Ordinal);
 
-            ResponseBody = downloader.Content;
+            ResponseBody = result.Content;
             ResetResponseBodyDerivedData();
-            Screenshot = downloader.Screenshot;
-            HttpStatusCode = downloader.HttpStatusCode;
-            RedirectUrl = downloader.RedirectUrl;
+            Screenshot = result.Screenshot;
+            HttpStatusCode = result.HttpStatusCode;
+            RedirectUrl = result.RedirectUrl;
             Etag = downloadedEtag;
             LastModified = downloadedLastModified;
         }

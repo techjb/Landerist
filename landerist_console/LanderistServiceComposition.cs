@@ -260,7 +260,8 @@ internal static class LanderistServiceComposition
                 batchMaxFileSize,
                 Config.MIN_PAGES_PER_BATCH),
             batchUploadProvider,
-            TimeProvider.System);
+            TimeProvider.System,
+            logger);
         return new TasksService(
             new TasksServiceOptions(executionMode),
             new SystemRecurringTaskScheduler(),

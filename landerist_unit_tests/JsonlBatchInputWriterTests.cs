@@ -1,3 +1,4 @@
+using landerist_library.Application.Logging;
 using landerist_library.Infrastructure.Parsing;
 using landerist_library.Pages;
 using landerist_library.Parse.ListingParser;
@@ -70,7 +71,8 @@ public sealed class JsonlBatchInputWriterTests
                 minPages),
             new StubProvider(),
             new FixedTimeProvider(
-                new DateTimeOffset(2026, 7, 27, 10, 0, 0, TimeSpan.Zero)));
+                new DateTimeOffset(2026, 7, 27, 10, 0, 0, TimeSpan.Zero)),
+            new NullApplicationLogger());
 
     private static Page CreatePage(string id, string input) =>
         new($"https://example.com/listing/{id}")
@@ -94,6 +96,16 @@ public sealed class JsonlBatchInputWriterTests
         Directory.Delete(directory);
     }
 
+    private sealed class NullApplicationLogger : IApplicationLogger
+    {
+        public void WriteError(string source, string message)
+        {
+        }
+
+        public void WriteInfo(string source, string message)
+        {
+        }
+    }
     private sealed class StubProvider : IListingBatchUploadProvider
     {
         public LLMProvider Provider => LLMProvider.OpenAI;

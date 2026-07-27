@@ -1,4 +1,4 @@
-using landerist_library.Logs;
+using landerist_library.Application.Logging;
 using landerist_library.Pages;
 
 namespace landerist_library.Infrastructure.Parsing;
@@ -16,15 +16,18 @@ public sealed class JsonlBatchInputWriter : IBatchInputWriter
     private readonly BatchInputWriterOptions _options;
     private readonly IListingBatchUploadProvider _provider;
     private readonly TimeProvider _timeProvider;
+    private readonly IApplicationLogger _logger;
 
     public JsonlBatchInputWriter(
         BatchInputWriterOptions options,
         IListingBatchUploadProvider provider,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        IApplicationLogger logger)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(provider);
         ArgumentNullException.ThrowIfNull(timeProvider);
+        ArgumentNullException.ThrowIfNull(logger);
         if (string.IsNullOrWhiteSpace(options.Directory))
             throw new ArgumentException("A batch directory is required.", nameof(options));
         if (options.MaxFileSizeInBytes <= 0)
@@ -39,6 +42,7 @@ public sealed class JsonlBatchInputWriter : IBatchInputWriter
         _options = options;
         _provider = provider;
         _timeProvider = timeProvider;
+        _logger = logger;
     }
 
     public BatchInputWriteResult Write(IReadOnlyList<Page> pages)
@@ -84,7 +88,7 @@ public sealed class JsonlBatchInputWriter : IBatchInputWriter
             }
         }
 
-        Log.WriteBatch(
+        _logger.WriteInfo(
             nameof(JsonlBatchInputWriter),
             $"Write {written.Count}/{pages.Count} skipped: {skipped} errors: {errors}");
 
@@ -123,9 +127,9 @@ public sealed class JsonlBatchInputWriter : IBatchInputWriter
         }
         catch (Exception exception)
         {
-            Log.WriteError(
+            _logger.WriteError(
                 $"{nameof(JsonlBatchInputWriter)} WritePage",
-                exception);
+                exception.ToString());
             return WriteResult.Error;
         }
     }
