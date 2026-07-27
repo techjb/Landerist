@@ -20,6 +20,7 @@ using landerist_library.Infrastructure.Backup;
 using landerist_library.Infrastructure.Distribution;
 using landerist_library.Infrastructure.Logging;
 using landerist_library.Infrastructure.Http;
+using landerist_library.Infrastructure.Indexing;
 using landerist_library.Infrastructure.PageServices;
 using landerist_library.Infrastructure.Listings;
 using landerist_library.Infrastructure.Sql;
@@ -129,11 +130,14 @@ internal static class LanderistServiceComposition
             TimeProvider.System);
         WebsiteSitemapService websiteSitemaps = new(
             Config.INDEXER_ENABLED,
-            pagePersistence,
-            websiteMetrics,
             robotsPolicy,
             TimeProvider.System,
-            httpClients);
+            new LegacyWebsiteSitemapIndexerFactory(
+                robotsPolicy,
+                httpClients,
+                pagePersistence,
+                websiteMetrics),
+            logger);
         ListingParserClientCatalog listingParserClients = new(
         [
             new OpenAIListingParserClient(),

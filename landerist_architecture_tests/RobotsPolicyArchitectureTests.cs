@@ -12,7 +12,7 @@ public sealed class RobotsPolicyArchitectureTests
             "Application");
         string sitemapService = Path.Combine(
             repositoryRoot,
-            "landerist_library",
+            "landerist_infrastructure",
             "Infrastructure",
             "WebsiteServices",
             "WebsiteSitemapService.cs");

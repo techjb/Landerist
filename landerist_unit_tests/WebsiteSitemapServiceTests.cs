@@ -1,3 +1,4 @@
+using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Websites;
 using landerist_library.Infrastructure.WebsiteServices;
@@ -16,19 +17,16 @@ public sealed class WebsiteSitemapServiceTests
         Website website = new(new Uri("https://example.com"));
         WebsiteSitemapService service = new(
             indexingEnabled: false,
-            new StubPagePersistenceService(),
-            new StubWebsiteMetricsService(),
             new StubWebsiteRobotsPolicy(),
             new FixedTimeProvider(now),
-            CreateHttpClients());
+            new StubSitemapIndexerFactory(),
+            new NullLogger());
 
         service.RefreshSitemap(website);
 
         Assert.Equal(now.DateTime, website.SitemapUpdated);
     }
 
-    private static HttpClientTransportFactory CreateHttpClients() =>
-        new(new HttpTransportOptions("localhost", 8080, false, 8080, 8080, "", ""));
     private sealed class FixedTimeProvider(DateTimeOffset now) : TimeProvider
     {
         public override DateTimeOffset GetUtcNow() => now;
@@ -48,5 +46,20 @@ public sealed class WebsiteSitemapServiceTests
     {
         public int CountPages(Website website) => 0;
         public bool HasAchievedMaximumPages(Website website) => false;
+    }
+    private sealed class StubSitemapIndexerFactory : IWebsiteSitemapIndexerFactory
+    {
+        public IWebsiteSitemapIndexer Create(Website website) => new StubSitemapIndexer();
+    }
+
+    private sealed class StubSitemapIndexer : IWebsiteSitemapIndexer
+    {
+        public bool IndexNewPages(Uri sitemapUri) => false;
+    }
+
+    private sealed class NullLogger : IApplicationLogger
+    {
+        public void WriteError(string source, string message) { }
+        public void WriteInfo(string source, string message) { }
     }
 }

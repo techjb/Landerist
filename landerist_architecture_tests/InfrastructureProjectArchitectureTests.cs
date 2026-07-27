@@ -88,7 +88,8 @@ public sealed class InfrastructureProjectArchitectureTests
         [
             "WebsiteNetworkService.cs",
             "WebsiteRefreshService.cs",
-            "WebsiteRobotsPolicy.cs"
+            "WebsiteRobotsPolicy.cs",
+            "WebsiteSitemapService.cs"
         ];
 
         foreach (string service in services)
@@ -106,6 +107,20 @@ public sealed class InfrastructureProjectArchitectureTests
                 "WebsiteServices",
                 service)));
         }
+    }
+    [Fact]
+    public void WebsiteSitemapService_DependsOnIndexerPort()
+    {
+        string source = File.ReadAllText(Path.Combine(
+            FindRepositoryRoot(),
+            "landerist_infrastructure",
+            "Infrastructure",
+            "WebsiteServices",
+            "WebsiteSitemapService.cs"));
+
+        Assert.DoesNotContain("new SitemapIndexer", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("Infrastructure.Indexing", source, StringComparison.Ordinal);
+        Assert.Contains("IWebsiteSitemapIndexerFactory", source, StringComparison.Ordinal);
     }
     [Fact]
     public void LegacyLibrary_ReferencesInfrastructureProject()
