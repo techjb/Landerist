@@ -45,12 +45,19 @@ public sealed partial class ArchitectureBoundaryTests
     [InlineData("Infrastructure")]
     public void ArchitecturalFolders_UseMatchingNamespaces(string boundary)
     {
-        string boundaryRoot = boundary == "Application"
-            ? ApplicationRoot
-            : Path.Combine(LibraryRoot, boundary);
+        string[] boundaryRoots = boundary switch
+        {
+            "Application" => [ApplicationRoot],
+            "Infrastructure" =>
+            [
+                Path.Combine(LibraryRoot, boundary),
+                Path.Combine(RepositoryRoot, "landerist_infrastructure", boundary)
+            ],
+            _ => [Path.Combine(LibraryRoot, boundary)]
+        };
         List<string> violations = [];
 
-        foreach (string file in GetSourceFiles(boundaryRoot))
+        foreach (string file in boundaryRoots.SelectMany(GetSourceFiles))
         {
             Match match = NamespaceDeclarationRegex().Match(File.ReadAllText(file));
             string expectedNamespace = $"landerist_library.{boundary}";
