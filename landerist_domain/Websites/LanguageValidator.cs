@@ -2,7 +2,7 @@ using landerist_library.Websites;
 
 namespace landerist_library.Websites
 {
-    internal class LanguageValidator
+    public static class LanguageValidator
     {
         private static readonly HashSet<string> Iso6391Codes = new(StringComparer.OrdinalIgnoreCase)
         {
@@ -46,7 +46,7 @@ namespace landerist_library.Websites
             return ContainsNotAllowed(firstSegment, allowedLanguage);
         }
 
-        protected static bool ContainsNotAllowed(string path, LanguageCode allowedLanguage)
+        private static bool ContainsNotAllowed(string path, LanguageCode allowedLanguage)
         {
             if (string.IsNullOrWhiteSpace(path))
             {

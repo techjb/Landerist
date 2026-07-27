@@ -6,6 +6,12 @@ Landerist is being migrated incrementally from a single legacy library to a laye
 Domain model (Pages, Websites) <- Application <- Infrastructure <- Console / hosts
 ```
 
+## Physical projects
+
+`landerist_domain` contains the first physically extracted domain area: `Websites`.
+It depends only on the .NET base class library and `landerist_orels`.
+`Pages` remains temporarily in `landerist_library` while HTML parsing, downloader
+contracts and legacy logging are removed from the entity.
 ## Boundaries
 
 `landerist_library/Application` contains use cases, policies and ports. It may depend only on `Application`, `Pages`, `Websites` and the .NET base class library. It must not depend on configuration, SQL, browser implementations, external providers or logging implementations.

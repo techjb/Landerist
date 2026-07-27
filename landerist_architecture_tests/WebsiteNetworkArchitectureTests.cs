@@ -7,7 +7,7 @@ public sealed class WebsiteNetworkArchitectureTests
     {
         string websitesRoot = Path.Combine(
             FindRepositoryRoot(),
-            "landerist_library",
+            "landerist_domain",
             "Websites");
         string[] forbiddenTokens =
         [

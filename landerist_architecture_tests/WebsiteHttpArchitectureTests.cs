@@ -7,7 +7,7 @@ public sealed class WebsiteHttpArchitectureTests
     {
         string websiteFile = Path.Combine(
             FindRepositoryRoot(),
-            "landerist_library",
+            "landerist_domain",
             "Websites",
             "Website.cs");
         string source = File.ReadAllText(websiteFile);

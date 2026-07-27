@@ -9,7 +9,7 @@ public sealed class WebsitePolicyArchitectureTests
     {
         string websitesRoot = Path.Combine(
             FindRepositoryRoot(),
-            "landerist_library",
+            "landerist_domain",
             "Websites");
         string[] policyFiles =
         [

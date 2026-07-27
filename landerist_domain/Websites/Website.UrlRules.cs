@@ -62,13 +62,8 @@ namespace landerist_library.Websites
                     RegexOptions.IgnoreCase,
                     TimeSpan.FromSeconds(1));
             }
-            catch (ArgumentException exception)
+            catch (ArgumentException)
             {
-                Logs.Log.WriteError(
-                    "Website MatchesRegex",
-                    $"{Host} {regexFieldName} {regexPattern}",
-                    exception);
-
                 return false;
             }
         }
