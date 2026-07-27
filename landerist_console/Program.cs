@@ -258,9 +258,6 @@ namespace landerist_console
             };
             BatchUploadOptions batchUploadOptions = new(
                 Config.LLM_PROVIDER,
-                Config.BATCH_DIRECTORY ?? throw new InvalidOperationException(
-                    "Batch directory is not configured."),
-                batchMaxFileSize,
                 batchMaxPages,
                 Config.MIN_PAGES_PER_BATCH,
                 batchMaxInputTokens,
@@ -272,6 +269,17 @@ namespace landerist_console
                 new OpenAIBatchUploadProvider(),
                 new VertexAIBatchUploadProvider()
             ]);
+            IListingBatchUploadProvider batchUploadProvider =
+                batchUploadProviders.GetRequired(Config.LLM_PROVIDER);
+            IBatchInputWriter batchInputWriter = new JsonlBatchInputWriter(
+                new BatchInputWriterOptions(
+                    Config.LLM_PROVIDER,
+                    Config.BATCH_DIRECTORY ?? throw new InvalidOperationException(
+                        "Batch directory is not configured."),
+                    batchMaxFileSize,
+                    Config.MIN_PAGES_PER_BATCH),
+                batchUploadProvider,
+                TimeProvider.System);
             return new TasksService(
                 new TasksServiceOptions(executionMode),
                 new SystemRecurringTaskScheduler(),
@@ -298,7 +306,7 @@ namespace landerist_console
                         pagePersistence,
                         batchUploadOptions,
                         batchUploadProviders,
-                        TimeProvider.System)),
+                        batchInputWriter)),
                 new HourlyTaskJob(
                     new WebsiteRefreshService(websiteCatalog, websitePersistence, websiteNetwork, websiteSitemaps),
                     new TaskBatchCleaner(batches)),

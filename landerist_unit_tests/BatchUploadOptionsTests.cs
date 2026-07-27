@@ -10,8 +10,6 @@ public sealed class BatchUploadOptionsTests
     {
         BatchUploadOptions options = new(
             LLMProvider.VertexAI,
-            "batch",
-            maxFileSizeInBytes: 200,
             maxPagesPerBatch: 20,
             minPagesPerBatch: 3,
             maxInputTokens: 900,
@@ -19,8 +17,6 @@ public sealed class BatchUploadOptionsTests
             statusUpdateParallelism: 2);
 
         Assert.Equal(LLMProvider.VertexAI, options.Provider);
-        Assert.Equal("batch", options.Directory);
-        Assert.Equal(200, options.MaxFileSizeInBytes);
         Assert.Equal(20, options.MaxPagesPerBatch);
         Assert.Equal(3, options.MinPagesPerBatch);
         Assert.Equal(900, options.MaxInputTokens);
@@ -38,8 +34,6 @@ public sealed class BatchUploadOptionsTests
         Assert.Throws<ArgumentOutOfRangeException>(() =>
             new BatchUploadOptions(
                 LLMProvider.OpenAI,
-                "batch",
-                maxFileSizeInBytes: 100,
                 maxPagesPerBatch: maximum,
                 minPagesPerBatch: minimum,
                 maxInputTokens: 100,

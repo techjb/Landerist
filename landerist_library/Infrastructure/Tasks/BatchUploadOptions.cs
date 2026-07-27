@@ -6,17 +6,12 @@ public sealed record BatchUploadOptions
 {
     public BatchUploadOptions(
         LLMProvider provider,
-        string directory,
-        long maxFileSizeInBytes,
         int maxPagesPerBatch,
         int minPagesPerBatch,
         int maxInputTokens,
         bool updateWaitingResponse,
         int statusUpdateParallelism = -1)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(directory);
-        if (maxFileSizeInBytes <= 0)
-            throw new ArgumentOutOfRangeException(nameof(maxFileSizeInBytes));
         if (maxPagesPerBatch <= 0)
             throw new ArgumentOutOfRangeException(nameof(maxPagesPerBatch));
         if (minPagesPerBatch <= 0 || minPagesPerBatch > maxPagesPerBatch)
@@ -27,8 +22,6 @@ public sealed record BatchUploadOptions
             throw new ArgumentOutOfRangeException(nameof(statusUpdateParallelism));
 
         Provider = provider;
-        Directory = directory;
-        MaxFileSizeInBytes = maxFileSizeInBytes;
         MaxPagesPerBatch = maxPagesPerBatch;
         MinPagesPerBatch = minPagesPerBatch;
         MaxInputTokens = maxInputTokens;
@@ -37,8 +30,6 @@ public sealed record BatchUploadOptions
     }
 
     public LLMProvider Provider { get; }
-    public string Directory { get; }
-    public long MaxFileSizeInBytes { get; }
     public int MaxPagesPerBatch { get; }
     public int MinPagesPerBatch { get; }
     public int MaxInputTokens { get; }

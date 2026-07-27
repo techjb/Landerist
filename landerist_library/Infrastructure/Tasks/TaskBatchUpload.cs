@@ -11,13 +11,6 @@ namespace landerist_library.Infrastructure.Tasks
 {
     public class TaskBatchUpload
     {
-        private enum FileWriteResult
-        {
-            Written,
-            Skipped,
-            Error
-        }
-
         private readonly object _initializeSync = new();
 
         private readonly BatchRepository _batches;
@@ -25,7 +18,7 @@ namespace landerist_library.Infrastructure.Tasks
         private readonly IPagePersistenceService _pagePersistence;
         private readonly BatchUploadOptions _options;
         private readonly IListingBatchUploadProvider _provider;
-        private readonly TimeProvider _timeProvider;
+        private readonly IBatchInputWriter _inputWriter;
         private readonly ParallelOptions _statusParallelOptions;
         private readonly List<Page> _pages = [];
         private readonly HashSet<string> _waitingAIResponse = [];
@@ -39,20 +32,20 @@ namespace landerist_library.Infrastructure.Tasks
             IPagePersistenceService pagePersistence,
             BatchUploadOptions options,
             ListingBatchUploadProviderCatalog providers,
-            TimeProvider timeProvider)
+            IBatchInputWriter inputWriter)
         {
             ArgumentNullException.ThrowIfNull(batches);
             ArgumentNullException.ThrowIfNull(waitingStatus);
             ArgumentNullException.ThrowIfNull(pagePersistence);
             ArgumentNullException.ThrowIfNull(options);
             ArgumentNullException.ThrowIfNull(providers);
-            ArgumentNullException.ThrowIfNull(timeProvider);
+            ArgumentNullException.ThrowIfNull(inputWriter);
             _batches = batches;
             _waitingStatus = waitingStatus;
             _pagePersistence = pagePersistence;
             _options = options;
             _provider = providers.GetRequired(options.Provider);
-            _timeProvider = timeProvider;
+            _inputWriter = inputWriter;
             _statusParallelOptions = options.CreateStatusParallelOptions();
         }
 
@@ -114,7 +107,11 @@ namespace landerist_library.Infrastructure.Tasks
                 return false;
             }
 
-            var filePath = CreateFile();
+            BatchInputWriteResult writeResult = _inputWriter.Write(_pages);
+            _waitingAIResponse.UnionWith(writeResult.WrittenPageHashes);
+            _invalidPages.UnionWith(writeResult.InvalidPageHashes);
+            PersistInvalidPages();
+            string? filePath = writeResult.FilePath;
             if (string.IsNullOrEmpty(filePath))
             {
                 SetWaitingAIRequestToAllPages();
@@ -141,128 +138,21 @@ namespace landerist_library.Infrastructure.Tasks
             return true;
         }
 
-        private string? CreateFile()
-        {
-            if (_pages.Count == 0)
-            {
-                return null;
-            }
-
-            Directory.CreateDirectory(_options.Directory);
-
-            var filePath = Path.Combine(
-                _options.Directory,
-                $"batch_{_options.Provider.ToString().ToLowerInvariant()}_{_timeProvider.GetLocalNow():yyyyMMddHHmmss}_input.json");
-
-            Console.WriteLine("TaskBatchUpload " + filePath);
-
-            if (File.Exists(filePath))
-            {
-                File.Delete(filePath);
-            }
-
-            _waitingAIResponse.Clear();
-
-            var errors = 0;
-            var skipped = 0;
-            var stopProcessing = false;
-
-            using StreamWriter writer = new(filePath, append: false)
-            {
-                AutoFlush = true
-            };
-
-            for (var index = 0; index < _pages.Count; index++)
-            {
-                var result = WriteToFile(_pages[index], writer);
-                switch (result)
-                {
-                    case FileWriteResult.Written:
-                        break;
-                    case FileWriteResult.Skipped:
-                        skipped = _pages.Count - index;
-                        stopProcessing = true;
-                        break;
-                    default:
-                        errors++;
-                        break;
-                }
-
-                if (stopProcessing)
-                {
-                    break;
-                }
-            }
-
-            Log.WriteBatch("TaskBatchUpload", $"CreateFile {_waitingAIResponse.Count}/{_pages.Count} skipped: {skipped} errors: {errors}");
-
-            if (_waitingAIResponse.Count < _options.MinPagesPerBatch)
-            {
-                File.Delete(filePath);
-                return null;
-            }
-
-            return filePath;
-        }
-
-        private bool CanWriteFile(StreamWriter writer, string json)
-        {
-            writer.Flush();
-            var sizeToAdd = writer.Encoding.GetByteCount(json + Environment.NewLine);
-            return writer.BaseStream.Length + sizeToAdd <= _options.MaxFileSizeInBytes;
-        }
-
-        private FileWriteResult WriteToFile(Page page, StreamWriter writer)
-        {
-            try
-            {
-                var json = GetJson(page);
-                if (string.IsNullOrEmpty(json))
-                {
-                    _invalidPages.Add(page.UriHash);
-                    page.RemoveWaitingStatus();
-                    _pagePersistence.Update(page);
-                    return FileWriteResult.Error;
-                }
-
-                if (!CanWriteFile(writer, json))
-                {
-                    return FileWriteResult.Skipped;
-                }
-
-                writer.WriteLine(json);
-                _waitingAIResponse.Add(page.UriHash);
-                return FileWriteResult.Written;
-            }
-            catch (Exception exception)
-            {
-                Log.WriteError("TaskBatchUpload AddToBatch", exception.Message);
-            }
-
-            return FileWriteResult.Error;
-        }
-
-        private string? GetJson(Page page)
-        {
-            page.SetResponseBodyFromZipped();
-            var text = page.GetListingParserInput();
-            page.RemoveResponseBody();
-
-            if (string.IsNullOrEmpty(text))
-            {
-                Log.WriteError("TaskBatchUpload GetJson", "Error getting user input. Page: " + page.UriHash);
-                return null;
-            }
-
-            return _provider.Serialize(page, text);
-        }
-
         private string? UploadFile(string filePath) =>
             _provider.UploadFile(filePath);
 
         private string? CreateBatch(string fileId) =>
             _provider.CreateBatch(fileId);
 
+        private void PersistInvalidPages()
+        {
+            foreach (Page page in _pages.Where(
+                page => _invalidPages.Contains(page.UriHash)))
+            {
+                page.RemoveWaitingStatus();
+                _pagePersistence.Update(page);
+            }
+        }
         private void Clear()
         {
             foreach (var page in _pages)
