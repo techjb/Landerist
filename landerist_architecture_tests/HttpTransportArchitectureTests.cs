@@ -8,6 +8,9 @@ public sealed class HttpTransportArchitectureTests
         string libraryRoot = Path.Combine(
             FindRepositoryRoot(),
             "landerist_library");
+        string infrastructureRoot = Path.Combine(
+            FindRepositoryRoot(),
+            "landerist_infrastructure");
         string[] consumers =
         [
             "Infrastructure/WebsiteServices/WebsiteNetworkService.cs",
@@ -28,7 +31,9 @@ public sealed class HttpTransportArchitectureTests
             {
                 string source = File.ReadAllText(
                     Path.Combine(
-                        libraryRoot,
+                        relative.EndsWith("WebsiteNetworkService.cs", StringComparison.Ordinal)
+                            ? infrastructureRoot
+                            : libraryRoot,
                         relative.Replace('/', Path.DirectorySeparatorChar)));
                 return forbiddenTokens.Any(token =>
                     source.Contains(token, StringComparison.Ordinal));

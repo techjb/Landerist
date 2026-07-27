@@ -13,7 +13,7 @@ It depends only on the .NET base class library and `landerist_orels`. Parsing, d
 
 `landerist_application` physically owns use cases, policies and ports. It depends only on `landerist_domain`, `landerist_orels` and the .NET base class library.
 
-`landerist_infrastructure` is the incremental destination for adapters. It currently owns HTTP transport and browser maintenance, and depends inward on `landerist_application` and `landerist_domain`; remaining adapters stay in `landerist_library/Infrastructure` until their legacy dependencies are removed.
+`landerist_infrastructure` is the incremental destination for adapters. It currently owns HTTP transport, browser maintenance and the decoupled website network/refresh/robots adapters, and depends inward on `landerist_application` and `landerist_domain`; remaining adapters stay in `landerist_library/Infrastructure` until their legacy dependencies are removed.
 ## Boundaries
 
 `landerist_application/Application` contains use cases, policies and ports. It may depend only on `Application`, `Pages`, `Websites` and the .NET base class library. It must not depend on configuration, SQL, browser implementations, external providers or logging implementations.

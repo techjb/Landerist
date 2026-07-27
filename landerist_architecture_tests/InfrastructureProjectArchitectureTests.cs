@@ -25,7 +25,9 @@ public sealed class InfrastructureProjectArchitectureTests
             .Order()
             .ToArray();
 
-        Assert.Equal(["PuppeteerSharp"], packages);
+        Assert.Equal(
+            ["Com.Bekijkhet.RobotsTxt", "PuppeteerSharp"],
+            packages);
         Assert.Equal(
             [
                 "..\\landerist_application\\landerist_application.csproj",
@@ -77,6 +79,33 @@ public sealed class InfrastructureProjectArchitectureTests
             .ToArray();
 
         Assert.Empty(violations);
+    }
+    [Fact]
+    public void ExtractedWebsiteServices_AreOwnedByInfrastructureProject()
+    {
+        string root = FindRepositoryRoot();
+        string[] services =
+        [
+            "WebsiteNetworkService.cs",
+            "WebsiteRefreshService.cs",
+            "WebsiteRobotsPolicy.cs"
+        ];
+
+        foreach (string service in services)
+        {
+            Assert.True(File.Exists(Path.Combine(
+                root,
+                "landerist_infrastructure",
+                "Infrastructure",
+                "WebsiteServices",
+                service)));
+            Assert.False(File.Exists(Path.Combine(
+                root,
+                "landerist_library",
+                "Infrastructure",
+                "WebsiteServices",
+                service)));
+        }
     }
     [Fact]
     public void LegacyLibrary_ReferencesInfrastructureProject()
