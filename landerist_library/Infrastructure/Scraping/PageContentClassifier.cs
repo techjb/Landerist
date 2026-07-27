@@ -2,6 +2,7 @@ using landerist_library.Application.Listings;
 using landerist_library.Application.Scraping;
 using landerist_library.Pages;
 using landerist_library.Application.Parsing;
+using landerist_library.Infrastructure.Parsing;
 
 namespace landerist_library.Infrastructure.Scraping;
 
@@ -39,7 +40,8 @@ public sealed class PageContentClassifier : IPageContentClassifier
             _notListingCache,
             _metrics,
             _listingParser,
-            _tokenLimitPolicy).GetPageType();
+            _tokenLimitPolicy,
+            new HtmlPageContentInspector()).GetPageType();
         return new PageClassificationResult(result.pageType, result.listing, result.waitingAIRequest);
     }
 }

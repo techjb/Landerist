@@ -12,6 +12,7 @@ namespace landerist_library.Application.Parsing
         private readonly IPageClassificationMetrics _metrics;
         private readonly IListingPageParser _listingParser;
         private readonly IPageTokenLimitPolicy _tokenLimitPolicy;
+        private readonly IPageContentInspector _contentInspector;
 
         public PageTypeParser(
             Page page,
@@ -19,19 +20,22 @@ namespace landerist_library.Application.Parsing
             INotListingCacheService notListingCache,
             IPageClassificationMetrics metrics,
             IListingPageParser listingParser,
-            IPageTokenLimitPolicy tokenLimitPolicy)
+            IPageTokenLimitPolicy tokenLimitPolicy,
+            IPageContentInspector contentInspector)
         {
             ArgumentNullException.ThrowIfNull(page);
             ArgumentNullException.ThrowIfNull(notListingCache);
             ArgumentNullException.ThrowIfNull(metrics);
             ArgumentNullException.ThrowIfNull(listingParser);
             ArgumentNullException.ThrowIfNull(tokenLimitPolicy);
+            ArgumentNullException.ThrowIfNull(contentInspector);
             Page = page;
             _isProduction = isProduction;
             _notListingCache = notListingCache;
             _metrics = metrics;
             _listingParser = listingParser;
             _tokenLimitPolicy = tokenLimitPolicy;
+            _contentInspector = contentInspector;
         }
 
         public (PageType? pageType, landerist_orels.ES.Listing? listing, bool waitingAIRequest)
@@ -84,24 +88,24 @@ namespace landerist_library.Application.Parsing
                 return (PageType.DiscardedByListingUrlRegex, null, false);
             }
 
-            if (Page.ContainsMetaRobotsNoIndex())
+            if (_contentInspector.ContainsMetaRobotsNoIndex(Page))
             {
                 return (PageType.NotIndexable, null, false);
             }
 
-            if (Page.NotCanonical())
+            if (_contentInspector.IsNotCanonical(Page))
             {
                 return (PageType.NotCanonical, null, false);
             }
 
-            if (Page.IncorrectLanguage())
+            if (_contentInspector.HasIncorrectLanguage(Page))
             {
                 return (PageType.IncorrectLanguage, null, false);
             }
 
-            Page.SetListingParserInput();
+            _contentInspector.PrepareListingParserInput(Page);
 
-            if (Page.MatchesWebsiteListingUnavailableRule())
+            if (_contentInspector.MatchesListingUnavailableRule(Page))
             {
                 return (PageType.NotListingByWebsiteRule, null, false);
             }
