@@ -1,6 +1,5 @@
 using landerist_library.Websites;
 using landerist_library.Infrastructure.Parsing;
-using landerist_library.Configuration;
 using landerist_library.Application.Pages;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Scraping;
@@ -15,10 +14,9 @@ namespace landerist_library.Infrastructure.Tasks
 {
     public class TaskLocalAIParsing
     {
-        private const int MAX_PAGES_PER_TASK = 100;
-        private const int MAX_NUM_SEQS = 4; // same as un vllm        
-        private const int COMPLETION_TOKENS = 7000;  // structured output and completion tokens aproximately
-        private readonly int MAX_TOKEN_COUNT;
+        private readonly LocalAiParsingTaskOptions _options;
+        private readonly int _maxTokenCount;
+        private readonly int _maxBlockingCollectionSize;
         private readonly IParsedPageClassificationService _parsedClassification;
         private readonly GlobalStatistics _globalStatistics;
         private readonly HostStatistics _hostStatistics;
@@ -34,8 +32,6 @@ namespace landerist_library.Infrastructure.Tasks
         private int TotalNotListingByParser = 0;
         private readonly CancellationTokenSource StoppingCancellationTokenSource = new();
         private BlockingCollection<Page> BlockingCollection = [];
-        private const int MAX_SIZE_BLOCKINGCOLLECTION = MAX_PAGES_PER_TASK * 10; 
-
 
         public TaskLocalAIParsing(
             IParsedPageClassificationService parsedClassification,
@@ -44,7 +40,9 @@ namespace landerist_library.Infrastructure.Tasks
             IPageWaitingStatusService waitingStatus,
             IPageCatalog pages,
             IPagePersistenceService pagePersistence,
-            ParseListing listingParser)
+            ParseListing listingParser,
+            LocalAiParsingTaskOptions options,
+            Tokenizer tokenizer)
         {
             ArgumentNullException.ThrowIfNull(parsedClassification);
             ArgumentNullException.ThrowIfNull(globalStatistics);
@@ -53,6 +51,8 @@ namespace landerist_library.Infrastructure.Tasks
             ArgumentNullException.ThrowIfNull(pages);
             ArgumentNullException.ThrowIfNull(pagePersistence);
             ArgumentNullException.ThrowIfNull(listingParser);
+            ArgumentNullException.ThrowIfNull(options);
+            ArgumentNullException.ThrowIfNull(tokenizer);
             _parsedClassification = parsedClassification;
             _globalStatistics = globalStatistics;
             _hostStatistics = hostStatistics;
@@ -60,22 +60,26 @@ namespace landerist_library.Infrastructure.Tasks
             _pages = pages;
             _pagePersistence = pagePersistence;
             _listingParser = listingParser;
-            Config.SetLLMProviderLocalAI();
-            Config.EnableLogsErrorsInConsole();
-            if (Config.IsConfigurationProduction())
+            _options = options;
+            _maxBlockingCollectionSize = options.MaxPagesPerTask * 10;
+            if (options.UpdateWaitingStatusOnStart)
             {
                 _waitingStatus.Update(WaitingStatus.readed_by_localai, WaitingStatus.waiting_ai_request);
             }
-            MAX_TOKEN_COUNT = GetMaxTokenCount();
+            _maxTokenCount = GetMaxTokenCount(options, tokenizer);
             Log.Console("TaskLocalAIParsing", "Started");
         }
 
-        public static int GetMaxTokenCount()
+        public static int GetMaxTokenCount(LocalAiParsingTaskOptions options, Tokenizer tokenizer)
         {
-            int systemTokens = Tokenizer.CountSystemTokens();
-            var otherTokens = systemTokens + COMPLETION_TOKENS;
-            return Config.LOCAL_AI_MAX_MODEL_LEN - otherTokens;
+            ArgumentNullException.ThrowIfNull(options);
+            ArgumentNullException.ThrowIfNull(tokenizer);
+            return options.ModelMaxTokens - (tokenizer.CountSystemTokens() + options.CompletionTokens);
         }
+        public static int GetMaxTokenCount() =>
+            GetMaxTokenCount(
+                new LocalAiParsingTaskOptions(),
+                new Tokenizer(TokenizerOptions.ForProvider(LLMProvider.LocalAI)));
 
         public void ProcessPages(CancellationToken cancellationToken = default)
         {
@@ -94,7 +98,7 @@ namespace landerist_library.Infrastructure.Tasks
                 Parallel.ForEach(orderablePartitioner,
                     new ParallelOptions()
                     {
-                        MaxDegreeOfParallelism = Config.IsConfigurationLocal() ? 1 : MAX_NUM_SEQS
+                        MaxDegreeOfParallelism = _options.RunSequentially ? 1 : _options.MaxConcurrentSequences
                     },
                     page =>
                     {
@@ -160,7 +164,7 @@ namespace landerist_library.Infrastructure.Tasks
 
         private void InitializeBlockingCollection(CancellationToken cancellationToken)
         {
-            BlockingCollection = new BlockingCollection<Page>(MAX_SIZE_BLOCKINGCOLLECTION);
+            BlockingCollection = new BlockingCollection<Page>(_maxBlockingCollectionSize);
             if (!AddPagesToBlockingCollection(cancellationToken))
             {
                 BlockingCollection.CompleteAdding();
@@ -198,12 +202,12 @@ namespace landerist_library.Infrastructure.Tasks
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (MAX_SIZE_BLOCKINGCOLLECTION < BlockingCollection.Count + MAX_PAGES_PER_TASK)
+            if (_maxBlockingCollectionSize < BlockingCollection.Count + _options.MaxPagesPerTask)
             {
                 return true;
             }
 
-            var pages = _waitingStatus.SelectAIRequest(MAX_PAGES_PER_TASK, WaitingStatus.readed_by_localai, MAX_TOKEN_COUNT, true);
+            var pages = _waitingStatus.SelectAIRequest(_options.MaxPagesPerTask, WaitingStatus.readed_by_localai, _maxTokenCount, true);
             if (pages.Count == 0)
             {
                 return false;

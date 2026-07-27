@@ -159,7 +159,7 @@ namespace landerist_tests
                     notListingCache,
                     new SqlPageClassificationMetrics(databaseFactory.Create()),
                     new LegacyListingPageParser(hostStatistics, listingParser),
-                    new LegacyPageTokenLimitPolicy()),
+                    new LegacyPageTokenLimitPolicy(new Tokenizer(TokenizerOptions.ForProvider(Config.LLM_PROVIDER)))),
                 new PageIndexingService(Config.INDEXER_ENABLED, pageLinks),
                 new SqlPageSchedulingService(listingStore),
                 Config.INDEXER_ENABLED);

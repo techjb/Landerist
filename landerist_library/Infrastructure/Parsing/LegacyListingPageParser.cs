@@ -14,7 +14,7 @@ public sealed class LegacyListingPageParser(HostStatistics statistics, ParseList
         parser.Parse(page, statistics);
 }
 
-public sealed class LegacyPageTokenLimitPolicy : IPageTokenLimitPolicy
+public sealed class LegacyPageTokenLimitPolicy(Tokenizer tokenizer) : IPageTokenLimitPolicy
 {
-    public bool TooManyTokens(Page page) => Tokenizer.TooManyTokens(page);
+    public bool TooManyTokens(Page page) => tokenizer.TooManyTokens(page);
 }

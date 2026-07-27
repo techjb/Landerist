@@ -1,72 +1,36 @@
-﻿using landerist_library.Configuration;
 using landerist_library.Pages;
-using landerist_library.Parse.ListingParser.LocalAI;
-using landerist_library.Parse.ListingParser.OpenAI;
-using landerist_library.Parse.ListingParser.VertexAI;
 using SharpToken;
 
+namespace landerist_library.Parse.ListingParser;
 
-namespace landerist_library.Parse.ListingParser
+public sealed class Tokenizer
 {
-    public class Tokenizer
+    private readonly GptEncoding _encoding;
+    private readonly int _maxContextWindow;
+
+    public Tokenizer(TokenizerOptions? options = null)
     {
-        private const string LOCAL_AI_TOKENIZER = "o200k_harmony";
+        options ??= new TokenizerOptions();
+        _encoding = GptEncoding.GetEncoding(options.EncodingName);
+        _maxContextWindow = options.MaxContextWindow;
+    }
 
-        private const int DEFAULT_MAX_TOKENS = 128000;
+    public int CountSystemTokens() => _encoding.CountTokens(SystemPrompt.Text);
 
-        public static int CountSystemTokens()
-        {
-            var encoding = GptEncoding.GetEncoding(LOCAL_AI_TOKENIZER);
-            return encoding.CountTokens(SystemPrompt.Text);
-        }
+    public (int PageTokens, int SystemTokens) CountPageAndSystemTokens(Page page)
+    {
+        ArgumentNullException.ThrowIfNull(page);
+        string? userInput = page.GetListingParserInput();
+        int pageTokens = string.IsNullOrWhiteSpace(userInput)
+            ? 0
+            : _encoding.CountTokens(userInput);
+        return (pageTokens, CountSystemTokens());
+    }
 
-        public static (int, int) CountPageAndSystemTokens(Page page)
-        {
-            var encoding = GptEncoding.GetEncoding(LOCAL_AI_TOKENIZER);
-
-            string? userInput = page.GetListingParserInput();
-            int systemTokens = encoding.CountTokens(SystemPrompt.Text);
-            int pageTokens = 0;
-            if (!string.IsNullOrWhiteSpace(userInput))
-            {
-                pageTokens = encoding.CountTokens(userInput);
-            }
-            return (pageTokens, systemTokens);
-        }
-
-        public static bool TooManyTokens(Page page)
-        {
-            var (pageTokens, systemTokens) = CountPageAndSystemTokens(page);
-            page.TokenCount = pageTokens;
-
-            int totalTokens = systemTokens + page.TokenCount.Value;
-            int maxContextWindow = GetMaxContextWindow();
-
-            return totalTokens > maxContextWindow;
-        }
-
-        private static int GetMaxContextWindow()
-        {
-            var maxContextWindow = DEFAULT_MAX_TOKENS;
-
-            switch (Config.LLM_PROVIDER)
-            {
-                case LLMProvider.OpenAI:
-                    maxContextWindow = OpenAIRequest.MAX_CONTEXT_WINDOW;
-                    break;
-                case LLMProvider.VertexAI:
-                    maxContextWindow = VertexAIRequest.MAX_CONTEXT_WINDOW;
-                    break;
-                case LLMProvider.LocalAI:
-                    maxContextWindow = LocalAIRequest.MAX_CONTEXT_WINDOW;
-                    break;
-            }
-
-            if (maxContextWindow <= 0)
-            {
-                maxContextWindow = DEFAULT_MAX_TOKENS;
-            }
-            return maxContextWindow;
-        }
+    public bool TooManyTokens(Page page)
+    {
+        var (pageTokens, systemTokens) = CountPageAndSystemTokens(page);
+        page.TokenCount = pageTokens;
+        return systemTokens + pageTokens > _maxContextWindow;
     }
 }

@@ -194,7 +194,7 @@ namespace landerist_console
                     notListingCache,
                     new SqlPageClassificationMetrics(databaseFactory.Create()),
                     new LegacyListingPageParser(hostStatistics, listingParser),
-                    new LegacyPageTokenLimitPolicy()),
+                    new LegacyPageTokenLimitPolicy(new Tokenizer(TokenizerOptions.ForProvider(Config.LLM_PROVIDER)))),
                 new PageIndexingService(Config.INDEXER_ENABLED, pageLinks),
                 new SqlPageSchedulingService(listingStore),
                 Config.INDEXER_ENABLED);
@@ -240,7 +240,19 @@ namespace landerist_console
                 new SystemRecurringTaskScheduler(),
                 logger,
                 new ScrapeTaskJob(scraper, batchScraping.Browser),
-                new LocalAiTaskJob(() => new TaskLocalAIParsing(parsedClassification, globalStatistics, hostStatistics, waitingStatus, pageCatalog, pagePersistence, listingParser)),
+                new LocalAiTaskJob(() => new TaskLocalAIParsing(
+                    parsedClassification,
+                    globalStatistics,
+                    hostStatistics,
+                    waitingStatus,
+                    pageCatalog,
+                    pagePersistence,
+                    listingParser,
+                    new LocalAiParsingTaskOptions(
+                        modelMaxTokens: Config.LOCAL_AI_MAX_MODEL_LEN,
+                        runSequentially: Config.IsConfigurationLocal(),
+                        updateWaitingStatusOnStart: Config.IsConfigurationProduction()),
+                    new Tokenizer(TokenizerOptions.ForProvider(LLMProvider.LocalAI)))),
                 new TenMinuteTaskJob(
                     new TaskBatchDownload(parsedClassification, batches, globalStatistics, pageCatalog, pagePersistence, new OpenAIBatchDownload(), new VertexAIBatchDownload(), listingParser),
                     new TaskBatchUpload(batches, waitingStatus, pagePersistence)),
