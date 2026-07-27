@@ -25,6 +25,18 @@ public sealed class ApplicationParsingArchitectureTests
             call => source.Contains(call, StringComparison.Ordinal));
     }
 
+    [Fact]
+    public void ListingLifecycle_UsesContentInspectionPortForCanonicalUri()
+    {
+        string source = File.ReadAllText(Path.Combine(
+            FindRepositoryRoot(),
+            "landerist_library",
+            "Application",
+            "Listings",
+            "ListingLifecycleService.cs"));
+
+        Assert.DoesNotContain("page.GetCanonicalUri(", source, StringComparison.Ordinal);
+    }
     private static string FindRepositoryRoot()
     {
         DirectoryInfo? directory = new(AppContext.BaseDirectory);

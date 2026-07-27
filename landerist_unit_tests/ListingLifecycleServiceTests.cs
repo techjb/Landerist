@@ -1,5 +1,6 @@
-﻿using landerist_library.Application.Listings;
+using landerist_library.Application.Listings;
 using landerist_library.Application.Logging;
+using landerist_library.Application.Parsing;
 using landerist_library.Pages;
 using landerist_library.Websites;
 using landerist_orels.ES;
@@ -96,6 +97,28 @@ public sealed class ListingLifecycleServiceTests
     }
 
     [Fact]
+    public void Apply_WhenCanonicalDestinationIsPublished_UsesInspectorAndUnpublishesSource()
+    {
+        Page sourcePage = CreatePage("https://example.com/listing/1");
+        sourcePage.SetPageType(PageType.NotCanonical);
+        Listing sourceListing = new() { guid = sourcePage.UriHash };
+        Uri destinationUri = new("https://example.com/listing/2");
+        Listing destinationListing = new()
+        {
+            guid = "destination",
+            listingStatus = ListingStatus.published
+        };
+        TestContext context = new();
+        context.Store.ListingsByUri[sourcePage.Uri] = sourceListing;
+        context.Store.ListingsByUri[destinationUri] = destinationListing;
+        context.ContentInspector.CanonicalUri = destinationUri;
+
+        context.Service.Apply(sourcePage, sourceListing);
+
+        Assert.Equal(destinationUri, context.PageLinks.IndexedUri);
+        Assert.Equal(ListingStatus.unpublished, sourceListing.listingStatus);
+    }
+    [Fact]
     public void Apply_WhenPublishedListingCannotBeLoaded_LogsErrorWithoutUpsert()
     {
         Page page = CreatePage("https://example.com/listing/1");
@@ -132,7 +155,8 @@ public sealed class ListingLifecycleServiceTests
                 PageLinks,
                 Enricher,
                 Policy,
-                Logger);
+                Logger,
+                ContentInspector);
         }
 
         public RecordingListingStore Store { get; } = new();
@@ -146,6 +170,8 @@ public sealed class ListingLifecycleServiceTests
         public RecordingUnpublishPolicy Policy { get; } = new();
 
         public RecordingApplicationLogger Logger { get; } = new();
+
+        public StubPageContentInspector ContentInspector { get; } = new();
 
         public ListingLifecycleService Service { get; }
     }
@@ -220,6 +246,17 @@ public sealed class ListingLifecycleServiceTests
         public ListingUnpublishDecision Decision { get; set; } = null!;
 
         public ListingUnpublishDecision Evaluate(Page page) => Decision;
+    }
+
+    private sealed class StubPageContentInspector : IPageContentInspector
+    {
+        public Uri? CanonicalUri { get; set; }
+        public bool ContainsMetaRobotsNoIndex(Page page) => false;
+        public bool IsNotCanonical(Page page) => page.IsNotCanonical();
+        public Uri? GetCanonicalUri(Page page) => CanonicalUri;
+        public bool HasIncorrectLanguage(Page page) => false;
+        public void PrepareListingParserInput(Page page) { }
+        public bool MatchesListingUnavailableRule(Page page) => false;
     }
 
     private sealed class RecordingApplicationLogger : IApplicationLogger

@@ -8,6 +8,8 @@ public interface IPageContentInspector
 
     bool IsNotCanonical(Page page);
 
+    Uri? GetCanonicalUri(Page page);
+
     bool HasIncorrectLanguage(Page page);
 
     void PrepareListingParserInput(Page page);

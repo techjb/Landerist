@@ -1,4 +1,5 @@
 using landerist_library.Application.Logging;
+using landerist_library.Application.Parsing;
 using landerist_library.Pages;
 using landerist_orels.ES;
 
@@ -12,6 +13,7 @@ public sealed class ListingLifecycleService : IListingLifecycleService
     private readonly IListingEnricher _listingEnricher;
     private readonly IListingUnpublishPolicy _unpublishPolicy;
     private readonly IApplicationLogger _logger;
+    private readonly IPageContentInspector _contentInspector;
 
     public ListingLifecycleService(
         IListingStore listingStore,
@@ -19,7 +21,8 @@ public sealed class ListingLifecycleService : IListingLifecycleService
         IPageLinkService pageLinks,
         IListingEnricher listingEnricher,
         IListingUnpublishPolicy unpublishPolicy,
-        IApplicationLogger logger)
+        IApplicationLogger logger,
+        IPageContentInspector contentInspector)
     {
         ArgumentNullException.ThrowIfNull(listingStore);
         ArgumentNullException.ThrowIfNull(notListingCache);
@@ -27,6 +30,7 @@ public sealed class ListingLifecycleService : IListingLifecycleService
         ArgumentNullException.ThrowIfNull(listingEnricher);
         ArgumentNullException.ThrowIfNull(unpublishPolicy);
         ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(contentInspector);
 
         _listingStore = listingStore;
         _notListingCache = notListingCache;
@@ -34,6 +38,7 @@ public sealed class ListingLifecycleService : IListingLifecycleService
         _listingEnricher = listingEnricher;
         _unpublishPolicy = unpublishPolicy;
         _logger = logger;
+        _contentInspector = contentInspector;
     }
 
     public void Apply(Page page, Listing? listing)
@@ -102,7 +107,7 @@ public sealed class ListingLifecycleService : IListingLifecycleService
         }
 
         return page.IsNotCanonical()
-            ? page.GetCanonicalUri()
+            ? _contentInspector.GetCanonicalUri(page)
             : null;
     }
 

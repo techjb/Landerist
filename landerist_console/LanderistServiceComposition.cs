@@ -163,7 +163,8 @@ internal static class LanderistServiceComposition
             pageLinks,
             new SqlListingEnricher(databaseFactory.Create(), goolzoom),
             new LegacyListingUnpublishPolicy(listingQueries),
-            logger);
+            logger,
+            new HtmlPageContentInspector());
         PageScrapePipelineServices pageScraping = new(
             new PageAcquisitionService(
                 new PooledPageDownloader(downloaders),

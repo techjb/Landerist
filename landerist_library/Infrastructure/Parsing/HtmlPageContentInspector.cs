@@ -10,6 +10,8 @@ public sealed class HtmlPageContentInspector : IPageContentInspector
 
     public bool IsNotCanonical(Page page) => page.NotCanonical();
 
+    public Uri? GetCanonicalUri(Page page) => page.GetCanonicalUri();
+
     public bool HasIncorrectLanguage(Page page) => page.IncorrectLanguage();
 
     public void PrepareListingParserInput(Page page) =>
