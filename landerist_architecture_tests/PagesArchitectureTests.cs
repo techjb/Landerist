@@ -95,6 +95,36 @@ public sealed class PagesArchitectureTests
             Environment.NewLine +
             string.Join(Environment.NewLine, violations));
     }
+    [Fact]
+    public void Pages_DoesNotImplementHtmlNavigationSignals()
+    {
+        string pagesRoot = Path.Combine(
+            FindRepositoryRoot(),
+            "landerist_library",
+            "Pages");
+        string[] forbiddenDeclarations =
+        [
+            "public bool ContainsMetaRobots",
+            "public bool IncorrectLanguage(",
+            "public bool NotCanonical(",
+            "public Uri? GetCanonicalUri("
+        ];
+        string[] violations = Directory
+            .EnumerateFiles(pagesRoot, "*.cs", SearchOption.AllDirectories)
+            .Where(file => forbiddenDeclarations.Any(declaration =>
+                File.ReadAllText(file).Contains(
+                    declaration,
+                    StringComparison.Ordinal)))
+            .Select(file => Path.GetFileName(file)!)
+            .Order()
+            .ToArray();
+
+        Assert.True(
+            violations.Length == 0,
+            "HTML navigation signals must be implemented outside the Page entity." +
+            Environment.NewLine +
+            string.Join(Environment.NewLine, violations));
+    }
     private static string FindRepositoryRoot()
     {
         DirectoryInfo? directory = new(AppContext.BaseDirectory);

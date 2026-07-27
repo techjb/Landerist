@@ -63,8 +63,6 @@ namespace landerist_library.Pages
 
         private bool HasComparableLastModified { get; set; } = false;
 
-        private const string RemaxInvalidCanonicalPath = "/buscador-de-inmuebles/todos/todos/todos/todos/todos/todos";
-
 
 
         public Website Website = new();
