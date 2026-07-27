@@ -1,13 +1,11 @@
 using landerist_library.Application.Pages;
 using landerist_library.Application.Persistence;
-using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Logs;
 using landerist_library.Infrastructure.Sql;
+using landerist_library.Infrastructure.Parsing;
 using landerist_library.Pages;
 using landerist_library.Parse.ListingParser;
-using landerist_library.Parse.ListingParser.OpenAI.Batch;
-using landerist_library.Parse.ListingParser.VertexAI.Batch;
 
 namespace landerist_library.Infrastructure.Tasks
 {
@@ -20,60 +18,42 @@ namespace landerist_library.Infrastructure.Tasks
             Error
         }
 
-        private static readonly object InitializeSync = new();
+        private readonly object _initializeSync = new();
 
         private readonly BatchRepository _batches;
         private readonly IPageWaitingStatusService _waitingStatus;
         private readonly IPagePersistenceService _pagePersistence;
-        private readonly long _maxFileSizeInBytes;
-        private readonly int _maxPagesPerBatch;
+        private readonly BatchUploadOptions _options;
+        private readonly IListingBatchUploadProvider _provider;
+        private readonly TimeProvider _timeProvider;
+        private readonly ParallelOptions _statusParallelOptions;
         private readonly List<Page> _pages = [];
         private readonly HashSet<string> _waitingAIResponse = [];
         private readonly HashSet<string> _invalidPages = [];
 
-        private static bool _firstTime = true;
+        private bool _initialized;
 
-        public TaskBatchUpload(BatchRepository batches, IPageWaitingStatusService waitingStatus, IPagePersistenceService pagePersistence)
+        public TaskBatchUpload(
+            BatchRepository batches,
+            IPageWaitingStatusService waitingStatus,
+            IPagePersistenceService pagePersistence,
+            BatchUploadOptions options,
+            ListingBatchUploadProviderCatalog providers,
+            TimeProvider timeProvider)
         {
             ArgumentNullException.ThrowIfNull(batches);
             ArgumentNullException.ThrowIfNull(waitingStatus);
             ArgumentNullException.ThrowIfNull(pagePersistence);
+            ArgumentNullException.ThrowIfNull(options);
+            ArgumentNullException.ThrowIfNull(providers);
+            ArgumentNullException.ThrowIfNull(timeProvider);
             _batches = batches;
             _waitingStatus = waitingStatus;
             _pagePersistence = pagePersistence;
-            _maxFileSizeInBytes = SetMaxFileSize();
-            _maxPagesPerBatch = GetMaxPagesPerBatch();
-        }
-
-        private static long SetMaxFileSize()
-        {
-            switch (Config.LLM_PROVIDER)
-            {
-                case LLMProvider.OpenAI:
-                    return Config.MAX_BATCH_FILE_SIZE_OPEN_AI * 1024 * 1024;
-                case LLMProvider.VertexAI:
-                    return Config.MAX_BATCH_FILE_SIZE_VERTEX_AI * 1024 * 1024;
-            }
-
-            return 0;
-        }
-
-        private static int GetMaxPagesPerBatch()
-        {
-            if (Config.IsConfigurationLocal())
-            {
-                return Config.MAX_PAGES_PER_BATCH_LOCAL;
-            }
-
-            switch (Config.LLM_PROVIDER)
-            {
-                case LLMProvider.OpenAI:
-                    return Config.MAX_PAGES_PER_BATCH_OPEN_AI;
-                case LLMProvider.VertexAI:
-                    return Config.MAX_PAGES_PER_BATCH_VERTEX_AI;
-            }
-
-            return 0;
+            _options = options;
+            _provider = providers.GetRequired(options.Provider);
+            _timeProvider = timeProvider;
+            _statusParallelOptions = options.CreateStatusParallelOptions();
         }
 
         public void Start()
@@ -106,29 +86,29 @@ namespace landerist_library.Infrastructure.Tasks
 
         private void Initialize()
         {
-            if (!_firstTime)
+            if (_initialized)
             {
                 return;
             }
 
-            lock (InitializeSync)
+            lock (_initializeSync)
             {
-                if (!_firstTime)
+                if (_initialized)
                 {
                     return;
                 }
 
                 _waitingStatus.Update(WaitingStatus.readed_by_batch, WaitingStatus.waiting_ai_request);
-                _firstTime = false;
+                _initialized = true;
             }
         }
 
         private bool BatchUpload()
         {
-            var tokenCount = TaskLocalAIParsing.GetMaxTokenCount();
-            _pages.AddRange(_waitingStatus.SelectAIRequest(_maxPagesPerBatch, WaitingStatus.readed_by_batch, tokenCount, false));
+            var tokenCount = _options.MaxInputTokens;
+            _pages.AddRange(_waitingStatus.SelectAIRequest(_options.MaxPagesPerBatch, WaitingStatus.readed_by_batch, tokenCount, false));
 
-            if (_pages.Count < Config.MIN_PAGES_PER_BATCH)
+            if (_pages.Count < _options.MinPagesPerBatch)
             {
                 SetWaitingAIRequestToAllPages();
                 return false;
@@ -155,7 +135,7 @@ namespace landerist_library.Infrastructure.Tasks
                 return false;
             }
 
-            _batches.Insert(batchId, _waitingAIResponse, Config.LLM_PROVIDER);
+            _batches.Insert(batchId, _waitingAIResponse, _options.Provider);
             SetWaitingAIResponse();
             SetWaitingAIRequest();
             return true;
@@ -168,11 +148,11 @@ namespace landerist_library.Infrastructure.Tasks
                 return null;
             }
 
-            Directory.CreateDirectory(Config.BATCH_DIRECTORY!);
+            Directory.CreateDirectory(_options.Directory);
 
             var filePath = Path.Combine(
-                Config.BATCH_DIRECTORY!,
-                $"batch_{Config.LLM_PROVIDER.ToString().ToLowerInvariant()}_{DateTime.Now:yyyyMMddHHmmss}_input.json");
+                _options.Directory,
+                $"batch_{_options.Provider.ToString().ToLowerInvariant()}_{_timeProvider.GetLocalNow():yyyyMMddHHmmss}_input.json");
 
             Console.WriteLine("TaskBatchUpload " + filePath);
 
@@ -216,7 +196,7 @@ namespace landerist_library.Infrastructure.Tasks
 
             Log.WriteBatch("TaskBatchUpload", $"CreateFile {_waitingAIResponse.Count}/{_pages.Count} skipped: {skipped} errors: {errors}");
 
-            if (_waitingAIResponse.Count < Config.MIN_PAGES_PER_BATCH)
+            if (_waitingAIResponse.Count < _options.MinPagesPerBatch)
             {
                 File.Delete(filePath);
                 return null;
@@ -229,7 +209,7 @@ namespace landerist_library.Infrastructure.Tasks
         {
             writer.Flush();
             var sizeToAdd = writer.Encoding.GetByteCount(json + Environment.NewLine);
-            return writer.BaseStream.Length + sizeToAdd <= _maxFileSizeInBytes;
+            return writer.BaseStream.Length + sizeToAdd <= _options.MaxFileSizeInBytes;
         }
 
         private FileWriteResult WriteToFile(Page page, StreamWriter writer)
@@ -262,7 +242,7 @@ namespace landerist_library.Infrastructure.Tasks
             return FileWriteResult.Error;
         }
 
-        public static string? GetJson(Page page)
+        private string? GetJson(Page page)
         {
             page.SetResponseBodyFromZipped();
             var text = page.GetListingParserInput();
@@ -274,36 +254,14 @@ namespace landerist_library.Infrastructure.Tasks
                 return null;
             }
 
-            switch (Config.LLM_PROVIDER)
-            {
-                case LLMProvider.OpenAI:
-                    return OpenAIBatchUpload.GetJson(page, text);
-                case LLMProvider.VertexAI:
-                    return VertexAIBatchUpload.GetJson(page, text);
-                default:
-                    return null;
-            }
+            return _provider.Serialize(page, text);
         }
 
-        private static string? UploadFile(string filePath)
-        {
-            return Config.LLM_PROVIDER switch
-            {
-                LLMProvider.OpenAI => OpenAIBatchClient.UploadFile(filePath),
-                LLMProvider.VertexAI => CloudStorage.UploadFile(filePath),
-                _ => null,
-            };
-        }
+        private string? UploadFile(string filePath) =>
+            _provider.UploadFile(filePath);
 
-        private static string? CreateBatch(string fileId)
-        {
-            return Config.LLM_PROVIDER switch
-            {
-                LLMProvider.OpenAI => OpenAIBatchClient.CreateBatch(fileId),
-                LLMProvider.VertexAI => BatchPredictions.CreateBatch(fileId),
-                _ => null,
-            };
-        }
+        private string? CreateBatch(string fileId) =>
+            _provider.CreateBatch(fileId);
 
         private void Clear()
         {
@@ -319,7 +277,7 @@ namespace landerist_library.Infrastructure.Tasks
 
         private void SetWaitingAIResponse()
         {
-            if (Config.IsConfigurationLocal())
+            if (!_options.UpdateWaitingResponse)
             {
                 return;
             }
@@ -330,7 +288,7 @@ namespace landerist_library.Infrastructure.Tasks
             }
 
             int counter = 0;
-            Parallel.ForEach(_waitingAIResponse, Config.PARALLELOPTIONS1INLOCAL, uriHash =>
+            Parallel.ForEach(_waitingAIResponse, _statusParallelOptions, uriHash =>
             {
                 if (_waitingStatus.UpdateAIResponse(uriHash))
                 {
@@ -353,7 +311,7 @@ namespace landerist_library.Infrastructure.Tasks
             }
 
             int counter = 0;
-            Parallel.ForEach(pages, Config.PARALLELOPTIONS1INLOCAL, page =>
+            Parallel.ForEach(pages, _statusParallelOptions, page =>
             {
                 if (_waitingStatus.UpdateAIRequest(page.UriHash))
                 {
@@ -376,7 +334,7 @@ namespace landerist_library.Infrastructure.Tasks
             }
 
             int counter = 0;
-            Parallel.ForEach(pages, Config.PARALLELOPTIONS1INLOCAL, page =>
+            Parallel.ForEach(pages, _statusParallelOptions, page =>
             {
                 if (_waitingStatus.UpdateAIRequest(page.UriHash))
                 {

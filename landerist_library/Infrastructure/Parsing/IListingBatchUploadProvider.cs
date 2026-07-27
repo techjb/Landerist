@@ -1,0 +1,41 @@
+using landerist_library.Pages;
+using landerist_library.Parse.ListingParser;
+
+namespace landerist_library.Infrastructure.Parsing;
+
+public interface IListingBatchUploadProvider
+{
+    LLMProvider Provider { get; }
+    string? Serialize(Page page, string userInput);
+    string? UploadFile(string filePath);
+    string? CreateBatch(string fileId);
+}
+
+public sealed class ListingBatchUploadProviderCatalog
+{
+    private readonly IReadOnlyDictionary<LLMProvider, IListingBatchUploadProvider>
+        _providers;
+
+    public ListingBatchUploadProviderCatalog(
+        IEnumerable<IListingBatchUploadProvider> providers)
+    {
+        ArgumentNullException.ThrowIfNull(providers);
+        try
+        {
+            _providers = providers.ToDictionary(provider => provider.Provider);
+        }
+        catch (ArgumentException exception)
+        {
+            throw new ArgumentException(
+                "Only one batch upload provider can be registered per LLM provider.",
+                nameof(providers),
+                exception);
+        }
+    }
+
+    public IListingBatchUploadProvider GetRequired(LLMProvider provider) =>
+        _providers.TryGetValue(provider, out IListingBatchUploadProvider? selected)
+            ? selected
+            : throw new InvalidOperationException(
+                $"No batch upload provider is registered for {provider}.");
+}

@@ -235,6 +235,43 @@ namespace landerist_console
                         ? TasksExecutionMode.Principal
                         : TasksExecutionMode.Scraper;
 
+            Tokenizer batchTokenizer = new(
+                TokenizerOptions.ForProvider(Config.LLM_PROVIDER));
+            int batchMaxInputTokens =
+                TokenizerOptions.ForProvider(Config.LLM_PROVIDER).MaxContextWindow -
+                batchTokenizer.CountSystemTokens();
+            int batchMaxPages = Config.IsConfigurationLocal()
+                ? Config.MAX_PAGES_PER_BATCH_LOCAL
+                : Config.LLM_PROVIDER switch
+                {
+                    LLMProvider.OpenAI => Config.MAX_PAGES_PER_BATCH_OPEN_AI,
+                    LLMProvider.VertexAI => Config.MAX_PAGES_PER_BATCH_VERTEX_AI,
+                    _ => throw new InvalidOperationException(
+                        $"Batch upload is not supported for {Config.LLM_PROVIDER}.")
+                };
+            long batchMaxFileSize = Config.LLM_PROVIDER switch
+            {
+                LLMProvider.OpenAI => Config.MAX_BATCH_FILE_SIZE_OPEN_AI * 1024L * 1024L,
+                LLMProvider.VertexAI => Config.MAX_BATCH_FILE_SIZE_VERTEX_AI * 1024L * 1024L,
+                _ => throw new InvalidOperationException(
+                    $"Batch upload is not supported for {Config.LLM_PROVIDER}.")
+            };
+            BatchUploadOptions batchUploadOptions = new(
+                Config.LLM_PROVIDER,
+                Config.BATCH_DIRECTORY ?? throw new InvalidOperationException(
+                    "Batch directory is not configured."),
+                batchMaxFileSize,
+                batchMaxPages,
+                Config.MIN_PAGES_PER_BATCH,
+                batchMaxInputTokens,
+                updateWaitingResponse: !Config.IsConfigurationLocal(),
+                statusUpdateParallelism:
+                    Config.PARALLELOPTIONS1INLOCAL.MaxDegreeOfParallelism);
+            ListingBatchUploadProviderCatalog batchUploadProviders = new(
+            [
+                new OpenAIBatchUploadProvider(),
+                new VertexAIBatchUploadProvider()
+            ]);
             return new TasksService(
                 new TasksServiceOptions(executionMode),
                 new SystemRecurringTaskScheduler(),
@@ -255,7 +292,13 @@ namespace landerist_console
                     new Tokenizer(TokenizerOptions.ForProvider(LLMProvider.LocalAI)))),
                 new TenMinuteTaskJob(
                     new TaskBatchDownload(parsedClassification, batches, globalStatistics, pageCatalog, pagePersistence, new OpenAIBatchDownload(), new VertexAIBatchDownload(), listingParser),
-                    new TaskBatchUpload(batches, waitingStatus, pagePersistence)),
+                    new TaskBatchUpload(
+                        batches,
+                        waitingStatus,
+                        pagePersistence,
+                        batchUploadOptions,
+                        batchUploadProviders,
+                        TimeProvider.System)),
                 new HourlyTaskJob(
                     new WebsiteRefreshService(websiteCatalog, websitePersistence, websiteNetwork, websiteSitemaps),
                     new TaskBatchCleaner(batches)),
