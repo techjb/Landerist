@@ -1,4 +1,4 @@
-using landerist_library.Index;
+using landerist_library.Websites;
 using landerist_library.Tools;
 
 namespace landerist_library.Pages
@@ -71,13 +71,24 @@ namespace landerist_library.Pages
                 if (node != null)
                 {
                     var contentAttribute = node.GetAttributeValue("href", "");
-                    var canonicalUri = new Indexer(this).GetUri(contentAttribute);
+                    var canonicalUri = ResolveUri(contentAttribute);
                     return IsIgnoredCanonicalUri(canonicalUri) ? null : canonicalUri;
                 }
             }
             return null;
         }
 
+        private Uri? ResolveUri(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value) ||
+                !Uri.TryCreate(Uri, value, out Uri? resolved) ||
+                (resolved.Scheme != Uri.UriSchemeHttp && resolved.Scheme != Uri.UriSchemeHttps))
+            {
+                return null;
+            }
+
+            return new UriBuilder(resolved) { Fragment = string.Empty }.Uri;
+        }
         private bool IsIgnoredCanonicalUri(Uri? canonicalUri)
         {
             if (canonicalUri is null)

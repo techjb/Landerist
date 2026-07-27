@@ -1,6 +1,6 @@
-﻿using landerist_library.Websites;
+using landerist_library.Websites;
 
-namespace landerist_library.Index
+namespace landerist_library.Websites
 {
     internal class LanguageValidator
     {

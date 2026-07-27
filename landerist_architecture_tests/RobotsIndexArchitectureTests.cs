@@ -1,36 +1,28 @@
 namespace landerist_architecture_tests;
 
-public sealed class WebsiteDependencyArchitectureTests
+public sealed class RobotsIndexArchitectureTests
 {
     [Fact]
-    public void Websites_DoesNotDependOnConfigurationOrIndexing()
+    public void Index_DoesNotCallWebsiteRobotsMethods()
     {
-        string websitesRoot = Path.Combine(
-            FindRepositoryRoot(),
-            "landerist_library",
-            "Websites");
-        string[] forbiddenTokens =
-        [
-            "landerist_library.Configuration",
-            "landerist_library.Infrastructure.Indexing",
-            "SitemapIndexer",
-            "Config."
-        ];
+        string root = FindRepositoryRoot();
+        string indexRoot = Path.Combine(root, "landerist_library", "Infrastructure", "Indexing");
         string[] violations = Directory
-            .EnumerateFiles(websitesRoot, "*.cs", SearchOption.AllDirectories)
+            .EnumerateFiles(indexRoot, "*.cs", SearchOption.AllDirectories)
             .Where(file =>
             {
                 string source = File.ReadAllText(file);
-                return forbiddenTokens.Any(token =>
-                    source.Contains(token, StringComparison.Ordinal));
+                return source.Contains(".IsAllowedByRobotsTxt(", StringComparison.Ordinal) ||
+                    source.Contains(".CrawlDelay()", StringComparison.Ordinal) ||
+                    source.Contains("GetSiteMapsFromRobotsTxt", StringComparison.Ordinal);
             })
-            .Select(file => Path.GetFileName(file)!)
+            .Select(file => Path.GetRelativePath(root, file).Replace('\\', '/'))
             .Order()
             .ToArray();
 
         Assert.True(
             violations.Length == 0,
-            "Websites must receive configuration and indexing behavior explicitly." +
+            "Index must use IWebsiteRobotsPolicy." +
             Environment.NewLine +
             string.Join(Environment.NewLine, violations));
     }

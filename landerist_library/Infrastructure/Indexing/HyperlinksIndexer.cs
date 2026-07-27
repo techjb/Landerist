@@ -1,10 +1,11 @@
-﻿using HtmlAgilityPack;
+using HtmlAgilityPack;
 using landerist_library.Pages;
+using landerist_library.Application.Websites;
 using System.Text.RegularExpressions;
 
-namespace landerist_library.Index
+namespace landerist_library.Infrastructure.Indexing
 {
-    public partial class HyperlinksIndexer(Page page) : Indexer(page)
+    public partial class HyperlinksIndexer(Page page, IWebsiteRobotsPolicy robots) : Indexer(page, robots)
     {
         public void Insert()
         {

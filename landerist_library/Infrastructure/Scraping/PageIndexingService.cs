@@ -1,7 +1,8 @@
+using landerist_library.Websites;
 using HtmlAgilityPack;
 using landerist_library.Application.Listings;
 using landerist_library.Application.Scraping;
-using landerist_library.Index;
+using landerist_library.Infrastructure.Indexing;
 using landerist_library.Pages;
 using System.Text.RegularExpressions;
 

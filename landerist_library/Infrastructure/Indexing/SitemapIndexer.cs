@@ -1,8 +1,9 @@
 using landerist_library.Websites;
 using landerist_library.Pages;
+using landerist_library.Application.Websites;
 using Louw.SitemapParser;
 
-namespace landerist_library.Index
+namespace landerist_library.Infrastructure.Indexing
 {
     public class SitemapIndexer : Indexer
     {
@@ -12,7 +13,7 @@ namespace landerist_library.Index
 
         private sealed record LoadedSitemap(Sitemap Sitemap, IReadOnlyList<Uri> AlternateUrls);
 
-        public SitemapIndexer(Website website, Func<Page, bool>? insertPage = null, Func<Website, bool>? achievedMaxNumberOfPages = null) : base(website, insertPage, achievedMaxNumberOfPages)
+        public SitemapIndexer(Website website, IWebsiteRobotsPolicy robots, Func<Page, bool>? insertPage = null, Func<Website, bool>? achievedMaxNumberOfPages = null) : base(website, robots, insertPage, achievedMaxNumberOfPages)
         {
             WebsiteSitemapFetcher = new GzipAwareSitemapFetcher(website);
         }

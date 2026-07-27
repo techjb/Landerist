@@ -1,10 +1,10 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Configuration;
 using landerist_library.Websites;
 using Louw.SitemapParser;
 using System.IO.Compression;
 using System.Net;
 
-namespace landerist_library.Index
+namespace landerist_library.Infrastructure.Indexing
 {
     internal sealed class GzipAwareSitemapFetcher : ISitemapFetcher
     {

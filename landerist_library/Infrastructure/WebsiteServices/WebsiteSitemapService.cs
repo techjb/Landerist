@@ -1,6 +1,6 @@
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Websites;
-using landerist_library.Index;
+using landerist_library.Infrastructure.Indexing;
 using landerist_library.Logs;
 using landerist_library.Websites;
 
@@ -47,6 +47,7 @@ public sealed class WebsiteSitemapService : IWebsiteSitemapService
             bool indexedFromRobotsTxt = false;
             SitemapIndexer sitemapIndexer = new(
                 website,
+                _robots,
                 _pagePersistence.Insert,
                 _metrics.HasAchievedMaximumPages);
             IReadOnlyList<Uri> sitemapUrls = _robots.GetSitemapUrls(website);

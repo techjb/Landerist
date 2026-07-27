@@ -1,13 +1,15 @@
 using landerist_library.Configuration;
+using landerist_library.Application.Websites;
 using landerist_library.Pages;
 using landerist_library.Tools;
 using landerist_library.Websites;
 
-namespace landerist_library.Index
+namespace landerist_library.Infrastructure.Indexing
 {
-    public class Indexer(Page page, Func<Page, bool>? insertPage = null, Func<Website, bool>? achievedMaxNumberOfPages = null)
+    public class Indexer(Page page, IWebsiteRobotsPolicy robots, Func<Page, bool>? insertPage = null, Func<Website, bool>? achievedMaxNumberOfPages = null)
     {
         protected Page Page { get; } = page;
+        protected IWebsiteRobotsPolicy RobotsPolicy { get; } = robots;
         private readonly Func<Page, bool>? _insertPage = insertPage;
         private readonly Func<Website, bool> _achievedMaxNumberOfPages = achievedMaxNumberOfPages ?? (_ => false);
 
@@ -27,7 +29,7 @@ namespace landerist_library.Index
             ".razor"
         ];
 
-        public Indexer(Website website, Func<Page, bool>? insertPage = null, Func<Website, bool>? achievedMaxNumberOfPages = null) : this(new Page(website), insertPage, achievedMaxNumberOfPages)
+        public Indexer(Website website, IWebsiteRobotsPolicy robots, Func<Page, bool>? insertPage = null, Func<Website, bool>? achievedMaxNumberOfPages = null) : this(new Page(website), robots, insertPage, achievedMaxNumberOfPages)
         {
         }
 
@@ -53,13 +55,13 @@ namespace landerist_library.Index
 
             if (Page.PageType.Equals(PageType.IncorrectLanguage))
             {
-                new LinkAlternateIndexer(Page).Insert();
+                new LinkAlternateIndexer(Page, RobotsPolicy).Insert();
                 return;
             }
 
             if (Page.PageType.Equals(PageType.NotCanonical))
             {
-                new CanonicalIndexer(Page).Insert();
+                new CanonicalIndexer(Page, RobotsPolicy).Insert();
                 return;
             }
 
@@ -70,7 +72,7 @@ namespace landerist_library.Index
 
             if (Page.Website.HtmlIndexingEnabled)
             {
-                new HyperlinksIndexer(Page).Insert();
+                new HyperlinksIndexer(Page, RobotsPolicy).Insert();
             }
         }
 
@@ -94,14 +96,16 @@ namespace landerist_library.Index
             }
         }
 
-        public Uri? GetUri(string? url)
+        public Uri? GetUri(string? url) => GetUri(Page, url);
+
+        public static Uri? GetUri(Page page, string? url)
         {
             if (string.IsNullOrWhiteSpace(url))
             {
                 return null;
             }
 
-            if (!Uri.TryCreate(Page.Uri, url, out Uri? uri))
+            if (!Uri.TryCreate(page.Uri, url, out Uri? uri))
             {
                 return null;
             }
@@ -180,7 +184,7 @@ namespace landerist_library.Index
                 return false;
             }
 
-            if (!website.IsAllowedByRobotsTxt(uri))
+            if (!RobotsPolicy.IsAllowed(website, uri))
             {
                 return false;
             }

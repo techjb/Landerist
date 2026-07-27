@@ -1,9 +1,11 @@
-﻿using HtmlAgilityPack;
+using HtmlAgilityPack;
 using landerist_library.Pages;
+using landerist_library.Websites;
+using landerist_library.Application.Websites;
 
-namespace landerist_library.Index
+namespace landerist_library.Infrastructure.Indexing
 {
-    public class LinkAlternateIndexer(Page page) : Indexer(page)
+    public class LinkAlternateIndexer(Page page, IWebsiteRobotsPolicy robots) : Indexer(page, robots)
     {
         public void Insert()
         {

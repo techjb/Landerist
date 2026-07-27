@@ -18,6 +18,7 @@ public sealed partial class PageAdministrationService : IPageAdministrationServi
     private readonly IWebsiteCatalog WebsiteCatalog;
     private readonly IListingQueryService ListingQueries;
     private readonly IListingMaintenanceService ListingMaintenance;
+    private readonly IWebsiteRobotsPolicy RobotsPolicy;
 
     public PageAdministrationService(
         IPagePersistenceService persistence,
@@ -25,7 +26,8 @@ public sealed partial class PageAdministrationService : IPageAdministrationServi
         IPageMaintenanceService maintenance,
         IWebsiteCatalog websiteCatalog,
         IListingQueryService listingQueries,
-        IListingMaintenanceService listingMaintenance)
+        IListingMaintenanceService listingMaintenance,
+        IWebsiteRobotsPolicy robotsPolicy)
     {
         Persistence = persistence;
         Queries = queries;
@@ -33,6 +35,7 @@ public sealed partial class PageAdministrationService : IPageAdministrationServi
         WebsiteCatalog = websiteCatalog;
         ListingQueries = listingQueries;
         ListingMaintenance = listingMaintenance;
+        RobotsPolicy = robotsPolicy;
     }
 
     public bool Insert(Page page) => Persistence.Insert(page);

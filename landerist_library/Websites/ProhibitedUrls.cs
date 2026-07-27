@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Text;
 using landerist_library.Websites;
 
-namespace landerist_library.Index
+namespace landerist_library.Websites
 {
     public class ProhibitedUrls
     {

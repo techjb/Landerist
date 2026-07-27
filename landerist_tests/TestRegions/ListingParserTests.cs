@@ -7,7 +7,7 @@ namespace landerist_tests
             //landerist_library.GetLatLng.Listing.ListingsParser.ProcessPages();
             //landerist_library.GetLatLng.Listing.ListingsParser.ParseListing(page);
 
-            //landerist_library.Index.ProhibitedUrls.FindNewProhibitedStartsWith();
+            //landerist_library.Infrastructure.Indexing.ProhibitedUrls.FindNewProhibitedStartsWith();
             //landerist_library.GetLatLng.PageType.LastSegment.FindProhibitedEndsSegments();
 
             //landerist_library.GetLatLng.PageType.PageTypeParser.ResponseBodyValidToIsListing();
