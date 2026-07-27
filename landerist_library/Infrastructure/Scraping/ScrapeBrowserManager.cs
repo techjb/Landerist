@@ -4,9 +4,9 @@ using landerist_library.Downloaders.Puppeteer;
 
 namespace landerist_library.Infrastructure.Scraping;
 
-public sealed class ScrapeBrowserManager : IScrapeBrowserManager
+public sealed class ScrapeBrowserManager(DownloadersPool pool) : IScrapeBrowserManager
 {
-    public void ClearDownloaders() => DownloadersPool.Clear();
+    public void ClearDownloaders() => pool.Clear();
 
     public void KillChrome() => ChromeKiller.KillChrome();
 

@@ -1,17 +1,27 @@
-﻿
 
-using landerist_library.Configuration;
+
 using landerist_library.Pages;
+using landerist_library.Downloaders;
 
 namespace landerist_library.Downloaders.Multiple
 {
     public class DownloadersPool
     {
-        private static readonly List<SingleDownloader> Downloaders = [];
+        private readonly int MaxDownloaders;
+        private readonly IDownloaderSessionFactory SessionFactory;
 
-        private static readonly Lock Sync = new();
+        public DownloadersPool(int maxDownloaders, IDownloaderSessionFactory sessionFactory)
+        {
+            if (maxDownloaders <= 0) throw new ArgumentOutOfRangeException(nameof(maxDownloaders));
+            ArgumentNullException.ThrowIfNull(sessionFactory);
+            MaxDownloaders = maxDownloaders;
+            SessionFactory = sessionFactory;
+        }
+        private readonly List<SingleDownloader> Downloaders = [];
 
-        public static bool Download(Page page, bool useProxy = false)
+        private readonly Lock Sync = new();
+
+        public bool Download(Page page, bool useProxy = false)
         {
             ArgumentNullException.ThrowIfNull(page);
             SingleDownloader? downloader = GetDownloader(useProxy);
@@ -23,7 +33,7 @@ namespace landerist_library.Downloaders.Multiple
             return downloader.Download(page);
         }
 
-        private static SingleDownloader? GetDownloader(bool useProxy)
+        private SingleDownloader? GetDownloader(bool useProxy)
         {
             lock (Sync)
             {
@@ -35,15 +45,15 @@ namespace landerist_library.Downloaders.Multiple
                     }
                 }
 
-                if (Downloaders.Count >= Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER)
+                if (Downloaders.Count >= MaxDownloaders)
                 {
                     Logs.Log.WriteInfo("MultipleDownloader GetDownloader",
-                        $"Max downloaders reached: {Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER}");
+                        $"Max downloaders reached: {MaxDownloaders}");
                     return null;
                 }
 
                 int id = Downloaders.Count + 1;
-                SingleDownloader newSingleDownloader = new(id, useProxy);
+                SingleDownloader newSingleDownloader = new(useProxy, SessionFactory) { Id = id };
                 if (newSingleDownloader.TryReserve(useProxy))
                 {
                     Downloaders.Add(newSingleDownloader);
@@ -55,7 +65,7 @@ namespace landerist_library.Downloaders.Multiple
             }
         }
 
-        public static void Clear()
+        public void Clear()
         {
             SingleDownloader[] toClear;
             lock (Sync)
@@ -68,7 +78,7 @@ namespace landerist_library.Downloaders.Multiple
                 singleDownloader.CloseBrowser());
         }
 
-        public static void Print()
+        public void Print()
         {
             lock (Sync)
             {
@@ -104,7 +114,7 @@ namespace landerist_library.Downloaders.Multiple
             }
         }
 
-        public static int GetDownloadersCounter()
+        public int GetDownloadersCounter()
         {
             lock (Sync)
             {
@@ -112,7 +122,7 @@ namespace landerist_library.Downloaders.Multiple
             }
         }
 
-        public static int GetMaxCrashCounter()
+        public int GetMaxCrashCounter()
         {
             lock (Sync)
             {
@@ -129,7 +139,7 @@ namespace landerist_library.Downloaders.Multiple
             }
         }
 
-        public static int GetMaxDownloads()
+        public int GetMaxDownloads()
         {
             lock (Sync)
             {

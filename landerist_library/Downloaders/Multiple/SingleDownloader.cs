@@ -1,4 +1,4 @@
-﻿using landerist_library.Downloaders;
+using landerist_library.Downloaders;
 using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Pages;
 
@@ -13,15 +13,6 @@ namespace landerist_library.Downloaders.Multiple
         private int Chrashes = 0;
         private int Scraped = 0;
         private readonly bool UseProxy;
-
-        public SingleDownloader(int id, bool useProxy) : this(useProxy)
-        {
-            Id = id;
-        }
-
-        public SingleDownloader(bool useProxy) : this(useProxy, new PuppeteerDownloaderFactory())
-        {
-        }
 
         public SingleDownloader(bool useProxy, IDownloaderSessionFactory downloaderSessionFactory)
         {

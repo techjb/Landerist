@@ -1,5 +1,4 @@
 using HtmlAgilityPack;
-using landerist_library.Configuration;
 using landerist_library.Pages;
 using landerist_library.Websites;
 using PuppeteerSharp;
@@ -18,6 +17,7 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private Pages.Page? Page;
         private readonly LaunchOptions launchOptions;
+        private readonly PuppeteerBrowserOptions Options;
 
         private IBrowser? Browser;
         private IPage? BrowserPage;
@@ -34,19 +34,21 @@ namespace landerist_library.Downloaders.Puppeteer
         private bool FirstNavigationRequestReaded = false;
         private string CurrentExecutionStep = "Idle";
 
-        public PuppeteerDownloader(bool useProxy)
+        public PuppeteerDownloader(bool useProxy, PuppeteerBrowserOptions options)
         {
+            ArgumentNullException.ThrowIfNull(options);
+            Options = options;
             UseProxy = useProxy;
             if (UseProxy)
             {
                 ProxyCredentials = new Credentials
                 {
-                    Username = AppConfig.PROXY_USERNAME,
-                    Password = AppConfig.PROXY_PASSWORD
+                    Username = options.ProxyUsername,
+                    Password = options.ProxyPassword
                 };
             }
 
-            launchOptions = PuppeteerLaunchOptionsFactory.Create(UseProxy);
+            launchOptions = PuppeteerLaunchOptionsFactory.Create(UseProxy, options);
             Browser = LaunchAsync().GetAwaiter().GetResult();
         }
 
@@ -239,10 +241,6 @@ namespace landerist_library.Downloaders.Puppeteer
             Page = page;
 
             var delay = GetTimeout(UseProxy);
-            if (Config.IsConfigurationLocal())
-            {
-                delay = 1000 * 1000;
-            }
 
             var stopwatch = Stopwatch.StartNew();
             SetExecutionStep("Starting download");
@@ -591,15 +589,8 @@ namespace landerist_library.Downloaders.Puppeteer
             return null;
         }
 
-        private static int GetTimeout(bool useProxy)
-        {
-            var timeout = Config.HTTPCLIENT_SECONDS_TIMEOUT * 1000;
-            if (useProxy)
-            {
-                timeout *= 2;
-            }
-            return timeout;
-        }
+        private int GetTimeout(bool useProxy) =>
+            Options.GetTimeoutMilliseconds(useProxy);
 
         private void SetExecutionStep(string step)
         {

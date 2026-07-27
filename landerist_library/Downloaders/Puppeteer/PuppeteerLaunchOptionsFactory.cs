@@ -1,4 +1,3 @@
-﻿using landerist_library.Configuration;
 using PuppeteerSharp;
 
 namespace landerist_library.Downloaders.Puppeteer
@@ -44,39 +43,27 @@ namespace landerist_library.Downloaders.Puppeteer
             "--disable-blink-features=AutomationControlled"
         ];
 
-        public static LaunchOptions Create(bool useProxy)
+        public static LaunchOptions Create(bool useProxy, PuppeteerBrowserOptions options)
         {
             return new LaunchOptions
             {
                 //Headless = true, // if false, maybe need to comment await browserPage.SetRequestInterceptionAsync(true);
-                Headless = Config.HEADLESS_BROWSER,
+                Headless = options.Headless,
                 Devtools = false,
                 //IgnoreHTTPSErrors = true,
-                Args = BuildArgs(useProxy),
+                Args = BuildArgs(useProxy, options),
             };
         }
 
-        private static string[] BuildArgs(bool useProxy)
+        private static string[] BuildArgs(bool useProxy, PuppeteerBrowserOptions options)
         {
-            return useProxy ? [.. DefaultArgs, BuildProxyServerArgument()] : DefaultArgs;
+            return useProxy ? [.. DefaultArgs, BuildProxyServerArgument(options)] : DefaultArgs;
         }
 
-        private static string BuildProxyServerArgument()
+        private static string BuildProxyServerArgument(PuppeteerBrowserOptions options)
         {
-            return "--proxy-server=" + AppConfig.PROXY_HOST + ":" + GetProxyPort();
+            return "--proxy-server=" + options.ProxyHost + ":" + options.GetProxyPort();
         }
 
-        private static string GetProxyPort()
-        {
-            if (!AppConfig.PROXY_RANDOMIZE_STICKY_PORTS ||
-                AppConfig.PROXY_STICKY_PORT_MIN > AppConfig.PROXY_STICKY_PORT_MAX)
-            {
-                return AppConfig.PROXY_PORT;
-            }
-
-            return Random.Shared
-                .Next(AppConfig.PROXY_STICKY_PORT_MIN, AppConfig.PROXY_STICKY_PORT_MAX + 1)
-                .ToString();
-        }
     }
 }

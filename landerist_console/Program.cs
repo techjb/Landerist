@@ -1,3 +1,5 @@
+using landerist_library.Downloaders.Puppeteer;
+using landerist_library.Downloaders.Multiple;
 using landerist_library.Parse.Location.Providers.Goolzoom;
 using landerist_library.Websites;
 using landerist_library.Infrastructure.Statistics;
@@ -69,6 +71,20 @@ namespace landerist_console
                     settings.GetInt32("PROXY_STICKY_PORT_MAX"),
                     settings.GetString("PROXY_USERNAME"),
                     settings.GetString("PROXY_PASSWORD")));
+            PuppeteerBrowserOptions browserOptions = new(
+                Config.HEADLESS_BROWSER,
+                Config.IsConfigurationLocal(),
+                Config.HTTPCLIENT_SECONDS_TIMEOUT * 1000,
+                settings.GetString("PROXY_HOST"),
+                settings.GetInt32("PROXY_PORT"),
+                settings.GetBoolean("PROXY_RANDOMIZE_STICKY_PORTS"),
+                settings.GetInt32("PROXY_STICKY_PORT_MIN"),
+                settings.GetInt32("PROXY_STICKY_PORT_MAX"),
+                settings.GetString("PROXY_USERNAME"),
+                settings.GetString("PROXY_PASSWORD"));
+            DownloadersPool downloaders = new(
+                Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
+                new PuppeteerDownloaderFactory(browserOptions));
             GoolzoomApi goolzoom = new(
                 httpClients,
                 new GoolzoomOptions(
@@ -144,7 +160,7 @@ namespace landerist_console
                 logger);
             PageScrapePipelineServices pageScraping = new(
                 new PageAcquisitionService(
-                    new PooledPageDownloader(),
+                    new PooledPageDownloader(downloaders),
                     new HttpConditionalPageHeaderService(httpClients),
                     new SqlScrapeMetrics(databaseFactory.Create()),
                     conditionalHeadersEnabled: !Config.IsConfigurationLocal()),
@@ -166,7 +182,7 @@ namespace landerist_console
                     enforceMinimumPages: Config.IsConfigurationProduction()));
             ScrapeBatchServices batchScraping = new(
                 new SqlWebsiteThrottleService(databaseFactory.Create(), robotsPolicy),
-                new ScrapeBrowserManager(),
+                new ScrapeBrowserManager(downloaders),
                 new SqlPageLockManager(databaseFactory.Create(), Config.MACHINE_NAME),
                 new SqlScrapeBatchMetrics(databaseFactory.Create()),
                 new SqlScrapePageSource(databaseFactory.Create(), listingStore),
