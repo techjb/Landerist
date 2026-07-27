@@ -107,7 +107,7 @@ namespace landerist_library.Websites
         public bool CrawlDelayTooBig()
         {
             var crawlDelay = CrawlDelay();
-            return crawlDelay > Config.MAX_CRAW_DELAY_SECONDS;
+            return crawlDelay > Rules.MaxCrawlDelaySeconds;
         }
 
         public List<Sitemap>? GetSiteMapsFromRobotsTxt()

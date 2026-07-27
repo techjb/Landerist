@@ -1,4 +1,3 @@
-using landerist_library.Configuration;
 using System.Text.Json;
 
 namespace landerist_library.Websites
@@ -62,7 +61,7 @@ namespace landerist_library.Websites
             };
 
             using var httpClient = new HttpClient(handler);
-            httpClient.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
+            httpClient.Timeout = TimeSpan.FromSeconds(Rules.HttpClientTimeoutSeconds);
 
             try
             {

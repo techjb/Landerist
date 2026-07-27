@@ -1,5 +1,4 @@
 using Com.Bekijkhet.RobotsTxt;
-using landerist_library.Configuration;
 using landerist_orels.ES;
 
 namespace landerist_library.Websites
@@ -44,7 +43,7 @@ namespace landerist_library.Websites
 
         public string BrowserUserAgent =>
             string.IsNullOrWhiteSpace(UserAgent)
-                ? Config.USER_AGENT_BROWSER
+                ? Rules.DefaultBrowserUserAgent
                 : UserAgent.Trim();
 
         public bool HtmlIndexingEnabled { get; set; } = false;
@@ -61,20 +60,37 @@ namespace landerist_library.Websites
 
         private bool Disposed;
 
-        public Website()
+        private readonly WebsiteRules Rules;
+
+        public Website() : this(WebsiteRules.Default)
         {
+        }
+
+        public Website(WebsiteRules rules)
+        {
+            ArgumentNullException.ThrowIfNull(rules);
+            Rules = rules;
             MainUri = new Uri("about:blank", UriKind.RelativeOrAbsolute);
         }
 
-        public Website(string host) : this()
+        public Website(string host) : this(host, WebsiteRules.Default)
+        {
+        }
+
+        public Website(string host, WebsiteRules rules) : this(rules)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(host);
             Host = host;
             MainUri = new Uri($"https://{host}");
         }
 
-        public Website(Uri mainUri) : this()
+        public Website(Uri mainUri) : this(mainUri, WebsiteRules.Default)
         {
+        }
+
+        public Website(Uri mainUri, WebsiteRules rules) : this(rules)
+        {
+            ArgumentNullException.ThrowIfNull(mainUri);
             SetMainUri(mainUri);
         }
 
