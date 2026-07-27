@@ -23,11 +23,13 @@ namespace landerist_library.Infrastructure.Administration
 
         private readonly IWebsiteAdministrationService _websites;
         private readonly IWebsiteNetworkService _network;
+        private readonly IWebsiteSitemapService _sitemaps;
 
-        public WebsitesInserter(bool initialize, IWebsiteAdministrationService websites, IWebsiteNetworkService network)
+        public WebsitesInserter(bool initialize, IWebsiteAdministrationService websites, IWebsiteNetworkService network, IWebsiteSitemapService sitemaps)
         {
             _websites = websites;
             _network = network;
+            _sitemaps = sitemaps;
             if (initialize)
             {
                 Init();
@@ -309,7 +311,7 @@ namespace landerist_library.Infrastructure.Administration
             try
             {
                 _websites.InsertMainPage(website);
-                website.ReadSitemap();
+                _sitemaps.RefreshSitemap(website);
                 _websites.Update(website);
             }
             catch (Exception exception)

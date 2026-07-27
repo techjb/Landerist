@@ -9,26 +9,34 @@ namespace landerist_unit_tests;
 public sealed class WebsiteRefreshServiceTests
 {
     [Fact]
-    public void Refresh_DelegatesRobotsAndIpUpdatesToNetworkPort()
+    public void Refresh_DelegatesNetworkAndSitemapUpdatesToPorts()
     {
         Website robotsWebsite = new(new Uri("https://robots.example.com"));
         Website ipWebsite = new(new Uri("https://ip.example.com"));
+        Website sitemapWebsite = new(new Uri("https://sitemap.example.com"));
         RecordingWebsiteNetworkService network = new();
         RecordingWebsitePersistenceService persistence = new();
+        RecordingWebsiteSitemapService sitemaps = new();
         WebsiteRefreshService service = new(
-            new StubWebsiteCatalog(robotsWebsite, ipWebsite),
+            new StubWebsiteCatalog(robotsWebsite, sitemapWebsite, ipWebsite),
             persistence,
-            new StubPagePersistenceService(),
-            new StubWebsiteMetricsService(),
-            network);
+            network,
+            sitemaps);
 
         service.Refresh();
 
         Assert.Same(robotsWebsite, Assert.Single(network.RobotsWebsites));
         Assert.Same(ipWebsite, Assert.Single(network.IpWebsites));
-        Assert.Equal(2, persistence.UpdatedWebsites.Count);
+        Assert.Same(sitemapWebsite, Assert.Single(sitemaps.Websites));
+        Assert.Equal(3, persistence.UpdatedWebsites.Count);
     }
 
+    private sealed class RecordingWebsiteSitemapService : IWebsiteSitemapService
+    {
+        public List<Website> Websites { get; } = [];
+
+        public void RefreshSitemap(Website website) => Websites.Add(website);
+    }
     private sealed class RecordingWebsiteNetworkService : IWebsiteNetworkService
     {
         public List<Website> RobotsWebsites { get; } = [];
@@ -51,12 +59,14 @@ public sealed class WebsiteRefreshServiceTests
 
     private sealed class StubWebsiteCatalog(
         Website robotsWebsite,
+        Website sitemapWebsite,
         Website ipWebsite) : IWebsiteCatalog
     {
         public IReadOnlyList<Website> GetNeedingRobotsTxtUpdate(DateTime updatedBefore) =>
             [robotsWebsite];
 
-        public IReadOnlyList<Website> GetNeedingSitemapUpdate(DateTime updatedBefore) => [];
+        public IReadOnlyList<Website> GetNeedingSitemapUpdate(DateTime updatedBefore) =>
+            [sitemapWebsite];
 
         public IReadOnlyList<Website> GetNeedingIpAddressUpdate(DateTime updatedBefore) =>
             [ipWebsite];

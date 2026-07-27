@@ -104,6 +104,11 @@ namespace landerist_console
                 new WebsitePageMetricsRepository(databaseFactory.Create()),
                 new ListingStatisticsRepository(databaseFactory.Create()),
                 Config.MAX_PAGES_PER_WEBSITE);
+            WebsiteSitemapService websiteSitemaps = new(
+                Config.INDEXER_ENABLED,
+                pagePersistence,
+                websiteMetrics,
+                TimeProvider.System);
             GlobalStatistics globalStatistics = new(
                 new GlobalStatisticsRepository(databaseFactory.Create()),
                 persistenceEnabled: !Config.IsConfigurationLocal());
@@ -183,7 +188,7 @@ namespace landerist_console
                     new TaskBatchDownload(parsedClassification, batches, globalStatistics, pageCatalog, pagePersistence, new OpenAIBatchDownload(), new VertexAIBatchDownload()),
                     new TaskBatchUpload(batches, waitingStatus, pagePersistence)),
                 new HourlyTaskJob(
-                    new WebsiteRefreshService(websiteCatalog, websitePersistence, pagePersistence, websiteMetrics, websiteNetwork),
+                    new WebsiteRefreshService(websiteCatalog, websitePersistence, websiteNetwork, websiteSitemaps),
                     new TaskBatchCleaner(batches)),
                 new DailyTaskJob(
                     databaseFactory.Create(),

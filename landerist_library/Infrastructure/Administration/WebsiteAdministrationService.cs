@@ -330,7 +330,7 @@ namespace landerist_library.Infrastructure.Administration
             {
                 try
                 {
-                    website.ReadSitemap(PagePersistence.Insert, Metrics.HasAchievedMaximumPages);
+                    Sitemaps.RefreshSitemap(website);
                     Update(website);
                     Interlocked.Increment(ref counter);
                 }

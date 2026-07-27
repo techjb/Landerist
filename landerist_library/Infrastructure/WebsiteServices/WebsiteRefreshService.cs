@@ -8,26 +8,23 @@ public sealed class WebsiteRefreshService : IWebsiteRefreshService
 {
     private readonly IWebsiteCatalog _catalog;
     private readonly IWebsitePersistenceService _websitePersistence;
-    private readonly IPagePersistenceService _pagePersistence;
-    private readonly IWebsiteMetricsService _metrics;
     private readonly IWebsiteNetworkService _network;
+    private readonly IWebsiteSitemapService _sitemaps;
 
     public WebsiteRefreshService(
         IWebsiteCatalog catalog,
         IWebsitePersistenceService websitePersistence,
-        IPagePersistenceService pagePersistence,
-        IWebsiteMetricsService metrics,
-        IWebsiteNetworkService network)
+        IWebsiteNetworkService network,
+        IWebsiteSitemapService sitemaps)
     {
         ArgumentNullException.ThrowIfNull(catalog);
         ArgumentNullException.ThrowIfNull(websitePersistence);
-        ArgumentNullException.ThrowIfNull(pagePersistence);
         ArgumentNullException.ThrowIfNull(network);
+        ArgumentNullException.ThrowIfNull(sitemaps);
         _catalog = catalog;
         _websitePersistence = websitePersistence;
-        _pagePersistence = pagePersistence;
-        _metrics = metrics;
         _network = network;
+        _sitemaps = sitemaps;
     }
 
     public void Refresh()
@@ -38,7 +35,7 @@ public sealed class WebsiteRefreshService : IWebsiteRefreshService
             website => _network.RefreshRobotsTxt(website));
         Refresh(
             _catalog.GetNeedingSitemapUpdate(updatedBefore),
-            website => website.ReadSitemap(_pagePersistence.Insert, _metrics.HasAchievedMaximumPages));
+            website => _sitemaps.RefreshSitemap(website));
         Refresh(
             _catalog.GetNeedingIpAddressUpdate(updatedBefore),
             website => _network.RefreshIpAddress(website));

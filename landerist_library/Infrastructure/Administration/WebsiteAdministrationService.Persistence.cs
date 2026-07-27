@@ -21,6 +21,7 @@ public sealed partial class WebsiteAdministrationService : IWebsiteAdministratio
     private readonly IPagePersistenceService PagePersistence;
     private readonly IPageMaintenanceService PageMaintenance;
     private readonly IWebsiteNetworkService Network;
+    private readonly IWebsiteSitemapService Sitemaps;
 
     public WebsiteAdministrationService(
         IWebsitePersistenceService persistence,
@@ -32,7 +33,8 @@ public sealed partial class WebsiteAdministrationService : IWebsiteAdministratio
         IListingMaintenanceService listingMaintenance,
         IPagePersistenceService pagePersistence,
         IPageMaintenanceService pageMaintenance,
-        IWebsiteNetworkService network)
+        IWebsiteNetworkService network,
+        IWebsiteSitemapService sitemaps)
     {
         Persistence = persistence;
         Deletion = deletion;
@@ -44,6 +46,7 @@ public sealed partial class WebsiteAdministrationService : IWebsiteAdministratio
         PagePersistence = pagePersistence;
         PageMaintenance = pageMaintenance;
         Network = network;
+        Sitemaps = sitemaps;
     }
 
     public bool Insert(Website website) => Persistence.Insert(website);

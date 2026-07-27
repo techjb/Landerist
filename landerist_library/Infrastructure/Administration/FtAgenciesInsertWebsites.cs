@@ -8,7 +8,7 @@ using System.Data;
 
 namespace landerist_library.Infrastructure.Administration
 {
-    public class FtAgenciesInsertWebsites(IWebsiteAdministrationService websites, IWebsiteNetworkService network) : WebsitesInserter(true, websites, network)
+    public class FtAgenciesInsertWebsites(IWebsiteAdministrationService websites, IWebsiteNetworkService network, IWebsiteSitemapService sitemaps) : WebsitesInserter(true, websites, network, sitemaps)
     {
         public void Start()
         {
