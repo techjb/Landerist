@@ -79,6 +79,8 @@ namespace landerist_library.Pages
 
         private readonly PageRules Rules;
 
+        public int MaxScreenshotSize => Rules.MaxScreenshotSize;
+
         public Page(string url) : this(new Uri(url), PageRules.Default)
         {
 

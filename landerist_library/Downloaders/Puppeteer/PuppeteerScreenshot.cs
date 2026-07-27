@@ -1,4 +1,3 @@
-﻿using landerist_library.Configuration;
 using landerist_library.Logs;
 using PuppeteerSharp;
 using System.Drawing;
@@ -9,32 +8,38 @@ namespace landerist_library.Downloaders.Puppeteer
 {
     public class PuppeteerScreenshot
     {
-        public static async Task<byte[]?> TakeScreenshot(IPage browserPage, Pages.Page page)
+        private readonly PuppeteerScreenshotPolicy Policy;
+        private readonly IScreenshotStore Store;
+
+        public PuppeteerScreenshot(PuppeteerScreenshotPolicy policy, IScreenshotStore store)
+        {
+            ArgumentNullException.ThrowIfNull(policy);
+            ArgumentNullException.ThrowIfNull(store);
+            Policy = policy.Validate();
+            Store = store;
+        }
+        public async Task<byte[]?> TakeScreenshot(IPage browserPage, Pages.Page page)
         {
             ScreenshotOptions screenshotOptions = new()
             {
-                Type = Config.SCREENSHOT_TYPE,
+                Type = Policy.Type,
                 FullPage = true,
                 OmitBackground = true,
             };
-            if (Config.SCREENSHOT_TYPE.Equals(ScreenshotType.Jpeg)
-                //|| Config.SCREENSHOT_TYPE.Equals(ScreenshotType.Webp) Not supported for webp. Screenshots have low quality.
+            if (Policy.Type.Equals(ScreenshotType.Jpeg)
+                //|| Policy.Type.Equals(ScreenshotType.Webp) Not supported for webp. Screenshots have low quality.
                 )
             {
-                screenshotOptions.Quality = 90;
+                screenshotOptions.Quality = Policy.InitialJpegQuality;
             }
             try
             {
                 var data = await browserPage.ScreenshotDataAsync(screenshotOptions);
                 if (data != null)
                 {
-                    data = ResizeImage(data);
+                    data = ResizeImage(data, page.MaxScreenshotSize);
 
-                    if (Config.SAVE_SCREENSHOT_FILE)
-                    {
-                        string fileName = Config.SCREENSHOTS_DIRECTORY + page.UriHash + "." + Config.SCREENSHOT_TYPE.ToString().ToLower();
-                        File.WriteAllBytes(fileName, data);
-                    }
+                    Store.Save(page.UriHash, Policy.Type, data);
                     return data;
                 }
             }
@@ -46,7 +51,7 @@ namespace landerist_library.Downloaders.Puppeteer
         }
 
 #pragma warning disable CA1416 // only supported in windows
-        static byte[] ResizeImage(byte[] bytes)
+        byte[] ResizeImage(byte[] bytes, int maxSizeBytes)
         {
             try
             {
@@ -54,7 +59,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 using Image image = Image.FromStream(memoryStream);
 
                 bytes = ResizeImageToMaxSides(bytes, image);
-                bytes = ResizeImageToMaxSize(bytes, image);
+                bytes = ResizeImageToMaxSize(bytes, image, maxSizeBytes);
             }
             catch (Exception exception)
             {
@@ -64,13 +69,13 @@ namespace landerist_library.Downloaders.Puppeteer
         }
 
 
-        static byte[] ResizeImageToMaxSides(byte[] bytes, Image image)
+        byte[] ResizeImageToMaxSides(byte[] bytes, Image image)
         {
             int originalWidth = image.Width;
             int originalHeight = image.Height;
 
-            if (originalWidth <= Config.MAX_SCREENSHOT_PIXELS_SIDE &&
-                originalHeight <= Config.MAX_SCREENSHOT_PIXELS_SIDE)
+            if (originalWidth <= Policy.MaxPixelsPerSide &&
+                originalHeight <= Policy.MaxPixelsPerSide)
             {
                 return bytes;
             }
@@ -80,13 +85,13 @@ namespace landerist_library.Downloaders.Puppeteer
 
             if (originalWidth > originalHeight)
             {
-                newWidth = Config.MAX_SCREENSHOT_PIXELS_SIDE;
-                newHeight = (int)(Config.MAX_SCREENSHOT_PIXELS_SIDE / heightWidthRatio);
+                newWidth = Policy.MaxPixelsPerSide;
+                newHeight = (int)(Policy.MaxPixelsPerSide / heightWidthRatio);
             }
             else
             {
-                newHeight = Config.MAX_SCREENSHOT_PIXELS_SIDE;
-                newWidth = (int)(Config.MAX_SCREENSHOT_PIXELS_SIDE * heightWidthRatio);
+                newHeight = Policy.MaxPixelsPerSide;
+                newWidth = (int)(Policy.MaxPixelsPerSide * heightWidthRatio);
             }
 
             using Bitmap resizedImage = new(newWidth, newHeight);
@@ -97,7 +102,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
 
             using MemoryStream resizedMemoryStream = new();
-            ImageFormat imageFormat = Config.SCREENSHOT_TYPE.Equals(ScreenshotType.Jpeg) ?
+            ImageFormat imageFormat = Policy.Type.Equals(ScreenshotType.Jpeg) ?
                 ImageFormat.Jpeg :
                 ImageFormat.Png;
 
@@ -106,24 +111,24 @@ namespace landerist_library.Downloaders.Puppeteer
         }
 
 
-        static byte[] ResizeImageToMaxSize(byte[] bytes, Image image)
+        byte[] ResizeImageToMaxSize(byte[] bytes, Image image, int maxSizeBytes)
         {
-            if (bytes.Length < Config.MAX_SCREENSHOT_SIZE)
+            if (bytes.Length < maxSizeBytes)
             {
                 return bytes;
             }
 
-            switch (Config.SCREENSHOT_TYPE)
+            switch (Policy.Type)
             {
-                case ScreenshotType.Jpeg: return ResizeImageToMaxSizeJpeg(image);
-                case ScreenshotType.Png: return ResizeImageToMaxSizePng(bytes, image);
+                case ScreenshotType.Jpeg: return ResizeImageToMaxSizeJpeg(image, maxSizeBytes);
+                case ScreenshotType.Png: return ResizeImageToMaxSizePng(bytes, image, maxSizeBytes);
                 case ScreenshotType.Webp:
                     break;
             }
             return [];
         }
 
-        static byte[] ResizeImageToMaxSizeJpeg(Image image)
+        byte[] ResizeImageToMaxSizeJpeg(Image image, int maxSizeBytes)
         {
             int quality = 100;
             byte[] resizedBytes;
@@ -143,7 +148,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 resizedBytes = outputStream.ToArray();
 
                 quality -= 5;
-            } while (resizedBytes.Length > Config.MAX_SCREENSHOT_SIZE && quality > 0);
+            } while (resizedBytes.Length > maxSizeBytes && quality > 0);
 
             return resizedBytes;
         }
@@ -161,12 +166,12 @@ namespace landerist_library.Downloaders.Puppeteer
             return null;
         }
 
-        static byte[] ResizeImageToMaxSizePng(byte[] bytes, Image image)
+        byte[] ResizeImageToMaxSizePng(byte[] bytes, Image image, int maxSizeBytes)
         {
             int width = image.Width;
             int height = image.Height;
 
-            double scale = Math.Sqrt((double)Config.MAX_SCREENSHOT_SIZE / bytes.Length);
+            double scale = Math.Sqrt((double)maxSizeBytes / bytes.Length);
             int newWidth = (int)(width * scale);
             int newHeight = (int)(height * scale);
 
@@ -175,7 +180,7 @@ namespace landerist_library.Downloaders.Puppeteer
             resizedBitmap.Save(outputStream, ImageFormat.Png);
             byte[] resizedBytes = outputStream.ToArray();
 
-            while (resizedBytes.Length > Config.MAX_SCREENSHOT_SIZE)
+            while (resizedBytes.Length > maxSizeBytes)
             {
                 scale *= 0.9;
                 newWidth = (int)(width * scale);
