@@ -20,7 +20,7 @@ public sealed class SqlPersistenceAdaptersTests
     public void WebsiteThrottle_UsesInjectedDatabase()
     {
         RecordingDatabase database = new() { QueryBoolResult = true };
-        WebsitesThrottle throttle = new(database);
+        WebsitesThrottle throttle = new(database, new StubWebsiteRobotsPolicy());
         Website website = new(new Uri("https://example.com"));
 
         bool blocked = throttle.IsBlocked(website);

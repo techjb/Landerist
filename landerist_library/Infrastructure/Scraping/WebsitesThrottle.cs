@@ -1,12 +1,15 @@
+using landerist_library.Application.Websites;
+using landerist_library.Database;
 using landerist_library.Websites;
 using System.Text;
 
-namespace landerist_library.Database
+namespace landerist_library.Infrastructure.Scraping
 {
     public sealed class WebsitesThrottle
     {
         public const string WEBSITES_THROTTLE = "[WEBSITES_THROTTLE]";
         private readonly IDatabase _database;
+        private readonly IWebsiteRobotsPolicy _robots;
 
         private static readonly int[] ForbiddenRetryDelaySecondsByLevel =
         [
@@ -19,10 +22,12 @@ namespace landerist_library.Database
         private const int MAX_FORBIDDEN_JITTER_SECONDS = 300;
         private const double FORBIDDEN_JITTER_RATIO = 0.2d;
 
-        public WebsitesThrottle(IDatabase database)
+        public WebsitesThrottle(IDatabase database, IWebsiteRobotsPolicy robots)
         {
             ArgumentNullException.ThrowIfNull(database);
+            ArgumentNullException.ThrowIfNull(robots);
             _database = database;
+            _robots = robots;
         }
 
         public bool IsBlocked(Website website)
@@ -212,10 +217,10 @@ namespace landerist_library.Database
             return _database.Query(query);
         }
 
-        private static int CalculateHostBlockDelayMilliseconds(Website website)
+        private int CalculateHostBlockDelayMilliseconds(Website website)
         {
             int randomMilliseconds = Random.Shared.Next(3000, 6000);
-            int crawlDelayMilliseconds = Math.Min(website.CrawlDelay(), Configuration.Config.MAX_CRAW_DELAY_SECONDS) * 1000;
+            int crawlDelayMilliseconds = Math.Min(_robots.GetCrawlDelaySeconds(website), website.Rules.MaxCrawlDelaySeconds) * 1000;
             int configuredMinimumMilliseconds = Math.Max(0, website.MinimumRequestIntervalMilliseconds ?? 0);
             return Math.Max(Math.Max(randomMilliseconds, crawlDelayMilliseconds), configuredMinimumMilliseconds);
         }

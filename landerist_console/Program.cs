@@ -121,6 +121,7 @@ namespace landerist_console
             SqlPageLinkService pageLinks = new(
                 pagePersistence,
                 new WebsitePageMetricsRepository(databaseFactory.Create()),
+                robotsPolicy,
                 Config.MAX_PAGES_PER_WEBSITE);
             ListingLifecycleService listingLifecycle = new(
                 listingStore,
@@ -152,7 +153,7 @@ namespace landerist_console
                     Config.MIN_PAGES_PER_SCRAPE,
                     enforceMinimumPages: Config.IsConfigurationProduction()));
             ScrapeBatchServices batchScraping = new(
-                new SqlWebsiteThrottleService(databaseFactory.Create()),
+                new SqlWebsiteThrottleService(databaseFactory.Create(), robotsPolicy),
                 new ScrapeBrowserManager(),
                 new SqlPageLockManager(databaseFactory.Create(), Config.MACHINE_NAME),
                 new SqlScrapeBatchMetrics(databaseFactory.Create()),

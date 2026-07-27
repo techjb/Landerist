@@ -1,5 +1,6 @@
 using landerist_library.Application.Listings;
 using landerist_library.Application.Persistence;
+using landerist_library.Application.Websites;
 using landerist_library.Index;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Pages;
@@ -12,20 +13,24 @@ public sealed class SqlPageLinkService : IPageLinkService
     private readonly IPagePersistenceService _pages;
     private readonly WebsitePageMetricsRepository _metrics;
     private readonly int _maximumPagesPerWebsite;
+    private readonly IWebsiteRobotsPolicy _robots;
 
     public SqlPageLinkService(
         IPagePersistenceService pages,
         WebsitePageMetricsRepository metrics,
+        IWebsiteRobotsPolicy robots,
         int maximumPagesPerWebsite)
     {
         ArgumentNullException.ThrowIfNull(pages);
         ArgumentNullException.ThrowIfNull(metrics);
+        ArgumentNullException.ThrowIfNull(robots);
         if (maximumPagesPerWebsite <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(maximumPagesPerWebsite));
         }
         _pages = pages;
         _metrics = metrics;
+        _robots = robots;
         _maximumPagesPerWebsite = maximumPagesPerWebsite;
     }
 
@@ -55,7 +60,7 @@ public sealed class SqlPageLinkService : IPageLinkService
             !Indexer.IsWebPage(uri) ||
             !uri.Host.Equals(sourcePage.Host, StringComparison.OrdinalIgnoreCase) ||
             uri.Equals(sourcePage.Uri) ||
-            !website.IsAllowedByRobotsTxt(uri) ||
+            !_robots.IsAllowed(website, uri) ||
             website.MainUri.Equals(uri))
         {
             return;

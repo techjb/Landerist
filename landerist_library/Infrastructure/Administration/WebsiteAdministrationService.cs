@@ -202,7 +202,7 @@ namespace landerist_library.Infrastructure.Administration
             int counterNo = 0;
             foreach (var website in websites)
             {
-                bool canAccess = website.IsMainUriAllowedByRobotsTxt();
+                bool canAccess = RobotsPolicy.IsAllowed(website, website.MainUri);
                 if (canAccess)
                 {
                     counterYes++;
@@ -221,7 +221,7 @@ namespace landerist_library.Infrastructure.Administration
             int counter = 0;
             foreach (var website in websites)
             {
-                counter += website.CountRobotsSiteMaps();
+                counter += RobotsPolicy.GetSitemapUrls(website).Count;
                 Console.WriteLine("SiteMaps: " + counter);
             }
         }

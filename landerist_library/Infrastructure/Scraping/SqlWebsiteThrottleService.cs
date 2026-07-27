@@ -1,4 +1,5 @@
 using landerist_library.Application.Scraping;
+using landerist_library.Application.Websites;
 using landerist_library.Database;
 using landerist_library.Websites;
 
@@ -8,9 +9,9 @@ public sealed class SqlWebsiteThrottleService : IWebsiteThrottleService
 {
     private readonly WebsitesThrottle _throttle;
 
-    public SqlWebsiteThrottleService(IDatabase database)
+    public SqlWebsiteThrottleService(IDatabase database, IWebsiteRobotsPolicy robots)
     {
-        _throttle = new WebsitesThrottle(database);
+        _throttle = new WebsitesThrottle(database, robots);
     }
 
     public bool Clean() => _throttle.Clean();

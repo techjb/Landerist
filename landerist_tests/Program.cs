@@ -74,9 +74,11 @@ namespace landerist_tests
                 new HostStatisticsRepository(databaseFactory.Create()),
                 new SqlWebsiteCatalog(new WebsiteQueryRepository(databaseFactory.Create())),
                 persistenceEnabled: !Config.IsConfigurationLocal());
+            WebsiteRobotsPolicy robotsPolicy = new();
             SqlPageLinkService pageLinks = new(
                 pagePersistence,
                 new WebsitePageMetricsRepository(databaseFactory.Create()),
+                robotsPolicy,
                 Config.MAX_PAGES_PER_WEBSITE);
             ListingLifecycleService listingLifecycle = new(
                 listingStore,
@@ -108,12 +110,12 @@ namespace landerist_tests
                     Config.MIN_PAGES_PER_SCRAPE,
                     enforceMinimumPages: Config.IsConfigurationProduction()));
             ScrapeBatchServices batchScraping = new(
-                new SqlWebsiteThrottleService(databaseFactory.Create()),
+                new SqlWebsiteThrottleService(databaseFactory.Create(), robotsPolicy),
                 new ScrapeBrowserManager(),
                 new SqlPageLockManager(databaseFactory.Create(), Config.MACHINE_NAME),
                 new SqlScrapeBatchMetrics(databaseFactory.Create()),
                 new SqlScrapePageSource(databaseFactory.Create(), listingStore),
-                new WebsiteRobotsPolicy(),
+                robotsPolicy,
                 new ScraperExecutionOptions(
                     Config.IsConfigurationProduction(),
                     Config.IsConfigurationLocal(),
