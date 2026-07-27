@@ -7,34 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Downloaders\HttpClient\**" />
-    <Compile Remove="Parse\ListingParser\Anthropic\**" />
-    <Compile Remove="Parse\ListingParser\Gemini\**" />
-    <Compile Remove="Parse\ListingParser\IsListingTest\**" />
-    <Compile Remove="Parse\ListingParser\MLModel\**" />
-    <Compile Remove="Parse\ListingParser\_Gemini\**" />
-    <EmbeddedResource Remove="Downloaders\HttpClient\**" />
-    <EmbeddedResource Remove="Parse\ListingParser\Anthropic\**" />
-    <EmbeddedResource Remove="Parse\ListingParser\Gemini\**" />
-    <EmbeddedResource Remove="Parse\ListingParser\IsListingTest\**" />
-    <EmbeddedResource Remove="Parse\ListingParser\MLModel\**" />
-    <EmbeddedResource Remove="Parse\ListingParser\_Gemini\**" />
-    <None Remove="Downloaders\HttpClient\**" />
-    <None Remove="Parse\ListingParser\Anthropic\**" />
-    <None Remove="Parse\ListingParser\Gemini\**" />
-    <None Remove="Parse\ListingParser\IsListingTest\**" />
-    <None Remove="Parse\ListingParser\MLModel\**" />
-    <None Remove="Parse\ListingParser\_Gemini\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Downloaders\SeleniumDownloader.cs" />
-    <Compile Remove="Parse\ListingParser\OpenAI\OpenAIStructuredOutput__.cs" />
-    <Compile Remove="Parse\ListingParser\StructuredOutputs\StructuredOutputEsOld.cs" />
-    <Compile Remove="Scrape\PageBlocker.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AI.Dev.OpenAI.GPT" Version="1.0.2" />
     <PackageReference Include="AWSSDK.CloudFront" Version="4.0.13.5" />
     <PackageReference Include="AWSSDK.S3" Version="4.0.21.1" />
