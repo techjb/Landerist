@@ -6,16 +6,16 @@ using landerist_library.Parse.ListingParser.VertexAI;
 
 namespace landerist_library.Parse.ListingParser
 {
-    internal sealed record ListingParserClientResult(string? ResponseText, bool WaitingAIRequest, string? Diagnostic = null);
+    public sealed record ListingParserClientResult(string? ResponseText, bool WaitingAIRequest, string? Diagnostic = null);
 
-    internal interface IListingParserClient
+    public interface IListingParserClient
     {
         LLMProvider Provider { get; }
 
         ListingParserClientResult GetResponse(Page page, string userInput);
     }
 
-    internal sealed class OpenAIListingParserClient : IListingParserClient
+    public sealed class OpenAIListingParserClient : IListingParserClient
     {
         public LLMProvider Provider => LLMProvider.OpenAI;
 
@@ -28,7 +28,7 @@ namespace landerist_library.Parse.ListingParser
         }
     }
 
-    internal sealed class VertexAIListingParserClient : IListingParserClient
+    public sealed class VertexAIListingParserClient : IListingParserClient
     {
         public LLMProvider Provider => LLMProvider.VertexAI;
 
@@ -44,7 +44,7 @@ namespace landerist_library.Parse.ListingParser
         }
     }
 
-    internal sealed class LocalAIListingParserClient : IListingParserClient
+    public sealed class LocalAIListingParserClient : IListingParserClient
     {
         public LLMProvider Provider => LLMProvider.LocalAI;
 

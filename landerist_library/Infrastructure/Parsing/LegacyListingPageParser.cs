@@ -8,10 +8,10 @@ using landerist_orels.ES;
 
 namespace landerist_library.Infrastructure.Parsing;
 
-public sealed class LegacyListingPageParser(HostStatistics statistics, ListingParsingServices parsingServices) : IListingPageParser
+public sealed class LegacyListingPageParser(HostStatistics statistics, ParseListing parser) : IListingPageParser
 {
     public (PageType pageType, Listing? listing, bool waitingAIRequest) Parse(Page page) =>
-        ParseListing.Parse(page, statistics, parsingServices);
+        parser.Parse(page, statistics);
 }
 
 public sealed class LegacyPageTokenLimitPolicy : IPageTokenLimitPolicy

@@ -152,6 +152,18 @@ namespace landerist_console
                 robotsPolicy,
                 TimeProvider.System,
                 httpClients);
+            ListingParserClientCatalog listingParserClients = new(
+            [
+                new OpenAIListingParserClient(),
+                new VertexAIListingParserClient(),
+                new LocalAIListingParserClient()
+            ]);
+            ParseListing listingParser = new(
+                new ListingParserOrchestrationOptions(
+                    Config.BATCH_ENABLED,
+                    Config.LLM_PROVIDER),
+                listingParserClients,
+                parsingServices);
             GlobalStatistics globalStatistics = new(
                 new GlobalStatisticsRepository(databaseFactory.Create()),
                 persistenceEnabled: !Config.IsConfigurationLocal());
@@ -181,7 +193,7 @@ namespace landerist_console
                     Config.IsConfigurationProduction(),
                     notListingCache,
                     new SqlPageClassificationMetrics(databaseFactory.Create()),
-                    new LegacyListingPageParser(hostStatistics, parsingServices),
+                    new LegacyListingPageParser(hostStatistics, listingParser),
                     new LegacyPageTokenLimitPolicy()),
                 new PageIndexingService(Config.INDEXER_ENABLED, pageLinks),
                 new SqlPageSchedulingService(listingStore),
@@ -228,9 +240,9 @@ namespace landerist_console
                 new SystemRecurringTaskScheduler(),
                 logger,
                 new ScrapeTaskJob(scraper, batchScraping.Browser),
-                new LocalAiTaskJob(() => new TaskLocalAIParsing(parsedClassification, globalStatistics, hostStatistics, waitingStatus, pageCatalog, pagePersistence, parsingServices)),
+                new LocalAiTaskJob(() => new TaskLocalAIParsing(parsedClassification, globalStatistics, hostStatistics, waitingStatus, pageCatalog, pagePersistence, listingParser)),
                 new TenMinuteTaskJob(
-                    new TaskBatchDownload(parsedClassification, batches, globalStatistics, pageCatalog, pagePersistence, new OpenAIBatchDownload(), new VertexAIBatchDownload(), parsingServices),
+                    new TaskBatchDownload(parsedClassification, batches, globalStatistics, pageCatalog, pagePersistence, new OpenAIBatchDownload(), new VertexAIBatchDownload(), listingParser),
                     new TaskBatchUpload(batches, waitingStatus, pagePersistence)),
                 new HourlyTaskJob(
                     new WebsiteRefreshService(websiteCatalog, websitePersistence, websiteNetwork, websiteSitemaps),

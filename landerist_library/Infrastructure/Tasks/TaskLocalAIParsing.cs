@@ -25,7 +25,7 @@ namespace landerist_library.Infrastructure.Tasks
         private readonly IPageWaitingStatusService _waitingStatus;
         private readonly IPageCatalog _pages;
         private readonly IPagePersistenceService _pagePersistence;
-        private readonly ListingParsingServices _parsingServices;
+        private readonly ParseListing _listingParser;
 
         private int TotalProcessed = 0;
         private int TotalErrors = 0;
@@ -44,7 +44,7 @@ namespace landerist_library.Infrastructure.Tasks
             IPageWaitingStatusService waitingStatus,
             IPageCatalog pages,
             IPagePersistenceService pagePersistence,
-            ListingParsingServices parsingServices)
+            ParseListing listingParser)
         {
             ArgumentNullException.ThrowIfNull(parsedClassification);
             ArgumentNullException.ThrowIfNull(globalStatistics);
@@ -52,14 +52,14 @@ namespace landerist_library.Infrastructure.Tasks
             ArgumentNullException.ThrowIfNull(waitingStatus);
             ArgumentNullException.ThrowIfNull(pages);
             ArgumentNullException.ThrowIfNull(pagePersistence);
-            ArgumentNullException.ThrowIfNull(parsingServices);
+            ArgumentNullException.ThrowIfNull(listingParser);
             _parsedClassification = parsedClassification;
             _globalStatistics = globalStatistics;
             _hostStatistics = hostStatistics;
             _waitingStatus = waitingStatus;
             _pages = pages;
             _pagePersistence = pagePersistence;
-            _parsingServices = parsingServices;
+            _listingParser = listingParser;
             Config.SetLLMProviderLocalAI();
             Config.EnableLogsErrorsInConsole();
             if (Config.IsConfigurationProduction())
@@ -263,7 +263,7 @@ namespace landerist_library.Infrastructure.Tasks
                 }
                 else
                 {
-                    var (pageType, listing, waitingAIRequest) = ParseListing.ParseLocalAI(page, userInput, _hostStatistics, _parsingServices);
+                    var (pageType, listing, waitingAIRequest) = _listingParser.ParseLocalAI(page, userInput, _hostStatistics);
                     newPageType = pageType;
                     success = _parsedClassification.Apply(page, pageType, listing);
                 }

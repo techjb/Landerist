@@ -1,6 +1,5 @@
 using landerist_library.Websites;
 using landerist_library.Parse.ListingParser;
-using landerist_library.Configuration;
 using landerist_library.Pages;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
 using landerist_library.Parse.ListingParser.UserInput;
@@ -19,18 +18,27 @@ namespace landerist_library.Infrastructure.Parsing
             NullValueHandling = NullValueHandling.Include,
         };
 
-        private static readonly Dictionary<LLMProvider, IListingParserClient> Clients = new()
-        {
-            { LLMProvider.OpenAI, new OpenAIListingParserClient() },
-            { LLMProvider.VertexAI, new VertexAIListingParserClient() },
-            { LLMProvider.LocalAI, new LocalAIListingParserClient() },
-        };
+        private readonly ListingParserOrchestrationOptions Options;
+        private readonly ListingParserClientCatalog Clients;
+        private readonly ListingParsingServices ParsingServices;
 
-        public static (PageType pageType, Listing? listing, bool waitingAIRequest) Parse(Page page, HostStatistics statistics, ListingParsingServices parsingServices)
+        public ParseListing(
+            ListingParserOrchestrationOptions options,
+            ListingParserClientCatalog clients,
+            ListingParsingServices parsingServices)
+        {
+            ArgumentNullException.ThrowIfNull(options);
+            ArgumentNullException.ThrowIfNull(clients);
+            ArgumentNullException.ThrowIfNull(parsingServices);
+            Options = options;
+            Clients = clients;
+            ParsingServices = parsingServices;
+        }
+        public (PageType pageType, Listing? listing, bool waitingAIRequest) Parse(Page page, HostStatistics statistics)
         {
             page.SetLastParseListing();
 
-            if (Config.BATCH_ENABLED)
+            if (Options.BatchEnabled)
             {
                 return (PageType.MayBeListing, null, true);
             }
@@ -41,17 +49,19 @@ namespace landerist_library.Infrastructure.Parsing
                 return (PageType.ResponseBodyTooShort, null, false);
             }
 
-            return Clients.TryGetValue(Config.LLM_PROVIDER, out var client)
-                ? ParseWithClient(page, text, client, statistics, parsingServices)
+            return Clients.TryGet(Options.Provider, out IListingParserClient? client)
+                ? ParseWithClient(page, text, client, statistics, ParsingServices)
                 : (PageType.ResponseBodyTooShort, null, false);
         }
 
-        public static (PageType pageType, Listing? listing, bool waitingAIRequest) ParseLocalAI(Page page, string text, HostStatistics statistics, ListingParsingServices parsingServices)
+        public (PageType pageType, Listing? listing, bool waitingAIRequest) ParseLocalAI(Page page, string text, HostStatistics statistics)
         {
-            return ParseWithClient(page, text, new LocalAIListingParserClient(), statistics, parsingServices);
+            return Clients.TryGet(LLMProvider.LocalAI, out IListingParserClient? client)
+                ? ParseWithClient(page, text, client, statistics, ParsingServices)
+                : (PageType.ResponseBodyTooShort, null, false);
         }
 
-        private static (PageType pageType, Listing? listing, bool waitingAIRequest) ParseWithClient(
+        private (PageType pageType, Listing? listing, bool waitingAIRequest) ParseWithClient(
             Page page,
             string userInput,
             IListingParserClient client,
@@ -106,9 +116,9 @@ namespace landerist_library.Infrastructure.Parsing
                 && page.Website.MatchesListingUrlRegex(page.Uri);
         }
 
-        public static (PageType pageType, Listing? listing) ParseResponse(Page page, string? text, ListingParsingServices parsingServices)
+        public (PageType pageType, Listing? listing) ParseResponse(Page page, string? text, LLMProvider? provider = null)
         {
-            return ParseResponse(page, text, Config.LLM_PROVIDER, parsingServices);
+            return ParseResponse(page, text, provider ?? Options.Provider, ParsingServices);
         }
 
         private static (PageType pageType, Listing? listing) ParseResponse(Page page, string? text, LLMProvider provider, ListingParsingServices parsingServices)

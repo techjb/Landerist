@@ -124,6 +124,18 @@ namespace landerist_tests
                 ListingMaterializationRules.Default,
                 websiteAccess,
                 TimeProvider.System);
+            ListingParserClientCatalog listingParserClients = new(
+            [
+                new OpenAIListingParserClient(),
+                new VertexAIListingParserClient(),
+                new LocalAIListingParserClient()
+            ]);
+            ParseListing listingParser = new(
+                new ListingParserOrchestrationOptions(
+                    Config.BATCH_ENABLED,
+                    Config.LLM_PROVIDER),
+                listingParserClients,
+                parsingServices);
             SqlPageLinkService pageLinks = new(
                 pagePersistence,
                 new WebsitePageMetricsRepository(databaseFactory.Create()),
@@ -146,7 +158,7 @@ namespace landerist_tests
                     Config.IsConfigurationProduction(),
                     notListingCache,
                     new SqlPageClassificationMetrics(databaseFactory.Create()),
-                    new LegacyListingPageParser(hostStatistics, parsingServices),
+                    new LegacyListingPageParser(hostStatistics, listingParser),
                     new LegacyPageTokenLimitPolicy()),
                 new PageIndexingService(Config.INDEXER_ENABLED, pageLinks),
                 new SqlPageSchedulingService(listingStore),
