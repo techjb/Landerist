@@ -49,6 +49,30 @@ public sealed class PagesArchitectureTests
             Environment.NewLine +
             string.Join(Environment.NewLine, violations));
     }
+
+    [Fact]
+    public void Pages_DoesNotWriteToGlobalLogs()
+    {
+        string pagesRoot = Path.Combine(
+            FindRepositoryRoot(),
+            "landerist_library",
+            "Pages");
+        string[] violations = Directory
+            .EnumerateFiles(pagesRoot, "*.cs", SearchOption.AllDirectories)
+            .Where(file => File.ReadAllText(file).Contains(
+                "Logs.Log",
+                StringComparison.Ordinal))
+            .Select(file => Path.GetFileName(file)!)
+            .Order()
+            .ToArray();
+
+        Assert.True(
+            violations.Length == 0,
+            "Pages must report failures through return values instead of global logging." +
+            Environment.NewLine +
+            string.Join(Environment.NewLine, violations));
+    }
+
     private static string FindRepositoryRoot()
     {
         DirectoryInfo? directory = new(AppContext.BaseDirectory);

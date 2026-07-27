@@ -60,9 +60,8 @@ namespace landerist_library.Pages
                 htmlDocument.LoadHtml(ListingParserInput);
                 return HtmlEntity.DeEntitize(htmlDocument.DocumentNode.InnerText);
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                Logs.Log.WriteError("Page GetListingParserInputText", Uri, exception);
                 return null;
             }
         }

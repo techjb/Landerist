@@ -48,4 +48,32 @@ public sealed class PageDownloadResultTests
 
         Assert.True(page.DownloadedHeadersHaveNotChanged());
     }
+
+    [Fact]
+    public void ResponseBodyCompression_RoundTripsContent()
+    {
+        Page page = new("https://example.com/listing/1");
+        page.SetDownloadedData(new PageDownloadResult(
+            Content: "<html>listing</html>",
+            Screenshot: null,
+            HttpStatusCode: 200,
+            RedirectUrl: null,
+            Etag: null,
+            LastModified: null));
+
+        Assert.True(page.SetResponseBodyZipped());
+        page.RemoveResponseBody();
+        Assert.True(page.ResponseBodyIsNullOrEmpty());
+
+        Assert.True(page.SetResponseBodyFromZipped());
+        Assert.False(page.ResponseBodyIsNullOrEmpty());
+    }
+
+    [Fact]
+    public void ResponseBodyDecompression_WithoutCompressedContentReturnsFalse()
+    {
+        Page page = new("https://example.com/listing/1");
+
+        Assert.False(page.SetResponseBodyFromZipped());
+    }
 }

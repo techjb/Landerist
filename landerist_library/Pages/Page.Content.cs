@@ -26,9 +26,9 @@ namespace landerist_library.Pages
                     OriginalOuterHtml = HtmlDocument.DocumentNode.OuterHtml;
                     return HtmlDocument;
                 }
-                catch (Exception exception)
+                catch (Exception)
                 {
-                    Logs.Log.WriteError("Page GetHtmlDocument", Uri, exception);
+                    return null;
                 }
             }
             return null;
@@ -120,18 +120,17 @@ namespace landerist_library.Pages
                 ResponseBodyZipped = memoryStream.ToArray();
                 return true;
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                Logs.Log.WriteError("Page SetResponseBodyZipped", exception);
                 return false;
             }
         }
 
-        public void SetResponseBodyFromZipped()
+        public bool SetResponseBodyFromZipped()
         {
             if (ResponseBodyZipped is null)
             {
-                return;
+                return false;
             }
             try
             {
@@ -140,10 +139,11 @@ namespace landerist_library.Pages
                 using var streamReader = new StreamReader(gzipStream);
                 ResponseBody = streamReader.ReadToEnd();
                 ResetResponseBodyDerivedData();
+                return true;
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                Logs.Log.WriteError("Page SetResponseBodyFromZipped", exception);
+                return false;
             }
         }
 
