@@ -56,6 +56,17 @@ namespace landerist_console
                     Config.DATABASE_ENCRYPT,
                     Config.DATABASE_TRUST_SERVER_CERTIFICATE));
             LegacyDatabase.Configure(databaseFactory);
+            LanderistSettings settings = LanderistSettings.Current;
+            WebsiteNetworkService websiteNetwork = new(
+                new WebsiteNetworkOptions(
+                    settings.GetString("PROXY_HOST"),
+                    settings.GetInt32("PROXY_PORT"),
+                    settings.GetBoolean("PROXY_RANDOMIZE_STICKY_PORTS"),
+                    settings.GetInt32("PROXY_STICKY_PORT_MIN"),
+                    settings.GetInt32("PROXY_STICKY_PORT_MAX"),
+                    settings.GetString("PROXY_USERNAME"),
+                    settings.GetString("PROXY_PASSWORD")),
+                TimeProvider.System);
             LegacyApplicationLogger logger = new();
             PagePersistenceService pagePersistence = new(new PageRepository(databaseFactory.Create()));
             WebsitePersistenceService websitePersistence = new(new WebsiteRepository(databaseFactory.Create()));
@@ -172,7 +183,7 @@ namespace landerist_console
                     new TaskBatchDownload(parsedClassification, batches, globalStatistics, pageCatalog, pagePersistence, new OpenAIBatchDownload(), new VertexAIBatchDownload()),
                     new TaskBatchUpload(batches, waitingStatus, pagePersistence)),
                 new HourlyTaskJob(
-                    new WebsiteRefreshService(websiteCatalog, websitePersistence, pagePersistence, websiteMetrics),
+                    new WebsiteRefreshService(websiteCatalog, websitePersistence, pagePersistence, websiteMetrics, websiteNetwork),
                     new TaskBatchCleaner(batches)),
                 new DailyTaskJob(
                     databaseFactory.Create(),

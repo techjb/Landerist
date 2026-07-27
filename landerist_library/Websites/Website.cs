@@ -60,7 +60,7 @@ namespace landerist_library.Websites
 
         private bool Disposed;
 
-        private readonly WebsiteRules Rules;
+        public WebsiteRules Rules { get; }
 
         public Website() : this(WebsiteRules.Default)
         {

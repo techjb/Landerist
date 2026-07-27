@@ -10,20 +10,24 @@ public sealed class WebsiteRefreshService : IWebsiteRefreshService
     private readonly IWebsitePersistenceService _websitePersistence;
     private readonly IPagePersistenceService _pagePersistence;
     private readonly IWebsiteMetricsService _metrics;
+    private readonly IWebsiteNetworkService _network;
 
     public WebsiteRefreshService(
         IWebsiteCatalog catalog,
         IWebsitePersistenceService websitePersistence,
         IPagePersistenceService pagePersistence,
-        IWebsiteMetricsService metrics)
+        IWebsiteMetricsService metrics,
+        IWebsiteNetworkService network)
     {
         ArgumentNullException.ThrowIfNull(catalog);
         ArgumentNullException.ThrowIfNull(websitePersistence);
         ArgumentNullException.ThrowIfNull(pagePersistence);
+        ArgumentNullException.ThrowIfNull(network);
         _catalog = catalog;
         _websitePersistence = websitePersistence;
         _pagePersistence = pagePersistence;
         _metrics = metrics;
+        _network = network;
     }
 
     public void Refresh()
@@ -31,13 +35,13 @@ public sealed class WebsiteRefreshService : IWebsiteRefreshService
         DateTime updatedBefore = DateTime.Now.AddDays(-1);
         Refresh(
             _catalog.GetNeedingRobotsTxtUpdate(updatedBefore),
-            website => website.SetRobotsTxt());
+            website => _network.RefreshRobotsTxt(website));
         Refresh(
             _catalog.GetNeedingSitemapUpdate(updatedBefore),
             website => website.ReadSitemap(_pagePersistence.Insert, _metrics.HasAchievedMaximumPages));
         Refresh(
             _catalog.GetNeedingIpAddressUpdate(updatedBefore),
-            website => website.SetIpAddress());
+            website => _network.RefreshIpAddress(website));
     }
 
     private void Refresh(

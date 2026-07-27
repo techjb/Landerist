@@ -70,7 +70,7 @@ namespace landerist_library.Infrastructure.Administration
                 {
                     try
                     {
-                        bool success = website.SetMainUri();
+                        bool success = Network.RefreshMainUri(website);
                         if (success)
                         {
                             Update(website);
@@ -119,7 +119,7 @@ namespace landerist_library.Infrastructure.Administration
                 {
                     try
                     {
-                        bool success = website.SetRobotsTxt();
+                        bool success = Network.RefreshRobotsTxt(website);
                         if (success)
                         {
                             Update(website);
@@ -168,7 +168,7 @@ namespace landerist_library.Infrastructure.Administration
                 {
                     try
                     {
-                        bool success = website.SetIpAddress();
+                        bool success = Network.RefreshIpAddress(website);
                         if (success)
                         {
                             Update(website);
@@ -293,7 +293,7 @@ namespace landerist_library.Infrastructure.Administration
             {
                 try
                 {
-                    website.SetRobotsTxt();
+                    Network.RefreshRobotsTxt(website);
                     Update(website);
                     Interlocked.Increment(ref counter);
                 }
@@ -367,7 +367,7 @@ namespace landerist_library.Infrastructure.Administration
             {
                 try
                 {
-                    website.SetIpAddress();
+                    Network.RefreshIpAddress(website);
                     Update(website);
                     Interlocked.Increment(ref counter);
                 }

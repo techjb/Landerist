@@ -1,67 +1,9 @@
 ﻿using Com.Bekijkhet.RobotsTxt;
-using landerist_library.Configuration;
-using System.Net;
-using System.Text;
 
 namespace landerist_library.Websites
 {
     public partial class Website
     {
-        public bool SetRobotsTxt()
-        {
-            RobotsTxtUpdated = DateTime.Now;
-
-            var robotsTxtUrl = new Uri(MainUri, "/robots.txt");
-
-            try
-            {
-                using var httpClient = GetRobotsTxtHttpClient();
-                using var request = CreateHttpRequestMessage(HttpMethod.Get, robotsTxtUrl);
-
-                var response = httpClient.SendAsync(request).GetAwaiter().GetResult();
-                RobotsTxt = null;
-                Robots = null;
-
-                if (response.StatusCode == HttpStatusCode.OK)
-                {
-                    using var streamReader = new StreamReader(response.Content.ReadAsStreamAsync().GetAwaiter().GetResult(), Encoding.Default);
-                    RobotsTxt = streamReader.ReadToEnd();
-                }
-
-                return true;
-            }
-            catch //(Exception exception)
-            {
-                //Logs.Log.WriteLogErrors("Website SetRobotsTxt", robotsTxtUrl, exception);
-            }
-
-            return false;
-        }
-
-        public bool SetIpAddress()
-        {
-            IpAddressUpdated = DateTime.Now;
-
-            try
-            {
-                IPAddress[] ipAddresses = Dns.GetHostAddresses(Host);
-                IpAddress = null;
-
-                if (ipAddresses.Length > 0)
-                {
-                    IpAddress = ipAddresses[0].ToString();
-                }
-
-                return true;
-            }
-            catch// (Exception exception)
-            {
-                //Logs.Log.WriteLogErrors("Website SetIpAddress", Host, exception);
-            }
-
-            return false;
-        }
-
         public bool IsMainUriAllowedByRobotsTxt()
         {
             return IsAllowedByRobotsTxt(MainUri);
@@ -121,38 +63,6 @@ namespace landerist_library.Websites
             return null;
         }
 
-        private HttpClient GetRobotsTxtHttpClient()
-        {
-            if (!UseProxy)
-            {
-                return new HttpClient();
-            }
-
-            HttpClientHandler handler = new()
-            {
-                UseProxy = true,
-                Proxy = new WebProxy(AppConfig.PROXY_HOST, GetProxyPort())
-                {
-                    Credentials = new NetworkCredential(
-                        AppConfig.PROXY_USERNAME,
-                        AppConfig.PROXY_PASSWORD)
-                }
-            };
-
-            return new HttpClient(handler);
-        }
-
-        private static int GetProxyPort()
-        {
-            if (!AppConfig.PROXY_RANDOMIZE_STICKY_PORTS ||
-                AppConfig.PROXY_STICKY_PORT_MIN > AppConfig.PROXY_STICKY_PORT_MAX)
-            {
-                return int.Parse(AppConfig.PROXY_PORT);
-            }
-
-            return Random.Shared.Next(
-                AppConfig.PROXY_STICKY_PORT_MIN,
-                AppConfig.PROXY_STICKY_PORT_MAX + 1);
-        }
+        internal void ResetParsedRobots() => Robots = null;
     }
 }

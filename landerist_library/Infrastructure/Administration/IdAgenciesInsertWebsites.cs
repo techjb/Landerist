@@ -1,4 +1,5 @@
 using landerist_library.Application.Administration;
+using landerist_library.Application.Websites;
 using landerist_library.Configuration;
 using landerist_library.Tools;
 using landerist_library.Websites;
@@ -6,7 +7,7 @@ using System.Data;
 
 namespace landerist_library.Infrastructure.Administration
 {
-    public class IdAgenciesInsertWebsites(IWebsiteAdministrationService websites) : WebsitesInserter(true, websites)
+    public class IdAgenciesInsertWebsites(IWebsiteAdministrationService websites, IWebsiteNetworkService network) : WebsitesInserter(true, websites, network)
     {
         public void Start()
         {

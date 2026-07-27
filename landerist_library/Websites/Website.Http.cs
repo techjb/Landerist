@@ -48,52 +48,6 @@ namespace landerist_library.Websites
             }
         }
 
-        public bool SetMainUri(int iteration = 0)
-        {
-            if (iteration >= 10)
-            {
-                return false;
-            }
-
-            HttpClientHandler handler = new()
-            {
-                AllowAutoRedirect = false
-            };
-
-            using var httpClient = new HttpClient(handler);
-            httpClient.Timeout = TimeSpan.FromSeconds(Rules.HttpClientTimeoutSeconds);
-
-            try
-            {
-                using var request = CreateHttpRequestMessage(HttpMethod.Head, MainUri);
-                var response = httpClient.SendAsync(request).GetAwaiter().GetResult();
-
-                if (response?.Headers?.Location != null)
-                {
-                    var uriLocation = response.Headers.Location;
-
-                    if (uriLocation.ToString().StartsWith('/'))
-                    {
-                        Uri.TryCreate(MainUri, uriLocation, out uriLocation);
-                    }
-
-                    if (uriLocation != null && !uriLocation.Equals(MainUri))
-                    {
-                        SetMainUri(uriLocation);
-                        return SetMainUri(iteration + 1);
-                    }
-                }
-
-                return true;
-            }
-            catch //(Exception exception)
-            {
-                //Logs.Log.WriteLogErrors("Website SetMainUriAndStatusCode", MainUri, exception);
-            }
-
-            return false;
-        }
-
         private static bool TryParseJsonHttpRequestHeaders(
             string value,
             out Dictionary<string, string> headers)

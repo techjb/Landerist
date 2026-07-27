@@ -1,6 +1,7 @@
 using landerist_library.Websites;
 using landerist_library.Insert;
 using landerist_library.Application.Administration;
+using landerist_library.Application.Websites;
 using landerist_library.Logs;
 using System.Data;
 
@@ -21,10 +22,12 @@ namespace landerist_library.Infrastructure.Administration
         private readonly HashSet<Uri> InsertedUris = [];
 
         private readonly IWebsiteAdministrationService _websites;
+        private readonly IWebsiteNetworkService _network;
 
-        public WebsitesInserter(bool initialize, IWebsiteAdministrationService websites)
+        public WebsitesInserter(bool initialize, IWebsiteAdministrationService websites, IWebsiteNetworkService network)
         {
             _websites = websites;
+            _network = network;
             if (initialize)
             {
                 Init();
@@ -157,11 +160,11 @@ namespace landerist_library.Infrastructure.Administration
             };
 
 
-            if (!website.SetRobotsTxt())
+            if (!_network.RefreshRobotsTxt(website))
             {
                 Console.WriteLine("Error setting robots.txt for " + website.MainUri);
             }
-            if (!website.SetIpAddress())
+            if (!_network.RefreshIpAddress(website))
             {
                 Console.WriteLine("Error setting IP address for " + website.MainUri);
             }
@@ -271,7 +274,7 @@ namespace landerist_library.Infrastructure.Administration
 
         private bool InsertWebsite(Website website)
         {
-            if (!website.SetMainUri())
+            if (!_network.RefreshMainUri(website))
             {
                 Interlocked.Increment(ref ErrorsMainUri);
                 return false;
@@ -281,12 +284,12 @@ namespace landerist_library.Infrastructure.Administration
                 Interlocked.Increment(ref Skipped);
                 return false;
             }
-            if (!website.SetRobotsTxt())
+            if (!_network.RefreshRobotsTxt(website))
             {
                 Interlocked.Increment(ref ErrorsRobotsTxt);
                 return false;
             }
-            if (!website.SetIpAddress())
+            if (!_network.RefreshIpAddress(website))
             {
                 Interlocked.Increment(ref ErrorsIpAddress);
                 return false;
