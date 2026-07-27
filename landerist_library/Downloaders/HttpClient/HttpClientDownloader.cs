@@ -1,4 +1,4 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Configuration;
 using landerist_library.Websites;
 using System.Net.Http.Headers;
 
@@ -56,7 +56,7 @@ namespace landerist_library.Downloaders.HttpClient
             using var httpClient = new System.Net.Http.HttpClient(handler);
             httpClient.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
 
-            using HttpRequestMessage httpRequestMessage = page.Website.CreateHttpRequestMessage(HttpMethod.Get, page.Uri);
+            using HttpRequestMessage httpRequestMessage = WebsiteHttpRequestProfile.From(page.Website).CreateRequest(HttpMethod.Get, page.Uri);
             SetAccepLanguage(httpRequestMessage, page.Website.LanguageCode);
             HttpResponseMessage = null;
 

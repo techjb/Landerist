@@ -1,3 +1,4 @@
+using landerist_library.Websites;
 using OpenCvSharp;
 
 namespace landerist_library.Parse.Media.Image
@@ -54,7 +55,7 @@ namespace landerist_library.Parse.Media.Image
         {
             try
             {
-                using var request = ImageParser.MediaParser.Page.Website.CreateHttpRequestMessage(HttpMethod.Get, uri);
+                using var request = WebsiteHttpRequestProfile.From(ImageParser.MediaParser.Page.Website).CreateRequest(HttpMethod.Get, uri);
                 using var response = HttpClient.SendAsync(request).GetAwaiter().GetResult();
                 response.EnsureSuccessStatusCode();
                 var bytes = response.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();

@@ -14,7 +14,7 @@ public sealed class WebsitePolicyArchitectureTests
         string[] policyFiles =
         [
             "Website.cs",
-            "Website.Http.cs",
+            "WebsiteHttpRequestProfile.cs",
             "IWebsiteRobotsPolicy.cs"
         ];
         string[] violations = policyFiles

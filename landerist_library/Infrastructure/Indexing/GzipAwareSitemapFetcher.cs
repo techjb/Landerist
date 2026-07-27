@@ -9,22 +9,18 @@ namespace landerist_library.Infrastructure.Indexing
     internal sealed class GzipAwareSitemapFetcher : ISitemapFetcher
     {
         private static readonly HttpClient HttpClient = CreateHttpClient(useProxy: false);
-        private readonly string UserAgent;
-        private readonly IReadOnlyDictionary<string, string> HttpRequestHeaders;
+        private readonly WebsiteHttpRequestProfile RequestProfile;
         private readonly bool UseProxy;
 
         public GzipAwareSitemapFetcher(Website website)
         {
-            UserAgent = website.BrowserUserAgent;
-            HttpRequestHeaders = website.GetHttpRequestHeaders();
+            RequestProfile = WebsiteHttpRequestProfile.From(website);
             UseProxy = website.UseProxy;
         }
 
         public async Task<string> Fetch(Uri uri)
         {
-            using HttpRequestMessage request = new(HttpMethod.Get, uri);
-            request.Headers.UserAgent.ParseAdd(UserAgent);
-            Website.ApplyHttpRequestHeaders(request, HttpRequestHeaders);
+            using HttpRequestMessage request = RequestProfile.CreateRequest(HttpMethod.Get, uri);
 
             if (UseProxy)
             {

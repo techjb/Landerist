@@ -1,4 +1,4 @@
-﻿using HtmlAgilityPack;
+using HtmlAgilityPack;
 using landerist_library.Configuration;
 using landerist_library.Pages;
 using landerist_library.Websites;
@@ -492,7 +492,7 @@ namespace landerist_library.Downloaders.Puppeteer
 
         private static async Task SetExtraHttpHeadersAsync(IPage browserPage, Website website)
         {
-            Dictionary<string, string> extraHeaders = website.GetHttpRequestHeaders();
+            Dictionary<string, string> extraHeaders = new(WebsiteHttpRequestProfile.From(website).Headers, StringComparer.OrdinalIgnoreCase);
             extraHeaders.Remove("User-Agent");
             switch (website.LanguageCode)
             {

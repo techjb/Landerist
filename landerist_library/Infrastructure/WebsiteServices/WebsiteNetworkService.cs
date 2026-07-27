@@ -39,7 +39,7 @@ public sealed class WebsiteNetworkService : IWebsiteNetworkService
             try
             {
                 using HttpRequestMessage request =
-                    website.CreateHttpRequestMessage(HttpMethod.Head, website.MainUri);
+                    WebsiteHttpRequestProfile.From(website).CreateRequest(HttpMethod.Head, website.MainUri);
                 using HttpResponseMessage response =
                     httpClient.SendAsync(request).GetAwaiter().GetResult();
                 Uri? location = response.Headers.Location;
@@ -81,7 +81,7 @@ public sealed class WebsiteNetworkService : IWebsiteNetworkService
         {
             using HttpClient httpClient = CreateRobotsTxtHttpClient(website);
             using HttpRequestMessage request =
-                website.CreateHttpRequestMessage(HttpMethod.Get, robotsTxtUrl);
+                WebsiteHttpRequestProfile.From(website).CreateRequest(HttpMethod.Get, robotsTxtUrl);
             using HttpResponseMessage response =
                 httpClient.SendAsync(request).GetAwaiter().GetResult();
             website.RobotsTxt = null;

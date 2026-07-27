@@ -100,7 +100,7 @@ namespace landerist_library.Infrastructure.Scraping
 
         private static HttpRequestMessage CreateRequest(Page page)
         {
-            var request = page.Website.CreateHttpRequestMessage(HttpMethod.Head, page.Uri);
+            var request = WebsiteHttpRequestProfile.From(page.Website).CreateRequest(HttpMethod.Head, page.Uri);
             SetAcceptLanguage(request, page.Website.LanguageCode);
 
             if (!string.IsNullOrWhiteSpace(page.Etag))
