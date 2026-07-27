@@ -12,7 +12,9 @@ public sealed class HttpTransportArchitectureTests
         [
             "Infrastructure/WebsiteServices/WebsiteNetworkService.cs",
             "Infrastructure/Indexing/GzipAwareSitemapFetcher.cs",
-            "Infrastructure/Scraping/ConditionalPageHeaderChecker.cs"
+            "Infrastructure/Scraping/ConditionalPageHeaderChecker.cs",
+            "Downloaders/HttpClient/HttpClientDownloader.cs",
+            "Parse/Media/Image/ImageDownloader.cs"
         ];
         string[] forbiddenTokens =
         [

@@ -1,8 +1,9 @@
 using System.Net;
+using landerist_library.Websites;
 
 namespace landerist_library.Infrastructure.Http;
 
-public sealed class HttpClientTransportFactory
+public sealed class HttpClientTransportFactory : IHttpClientTransportFactory
 {
     private readonly HttpTransportOptions _options;
     private readonly Func<int, int, int> _nextPort;

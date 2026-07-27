@@ -14,7 +14,7 @@ namespace landerist_library.Infrastructure.Indexing
 
         private sealed record LoadedSitemap(Sitemap Sitemap, IReadOnlyList<Uri> AlternateUrls);
 
-        public SitemapIndexer(Website website, IWebsiteRobotsPolicy robots, HttpClientTransportFactory httpClients, Func<Page, bool>? insertPage = null, Func<Website, bool>? achievedMaxNumberOfPages = null) : base(website, robots, insertPage, achievedMaxNumberOfPages)
+        public SitemapIndexer(Website website, IWebsiteRobotsPolicy robots, IHttpClientTransportFactory httpClients, Func<Page, bool>? insertPage = null, Func<Website, bool>? achievedMaxNumberOfPages = null) : base(website, robots, insertPage, achievedMaxNumberOfPages)
         {
             WebsiteSitemapFetcher = new GzipAwareSitemapFetcher(website, httpClients);
         }

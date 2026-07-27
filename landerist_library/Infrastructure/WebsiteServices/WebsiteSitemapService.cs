@@ -14,7 +14,7 @@ public sealed class WebsiteSitemapService : IWebsiteSitemapService
     private readonly IWebsiteMetricsService _metrics;
     private readonly TimeProvider _timeProvider;
     private readonly IWebsiteRobotsPolicy _robots;
-    private readonly HttpClientTransportFactory _httpClients;
+    private readonly IHttpClientTransportFactory _httpClients;
 
     public WebsiteSitemapService(
         bool indexingEnabled,
@@ -22,7 +22,7 @@ public sealed class WebsiteSitemapService : IWebsiteSitemapService
         IWebsiteMetricsService metrics,
         IWebsiteRobotsPolicy robots,
         TimeProvider timeProvider,
-        HttpClientTransportFactory httpClients)
+        IHttpClientTransportFactory httpClients)
     {
         ArgumentNullException.ThrowIfNull(pagePersistence);
         ArgumentNullException.ThrowIfNull(metrics);

@@ -1,3 +1,4 @@
+using landerist_library.Websites;
 using landerist_library.Infrastructure.Statistics;
 using landerist_library.Infrastructure.Parsing.OpenAI;
 using landerist_library.Infrastructure.Parsing.VertexAI;
@@ -107,6 +108,7 @@ namespace landerist_console
                 new ListingStatisticsRepository(databaseFactory.Create()),
                 Config.MAX_PAGES_PER_WEBSITE);
             WebsiteRobotsPolicy robotsPolicy = new();
+            WebsiteAccessServices websiteAccess = new(robotsPolicy, httpClients);
             WebsiteSitemapService websiteSitemaps = new(
                 Config.INDEXER_ENABLED,
                 pagePersistence,
@@ -143,7 +145,7 @@ namespace landerist_console
                     Config.IsConfigurationProduction(),
                     notListingCache,
                     new SqlPageClassificationMetrics(databaseFactory.Create()),
-                    new LegacyListingPageParser(hostStatistics, robotsPolicy),
+                    new LegacyListingPageParser(hostStatistics, websiteAccess),
                     new LegacyPageTokenLimitPolicy()),
                 new PageIndexingService(Config.INDEXER_ENABLED, pageLinks),
                 new SqlPageSchedulingService(listingStore),
@@ -190,9 +192,9 @@ namespace landerist_console
                 new SystemRecurringTaskScheduler(),
                 logger,
                 new ScrapeTaskJob(scraper, batchScraping.Browser),
-                new LocalAiTaskJob(() => new TaskLocalAIParsing(parsedClassification, globalStatistics, hostStatistics, waitingStatus, pageCatalog, pagePersistence, robotsPolicy)),
+                new LocalAiTaskJob(() => new TaskLocalAIParsing(parsedClassification, globalStatistics, hostStatistics, waitingStatus, pageCatalog, pagePersistence, websiteAccess)),
                 new TenMinuteTaskJob(
-                    new TaskBatchDownload(parsedClassification, batches, globalStatistics, pageCatalog, pagePersistence, new OpenAIBatchDownload(), new VertexAIBatchDownload(), robotsPolicy),
+                    new TaskBatchDownload(parsedClassification, batches, globalStatistics, pageCatalog, pagePersistence, new OpenAIBatchDownload(), new VertexAIBatchDownload(), websiteAccess),
                     new TaskBatchUpload(batches, waitingStatus, pagePersistence)),
                 new HourlyTaskJob(
                     new WebsiteRefreshService(websiteCatalog, websitePersistence, websiteNetwork, websiteSitemaps),

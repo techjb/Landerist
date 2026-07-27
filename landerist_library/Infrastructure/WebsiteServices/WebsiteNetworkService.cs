@@ -9,11 +9,11 @@ namespace landerist_library.Infrastructure.WebsiteServices;
 public sealed class WebsiteNetworkService : IWebsiteNetworkService
 {
     private const int MaxRedirects = 10;
-    private readonly HttpClientTransportFactory _httpClients;
+    private readonly IHttpClientTransportFactory _httpClients;
     private readonly TimeProvider _timeProvider;
 
     public WebsiteNetworkService(
-        HttpClientTransportFactory httpClients,
+        IHttpClientTransportFactory httpClients,
         TimeProvider timeProvider)
     {
         ArgumentNullException.ThrowIfNull(httpClients);

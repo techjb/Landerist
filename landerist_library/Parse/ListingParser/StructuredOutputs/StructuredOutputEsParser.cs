@@ -11,7 +11,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
     {
         public Anuncio? Anuncio = structuredOutputEs.Anuncio;
 
-        public (PageType pageType, Listing? listing) Parse(Page page, IWebsiteRobotsPolicy robotsPolicy)
+        public (PageType pageType, Listing? listing) Parse(Page page, WebsiteAccessServices websiteAccess)
         {
             if (Anuncio == null)
             {
@@ -61,7 +61,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
                     securitySystems = Anuncio.TieneSistemasDeSeguridad,
                 };
 
-                SetMedia(listing, page, robotsPolicy);
+                SetMedia(listing, page, websiteAccess);
                 SetSource(listing, page);
                 return (PageType.Listing, listing);
             }
@@ -390,7 +390,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             return null;
         }
 
-        private void SetMedia(Listing listing, Page page, IWebsiteRobotsPolicy robotsPolicy)
+        private void SetMedia(Listing listing, Page page, WebsiteAccessServices websiteAccess)
         {
             if (Anuncio!.ImagenesDelAnuncio is null ||
                 Anuncio!.ImagenesDelAnuncio.Count.Equals(0) ||
@@ -398,7 +398,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             {
                 return;
             }
-            MediaParser mediaParser = new(page, robotsPolicy);
+            MediaParser mediaParser = new(page, websiteAccess);
             var list = new List<(string url, string? title)>();
             foreach (var img in Anuncio!.ImagenesDelAnuncio.Take((int)StructuredOutputEsJson.MAX_URLS_DE_IMAGENES_DEL_ANUNCIO))
             {

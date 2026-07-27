@@ -26,7 +26,7 @@ namespace landerist_library.Infrastructure.Tasks
         private readonly IPagePersistenceService _pagePersistence;
         private readonly IListingBatchProvider _openAi;
         private readonly IListingBatchProvider _vertexAi;
-        private readonly IWebsiteRobotsPolicy _robots;
+        private readonly WebsiteAccessServices _websiteAccess;
 
         public TaskBatchDownload(
             IParsedPageClassificationService parsedClassification,
@@ -36,7 +36,7 @@ namespace landerist_library.Infrastructure.Tasks
             IPagePersistenceService pagePersistence,
             IListingBatchProvider openAi,
             IListingBatchProvider vertexAi,
-            IWebsiteRobotsPolicy robots)
+            WebsiteAccessServices websiteAccess)
         {
             ArgumentNullException.ThrowIfNull(parsedClassification);
             ArgumentNullException.ThrowIfNull(batches);
@@ -45,7 +45,7 @@ namespace landerist_library.Infrastructure.Tasks
             ArgumentNullException.ThrowIfNull(pagePersistence);
             ArgumentNullException.ThrowIfNull(openAi);
             ArgumentNullException.ThrowIfNull(vertexAi);
-            ArgumentNullException.ThrowIfNull(robots);
+            ArgumentNullException.ThrowIfNull(websiteAccess);
             _parsedClassification = parsedClassification;
             _batches = batches;
             _statistics = statistics;
@@ -53,7 +53,7 @@ namespace landerist_library.Infrastructure.Tasks
             _pagePersistence = pagePersistence;
             _openAi = openAi;
             _vertexAi = vertexAi;
-            _robots = robots;
+            _websiteAccess = websiteAccess;
         }
 
         public readonly HashSet<string> DownloadedPagesUriHashes = [];
@@ -206,7 +206,7 @@ namespace landerist_library.Infrastructure.Tasks
             using var page = result.Value.page;
             var text = result.Value.text;
 
-            var (newPageType, listing) = ParseListing.ParseResponse(page, text, _robots);
+            var (newPageType, listing) = ParseListing.ParseResponse(page, text, _websiteAccess);
             bool success = _parsedClassification.Apply(page, newPageType, listing);
 
             if (success)

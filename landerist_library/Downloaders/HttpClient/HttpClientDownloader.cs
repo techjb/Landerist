@@ -1,4 +1,3 @@
-using landerist_library.Configuration;
 using landerist_library.Websites;
 using System.Net.Http.Headers;
 
@@ -46,15 +45,10 @@ namespace landerist_library.Downloaders.HttpClient
 
         public async void GetAsync(Page page)
         {
-            HttpClientHandler handler = new()
-            {
-                AllowAutoRedirect = false,
-                // trust certificate allways
-                //ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; }
-            };
-
-            using var httpClient = new System.Net.Http.HttpClient(handler);
-            httpClient.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
+            using HttpClient httpClient = HttpClients.Create(
+                page.Website.UseProxy,
+                TimeSpan.FromSeconds(page.Website.Rules.HttpClientTimeoutSeconds),
+                allowAutoRedirect: false);
 
             using HttpRequestMessage httpRequestMessage = WebsiteHttpRequestProfile.From(page.Website).CreateRequest(HttpMethod.Get, page.Uri);
             SetAccepLanguage(httpRequestMessage, page.Website.LanguageCode);

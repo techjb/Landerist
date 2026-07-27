@@ -1,3 +1,4 @@
+using landerist_library.Websites;
 using landerist_library.Infrastructure.Statistics;
 using landerist_library.Infrastructure.Parsing;
 using landerist_library.Configuration;
@@ -85,6 +86,7 @@ namespace landerist_tests
                 new SqlWebsiteCatalog(new WebsiteQueryRepository(databaseFactory.Create())),
                 persistenceEnabled: !Config.IsConfigurationLocal());
             WebsiteRobotsPolicy robotsPolicy = new();
+            WebsiteAccessServices websiteAccess = new(robotsPolicy, httpClients);
             SqlPageLinkService pageLinks = new(
                 pagePersistence,
                 new WebsitePageMetricsRepository(databaseFactory.Create()),
@@ -107,7 +109,7 @@ namespace landerist_tests
                     Config.IsConfigurationProduction(),
                     notListingCache,
                     new SqlPageClassificationMetrics(databaseFactory.Create()),
-                    new LegacyListingPageParser(hostStatistics, robotsPolicy),
+                    new LegacyListingPageParser(hostStatistics, websiteAccess),
                     new LegacyPageTokenLimitPolicy()),
                 new PageIndexingService(Config.INDEXER_ENABLED, pageLinks),
                 new SqlPageSchedulingService(listingStore),

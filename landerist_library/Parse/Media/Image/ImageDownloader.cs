@@ -5,7 +5,6 @@ namespace landerist_library.Parse.Media.Image
 {
     public class ImageDownloader(ImageParser imageParser)
     {
-        private static readonly HttpClient HttpClient = CreateHttpClient();
 
         private readonly ImageParser ImageParser = imageParser;
         private readonly object Sync1 = new();
@@ -35,7 +34,7 @@ namespace landerist_library.Parse.Media.Image
 
         private void DownloadImage(landerist_orels.Media image)
         {
-            if (!ImageParser.MediaParser.RobotsPolicy.IsAllowed(
+            if (!ImageParser.MediaParser.WebsiteAccess.Robots.IsAllowed(
                     ImageParser.MediaParser.Page.Website,
                     image.url))
             {
@@ -55,8 +54,12 @@ namespace landerist_library.Parse.Media.Image
         {
             try
             {
-                using var request = WebsiteHttpRequestProfile.From(ImageParser.MediaParser.Page.Website).CreateRequest(HttpMethod.Get, uri);
-                using var response = HttpClient.SendAsync(request).GetAwaiter().GetResult();
+                Website website = ImageParser.MediaParser.Page.Website;
+                using HttpClient httpClient = ImageParser.MediaParser.WebsiteAccess.HttpClients.Create(
+                    website.UseProxy,
+                    TimeSpan.FromSeconds(website.Rules.HttpClientTimeoutSeconds));
+                using var request = WebsiteHttpRequestProfile.From(website).CreateRequest(HttpMethod.Get, uri);
+                using var response = httpClient.SendAsync(request).GetAwaiter().GetResult();
                 response.EnsureSuccessStatusCode();
                 var bytes = response.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
                 using var mat = Cv2.ImDecode(bytes, ImreadModes.Color);
@@ -80,9 +83,5 @@ namespace landerist_library.Parse.Media.Image
             }
         }
 
-        private static HttpClient CreateHttpClient()
-        {
-            return new HttpClient();
-        }
     }
 }

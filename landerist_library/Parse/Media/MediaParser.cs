@@ -10,19 +10,19 @@ namespace landerist_library.Parse.Media
     public class MediaParser
     {
         public readonly Page Page;
-        public IWebsiteRobotsPolicy RobotsPolicy { get; }
+        public WebsiteAccessServices WebsiteAccess { get; }
 
         private readonly SortedSet<landerist_orels.Media> _media = new(new MediaComparer());
 
         public HtmlDocument? HtmlDocument { get; private set; }
 
-        public MediaParser(Page page, IWebsiteRobotsPolicy robotsPolicy)
+        public MediaParser(Page page, WebsiteAccessServices websiteAccess)
         {
             ArgumentNullException.ThrowIfNull(page);
-            ArgumentNullException.ThrowIfNull(robotsPolicy);
+            ArgumentNullException.ThrowIfNull(websiteAccess);
 
             Page = page;
-            RobotsPolicy = robotsPolicy;
+            WebsiteAccess = websiteAccess;
             InitHtmlDocument();
         }
 

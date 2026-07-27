@@ -26,7 +26,7 @@ namespace landerist_library.Infrastructure.Parsing
             { LLMProvider.LocalAI, new LocalAIListingParserClient() },
         };
 
-        public static (PageType pageType, Listing? listing, bool waitingAIRequest) Parse(Page page, HostStatistics statistics, IWebsiteRobotsPolicy robotsPolicy)
+        public static (PageType pageType, Listing? listing, bool waitingAIRequest) Parse(Page page, HostStatistics statistics, WebsiteAccessServices websiteAccess)
         {
             page.SetLastParseListing();
 
@@ -42,13 +42,13 @@ namespace landerist_library.Infrastructure.Parsing
             }
 
             return Clients.TryGetValue(Config.LLM_PROVIDER, out var client)
-                ? ParseWithClient(page, text, client, statistics, robotsPolicy)
+                ? ParseWithClient(page, text, client, statistics, websiteAccess)
                 : (PageType.ResponseBodyTooShort, null, false);
         }
 
-        public static (PageType pageType, Listing? listing, bool waitingAIRequest) ParseLocalAI(Page page, string text, HostStatistics statistics, IWebsiteRobotsPolicy robotsPolicy)
+        public static (PageType pageType, Listing? listing, bool waitingAIRequest) ParseLocalAI(Page page, string text, HostStatistics statistics, WebsiteAccessServices websiteAccess)
         {
-            return ParseWithClient(page, text, new LocalAIListingParserClient(), statistics, robotsPolicy);
+            return ParseWithClient(page, text, new LocalAIListingParserClient(), statistics, websiteAccess);
         }
 
         private static (PageType pageType, Listing? listing, bool waitingAIRequest) ParseWithClient(
@@ -56,7 +56,7 @@ namespace landerist_library.Infrastructure.Parsing
             string userInput,
             IListingParserClient client,
             HostStatistics statistics,
-            IWebsiteRobotsPolicy robotsPolicy)
+            WebsiteAccessServices websiteAccess)
         {
             return ParseWithRetry(page, () =>
             {
@@ -67,7 +67,7 @@ namespace landerist_library.Infrastructure.Parsing
                     return (PageType.MayBeListing, null, true);
                 }
 
-                var (pageType, listing) = ParseResponse(page, response.ResponseText, client.Provider, robotsPolicy);
+                var (pageType, listing) = ParseResponse(page, response.ResponseText, client.Provider, websiteAccess);
                 if (pageType == PageType.MayBeListing)
                 {
                     WriteLocalAIDiagnostic(client, "pageType is MayBeListing. " + response.Diagnostic);
@@ -106,12 +106,12 @@ namespace landerist_library.Infrastructure.Parsing
                 && page.Website.MatchesListingUrlRegex(page.Uri);
         }
 
-        public static (PageType pageType, Listing? listing) ParseResponse(Page page, string? text, IWebsiteRobotsPolicy robotsPolicy)
+        public static (PageType pageType, Listing? listing) ParseResponse(Page page, string? text, WebsiteAccessServices websiteAccess)
         {
-            return ParseResponse(page, text, Config.LLM_PROVIDER, robotsPolicy);
+            return ParseResponse(page, text, Config.LLM_PROVIDER, websiteAccess);
         }
 
-        private static (PageType pageType, Listing? listing) ParseResponse(Page page, string? text, LLMProvider provider, IWebsiteRobotsPolicy robotsPolicy)
+        private static (PageType pageType, Listing? listing) ParseResponse(Page page, string? text, LLMProvider provider, WebsiteAccessServices websiteAccess)
         {
             if (string.IsNullOrWhiteSpace(text))
             {
@@ -127,7 +127,7 @@ namespace landerist_library.Infrastructure.Parsing
                 }
 
                 ListingImageUrlPlaceholders.Resolve(page, structuredOutputEs);
-                return new StructuredOutputEsParser(structuredOutputEs).Parse(page, robotsPolicy);
+                return new StructuredOutputEsParser(structuredOutputEs).Parse(page, websiteAccess);
             }
             catch (Exception exception)
             {

@@ -10,9 +10,9 @@ namespace landerist_library.Infrastructure.Indexing
         private readonly WebsiteHttpRequestProfile RequestProfile;
         private readonly bool UseProxy;
         private readonly TimeSpan Timeout;
-        private readonly HttpClientTransportFactory HttpClients;
+        private readonly IHttpClientTransportFactory HttpClients;
 
-        public GzipAwareSitemapFetcher(Website website, HttpClientTransportFactory httpClients)
+        public GzipAwareSitemapFetcher(Website website, IHttpClientTransportFactory httpClients)
         {
             ArgumentNullException.ThrowIfNull(httpClients);
             RequestProfile = WebsiteHttpRequestProfile.From(website);

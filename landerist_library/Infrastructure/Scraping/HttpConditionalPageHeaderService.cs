@@ -1,12 +1,13 @@
+using landerist_library.Websites;
 using landerist_library.Application.Scraping;
 using landerist_library.Infrastructure.Http;
 using landerist_library.Pages;
 
 namespace landerist_library.Infrastructure.Scraping;
 
-public sealed class HttpConditionalPageHeaderService(HttpClientTransportFactory httpClients) : IConditionalPageHeaderService
+public sealed class HttpConditionalPageHeaderService(IHttpClientTransportFactory httpClients) : IConditionalPageHeaderService
 {
-    private readonly HttpClientTransportFactory _httpClients =
+    private readonly IHttpClientTransportFactory _httpClients =
         httpClients ?? throw new ArgumentNullException(nameof(httpClients));
     public ConditionalPageHeaderResult Check(Page page, bool useProxy)
     {

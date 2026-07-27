@@ -10,9 +10,9 @@ namespace landerist_library.Infrastructure.Scraping
     internal sealed class ConditionalPageHeaderChecker
     {
         private readonly bool UseProxy;
-        private readonly HttpClientTransportFactory HttpClients;
+        private readonly IHttpClientTransportFactory HttpClients;
 
-        public ConditionalPageHeaderChecker(bool useProxy, HttpClientTransportFactory httpClients)
+        public ConditionalPageHeaderChecker(bool useProxy, IHttpClientTransportFactory httpClients)
         {
             ArgumentNullException.ThrowIfNull(httpClients);
             UseProxy = useProxy;
