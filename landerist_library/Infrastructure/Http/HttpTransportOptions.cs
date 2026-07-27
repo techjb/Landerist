@@ -1,6 +1,6 @@
-namespace landerist_library.Infrastructure.WebsiteServices;
+namespace landerist_library.Infrastructure.Http;
 
-public sealed record WebsiteNetworkOptions(
+public sealed record HttpTransportOptions(
     string ProxyHost,
     int ProxyPort,
     bool RandomizeStickyPorts,

@@ -1,6 +1,7 @@
 using landerist_library.Websites;
 using landerist_library.Pages;
 using landerist_library.Application.Websites;
+using landerist_library.Infrastructure.Http;
 using Louw.SitemapParser;
 
 namespace landerist_library.Infrastructure.Indexing
@@ -13,9 +14,9 @@ namespace landerist_library.Infrastructure.Indexing
 
         private sealed record LoadedSitemap(Sitemap Sitemap, IReadOnlyList<Uri> AlternateUrls);
 
-        public SitemapIndexer(Website website, IWebsiteRobotsPolicy robots, Func<Page, bool>? insertPage = null, Func<Website, bool>? achievedMaxNumberOfPages = null) : base(website, robots, insertPage, achievedMaxNumberOfPages)
+        public SitemapIndexer(Website website, IWebsiteRobotsPolicy robots, HttpClientTransportFactory httpClients, Func<Page, bool>? insertPage = null, Func<Website, bool>? achievedMaxNumberOfPages = null) : base(website, robots, insertPage, achievedMaxNumberOfPages)
         {
-            WebsiteSitemapFetcher = new GzipAwareSitemapFetcher(website);
+            WebsiteSitemapFetcher = new GzipAwareSitemapFetcher(website, httpClients);
         }
 
         public bool IndexNewPages(List<Com.Bekijkhet.RobotsTxt.Sitemap> sitemaps)

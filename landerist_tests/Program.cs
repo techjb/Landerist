@@ -8,6 +8,7 @@ using landerist_library.Application.Scraping;
 using landerist_library.Application.Websites;
 using landerist_library.Database;
 using landerist_library.Infrastructure.Logging;
+using landerist_library.Infrastructure.Http;
 using landerist_library.Infrastructure.Listings;
 using landerist_library.Infrastructure.PageServices;
 using landerist_library.Infrastructure.Sql;
@@ -54,7 +55,16 @@ namespace landerist_tests
                     Config.DATABASE_NAME,
                     Config.DATABASE_ENCRYPT,
                     Config.DATABASE_TRUST_SERVER_CERTIFICATE));
-            LegacyDatabase.Configure(databaseFactory);
+            LegacyDatabase.Configure(databaseFactory);            LanderistSettings settings = LanderistSettings.Current;
+            HttpClientTransportFactory httpClients = new(
+                new HttpTransportOptions(
+                    settings.GetString("PROXY_HOST"),
+                    settings.GetInt32("PROXY_PORT"),
+                    settings.GetBoolean("PROXY_RANDOMIZE_STICKY_PORTS"),
+                    settings.GetInt32("PROXY_STICKY_PORT_MIN"),
+                    settings.GetInt32("PROXY_STICKY_PORT_MAX"),
+                    settings.GetString("PROXY_USERNAME"),
+                    settings.GetString("PROXY_PASSWORD")));
             LegacyApplicationLogger logger = new();
             PagePersistenceService pagePersistence = new(new PageRepository(databaseFactory.Create()));
             WebsitePersistenceService websitePersistence = new(new WebsiteRepository(databaseFactory.Create()));
@@ -90,7 +100,7 @@ namespace landerist_tests
             PageScrapePipelineServices pageScraping = new(
                 new PageAcquisitionService(
                     new PooledPageDownloader(),
-                    new HttpConditionalPageHeaderService(),
+                    new HttpConditionalPageHeaderService(httpClients),
                     new SqlScrapeMetrics(databaseFactory.Create()),
                     conditionalHeadersEnabled: !Config.IsConfigurationLocal()),
                 new PageContentClassifier(

@@ -1,4 +1,4 @@
-using landerist_library.Configuration;
+using landerist_library.Infrastructure.Http;
 using landerist_library.Pages;
 using landerist_library.Websites;
 using System.Globalization;
@@ -10,10 +10,13 @@ namespace landerist_library.Infrastructure.Scraping
     internal sealed class ConditionalPageHeaderChecker
     {
         private readonly bool UseProxy;
+        private readonly HttpClientTransportFactory HttpClients;
 
-        public ConditionalPageHeaderChecker(bool useProxy)
+        public ConditionalPageHeaderChecker(bool useProxy, HttpClientTransportFactory httpClients)
         {
+            ArgumentNullException.ThrowIfNull(httpClients);
             UseProxy = useProxy;
+            HttpClients = httpClients;
         }
 
         public ConditionalHeaderCheckResult Check(Page page)
@@ -32,7 +35,7 @@ namespace landerist_library.Infrastructure.Scraping
 
         private async Task<ConditionalHeaderCheckResult> CheckAsync(Page page)
         {
-            using var httpClient = CreateHttpClient();
+            using var httpClient = CreateHttpClient(page);
             using var request = CreateRequest(page);
             using var response = await httpClient
                 .SendAsync(request, HttpCompletionOption.ResponseHeadersRead)
@@ -52,52 +55,11 @@ namespace landerist_library.Infrastructure.Scraping
             };
         }
 
-        private HttpClient CreateHttpClient()
-        {
-            var httpClient = UseProxy
-                ? new HttpClient(CreateProxyHandler())
-                : new HttpClient(CreateHandler());
-
-            httpClient.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
-            return httpClient;
-        }
-
-        private static HttpClientHandler CreateHandler()
-        {
-            return new HttpClientHandler
-            {
-                AllowAutoRedirect = false
-            };
-        }
-
-        private static HttpClientHandler CreateProxyHandler()
-        {
-            return new HttpClientHandler
-            {
-                AllowAutoRedirect = false,
-                UseProxy = true,
-                Proxy = new WebProxy(AppConfig.PROXY_HOST, GetProxyPort())
-                {
-                    Credentials = new NetworkCredential(
-                        AppConfig.PROXY_USERNAME,
-                        AppConfig.PROXY_PASSWORD)
-                }
-            };
-        }
-
-        private static int GetProxyPort()
-        {
-            if (!AppConfig.PROXY_RANDOMIZE_STICKY_PORTS ||
-                AppConfig.PROXY_STICKY_PORT_MIN > AppConfig.PROXY_STICKY_PORT_MAX)
-            {
-                return int.Parse(AppConfig.PROXY_PORT, CultureInfo.InvariantCulture);
-            }
-
-            return Random.Shared.Next(
-                AppConfig.PROXY_STICKY_PORT_MIN,
-                AppConfig.PROXY_STICKY_PORT_MAX + 1);
-        }
-
+        private HttpClient CreateHttpClient(Page page) =>
+            HttpClients.Create(
+                UseProxy,
+                TimeSpan.FromSeconds(page.Website.Rules.HttpClientTimeoutSeconds),
+                allowAutoRedirect: false);
         private static HttpRequestMessage CreateRequest(Page page)
         {
             var request = WebsiteHttpRequestProfile.From(page.Website).CreateRequest(HttpMethod.Head, page.Uri);

@@ -1,4 +1,5 @@
 using landerist_library.Application.Websites;
+using landerist_library.Infrastructure.Http;
 using landerist_library.Websites;
 using System.Net;
 using System.Text;
@@ -8,16 +9,16 @@ namespace landerist_library.Infrastructure.WebsiteServices;
 public sealed class WebsiteNetworkService : IWebsiteNetworkService
 {
     private const int MaxRedirects = 10;
-    private readonly WebsiteNetworkOptions _options;
+    private readonly HttpClientTransportFactory _httpClients;
     private readonly TimeProvider _timeProvider;
 
     public WebsiteNetworkService(
-        WebsiteNetworkOptions options,
+        HttpClientTransportFactory httpClients,
         TimeProvider timeProvider)
     {
-        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(httpClients);
         ArgumentNullException.ThrowIfNull(timeProvider);
-        _options = options;
+        _httpClients = httpClients;
         _timeProvider = timeProvider;
     }
 
@@ -27,14 +28,10 @@ public sealed class WebsiteNetworkService : IWebsiteNetworkService
 
         for (int iteration = 0; iteration < MaxRedirects; iteration++)
         {
-            using HttpClientHandler handler = new()
-            {
-                AllowAutoRedirect = false
-            };
-            using HttpClient httpClient = new(handler)
-            {
-                Timeout = TimeSpan.FromSeconds(website.Rules.HttpClientTimeoutSeconds)
-            };
+            using HttpClient httpClient = _httpClients.Create(
+                useProxy: false,
+                TimeSpan.FromSeconds(website.Rules.HttpClientTimeoutSeconds),
+                allowAutoRedirect: false);
 
             try
             {
@@ -123,43 +120,8 @@ public sealed class WebsiteNetworkService : IWebsiteNetworkService
         }
     }
 
-    private HttpClient CreateRobotsTxtHttpClient(Website website)
-    {
-        if (!website.UseProxy)
-        {
-            return new HttpClient
-            {
-                Timeout = TimeSpan.FromSeconds(website.Rules.HttpClientTimeoutSeconds)
-            };
-        }
-
-        HttpClientHandler handler = new()
-        {
-            UseProxy = true,
-            Proxy = new WebProxy(_options.ProxyHost, GetProxyPort())
-            {
-                Credentials = new NetworkCredential(
-                    _options.ProxyUsername,
-                    _options.ProxyPassword)
-            }
-        };
-
-        return new HttpClient(handler)
-        {
-            Timeout = TimeSpan.FromSeconds(website.Rules.HttpClientTimeoutSeconds)
-        };
-    }
-
-    private int GetProxyPort()
-    {
-        if (!_options.RandomizeStickyPorts ||
-            _options.StickyPortMin > _options.StickyPortMax)
-        {
-            return _options.ProxyPort;
-        }
-
-        return Random.Shared.Next(
-            _options.StickyPortMin,
-            _options.StickyPortMax + 1);
-    }
+    private HttpClient CreateRobotsTxtHttpClient(Website website) =>
+        _httpClients.Create(
+            website.UseProxy,
+            TimeSpan.FromSeconds(website.Rules.HttpClientTimeoutSeconds));
 }

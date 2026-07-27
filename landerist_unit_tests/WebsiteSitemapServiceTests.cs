@@ -1,6 +1,7 @@
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Websites;
 using landerist_library.Infrastructure.WebsiteServices;
+using landerist_library.Infrastructure.Http;
 using landerist_library.Pages;
 using landerist_library.Websites;
 
@@ -18,13 +19,16 @@ public sealed class WebsiteSitemapServiceTests
             new StubPagePersistenceService(),
             new StubWebsiteMetricsService(),
             new StubWebsiteRobotsPolicy(),
-            new FixedTimeProvider(now));
+            new FixedTimeProvider(now),
+            CreateHttpClients());
 
         service.RefreshSitemap(website);
 
         Assert.Equal(now.DateTime, website.SitemapUpdated);
     }
 
+    private static HttpClientTransportFactory CreateHttpClients() =>
+        new(new HttpTransportOptions("localhost", 8080, false, 8080, 8080, "", ""));
     private sealed class FixedTimeProvider(DateTimeOffset now) : TimeProvider
     {
         public override DateTimeOffset GetUtcNow() => now;

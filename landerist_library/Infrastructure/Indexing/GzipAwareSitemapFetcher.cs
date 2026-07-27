@@ -1,20 +1,23 @@
-using landerist_library.Configuration;
+using landerist_library.Infrastructure.Http;
 using landerist_library.Websites;
 using Louw.SitemapParser;
 using System.IO.Compression;
-using System.Net;
 
 namespace landerist_library.Infrastructure.Indexing
 {
     internal sealed class GzipAwareSitemapFetcher : ISitemapFetcher
     {
-        private static readonly HttpClient HttpClient = CreateHttpClient(useProxy: false);
         private readonly WebsiteHttpRequestProfile RequestProfile;
         private readonly bool UseProxy;
+        private readonly TimeSpan Timeout;
+        private readonly HttpClientTransportFactory HttpClients;
 
-        public GzipAwareSitemapFetcher(Website website)
+        public GzipAwareSitemapFetcher(Website website, HttpClientTransportFactory httpClients)
         {
+            ArgumentNullException.ThrowIfNull(httpClients);
             RequestProfile = WebsiteHttpRequestProfile.From(website);
+            HttpClients = httpClients;
+            Timeout = TimeSpan.FromSeconds(website.Rules.HttpClientTimeoutSeconds);
             UseProxy = website.UseProxy;
         }
 
@@ -24,55 +27,18 @@ namespace landerist_library.Infrastructure.Indexing
 
             if (UseProxy)
             {
-                using HttpClient httpClient = CreateHttpClient(useProxy: true);
+                using HttpClient httpClient = HttpClients.Create(useProxy: true, Timeout);
                 using HttpResponseMessage proxyResponse = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
 
                 proxyResponse.EnsureSuccessStatusCode();
                 return await ReadContentAsync(uri, proxyResponse).ConfigureAwait(false);
             }
 
-            using HttpResponseMessage response = await HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+            using HttpClient directClient = HttpClients.Create(useProxy: false, Timeout);
+            using HttpResponseMessage response = await directClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
 
             response.EnsureSuccessStatusCode();
             return await ReadContentAsync(uri, response).ConfigureAwait(false);
-        }
-
-        private static HttpClient CreateHttpClient(bool useProxy)
-        {
-            HttpClient client = useProxy
-                ? new HttpClient(CreateProxyHandler())
-                : new HttpClient();
-
-            client.Timeout = TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT);
-
-            return client;
-        }
-
-        private static HttpClientHandler CreateProxyHandler()
-        {
-            return new HttpClientHandler
-            {
-                UseProxy = true,
-                Proxy = new WebProxy(AppConfig.PROXY_HOST, GetProxyPort())
-                {
-                    Credentials = new NetworkCredential(
-                        AppConfig.PROXY_USERNAME,
-                        AppConfig.PROXY_PASSWORD)
-                }
-            };
-        }
-
-        private static int GetProxyPort()
-        {
-            if (!AppConfig.PROXY_RANDOMIZE_STICKY_PORTS ||
-                AppConfig.PROXY_STICKY_PORT_MIN > AppConfig.PROXY_STICKY_PORT_MAX)
-            {
-                return int.Parse(AppConfig.PROXY_PORT);
-            }
-
-            return Random.Shared.Next(
-                AppConfig.PROXY_STICKY_PORT_MIN,
-                AppConfig.PROXY_STICKY_PORT_MAX + 1);
         }
 
         private static async Task<string> ReadContentAsync(Uri uri, HttpResponseMessage response)
