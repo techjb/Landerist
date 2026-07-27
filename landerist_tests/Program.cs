@@ -87,11 +87,12 @@ namespace landerist_tests
             DownloadersPool downloaders = new(
                 Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
                 new PuppeteerDownloaderFactory(browserOptions));
+            LegacyApplicationLogger logger = new();
             ChromeMaintenanceService chrome = new(
                 new ChromeMaintenanceOptions(
                     ProcessCleanupEnabled: Config.IsConfigurationProduction(),
                     UseTaskKillFallback: Config.IsPrincipalMachine()),
-                new SystemChromeProcessController(),
+                new SystemChromeProcessController(logger),
                 new PuppeteerChromeBrowserInstaller());
             GoolzoomApi goolzoom = new(
                 httpClients,
@@ -99,7 +100,6 @@ namespace landerist_tests
                     settings.GetString("GOOLZOOM_API"),
                     TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT),
                     MaxRetryAttempts: 3));
-            LegacyApplicationLogger logger = new();
             PagePersistenceService pagePersistence = new(new PageRepository(databaseFactory.Create()), logger);
             WebsitePersistenceService websitePersistence = new(new WebsiteRepository(databaseFactory.Create()));
             SqlListingStore listingStore = new(databaseFactory.Create(), logger);

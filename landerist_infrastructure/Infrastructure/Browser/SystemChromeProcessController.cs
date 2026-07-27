@@ -1,9 +1,17 @@
 using System.Diagnostics;
+using landerist_library.Application.Logging;
 
 namespace landerist_library.Infrastructure.Browser;
 
 public sealed class SystemChromeProcessController : IChromeProcessController
 {
+    private readonly IApplicationLogger _logger;
+
+    public SystemChromeProcessController(IApplicationLogger logger)
+    {
+        ArgumentNullException.ThrowIfNull(logger);
+        _logger = logger;
+    }
     public void KillProcesses(string processName)
     {
         try
@@ -16,9 +24,9 @@ public sealed class SystemChromeProcessController : IChromeProcessController
                 }
                 catch (Exception exception)
                 {
-                    Logs.Log.WriteError(
+                    _logger.WriteError(
                         "SystemChromeProcessController KillProcess",
-                        exception);
+                        exception.ToString());
                 }
                 finally
                 {
@@ -28,9 +36,9 @@ public sealed class SystemChromeProcessController : IChromeProcessController
         }
         catch (Exception exception)
         {
-            Logs.Log.WriteError(
+            _logger.WriteError(
                 "SystemChromeProcessController KillProcesses",
-                exception);
+                        exception.ToString());
         }
     }
 
@@ -53,9 +61,9 @@ public sealed class SystemChromeProcessController : IChromeProcessController
         }
         catch (Exception exception)
         {
-            Logs.Log.WriteError(
+            _logger.WriteError(
                 "SystemChromeProcessController ForceKillExecutable",
-                exception);
+                        exception.ToString());
         }
     }
 }

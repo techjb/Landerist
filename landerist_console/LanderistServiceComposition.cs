@@ -69,11 +69,12 @@ internal static class LanderistServiceComposition
         DownloadersPool downloaders = new(
             Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
             new PuppeteerDownloaderFactory(browserOptions));
+        LegacyApplicationLogger logger = new();
         ChromeMaintenanceService chrome = new(
             new ChromeMaintenanceOptions(
                 ProcessCleanupEnabled: Config.IsConfigurationProduction(),
                 UseTaskKillFallback: Config.IsPrincipalMachine()),
-            new SystemChromeProcessController(),
+            new SystemChromeProcessController(logger),
             new PuppeteerChromeBrowserInstaller());
         GoolzoomApi goolzoom = new(
             httpClients,
@@ -83,7 +84,7 @@ internal static class LanderistServiceComposition
                 MaxRetryAttempts: 3));
         WebsiteNetworkService websiteNetwork = new(
             httpClients,
-            TimeProvider.System);            LegacyApplicationLogger logger = new();
+            TimeProvider.System);
         PagePersistenceService pagePersistence = new(new PageRepository(databaseFactory.Create()), logger);
         WebsitePersistenceService websitePersistence = new(new WebsiteRepository(databaseFactory.Create()));
         SqlListingStore listingStore = new(databaseFactory.Create(), logger);

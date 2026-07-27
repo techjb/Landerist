@@ -5,7 +5,7 @@ namespace landerist_architecture_tests;
 public sealed class InfrastructureProjectArchitectureTests
 {
     [Fact]
-    public void InfrastructureProject_DoesNotReferenceLegacyLibraryOrPackages()
+    public void InfrastructureProject_UsesOnlyDeclaredAdapterDependencies()
     {
         string root = FindRepositoryRoot();
         XDocument project = XDocument.Load(Path.Combine(
@@ -25,7 +25,7 @@ public sealed class InfrastructureProjectArchitectureTests
             .Order()
             .ToArray();
 
-        Assert.Empty(packages);
+        Assert.Equal(["PuppeteerSharp"], packages);
         Assert.Equal(
             [
                 "..\\landerist_application\\landerist_application.csproj",
@@ -38,7 +38,7 @@ public sealed class InfrastructureProjectArchitectureTests
     }
 
     [Fact]
-    public void HttpInfrastructure_IsPhysicallyOwnedByInfrastructureProject()
+    public void ExtractedInfrastructure_IsPhysicallyOwnedByInfrastructureProject()
     {
         string root = FindRepositoryRoot();
 
@@ -47,6 +47,16 @@ public sealed class InfrastructureProjectArchitectureTests
             "landerist_infrastructure",
             "Infrastructure",
             "Http")));
+        Assert.True(Directory.Exists(Path.Combine(
+            root,
+            "landerist_infrastructure",
+            "Infrastructure",
+            "Browser")));
+        Assert.False(Directory.Exists(Path.Combine(
+            root,
+            "landerist_library",
+            "Infrastructure",
+            "Browser")));
         Assert.False(Directory.Exists(Path.Combine(
             root,
             "landerist_library",
@@ -54,6 +64,20 @@ public sealed class InfrastructureProjectArchitectureTests
             "Http")));
     }
 
+    [Fact]
+    public void ExtractedInfrastructure_DoesNotUseGlobalLogging()
+    {
+        string root = Path.Combine(
+            FindRepositoryRoot(),
+            "landerist_infrastructure",
+            "Infrastructure");
+        string[] violations = Directory.EnumerateFiles(root, "*.cs", SearchOption.AllDirectories)
+            .Where(file => File.ReadAllText(file).Contains("Logs.Log", StringComparison.Ordinal))
+            .Select(file => Path.GetFileName(file)!)
+            .ToArray();
+
+        Assert.Empty(violations);
+    }
     [Fact]
     public void LegacyLibrary_ReferencesInfrastructureProject()
     {

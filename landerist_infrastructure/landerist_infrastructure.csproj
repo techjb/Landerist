@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="PuppeteerSharp" Version="24.40.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\landerist_application\landerist_application.csproj" />
     <ProjectReference Include="..\landerist_domain\landerist_domain.csproj" />
   </ItemGroup>
