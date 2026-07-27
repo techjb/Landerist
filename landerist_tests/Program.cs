@@ -1,3 +1,5 @@
+using landerist_library.Parse.ListingParser.StructuredOutputs;
+using landerist_library.Parse.ListingParser;
 using landerist_library.Infrastructure.Browser;
 using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Downloaders.Multiple;
@@ -118,6 +120,10 @@ namespace landerist_tests
                 persistenceEnabled: !Config.IsConfigurationLocal());
             WebsiteRobotsPolicy robotsPolicy = new();
             WebsiteAccessServices websiteAccess = new(robotsPolicy, httpClients);
+            ListingParsingServices parsingServices = new(
+                ListingMaterializationRules.Default,
+                websiteAccess,
+                TimeProvider.System);
             SqlPageLinkService pageLinks = new(
                 pagePersistence,
                 new WebsitePageMetricsRepository(databaseFactory.Create()),
@@ -140,7 +146,7 @@ namespace landerist_tests
                     Config.IsConfigurationProduction(),
                     notListingCache,
                     new SqlPageClassificationMetrics(databaseFactory.Create()),
-                    new LegacyListingPageParser(hostStatistics, websiteAccess),
+                    new LegacyListingPageParser(hostStatistics, parsingServices),
                     new LegacyPageTokenLimitPolicy()),
                 new PageIndexingService(Config.INDEXER_ENABLED, pageLinks),
                 new SqlPageSchedulingService(listingStore),

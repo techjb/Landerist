@@ -1,4 +1,3 @@
-using landerist_library.Configuration;
 using landerist_library.Parse.Media;
 using landerist_orels.ES;
 using landerist_orels;
@@ -7,7 +6,7 @@ using landerist_library.Websites;
 
 namespace landerist_library.Parse.ListingParser.StructuredOutputs
 {
-    public class StructuredOutputEsParser(StructuredOutputEs structuredOutputEs)
+    public class StructuredOutputEsParser(StructuredOutputEs structuredOutputEs, ListingMaterializationRules rules, TimeProvider timeProvider)
     {
         public Anuncio? Anuncio = structuredOutputEs.Anuncio;
 
@@ -81,11 +80,11 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
 
         private DateTime GetListingDate()
         {
-            var now = DateTime.Now;
+            var now = timeProvider.GetLocalNow().DateTime;
             if (DateTime.TryParse(Anuncio?.FechaDePublicación, out DateTime listingDateParsed))
             {
                 var maxListingDate = now.AddDays(1);
-                var minListingDate = now.AddYears(-Config.MAX_YEARS_SINCE_PUBLISHED_LISTING);
+                var minListingDate = now.AddYears(-rules.MaxPublishedAgeYears);
                 if (listingDateParsed >= minListingDate && listingDateParsed <= maxListingDate)
                 {
                     return listingDateParsed;
@@ -263,8 +262,8 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         private double? GetPropertySize()
         {
             if (Anuncio!.TamañoDelInmueble.HasValue &&
-                Anuncio!.TamañoDelInmueble >= Config.MIN_PROPERTY_SIZE &&
-                Anuncio!.TamañoDelInmueble <= Config.MAX_PROPERTY_SIZE)
+                Anuncio!.TamañoDelInmueble >= rules.MinPropertySize &&
+                Anuncio!.TamañoDelInmueble <= rules.MaxPropertySize)
             {
                 return Anuncio!.TamañoDelInmueble;
             }
@@ -274,8 +273,8 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         private double? GetLandSize()
         {
             if (Anuncio!.TamañoDeLaParcela.HasValue &&
-                Anuncio!.TamañoDeLaParcela >= Config.MIN_LAND_SIZE &&
-                Anuncio!.TamañoDeLaParcela <= Config.MAX_LAND_SIZE)
+                Anuncio!.TamañoDeLaParcela >= rules.MinLandSize &&
+                Anuncio!.TamañoDeLaParcela <= rules.MaxLandSize)
             {
                 return Anuncio!.TamañoDeLaParcela;
             }
@@ -285,10 +284,10 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         private int? GetConstrunctionYear()
         {
             var constructionYear = Anuncio!.AñoDeConstrucción;
-            var maxConstructionYear = DateTime.Now.AddYears(Config.MAX_CONSTRUCTION_YEARS_FROM_NOW).Year;
+            var maxConstructionYear = timeProvider.GetLocalNow().DateTime.AddYears(rules.MaxConstructionYearsFromNow).Year;
 
             if (constructionYear.HasValue &&
-                constructionYear >= Config.MIN_CONSTRUCTION_YEAR &&
+                constructionYear >= rules.MinConstructionYear &&
                 constructionYear <= maxConstructionYear)
             {
                 return constructionYear;
@@ -337,8 +336,8 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         {
             var floors = Anuncio!.PlantasDelEdificio;
             if (floors.HasValue &&
-                floors >= Config.MIN_FLOORS &&
-                floors <= Config.MAX_FLOORS)
+                floors >= rules.MinFloors &&
+                floors <= rules.MaxFloors)
             {
                 return floors;
             }
@@ -358,8 +357,8 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         {
             var bedrooms = Anuncio!.NúmeroDeDormitorios;
             if (bedrooms.HasValue &&
-                bedrooms >= Config.MIN_BEDROOMS &&
-                bedrooms <= Config.MAX_BEDROOMS)
+                bedrooms >= rules.MinBedrooms &&
+                bedrooms <= rules.MaxBedrooms)
             {
                 return bedrooms;
             }
@@ -370,8 +369,8 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         {
             var bathrooms = Anuncio!.NúmeroDeBaños;
             if (bathrooms.HasValue &&
-                bathrooms >= Config.MIN_BATHROOMS &&
-                bathrooms <= Config.MAX_BATHROOMS)
+                bathrooms >= rules.MinBathrooms &&
+                bathrooms <= rules.MaxBathrooms)
             {
                 return bathrooms;
             }
@@ -382,8 +381,8 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         {
             var parkings = Anuncio!.NúmeroDeParkings;
             if (parkings.HasValue &&
-                parkings >= Config.MIN_PARKINGS &&
-                parkings <= Config.MAX_PARKINGS)
+                parkings >= rules.MinParkings &&
+                parkings <= rules.MaxParkings)
             {
                 return parkings;
             }
@@ -394,7 +393,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         {
             if (Anuncio!.ImagenesDelAnuncio is null ||
                 Anuncio!.ImagenesDelAnuncio.Count.Equals(0) ||
-                !Config.MEDIA_PARSER_ENABLED)
+                !rules.MediaEnabled)
             {
                 return;
             }
