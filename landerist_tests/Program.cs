@@ -1,3 +1,4 @@
+using landerist_library.Infrastructure.Browser;
 using landerist_library.Downloaders.Puppeteer;
 using landerist_library.Downloaders.Multiple;
 using landerist_library.Parse.Location.Providers.Goolzoom;
@@ -84,6 +85,12 @@ namespace landerist_tests
             DownloadersPool downloaders = new(
                 Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
                 new PuppeteerDownloaderFactory(browserOptions));
+            ChromeMaintenanceService chrome = new(
+                new ChromeMaintenanceOptions(
+                    ProcessCleanupEnabled: Config.IsConfigurationProduction(),
+                    UseTaskKillFallback: Config.IsPrincipalMachine()),
+                new SystemChromeProcessController(),
+                new PuppeteerChromeBrowserInstaller());
             GoolzoomApi goolzoom = new(
                 httpClients,
                 new GoolzoomOptions(
@@ -147,7 +154,7 @@ namespace landerist_tests
                     enforceMinimumPages: Config.IsConfigurationProduction()));
             ScrapeBatchServices batchScraping = new(
                 new SqlWebsiteThrottleService(databaseFactory.Create(), robotsPolicy),
-                new ScrapeBrowserManager(downloaders),
+                new ScrapeBrowserManager(downloaders, chrome),
                 new SqlPageLockManager(databaseFactory.Create(), Config.MACHINE_NAME),
                 new SqlScrapeBatchMetrics(databaseFactory.Create()),
                 new SqlScrapePageSource(databaseFactory.Create(), listingStore),

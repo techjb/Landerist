@@ -149,32 +149,6 @@ namespace landerist_library.Downloaders.Puppeteer
             }
         }
 
-        public static void UpdateChromeAndDoTest()
-        {
-            UpdateChrome();
-            DoTest();
-        }
-
-        public static void UpdateChrome()
-        {
-            bool sucess = Task.Run(DownloadBrowserAsync).Result;
-            Logs.Log.WriteInfo("service", "Updating Chrome. Success: " + sucess);
-        }
-
-        private static async Task<bool> DownloadBrowserAsync()
-        {
-            try
-            {
-                BrowserFetcher browserFetcher = new();
-                await browserFetcher.DownloadAsync();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
         public static void DoTest()
         {
             // working
