@@ -1,3 +1,5 @@
+using landerist_library.Application.Websites;
+
 namespace landerist_library.Application.Scraping;
 
 public sealed class ScrapeBatchServices
@@ -8,6 +10,7 @@ public sealed class ScrapeBatchServices
         IPageLockManager pageLocks,
         IScrapeBatchMetrics metrics,
         IScrapePageSource pages,
+        IWebsiteRobotsPolicy robots,
         ScraperExecutionOptions options)
     {
         ArgumentNullException.ThrowIfNull(websiteThrottle);
@@ -15,6 +18,7 @@ public sealed class ScrapeBatchServices
         ArgumentNullException.ThrowIfNull(pageLocks);
         ArgumentNullException.ThrowIfNull(metrics);
         ArgumentNullException.ThrowIfNull(pages);
+        ArgumentNullException.ThrowIfNull(robots);
         ArgumentNullException.ThrowIfNull(options);
 
         WebsiteThrottle = websiteThrottle;
@@ -22,6 +26,7 @@ public sealed class ScrapeBatchServices
         PageLocks = pageLocks;
         Metrics = metrics;
         Pages = pages;
+        Robots = robots;
         Options = options;
         Parallelism = new ScrapeParallelismCalculator(options);
     }
@@ -35,6 +40,8 @@ public sealed class ScrapeBatchServices
     public IScrapeBatchMetrics Metrics { get; }
 
     public IScrapePageSource Pages { get; }
+
+    public IWebsiteRobotsPolicy Robots { get; }
 
     public ScraperExecutionOptions Options { get; }
 

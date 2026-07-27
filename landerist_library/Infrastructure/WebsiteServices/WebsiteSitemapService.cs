@@ -12,20 +12,24 @@ public sealed class WebsiteSitemapService : IWebsiteSitemapService
     private readonly IPagePersistenceService _pagePersistence;
     private readonly IWebsiteMetricsService _metrics;
     private readonly TimeProvider _timeProvider;
+    private readonly IWebsiteRobotsPolicy _robots;
 
     public WebsiteSitemapService(
         bool indexingEnabled,
         IPagePersistenceService pagePersistence,
         IWebsiteMetricsService metrics,
+        IWebsiteRobotsPolicy robots,
         TimeProvider timeProvider)
     {
         ArgumentNullException.ThrowIfNull(pagePersistence);
         ArgumentNullException.ThrowIfNull(metrics);
+        ArgumentNullException.ThrowIfNull(robots);
         ArgumentNullException.ThrowIfNull(timeProvider);
         _indexingEnabled = indexingEnabled;
         _pagePersistence = pagePersistence;
         _metrics = metrics;
         _timeProvider = timeProvider;
+        _robots = robots;
     }
 
     public void RefreshSitemap(Website website)
@@ -45,12 +49,10 @@ public sealed class WebsiteSitemapService : IWebsiteSitemapService
                 website,
                 _pagePersistence.Insert,
                 _metrics.HasAchievedMaximumPages);
-            List<Com.Bekijkhet.RobotsTxt.Sitemap>? sitemaps =
-                website.GetSiteMapsFromRobotsTxt();
-
-            if (sitemaps is { Count: > 0 })
+            IReadOnlyList<Uri> sitemapUrls = _robots.GetSitemapUrls(website);
+            foreach (Uri sitemapUrl in sitemapUrls)
             {
-                indexedFromRobotsTxt = sitemapIndexer.IndexNewPages(sitemaps);
+                indexedFromRobotsTxt |= sitemapIndexer.IndexNewPages(sitemapUrl);
             }
 
             if (!indexedFromRobotsTxt)

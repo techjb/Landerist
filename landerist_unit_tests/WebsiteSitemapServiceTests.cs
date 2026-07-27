@@ -17,6 +17,7 @@ public sealed class WebsiteSitemapServiceTests
             indexingEnabled: false,
             new StubPagePersistenceService(),
             new StubWebsiteMetricsService(),
+            new StubWebsiteRobotsPolicy(),
             new FixedTimeProvider(now));
 
         service.RefreshSitemap(website);

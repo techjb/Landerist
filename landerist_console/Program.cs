@@ -104,10 +104,12 @@ namespace landerist_console
                 new WebsitePageMetricsRepository(databaseFactory.Create()),
                 new ListingStatisticsRepository(databaseFactory.Create()),
                 Config.MAX_PAGES_PER_WEBSITE);
+            WebsiteRobotsPolicy robotsPolicy = new();
             WebsiteSitemapService websiteSitemaps = new(
                 Config.INDEXER_ENABLED,
                 pagePersistence,
                 websiteMetrics,
+                robotsPolicy,
                 TimeProvider.System);
             GlobalStatistics globalStatistics = new(
                 new GlobalStatisticsRepository(databaseFactory.Create()),
@@ -155,6 +157,7 @@ namespace landerist_console
                 new SqlPageLockManager(databaseFactory.Create(), Config.MACHINE_NAME),
                 new SqlScrapeBatchMetrics(databaseFactory.Create()),
                 new SqlScrapePageSource(databaseFactory.Create(), listingStore),
+                robotsPolicy,
                 new ScraperExecutionOptions(
                     Config.IsConfigurationProduction(),
                     Config.IsConfigurationLocal(),

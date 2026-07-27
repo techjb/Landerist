@@ -14,6 +14,7 @@ internal static class ScrapeBatchTestFactory
             new NullScrapeResourceManager(),
             new NullScrapeBatchMetrics(),
             new NullScrapePageSource(),
+            new StubWebsiteRobotsPolicy(),
             new ScraperExecutionOptions(
                 isProduction: false,
                 isLocal: true,

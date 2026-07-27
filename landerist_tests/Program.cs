@@ -113,6 +113,7 @@ namespace landerist_tests
                 new SqlPageLockManager(databaseFactory.Create(), Config.MACHINE_NAME),
                 new SqlScrapeBatchMetrics(databaseFactory.Create()),
                 new SqlScrapePageSource(databaseFactory.Create(), listingStore),
+                new WebsiteRobotsPolicy(),
                 new ScraperExecutionOptions(
                     Config.IsConfigurationProduction(),
                     Config.IsConfigurationLocal(),

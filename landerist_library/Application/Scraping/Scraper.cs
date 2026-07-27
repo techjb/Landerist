@@ -154,7 +154,7 @@ namespace landerist_library.Application.Scraping
 
         private void ProcessThread(Page page)
         {
-            if (!page.Website.IsAllowedByRobotsTxt(page.Uri))
+            if (!_batchServices.Robots.IsAllowed(page.Website, page.Uri))
             {
                 page.SetPageType(PageType.BlockedByRobotsTxt);
                 _pageScraping.Scheduling.SetNextScrapeFromNow(page);
@@ -163,7 +163,7 @@ namespace landerist_library.Application.Scraping
                 return;
             }
 
-            if (page.Website.CrawlDelayTooBig())
+            if (_batchServices.Robots.IsCrawlDelayTooBig(page.Website))
             {
                 page.SetPageType(PageType.CrawlDelayTooBig);
                 _pageScraping.Scheduling.SetNextScrapeFromNow(page);

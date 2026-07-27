@@ -119,6 +119,7 @@ public sealed class ScraperBatchTests
             resources,
             metrics,
             new NullScrapePageSource(),
+            new StubWebsiteRobotsPolicy(),
             new ScraperExecutionOptions(
                 isProduction,
                 isLocal: true,
