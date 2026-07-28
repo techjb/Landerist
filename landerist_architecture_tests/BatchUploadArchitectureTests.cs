@@ -7,7 +7,7 @@ public sealed class BatchUploadArchitectureTests
     {
         string source = File.ReadAllText(Path.Combine(
             FindRepositoryRoot(),
-            "landerist_library",
+            "landerist_infrastructure",
             "Infrastructure",
             "Tasks",
             "TaskBatchUpload.cs"));

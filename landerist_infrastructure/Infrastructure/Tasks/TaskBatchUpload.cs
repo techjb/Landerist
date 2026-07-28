@@ -1,11 +1,8 @@
 using landerist_library.Application.Pages;
 using landerist_library.Application.Persistence;
-using landerist_library.Database;
-using landerist_library.Logs;
-using landerist_library.Infrastructure.Sql;
+using landerist_library.Application.Logging;
 using landerist_library.Infrastructure.Parsing;
 using landerist_library.Pages;
-using landerist_library.Parse.ListingParser;
 
 namespace landerist_library.Infrastructure.Tasks
 {
@@ -13,12 +10,13 @@ namespace landerist_library.Infrastructure.Tasks
     {
         private readonly object _initializeSync = new();
 
-        private readonly BatchRepository _batches;
+        private readonly IBatchRegistrationStore _batches;
         private readonly IPageWaitingStatusService _waitingStatus;
         private readonly IPagePersistenceService _pagePersistence;
         private readonly BatchUploadOptions _options;
         private readonly IListingBatchUploadProvider _provider;
         private readonly IBatchInputWriter _inputWriter;
+        private readonly IApplicationLogger _logger;
         private readonly ParallelOptions _statusParallelOptions;
         private readonly List<Page> _pages = [];
         private readonly HashSet<string> _waitingAIResponse = [];
@@ -27,12 +25,13 @@ namespace landerist_library.Infrastructure.Tasks
         private bool _initialized;
 
         public TaskBatchUpload(
-            BatchRepository batches,
+            IBatchRegistrationStore batches,
             IPageWaitingStatusService waitingStatus,
             IPagePersistenceService pagePersistence,
             BatchUploadOptions options,
             ListingBatchUploadProviderCatalog providers,
-            IBatchInputWriter inputWriter)
+            IBatchInputWriter inputWriter,
+            IApplicationLogger logger)
         {
             ArgumentNullException.ThrowIfNull(batches);
             ArgumentNullException.ThrowIfNull(waitingStatus);
@@ -40,23 +39,17 @@ namespace landerist_library.Infrastructure.Tasks
             ArgumentNullException.ThrowIfNull(options);
             ArgumentNullException.ThrowIfNull(providers);
             ArgumentNullException.ThrowIfNull(inputWriter);
+            ArgumentNullException.ThrowIfNull(logger);
             _batches = batches;
             _waitingStatus = waitingStatus;
             _pagePersistence = pagePersistence;
             _options = options;
-            _provider = providers.GetRequired(ToBatchProvider(options.Provider));
+            _provider = providers.GetRequired(options.Provider);
             _inputWriter = inputWriter;
+            _logger = logger;
             _statusParallelOptions = options.CreateStatusParallelOptions();
         }
 
-        private static BatchProvider ToBatchProvider(LLMProvider provider) =>
-            provider switch
-            {
-                LLMProvider.OpenAI => BatchProvider.OpenAI,
-                LLMProvider.VertexAI => BatchProvider.VertexAI,
-                _ => throw new InvalidOperationException(
-                    $"Batch upload is not supported for {provider}.")
-            };
 
         public void Start()
         {
@@ -141,7 +134,7 @@ namespace landerist_library.Infrastructure.Tasks
                 return false;
             }
 
-            _batches.Insert(batchId, _waitingAIResponse, _options.Provider);
+            _batches.Register(batchId, _waitingAIResponse, _options.Provider);
             SetWaitingAIResponse();
             SetWaitingAIRequest();
             return true;
@@ -195,7 +188,7 @@ namespace landerist_library.Infrastructure.Tasks
                 }
             });
 
-            Log.WriteBatch("TaskBatchUpload", "SetWaitingAIResponse: " + counter + "/" + _waitingAIResponse.Count);
+            _logger.WriteInfo("TaskBatchUpload", "SetWaitingAIResponse: " + counter + "/" + _waitingAIResponse.Count);
         }
 
         private void SetWaitingAIRequest()
@@ -218,7 +211,7 @@ namespace landerist_library.Infrastructure.Tasks
                 }
             });
 
-            Log.WriteBatch("TaskBatchUpload", "SetWaitingAIRequest: " + counter + "/" + pages.Count);
+            _logger.WriteInfo("TaskBatchUpload", "SetWaitingAIRequest: " + counter + "/" + pages.Count);
         }
 
         private void SetWaitingAIRequestToAllPages()
@@ -241,7 +234,6 @@ namespace landerist_library.Infrastructure.Tasks
                 }
             });
 
-            //Log.WriteBatch("TaskBatchUpload", "SetWaitingAIRequestToAllPages: " + counter + "/" + pages.Count);
         }
     }
 }

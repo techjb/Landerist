@@ -566,6 +566,26 @@ public sealed class InfrastructureProjectArchitectureTests
         Assert.DoesNotContain("Parse.ListingParser", writer, StringComparison.Ordinal);
     }
     [Fact]
+    public void BatchUploadTask_IsOwnedByInfrastructureProject()
+    {
+        string root = FindRepositoryRoot();
+        AssertMoved(root, "Tasks", "BatchUploadOptions.cs");
+        AssertMoved(root, "Tasks", "TaskBatchUpload.cs");
+
+        string task = File.ReadAllText(Path.Combine(
+            root,
+            "landerist_infrastructure",
+            "Infrastructure",
+            "Tasks",
+            "TaskBatchUpload.cs"));
+        Assert.Contains("IBatchRegistrationStore", task, StringComparison.Ordinal);
+        Assert.Contains("IApplicationLogger", task, StringComparison.Ordinal);
+        Assert.DoesNotContain("BatchRepository", task, StringComparison.Ordinal);
+        Assert.DoesNotContain("LLMProvider", task, StringComparison.Ordinal);
+        Assert.DoesNotContain("Logs.Log", task, StringComparison.Ordinal);
+        Assert.DoesNotContain("Log.Write", task, StringComparison.Ordinal);
+    }
+    [Fact]
     public void LegacyLibrary_ReferencesInfrastructureProject()
     {
         string project = File.ReadAllText(Path.Combine(

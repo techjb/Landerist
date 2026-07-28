@@ -1,5 +1,5 @@
 using landerist_library.Infrastructure.Tasks;
-using landerist_library.Parse.ListingParser;
+using landerist_library.Infrastructure.Parsing;
 
 namespace landerist_unit_tests;
 
@@ -9,14 +9,14 @@ public sealed class BatchUploadOptionsTests
     public void Constructor_PreservesProviderSpecificLimits()
     {
         BatchUploadOptions options = new(
-            LLMProvider.VertexAI,
+            BatchProvider.VertexAI,
             maxPagesPerBatch: 20,
             minPagesPerBatch: 3,
             maxInputTokens: 900,
             updateWaitingResponse: true,
             statusUpdateParallelism: 2);
 
-        Assert.Equal(LLMProvider.VertexAI, options.Provider);
+        Assert.Equal(BatchProvider.VertexAI, options.Provider);
         Assert.Equal(20, options.MaxPagesPerBatch);
         Assert.Equal(3, options.MinPagesPerBatch);
         Assert.Equal(900, options.MaxInputTokens);
@@ -33,7 +33,7 @@ public sealed class BatchUploadOptionsTests
     {
         Assert.Throws<ArgumentOutOfRangeException>(() =>
             new BatchUploadOptions(
-                LLMProvider.OpenAI,
+                BatchProvider.OpenAI,
                 maxPagesPerBatch: maximum,
                 minPagesPerBatch: minimum,
                 maxInputTokens: 100,

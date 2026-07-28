@@ -1,11 +1,11 @@
-using landerist_library.Parse.ListingParser;
+using landerist_library.Infrastructure.Parsing;
 
 namespace landerist_library.Infrastructure.Tasks;
 
 public sealed record BatchUploadOptions
 {
     public BatchUploadOptions(
-        LLMProvider provider,
+        BatchProvider provider,
         int maxPagesPerBatch,
         int minPagesPerBatch,
         int maxInputTokens,
@@ -29,7 +29,7 @@ public sealed record BatchUploadOptions
         StatusUpdateParallelism = statusUpdateParallelism;
     }
 
-    public LLMProvider Provider { get; }
+    public BatchProvider Provider { get; }
     public int MaxPagesPerBatch { get; }
     public int MinPagesPerBatch { get; }
     public int MaxInputTokens { get; }

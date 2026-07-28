@@ -263,8 +263,15 @@ internal static class LanderistServiceComposition
             _ => throw new InvalidOperationException(
                 $"Batch upload is not supported for {Config.LLM_PROVIDER}.")
         };
+        BatchProvider batchProvider = Config.LLM_PROVIDER switch
+        {
+            LLMProvider.OpenAI => BatchProvider.OpenAI,
+            LLMProvider.VertexAI => BatchProvider.VertexAI,
+            _ => throw new InvalidOperationException(
+                $"Batch upload is not supported for {Config.LLM_PROVIDER}.")
+        };
         BatchUploadOptions batchUploadOptions = new(
-            Config.LLM_PROVIDER,
+            batchProvider,
             batchMaxPages,
             Config.MIN_PAGES_PER_BATCH,
             batchMaxInputTokens,
@@ -276,13 +283,6 @@ internal static class LanderistServiceComposition
             new OpenAIBatchUploadProvider(),
             new VertexAIBatchUploadProvider()
         ]);
-        BatchProvider batchProvider = Config.LLM_PROVIDER switch
-        {
-            LLMProvider.OpenAI => BatchProvider.OpenAI,
-            LLMProvider.VertexAI => BatchProvider.VertexAI,
-            _ => throw new InvalidOperationException(
-                $"Batch upload is not supported for {Config.LLM_PROVIDER}.")
-        };
         IListingBatchUploadProvider batchUploadProvider =
             batchUploadProviders.GetRequired(batchProvider);
         IBatchInputWriter batchInputWriter = new JsonlBatchInputWriter(
@@ -317,12 +317,13 @@ internal static class LanderistServiceComposition
             new TenMinuteTaskJob(
                 new TaskBatchDownload(parsedClassification, batches, globalStatistics, pageCatalog, pagePersistence, new OpenAIBatchDownload(), new VertexAIBatchDownload(), listingParser),
                 new TaskBatchUpload(
-                    batches,
+                    new LegacyBatchRegistrationStore(batches),
                     waitingStatus,
                     pagePersistence,
                     batchUploadOptions,
                     batchUploadProviders,
-                    batchInputWriter)),
+                    batchInputWriter,
+                    logger)),
             new HourlyTaskJob(
                 new WebsiteRefreshService(websiteCatalog, websitePersistence, websiteNetwork, websiteSitemaps),
                 new TaskBatchCleaner(batches)),
