@@ -362,6 +362,32 @@ public sealed class InfrastructureProjectArchitectureTests
         Assert.DoesNotContain("LocationParser", source, StringComparison.Ordinal);
     }
     [Fact]
+    public void PageServicesAndStatistics_AreOwnedByInfrastructureProject()
+    {
+        string root = FindRepositoryRoot();
+        string[] pageServices =
+        [
+            "SqlPageCatalog.cs",
+            "SqlPageDeletionService.cs",
+            "SqlPageQueryService.cs",
+            "SqlPageWaitingStatusService.cs"
+        ];
+        foreach (string file in pageServices)
+        {
+            AssertMoved(root, "PageServices", file);
+        }
+
+        string[] statistics =
+        [
+            "GlobalStatisticsRepository.cs",
+            "HostStatisticsRepository.cs"
+        ];
+        foreach (string file in statistics)
+        {
+            AssertMoved(root, "Statistics", file);
+        }
+    }
+    [Fact]
     public void LegacyLibrary_ReferencesInfrastructureProject()
     {
         string project = File.ReadAllText(Path.Combine(
