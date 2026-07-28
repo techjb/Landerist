@@ -540,6 +540,32 @@ public sealed class InfrastructureProjectArchitectureTests
             "PageHtmlSignalExtensions.cs")));
     }
     [Fact]
+    public void BatchWritingInfrastructure_IsOwnedByInfrastructureProject()
+    {
+        string root = FindRepositoryRoot();
+        string[] files =
+        [
+            "BatchProvider.cs",
+            "IBatchInputWriter.cs",
+            "IListingBatchUploadProvider.cs",
+            "JsonlBatchInputWriter.cs"
+        ];
+
+        foreach (string file in files)
+        {
+            AssertMoved(root, "Parsing", file);
+        }
+
+        string writer = File.ReadAllText(Path.Combine(
+            root,
+            "landerist_infrastructure",
+            "Infrastructure",
+            "Parsing",
+            "JsonlBatchInputWriter.cs"));
+        Assert.DoesNotContain("LLMProvider", writer, StringComparison.Ordinal);
+        Assert.DoesNotContain("Parse.ListingParser", writer, StringComparison.Ordinal);
+    }
+    [Fact]
     public void LegacyLibrary_ReferencesInfrastructureProject()
     {
         string project = File.ReadAllText(Path.Combine(

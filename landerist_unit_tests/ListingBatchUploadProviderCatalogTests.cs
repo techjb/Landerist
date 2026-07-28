@@ -9,12 +9,12 @@ public sealed class ListingBatchUploadProviderCatalogTests
     [Fact]
     public void GetRequired_ReturnsProviderForRequestedModel()
     {
-        StubProvider vertexAi = new(LLMProvider.VertexAI);
+        StubProvider vertexAi = new(BatchProvider.VertexAI);
         ListingBatchUploadProviderCatalog catalog =
-            new([new StubProvider(LLMProvider.OpenAI), vertexAi]);
+            new([new StubProvider(BatchProvider.OpenAI), vertexAi]);
 
         IListingBatchUploadProvider selected =
-            catalog.GetRequired(LLMProvider.VertexAI);
+            catalog.GetRequired(BatchProvider.VertexAI);
 
         Assert.Same(vertexAi, selected);
     }
@@ -23,10 +23,10 @@ public sealed class ListingBatchUploadProviderCatalogTests
     public void GetRequired_RejectsUnregisteredProvider()
     {
         ListingBatchUploadProviderCatalog catalog =
-            new([new StubProvider(LLMProvider.OpenAI)]);
+            new([new StubProvider(BatchProvider.OpenAI)]);
 
         Assert.Throws<InvalidOperationException>(() =>
-            catalog.GetRequired(LLMProvider.LocalAI));
+            catalog.GetRequired((BatchProvider)999));
     }
 
     [Fact]
@@ -35,15 +35,15 @@ public sealed class ListingBatchUploadProviderCatalogTests
         Assert.Throws<ArgumentException>(() =>
             new ListingBatchUploadProviderCatalog(
             [
-                new StubProvider(LLMProvider.OpenAI),
-                new StubProvider(LLMProvider.OpenAI)
+                new StubProvider(BatchProvider.OpenAI),
+                new StubProvider(BatchProvider.OpenAI)
             ]));
     }
 
-    private sealed class StubProvider(LLMProvider provider)
+    private sealed class StubProvider(BatchProvider provider)
         : IListingBatchUploadProvider
     {
-        public LLMProvider Provider => provider;
+        public BatchProvider Provider => provider;
         public string? Serialize(Page page, string userInput) => userInput;
         public string? UploadFile(string filePath) => filePath;
         public string? CreateBatch(string fileId) => fileId;

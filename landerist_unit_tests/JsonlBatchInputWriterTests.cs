@@ -66,7 +66,7 @@ public sealed class JsonlBatchInputWriterTests
         int minPages) =>
         new(
             new BatchInputWriterOptions(
-                LLMProvider.OpenAI,
+                BatchProvider.OpenAI,
                 directory,
                 maxFileSize,
                 minPages),
@@ -116,7 +116,7 @@ public sealed class JsonlBatchInputWriterTests
 
     private sealed class StubProvider : IListingBatchUploadProvider
     {
-        public LLMProvider Provider => LLMProvider.OpenAI;
+        public BatchProvider Provider => BatchProvider.OpenAI;
         public string? Serialize(Page page, string userInput) =>
             $"{{\"input\":\"{userInput}\"}}";
         public string? UploadFile(string filePath) => filePath;

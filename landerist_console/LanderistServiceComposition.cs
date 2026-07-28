@@ -276,11 +276,18 @@ internal static class LanderistServiceComposition
             new OpenAIBatchUploadProvider(),
             new VertexAIBatchUploadProvider()
         ]);
+        BatchProvider batchProvider = Config.LLM_PROVIDER switch
+        {
+            LLMProvider.OpenAI => BatchProvider.OpenAI,
+            LLMProvider.VertexAI => BatchProvider.VertexAI,
+            _ => throw new InvalidOperationException(
+                $"Batch upload is not supported for {Config.LLM_PROVIDER}.")
+        };
         IListingBatchUploadProvider batchUploadProvider =
-            batchUploadProviders.GetRequired(Config.LLM_PROVIDER);
+            batchUploadProviders.GetRequired(batchProvider);
         IBatchInputWriter batchInputWriter = new JsonlBatchInputWriter(
             new BatchInputWriterOptions(
-                Config.LLM_PROVIDER,
+                batchProvider,
                 Config.BATCH_DIRECTORY ?? throw new InvalidOperationException(
                     "Batch directory is not configured."),
                 batchMaxFileSize,

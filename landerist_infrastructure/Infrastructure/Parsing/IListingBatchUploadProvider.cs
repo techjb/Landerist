@@ -1,11 +1,10 @@
 using landerist_library.Pages;
-using landerist_library.Parse.ListingParser;
 
 namespace landerist_library.Infrastructure.Parsing;
 
 public interface IListingBatchUploadProvider
 {
-    LLMProvider Provider { get; }
+    BatchProvider Provider { get; }
     string? Serialize(Page page, string userInput);
     string? UploadFile(string filePath);
     string? CreateBatch(string fileId);
@@ -13,7 +12,7 @@ public interface IListingBatchUploadProvider
 
 public sealed class ListingBatchUploadProviderCatalog
 {
-    private readonly IReadOnlyDictionary<LLMProvider, IListingBatchUploadProvider>
+    private readonly IReadOnlyDictionary<BatchProvider, IListingBatchUploadProvider>
         _providers;
 
     public ListingBatchUploadProviderCatalog(
@@ -33,7 +32,7 @@ public sealed class ListingBatchUploadProviderCatalog
         }
     }
 
-    public IListingBatchUploadProvider GetRequired(LLMProvider provider) =>
+    public IListingBatchUploadProvider GetRequired(BatchProvider provider) =>
         _providers.TryGetValue(provider, out IListingBatchUploadProvider? selected)
             ? selected
             : throw new InvalidOperationException(

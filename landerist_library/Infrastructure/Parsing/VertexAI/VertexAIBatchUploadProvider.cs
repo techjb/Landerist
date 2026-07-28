@@ -6,7 +6,7 @@ namespace landerist_library.Infrastructure.Parsing.VertexAI;
 
 public sealed class VertexAIBatchUploadProvider : IListingBatchUploadProvider
 {
-    public LLMProvider Provider => LLMProvider.VertexAI;
+    public BatchProvider Provider => BatchProvider.VertexAI;
 
     public string? Serialize(Page page, string userInput) =>
         VertexAIBatchUpload.GetJson(page, userInput);

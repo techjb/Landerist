@@ -1,10 +1,9 @@
 using landerist_library.Pages;
-using landerist_library.Parse.ListingParser;
 
 namespace landerist_library.Infrastructure.Parsing;
 
 public sealed record BatchInputWriterOptions(
-    LLMProvider Provider,
+    BatchProvider Provider,
     string Directory,
     long MaxFileSizeInBytes,
     int MinPagesPerBatch);

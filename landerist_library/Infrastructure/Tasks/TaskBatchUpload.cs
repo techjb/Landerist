@@ -44,10 +44,19 @@ namespace landerist_library.Infrastructure.Tasks
             _waitingStatus = waitingStatus;
             _pagePersistence = pagePersistence;
             _options = options;
-            _provider = providers.GetRequired(options.Provider);
+            _provider = providers.GetRequired(ToBatchProvider(options.Provider));
             _inputWriter = inputWriter;
             _statusParallelOptions = options.CreateStatusParallelOptions();
         }
+
+        private static BatchProvider ToBatchProvider(LLMProvider provider) =>
+            provider switch
+            {
+                LLMProvider.OpenAI => BatchProvider.OpenAI,
+                LLMProvider.VertexAI => BatchProvider.VertexAI,
+                _ => throw new InvalidOperationException(
+                    $"Batch upload is not supported for {provider}.")
+            };
 
         public void Start()
         {
