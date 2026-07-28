@@ -280,7 +280,8 @@ public sealed class InfrastructureProjectArchitectureTests
             "SqlListingQueryService.cs",
             "SqlListingSourceStore.cs",
             "SqlNotListingCacheService.cs",
-            "SqlListingStore.cs"
+            "SqlListingStore.cs",
+            "SqlPageLinkService.cs"
         ];
         foreach (string file in adapters)
         {
@@ -316,6 +317,20 @@ public sealed class InfrastructureProjectArchitectureTests
         Assert.Contains("IGlobalStatisticsRepository", source, StringComparison.Ordinal);
         Assert.DoesNotContain("new GlobalStatisticsRepository", source, StringComparison.Ordinal);
         Assert.DoesNotContain("Infrastructure.Statistics", source, StringComparison.Ordinal);
+    }
+    [Fact]
+    public void SqlPageLinkService_UsesDomainUrlRules()
+    {
+        string source = File.ReadAllText(Path.Combine(
+            FindRepositoryRoot(),
+            "landerist_infrastructure",
+            "Infrastructure",
+            "Listings",
+            "SqlPageLinkService.cs"));
+
+        Assert.Contains("WebsiteUrlRules", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("landerist_library.Tools", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("Infrastructure.Indexing", source, StringComparison.Ordinal);
     }
     [Fact]
     public void LegacyLibrary_ReferencesInfrastructureProject()

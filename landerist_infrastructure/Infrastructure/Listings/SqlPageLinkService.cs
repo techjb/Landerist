@@ -2,10 +2,8 @@ using landerist_library.Websites;
 using landerist_library.Application.Listings;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Websites;
-using landerist_library.Infrastructure.Indexing;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Pages;
-using landerist_library.Tools;
 
 namespace landerist_library.Infrastructure.Listings;
 
@@ -54,11 +52,11 @@ public sealed class SqlPageLinkService : IPageLinkService
         ArgumentNullException.ThrowIfNull(sourcePage);
         ArgumentNullException.ThrowIfNull(destinationUri);
         var website = sourcePage.Website;
-        Uri uri = Uris.CleanUri(destinationUri);
+        Uri uri = WebsiteUrlRules.Normalize(destinationUri);
         if (_metrics.CountPages(website.Host) >= _maximumPagesPerWebsite ||
             website.IsDiscardedByIndexUrlRegex(uri) ||
             ProhibitedUrls.IsProhibited(uri, website.LanguageCode) ||
-            !Indexer.IsWebPage(uri) ||
+            !WebsiteUrlRules.IsWebPage(uri) ||
             !uri.Host.Equals(sourcePage.Host, StringComparison.OrdinalIgnoreCase) ||
             uri.Equals(sourcePage.Uri) ||
             !_robots.IsAllowed(website, uri) ||

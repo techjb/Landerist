@@ -1,7 +1,6 @@
 using landerist_library.Configuration;
 using landerist_library.Application.Websites;
 using landerist_library.Pages;
-using landerist_library.Tools;
 using landerist_library.Websites;
 
 namespace landerist_library.Infrastructure.Indexing
@@ -15,19 +14,6 @@ namespace landerist_library.Infrastructure.Indexing
 
         private readonly HashSet<Uri> Processed = [];
 
-        private static readonly HashSet<string> WebPageExtensions =
-        [
-            ".htm",
-            ".html",
-            ".xhtml",
-            ".asp",
-            ".aspx",
-            ".php",
-            ".jsp",
-            ".cshtml",
-            ".vbhtml",
-            ".razor"
-        ];
 
         public Indexer(Website website, IWebsiteRobotsPolicy robots, Func<Page, bool>? insertPage = null, Func<Website, bool>? achievedMaxNumberOfPages = null) : this(new Page(website), robots, insertPage, achievedMaxNumberOfPages)
         {
@@ -157,7 +143,7 @@ namespace landerist_library.Infrastructure.Indexing
                 return false;
             }
 
-            uri = Uris.CleanUri(uri);
+            uri = WebsiteUrlRules.Normalize(uri);
 
             if (Processed.Contains(uri))
             {
@@ -169,7 +155,7 @@ namespace landerist_library.Infrastructure.Indexing
                 return false;
             }
 
-            if (!IsWebPage(uri))
+            if (!WebsiteUrlRules.IsWebPage(uri))
             {
                 return false;
             }
@@ -207,10 +193,5 @@ namespace landerist_library.Infrastructure.Indexing
         //    return MultimediaExtensions.Contains(extension);
         //}
 
-        public static bool IsWebPage(Uri uri)
-        {
-            string extension = Path.GetExtension(uri.AbsolutePath);
-            return string.IsNullOrEmpty(extension) || WebPageExtensions.Contains(extension);
-        }
     }
 }

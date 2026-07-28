@@ -9,7 +9,7 @@ public sealed class RobotsServiceConsumersArchitectureTests
         string[] files =
         [
             Path.Combine(root, "landerist_library", "Infrastructure", "Scraping", "WebsitesThrottle.cs"),
-            Path.Combine(root, "landerist_library", "Infrastructure", "Listings", "SqlPageLinkService.cs"),
+            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Listings", "SqlPageLinkService.cs"),
             Path.Combine(root, "landerist_library", "Infrastructure", "Scraping", "SqlWebsiteThrottleService.cs"),
             Path.Combine(root, "landerist_library", "Infrastructure", "Administration", "WebsiteAdministrationService.cs")
         ];

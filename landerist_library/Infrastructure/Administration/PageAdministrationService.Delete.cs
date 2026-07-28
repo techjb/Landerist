@@ -1,7 +1,6 @@
 using landerist_library.Pages;
 using landerist_library.Configuration;
 using landerist_library.Infrastructure.Indexing;
-using landerist_library.Tools;
 using landerist_library.Websites;
 using landerist_orels.ES;
 using System.Collections.Concurrent;
@@ -24,7 +23,7 @@ public sealed partial class PageAdministrationService
         Parallel.ForEach(uris, uriString =>
         {
             var uri = new Uri(uriString);
-            var newUri = Uris.CleanUri(uri);
+            var newUri = WebsiteUrlRules.Normalize(uri);
             int current = Interlocked.Increment(ref counter);
 
             if (newUri != uri)
