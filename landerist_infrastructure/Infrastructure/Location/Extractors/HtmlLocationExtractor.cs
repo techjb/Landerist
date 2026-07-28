@@ -1,17 +1,17 @@
 using HtmlAgilityPack;
 using landerist_library.Parse.Location.Candidates;
-using landerist_library.Parse.Location.Validation;
+using landerist_library.Application.Parsing;
 
 namespace landerist_library.Parse.Location.Extractors
 {
-    internal sealed class HtmlLocationExtractor
+    public sealed class HtmlLocationExtractor
     {
         private readonly MetaLocationExtractor MetaLocationExtractor;
         private readonly JsonLocationExtractor JsonLocationExtractor;
         private readonly GoogleMapsIframeLocationExtractor GoogleMapsIframeLocationExtractor;
         private readonly RegexLocationExtractor RegexLocationExtractor;
 
-        public HtmlLocationExtractor(CountryCoordinateValidator coordinateValidator)
+        public HtmlLocationExtractor(ICoordinateValidator coordinateValidator)
         {
             var candidateFactory = new LocationCandidateFactory(coordinateValidator);
             MetaLocationExtractor = new MetaLocationExtractor(candidateFactory);

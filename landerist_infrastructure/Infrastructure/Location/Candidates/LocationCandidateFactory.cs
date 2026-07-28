@@ -1,13 +1,13 @@
 using System.Globalization;
-using landerist_library.Parse.Location.Validation;
+using landerist_library.Application.Parsing;
 
 namespace landerist_library.Parse.Location.Candidates
 {
     internal sealed class LocationCandidateFactory
     {
-        private readonly CountryCoordinateValidator CoordinateValidator;
+        private readonly ICoordinateValidator CoordinateValidator;
 
-        public LocationCandidateFactory(CountryCoordinateValidator coordinateValidator)
+        public LocationCandidateFactory(ICoordinateValidator coordinateValidator)
         {
             CoordinateValidator = coordinateValidator;
         }

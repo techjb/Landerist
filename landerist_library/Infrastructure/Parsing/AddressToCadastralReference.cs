@@ -175,8 +175,8 @@ namespace landerist_library.Infrastructure.Parsing
                     Console.WriteLine($"Processed {currentProcessed}/{total} ({processedPercentage}%) Found: {found}  Not Found: {notFound}");
                 });
 
-            Tools.Csv.Write(dataTableFound, Configuration.AppConfig.EXPORT_DIRECTORY_LOCAL + "Found.csv", true);
-            Tools.Csv.Write(dataTableNotFound, Configuration.AppConfig.EXPORT_DIRECTORY_LOCAL + "NotFound.csv", true);
+            Tools.Csv.Write(dataTableFound, global::landerist_library.Configuration.AppConfig.EXPORT_DIRECTORY_LOCAL + "Found.csv", true);
+            Tools.Csv.Write(dataTableNotFound, global::landerist_library.Configuration.AppConfig.EXPORT_DIRECTORY_LOCAL + "NotFound.csv", true);
         }
     }
 }

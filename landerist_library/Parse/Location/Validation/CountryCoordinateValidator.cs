@@ -1,9 +1,10 @@
 using landerist_library.Parse.Location.Delimitations;
+using landerist_library.Application.Parsing;
 using landerist_library.Websites;
 
 namespace landerist_library.Parse.Location.Validation
 {
-    internal sealed class CountryCoordinateValidator
+    internal sealed class CountryCoordinateValidator : ICoordinateValidator
     {
         private readonly CountryCode CountryCode;
 
