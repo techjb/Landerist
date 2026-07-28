@@ -255,8 +255,6 @@ public sealed class ListingLifecycleServiceTests
         public bool IsNotCanonical(Page page) => page.IsNotCanonical();
         public Uri? GetCanonicalUri(Page page) => CanonicalUri;
         public bool HasIncorrectLanguage(Page page) => false;
-        public void PrepareListingParserInput(Page page) { }
-        public bool MatchesListingUnavailableRule(Page page) => false;
     }
 
     private sealed class RecordingApplicationLogger : IApplicationLogger

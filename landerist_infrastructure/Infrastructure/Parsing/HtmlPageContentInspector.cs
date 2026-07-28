@@ -14,9 +14,4 @@ public sealed class HtmlPageContentInspector : IPageContentInspector
 
     public bool HasIncorrectLanguage(Page page) => page.IncorrectLanguage();
 
-    public void PrepareListingParserInput(Page page) =>
-        page.SetListingParserInput();
-
-    public bool MatchesListingUnavailableRule(Page page) =>
-        page.MatchesWebsiteListingUnavailableRule();
 }

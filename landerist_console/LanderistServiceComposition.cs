@@ -194,7 +194,8 @@ internal static class LanderistServiceComposition
                 new SqlPageClassificationMetrics(databaseFactory.Create()),
                 new LegacyListingPageParser(hostStatistics, listingParser),
                 new LegacyPageTokenLimitPolicy(new Tokenizer(TokenizerOptions.ForProvider(Config.LLM_PROVIDER))),
-                new HtmlPageContentInspector()),
+                new HtmlPageContentInspector(),
+                new PageListingInputPreparer()),
             new PageIndexingService(
                 Config.INDEXER_ENABLED,
                 pageLinks,

@@ -507,6 +507,10 @@ public sealed class InfrastructureProjectArchitectureTests
             "Infrastructure",
             "Parsing");
         Assert.True(File.Exists(Path.Combine(target, "HtmlPageLinkExtractor.cs")));
+        Assert.True(File.Exists(Path.Combine(target, "HtmlPageContentInspector.cs")));
+        string inspector = File.ReadAllText(Path.Combine(target, "HtmlPageContentInspector.cs"));
+        Assert.DoesNotContain("SetListingParserInput", inspector, StringComparison.Ordinal);
+        Assert.DoesNotContain("MatchesWebsiteListingUnavailableRule", inspector, StringComparison.Ordinal);
         string htmlTarget = Path.Combine(root, "landerist_infrastructure", "Html");
         Assert.True(File.Exists(Path.Combine(htmlTarget, "PageHtmlDocumentExtensions.cs")));
         Assert.True(File.Exists(Path.Combine(htmlTarget, "PageHtmlSignalExtensions.cs")));
@@ -516,6 +520,12 @@ public sealed class InfrastructureProjectArchitectureTests
             "Infrastructure",
             "Parsing",
             "HtmlPageLinkExtractor.cs")));
+        Assert.False(File.Exists(Path.Combine(
+            root,
+            "landerist_library",
+            "Infrastructure",
+            "Parsing",
+            "HtmlPageContentInspector.cs")));
         Assert.False(File.Exists(Path.Combine(
             root,
             "landerist_library",

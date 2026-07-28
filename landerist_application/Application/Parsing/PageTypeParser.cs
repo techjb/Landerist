@@ -13,6 +13,7 @@ namespace landerist_library.Application.Parsing
         private readonly IListingPageParser _listingParser;
         private readonly IPageTokenLimitPolicy _tokenLimitPolicy;
         private readonly IPageContentInspector _contentInspector;
+        private readonly IListingInputPreparer _listingInput;
 
         public PageTypeParser(
             Page page,
@@ -21,7 +22,8 @@ namespace landerist_library.Application.Parsing
             IPageClassificationMetrics metrics,
             IListingPageParser listingParser,
             IPageTokenLimitPolicy tokenLimitPolicy,
-            IPageContentInspector contentInspector)
+            IPageContentInspector contentInspector,
+            IListingInputPreparer listingInput)
         {
             ArgumentNullException.ThrowIfNull(page);
             ArgumentNullException.ThrowIfNull(notListingCache);
@@ -29,6 +31,7 @@ namespace landerist_library.Application.Parsing
             ArgumentNullException.ThrowIfNull(listingParser);
             ArgumentNullException.ThrowIfNull(tokenLimitPolicy);
             ArgumentNullException.ThrowIfNull(contentInspector);
+            ArgumentNullException.ThrowIfNull(listingInput);
             Page = page;
             _isProduction = isProduction;
             _notListingCache = notListingCache;
@@ -36,6 +39,7 @@ namespace landerist_library.Application.Parsing
             _listingParser = listingParser;
             _tokenLimitPolicy = tokenLimitPolicy;
             _contentInspector = contentInspector;
+            _listingInput = listingInput;
         }
 
         public (PageType? pageType, landerist_orels.ES.Listing? listing, bool waitingAIRequest)
@@ -103,9 +107,9 @@ namespace landerist_library.Application.Parsing
                 return (PageType.IncorrectLanguage, null, false);
             }
 
-            _contentInspector.PrepareListingParserInput(Page);
+            _listingInput.Prepare(Page);
 
-            if (_contentInspector.MatchesListingUnavailableRule(Page))
+            if (_listingInput.MatchesUnavailableRule(Page))
             {
                 return (PageType.NotListingByWebsiteRule, null, false);
             }

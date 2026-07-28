@@ -12,7 +12,4 @@ public interface IPageContentInspector
 
     bool HasIncorrectLanguage(Page page);
 
-    void PrepareListingParserInput(Page page);
-
-    bool MatchesListingUnavailableRule(Page page);
 }

@@ -13,6 +13,7 @@ public sealed class PageContentClassifier : IPageContentClassifier
     private readonly IListingPageParser _listingParser;
     private readonly IPageTokenLimitPolicy _tokenLimitPolicy;
     private readonly IPageContentInspector _contentInspector;
+    private readonly IListingInputPreparer _listingInput;
 
     public PageContentClassifier(
         bool isProduction,
@@ -20,19 +21,22 @@ public sealed class PageContentClassifier : IPageContentClassifier
         IPageClassificationMetrics metrics,
         IListingPageParser listingParser,
         IPageTokenLimitPolicy tokenLimitPolicy,
-        IPageContentInspector contentInspector)
+        IPageContentInspector contentInspector,
+        IListingInputPreparer listingInput)
     {
         ArgumentNullException.ThrowIfNull(notListingCache);
         ArgumentNullException.ThrowIfNull(metrics);
         ArgumentNullException.ThrowIfNull(listingParser);
         ArgumentNullException.ThrowIfNull(tokenLimitPolicy);
         ArgumentNullException.ThrowIfNull(contentInspector);
+        ArgumentNullException.ThrowIfNull(listingInput);
         _isProduction = isProduction;
         _notListingCache = notListingCache;
         _metrics = metrics;
         _listingParser = listingParser;
         _tokenLimitPolicy = tokenLimitPolicy;
         _contentInspector = contentInspector;
+        _listingInput = listingInput;
     }
 
     public PageClassificationResult Classify(Page page)
@@ -44,7 +48,8 @@ public sealed class PageContentClassifier : IPageContentClassifier
             _metrics,
             _listingParser,
             _tokenLimitPolicy,
-            _contentInspector).GetPageType();
+            _contentInspector,
+            _listingInput).GetPageType();
         return new PageClassificationResult(result.pageType, result.listing, result.waitingAIRequest);
     }
 }
