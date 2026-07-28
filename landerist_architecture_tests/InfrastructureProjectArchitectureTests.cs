@@ -26,7 +26,7 @@ public sealed class InfrastructureProjectArchitectureTests
             .ToArray();
 
         Assert.Equal(
-            ["Com.Bekijkhet.RobotsTxt", "HtmlAgilityPack", "Louw.SitemapParser", "Microsoft.Data.SqlClient", "System.Drawing.Common", "PuppeteerSharp"],
+            ["Com.Bekijkhet.RobotsTxt", "HtmlAgilityPack", "Louw.SitemapParser", "Microsoft.Data.SqlClient", "NetTopologySuite", "NetTopologySuite.IO.GeoJSON", "System.Drawing.Common", "PuppeteerSharp"],
             packages);
         Assert.Equal(
             [
