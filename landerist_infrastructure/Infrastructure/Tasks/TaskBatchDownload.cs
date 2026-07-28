@@ -1,59 +1,57 @@
 using landerist_library.Websites;
 using landerist_library.Infrastructure.Parsing;
-using landerist_library.Configuration;
 using landerist_library.Application.Pages;
 using landerist_library.Application.Parsing;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Scraping;
-using landerist_library.Database;
-using landerist_library.Logs;
-using landerist_library.Infrastructure.Sql;
+using landerist_library.Application.Logging;
 using landerist_library.Pages;
-using landerist_library.Parse.ListingParser;
-using landerist_library.Infrastructure.Parsing.OpenAI;
-using landerist_library.Infrastructure.Parsing.VertexAI;
 using landerist_library.Application.Statistics;
 using landerist_library.Application.Websites;
 
 namespace landerist_library.Infrastructure.Tasks
 {
-    public class TaskBatchDownload
+    public sealed class TaskBatchDownload
     {
         private readonly IParsedPageClassificationService _parsedClassification;
-        private readonly BatchRepository _batches;
+        private readonly IBatchStore _batches;
         private readonly GlobalStatistics _statistics;
         private readonly IPageCatalog _pages;
         private readonly IPagePersistenceService _pagePersistence;
-        private readonly IListingBatchProvider _openAi;
-        private readonly IListingBatchProvider _vertexAi;
-        private readonly ParseListing _listingParser;
+        private readonly BatchDownloadProviderCatalog _providers;
+        private readonly IBatchListingResponseParser _listingParser;
+        private readonly BatchDownloadOptions _options;
+        private readonly IApplicationLogger _logger;
 
         public TaskBatchDownload(
             IParsedPageClassificationService parsedClassification,
-            BatchRepository batches,
+            IBatchStore batches,
             GlobalStatistics statistics,
             IPageCatalog pages,
             IPagePersistenceService pagePersistence,
-            IListingBatchProvider openAi,
-            IListingBatchProvider vertexAi,
-            ParseListing listingParser)
+            BatchDownloadProviderCatalog providers,
+            IBatchListingResponseParser listingParser,
+            BatchDownloadOptions options,
+            IApplicationLogger logger)
         {
             ArgumentNullException.ThrowIfNull(parsedClassification);
             ArgumentNullException.ThrowIfNull(batches);
             ArgumentNullException.ThrowIfNull(statistics);
             ArgumentNullException.ThrowIfNull(pages);
             ArgumentNullException.ThrowIfNull(pagePersistence);
-            ArgumentNullException.ThrowIfNull(openAi);
-            ArgumentNullException.ThrowIfNull(vertexAi);
+            ArgumentNullException.ThrowIfNull(providers);
             ArgumentNullException.ThrowIfNull(listingParser);
+            ArgumentNullException.ThrowIfNull(options);
+            ArgumentNullException.ThrowIfNull(logger);
             _parsedClassification = parsedClassification;
             _batches = batches;
             _statistics = statistics;
             _pages = pages;
             _pagePersistence = pagePersistence;
-            _openAi = openAi;
-            _vertexAi = vertexAi;
+            _providers = providers;
             _listingParser = listingParser;
+            _options = options;
+            _logger = logger;
         }
 
         public readonly HashSet<string> DownloadedPagesUriHashes = [];
@@ -67,7 +65,7 @@ namespace landerist_library.Infrastructure.Tasks
             }
         }
 
-        private void Download(Batch batch)
+        private void Download(BatchRecord batch)
         {
             DownloadedPagesUriHashes.Clear();
 
@@ -84,10 +82,10 @@ namespace landerist_library.Infrastructure.Tasks
             }
 
             RemoveWaitingStatus(batch);
-            _batches.Update(batch.Id, downloaded: true);
+            _batches.MarkDownloaded(batch.Id);
         }
 
-        private bool DownloadAndReadFile(Batch batch, string? file)
+        private bool DownloadAndReadFile(BatchRecord batch, string? file)
         {
             if (string.IsNullOrWhiteSpace(file))
             {
@@ -96,7 +94,7 @@ namespace landerist_library.Infrastructure.Tasks
 
             //file = "input/batch_vertexai_20250620112155_input.json";
 
-            var filePath = DownloadBatchFile(batch.LLMProvider, file);
+            var filePath = DownloadBatchFile(batch.Provider, file);
             if (string.IsNullOrEmpty(filePath))
             {
                 return false;
@@ -117,39 +115,25 @@ namespace landerist_library.Infrastructure.Tasks
                 }
                 catch (Exception exception)
                 {
-                    Log.WriteError("TaskBatchDownload DeleteFile", exception);
+                    _logger.WriteError("TaskBatchDownload DeleteFile", exception.ToString());
                 }
             }
         }
 
-        private (string? fileSuccess, string? fileError)? GetFiles(Batch batch)
-        {
-            return batch.LLMProvider switch
-            {
-                LLMProvider.OpenAI => _openAi.GetFiles(batch.Id),
-                LLMProvider.VertexAI => _vertexAi.GetFiles(batch.Id),
-                _ => null,
-            };
-        }
+        private (string? fileSuccess, string? fileError)? GetFiles(BatchRecord batch) =>
+            _providers.GetRequired(batch.Provider).GetFiles(batch.Id);
 
-        private string? DownloadBatchFile(LLMProvider llmProvider, string file)
+        private string? DownloadBatchFile(BatchProvider provider, string file)
         {
             if (string.IsNullOrWhiteSpace(file))
             {
                 return null;
             }
 
-            Console.WriteLine($"TaskBatchDownload {file}");
-
-            return llmProvider switch
-            {
-                LLMProvider.OpenAI => _openAi.DownloadFile(file),
-                LLMProvider.VertexAI => _vertexAi.DownloadFile(file),
-                _ => null,
-            };
+            _logger.WriteInfo("TaskBatchDownload", file);
+            return _providers.GetRequired(provider).DownloadFile(file);
         }
-
-        private bool ReadFile(Batch batch, string filePath)
+        private bool ReadFile(BatchRecord batch, string filePath)
         {
             try
             {
@@ -159,17 +143,17 @@ namespace landerist_library.Infrastructure.Tasks
             }
             catch (Exception exception)
             {
-                Log.WriteError("TaskBatchDownload ReadFile", exception);
+                _logger.WriteError("TaskBatchDownload ReadFile", exception.ToString());
                 return false;
             }
         }
 
-        private void ReadSuccessFile(Batch batch, string[] lines)
+        private void ReadSuccessFile(BatchRecord batch, string[] lines)
         {
             int read = 0;
             int errors = 0;
 
-            Parallel.ForEach(lines, Config.PARALLELOPTIONS1INLOCAL, line =>
+            Parallel.ForEach(lines, _options.ParallelOptions, line =>
             {
                 try
                 {
@@ -184,18 +168,18 @@ namespace landerist_library.Infrastructure.Tasks
                 }
                 catch (Exception exception)
                 {
-                    Log.WriteError("TaskBatchDownload ReadSuccessFile", exception);
+                    _logger.WriteError("TaskBatchDownload ReadSuccessFile", exception.ToString());
                     Interlocked.Increment(ref errors);
                 }
             });
 
-            Log.WriteBatch("TaskBatchDownload", $"ReadSuccessFile {read}/{lines.Length} errors: {errors}");
+            _logger.WriteInfo("TaskBatchDownload", $"ReadSuccessFile {read}/{lines.Length} errors: {errors}");
 
             _statistics.InsertDailyCounter(StatisticsKey.BatchReaded, read);
             _statistics.InsertDailyCounter(StatisticsKey.BatchReadedErrors, errors);
         }
 
-        private bool ReadSuccessLine(Batch batch, string line)
+        private bool ReadSuccessLine(BatchRecord batch, string line)
         {
             var result = GetPageAndText(batch, line);
             if (result == null)
@@ -206,7 +190,7 @@ namespace landerist_library.Infrastructure.Tasks
             using var page = result.Value.page;
             var text = result.Value.text;
 
-            var (newPageType, listing) = _listingParser.ParseResponse(page, text, batch.LLMProvider);
+            var (newPageType, listing) = _listingParser.Parse(page, text, batch.Provider);
             bool success = _parsedClassification.Apply(page, newPageType, listing);
 
             if (success)
@@ -220,19 +204,12 @@ namespace landerist_library.Infrastructure.Tasks
             return success;
         }
 
-        private (Page page, string? text)? GetPageAndText(Batch batch, string line)
-        {
-            return batch.LLMProvider switch
-            {
-                LLMProvider.OpenAI => _openAi.ReadLine(batch.Id, line, _pages),
-                LLMProvider.VertexAI => _vertexAi.ReadLine(batch.Id, line, _pages),
-                _ => null,
-            };
-        }
+        private (Page page, string? text)? GetPageAndText(BatchRecord batch, string line) =>
+            _providers.GetRequired(batch.Provider).ReadLine(batch.Id, line, _pages);
 
-        private void RemoveWaitingStatus(Batch batch)
+        private void RemoveWaitingStatus(BatchRecord batch)
         {
-            var difference = new HashSet<string>(batch.PagesUriHashes);
+            var difference = new HashSet<string>(batch.PageUriHashes);
             difference.ExceptWith(DownloadedPagesUriHashes);
 
             if (difference.Count == 0)
@@ -242,7 +219,7 @@ namespace landerist_library.Infrastructure.Tasks
 
             int counter = 0;
 
-            Parallel.ForEach(difference, Config.PARALLELOPTIONS1INLOCAL, uriHash =>
+            Parallel.ForEach(difference, _options.ParallelOptions, uriHash =>
             {
                 try
                 {
@@ -262,11 +239,11 @@ namespace landerist_library.Infrastructure.Tasks
                 }
                 catch (Exception exception)
                 {
-                    Log.WriteError("TaskBatchDownload RemoveWaitingStatus", exception);
+                    _logger.WriteError("TaskBatchDownload RemoveWaitingStatus", exception.ToString());
                 }
             });
 
-            Log.WriteBatch("TaskBatchDownload", $"RemoveWaitingStatus {counter}/{difference.Count}");
+            _logger.WriteInfo("TaskBatchDownload", $"RemoveWaitingStatus {counter}/{difference.Count}");
         }
     }
 }

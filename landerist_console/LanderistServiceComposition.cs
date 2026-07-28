@@ -315,7 +315,21 @@ internal static class LanderistServiceComposition
                     updateWaitingStatusOnStart: Config.IsConfigurationProduction()),
                 new Tokenizer(TokenizerOptions.ForProvider(LLMProvider.LocalAI)))),
             new TenMinuteTaskJob(
-                new TaskBatchDownload(parsedClassification, batches, globalStatistics, pageCatalog, pagePersistence, new OpenAIBatchDownload(), new VertexAIBatchDownload(), listingParser),
+                new TaskBatchDownload(
+                    parsedClassification,
+                    new SqlBatchStore(databaseFactory.Create()),
+                    globalStatistics,
+                    pageCatalog,
+                    pagePersistence,
+                    new BatchDownloadProviderCatalog(
+                    [
+                        new BatchDownloadProvider(BatchProvider.OpenAI, new OpenAIBatchDownload()),
+                        new BatchDownloadProvider(BatchProvider.VertexAI, new VertexAIBatchDownload())
+                    ]),
+                    new LegacyBatchListingResponseParser(listingParser),
+                    new BatchDownloadOptions(
+                        Config.PARALLELOPTIONS1INLOCAL.MaxDegreeOfParallelism),
+                    logger),
                 new TaskBatchUpload(
                     new SqlBatchRegistrationStore(databaseFactory.Create()),
                     waitingStatus,

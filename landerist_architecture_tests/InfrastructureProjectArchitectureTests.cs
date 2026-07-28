@@ -632,6 +632,37 @@ public sealed class InfrastructureProjectArchitectureTests
             "SqlBatchStore.cs")));
     }
     [Fact]
+    public void BatchDownloadTask_IsOwnedByInfrastructureProject()
+    {
+        string root = FindRepositoryRoot();
+        AssertMoved(root, "Tasks", "TaskBatchDownload.cs");
+
+        string task = File.ReadAllText(Path.Combine(
+            root,
+            "landerist_infrastructure",
+            "Infrastructure",
+            "Tasks",
+            "TaskBatchDownload.cs"));
+        string[] forbidden =
+        [
+            "BatchRepository",
+            "LLMProvider",
+            "Config.",
+            "ParseListing",
+            "OpenAIBatchDownload",
+            "VertexAIBatchDownload",
+            "Logs.Log",
+            "Log.Write"
+        ];
+        Assert.DoesNotContain(
+            forbidden,
+            token => task.Contains(token, StringComparison.Ordinal));
+        Assert.Contains("IBatchStore", task, StringComparison.Ordinal);
+        Assert.Contains("BatchDownloadProviderCatalog", task, StringComparison.Ordinal);
+        Assert.Contains("IBatchListingResponseParser", task, StringComparison.Ordinal);
+        Assert.Contains("IApplicationLogger", task, StringComparison.Ordinal);
+    }
+    [Fact]
     public void LegacyLibrary_ReferencesInfrastructureProject()
     {
         string project = File.ReadAllText(Path.Combine(

@@ -40,14 +40,14 @@ public sealed class ListingParserOrchestrationArchitectureTests
     {
         string taskFile = Path.Combine(
             FindRepositoryRoot(),
-            "landerist_library",
+            "landerist_infrastructure",
             "Infrastructure",
             "Tasks",
             "TaskBatchDownload.cs");
         string source = File.ReadAllText(taskFile);
 
         Assert.Contains(
-            "ParseResponse(page, text, batch.LLMProvider)",
+            "_listingParser.Parse(page, text, batch.Provider)",
             source,
             StringComparison.Ordinal);
     }
