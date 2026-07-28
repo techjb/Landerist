@@ -1,10 +1,11 @@
 using landerist_library.Websites;
+using landerist_library.Application.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Globalization;
 using System.Net;
 
-namespace landerist_library.Parse.Location.Providers.Goolzoom
+namespace landerist_library.Infrastructure.Location.Providers.Goolzoom
 {
     public class GoolzoomCenter
     {
@@ -23,16 +24,19 @@ namespace landerist_library.Parse.Location.Providers.Goolzoom
         private readonly HttpClient HttpClient;
         private readonly GoolzoomOptions Options;
         private readonly Func<TimeSpan, CancellationToken, Task> Delay;
+        private readonly IApplicationLogger? Logger;
 
         public GoolzoomApi(
             IHttpClientTransportFactory httpClients,
             GoolzoomOptions options,
-            Func<TimeSpan, CancellationToken, Task>? delay = null)
+            Func<TimeSpan, CancellationToken, Task>? delay = null,
+            IApplicationLogger? logger = null)
         {
             ArgumentNullException.ThrowIfNull(httpClients);
             ArgumentNullException.ThrowIfNull(options);
             Options = options.Validate();
             Delay = delay ?? Task.Delay;
+            Logger = logger;
             HttpClient = httpClients.Create(useProxy: false, Options.Timeout);
             if (!string.IsNullOrWhiteSpace(Options.ApiKey))
             {
@@ -81,7 +85,7 @@ namespace landerist_library.Parse.Location.Providers.Goolzoom
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteError("GoolzoomApi GetLatLng", exception);
+                Logger?.WriteError("GoolzoomApi GetLatLng", exception.ToString());
             }
 
             return new GoolzoomLatLngResult(false, null, null);
@@ -125,7 +129,7 @@ namespace landerist_library.Parse.Location.Providers.Goolzoom
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteError("GoolzoomApi GetAddress", exception);
+                Logger?.WriteError("GoolzoomApi GetAddress", exception.ToString());
             }
 
             return null;
@@ -193,7 +197,7 @@ namespace landerist_library.Parse.Location.Providers.Goolzoom
             catch (Exception exception)
             {
                 Console.WriteLine($"Error in GoolzoomApi GetAddresses: {exception.Message}");
-                Logs.Log.WriteError("GoolzoomApi GetAddresses", exception);
+                Logger?.WriteError("GoolzoomApi GetAddresses", exception.ToString());
             }
 
             return null;

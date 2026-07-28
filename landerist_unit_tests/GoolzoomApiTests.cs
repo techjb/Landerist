@@ -1,5 +1,5 @@
 using System.Net;
-using landerist_library.Parse.Location.Providers.Goolzoom;
+using landerist_library.Infrastructure.Location.Providers.Goolzoom;
 using landerist_library.Websites;
 
 namespace landerist_unit_tests;

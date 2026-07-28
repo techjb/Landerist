@@ -1,9 +1,9 @@
 using HtmlAgilityPack;
-using landerist_library.Parse.Location.Candidates;
+using landerist_library.Infrastructure.Location.Candidates;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace landerist_library.Parse.Location.Extractors
+namespace landerist_library.Infrastructure.Location.Extractors
 {
     internal sealed class RegexLocationExtractor
     {

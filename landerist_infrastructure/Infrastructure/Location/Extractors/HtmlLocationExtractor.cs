@@ -1,8 +1,9 @@
 using HtmlAgilityPack;
-using landerist_library.Parse.Location.Candidates;
+using landerist_library.Application.Logging;
+using landerist_library.Infrastructure.Location.Candidates;
 using landerist_library.Application.Parsing;
 
-namespace landerist_library.Parse.Location.Extractors
+namespace landerist_library.Infrastructure.Location.Extractors
 {
     public sealed class HtmlLocationExtractor
     {
@@ -11,12 +12,12 @@ namespace landerist_library.Parse.Location.Extractors
         private readonly GoogleMapsIframeLocationExtractor GoogleMapsIframeLocationExtractor;
         private readonly RegexLocationExtractor RegexLocationExtractor;
 
-        public HtmlLocationExtractor(ICoordinateValidator coordinateValidator)
+        public HtmlLocationExtractor(ICoordinateValidator coordinateValidator, IApplicationLogger? logger = null)
         {
             var candidateFactory = new LocationCandidateFactory(coordinateValidator);
             MetaLocationExtractor = new MetaLocationExtractor(candidateFactory);
             JsonLocationExtractor = new JsonLocationExtractor(candidateFactory);
-            GoogleMapsIframeLocationExtractor = new GoogleMapsIframeLocationExtractor(candidateFactory);
+            GoogleMapsIframeLocationExtractor = new GoogleMapsIframeLocationExtractor(candidateFactory, logger);
             RegexLocationExtractor = new RegexLocationExtractor(candidateFactory);
         }
 

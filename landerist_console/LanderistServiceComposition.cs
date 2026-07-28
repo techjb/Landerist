@@ -3,7 +3,7 @@ using landerist_library.Parse.ListingParser;
 using landerist_library.Infrastructure.Browser;
 using landerist_library.Infrastructure.Downloaders.Puppeteer;
 using landerist_library.Infrastructure.Downloaders.Multiple;
-using landerist_library.Parse.Location.Providers.Goolzoom;
+using landerist_library.Infrastructure.Location.Providers.Goolzoom;
 using landerist_library.Websites;
 using landerist_library.Infrastructure.Statistics;
 using landerist_library.Infrastructure.Parsing.OpenAI;
@@ -138,7 +138,10 @@ internal static class LanderistServiceComposition
             listingStore,
             notListingCache,
             pageLinks,
-            databaseAdapters.CreateListingEnricher(goolzoom),
+            databaseAdapters.CreateListingEnricher(
+                goolzoom,
+                LanderistSettings.Current.GetString("GOOGLE_CLOUD_LANDERIST_API_KEY"),
+                logger),
             new LegacyListingUnpublishPolicy(listingQueries),
             logger,
             new HtmlPageContentInspector());

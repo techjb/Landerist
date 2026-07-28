@@ -1,33 +1,47 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Application.Parsing;
+using landerist_library.Application.Logging;
 using landerist_library.Database;
 using landerist_library.Websites;
 using Newtonsoft.Json;
 
-namespace landerist_library.Parse.Location.Providers.GoogleMaps
+namespace landerist_library.Infrastructure.Location.Providers.GoogleMaps
 {
-    public class GoogleMapsApi
+    public class GoogleMapsApi : IAddressGeocoder
     {
         private const int GeocodeApiMaxAttempts = 3;
 
         private readonly GoogleMapsLatLngCache latLngCache;
+        private readonly string apiKey;
+        private readonly HttpClient httpClient;
+        private readonly IApplicationLogger? logger;
 
-        public GoogleMapsApi(IDatabase database)
+        public GoogleMapsApi(
+            IDatabase database,
+            string apiKey,
+            IApplicationLogger? logger = null,
+            HttpClient? httpClient = null)
         {
             ArgumentNullException.ThrowIfNull(database);
+            this.apiKey = apiKey ?? string.Empty;
+            this.logger = logger;
+            this.httpClient = httpClient ?? new HttpClient { Timeout = TimeSpan.FromSeconds(20) };
             latLngCache = new GoogleMapsLatLngCache(new AddressLatLng(database));
         }
-
-        private static readonly HttpClient httpClient = new()
-        {
-            Timeout = TimeSpan.FromSeconds(20),
-        };
 
         public GoogleMapsLatLngResult? GetLatLng(string address, CountryCode countryCode = CountryCode.ES)
         {
             return GetLatLngLookup(address, countryCode).Coordinates;
         }
 
-        internal GoogleMapsLatLngLookupResult GetLatLngLookup(string address, CountryCode countryCode = CountryCode.ES)
+        GeocodedLocation? IAddressGeocoder.GetLatLng(string address, CountryCode countryCode)
+        {
+            GoogleMapsLatLngResult? result = GetLatLng(address, countryCode);
+            return result is null
+                ? null
+                : new GeocodedLocation(result.Value.Latitude, result.Value.Longitude, result.Value.IsAccurate);
+        }
+
+        public GoogleMapsLatLngLookupResult GetLatLngLookup(string address, CountryCode countryCode = CountryCode.ES)
         {
             return latLngCache.GetOrAdd(address, countryCode, GetLatLngFromGoogle);
         }
@@ -68,13 +82,13 @@ namespace landerist_library.Parse.Location.Providers.GoogleMaps
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteError("GoogleMapsApi GetLatLng", exception);
+                logger?.WriteError("GoogleMapsApi GetLatLng", exception.ToString());
             }
 
             return new GoogleMapsLatLngLookupResult(GoogleMapsLatLngLookupStatus.Error, null);
         }
 
-        private static GeocodeData? GetGeocodeData(string url)
+        private GeocodeData? GetGeocodeData(string url)
         {
             for (var attempt = 1; attempt <= GeocodeApiMaxAttempts; attempt++)
             {
@@ -84,7 +98,7 @@ namespace landerist_library.Parse.Location.Providers.GoogleMaps
                 var content = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                 if (string.IsNullOrWhiteSpace(content))
                 {
-                    Logs.Log.WriteError(
+                    logger?.WriteError(
                         "GoogleMapsApi GetLatLng",
                         $"Google Maps empty response. Attempt {attempt}/{GeocodeApiMaxAttempts}.");
                     return null;
@@ -107,7 +121,7 @@ namespace landerist_library.Parse.Location.Providers.GoogleMaps
             "address=" + Uri.EscapeDataString(address) +
             "&region=" + GoogleMapsCountry.GetRegion(countryCode) +
             GetComponents(countryCode) +
-            "&key=" + AppConfig.GOOGLE_CLOUD_LANDERIST_API_KEY;
+            "&key=" + apiKey;
 
         private static string GetComponents(CountryCode countryCode)
         {
@@ -151,7 +165,7 @@ namespace landerist_library.Parse.Location.Providers.GoogleMaps
             return TimeSpan.FromSeconds(attempt * 2);
         }
 
-        private static void LogGoogleMapsStatus(GeocodeData? geocodeData, int? attempt = null, bool retrying = false)
+        private void LogGoogleMapsStatus(GeocodeData? geocodeData, int? attempt = null, bool retrying = false)
         {
             var status = string.IsNullOrWhiteSpace(geocodeData?.status) ? "NO_STATUS" : geocodeData.status;
             var errorMessage = string.IsNullOrWhiteSpace(geocodeData?.error_message)
@@ -160,7 +174,7 @@ namespace landerist_library.Parse.Location.Providers.GoogleMaps
             var attemptText = attempt.HasValue ? $" Attempt {attempt.Value}/{GeocodeApiMaxAttempts}." : string.Empty;
             var retryText = retrying ? " Retrying." : string.Empty;
 
-            Logs.Log.WriteError(
+            logger?.WriteError(
                 "GoogleMapsApi GetLatLng",
                 $"Google Maps status: {status}.{attemptText}{retryText} {errorMessage}");
         }

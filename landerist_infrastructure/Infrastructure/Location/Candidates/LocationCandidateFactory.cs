@@ -1,7 +1,7 @@
 using System.Globalization;
 using landerist_library.Application.Parsing;
 
-namespace landerist_library.Parse.Location.Candidates
+namespace landerist_library.Infrastructure.Location.Candidates
 {
     internal sealed class LocationCandidateFactory
     {

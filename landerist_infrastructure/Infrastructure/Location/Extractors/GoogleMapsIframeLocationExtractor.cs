@@ -1,15 +1,18 @@
 using HtmlAgilityPack;
-using landerist_library.Parse.Location.Candidates;
+using landerist_library.Application.Logging;
+using landerist_library.Infrastructure.Location.Candidates;
 
-namespace landerist_library.Parse.Location.Extractors
+namespace landerist_library.Infrastructure.Location.Extractors
 {
     internal sealed class GoogleMapsIframeLocationExtractor
     {
         private readonly LocationCandidateFactory CandidateFactory;
+        private readonly IApplicationLogger? Logger;
 
-        public GoogleMapsIframeLocationExtractor(LocationCandidateFactory candidateFactory)
+        public GoogleMapsIframeLocationExtractor(LocationCandidateFactory candidateFactory, IApplicationLogger? logger = null)
         {
             CandidateFactory = candidateFactory;
+            Logger = logger;
         }
 
         public bool TryExtract(HtmlDocument htmlDocument, out LocationCandidate? candidate)
@@ -83,7 +86,7 @@ namespace landerist_library.Parse.Location.Extractors
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteError("LatLngParser AddframeGoogleMapsLatLng", src, exception);
+                Logger?.WriteError("GoogleMapsIframeLocationExtractor " + src, exception.ToString());
             }
 
             return false;

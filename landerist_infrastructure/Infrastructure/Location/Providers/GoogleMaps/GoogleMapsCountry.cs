@@ -1,6 +1,6 @@
 using landerist_library.Websites;
 
-namespace landerist_library.Parse.Location.Providers.GoogleMaps
+namespace landerist_library.Infrastructure.Location.Providers.GoogleMaps
 {
     internal static class GoogleMapsCountry
     {

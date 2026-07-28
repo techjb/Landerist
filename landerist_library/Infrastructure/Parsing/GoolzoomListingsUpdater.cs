@@ -1,6 +1,6 @@
 using landerist_library.Application.Listings;
-using landerist_library.Parse.Location.Providers.Goolzoom;
-using landerist_library.Parse.Location.Candidates;
+using landerist_library.Infrastructure.Location.Providers.Goolzoom;
+using landerist_library.Infrastructure.Location.Candidates;
 
 namespace landerist_library.Infrastructure.Parsing
 {

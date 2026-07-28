@@ -1,16 +1,16 @@
-using landerist_library.Parse.Location.Candidates;
-using landerist_library.Parse.Location.Providers.Goolzoom;
-using landerist_library.Parse.Location.Validation;
+using landerist_library.Infrastructure.Location.Candidates;
+using landerist_library.Infrastructure.Location.Providers.Goolzoom;
+using landerist_library.Application.Parsing;
 using landerist_orels.ES;
 
-namespace landerist_library.Parse.Location.Resolvers
+namespace landerist_library.Infrastructure.Location.Resolvers
 {
-    internal sealed class CadastralLocationResolver
+    public sealed class CadastralLocationResolver
     {
-        private readonly CountryCoordinateValidator CoordinateValidator;
+        private readonly ICoordinateValidator CoordinateValidator;
         private readonly IGoolzoomClient Goolzoom;
 
-        public CadastralLocationResolver(CountryCoordinateValidator coordinateValidator, IGoolzoomClient goolzoom)
+        public CadastralLocationResolver(ICoordinateValidator coordinateValidator, IGoolzoomClient goolzoom)
         {
             ArgumentNullException.ThrowIfNull(goolzoom);
             CoordinateValidator = coordinateValidator;

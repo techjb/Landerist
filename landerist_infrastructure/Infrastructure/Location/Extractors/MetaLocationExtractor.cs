@@ -1,7 +1,7 @@
 using HtmlAgilityPack;
-using landerist_library.Parse.Location.Candidates;
+using landerist_library.Infrastructure.Location.Candidates;
 
-namespace landerist_library.Parse.Location.Extractors
+namespace landerist_library.Infrastructure.Location.Extractors
 {
     internal sealed class MetaLocationExtractor
     {

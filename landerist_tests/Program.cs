@@ -3,7 +3,8 @@ using landerist_library.Parse.ListingParser;
 using landerist_library.Infrastructure.Browser;
 using landerist_library.Infrastructure.Downloaders.Puppeteer;
 using landerist_library.Infrastructure.Downloaders.Multiple;
-using landerist_library.Parse.Location.Providers.Goolzoom;
+using landerist_library.Infrastructure.Location.Providers.Goolzoom;
+using landerist_library.Infrastructure.Location.Providers.GoogleMaps;
 using landerist_library.Websites;
 using landerist_library.Infrastructure.Statistics;
 using landerist_library.Infrastructure.Parsing;
@@ -170,7 +171,11 @@ namespace landerist_tests
                     databaseFactory.Create(),
                     new LegacyListingLocationEnricher(
                         databaseFactory.Create(),
-                        goolzoom)),
+                        goolzoom,
+                        new GoogleMapsApi(
+                            databaseFactory.Create(),
+                            LanderistSettings.Current.GetString("GOOGLE_CLOUD_LANDERIST_API_KEY"),
+                            logger))),
                 new LegacyListingUnpublishPolicy(listingQueries),
                 logger,
                 new HtmlPageContentInspector());

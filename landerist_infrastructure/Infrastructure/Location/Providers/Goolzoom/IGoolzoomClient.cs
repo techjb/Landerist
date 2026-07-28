@@ -1,4 +1,4 @@
-namespace landerist_library.Parse.Location.Providers.Goolzoom;
+namespace landerist_library.Infrastructure.Location.Providers.Goolzoom;
 
 public interface IGoolzoomClient
 {

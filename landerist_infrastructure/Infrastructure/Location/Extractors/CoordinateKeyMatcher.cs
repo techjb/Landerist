@@ -1,4 +1,4 @@
-namespace landerist_library.Parse.Location.Extractors
+namespace landerist_library.Infrastructure.Location.Extractors
 {
     internal static class CoordinateKeyMatcher
     {

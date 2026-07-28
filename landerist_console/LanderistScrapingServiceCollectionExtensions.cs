@@ -10,7 +10,7 @@ using landerist_library.Infrastructure.Scraping;
 using landerist_library.Infrastructure.WebsiteServices;
 using landerist_library.Infrastructure.Downloaders.Multiple;
 using landerist_library.Infrastructure.Downloaders.Puppeteer;
-using landerist_library.Parse.Location.Providers.Goolzoom;
+using landerist_library.Infrastructure.Location.Providers.Goolzoom;
 using landerist_library.Websites;
 using Microsoft.Extensions.DependencyInjection;
 

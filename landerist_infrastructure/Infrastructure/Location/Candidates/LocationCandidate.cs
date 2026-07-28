@@ -1,4 +1,4 @@
-namespace landerist_library.Parse.Location.Candidates
+namespace landerist_library.Infrastructure.Location.Candidates
 {
     public sealed record LocationCandidate(double latitude, double longitude, bool isAccurate, string source);
 }

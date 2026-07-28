@@ -9,7 +9,8 @@ using landerist_library.Infrastructure.Listings;
 using landerist_library.Infrastructure.Parsing;
 using landerist_library.Infrastructure.Scraping;
 using landerist_library.Infrastructure.Sql;
-using landerist_library.Parse.Location.Providers.Goolzoom;
+using landerist_library.Infrastructure.Location.Providers.Goolzoom;
+using landerist_library.Infrastructure.Location.Providers.GoogleMaps;
 using landerist_library.Websites;
 
 namespace landerist_console;
@@ -25,12 +26,16 @@ internal sealed class LanderistDatabaseAdapterFactory(
     public SqlNotListingCacheService CreateNotListingCache(bool enabled) =>
         new(databaseFactory.Create(), enabled);
 
-    public SqlListingEnricher CreateListingEnricher(IGoolzoomClient goolzoom) =>
+    public SqlListingEnricher CreateListingEnricher(
+        IGoolzoomClient goolzoom,
+        string googleMapsApiKey,
+        IApplicationLogger logger) =>
         new(
             databaseFactory.Create(),
             new LegacyListingLocationEnricher(
                 databaseFactory.Create(),
-                goolzoom));
+                goolzoom,
+                new GoogleMapsApi(databaseFactory.Create(), googleMapsApiKey, logger)));
 
     public SqlScrapeMetrics CreateScrapeMetrics() =>
         new(databaseFactory.Create());

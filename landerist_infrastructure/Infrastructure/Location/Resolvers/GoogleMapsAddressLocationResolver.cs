@@ -1,24 +1,23 @@
-using landerist_library.Parse.Location.Candidates;
-using landerist_library.Parse.Location.Providers.GoogleMaps;
-using landerist_library.Parse.Location.Validation;
+using landerist_library.Infrastructure.Location.Candidates;
+using landerist_library.Application.Parsing;
 using landerist_library.Websites;
 
-namespace landerist_library.Parse.Location.Resolvers
+namespace landerist_library.Infrastructure.Location.Resolvers
 {
-    internal sealed class GoogleMapsAddressLocationResolver
+    public sealed class GoogleMapsAddressLocationResolver
     {
         private readonly CountryCode CountryCode;
-        private readonly CountryCoordinateValidator CoordinateValidator;
-        private readonly GoogleMapsApi GoogleMapsApi;
+        private readonly ICoordinateValidator CoordinateValidator;
+        private readonly IAddressGeocoder Geocoder;
 
         public GoogleMapsAddressLocationResolver(
             CountryCode countryCode,
-            CountryCoordinateValidator coordinateValidator,
-            GoogleMapsApi googleMapsApi)
+            ICoordinateValidator coordinateValidator,
+            IAddressGeocoder geocoder)
         {
             CountryCode = countryCode;
             CoordinateValidator = coordinateValidator;
-            GoogleMapsApi = googleMapsApi;
+            Geocoder = geocoder;
         }
 
         public bool TryResolve(string? address, out LocationCandidate? candidate)
@@ -29,7 +28,7 @@ namespace landerist_library.Parse.Location.Resolvers
                 return false;
             }
 
-            var result = GoogleMapsApi.GetLatLng(address, CountryCode);
+            var result = Geocoder.GetLatLng(address, CountryCode);
             if (result == null ||
                 !CoordinateValidator.Contains(result.Value.Latitude, result.Value.Longitude))
             {

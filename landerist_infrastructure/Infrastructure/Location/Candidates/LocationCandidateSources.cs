@@ -1,4 +1,4 @@
-namespace landerist_library.Parse.Location.Candidates
+namespace landerist_library.Infrastructure.Location.Candidates
 {
     public static class LocationCandidateSources
     {

@@ -1,15 +1,15 @@
-namespace landerist_library.Parse.Location.Providers.GoogleMaps
+namespace landerist_library.Infrastructure.Location.Providers.GoogleMaps
 {
     public readonly record struct GoogleMapsLatLngResult(double Latitude, double Longitude, bool IsAccurate);
 
-    internal enum GoogleMapsLatLngLookupStatus
+    public enum GoogleMapsLatLngLookupStatus
     {
         Found,
         NotFound,
         Error
     }
 
-    internal readonly record struct GoogleMapsLatLngLookupResult(
+    public readonly record struct GoogleMapsLatLngLookupResult(
         GoogleMapsLatLngLookupStatus Status,
         GoogleMapsLatLngResult? Coordinates);
 }

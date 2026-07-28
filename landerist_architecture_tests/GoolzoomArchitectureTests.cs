@@ -7,10 +7,10 @@ public sealed class GoolzoomArchitectureTests
     {
         string root = Path.Combine(
             FindRepositoryRoot(),
-            "landerist_library");
+            "landerist_infrastructure");
         string apiFile = Path.Combine(
             root,
-            "Parse",
+            "Infrastructure",
             "Location",
             "Providers",
             "Goolzoom",
@@ -30,9 +30,9 @@ public sealed class GoolzoomArchitectureTests
     {
         string root = Path.Combine(
             FindRepositoryRoot(),
-            "landerist_library");
+            "landerist_infrastructure");
         string apiFile = Path.Combine(
-            "Parse",
+            "Infrastructure",
             "Location",
             "Providers",
             "Goolzoom",

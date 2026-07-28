@@ -1,12 +1,14 @@
 using landerist_library.Database;
 using landerist_library.Application.Listings;
-using landerist_library.Parse.Location.Providers.GoogleMaps;
-using landerist_library.Parse.Location.Candidates;
+using landerist_library.Infrastructure.Location.Providers.GoogleMaps;
+using landerist_library.Infrastructure.Location.Candidates;
 using landerist_library.Websites;
 
 namespace landerist_library.Infrastructure.Parsing
 {
-    public sealed class GoogleMapsListingsLocationUpdater(IListingAdministrationService listings)
+    public sealed class GoogleMapsListingsLocationUpdater(
+        IListingAdministrationService listings,
+        GoogleMapsApi googleMapsApi)
     {
         public void UpdateListingsLocationIsAccurate(IDatabase database)
         {
@@ -15,8 +17,6 @@ namespace landerist_library.Infrastructure.Parsing
             {
                 return;
             }
-
-            var googleMapsApi = new GoogleMapsApi(database);
 
             int total = items.Count;
             int processed = 0;
