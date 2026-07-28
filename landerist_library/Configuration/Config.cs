@@ -1,5 +1,4 @@
-﻿using landerist_library.Parse.ListingParser;
-using PuppeteerSharp;
+using landerist_library.Parse.ListingParser;
 
 namespace landerist_library.Configuration
 {
@@ -61,9 +60,7 @@ namespace landerist_library.Configuration
         public static string? SCREENSHOTS_DIRECTORY { get; set; }
         public static bool SAVE_SCREENSHOT_FILE { get; set; }
 
-        public static readonly ScreenshotType SCREENSHOT_TYPE = ScreenshotType.Jpeg;
-
-        public const int MAX_SCREENSHOT_SIZE = 5 * 1024 * 1024; // 5 MB                
+public const int MAX_SCREENSHOT_SIZE = 5 * 1024 * 1024; // 5 MB                
 
         public const int MAX_SCREENSHOT_PIXELS_SIDE = 8000;
         public static string? CHROME_EXTENSIONS_DIRECTORY { get; set; }

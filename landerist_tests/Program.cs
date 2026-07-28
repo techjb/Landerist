@@ -1,8 +1,8 @@
 using landerist_library.Parse.ListingParser.StructuredOutputs;
 using landerist_library.Parse.ListingParser;
 using landerist_library.Infrastructure.Browser;
-using landerist_library.Downloaders.Puppeteer;
-using landerist_library.Downloaders.Multiple;
+using landerist_library.Infrastructure.Downloaders.Puppeteer;
+using landerist_library.Infrastructure.Downloaders.Multiple;
 using landerist_library.Parse.Location.Providers.Goolzoom;
 using landerist_library.Websites;
 using landerist_library.Infrastructure.Statistics;
@@ -93,9 +93,6 @@ namespace landerist_tests
                 settings.GetInt32("PROXY_STICKY_PORT_MAX"),
                 settings.GetString("PROXY_USERNAME"),
                 settings.GetString("PROXY_PASSWORD"));
-            DownloadersPool downloaders = new(
-                Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
-                new PuppeteerDownloaderFactory(browserOptions));
             SqlApplicationLogger logger = new(
                 databaseFactory,
                 new ApplicationLoggerOptions(
@@ -104,6 +101,10 @@ namespace landerist_tests
                     Config.LOGS_INFO_IN_CONSOLE,
                     Config.MACHINE_NAME),
                 TimeProvider.System);
+            DownloadersPool downloaders = new(
+                Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
+                new PuppeteerDownloaderFactory(browserOptions, logger),
+                logger);
             LegacyDownloadersPoolAdapter downloaderPool = new(downloaders);
             ChromeMaintenanceService chrome = new(
                 new ChromeMaintenanceOptions(

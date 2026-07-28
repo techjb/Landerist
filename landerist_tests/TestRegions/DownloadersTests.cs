@@ -1,4 +1,4 @@
-using landerist_library.Downloaders.Puppeteer;
+using landerist_library.Infrastructure.Downloaders.Puppeteer;
 
 namespace landerist_tests
 {
@@ -7,7 +7,7 @@ namespace landerist_tests
         public static void Run()
         {
             //new HttpClientDownloader().Get(uriPage);
-            //landerist_library.Downloaders.Puppeteer.PuppeteerDownloader.UpdateChrome();
+            //landerist_library.Infrastructure.Downloaders.Puppeteer.PuppeteerDownloader.UpdateChrome();
             //PuppeteerDownloader.KillChrome();
             //PuppeteerDownloader.TestSinglePage();
             //PuppeteerDownloader.UpdateChrome();

@@ -1,6 +1,6 @@
 using PuppeteerSharp;
 
-namespace landerist_library.Downloaders.Puppeteer;
+namespace landerist_library.Infrastructure.Downloaders.Puppeteer;
 
 public sealed record PuppeteerScreenshotPolicy(
     ScreenshotType Type,

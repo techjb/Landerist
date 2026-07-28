@@ -1,8 +1,8 @@
-using landerist_library.Downloaders;
-using landerist_library.Downloaders.Puppeteer;
+using landerist_library.Infrastructure.Downloaders;
+using landerist_library.Infrastructure.Downloaders.Puppeteer;
 using landerist_library.Pages;
 
-namespace landerist_library.Downloaders.Multiple
+namespace landerist_library.Infrastructure.Downloaders.Multiple
 {
     public class SingleDownloader
     {

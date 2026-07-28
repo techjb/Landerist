@@ -8,8 +8,8 @@ using landerist_library.Infrastructure.Logging;
 using landerist_library.Infrastructure.Runtime;
 using landerist_library.Infrastructure.Scraping;
 using landerist_library.Infrastructure.WebsiteServices;
-using landerist_library.Downloaders.Multiple;
-using landerist_library.Downloaders.Puppeteer;
+using landerist_library.Infrastructure.Downloaders.Multiple;
+using landerist_library.Infrastructure.Downloaders.Puppeteer;
 using landerist_library.Parse.Location.Providers.Goolzoom;
 using landerist_library.Websites;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,10 +47,6 @@ internal static class LanderistScrapingServiceCollectionExtensions
             runtimeOptions.Proxy.StickyPortMax,
             runtimeOptions.Proxy.Username,
             runtimeOptions.Proxy.Password);
-        DownloadersPool downloaders = new(
-            Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
-            new PuppeteerDownloaderFactory(browserOptions));
-        LegacyDownloadersPoolAdapter downloaderPool = new(downloaders);
         WebsiteRobotsPolicy robotsPolicy = new();
         GoolzoomApi goolzoom = new(
             httpClients,
@@ -62,7 +58,6 @@ internal static class LanderistScrapingServiceCollectionExtensions
         services.AddSingleton(httpClients);
         services.AddSingleton<IHttpClientTransportFactory>(httpClients);
         services.AddSingleton(browserOptions);
-        services.AddSingleton(downloaders);
         ApplicationLoggerOptions loggerOptions = new(
             Config.LOGS_ENABLED,
             Config.LOGS_ERRORS_IN_CONSOLE,
@@ -73,8 +68,18 @@ internal static class LanderistScrapingServiceCollectionExtensions
         services.AddSingleton<SqlApplicationLogger>();
         services.AddSingleton<IApplicationLogger>(serviceProvider =>
             serviceProvider.GetRequiredService<SqlApplicationLogger>());
-        services.AddSingleton(downloaderPool);
-        services.AddSingleton<IDownloaderPool>(downloaderPool);
+        services.AddSingleton<DownloadersPool>(serviceProvider =>
+            new DownloadersPool(
+                Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
+                new PuppeteerDownloaderFactory(
+                    browserOptions,
+                    serviceProvider.GetRequiredService<IApplicationLogger>()),
+                serviceProvider.GetRequiredService<IApplicationLogger>()));
+        services.AddSingleton<LegacyDownloadersPoolAdapter>(serviceProvider =>
+            new LegacyDownloadersPoolAdapter(
+                serviceProvider.GetRequiredService<DownloadersPool>()));
+        services.AddSingleton<IDownloaderPool>(serviceProvider =>
+            serviceProvider.GetRequiredService<LegacyDownloadersPoolAdapter>());
         services.AddSingleton<ChromeMaintenanceService>(serviceProvider =>
             new ChromeMaintenanceService(
                 new ChromeMaintenanceOptions(
@@ -88,11 +93,13 @@ internal static class LanderistScrapingServiceCollectionExtensions
         services.AddSingleton(goolzoom);
         services.AddSingleton(new WebsiteNetworkService(httpClients, TimeProvider.System));
         services.AddSingleton(new WebsiteAccessServices(robotsPolicy, httpClients));
-        services.AddSingleton(new PooledPageDownloader(downloaderPool));
+        services.AddSingleton<PooledPageDownloader>(serviceProvider =>
+            new PooledPageDownloader(
+                serviceProvider.GetRequiredService<IDownloaderPool>()));
         services.AddSingleton(new HttpConditionalPageHeaderService(httpClients));
         services.AddSingleton<ScrapeBrowserManager>(serviceProvider =>
             new ScrapeBrowserManager(
-                downloaderPool,
+                serviceProvider.GetRequiredService<IDownloaderPool>(),
                 serviceProvider.GetRequiredService<ChromeMaintenanceService>(),
                 serviceProvider.GetRequiredService<IApplicationLogger>()));
         services.AddSingleton<LanderistScrapingPipelineFactory>();

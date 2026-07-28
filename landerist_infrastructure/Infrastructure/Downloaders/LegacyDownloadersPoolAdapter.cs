@@ -1,4 +1,4 @@
-using landerist_library.Downloaders.Multiple;
+using landerist_library.Infrastructure.Downloaders.Multiple;
 using landerist_library.Infrastructure.Scraping;
 using landerist_library.Pages;
 

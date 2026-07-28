@@ -1,4 +1,4 @@
-using landerist_library.Downloaders.Puppeteer;
+using landerist_library.Infrastructure.Downloaders.Puppeteer;
 using PuppeteerSharp;
 
 namespace landerist_unit_tests;

@@ -11,7 +11,7 @@ public sealed class ChromeMaintenanceArchitectureTests
         string[] files =
         [
             "Infrastructure/Scraping/ScrapeBrowserManager.cs",
-            "Downloaders/Puppeteer/PuppeteerDownloader.cs"
+            "Infrastructure/Downloaders/Puppeteer/PuppeteerDownloader.cs"
         ];
         string[] forbiddenTokens =
         [
@@ -25,9 +25,7 @@ public sealed class ChromeMaintenanceArchitectureTests
             .Where(relative =>
             {
                 string source = File.ReadAllText(Path.Combine(
-                    relative.EndsWith("ScrapeBrowserManager.cs", StringComparison.Ordinal)
-                        ? infrastructureRoot
-                        : libraryRoot,
+                    infrastructureRoot,
                     relative.Replace('/', Path.DirectorySeparatorChar)));
                 return forbiddenTokens.Any(token =>
                     source.Contains(token, StringComparison.Ordinal));

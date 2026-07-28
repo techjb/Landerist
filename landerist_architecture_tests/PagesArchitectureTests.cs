@@ -37,7 +37,7 @@ public sealed class PagesArchitectureTests
         string[] violations = Directory
             .EnumerateFiles(pagesRoot, "*.cs", SearchOption.AllDirectories)
             .Where(file => File.ReadAllText(file).Contains(
-                "landerist_library.Downloaders",
+                "landerist_library.Infrastructure.Downloaders",
                 StringComparison.Ordinal))
             .Select(file => Path.GetFileName(file)!)
             .Order()

@@ -1,8 +1,8 @@
 using landerist_library.Parse.ListingParser.StructuredOutputs;
 using landerist_library.Parse.ListingParser;
 using landerist_library.Infrastructure.Browser;
-using landerist_library.Downloaders.Puppeteer;
-using landerist_library.Downloaders.Multiple;
+using landerist_library.Infrastructure.Downloaders.Puppeteer;
+using landerist_library.Infrastructure.Downloaders.Multiple;
 using landerist_library.Parse.Location.Providers.Goolzoom;
 using landerist_library.Websites;
 using landerist_library.Infrastructure.Statistics;

@@ -1,20 +1,26 @@
-using landerist_library.Logs;
+using landerist_library.Application.Logging;
 using PuppeteerSharp;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 
-namespace landerist_library.Downloaders.Puppeteer
+namespace landerist_library.Infrastructure.Downloaders.Puppeteer
 {
     public class PuppeteerScreenshot
     {
         private readonly PuppeteerScreenshotPolicy Policy;
         private readonly IScreenshotStore Store;
+        private readonly IApplicationLogger Logger;
 
-        public PuppeteerScreenshot(PuppeteerScreenshotPolicy policy, IScreenshotStore store)
+        public PuppeteerScreenshot(
+            PuppeteerScreenshotPolicy policy,
+            IScreenshotStore store,
+            IApplicationLogger logger)
         {
             ArgumentNullException.ThrowIfNull(policy);
             ArgumentNullException.ThrowIfNull(store);
+            ArgumentNullException.ThrowIfNull(logger);
+            Logger = logger;
             Policy = policy.Validate();
             Store = store;
         }
@@ -45,7 +51,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
             catch (Exception exception)
             {
-                Log.WriteError("PuppeteerDownloader TakeScreenshot", exception);
+                Logger.WriteError("PuppeteerDownloader TakeScreenshot", exception.ToString());
             }
             return null;
         }
@@ -63,7 +69,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
             catch (Exception exception)
             {
-                Log.WriteError("PuppeteerScreenshot ResizeImage", exception);
+                Logger.WriteError("PuppeteerScreenshot ResizeImage", exception.ToString());
             }
             return bytes;
         }

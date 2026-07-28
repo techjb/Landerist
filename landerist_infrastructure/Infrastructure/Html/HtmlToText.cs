@@ -1,6 +1,6 @@
-﻿using HtmlAgilityPack;
+using HtmlAgilityPack;
 
-namespace landerist_library.Tools
+namespace landerist_library.Infrastructure.Html
 {
     public class HtmlToText
     {
@@ -380,7 +380,7 @@ namespace landerist_library.Tools
                 return false;
             }
 
-            int wordCount = Strings.CountWords(text);
+            int wordCount = HtmlTextNormalizer.CountWords(text);
             if (wordCount == 0)
             {
                 return false;
@@ -399,7 +399,7 @@ namespace landerist_library.Tools
 
             bool hasHint = HasRecommendationHint(node, text);
             bool hasRepeatedLinkedChildren = HasRepeatedLinkedChildren(node);
-            int linkWords = anchors.Sum(Strings.CountWords);
+            int linkWords = anchors.Sum(HtmlTextNormalizer.CountWords);
             double linkDensity = (double)linkWords / Math.Max(1, wordCount);
 
             if (hasHint && (linkCount >= MinimumRecommendationLinks || hasRepeatedLinkedChildren || linkDensity >= 0.20d))
@@ -478,7 +478,7 @@ namespace landerist_library.Tools
 
         private static string NormalizeText(string? text)
         {
-            return Strings.Clean(HtmlEntity.DeEntitize(text ?? string.Empty)).ToLowerInvariant();
+            return HtmlTextNormalizer.Clean(HtmlEntity.DeEntitize(text ?? string.Empty)).ToLowerInvariant();
         }
 
         private static string TakeWords(string text, int maxWords)
@@ -542,7 +542,7 @@ namespace landerist_library.Tools
             }
 
             string text = string.Join(" ", cleanedLines);
-            return Strings.Clean(text);
+            return HtmlTextNormalizer.Clean(text);
         }
 
         public static bool IsSymbol(string input)

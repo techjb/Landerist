@@ -26,7 +26,7 @@ public sealed class InfrastructureProjectArchitectureTests
             .ToArray();
 
         Assert.Equal(
-            ["Com.Bekijkhet.RobotsTxt", "HtmlAgilityPack", "Louw.SitemapParser", "Microsoft.Data.SqlClient", "PuppeteerSharp"],
+            ["Com.Bekijkhet.RobotsTxt", "HtmlAgilityPack", "Louw.SitemapParser", "Microsoft.Data.SqlClient", "System.Drawing.Common", "PuppeteerSharp"],
             packages);
         Assert.Equal(
             [
@@ -429,7 +429,7 @@ public sealed class InfrastructureProjectArchitectureTests
         foreach (string file in Directory.GetFiles(directory, "*.cs"))
         {
             string source = File.ReadAllText(file);
-            Assert.DoesNotContain("landerist_library.Downloaders", source, StringComparison.Ordinal);
+            Assert.DoesNotContain("landerist_library.Infrastructure.Downloaders", source, StringComparison.Ordinal);
             Assert.DoesNotContain("Logs.Log", source, StringComparison.Ordinal);
             Assert.DoesNotContain("landerist_library.Tools", source, StringComparison.Ordinal);
             Assert.DoesNotContain("landerist_library.Infrastructure.Parsing", source, StringComparison.Ordinal);

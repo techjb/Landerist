@@ -7,7 +7,8 @@ public sealed class PuppeteerScreenshotArchitectureTests
     {
         string file = Path.Combine(
             FindRepositoryRoot(),
-            "landerist_library",
+            "landerist_infrastructure",
+            "Infrastructure",
             "Downloaders",
             "Puppeteer",
             "PuppeteerScreenshot.cs");
@@ -32,13 +33,14 @@ public sealed class PuppeteerScreenshotArchitectureTests
 
         Assert.True(File.Exists(Path.Combine(
             repositoryRoot,
-            "landerist_library",
+            "landerist_infrastructure",
             "Infrastructure",
             "Files",
             "FileScreenshotStore.cs")));
         Assert.False(File.Exists(Path.Combine(
             repositoryRoot,
-            "landerist_library",
+            "landerist_infrastructure",
+            "Infrastructure",
             "Downloaders",
             "Puppeteer",
             "FileScreenshotStore.cs")));

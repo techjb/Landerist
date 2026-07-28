@@ -1,6 +1,6 @@
-﻿using landerist_library.Pages;
+using landerist_library.Pages;
 
-namespace landerist_library.Downloaders
+namespace landerist_library.Infrastructure.Downloaders
 {
     public interface IDownloader
     {

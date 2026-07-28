@@ -1,4 +1,4 @@
-namespace landerist_library.Downloaders
+namespace landerist_library.Infrastructure.Downloaders
 {
     public interface IDownloaderSessionFactory
     {

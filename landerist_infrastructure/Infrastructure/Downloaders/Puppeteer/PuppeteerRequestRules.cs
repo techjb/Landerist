@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using PuppeteerSharp;
 
-namespace landerist_library.Downloaders.Puppeteer
+namespace landerist_library.Infrastructure.Downloaders.Puppeteer
 {
     internal static class PuppeteerRequestRules
     {

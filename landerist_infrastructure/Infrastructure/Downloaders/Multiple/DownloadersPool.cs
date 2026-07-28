@@ -1,21 +1,28 @@
 
 
+using landerist_library.Application.Logging;
 using landerist_library.Pages;
-using landerist_library.Downloaders;
+using landerist_library.Infrastructure.Downloaders;
 
-namespace landerist_library.Downloaders.Multiple
+namespace landerist_library.Infrastructure.Downloaders.Multiple
 {
     public class DownloadersPool
     {
         private readonly int MaxDownloaders;
         private readonly IDownloaderSessionFactory SessionFactory;
+        private readonly IApplicationLogger Logger;
 
-        public DownloadersPool(int maxDownloaders, IDownloaderSessionFactory sessionFactory)
+        public DownloadersPool(
+            int maxDownloaders,
+            IDownloaderSessionFactory sessionFactory,
+            IApplicationLogger logger)
         {
             if (maxDownloaders <= 0) throw new ArgumentOutOfRangeException(nameof(maxDownloaders));
             ArgumentNullException.ThrowIfNull(sessionFactory);
+            ArgumentNullException.ThrowIfNull(logger);
             MaxDownloaders = maxDownloaders;
             SessionFactory = sessionFactory;
+            Logger = logger;
         }
         private readonly List<SingleDownloader> Downloaders = [];
 
@@ -27,7 +34,7 @@ namespace landerist_library.Downloaders.Multiple
             SingleDownloader? downloader = GetDownloader(useProxy);
             if (downloader is null)
             {
-                Logs.Log.WriteError("MultipleDownloader Download", "Downloader not found");
+                Logger.WriteError("MultipleDownloader Download", "Downloader not found");
                 return false;
             }
             return downloader.Download(page);
@@ -47,7 +54,7 @@ namespace landerist_library.Downloaders.Multiple
 
                 if (Downloaders.Count >= MaxDownloaders)
                 {
-                    Logs.Log.WriteInfo("MultipleDownloader GetDownloader",
+                    Logger.WriteInfo("MultipleDownloader GetDownloader",
                         $"Max downloaders reached: {MaxDownloaders}");
                     return null;
                 }
@@ -60,7 +67,7 @@ namespace landerist_library.Downloaders.Multiple
                     return newSingleDownloader;
                 }
 
-                Logs.Log.WriteError("MultipleDownloader GetDownloader", "Downloader not found");
+                Logger.WriteError("MultipleDownloader GetDownloader", "Downloader not found");
                 return null;
             }
         }
@@ -109,7 +116,7 @@ namespace landerist_library.Downloaders.Multiple
                     }
                 }
 
-                Logs.Log.WriteInfo("MultipleDownloaders",
+                Logger.WriteInfo("MultipleDownloaders",
                     $"Downloaders: {Downloaders.Count} WithProxy: {withProxy} MaxDownloads: {maxDownloads} MaxCrashCounter: {maxCrashCounter}");
             }
         }

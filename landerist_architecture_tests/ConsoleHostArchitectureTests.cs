@@ -119,6 +119,35 @@ public sealed class ConsoleHostArchitectureTests
         Assert.DoesNotContain("Config.", logSource);
         Assert.DoesNotContain("LegacyDatabase", logSource);
     }
+    [Fact]
+    public void Downloaders_AreOwnedByInfrastructureProject()
+    {
+        string root = FindRepositoryRoot();
+        string infrastructureDownloaders = Path.Combine(
+            root,
+            "landerist_infrastructure",
+            "Infrastructure",
+            "Downloaders");
+
+        Assert.True(Directory.Exists(infrastructureDownloaders));
+        Assert.True(File.Exists(Path.Combine(
+            infrastructureDownloaders,
+            "Puppeteer",
+            "PuppeteerDownloader.cs")));
+        Assert.True(File.Exists(Path.Combine(
+            infrastructureDownloaders,
+            "Multiple",
+            "DownloadersPool.cs")));
+        Assert.False(Directory.Exists(Path.Combine(
+            root,
+            "landerist_library",
+            "Downloaders")));
+        Assert.False(Directory.Exists(Path.Combine(
+            root,
+            "landerist_library",
+            "Infrastructure",
+            "Downloaders")));
+    }
     private static string ReadConsoleSource(string fileName) =>
         File.ReadAllText(GetConsolePath(fileName));
 

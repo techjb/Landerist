@@ -7,14 +7,14 @@ public sealed class PuppeteerArchitectureTests
     {
         string root = Path.Combine(
             FindRepositoryRoot(),
-            "landerist_library");
+            "landerist_infrastructure");
         string[] files =
         [
-            "Downloaders/Puppeteer/PuppeteerDownloader.cs",
-            "Downloaders/Puppeteer/PuppeteerDownloaderFactory.cs",
-            "Downloaders/Puppeteer/PuppeteerLaunchOptionsFactory.cs",
-            "Downloaders/Multiple/DownloadersPool.cs",
-            "Downloaders/Multiple/SingleDownloader.cs"
+            "Infrastructure/Downloaders/Puppeteer/PuppeteerDownloader.cs",
+            "Infrastructure/Downloaders/Puppeteer/PuppeteerDownloaderFactory.cs",
+            "Infrastructure/Downloaders/Puppeteer/PuppeteerLaunchOptionsFactory.cs",
+            "Infrastructure/Downloaders/Multiple/DownloadersPool.cs",
+            "Infrastructure/Downloaders/Multiple/SingleDownloader.cs"
         ];
         string[] forbiddenTokens =
         [
@@ -41,7 +41,8 @@ public sealed class PuppeteerArchitectureTests
     {
         string poolFile = Path.Combine(
             FindRepositoryRoot(),
-            "landerist_library",
+            "landerist_infrastructure",
+            "Infrastructure",
             "Downloaders",
             "Multiple",
             "DownloadersPool.cs");

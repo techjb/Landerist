@@ -1,10 +1,11 @@
 using HtmlAgilityPack;
+using landerist_library.Application.Logging;
 using landerist_library.Pages;
 using landerist_library.Websites;
 using PuppeteerSharp;
 using System.Diagnostics;
 
-namespace landerist_library.Downloaders.Puppeteer
+namespace landerist_library.Infrastructure.Downloaders.Puppeteer
 {
     public class PuppeteerDownloader : IDownloader, IDownloaderSession
     {
@@ -18,6 +19,7 @@ namespace landerist_library.Downloaders.Puppeteer
         private Pages.Page? Page;
         private readonly LaunchOptions launchOptions;
         private readonly PuppeteerBrowserOptions Options;
+        private readonly IApplicationLogger Logger;
 
         private IBrowser? Browser;
         private IPage? BrowserPage;
@@ -34,9 +36,14 @@ namespace landerist_library.Downloaders.Puppeteer
         private bool FirstNavigationRequestReaded = false;
         private string CurrentExecutionStep = "Idle";
 
-        public PuppeteerDownloader(bool useProxy, PuppeteerBrowserOptions options)
+        public PuppeteerDownloader(
+            bool useProxy,
+            PuppeteerBrowserOptions options,
+            IApplicationLogger logger)
         {
             ArgumentNullException.ThrowIfNull(options);
+            ArgumentNullException.ThrowIfNull(logger);
+            Logger = logger;
             Options = options;
             UseProxy = useProxy;
             if (UseProxy)
@@ -80,7 +87,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteError("PuppeteerDownloader LaunchAsync", exception);
+                Logger.WriteError("PuppeteerDownloader LaunchAsync", exception.ToString());
             }
 
             return null;
@@ -114,7 +121,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteError("PuppeteerDownloader CloseBrowserAsync", exception);
+                Logger.WriteError("PuppeteerDownloader CloseBrowserAsync", exception.ToString());
             }
         }
 
@@ -145,7 +152,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteError("PuppeteerDownloader ClosePageAsync", exception);
+                Logger.WriteError("PuppeteerDownloader ClosePageAsync", exception.ToString());
             }
         }
 
@@ -162,7 +169,7 @@ namespace landerist_library.Downloaders.Puppeteer
             // redirect example: has to throw error
             //var Page = new Websites.Page("https://www.realestate.bnpparibas.es/es/soluciones-medida/soluciones-para-inversores");
 
-            //Logs.Log.WriteInfo("PuppeteerTest", "Starting test");
+            //Logger.WriteInfo("PuppeteerTest", "Starting test");
             //string? text = new PuppeteerDownloader(true).GetText(Page);
 
             //Pages.Page page1 = new("https://www.rualcasa.com/ficha/local-comercial/alicante/babel/1008/21300773/es/");
@@ -180,11 +187,11 @@ namespace landerist_library.Downloaders.Puppeteer
                 try
                 {
                     htmlDocument.LoadHtml(Content);
-                    return Tools.HtmlToText.GetText(htmlDocument);
+                    return landerist_library.Infrastructure.Html.HtmlToText.GetText(htmlDocument);
                 }
                 catch (Exception exception)
                 {
-                    Logs.Log.WriteError("PuppeteerDownloader GetText", exception);
+                    Logger.WriteError("PuppeteerDownloader GetText", exception.ToString());
                 }
             }
 
@@ -321,7 +328,7 @@ namespace landerist_library.Downloaders.Puppeteer
                 }
                 catch //(Exception exception)
                 {
-                    //Logs.Log.WriteInfo("PuppeteerDownloader ExpressionRemoveInvisibleElements", exception.Message);
+                    //Logger.WriteInfo("PuppeteerDownloader ExpressionRemoveInvisibleElements", exception.Message);
                 }
 
                 SetExecutionStep("Reading page content");
@@ -344,7 +351,7 @@ namespace landerist_library.Downloaders.Puppeteer
                     return content;
                 }
 
-                //Logs.Log.WriteInfo("PuppeteerDownloader NavigationException", message);
+                //Logger.WriteInfo("PuppeteerDownloader NavigationException", message);
             }
             catch (Exception exception)
             {
@@ -449,7 +456,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteInfo("PuppeterDownloader InitializePage", exception.Message);
+                Logger.WriteInfo("PuppeterDownloader InitializePage", exception.Message);
                 return;
             }
 
@@ -510,7 +517,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
             catch //(Exception exception)
             {
-                //Logs.Log.WriteLogErrors("PuppeteerDownloader HandleRequestAsync " + uri.ToString(), exception);
+                //Logger.WriteError("PuppeteerDownloader HandleRequestAsync " + uri.ToString(), exception);
             }
         }
 
@@ -552,7 +559,7 @@ namespace landerist_library.Downloaders.Puppeteer
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteError("PuppeteerDownloader HandleResponseAsync", exception);
+                Logger.WriteError("PuppeteerDownloader HandleResponseAsync", exception.ToString());
             }
         }
 

@@ -1,4 +1,4 @@
-namespace landerist_library.Downloaders.Puppeteer
+namespace landerist_library.Infrastructure.Downloaders.Puppeteer
 {
     internal static class PuppeteerPageScripts
     {
