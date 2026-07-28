@@ -1,0 +1,12 @@
+using landerist_library.Downloaders.Multiple;
+using landerist_library.Infrastructure.Scraping;
+using landerist_library.Pages;
+
+namespace landerist_library.Infrastructure.Downloaders;
+
+public sealed class LegacyDownloadersPoolAdapter(DownloadersPool pool) : IDownloaderPool
+{
+    public bool Download(Page page, bool useProxy) => pool.Download(page, useProxy);
+
+    public void Clear() => pool.Clear();
+}

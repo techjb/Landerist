@@ -5,9 +5,9 @@ public sealed class ChromeMaintenanceArchitectureTests
     [Fact]
     public void BrowserOrchestration_DoesNotUseGlobalProcessUtilities()
     {
-        string root = Path.Combine(
-            FindRepositoryRoot(),
-            "landerist_library");
+        string repositoryRoot = FindRepositoryRoot();
+        string libraryRoot = Path.Combine(repositoryRoot, "landerist_library");
+        string infrastructureRoot = Path.Combine(repositoryRoot, "landerist_infrastructure");
         string[] files =
         [
             "Infrastructure/Scraping/ScrapeBrowserManager.cs",
@@ -25,7 +25,9 @@ public sealed class ChromeMaintenanceArchitectureTests
             .Where(relative =>
             {
                 string source = File.ReadAllText(Path.Combine(
-                    root,
+                    relative.EndsWith("ScrapeBrowserManager.cs", StringComparison.Ordinal)
+                        ? infrastructureRoot
+                        : libraryRoot,
                     relative.Replace('/', Path.DirectorySeparatorChar)));
                 return forbiddenTokens.Any(token =>
                     source.Contains(token, StringComparison.Ordinal));

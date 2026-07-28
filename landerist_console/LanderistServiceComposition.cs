@@ -18,6 +18,7 @@ using landerist_library.Application.Websites;
 using landerist_library.Database;
 using landerist_library.Infrastructure.Backup;
 using landerist_library.Infrastructure.Distribution;
+using landerist_library.Infrastructure.Downloaders;
 using landerist_library.Infrastructure.Logging;
 using landerist_library.Infrastructure.Http;
 using landerist_library.Infrastructure.Indexing;
@@ -71,6 +72,7 @@ internal static class LanderistServiceComposition
             Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
             new PuppeteerDownloaderFactory(browserOptions));
         LegacyApplicationLogger logger = new();
+        LegacyDownloadersPoolAdapter downloaderPool = new(downloaders);
         ChromeMaintenanceService chrome = new(
             new ChromeMaintenanceOptions(
                 ProcessCleanupEnabled: Config.IsConfigurationProduction(),
@@ -182,7 +184,7 @@ internal static class LanderistServiceComposition
             new HtmlPageContentInspector());
         PageScrapePipelineServices pageScraping = new(
             new PageAcquisitionService(
-                new PooledPageDownloader(downloaders),
+                new PooledPageDownloader(downloaderPool),
                 new HttpConditionalPageHeaderService(httpClients),
                 new SqlScrapeMetrics(databaseFactory.Create()),
                 conditionalHeadersEnabled: !Config.IsConfigurationLocal()),
@@ -211,7 +213,7 @@ internal static class LanderistServiceComposition
                 enforceMinimumPages: Config.IsConfigurationProduction()));
         ScrapeBatchServices batchScraping = new(
             new SqlWebsiteThrottleService(databaseFactory.Create(), robotsPolicy),
-            new ScrapeBrowserManager(downloaders, chrome),
+            new ScrapeBrowserManager(downloaderPool, chrome, logger),
             new SqlPageLockManager(databaseFactory.Create(), Config.MACHINE_NAME),
             new SqlScrapeBatchMetrics(databaseFactory.Create()),
             new SqlScrapePageSource(databaseFactory.Create(), listingStore),

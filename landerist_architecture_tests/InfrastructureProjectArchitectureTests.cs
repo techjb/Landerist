@@ -398,6 +398,8 @@ public sealed class InfrastructureProjectArchitectureTests
             "HttpConditionalPageHeaderService.cs",
             "PageContentClassifier.cs",
             "PageIndexingService.cs",
+            "PooledPageDownloader.cs",
+            "ScrapeBrowserManager.cs",
             "SqlPageClassificationMetrics.cs",
             "SqlPageLockManager.cs",
             "SqlPageSchedulingService.cs",
@@ -428,6 +430,7 @@ public sealed class InfrastructureProjectArchitectureTests
         {
             string source = File.ReadAllText(file);
             Assert.DoesNotContain("landerist_library.Downloaders", source, StringComparison.Ordinal);
+            Assert.DoesNotContain("Logs.Log", source, StringComparison.Ordinal);
             Assert.DoesNotContain("landerist_library.Tools", source, StringComparison.Ordinal);
             Assert.DoesNotContain("landerist_library.Infrastructure.Parsing", source, StringComparison.Ordinal);
         }
