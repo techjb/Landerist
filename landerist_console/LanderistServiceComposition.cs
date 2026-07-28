@@ -326,7 +326,10 @@ internal static class LanderistServiceComposition
                     logger)),
             new HourlyTaskJob(
                 new WebsiteRefreshService(websiteCatalog, websitePersistence, websiteNetwork, websiteSitemaps),
-                new TaskBatchCleaner(batches)),
+                new TaskBatchCleaner(
+                    new SqlBatchStore(databaseFactory.Create()),
+                    new BatchCleanupOptions(Config.BATCH_DIRECTORY),
+                    new LegacyVertexAiBatchArtifactCleaner())),
             new DailyTaskJob(
                 databaseFactory.Create(),
                 notListingCache,

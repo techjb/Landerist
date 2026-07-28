@@ -607,6 +607,31 @@ public sealed class InfrastructureProjectArchitectureTests
         Assert.DoesNotContain("public bool Insert(", legacyRepository, StringComparison.Ordinal);
     }
     [Fact]
+    public void BatchCleaner_IsOwnedByInfrastructureProject()
+    {
+        string root = FindRepositoryRoot();
+        AssertMoved(root, "Tasks", "TaskBatchCleaner.cs");
+
+        string cleaner = File.ReadAllText(Path.Combine(
+            root,
+            "landerist_infrastructure",
+            "Infrastructure",
+            "Tasks",
+            "TaskBatchCleaner.cs"));
+        Assert.Contains("IBatchStore", cleaner, StringComparison.Ordinal);
+        Assert.Contains("IBatchArtifactCleaner", cleaner, StringComparison.Ordinal);
+        Assert.DoesNotContain("BatchRepository", cleaner, StringComparison.Ordinal);
+        Assert.DoesNotContain("Config.", cleaner, StringComparison.Ordinal);
+        Assert.DoesNotContain("VertexAIBatchCleaner", cleaner, StringComparison.Ordinal);
+
+        Assert.True(File.Exists(Path.Combine(
+            root,
+            "landerist_infrastructure",
+            "Infrastructure",
+            "Sql",
+            "SqlBatchStore.cs")));
+    }
+    [Fact]
     public void LegacyLibrary_ReferencesInfrastructureProject()
     {
         string project = File.ReadAllText(Path.Combine(
