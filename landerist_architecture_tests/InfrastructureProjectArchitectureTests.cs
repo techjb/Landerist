@@ -598,13 +598,17 @@ public sealed class InfrastructureProjectArchitectureTests
             "Infrastructure",
             "Sql",
             "LegacyBatchRegistrationStore.cs")));
-        string legacyRepository = File.ReadAllText(Path.Combine(
+        Assert.False(File.Exists(Path.Combine(
             root,
             "landerist_library",
             "Infrastructure",
             "Sql",
-            "BatchRepository.cs"));
-        Assert.DoesNotContain("public bool Insert(", legacyRepository, StringComparison.Ordinal);
+            "BatchRepository.cs")));
+        Assert.False(File.Exists(Path.Combine(
+            root,
+            "landerist_library",
+            "Database",
+            "Batch.cs")));
     }
     [Fact]
     public void BatchCleaner_IsOwnedByInfrastructureProject()

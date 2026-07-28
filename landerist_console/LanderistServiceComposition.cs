@@ -105,7 +105,6 @@ internal static class LanderistServiceComposition
         SqlNotListingCacheService notListingCache = new(
             databaseFactory.Create(),
             Config.NOT_LISTING_CACHE_ENABLED);
-        BatchRepository batches = new(databaseFactory.Create());
         PageQueryOptions pageQueryOptions = new(
             Config.IsConfigurationLocal() ? null : Config.MACHINE_NAME,
             Config.MAX_PAGES_PER_HOST_PER_SCRAPE);
