@@ -675,6 +675,8 @@ public sealed class InfrastructureProjectArchitectureTests
             "DailyTaskJob.cs",
             "HourlyTaskJob.cs",
             "LocalAiTaskJob.cs",
+            "LocalAiParsingTaskOptions.cs",
+            "TaskLocalAIParsing.cs",
             "ScrapeTaskJob.cs",
             "SystemRecurringTaskScheduler.cs",
             "TenMinuteTaskJob.cs"
@@ -698,6 +700,37 @@ public sealed class InfrastructureProjectArchitectureTests
             Assert.DoesNotContain("landerist_library.Database", source, StringComparison.Ordinal);
             Assert.DoesNotContain("Console.", source, StringComparison.Ordinal);
         }
+    }
+    [Fact]
+    public void LocalAiParsingTask_UsesMigrationPorts()
+    {
+        string source = File.ReadAllText(Path.Combine(
+            FindRepositoryRoot(),
+            "landerist_infrastructure",
+            "Infrastructure",
+            "Tasks",
+            "TaskLocalAIParsing.cs"));
+        string[] required =
+        [
+            "ILocalAiListingParser",
+            "ILocalAiTokenBudget",
+            "IListingInputPreparer",
+            "IApplicationLogger"
+        ];
+        Assert.All(required, token => Assert.Contains(token, source, StringComparison.Ordinal));
+
+        string[] forbidden =
+        [
+            "ParseListing",
+            "Tokenizer",
+            "LLMProvider",
+            "GetListingParserInput",
+            "Logs.Log",
+            "Log.Write"
+        ];
+        Assert.DoesNotContain(
+            forbidden,
+            token => source.Contains(token, StringComparison.Ordinal));
     }
     [Fact]
     public void LegacyLibrary_ReferencesInfrastructureProject()

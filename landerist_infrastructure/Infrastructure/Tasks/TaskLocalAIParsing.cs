@@ -1,13 +1,10 @@
-using landerist_library.Websites;
-using landerist_library.Infrastructure.Parsing;
 using landerist_library.Application.Pages;
+using landerist_library.Application.Parsing;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Scraping;
-using landerist_library.Logs;
+using landerist_library.Application.Logging;
 using landerist_library.Pages;
-using landerist_library.Parse.ListingParser;
 using landerist_library.Application.Statistics;
-using landerist_library.Application.Websites;
 using System.Collections.Concurrent;
 
 namespace landerist_library.Infrastructure.Tasks
@@ -19,11 +16,12 @@ namespace landerist_library.Infrastructure.Tasks
         private readonly int _maxBlockingCollectionSize;
         private readonly IParsedPageClassificationService _parsedClassification;
         private readonly GlobalStatistics _globalStatistics;
-        private readonly HostStatistics _hostStatistics;
         private readonly IPageWaitingStatusService _waitingStatus;
         private readonly IPageCatalog _pages;
         private readonly IPagePersistenceService _pagePersistence;
-        private readonly ParseListing _listingParser;
+        private readonly ILocalAiListingParser _listingParser;
+        private readonly IListingInputPreparer _listingInput;
+        private readonly IApplicationLogger _logger;
 
         private int TotalProcessed = 0;
         private int TotalErrors = 0;
@@ -36,50 +34,42 @@ namespace landerist_library.Infrastructure.Tasks
         public TaskLocalAIParsing(
             IParsedPageClassificationService parsedClassification,
             GlobalStatistics globalStatistics,
-            HostStatistics hostStatistics,
             IPageWaitingStatusService waitingStatus,
             IPageCatalog pages,
             IPagePersistenceService pagePersistence,
-            ParseListing listingParser,
+            ILocalAiListingParser listingParser,
+            IListingInputPreparer listingInput,
             LocalAiParsingTaskOptions options,
-            Tokenizer tokenizer)
+            ILocalAiTokenBudget tokenBudget,
+            IApplicationLogger logger)
         {
             ArgumentNullException.ThrowIfNull(parsedClassification);
             ArgumentNullException.ThrowIfNull(globalStatistics);
-            ArgumentNullException.ThrowIfNull(hostStatistics);
             ArgumentNullException.ThrowIfNull(waitingStatus);
             ArgumentNullException.ThrowIfNull(pages);
             ArgumentNullException.ThrowIfNull(pagePersistence);
             ArgumentNullException.ThrowIfNull(listingParser);
+            ArgumentNullException.ThrowIfNull(listingInput);
             ArgumentNullException.ThrowIfNull(options);
-            ArgumentNullException.ThrowIfNull(tokenizer);
+            ArgumentNullException.ThrowIfNull(tokenBudget);
+            ArgumentNullException.ThrowIfNull(logger);
             _parsedClassification = parsedClassification;
             _globalStatistics = globalStatistics;
-            _hostStatistics = hostStatistics;
             _waitingStatus = waitingStatus;
             _pages = pages;
             _pagePersistence = pagePersistence;
             _listingParser = listingParser;
+            _listingInput = listingInput;
+            _logger = logger;
             _options = options;
             _maxBlockingCollectionSize = options.MaxPagesPerTask * 10;
             if (options.UpdateWaitingStatusOnStart)
             {
                 _waitingStatus.Update(WaitingStatus.readed_by_localai, WaitingStatus.waiting_ai_request);
             }
-            _maxTokenCount = GetMaxTokenCount(options, tokenizer);
-            Log.Console("TaskLocalAIParsing", "Started");
+            _maxTokenCount = tokenBudget.Calculate(options);
+            _logger.WriteInfo(nameof(TaskLocalAIParsing), "Started");
         }
-
-        public static int GetMaxTokenCount(LocalAiParsingTaskOptions options, Tokenizer tokenizer)
-        {
-            ArgumentNullException.ThrowIfNull(options);
-            ArgumentNullException.ThrowIfNull(tokenizer);
-            return options.ModelMaxTokens - (tokenizer.CountSystemTokens() + options.CompletionTokens);
-        }
-        public static int GetMaxTokenCount() =>
-            GetMaxTokenCount(
-                new LocalAiParsingTaskOptions(),
-                new Tokenizer(TokenizerOptions.ForProvider(LLMProvider.LocalAI)));
 
         public void ProcessPages(CancellationToken cancellationToken = default)
         {
@@ -132,7 +122,7 @@ namespace landerist_library.Infrastructure.Tasks
                                 ? 0
                                 : Math.Round((double)totalNotListingByParser * 100 / totalProcessed, 2);
 
-                            Log.WriteLocalAI(
+                            _logger.WriteInfo(
                                 "ProcessPages",
                                 $"Processed: {totalProcessed} " +
                                 $"Errors: {totalErrors} ({totalErrorPercentage}%) " +
@@ -143,7 +133,7 @@ namespace landerist_library.Infrastructure.Tasks
             }
             catch (OperationCanceledException)
             {
-                Log.WriteLocalAI("ProcessPages", "Cancellation requested");
+                _logger.WriteInfo("ProcessPages", "Cancellation requested");
             }
         }
 
@@ -189,7 +179,7 @@ namespace landerist_library.Infrastructure.Tasks
                 }
                 catch (Exception exception)
                 {
-                    Log.WriteError("TaskLocalAIParsing InitializeBlockingCollection", exception);
+                    _logger.WriteError("TaskLocalAIParsing InitializeBlockingCollection", exception.ToString());
                 }
                 finally
                 {
@@ -245,7 +235,7 @@ namespace landerist_library.Infrastructure.Tasks
             var page = _pages.GetByHash(uriHash);
             if (page == null)
             {
-                Log.WriteError("TaskLocalAIParsing ProcessPage", "Page not found. UriHash: " + uriHash);
+                _logger.WriteError("TaskLocalAIParsing ProcessPage", "Page not found. UriHash: " + uriHash);
                 return;
             }
             ProcessPage(page);
@@ -259,22 +249,23 @@ namespace landerist_library.Infrastructure.Tasks
             try
             {
                 page.SetResponseBodyFromZipped();
-                var userInput = page.GetListingParserInput();
+                _listingInput.Prepare(page);
+                string? userInput = page.ListingParserInput;
                 if (string.IsNullOrEmpty(userInput))
                 {
-                    Log.WriteError("TaskLocalAIParsing ProcessPage", "Error getting user input. Page: " + page.UriHash);
+                    _logger.WriteError("TaskLocalAIParsing ProcessPage", "Error getting user input. Page: " + page.UriHash);
                     success = ReturnPageToScrape(page);
                 }
                 else
                 {
-                    var (pageType, listing, waitingAIRequest) = _listingParser.ParseLocalAI(page, userInput, _hostStatistics);
+                    var (pageType, listing, waitingAIRequest) = _listingParser.Parse(page, userInput);
                     newPageType = pageType;
                     success = _parsedClassification.Apply(page, pageType, listing);
                 }
             }
             catch (Exception exception)
             {
-                Log.WriteError("TaskLocalAIParsing ProcessPage", exception);
+                _logger.WriteError("TaskLocalAIParsing ProcessPage", exception.ToString());
             }
             finally
             {
@@ -287,7 +278,7 @@ namespace landerist_library.Infrastructure.Tasks
                 }
                 catch (Exception exception)
                 {
-                    Log.WriteError("TaskLocalAIParsing ProcessPage UpdateWaitingStatusAIRequest", exception);
+                    _logger.WriteError("TaskLocalAIParsing ProcessPage UpdateWaitingStatusAIRequest", exception.ToString());
                 }
 
                 page.Dispose();

@@ -303,16 +303,18 @@ internal static class LanderistServiceComposition
             new LocalAiTaskJob(() => new TaskLocalAIParsing(
                 parsedClassification,
                 globalStatistics,
-                hostStatistics,
                 waitingStatus,
                 pageCatalog,
                 pagePersistence,
-                listingParser,
+                new LegacyLocalAiListingParser(listingParser, hostStatistics),
+                new PageListingInputPreparer(),
                 new LocalAiParsingTaskOptions(
                     modelMaxTokens: Config.LOCAL_AI_MAX_MODEL_LEN,
                     runSequentially: Config.IsConfigurationLocal(),
                     updateWaitingStatusOnStart: Config.IsConfigurationProduction()),
-                new Tokenizer(TokenizerOptions.ForProvider(LLMProvider.LocalAI)))),
+                new LegacyLocalAiTokenBudget(
+                    new Tokenizer(TokenizerOptions.ForProvider(LLMProvider.LocalAI))),
+                logger)),
             new TenMinuteTaskJob(
                 new TaskBatchDownload(
                     parsedClassification,

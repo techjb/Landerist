@@ -3,16 +3,17 @@ namespace landerist_architecture_tests;
 public sealed class TokenizerArchitectureTests
 {
     [Theory]
-    [InlineData("Parse", "ListingParser", "Tokenizer.cs")]
-    [InlineData("Infrastructure", "Tasks", "TaskLocalAIParsing.cs")]
+    [InlineData("landerist_library", "Parse", "ListingParser", "Tokenizer.cs")]
+    [InlineData("landerist_infrastructure", "Infrastructure", "Tasks", "TaskLocalAIParsing.cs")]
     public void TokenizationAndLocalAiTask_DoNotReadOrMutateGlobalConfiguration(
+        string project,
         string firstDirectory,
         string secondDirectory,
         string fileName)
     {
         string source = File.ReadAllText(Path.Combine(
             FindRepositoryRoot(),
-            "landerist_library",
+            project,
             firstDirectory,
             secondDirectory,
             fileName));

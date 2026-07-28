@@ -50,7 +50,7 @@ public sealed class TokenizerTests
             completionTokens: 123,
             modelMaxTokens: systemTokens + 1000);
 
-        int budget = TaskLocalAIParsing.GetMaxTokenCount(options, tokenizer);
+        int budget = new LegacyLocalAiTokenBudget(tokenizer).Calculate(options);
 
         Assert.Equal(877, budget);
     }
