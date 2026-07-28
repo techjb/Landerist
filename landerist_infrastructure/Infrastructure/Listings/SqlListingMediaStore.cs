@@ -7,7 +7,7 @@ using System.Data;
 
 namespace landerist_library.Infrastructure.Listings
 {
-    internal sealed class SqlListingMediaStore
+    public sealed class SqlListingMediaStore
     {
         private readonly IListingMediaRepository Repository;
 

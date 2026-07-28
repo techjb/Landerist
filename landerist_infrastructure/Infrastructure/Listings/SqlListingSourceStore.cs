@@ -7,7 +7,7 @@ using System.Data;
 
 namespace landerist_library.Infrastructure.Listings
 {
-    internal sealed class SqlListingSourceStore
+    public sealed class SqlListingSourceStore
     {
         private readonly IListingSourceRepository Repository;
 

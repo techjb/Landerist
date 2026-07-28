@@ -245,6 +245,64 @@ public sealed class InfrastructureProjectArchitectureTests
         }
     }
     [Fact]
+    public void ListingPersistenceGroup_IsOwnedByInfrastructureProject()
+    {
+        string root = FindRepositoryRoot();
+        string[] repositories =
+        [
+            "ListingRepository.cs",
+            "ListingQueryRepository.cs",
+            "MediaRepository.cs",
+            "SourceRepository.cs"
+        ];
+        foreach (string file in repositories)
+        {
+            AssertMoved(root, "Sql", file);
+        }
+
+        string[] mappers =
+        [
+            "ListingDataMapper.cs",
+            "MediaDataMapper.cs",
+            "SourceDataMapper.cs"
+        ];
+        foreach (string file in mappers)
+        {
+            AssertMoved(root, Path.Combine("Sql", "Mapping"), file);
+        }
+
+        string[] adapters =
+        [
+            "LegacyListingUnpublishPolicy.cs",
+            "OrelsListingDeletionService.cs",
+            "SqlListingMaintenanceService.cs",
+            "SqlListingMediaStore.cs",
+            "SqlListingQueryService.cs",
+            "SqlListingSourceStore.cs",
+            "SqlNotListingCacheService.cs"
+        ];
+        foreach (string file in adapters)
+        {
+            AssertMoved(root, "Listings", file);
+        }
+    }
+
+    private static void AssertMoved(string root, string area, string file)
+    {
+        Assert.True(File.Exists(Path.Combine(
+            root,
+            "landerist_infrastructure",
+            "Infrastructure",
+            area,
+            file)));
+        Assert.False(File.Exists(Path.Combine(
+            root,
+            "landerist_library",
+            "Infrastructure",
+            area,
+            file)));
+    }
+    [Fact]
     public void LegacyLibrary_ReferencesInfrastructureProject()
     {
         string project = File.ReadAllText(Path.Combine(
