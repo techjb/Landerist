@@ -83,6 +83,7 @@ internal static class LanderistScrapingServiceCollectionExtensions
         services.AddSingleton(new PooledPageDownloader(downloaderPool));
         services.AddSingleton(new HttpConditionalPageHeaderService(httpClients));
         services.AddSingleton(new ScrapeBrowserManager(downloaderPool, chrome, logger));
+        services.AddSingleton<LanderistScrapingPipelineFactory>();
 
         return services;
     }

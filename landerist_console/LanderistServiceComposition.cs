@@ -141,58 +141,21 @@ internal static class LanderistServiceComposition
             new LegacyListingUnpublishPolicy(listingQueries),
             logger,
             new HtmlPageContentInspector());
-        PageScrapePipelineServices pageScraping = new(
-            new PageAcquisitionService(
-                services.GetRequiredService<PooledPageDownloader>(),
-                services.GetRequiredService<HttpConditionalPageHeaderService>(),
-                databaseAdapters.CreateScrapeMetrics(),
-                conditionalHeadersEnabled: !Config.IsConfigurationLocal()),
-            new PageContentClassifier(
-                Config.IsConfigurationProduction(),
+        LanderistScrapingPipeline scrapingPipeline = services
+            .GetRequiredService<LanderistScrapingPipelineFactory>()
+            .Create(
+                pagePersistence,
+                listingLifecycle,
                 notListingCache,
-                databaseAdapters.CreatePageClassificationMetrics(),
-                new LegacyListingPageParser(hostStatistics, listingParser),
-                new LegacyPageTokenLimitPolicy(new Tokenizer(TokenizerOptions.ForProvider(Config.LLM_PROVIDER))),
-                new HtmlPageContentInspector(),
-                new PageListingInputPreparer()),
-            new PageIndexingService(
-                Config.INDEXER_ENABLED,
+                hostStatistics,
+                listingParser,
                 pageLinks,
-                new HtmlPageLinkExtractor()),
-            new SqlPageSchedulingService(listingStore),
-            Config.INDEXER_ENABLED);
-        PageBatchSelector pageBatchSelector = new(
-            databaseAdapters.CreatePageSelectionRepository(
-                Config.MACHINE_NAME,
-                pageQueryOptions),
-            new PageSelectionOptions(
-                Config.MAX_PAGES_PER_SCRAPE,
-                Config.MAX_PAGES_PER_HOST_PER_SCRAPE,
-                Config.MIN_PAGES_PER_SCRAPE,
-                enforceMinimumPages: Config.IsConfigurationProduction()));
-        ScrapeBatchServices batchScraping = new(
-            databaseAdapters.CreateWebsiteThrottle(robotsPolicy),
-            services.GetRequiredService<ScrapeBrowserManager>(),
-            databaseAdapters.CreatePageLockManager(Config.MACHINE_NAME),
-            databaseAdapters.CreateScrapeBatchMetrics(),
-            databaseAdapters.CreateScrapePageSource(listingStore),
-            robotsPolicy,
-            new ScraperExecutionOptions(
-                Config.IsConfigurationProduction(),
-                Config.IsConfigurationLocal(),
-                Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER));
-        ParsedPageClassificationService parsedClassification = new(
-            pagePersistence,
-            listingLifecycle);
-
-        Scraper scraper = new(
-            pagePersistence,
-            logger,
-            listingLifecycle,
-            pageScraping,
-            pageBatchSelector,
-            batchScraping,
-            new ConsoleScrapeProgressReporter());
+                listingStore,
+                pageQueryOptions);
+        Scraper scraper = scrapingPipeline.Scraper;
+        ScrapeBatchServices batchScraping = scrapingPipeline.BatchServices;
+        ParsedPageClassificationService parsedClassification =
+            scrapingPipeline.ParsedClassification;
         TasksExecutionMode executionMode = runtimeOptions.Role switch
         {
             LanderistExecutionRole.LocalAi => TasksExecutionMode.LocalAi,
