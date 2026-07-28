@@ -26,7 +26,7 @@ public sealed class InfrastructureProjectArchitectureTests
             .ToArray();
 
         Assert.Equal(
-            ["Com.Bekijkhet.RobotsTxt", "Louw.SitemapParser", "Microsoft.Data.SqlClient", "PuppeteerSharp"],
+            ["Com.Bekijkhet.RobotsTxt", "HtmlAgilityPack", "Louw.SitemapParser", "Microsoft.Data.SqlClient", "PuppeteerSharp"],
             packages);
         Assert.Equal(
             [
@@ -496,6 +496,38 @@ public sealed class InfrastructureProjectArchitectureTests
         Assert.Contains("PageLinks.Index(page, newUri)", administration, StringComparison.Ordinal);
         Assert.DoesNotContain("new Indexer", administration, StringComparison.Ordinal);
         Assert.DoesNotContain("Infrastructure.Indexing", administration, StringComparison.Ordinal);
+    }
+    [Fact]
+    public void HtmlNavigationAdapters_AreOwnedByInfrastructureProject()
+    {
+        string root = FindRepositoryRoot();
+        string target = Path.Combine(
+            root,
+            "landerist_infrastructure",
+            "Infrastructure",
+            "Parsing");
+        Assert.True(File.Exists(Path.Combine(target, "HtmlPageLinkExtractor.cs")));
+        string htmlTarget = Path.Combine(root, "landerist_infrastructure", "Html");
+        Assert.True(File.Exists(Path.Combine(htmlTarget, "PageHtmlDocumentExtensions.cs")));
+        Assert.True(File.Exists(Path.Combine(htmlTarget, "PageHtmlSignalExtensions.cs")));
+        Assert.False(File.Exists(Path.Combine(
+            root,
+            "landerist_library",
+            "Infrastructure",
+            "Parsing",
+            "HtmlPageLinkExtractor.cs")));
+        Assert.False(File.Exists(Path.Combine(
+            root,
+            "landerist_library",
+            "Parse",
+            "Pages",
+            "PageHtmlDocumentExtensions.cs")));
+        Assert.False(File.Exists(Path.Combine(
+            root,
+            "landerist_library",
+            "Parse",
+            "Pages",
+            "PageHtmlSignalExtensions.cs")));
     }
     [Fact]
     public void LegacyLibrary_ReferencesInfrastructureProject()
