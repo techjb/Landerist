@@ -477,6 +477,27 @@ public sealed class InfrastructureProjectArchitectureTests
         Assert.DoesNotContain("Logs.Log", indexer, StringComparison.Ordinal);
     }
     [Fact]
+    public void LegacyHtmlIndexers_DoNotExist()
+    {
+        string root = FindRepositoryRoot();
+        string legacyDirectory = Path.Combine(
+            root,
+            "landerist_library",
+            "Infrastructure",
+            "Indexing");
+        Assert.False(Directory.Exists(legacyDirectory));
+
+        string administration = File.ReadAllText(Path.Combine(
+            root,
+            "landerist_library",
+            "Infrastructure",
+            "Administration",
+            "PageAdministrationService.Delete.cs"));
+        Assert.Contains("PageLinks.Index(page, newUri)", administration, StringComparison.Ordinal);
+        Assert.DoesNotContain("new Indexer", administration, StringComparison.Ordinal);
+        Assert.DoesNotContain("Infrastructure.Indexing", administration, StringComparison.Ordinal);
+    }
+    [Fact]
     public void LegacyLibrary_ReferencesInfrastructureProject()
     {
         string project = File.ReadAllText(Path.Combine(

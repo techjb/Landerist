@@ -1,6 +1,5 @@
 using landerist_library.Pages;
 using landerist_library.Configuration;
-using landerist_library.Infrastructure.Indexing;
 using landerist_library.Websites;
 using landerist_orels.ES;
 using System.Collections.Concurrent;
@@ -29,7 +28,7 @@ public sealed partial class PageAdministrationService
             if (newUri != uri)
             {
                 Page page = LoadOrCreate(uri);
-                new Indexer(page, RobotsPolicy).Insert(page.Uri);
+                PageLinks.Index(page, newUri);
                 pages.Add(page);
             }
 

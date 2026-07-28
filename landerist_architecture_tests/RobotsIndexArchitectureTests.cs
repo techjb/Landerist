@@ -6,7 +6,7 @@ public sealed class RobotsIndexArchitectureTests
     public void Index_DoesNotCallWebsiteRobotsMethods()
     {
         string root = FindRepositoryRoot();
-        string indexRoot = Path.Combine(root, "landerist_library", "Infrastructure", "Indexing");
+        string indexRoot = Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Indexing");
         string[] violations = Directory
             .EnumerateFiles(indexRoot, "*.cs", SearchOption.AllDirectories)
             .Where(file =>
