@@ -12,7 +12,7 @@ using System.Collections.Concurrent;
 
 namespace landerist_library.Infrastructure.Tasks
 {
-    public class TaskLocalAIParsing
+    public class TaskLocalAIParsing : ILocalAiParsingTask
     {
         private readonly LocalAiParsingTaskOptions _options;
         private readonly int _maxTokenCount;

@@ -667,6 +667,39 @@ public sealed class InfrastructureProjectArchitectureTests
         Assert.Contains("IApplicationLogger", task, StringComparison.Ordinal);
     }
     [Fact]
+    public void DecoupledTaskJobs_AreOwnedByInfrastructureProject()
+    {
+        string root = FindRepositoryRoot();
+        string[] files =
+        [
+            "DailyTaskJob.cs",
+            "HourlyTaskJob.cs",
+            "LocalAiTaskJob.cs",
+            "ScrapeTaskJob.cs",
+            "SystemRecurringTaskScheduler.cs",
+            "TenMinuteTaskJob.cs"
+        ];
+
+        foreach (string file in files)
+        {
+            AssertMoved(root, "Tasks", file);
+        }
+
+        string directory = Path.Combine(
+            root,
+            "landerist_infrastructure",
+            "Infrastructure",
+            "Tasks");
+        foreach (string file in files)
+        {
+            string source = File.ReadAllText(Path.Combine(directory, file));
+            Assert.DoesNotContain("Config.", source, StringComparison.Ordinal);
+            Assert.DoesNotContain("Logs.Log", source, StringComparison.Ordinal);
+            Assert.DoesNotContain("landerist_library.Database", source, StringComparison.Ordinal);
+            Assert.DoesNotContain("Console.", source, StringComparison.Ordinal);
+        }
+    }
+    [Fact]
     public void LegacyLibrary_ReferencesInfrastructureProject()
     {
         string project = File.ReadAllText(Path.Combine(

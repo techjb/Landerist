@@ -344,7 +344,7 @@ internal static class LanderistServiceComposition
                     new BatchCleanupOptions(Config.BATCH_DIRECTORY),
                     new LegacyVertexAiBatchArtifactCleaner())),
             new DailyTaskJob(
-                databaseFactory.Create(),
+                new LegacyAddressDataMaintenance(databaseFactory.Create()),
                 notListingCache,
                 new SqlDatabaseBackupService(databaseFactory.Create()),
                 globalStatistics,
@@ -362,7 +362,8 @@ internal static class LanderistServiceComposition
                         new ListingStatisticsRepository(databaseFactory.Create()),
                         new MediaRepository(databaseFactory.Create()),
                         new SourceRepository(databaseFactory.Create()),
-                        logger))),
+                        logger)),
+                logger),
             TimeProvider.System);
     }
 }
