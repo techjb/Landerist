@@ -169,7 +169,10 @@ namespace landerist_tests
                     new LegacyListingPageParser(hostStatistics, listingParser),
                     new LegacyPageTokenLimitPolicy(new Tokenizer(TokenizerOptions.ForProvider(Config.LLM_PROVIDER))),
                 new HtmlPageContentInspector()),
-                new PageIndexingService(Config.INDEXER_ENABLED, pageLinks),
+                new PageIndexingService(
+                Config.INDEXER_ENABLED,
+                pageLinks,
+                new HtmlPageLinkExtractor()),
                 new SqlPageSchedulingService(listingStore),
                 Config.INDEXER_ENABLED);
             PageBatchSelector pageBatchSelector = new(
@@ -240,7 +243,7 @@ namespace landerist_tests
                 if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0 &&
                     keyInfo.Key == ConsoleKey.D)
                 {
-                    Console.WriteLine("Ãƒâ€šÃ‚Â¡Ctrl + D detectado!");
+                    Console.WriteLine("ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡Ctrl + D detectado!");
                     ExitSignal.Set();
                 }
             };

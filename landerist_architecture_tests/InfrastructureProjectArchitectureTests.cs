@@ -397,6 +397,7 @@ public sealed class InfrastructureProjectArchitectureTests
             "ConditionalPageHeaderChecker.cs",
             "HttpConditionalPageHeaderService.cs",
             "PageContentClassifier.cs",
+            "PageIndexingService.cs",
             "SqlPageClassificationMetrics.cs",
             "SqlPageLockManager.cs",
             "SqlPageSchedulingService.cs",
@@ -430,6 +431,21 @@ public sealed class InfrastructureProjectArchitectureTests
             Assert.DoesNotContain("landerist_library.Tools", source, StringComparison.Ordinal);
             Assert.DoesNotContain("landerist_library.Infrastructure.Parsing", source, StringComparison.Ordinal);
         }
+    }
+    [Fact]
+    public void PageIndexingService_DelegatesHtmlExtraction()
+    {
+        string source = File.ReadAllText(Path.Combine(
+            FindRepositoryRoot(),
+            "landerist_infrastructure",
+            "Infrastructure",
+            "Scraping",
+            "PageIndexingService.cs"));
+
+        Assert.Contains("IPageLinkExtractor", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("HtmlAgilityPack", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("GetHtmlDocument", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("Infrastructure.Indexing", source, StringComparison.Ordinal);
     }
     [Fact]
     public void LegacyLibrary_ReferencesInfrastructureProject()

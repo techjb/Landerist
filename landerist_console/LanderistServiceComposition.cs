@@ -193,7 +193,10 @@ internal static class LanderistServiceComposition
                 new LegacyListingPageParser(hostStatistics, listingParser),
                 new LegacyPageTokenLimitPolicy(new Tokenizer(TokenizerOptions.ForProvider(Config.LLM_PROVIDER))),
                 new HtmlPageContentInspector()),
-            new PageIndexingService(Config.INDEXER_ENABLED, pageLinks),
+            new PageIndexingService(
+                Config.INDEXER_ENABLED,
+                pageLinks,
+                new HtmlPageLinkExtractor()),
             new SqlPageSchedulingService(listingStore),
             Config.INDEXER_ENABLED);
         PageBatchSelector pageBatchSelector = new(
