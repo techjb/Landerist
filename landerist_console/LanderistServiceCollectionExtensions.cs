@@ -17,6 +17,7 @@ internal static class LanderistServiceCollectionExtensions
 
         services.AddSingleton(runtimeOptions);
         services.AddLanderistPersistence(runtimeOptions);
+        services.AddLanderistScraping(runtimeOptions);
         services.AddSingleton<TasksService>(serviceProvider =>
             LanderistServiceComposition.CreateTasksService(
                 serviceProvider.GetRequiredService<LanderistRuntimeOptions>(),

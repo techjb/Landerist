@@ -46,47 +46,13 @@ internal static class LanderistServiceComposition
         runtimeOptions.Validate();
         LanderistDatabaseAdapterFactory databaseAdapters =
             services.GetRequiredService<LanderistDatabaseAdapterFactory>();
-        LanderistSettings settings = LanderistSettings.Current;
-        HttpClientTransportFactory httpClients = new(
-            new HttpTransportOptions(
-                runtimeOptions.Proxy.Host,
-                runtimeOptions.Proxy.Port,
-                runtimeOptions.Proxy.RandomizeStickyPorts,
-                runtimeOptions.Proxy.StickyPortMin,
-                runtimeOptions.Proxy.StickyPortMax,
-                runtimeOptions.Proxy.Username,
-                runtimeOptions.Proxy.Password));
-        PuppeteerBrowserOptions browserOptions = new(
-            runtimeOptions.Browser.Headless,
-            runtimeOptions.Browser.IsLocal,
-            runtimeOptions.Browser.TimeoutMilliseconds,
-            runtimeOptions.Proxy.Host,
-            runtimeOptions.Proxy.Port,
-            runtimeOptions.Proxy.RandomizeStickyPorts,
-            runtimeOptions.Proxy.StickyPortMin,
-            runtimeOptions.Proxy.StickyPortMax,
-            runtimeOptions.Proxy.Username,
-            runtimeOptions.Proxy.Password);
-        DownloadersPool downloaders = new(
-            Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
-            new PuppeteerDownloaderFactory(browserOptions));
-        LegacyApplicationLogger logger = new();
-        LegacyDownloadersPoolAdapter downloaderPool = new(downloaders);
-        ChromeMaintenanceService chrome = new(
-            new ChromeMaintenanceOptions(
-                runtimeOptions.Browser.ProcessCleanupEnabled,
-                runtimeOptions.Browser.UseTaskKillFallback),
-            new SystemChromeProcessController(logger),
-            new PuppeteerChromeBrowserInstaller());
-        GoolzoomApi goolzoom = new(
-            httpClients,
-            new GoolzoomOptions(
-                settings.GetString("GOOLZOOM_API"),
-                TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT),
-                MaxRetryAttempts: 3));
-        WebsiteNetworkService websiteNetwork = new(
-            httpClients,
-            TimeProvider.System);
+        HttpClientTransportFactory httpClients =
+            services.GetRequiredService<HttpClientTransportFactory>();
+        LegacyApplicationLogger logger =
+            services.GetRequiredService<LegacyApplicationLogger>();
+        GoolzoomApi goolzoom = services.GetRequiredService<GoolzoomApi>();
+        WebsiteNetworkService websiteNetwork =
+            services.GetRequiredService<WebsiteNetworkService>();
         PagePersistenceService pagePersistence = new(services.GetRequiredService<PageRepository>(), logger);
         WebsitePersistenceService websitePersistence = new(services.GetRequiredService<WebsiteRepository>());
         SqlListingStore listingStore = databaseAdapters.CreateListingStore(
@@ -125,8 +91,10 @@ internal static class LanderistServiceComposition
             services.GetRequiredService<WebsitePageMetricsRepository>(),
             services.GetRequiredService<ListingStatisticsRepository>(),
             Config.MAX_PAGES_PER_WEBSITE);
-        WebsiteRobotsPolicy robotsPolicy = new();
-        WebsiteAccessServices websiteAccess = new(robotsPolicy, httpClients);
+        WebsiteRobotsPolicy robotsPolicy =
+            services.GetRequiredService<WebsiteRobotsPolicy>();
+        WebsiteAccessServices websiteAccess =
+            services.GetRequiredService<WebsiteAccessServices>();
         ListingParsingServices parsingServices = new(
             ListingMaterializationRules.Default,
             websiteAccess,
@@ -175,8 +143,8 @@ internal static class LanderistServiceComposition
             new HtmlPageContentInspector());
         PageScrapePipelineServices pageScraping = new(
             new PageAcquisitionService(
-                new PooledPageDownloader(downloaderPool),
-                new HttpConditionalPageHeaderService(httpClients),
+                services.GetRequiredService<PooledPageDownloader>(),
+                services.GetRequiredService<HttpConditionalPageHeaderService>(),
                 databaseAdapters.CreateScrapeMetrics(),
                 conditionalHeadersEnabled: !Config.IsConfigurationLocal()),
             new PageContentClassifier(
@@ -204,7 +172,7 @@ internal static class LanderistServiceComposition
                 enforceMinimumPages: Config.IsConfigurationProduction()));
         ScrapeBatchServices batchScraping = new(
             databaseAdapters.CreateWebsiteThrottle(robotsPolicy),
-            new ScrapeBrowserManager(downloaderPool, chrome, logger),
+            services.GetRequiredService<ScrapeBrowserManager>(),
             databaseAdapters.CreatePageLockManager(Config.MACHINE_NAME),
             databaseAdapters.CreateScrapeBatchMetrics(),
             databaseAdapters.CreateScrapePageSource(listingStore),

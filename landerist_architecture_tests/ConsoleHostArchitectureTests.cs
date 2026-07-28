@@ -56,6 +56,22 @@ public sealed class ConsoleHostArchitectureTests
         Assert.Contains("IDatabaseFactory databaseFactory", adapterFactory);
         Assert.Contains("databaseFactory.Create()", adapterFactory);
     }
+    [Fact]
+    public void ScrapingRegistration_OwnsSharedBrowserInfrastructure()
+    {
+        string registrations = ReadConsoleSource(
+            "LanderistScrapingServiceCollectionExtensions.cs");
+        string composition = ReadConsoleSource("LanderistServiceComposition.cs");
+
+        Assert.Contains("HttpClientTransportFactory httpClients = new(", registrations);
+        Assert.Contains("PuppeteerBrowserOptions browserOptions = new(", registrations);
+        Assert.Contains("ChromeMaintenanceService chrome = new(", registrations);
+        Assert.Contains("services.AddSingleton<IWebsiteRobotsPolicy>", registrations);
+        Assert.DoesNotContain("new HttpClientTransportFactory(", composition);
+        Assert.DoesNotContain("new PuppeteerBrowserOptions(", composition);
+        Assert.DoesNotContain("new ChromeMaintenanceService(", composition);
+        Assert.DoesNotContain("WebsiteRobotsPolicy robotsPolicy = new", composition);
+    }
     private static string ReadConsoleSource(string fileName) =>
         File.ReadAllText(GetConsolePath(fileName));
 
