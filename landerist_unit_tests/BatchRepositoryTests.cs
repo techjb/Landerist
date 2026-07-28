@@ -1,4 +1,5 @@
 using landerist_library.Infrastructure.Sql;
+using landerist_library.Infrastructure.Parsing;
 using landerist_library.Parse.ListingParser;
 using System.Data;
 
@@ -7,16 +8,16 @@ namespace landerist_unit_tests;
 public sealed class BatchRepositoryTests
 {
     [Fact]
-    public void Insert_DelegatesProviderIdAndPageHashes()
+    public void Register_DelegatesProviderIdAndPageHashes()
     {
         RecordingDatabase database = new() { QueryResult = true };
-        BatchRepository repository = new(database);
+        SqlBatchRegistrationStore repository = new(database);
         HashSet<string> pageHashes = ["page-hash"];
 
-        bool result = repository.Insert(
+        bool result = repository.Register(
             "batch-id",
             pageHashes,
-            LLMProvider.VertexAI);
+            BatchProvider.VertexAI);
 
         Assert.True(result);
         Assert.Equal("VertexAI", database.LastParameters!["LLMProvider"]);

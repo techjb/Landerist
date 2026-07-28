@@ -584,6 +584,27 @@ public sealed class InfrastructureProjectArchitectureTests
         Assert.DoesNotContain("LLMProvider", task, StringComparison.Ordinal);
         Assert.DoesNotContain("Logs.Log", task, StringComparison.Ordinal);
         Assert.DoesNotContain("Log.Write", task, StringComparison.Ordinal);
+
+        string registrationStore = Path.Combine(
+            root,
+            "landerist_infrastructure",
+            "Infrastructure",
+            "Sql",
+            "SqlBatchRegistrationStore.cs");
+        Assert.True(File.Exists(registrationStore));
+        Assert.False(File.Exists(Path.Combine(
+            root,
+            "landerist_library",
+            "Infrastructure",
+            "Sql",
+            "LegacyBatchRegistrationStore.cs")));
+        string legacyRepository = File.ReadAllText(Path.Combine(
+            root,
+            "landerist_library",
+            "Infrastructure",
+            "Sql",
+            "BatchRepository.cs"));
+        Assert.DoesNotContain("public bool Insert(", legacyRepository, StringComparison.Ordinal);
     }
     [Fact]
     public void LegacyLibrary_ReferencesInfrastructureProject()

@@ -16,23 +16,6 @@ namespace landerist_library.Infrastructure.Sql
 
         private IDatabase Database => _database;
 
-        public bool Insert(
-            string id,
-            HashSet<string> pagesUriHashes,
-            LLMProvider llmProvider)
-        {
-            string query =
-                "INSERT INTO " + BatchesTable + " " +
-                "VALUES (GETDATE(), @LLMProvider, @Id, @PagesUriHashes, 0)";
-
-            return Database.Query(query, new Dictionary<string, object?>
-            {
-                { "LLMProvider", llmProvider.ToString() },
-                { "Id", id },
-                { "PagesUriHashes", string.Join(",", pagesUriHashes) }
-            });
-        }
-
         public bool Delete(string id)
         {
             string query =

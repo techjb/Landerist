@@ -33,6 +33,8 @@ public sealed class BatchUploadArchitectureTests
             "IListingBatchUploadProvider",
             source,
             StringComparison.Ordinal);
+        Assert.Contains("IBatchRegistrationStore", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("BatchRepository", source, StringComparison.Ordinal);
     }
 
     [Fact]

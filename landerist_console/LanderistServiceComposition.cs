@@ -317,7 +317,7 @@ internal static class LanderistServiceComposition
             new TenMinuteTaskJob(
                 new TaskBatchDownload(parsedClassification, batches, globalStatistics, pageCatalog, pagePersistence, new OpenAIBatchDownload(), new VertexAIBatchDownload(), listingParser),
                 new TaskBatchUpload(
-                    new LegacyBatchRegistrationStore(batches),
+                    new SqlBatchRegistrationStore(databaseFactory.Create()),
                     waitingStatus,
                     pagePersistence,
                     batchUploadOptions,
