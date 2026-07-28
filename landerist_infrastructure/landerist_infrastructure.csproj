@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Com.Bekijkhet.RobotsTxt" Version="1.0.0" />
+    <PackageReference Include="Louw.SitemapParser" Version="0.0.2" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.0" />
     <PackageReference Include="PuppeteerSharp" Version="24.40.0" />
   </ItemGroup>

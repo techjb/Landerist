@@ -6,16 +6,33 @@ using Louw.SitemapParser;
 
 namespace landerist_library.Infrastructure.Indexing
 {
-    public class SitemapIndexer : Indexer
+    public sealed class SitemapIndexer
     {
         private static readonly ISitemapParser SitemapParser = new SitemapParser();
         private readonly ISitemapFetcher WebsiteSitemapFetcher;
         private readonly HashSet<string> SitemapsIndexes = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Page Page;
+        private readonly IWebsiteRobotsPolicy RobotsPolicy;
+        private readonly Func<Page, bool>? InsertPage;
+        private readonly Func<Website, bool> AchievedMaxNumberOfPages;
+        private readonly HashSet<Uri> Processed = [];
 
         private sealed record LoadedSitemap(Sitemap Sitemap, IReadOnlyList<Uri> AlternateUrls);
 
-        public SitemapIndexer(Website website, IWebsiteRobotsPolicy robots, IHttpClientTransportFactory httpClients, Func<Page, bool>? insertPage = null, Func<Website, bool>? achievedMaxNumberOfPages = null) : base(website, robots, insertPage, achievedMaxNumberOfPages)
+        public SitemapIndexer(
+            Website website,
+            IWebsiteRobotsPolicy robots,
+            IHttpClientTransportFactory httpClients,
+            Func<Page, bool>? insertPage = null,
+            Func<Website, bool>? achievedMaxNumberOfPages = null)
         {
+            ArgumentNullException.ThrowIfNull(website);
+            ArgumentNullException.ThrowIfNull(robots);
+            ArgumentNullException.ThrowIfNull(httpClients);
+            Page = new Page(website);
+            RobotsPolicy = robots;
+            InsertPage = insertPage;
+            AchievedMaxNumberOfPages = achievedMaxNumberOfPages ?? (_ => false);
             WebsiteSitemapFetcher = new GzipAwareSitemapFetcher(website, httpClients);
         }
 
@@ -216,5 +233,26 @@ namespace landerist_library.Infrastructure.Indexing
 
             return !LanguageValidator.ContainsNotAllowed(sitemap.SitemapLocation, Page.Website.LanguageCode);
         }
-    }
+
+        private bool InsertUri(Uri uri)
+        {
+            Website website = Page.Website;
+            uri = WebsiteUrlRules.Normalize(uri);
+            if (AchievedMaxNumberOfPages(website) ||
+                website.IsDiscardedByIndexUrlRegex(uri) ||
+                Processed.Contains(uri) ||
+                ProhibitedUrls.IsProhibited(uri, website.LanguageCode) ||
+                !WebsiteUrlRules.IsWebPage(uri) ||
+                !uri.Host.Equals(Page.Host, StringComparison.OrdinalIgnoreCase) ||
+                uri.Equals(Page.Uri) ||
+                !RobotsPolicy.IsAllowed(website, uri) ||
+                website.MainUri.Equals(uri))
+            {
+                return false;
+            }
+
+            bool inserted = InsertPage?.Invoke(new Page(website, uri)) ?? false;
+            Processed.Add(uri);
+            return inserted;
+        }    }
 }

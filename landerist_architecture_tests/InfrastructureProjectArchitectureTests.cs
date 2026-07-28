@@ -26,7 +26,7 @@ public sealed class InfrastructureProjectArchitectureTests
             .ToArray();
 
         Assert.Equal(
-            ["Com.Bekijkhet.RobotsTxt", "Microsoft.Data.SqlClient", "PuppeteerSharp"],
+            ["Com.Bekijkhet.RobotsTxt", "Louw.SitemapParser", "Microsoft.Data.SqlClient", "PuppeteerSharp"],
             packages);
         Assert.Equal(
             [
@@ -449,6 +449,32 @@ public sealed class InfrastructureProjectArchitectureTests
         Assert.DoesNotContain("HtmlAgilityPack", source, StringComparison.Ordinal);
         Assert.DoesNotContain("GetHtmlDocument", source, StringComparison.Ordinal);
         Assert.DoesNotContain("Infrastructure.Indexing", source, StringComparison.Ordinal);
+    }
+    [Fact]
+    public void SitemapInfrastructure_IsOwnedByInfrastructureProject()
+    {
+        string root = FindRepositoryRoot();
+        string[] files =
+        [
+            "GzipAwareSitemapFetcher.cs",
+            "LegacyWebsiteSitemapIndexerFactory.cs",
+            "SitemapIndexer.cs"
+        ];
+
+        foreach (string file in files)
+        {
+            AssertMoved(root, "Indexing", file);
+        }
+
+        string indexer = File.ReadAllText(Path.Combine(
+            root,
+            "landerist_infrastructure",
+            "Infrastructure",
+            "Indexing",
+            "SitemapIndexer.cs"));
+        Assert.DoesNotContain(": Indexer", indexer, StringComparison.Ordinal);
+        Assert.DoesNotContain("Config.", indexer, StringComparison.Ordinal);
+        Assert.DoesNotContain("Logs.Log", indexer, StringComparison.Ordinal);
     }
     [Fact]
     public void LegacyLibrary_ReferencesInfrastructureProject()
