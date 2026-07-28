@@ -17,6 +17,7 @@ using landerist_library.Application.Scraping;
 using landerist_library.Application.Tasks;
 using landerist_library.Application.Websites;
 using landerist_library.Infrastructure.Administration;
+using landerist_library.Infrastructure.Ai;
 using landerist_library.Infrastructure.Backup;
 using landerist_library.Infrastructure.Distribution;
 using landerist_library.Infrastructure.Downloaders;
@@ -141,6 +142,7 @@ internal static class LanderistServiceComposition
             databaseAdapters.CreateListingEnricher(
                 goolzoom,
                 LanderistSettings.Current.GetString("GOOGLE_CLOUD_LANDERIST_API_KEY"),
+                CreateVertexAddressSelectorOptions(),
                 logger),
             new LegacyListingUnpublishPolicy(listingQueries),
             logger,
@@ -298,4 +300,12 @@ internal static class LanderistServiceComposition
                 logger),
             TimeProvider.System);
     }
+    private static VertexAddressSelectorOptions CreateVertexAddressSelectorOptions() =>
+        new(
+            LanderistSettings.Current.GetString("GOOGLE_CLOUD_VERTEX_AI_CREDENTIAL"),
+            LanderistSettings.Current.GetString("GOOGLE_CLOUD_VERTEX_AI_PROJECTID"),
+            LanderistSettings.Current.GetString("GOOGLE_CLOUD_VERTEX_AI_LOCATION"),
+            LanderistSettings.Current.GetString("GOOGLE_CLOUD_VERTEX_AI_PUBLISHER"),
+            Config.VERTEX_AI_MODEL_NAME_GEMINI_FLASH);
+
 }

@@ -1,6 +1,7 @@
 using landerist_library.Parse.ListingParser.StructuredOutputs;
 using landerist_library.Parse.ListingParser;
 using landerist_library.Infrastructure.Browser;
+using landerist_library.Infrastructure.Ai;
 using landerist_library.Infrastructure.Downloaders.Puppeteer;
 using landerist_library.Infrastructure.Downloaders.Multiple;
 using landerist_library.Infrastructure.Location.Providers.Goolzoom;
@@ -180,7 +181,14 @@ namespace landerist_tests
                             new AddressCadastralReference(databaseFactory.Create()),
                             new GlobalStatisticsRepository(databaseFactory.Create()),
                             goolzoom,
-                            new LegacyAddressCandidateSelector(),
+                            new VertexAddressCandidateSelector(
+                                new VertexAddressSelectorOptions(
+                                    LanderistSettings.Current.GetString("GOOGLE_CLOUD_VERTEX_AI_CREDENTIAL"),
+                                    LanderistSettings.Current.GetString("GOOGLE_CLOUD_VERTEX_AI_PROJECTID"),
+                                    LanderistSettings.Current.GetString("GOOGLE_CLOUD_VERTEX_AI_LOCATION"),
+                                    LanderistSettings.Current.GetString("GOOGLE_CLOUD_VERTEX_AI_PUBLISHER"),
+                                    Config.VERTEX_AI_MODEL_NAME_GEMINI_FLASH),
+                                logger),
                             logger))),
                 new LegacyListingUnpublishPolicy(listingQueries),
                 logger,

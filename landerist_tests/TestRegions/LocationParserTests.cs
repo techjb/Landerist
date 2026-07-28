@@ -1,4 +1,3 @@
-using landerist_library.Parse.CadastralReference;
 using landerist_library.Infrastructure.Location.Providers.GoogleMaps;
 using landerist_library.Infrastructure.Location.Providers.Goolzoom;
 using landerist_library.Websites;
@@ -10,7 +9,7 @@ namespace landerist_tests
     {
         public static void Run()
         {
-            //var tuple1 = new landerist_library.Infrastructure.Location.Providers.GoogleMaps.GoogleMapsApi().GetLatLng("Av. Domingo Bueno, 126. O PorriÃƒÂ±o, 36.400 Pontevedra", CountryCode.ES);
+            //var tuple1 = new landerist_library.Infrastructure.Location.Providers.GoogleMaps.GoogleMapsApi().GetLatLng("Av. Domingo Bueno, 126. O PorriÃƒÆ’Ã‚Â±o, 36.400 Pontevedra", CountryCode.ES);
             //Console.WriteLine(tuple1);
 
             //var tuple1 = new landerist_library.Infrastructure.Location.Providers.Goolzoom.GoolzoomApi().GetLatLng("9441515XM7094A0001FT");
@@ -22,7 +21,7 @@ namespace landerist_tests
             //Console.WriteLine(landerist_library.Tools.Validate.CadastralReference("3979515DD7737H0002LX"));
             //landerist_library.Tools.Validate.RemoveInvalidCatastralReferences();
 
-            //string address = "Fuengirola, Torreblanca del Sol, MÃƒÂ¡laga, EspaÃƒÂ±a, 29640";
+            //string address = "Fuengirola, Torreblanca del Sol, MÃƒÆ’Ã‚Â¡laga, EspaÃƒÆ’Ã‚Â±a, 29640";
             //string address = "Calle Alondra 8, 28232, las rozas de madrid";
             //var latLNg = new GoogleMapsApi().GetLatLng(address, CountryCode.ES);
             // var cadastralReference = new GoolzoomApi().GetAddresses(latLNg.Value.Latitude, latLNg.Value.Longitude, 10);
