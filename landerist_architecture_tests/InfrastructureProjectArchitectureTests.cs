@@ -279,7 +279,8 @@ public sealed class InfrastructureProjectArchitectureTests
             "SqlListingMediaStore.cs",
             "SqlListingQueryService.cs",
             "SqlListingSourceStore.cs",
-            "SqlNotListingCacheService.cs"
+            "SqlNotListingCacheService.cs",
+            "SqlListingStore.cs"
         ];
         foreach (string file in adapters)
         {
@@ -301,6 +302,20 @@ public sealed class InfrastructureProjectArchitectureTests
             "Infrastructure",
             area,
             file)));
+    }
+    [Fact]
+    public void SqlListingStore_UsesStatisticsPort()
+    {
+        string source = File.ReadAllText(Path.Combine(
+            FindRepositoryRoot(),
+            "landerist_infrastructure",
+            "Infrastructure",
+            "Listings",
+            "SqlListingStore.cs"));
+
+        Assert.Contains("IGlobalStatisticsRepository", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("new GlobalStatisticsRepository", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("Infrastructure.Statistics", source, StringComparison.Ordinal);
     }
     [Fact]
     public void LegacyLibrary_ReferencesInfrastructureProject()

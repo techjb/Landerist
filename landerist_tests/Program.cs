@@ -102,7 +102,10 @@ namespace landerist_tests
                     MaxRetryAttempts: 3));
             PagePersistenceService pagePersistence = new(new PageRepository(databaseFactory.Create()), logger);
             WebsitePersistenceService websitePersistence = new(new WebsiteRepository(databaseFactory.Create()));
-            SqlListingStore listingStore = new(databaseFactory.Create(), logger);
+            SqlListingStore listingStore = new(
+                databaseFactory.Create(),
+                new GlobalStatisticsRepository(databaseFactory.Create()),
+                logger);
             SqlListingQueryService listingQueries = new(
                 new ListingQueryRepository(databaseFactory.Create()),
                 new MediaRepository(databaseFactory.Create()),

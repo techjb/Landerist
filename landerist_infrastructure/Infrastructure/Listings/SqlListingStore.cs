@@ -1,4 +1,3 @@
-using landerist_library.Infrastructure.Statistics;
 using landerist_library.Application.Listings;
 using landerist_library.Application.Logging;
 using landerist_library.Database;
@@ -15,12 +14,16 @@ public sealed class SqlListingStore : IListingStore
     private readonly IListingQueryService _queries;
     private readonly IListingMediaRepository _media;
     private readonly IListingSourceRepository _sources;
-    private readonly GlobalStatisticsRepository _statistics;
+    private readonly IGlobalStatisticsRepository _statistics;
     private readonly IApplicationLogger _logger;
 
-    public SqlListingStore(IDatabase database, IApplicationLogger logger)
+    public SqlListingStore(
+        IDatabase database,
+        IGlobalStatisticsRepository statistics,
+        IApplicationLogger logger)
     {
         ArgumentNullException.ThrowIfNull(database);
+        ArgumentNullException.ThrowIfNull(statistics);
         ArgumentNullException.ThrowIfNull(logger);
         _listings = new ListingRepository(database);
         _media = new MediaRepository(database);
@@ -29,7 +32,7 @@ public sealed class SqlListingStore : IListingStore
             new ListingQueryRepository(database),
             _media,
             _sources);
-        _statistics = new GlobalStatisticsRepository(database);
+        _statistics = statistics;
         _logger = logger;
     }
 
