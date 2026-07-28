@@ -281,7 +281,8 @@ public sealed class InfrastructureProjectArchitectureTests
             "SqlListingSourceStore.cs",
             "SqlNotListingCacheService.cs",
             "SqlListingStore.cs",
-            "SqlPageLinkService.cs"
+            "SqlPageLinkService.cs",
+            "SqlListingAdministrationService.cs"
         ];
         foreach (string file in adapters)
         {
@@ -331,6 +332,19 @@ public sealed class InfrastructureProjectArchitectureTests
         Assert.Contains("WebsiteUrlRules", source, StringComparison.Ordinal);
         Assert.DoesNotContain("landerist_library.Tools", source, StringComparison.Ordinal);
         Assert.DoesNotContain("Infrastructure.Indexing", source, StringComparison.Ordinal);
+    }
+    [Fact]
+    public void SqlListingAdministrationService_UsesLoggingPort()
+    {
+        string source = File.ReadAllText(Path.Combine(
+            FindRepositoryRoot(),
+            "landerist_infrastructure",
+            "Infrastructure",
+            "Listings",
+            "SqlListingAdministrationService.cs"));
+
+        Assert.Contains("IApplicationLogger", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("Logs.Log", source, StringComparison.Ordinal);
     }
     [Fact]
     public void LegacyLibrary_ReferencesInfrastructureProject()

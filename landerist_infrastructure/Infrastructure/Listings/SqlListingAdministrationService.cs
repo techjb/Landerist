@@ -1,6 +1,7 @@
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Infrastructure.Sql.Mapping;
 using landerist_library.Application.Listings;
+using landerist_library.Application.Logging;
 using landerist_library.Pages;
 using landerist_library.Websites;
 using landerist_orels;
@@ -16,19 +17,28 @@ namespace landerist_library.Infrastructure.Listings
         private readonly ListingStatisticsRepository StatisticsRepository;
         private readonly SqlListingMediaStore Media;
         private readonly SqlListingSourceStore Sources;
+        private readonly IApplicationLogger Logger;
 
         public SqlListingAdministrationService(
             IListingRecordRepository repository,
             ListingQueryRepository queryRepository,
             ListingStatisticsRepository statisticsRepository,
             IListingMediaRepository mediaRepository,
-            SourceRepository sourceRepository)
+            SourceRepository sourceRepository,
+            IApplicationLogger logger)
         {
+            ArgumentNullException.ThrowIfNull(repository);
+            ArgumentNullException.ThrowIfNull(queryRepository);
+            ArgumentNullException.ThrowIfNull(statisticsRepository);
+            ArgumentNullException.ThrowIfNull(mediaRepository);
+            ArgumentNullException.ThrowIfNull(sourceRepository);
+            ArgumentNullException.ThrowIfNull(logger);
             Repository = repository;
             QueryRepository = queryRepository;
             StatisticsRepository = statisticsRepository;
             Media = new SqlListingMediaStore(mediaRepository);
             Sources = new SqlListingSourceStore(sourceRepository);
+            Logger = logger;
         }
 
         public void Upsert(Website website, Listing newListing, ListingUnpublishDecision? unpublishDecision = null)
@@ -56,7 +66,7 @@ namespace landerist_library.Infrastructure.Listings
                 return true;
             }
 
-            Logs.Log.WriteError("SqlListingAdministrationService", "Insert error");
+            Logger.WriteError("SqlListingAdministrationService", "Insert error");
             return false;
         }
 
@@ -65,7 +75,9 @@ namespace landerist_library.Infrastructure.Listings
             bool inserted = Repository.Insert(listing, host, unpublishDecision, out Exception? exception);
             if (!inserted && exception != null)
             {
-                Logs.Log.WriteError("SqlListingAdministrationService Insert", "Guid: " + listing.guid + " Host: " + host, exception);
+                Logger.WriteError(
+                    "SqlListingAdministrationService Insert",
+                    $"Guid: {listing.guid} Host: {host}. {exception}");
             }
             return inserted;
         }
@@ -109,7 +121,7 @@ namespace landerist_library.Infrastructure.Listings
         {
             if (!Update(newListing, unpublishDecision))
             {
-                Logs.Log.WriteError("SqlListingAdministrationService", "Update error");
+                Logger.WriteError("SqlListingAdministrationService", "Update error");
                 return false;
             }
             if (!ListingMediaAreEquals(oldListing, newListing))

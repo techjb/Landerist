@@ -325,7 +325,8 @@ internal static class LanderistServiceComposition
                         new ListingQueryRepository(databaseFactory.Create()),
                         new ListingStatisticsRepository(databaseFactory.Create()),
                         new MediaRepository(databaseFactory.Create()),
-                        new SourceRepository(databaseFactory.Create())))),
+                        new SourceRepository(databaseFactory.Create()),
+                        logger))),
             TimeProvider.System);
     }
 }
