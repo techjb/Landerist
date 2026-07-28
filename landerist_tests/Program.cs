@@ -176,7 +176,12 @@ namespace landerist_tests
                             databaseFactory.Create(),
                             LanderistSettings.Current.GetString("GOOGLE_CLOUD_LANDERIST_API_KEY"),
                             logger),
-                        new AddressToCadastralReference(databaseFactory.Create(), goolzoom))),
+                        new GoolzoomCadastralReferenceProvider(
+                            new AddressCadastralReference(databaseFactory.Create()),
+                            new GlobalStatisticsRepository(databaseFactory.Create()),
+                            goolzoom,
+                            new LegacyAddressCandidateSelector(),
+                            logger))),
                 new LegacyListingUnpublishPolicy(listingQueries),
                 logger,
                 new HtmlPageContentInspector());

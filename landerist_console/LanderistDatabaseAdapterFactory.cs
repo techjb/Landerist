@@ -9,6 +9,7 @@ using landerist_library.Infrastructure.Listings;
 using landerist_library.Infrastructure.Parsing;
 using landerist_library.Infrastructure.Scraping;
 using landerist_library.Infrastructure.Sql;
+using landerist_library.Infrastructure.Statistics;
 using landerist_library.Infrastructure.Location.Providers.Goolzoom;
 using landerist_library.Infrastructure.Location.Providers.GoogleMaps;
 using landerist_library.Websites;
@@ -36,7 +37,12 @@ internal sealed class LanderistDatabaseAdapterFactory(
                 databaseFactory.Create(),
                 goolzoom,
                 new GoogleMapsApi(databaseFactory.Create(), googleMapsApiKey, logger),
-                new AddressToCadastralReference(databaseFactory.Create(), goolzoom)));
+                new GoolzoomCadastralReferenceProvider(
+                    new AddressCadastralReference(databaseFactory.Create()),
+                    new GlobalStatisticsRepository(databaseFactory.Create()),
+                    goolzoom,
+                    new LegacyAddressCandidateSelector(),
+                    logger)));
 
     public SqlScrapeMetrics CreateScrapeMetrics() =>
         new(databaseFactory.Create());
