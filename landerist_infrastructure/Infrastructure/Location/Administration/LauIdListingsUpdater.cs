@@ -1,10 +1,13 @@
 using landerist_library.Application.Listings;
-using landerist_library.Parse.Location;
+using landerist_library.Application.Parsing;
+using landerist_library.Infrastructure.Location.Parsing;
 using landerist_library.Websites;
 
-namespace landerist_library.Infrastructure.Parsing;
+namespace landerist_library.Infrastructure.Location.Administration;
 
-public sealed class LauIdListingsUpdater(IListingAdministrationService listings)
+public sealed class LauIdListingsUpdater(
+    IListingAdministrationService listings,
+    ILocalAdministrativeAreaLookup areas)
 {
     public void Update()
     {
@@ -16,7 +19,7 @@ public sealed class LauIdListingsUpdater(IListingAdministrationService listings)
 
         Parallel.ForEach(items, listing =>
         {
-            var parser = new LauIdParser(CountryCode.ES, listing);
+            var parser = new LauIdParser(areas, CountryCode.ES, listing);
             parser.SetLauIdAndLauName();
 
             if (listings.Update(listing))

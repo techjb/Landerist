@@ -1,5 +1,3 @@
-﻿using System.Data;
-
 namespace landerist_library.Database
 {
     internal class LAU : DBDelimitations
@@ -33,11 +31,6 @@ namespace landerist_library.Database
         public static bool ReorientIfNeccesary()
         {
             return ReorientTheGeomIfNeccesary(TABLE_LAU);
-        }
-
-        public static DataRow? Get(double latitude, double longitude)
-        {
-            return GetdDataRow(TABLE_LAU, "lau_id AS LauId, lau_name AS LauName", latitude, longitude);
         }
     }
 }

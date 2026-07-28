@@ -1,5 +1,3 @@
-﻿using System.Data;
-
 namespace landerist_library.Database
 {
     public class CNIG : DBDelimitations
@@ -32,11 +30,6 @@ namespace landerist_library.Database
         public static bool ReorientIfNeccesary()
         {
             return ReorientTheGeomIfNeccesary(TABLE_CNIG);
-        }
-
-        public static DataRow? Get(double latitude, double longitude)
-        {
-            return GetdDataRow(TABLE_CNIG, "natcode AS NatCode, nameunit AS NameUnit", latitude, longitude);
         }
     }
 }
