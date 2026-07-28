@@ -130,10 +130,12 @@ namespace landerist_library.Pages
             return new Website(new Uri(uri.GetLeftPart(UriPartial.Authority)));
         }
 
-        public string GetUriHash()
+        public string GetUriHash() => CalculateUriHash(Uri);
+
+        public static string CalculateUriHash(Uri uri)
         {
-            var uriString = Uri.ToString();
-            byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(uriString));
+            ArgumentNullException.ThrowIfNull(uri);
+            byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(uri.ToString()));
             return Convert.ToHexString(hash);
         }
 

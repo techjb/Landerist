@@ -388,6 +388,48 @@ public sealed class InfrastructureProjectArchitectureTests
         }
     }
     [Fact]
+    public void DecoupledScrapingAdapters_AreOwnedByInfrastructureProject()
+    {
+        string root = FindRepositoryRoot();
+        string[] scrapingAdapters =
+        [
+            "ConditionalHeaderCheckResult.cs",
+            "ConditionalPageHeaderChecker.cs",
+            "HttpConditionalPageHeaderService.cs",
+            "SqlPageClassificationMetrics.cs",
+            "SqlPageLockManager.cs",
+            "SqlPageSchedulingService.cs",
+            "SqlPageSelectionRepository.cs",
+            "SqlScrapeBatchMetrics.cs",
+            "SqlScrapeMetrics.cs",
+            "SqlScrapePageSource.cs",
+            "SqlWebsiteThrottleService.cs",
+            "WebsitesThrottle.cs"
+        ];
+
+        foreach (string file in scrapingAdapters)
+        {
+            AssertMoved(root, "Scraping", file);
+        }
+    }
+
+    [Fact]
+    public void ExtractedScraping_DoesNotDependOnLegacyDownloaders()
+    {
+        string directory = Path.Combine(
+            FindRepositoryRoot(),
+            "landerist_infrastructure",
+            "Infrastructure",
+            "Scraping");
+
+        foreach (string file in Directory.GetFiles(directory, "*.cs"))
+        {
+            string source = File.ReadAllText(file);
+            Assert.DoesNotContain("landerist_library.Downloaders", source, StringComparison.Ordinal);
+            Assert.DoesNotContain("landerist_library.Tools", source, StringComparison.Ordinal);
+        }
+    }
+    [Fact]
     public void LegacyLibrary_ReferencesInfrastructureProject()
     {
         string project = File.ReadAllText(Path.Combine(

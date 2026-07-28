@@ -31,7 +31,8 @@ public sealed class HttpTransportArchitectureTests
             {
                 string source = File.ReadAllText(
                     Path.Combine(
-                        relative.EndsWith("WebsiteNetworkService.cs", StringComparison.Ordinal)
+                        (relative.EndsWith("WebsiteNetworkService.cs", StringComparison.Ordinal) ||
+                            relative.EndsWith("ConditionalPageHeaderChecker.cs", StringComparison.Ordinal))
                             ? infrastructureRoot
                             : libraryRoot,
                         relative.Replace('/', Path.DirectorySeparatorChar)));

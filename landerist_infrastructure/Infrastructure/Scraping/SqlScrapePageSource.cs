@@ -28,7 +28,7 @@ public sealed class SqlScrapePageSource : IScrapePageSource
     public Page LoadOrCreate(Uri uri)
     {
         ArgumentNullException.ThrowIfNull(uri);
-        DataTable pageRows = _pages.GetPageByUriHash(Tools.Strings.GetHash(uri.ToString()));
+        DataTable pageRows = _pages.GetPageByUriHash(Page.CalculateUriHash(uri));
         if (pageRows.Rows.Count == 1)
         {
             Website existingWebsite = WebsiteDataMapper.Map(pageRows.Rows[0]);
