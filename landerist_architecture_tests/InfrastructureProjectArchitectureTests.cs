@@ -31,7 +31,8 @@ public sealed class InfrastructureProjectArchitectureTests
         Assert.Equal(
             [
                 "..\\landerist_application\\landerist_application.csproj",
-                "..\\landerist_domain\\landerist_domain.csproj"
+                "..\\landerist_domain\\landerist_domain.csproj",
+                "..\\landerist_orels\\landerist_orels.csproj"
             ],
             projects);
         Assert.DoesNotContain(
@@ -89,7 +90,9 @@ public sealed class InfrastructureProjectArchitectureTests
             "WebsiteNetworkService.cs",
             "WebsiteRefreshService.cs",
             "WebsiteRobotsPolicy.cs",
-            "WebsiteSitemapService.cs"
+            "WebsiteSitemapService.cs",
+            "SqlWebsiteCatalog.cs",
+            "WebsiteMetricsService.cs"
         ];
 
         foreach (string service in services)
@@ -212,6 +215,34 @@ public sealed class InfrastructureProjectArchitectureTests
         Assert.DoesNotContain("Config.", source, StringComparison.Ordinal);
         Assert.DoesNotContain("WebsitesThrottle.", source, StringComparison.Ordinal);
         Assert.Contains("PageQueryOptions", source, StringComparison.Ordinal);
+    }
+    [Fact]
+    public void WebsitePersistenceRepositories_AreOwnedByInfrastructureProject()
+    {
+        string root = FindRepositoryRoot();
+        string[] repositories =
+        [
+            "WebsiteRepository.cs",
+            "WebsiteQueryRepository.cs",
+            "WebsitePageMetricsRepository.cs",
+            "ListingStatisticsRepository.cs"
+        ];
+
+        foreach (string file in repositories)
+        {
+            Assert.True(File.Exists(Path.Combine(
+                root,
+                "landerist_infrastructure",
+                "Infrastructure",
+                "Sql",
+                file)));
+            Assert.False(File.Exists(Path.Combine(
+                root,
+                "landerist_library",
+                "Infrastructure",
+                "Sql",
+                file)));
+        }
     }
     [Fact]
     public void LegacyLibrary_ReferencesInfrastructureProject()
