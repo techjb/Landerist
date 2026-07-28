@@ -11,6 +11,7 @@ using landerist_library.Infrastructure.Parsing.VertexAI;
 using landerist_library.Infrastructure.Parsing;
 using landerist_library.Configuration;
 using landerist_library.Application.Listings;
+using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Scraping;
 using landerist_library.Application.Tasks;
@@ -48,8 +49,8 @@ internal static class LanderistServiceComposition
             services.GetRequiredService<LanderistDatabaseAdapterFactory>();
         HttpClientTransportFactory httpClients =
             services.GetRequiredService<HttpClientTransportFactory>();
-        LegacyApplicationLogger logger =
-            services.GetRequiredService<LegacyApplicationLogger>();
+        IApplicationLogger logger =
+            services.GetRequiredService<IApplicationLogger>();
         GoolzoomApi goolzoom = services.GetRequiredService<GoolzoomApi>();
         WebsiteNetworkService websiteNetwork =
             services.GetRequiredService<WebsiteNetworkService>();

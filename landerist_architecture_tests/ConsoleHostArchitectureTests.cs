@@ -67,7 +67,7 @@ public sealed class ConsoleHostArchitectureTests
 
         Assert.Contains("HttpClientTransportFactory httpClients = new(", registrations);
         Assert.Contains("PuppeteerBrowserOptions browserOptions = new(", registrations);
-        Assert.Contains("ChromeMaintenanceService chrome = new(", registrations);
+        Assert.Contains("AddSingleton<ChromeMaintenanceService>", registrations);
         Assert.Contains("services.AddSingleton<IWebsiteRobotsPolicy>", registrations);
         Assert.DoesNotContain("new HttpClientTransportFactory(", composition);
         Assert.DoesNotContain("new PuppeteerBrowserOptions(", composition);
@@ -81,6 +81,29 @@ public sealed class ConsoleHostArchitectureTests
         Assert.DoesNotContain("new PageContentClassifier(", composition);
         Assert.DoesNotContain("new PageIndexingService(", composition);
         Assert.DoesNotContain("new PageBatchSelector(", composition);
+    }
+    [Fact]
+    public void LoggingAdapters_AreOwnedByInfrastructureProject()
+    {
+        string root = FindRepositoryRoot();
+
+        Assert.True(File.Exists(Path.Combine(
+            root,
+            "landerist_infrastructure",
+            "Infrastructure",
+            "Logging",
+            "SqlApplicationLogger.cs")));
+        Assert.True(File.Exists(Path.Combine(
+            root,
+            "landerist_infrastructure",
+            "Infrastructure",
+            "Logging",
+            "ConsoleScrapeProgressReporter.cs")));
+        Assert.False(Directory.Exists(Path.Combine(
+            root,
+            "landerist_library",
+            "Infrastructure",
+            "Logging")));
     }
     private static string ReadConsoleSource(string fileName) =>
         File.ReadAllText(GetConsolePath(fileName));

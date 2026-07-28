@@ -1,4 +1,5 @@
 using landerist_library.Application.Listings;
+using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Scraping;
 using landerist_library.Application.Statistics;
@@ -25,7 +26,7 @@ internal sealed class LanderistScrapingPipelineFactory(
     HttpConditionalPageHeaderService conditionalHeaders,
     ScrapeBrowserManager browser,
     WebsiteRobotsPolicy robotsPolicy,
-    LegacyApplicationLogger logger)
+    IApplicationLogger logger)
 {
     public LanderistScrapingPipeline Create(
         PagePersistenceService pagePersistence,

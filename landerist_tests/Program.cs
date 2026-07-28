@@ -88,7 +88,14 @@ namespace landerist_tests
             DownloadersPool downloaders = new(
                 Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
                 new PuppeteerDownloaderFactory(browserOptions));
-            LegacyApplicationLogger logger = new();
+            SqlApplicationLogger logger = new(
+                databaseFactory,
+                new ApplicationLoggerOptions(
+                    Config.LOGS_ENABLED,
+                    Config.LOGS_ERRORS_IN_CONSOLE,
+                    Config.LOGS_INFO_IN_CONSOLE,
+                    Config.MACHINE_NAME),
+                TimeProvider.System);
             LegacyDownloadersPoolAdapter downloaderPool = new(downloaders);
             ChromeMaintenanceService chrome = new(
                 new ChromeMaintenanceOptions(

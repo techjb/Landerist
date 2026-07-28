@@ -50,14 +50,7 @@ internal static class LanderistScrapingServiceCollectionExtensions
         DownloadersPool downloaders = new(
             Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
             new PuppeteerDownloaderFactory(browserOptions));
-        LegacyApplicationLogger logger = new();
         LegacyDownloadersPoolAdapter downloaderPool = new(downloaders);
-        ChromeMaintenanceService chrome = new(
-            new ChromeMaintenanceOptions(
-                runtimeOptions.Browser.ProcessCleanupEnabled,
-                runtimeOptions.Browser.UseTaskKillFallback),
-            new SystemChromeProcessController(logger),
-            new PuppeteerChromeBrowserInstaller());
         WebsiteRobotsPolicy robotsPolicy = new();
         GoolzoomApi goolzoom = new(
             httpClients,
@@ -70,11 +63,26 @@ internal static class LanderistScrapingServiceCollectionExtensions
         services.AddSingleton<IHttpClientTransportFactory>(httpClients);
         services.AddSingleton(browserOptions);
         services.AddSingleton(downloaders);
-        services.AddSingleton(logger);
-        services.AddSingleton<IApplicationLogger>(logger);
+        ApplicationLoggerOptions loggerOptions = new(
+            Config.LOGS_ENABLED,
+            Config.LOGS_ERRORS_IN_CONSOLE,
+            Config.LOGS_INFO_IN_CONSOLE,
+            Config.MACHINE_NAME);
+        services.AddSingleton(loggerOptions);
+        services.AddSingleton(TimeProvider.System);
+        services.AddSingleton<SqlApplicationLogger>();
+        services.AddSingleton<IApplicationLogger>(serviceProvider =>
+            serviceProvider.GetRequiredService<SqlApplicationLogger>());
         services.AddSingleton(downloaderPool);
         services.AddSingleton<IDownloaderPool>(downloaderPool);
-        services.AddSingleton(chrome);
+        services.AddSingleton<ChromeMaintenanceService>(serviceProvider =>
+            new ChromeMaintenanceService(
+                new ChromeMaintenanceOptions(
+                    runtimeOptions.Browser.ProcessCleanupEnabled,
+                    runtimeOptions.Browser.UseTaskKillFallback),
+                new SystemChromeProcessController(
+                    serviceProvider.GetRequiredService<IApplicationLogger>()),
+                new PuppeteerChromeBrowserInstaller()));
         services.AddSingleton(robotsPolicy);
         services.AddSingleton<IWebsiteRobotsPolicy>(robotsPolicy);
         services.AddSingleton(goolzoom);
@@ -82,7 +90,11 @@ internal static class LanderistScrapingServiceCollectionExtensions
         services.AddSingleton(new WebsiteAccessServices(robotsPolicy, httpClients));
         services.AddSingleton(new PooledPageDownloader(downloaderPool));
         services.AddSingleton(new HttpConditionalPageHeaderService(httpClients));
-        services.AddSingleton(new ScrapeBrowserManager(downloaderPool, chrome, logger));
+        services.AddSingleton<ScrapeBrowserManager>(serviceProvider =>
+            new ScrapeBrowserManager(
+                downloaderPool,
+                serviceProvider.GetRequiredService<ChromeMaintenanceService>(),
+                serviceProvider.GetRequiredService<IApplicationLogger>()));
         services.AddSingleton<LanderistScrapingPipelineFactory>();
 
         return services;
