@@ -104,6 +104,20 @@ public sealed class ConsoleHostArchitectureTests
             "landerist_library",
             "Infrastructure",
             "Logging")));
+        string logPath = Path.Combine(
+            root,
+            "landerist_infrastructure",
+            "Compatibility",
+            "LegacyLogging",
+            "Log.cs");
+        Assert.True(File.Exists(logPath));
+        Assert.False(Directory.Exists(Path.Combine(
+            root,
+            "landerist_library",
+            "Logs")));
+        string logSource = File.ReadAllText(logPath);
+        Assert.DoesNotContain("Config.", logSource);
+        Assert.DoesNotContain("LegacyDatabase", logSource);
     }
     private static string ReadConsoleSource(string fileName) =>
         File.ReadAllText(GetConsolePath(fileName));

@@ -64,6 +64,14 @@ namespace landerist_tests
                     Config.DATABASE_ENCRYPT,
                     Config.DATABASE_TRUST_SERVER_CERTIFICATE));
             LegacyDatabase.Configure(databaseFactory);
+            Log.Configure(
+                databaseFactory,
+                new LegacyLogOptions(
+                    Config.LOGS_ENABLED,
+                    Config.LOGS_ERRORS_IN_CONSOLE,
+                    Config.LOGS_INFO_IN_CONSOLE,
+                    Config.MACHINE_NAME),
+                TimeProvider.System);
             LanderistSettings settings = LanderistSettings.Current;
             HttpClientTransportFactory httpClients = new(
                 new HttpTransportOptions(

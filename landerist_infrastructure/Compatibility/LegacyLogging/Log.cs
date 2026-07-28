@@ -1,4 +1,4 @@
-﻿using landerist_library.Configuration;
+using landerist_library.Infrastructure.Logging;
 using landerist_library.Database;
 using landerist_orels;
 using System.Data;
@@ -8,6 +8,33 @@ namespace landerist_library.Logs
     public class Log
     {
         private const string TABLE_LOGS = "[LOGS]";
+        private static IDatabaseFactory? _databaseFactory;
+        private static LegacyLogOptions _options = new(
+            PersistenceEnabled: false,
+            ErrorsInConsole: false,
+            InformationInConsole: true,
+            MachineName: Environment.MachineName);
+        private static TimeProvider _timeProvider = TimeProvider.System;
+
+        public static void Configure(
+            IDatabaseFactory databaseFactory,
+            LegacyLogOptions options,
+            TimeProvider timeProvider)
+        {
+            ArgumentNullException.ThrowIfNull(databaseFactory);
+            ArgumentNullException.ThrowIfNull(options);
+            ArgumentNullException.ThrowIfNull(timeProvider);
+            options.Validate();
+
+            _databaseFactory = databaseFactory;
+            _options = options;
+            _timeProvider = timeProvider;
+        }
+
+        private static IDatabase CreateDatabase() =>
+            (_databaseFactory ?? throw new InvalidOperationException(
+                "Legacy logging has not been configured."))
+            .Create();
 
         public const string LogKeyError = "error";
         public const string LogKeyInfo = "info";
@@ -22,7 +49,7 @@ namespace landerist_library.Logs
                 return;
             }
 
-            if (Config.LOGS_ENABLED)
+            if (_options.PersistenceEnabled)
             {
                 WriteDB(logKey, source ?? string.Empty, text);
             }
@@ -30,13 +57,13 @@ namespace landerist_library.Logs
 
         public static void Console(string text)
         {
-            DateTime date = DateTime.Now;
+            DateTime date = _timeProvider.GetLocalNow().DateTime;
             System.Console.WriteLine($"{date:HH\\:mm\\:ss} {text}");
         }
 
         public static void Console(string source, string text)
         {
-            DateTime date = DateTime.Now;
+            DateTime date = _timeProvider.GetLocalNow().DateTime;
             System.Console.WriteLine($"{date:HH\\:mm\\:ss} {source} {text}");
         }
 
@@ -46,9 +73,9 @@ namespace landerist_library.Logs
                 "INSERT INTO " + TABLE_LOGS + " ([Date], [MachineName], [LogKey], [Source], [Text]) " +
                 "VALUES(@Date, @MachineName, @LogKey, @Source, @Text)";
 
-            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?> {
-                { "Date", DateTime.Now },
-                { "MachineName", Config.MACHINE_NAME },
+            return CreateDatabase().Query(query, new Dictionary<string, object?> {
+                { "Date", _timeProvider.GetLocalNow().DateTime },
+                { "MachineName", _options.MachineName },
                 { "LogKey", logKey },
                 { "Source", source },
                 { "Text", text.Trim() }
@@ -65,7 +92,7 @@ namespace landerist_library.Logs
                 "WHERE LogKey = @LogKey " +
                 "ORDER BY [Date] DESC";
 
-            return LegacyDatabase.Create().QueryTable(query, new Dictionary<string, object?> {
+            return CreateDatabase().QueryTable(query, new Dictionary<string, object?> {
                 { "LogKey", logKey }
             });
         }
@@ -76,7 +103,7 @@ namespace landerist_library.Logs
                 "SELECT DISTINCT LogKey " +
                 "FROM " + TABLE_LOGS;
 
-            return LegacyDatabase.Create().QueryListString(query);
+            return CreateDatabase().QueryListString(query);
         }
 
         public static void Delete(string logKey)
@@ -85,7 +112,7 @@ namespace landerist_library.Logs
                 "DELETE FROM " + TABLE_LOGS + " " +
                 "WHERE LogKey = @LogKey";
 
-            LegacyDatabase.Create().Query(query, new Dictionary<string, object?> {
+            CreateDatabase().Query(query, new Dictionary<string, object?> {
                 { "LogKey", logKey }
             });
         }
@@ -109,7 +136,7 @@ namespace landerist_library.Logs
 
         public static void WriteError(string source, string text)
         {
-            if (Config.LOGS_ERRORS_IN_CONSOLE)
+            if (_options.ErrorsInConsole)
             {
                 Console(source, text);
             }
@@ -143,7 +170,7 @@ namespace landerist_library.Logs
 
         public static void WriteInfo(string source, string text)
         {
-            if (Config.LOGS_INFO_IN_CONSOLE)
+            if (_options.InformationInConsole)
             {
                 Console(source, text);
             }
@@ -164,7 +191,7 @@ namespace landerist_library.Logs
 
         public static void WriteBatch(string source, string text)
         {
-            if (Config.LOGS_INFO_IN_CONSOLE)
+            if (_options.InformationInConsole)
             {
                 Console(source, text);
             }
@@ -174,7 +201,7 @@ namespace landerist_library.Logs
 
         public static void WriteLocalAI(string source, string text)
         {
-            if (Config.LOGS_INFO_IN_CONSOLE)
+            if (_options.InformationInConsole)
             {
                 Console(source, text);
             }
@@ -195,8 +222,8 @@ namespace landerist_library.Logs
             string query =
                 "DELETE FROM " + TABLE_LOGS + " WHERE [MachineName] = @MachineName";
 
-            return LegacyDatabase.Create().Query(query, new Dictionary<string, object?> {
-                { "MachineName", Config.MACHINE_NAME }
+            return CreateDatabase().Query(query, new Dictionary<string, object?> {
+                { "MachineName", _options.MachineName }
             });
         }
 
@@ -206,7 +233,7 @@ namespace landerist_library.Logs
                 "DELETE FROM " + TABLE_LOGS + " " +
                 "WHERE [Date] < DATEADD(YEAR, -1, GETDATE())";
 
-            return LegacyDatabase.Create().Query(query);
+            return CreateDatabase().Query(query);
         }
     }
 }

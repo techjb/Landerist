@@ -1,6 +1,8 @@
 using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Infrastructure.Statistics;
+using landerist_library.Infrastructure.Logging;
+using landerist_library.Logs;
 using landerist_library.Infrastructure.Runtime;
 using landerist_library.Infrastructure.Sql;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,6 +31,14 @@ internal static class LanderistPersistenceServiceCollectionExtensions
         SqlDatabaseFactory databaseFactory = new(databaseOptions);
 
         LegacyDatabase.Configure(databaseFactory);
+        Log.Configure(
+            databaseFactory,
+            new LegacyLogOptions(
+                Config.LOGS_ENABLED,
+                Config.LOGS_ERRORS_IN_CONSOLE,
+                Config.LOGS_INFO_IN_CONSOLE,
+                Config.MACHINE_NAME),
+            TimeProvider.System);
         services.AddSingleton(databaseOptions);
         services.AddSingleton(databaseFactory);
         services.AddSingleton<IDatabaseFactory>(databaseFactory);
