@@ -39,13 +39,13 @@ internal static class LanderistServiceComposition
 {
     public static TasksService CreateTasksService(
         LanderistRuntimeOptions runtimeOptions,
-        SqlDatabaseFactory databaseFactory,
         IServiceProvider services)
     {
         ArgumentNullException.ThrowIfNull(runtimeOptions);
-        ArgumentNullException.ThrowIfNull(databaseFactory);
         ArgumentNullException.ThrowIfNull(services);
         runtimeOptions.Validate();
+        LanderistDatabaseAdapterFactory databaseAdapters =
+            services.GetRequiredService<LanderistDatabaseAdapterFactory>();
         LanderistSettings settings = LanderistSettings.Current;
         HttpClientTransportFactory httpClients = new(
             new HttpTransportOptions(
@@ -89,8 +89,7 @@ internal static class LanderistServiceComposition
             TimeProvider.System);
         PagePersistenceService pagePersistence = new(services.GetRequiredService<PageRepository>(), logger);
         WebsitePersistenceService websitePersistence = new(services.GetRequiredService<WebsiteRepository>());
-        SqlListingStore listingStore = new(
-            databaseFactory.Create(),
+        SqlListingStore listingStore = databaseAdapters.CreateListingStore(
             services.GetRequiredService<GlobalStatisticsRepository>(),
             logger);
         SqlListingQueryService listingQueries = new(
@@ -101,9 +100,9 @@ internal static class LanderistServiceComposition
             services.GetRequiredService<ListingRepository>(),
             services.GetRequiredService<MediaRepository>(),
             services.GetRequiredService<SourceRepository>());
-        SqlNotListingCacheService notListingCache = new(
-            databaseFactory.Create(),
-            Config.NOT_LISTING_CACHE_ENABLED);
+        SqlNotListingCacheService notListingCache =
+            databaseAdapters.CreateNotListingCache(
+                Config.NOT_LISTING_CACHE_ENABLED);
         PageQueryOptions pageQueryOptions = services.GetRequiredService<PageQueryOptions>();
         SqlPageCatalog pageCatalog = new(
             services.GetRequiredService<PageQueryRepository>());
@@ -170,11 +169,7 @@ internal static class LanderistServiceComposition
             listingStore,
             notListingCache,
             pageLinks,
-            new SqlListingEnricher(
-                databaseFactory.Create(),
-                new LegacyListingLocationEnricher(
-                    databaseFactory.Create(),
-                    goolzoom)),
+            databaseAdapters.CreateListingEnricher(goolzoom),
             new LegacyListingUnpublishPolicy(listingQueries),
             logger,
             new HtmlPageContentInspector());
@@ -182,12 +177,12 @@ internal static class LanderistServiceComposition
             new PageAcquisitionService(
                 new PooledPageDownloader(downloaderPool),
                 new HttpConditionalPageHeaderService(httpClients),
-                new SqlScrapeMetrics(databaseFactory.Create()),
+                databaseAdapters.CreateScrapeMetrics(),
                 conditionalHeadersEnabled: !Config.IsConfigurationLocal()),
             new PageContentClassifier(
                 Config.IsConfigurationProduction(),
                 notListingCache,
-                new SqlPageClassificationMetrics(databaseFactory.Create()),
+                databaseAdapters.CreatePageClassificationMetrics(),
                 new LegacyListingPageParser(hostStatistics, listingParser),
                 new LegacyPageTokenLimitPolicy(new Tokenizer(TokenizerOptions.ForProvider(Config.LLM_PROVIDER))),
                 new HtmlPageContentInspector(),
@@ -199,8 +194,7 @@ internal static class LanderistServiceComposition
             new SqlPageSchedulingService(listingStore),
             Config.INDEXER_ENABLED);
         PageBatchSelector pageBatchSelector = new(
-            new SqlPageSelectionRepository(
-                databaseFactory.Create(),
+            databaseAdapters.CreatePageSelectionRepository(
                 Config.MACHINE_NAME,
                 pageQueryOptions),
             new PageSelectionOptions(
@@ -209,11 +203,11 @@ internal static class LanderistServiceComposition
                 Config.MIN_PAGES_PER_SCRAPE,
                 enforceMinimumPages: Config.IsConfigurationProduction()));
         ScrapeBatchServices batchScraping = new(
-            new SqlWebsiteThrottleService(databaseFactory.Create(), robotsPolicy),
+            databaseAdapters.CreateWebsiteThrottle(robotsPolicy),
             new ScrapeBrowserManager(downloaderPool, chrome, logger),
-            new SqlPageLockManager(databaseFactory.Create(), Config.MACHINE_NAME),
-            new SqlScrapeBatchMetrics(databaseFactory.Create()),
-            new SqlScrapePageSource(databaseFactory.Create(), listingStore),
+            databaseAdapters.CreatePageLockManager(Config.MACHINE_NAME),
+            databaseAdapters.CreateScrapeBatchMetrics(),
+            databaseAdapters.CreateScrapePageSource(listingStore),
             robotsPolicy,
             new ScraperExecutionOptions(
                 Config.IsConfigurationProduction(),
@@ -319,7 +313,7 @@ internal static class LanderistServiceComposition
             new TenMinuteTaskJob(
                 new TaskBatchDownload(
                     parsedClassification,
-                    new SqlBatchStore(databaseFactory.Create()),
+                    databaseAdapters.CreateBatchStore(),
                     globalStatistics,
                     pageCatalog,
                     pagePersistence,
@@ -333,7 +327,7 @@ internal static class LanderistServiceComposition
                         Config.PARALLELOPTIONS1INLOCAL.MaxDegreeOfParallelism),
                     logger),
                 new TaskBatchUpload(
-                    new SqlBatchRegistrationStore(databaseFactory.Create()),
+                    databaseAdapters.CreateBatchRegistrationStore(),
                     waitingStatus,
                     pagePersistence,
                     batchUploadOptions,
@@ -343,13 +337,13 @@ internal static class LanderistServiceComposition
             new HourlyTaskJob(
                 new WebsiteRefreshService(websiteCatalog, websitePersistence, websiteNetwork, websiteSitemaps),
                 new TaskBatchCleaner(
-                    new SqlBatchStore(databaseFactory.Create()),
+                    databaseAdapters.CreateBatchStore(),
                     new BatchCleanupOptions(Config.BATCH_DIRECTORY),
                     new LegacyVertexAiBatchArtifactCleaner())),
             new DailyTaskJob(
-                new LegacyAddressDataMaintenance(databaseFactory.Create()),
+                databaseAdapters.CreateAddressDataMaintenance(),
                 notListingCache,
-                new SqlDatabaseBackupService(databaseFactory.Create()),
+                databaseAdapters.CreateDatabaseBackupService(),
                 globalStatistics,
                 hostStatistics,
                 new DistributionPublisher(

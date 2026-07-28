@@ -32,6 +32,7 @@ internal static class LanderistPersistenceServiceCollectionExtensions
         services.AddSingleton(databaseOptions);
         services.AddSingleton(databaseFactory);
         services.AddSingleton<IDatabaseFactory>(databaseFactory);
+        services.AddSingleton<LanderistDatabaseAdapterFactory>();
 
         PageQueryOptions pageQueryOptions = new(
             runtimeOptions.Browser.IsLocal ? null : Config.MACHINE_NAME,

@@ -38,6 +38,8 @@ public sealed class ConsoleHostArchitectureTests
         string registrations = ReadConsoleSource(
             "LanderistPersistenceServiceCollectionExtensions.cs");
         string composition = ReadConsoleSource("LanderistServiceComposition.cs");
+        string adapterFactory = ReadConsoleSource(
+            "LanderistDatabaseAdapterFactory.cs");
 
         Assert.Contains("SqlDatabaseOptions databaseOptions = new(", registrations);
         Assert.Contains("LegacyDatabase.Configure(databaseFactory)", registrations);
@@ -50,6 +52,9 @@ public sealed class ConsoleHostArchitectureTests
         Assert.Contains("AddTransient(_ => new PageRepository(", registrations);
         Assert.Contains("AddTransient(_ => new WebsiteRepository(", registrations);
         Assert.Contains("AddTransient(_ => new ListingRepository(", registrations);
+        Assert.DoesNotContain("databaseFactory.Create()", composition);
+        Assert.Contains("IDatabaseFactory databaseFactory", adapterFactory);
+        Assert.Contains("databaseFactory.Create()", adapterFactory);
     }
     private static string ReadConsoleSource(string fileName) =>
         File.ReadAllText(GetConsolePath(fileName));
