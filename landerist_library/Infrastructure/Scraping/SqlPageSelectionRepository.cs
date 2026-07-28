@@ -13,11 +13,15 @@ public sealed class SqlPageSelectionRepository : IPageSelectionRepository
     private readonly PageMaintenanceRepository _maintenance;
     private readonly string _machineName;
 
-    public SqlPageSelectionRepository(IDatabase database, string machineName)
+    public SqlPageSelectionRepository(
+        IDatabase database,
+        string machineName,
+        PageQueryOptions queryOptions)
     {
         ArgumentNullException.ThrowIfNull(database);
         ArgumentException.ThrowIfNullOrWhiteSpace(machineName);
-        _queries = new PageQueryRepository(database);
+        ArgumentNullException.ThrowIfNull(queryOptions);
+        _queries = new PageQueryRepository(database, queryOptions);
         _maintenance = new PageMaintenanceRepository(database);
         _machineName = machineName;
     }

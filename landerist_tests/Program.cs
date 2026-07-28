@@ -165,7 +165,12 @@ namespace landerist_tests
                 new SqlPageSchedulingService(listingStore),
                 Config.INDEXER_ENABLED);
             PageBatchSelector pageBatchSelector = new(
-                new SqlPageSelectionRepository(databaseFactory.Create(), Config.MACHINE_NAME),
+                new SqlPageSelectionRepository(
+                    databaseFactory.Create(),
+                    Config.MACHINE_NAME,
+                    new PageQueryOptions(
+                        Config.IsConfigurationLocal() ? null : Config.MACHINE_NAME,
+                        Config.MAX_PAGES_PER_HOST_PER_SCRAPE)),
                 new PageSelectionOptions(
                     Config.MAX_PAGES_PER_SCRAPE,
                     Config.MAX_PAGES_PER_HOST_PER_SCRAPE,

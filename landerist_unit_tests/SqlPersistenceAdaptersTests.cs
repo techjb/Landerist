@@ -74,7 +74,10 @@ public sealed class SqlPersistenceAdaptersTests
     {
         RecordingDatabase database = new();
         AddPageRow(database.TableResult);
-        SqlPageSelectionRepository repository = new(database, "test-machine");
+        SqlPageSelectionRepository repository = new(
+            database,
+            "test-machine",
+            new PageQueryOptions("test-machine", 10));
 
         IReadOnlyList<Page> pages = repository.GetScrapePages(5);
 

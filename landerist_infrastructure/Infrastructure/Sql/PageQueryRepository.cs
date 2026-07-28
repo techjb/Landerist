@@ -1,6 +1,4 @@
-using landerist_library.Configuration;
 using landerist_library.Database;
-using landerist_library.Infrastructure.Scraping;
 using landerist_library.Pages;
 using System.Data;
 
@@ -9,10 +7,18 @@ namespace landerist_library.Infrastructure.Sql
     public class PageQueryRepository
     {
         private readonly IDatabase _database;
+        private readonly PageQueryOptions _options;
         public PageQueryRepository(IDatabase database)
+            : this(database, PageQueryOptions.Default)
+        {
+        }
+
+        public PageQueryRepository(IDatabase database, PageQueryOptions options)
         {
             ArgumentNullException.ThrowIfNull(database);
+            ArgumentNullException.ThrowIfNull(options);
             _database = database;
+            _options = options;
         }
 
         private IDatabase Database => _database;
@@ -47,7 +53,7 @@ namespace landerist_library.Infrastructure.Sql
                 "   AND (P.[PageType] IS NULL OR P.[NextScrape] < GETDATE()) " +
                 "   AND NOT EXISTS (" +
                 "       SELECT 1 " +
-                "       FROM " + WebsitesThrottle.WEBSITES_THROTTLE + " AS WB " +
+                "       FROM " + SqlTableNames.WebsiteThrottle + " AS WB " +
                 "       WHERE WB.[Host] = P.[Host] AND WB.[BlockUntil] > GETDATE()" +
                 "   ) " +
                 "), " +
@@ -65,8 +71,8 @@ namespace landerist_library.Infrastructure.Sql
                 "INNER JOIN TopPages AS TP ON P.[UriHash] = TP.[UriHash]";
 
             return Database.QueryTable(query, new Dictionary<string, object?>(){
-                { "LockedBy", Config.IsConfigurationLocal()? null: Config.MACHINE_NAME},
-                { "MaxPagesPerHost", Config.MAX_PAGES_PER_HOST_PER_SCRAPE}
+                { "LockedBy", _options.LockedBy},
+                { "MaxPagesPerHost", _options.MaxPagesPerHost}
             });
         }
 
@@ -80,7 +86,7 @@ namespace landerist_library.Infrastructure.Sql
                 "   WHERE P.[LockedBy] IS NULL AND P.[WaitingStatus] IS NULL " +
                 "   AND NOT EXISTS (" +
                 "       SELECT 1 " +
-                "       FROM " + WebsitesThrottle.WEBSITES_THROTTLE + " AS WB " +
+                "       FROM " + SqlTableNames.WebsiteThrottle + " AS WB " +
                 "       WHERE WB.[Host] = P.[Host] AND WB.[BlockUntil] > GETDATE()" +
                 "   ) " +
                 (string.IsNullOrEmpty(where) ? string.Empty : " AND " + where) + " " +
@@ -94,7 +100,7 @@ namespace landerist_library.Infrastructure.Sql
                 "INNER JOIN TopPages AS TP ON P.[UriHash] = TP.[UriHash]";
 
             return Database.QueryTable(query, new Dictionary<string, object?>(){
-                { "LockedBy", Config.IsConfigurationLocal()? null: Config.MACHINE_NAME}
+                { "LockedBy", _options.LockedBy}
             });
         }
 

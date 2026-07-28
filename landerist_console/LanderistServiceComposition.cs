@@ -101,10 +101,13 @@ internal static class LanderistServiceComposition
             databaseFactory.Create(),
             Config.NOT_LISTING_CACHE_ENABLED);
         BatchRepository batches = new(databaseFactory.Create());
+        PageQueryOptions pageQueryOptions = new(
+            Config.IsConfigurationLocal() ? null : Config.MACHINE_NAME,
+            Config.MAX_PAGES_PER_HOST_PER_SCRAPE);
         SqlPageCatalog pageCatalog = new(
-            new PageQueryRepository(databaseFactory.Create()));
+            new PageQueryRepository(databaseFactory.Create(), pageQueryOptions));
         SqlPageQueryService pageQueries = new(
-            new PageQueryRepository(databaseFactory.Create()));
+            new PageQueryRepository(databaseFactory.Create(), pageQueryOptions));
         SqlPageMaintenanceService pageMaintenance = new(
             new PageMaintenanceRepository(databaseFactory.Create()));
         WebsiteDeletionService websiteDeletion = new(
@@ -186,7 +189,10 @@ internal static class LanderistServiceComposition
             new SqlPageSchedulingService(listingStore),
             Config.INDEXER_ENABLED);
         PageBatchSelector pageBatchSelector = new(
-            new SqlPageSelectionRepository(databaseFactory.Create(), Config.MACHINE_NAME),
+            new SqlPageSelectionRepository(
+                databaseFactory.Create(),
+                Config.MACHINE_NAME,
+                pageQueryOptions),
             new PageSelectionOptions(
                 Config.MAX_PAGES_PER_SCRAPE,
                 Config.MAX_PAGES_PER_HOST_PER_SCRAPE,
