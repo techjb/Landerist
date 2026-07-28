@@ -26,7 +26,7 @@ public sealed class InfrastructureProjectArchitectureTests
             .ToArray();
 
         Assert.Equal(
-            ["Com.Bekijkhet.RobotsTxt", "PuppeteerSharp"],
+            ["Com.Bekijkhet.RobotsTxt", "Microsoft.Data.SqlClient", "PuppeteerSharp"],
             packages);
         Assert.Equal(
             [
@@ -121,6 +121,34 @@ public sealed class InfrastructureProjectArchitectureTests
         Assert.DoesNotContain("new SitemapIndexer", source, StringComparison.Ordinal);
         Assert.DoesNotContain("Infrastructure.Indexing", source, StringComparison.Ordinal);
         Assert.Contains("IWebsiteSitemapIndexerFactory", source, StringComparison.Ordinal);
+    }
+    [Fact]
+    public void SqlCore_IsPhysicallyOwnedByInfrastructureProject()
+    {
+        string root = FindRepositoryRoot();
+        string[] databaseTypes = ["IDatabase.cs", "IDatabaseFactory.cs", "DataBase.cs"];
+        foreach (string file in databaseTypes)
+        {
+            Assert.True(File.Exists(Path.Combine(root, "landerist_infrastructure", "Database", file)));
+            Assert.False(File.Exists(Path.Combine(root, "landerist_library", "Database", file)));
+        }
+
+        string[] sqlTypes = ["SqlDatabaseFactory.cs", "SqlDatabaseOptions.cs"];
+        foreach (string file in sqlTypes)
+        {
+            Assert.True(File.Exists(Path.Combine(
+                root,
+                "landerist_infrastructure",
+                "Infrastructure",
+                "Sql",
+                file)));
+            Assert.False(File.Exists(Path.Combine(
+                root,
+                "landerist_library",
+                "Infrastructure",
+                "Sql",
+                file)));
+        }
     }
     [Fact]
     public void LegacyLibrary_ReferencesInfrastructureProject()
