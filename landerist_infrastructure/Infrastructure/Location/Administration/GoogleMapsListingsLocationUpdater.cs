@@ -4,7 +4,7 @@ using landerist_library.Infrastructure.Location.Providers.GoogleMaps;
 using landerist_library.Infrastructure.Location.Candidates;
 using landerist_library.Websites;
 
-namespace landerist_library.Infrastructure.Parsing
+namespace landerist_library.Infrastructure.Location.Administration
 {
     public sealed class GoogleMapsListingsLocationUpdater(
         IListingAdministrationService listings,

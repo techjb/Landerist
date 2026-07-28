@@ -35,7 +35,8 @@ internal sealed class LanderistDatabaseAdapterFactory(
             new LegacyListingLocationEnricher(
                 databaseFactory.Create(),
                 goolzoom,
-                new GoogleMapsApi(databaseFactory.Create(), googleMapsApiKey, logger)));
+                new GoogleMapsApi(databaseFactory.Create(), googleMapsApiKey, logger),
+                new AddressToCadastralReference(databaseFactory.Create(), goolzoom)));
 
     public SqlScrapeMetrics CreateScrapeMetrics() =>
         new(databaseFactory.Create());

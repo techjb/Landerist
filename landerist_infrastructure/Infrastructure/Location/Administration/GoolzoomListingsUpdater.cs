@@ -2,7 +2,7 @@ using landerist_library.Application.Listings;
 using landerist_library.Infrastructure.Location.Providers.Goolzoom;
 using landerist_library.Infrastructure.Location.Candidates;
 
-namespace landerist_library.Infrastructure.Parsing
+namespace landerist_library.Infrastructure.Location.Administration
 {
     public sealed class GoolzoomListingsUpdater(IListingAdministrationService listings, IGoolzoomClient goolzoom)
     {

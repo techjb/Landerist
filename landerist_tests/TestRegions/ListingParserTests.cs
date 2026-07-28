@@ -14,7 +14,7 @@ namespace landerist_tests
             //landerist_library.GetLatLng.PageType.PageTypeParser.ResponseBodyValidToIsListing(page);
 
             //new ChatGPTRequest().ListModels();
-            //landerist_library.Parse.Location.LauIdParser.SetLauIdAndLauNameToListings();
+            //landerist_library.Infrastructure.Location.Parsing.LauIdParser.SetLauIdAndLauNameToListings();
 
             //landerist_library.GetLatLng.Listing.VertexAI.ParseListingVertexAI.GetResponse();
 

@@ -175,7 +175,8 @@ namespace landerist_tests
                         new GoogleMapsApi(
                             databaseFactory.Create(),
                             LanderistSettings.Current.GetString("GOOGLE_CLOUD_LANDERIST_API_KEY"),
-                            logger))),
+                            logger),
+                        new AddressToCadastralReference(databaseFactory.Create(), goolzoom))),
                 new LegacyListingUnpublishPolicy(listingQueries),
                 logger,
                 new HtmlPageContentInspector());

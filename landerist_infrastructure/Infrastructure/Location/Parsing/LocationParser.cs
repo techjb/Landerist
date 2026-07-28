@@ -8,7 +8,7 @@ using landerist_library.Infrastructure.Location.Extractors;
 using landerist_library.Infrastructure.Location.Providers.Goolzoom;
 using landerist_library.Infrastructure.Location.Validation;
 
-namespace landerist_library.Infrastructure.Parsing
+namespace landerist_library.Infrastructure.Location.Parsing
 {
     public class LocationParser
     {
@@ -18,7 +18,7 @@ namespace landerist_library.Infrastructure.Parsing
         private readonly HtmlLocationExtractor HtmlLocationExtractor;
         private readonly GoogleMapsAddressLocationResolver GoogleMapsAddressLocationResolver;
         private readonly CadastralLocationResolver CadastralLocationResolver;
-        private readonly AddressCadastralReferenceResolver AddressCadastralReferenceResolver;
+        private readonly ICadastralReferenceProvider CadastralReferenceProvider;
 
         public LocationParser(
             IDatabase database,
@@ -38,7 +38,7 @@ namespace landerist_library.Infrastructure.Parsing
                 CoordinateValidator,
                 geocoder);
             CadastralLocationResolver = new CadastralLocationResolver(CoordinateValidator, goolzoom);
-            AddressCadastralReferenceResolver = new AddressCadastralReferenceResolver(cadastralReference);
+            CadastralReferenceProvider = cadastralReference;
         }
 
         public void SetLocation()
@@ -171,10 +171,10 @@ namespace landerist_library.Infrastructure.Parsing
             {
                 return;
             }
-            var cadastralReference = AddressCadastralReferenceResolver.Resolve(
+            var cadastralReference = CadastralReferenceProvider.GetCadastralReference(
                 Listing.latitude,
                 Listing.longitude,
-                Listing.address);
+                Listing.address!);
             if (!string.IsNullOrEmpty(cadastralReference))
             {
                 Listing.cadastralReference = cadastralReference;

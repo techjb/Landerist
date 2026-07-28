@@ -758,7 +758,14 @@ public sealed class InfrastructureProjectArchitectureTests
             "Infrastructure",
             "Parsing");
         Assert.True(File.Exists(Path.Combine(parsing, "LegacyBatchListingResponseParser.cs")));
-        Assert.True(File.Exists(Path.Combine(parsing, "LegacyListingLocationEnricher.cs")));
+        string extractedParsing = Path.Combine(
+            root,
+            "landerist_infrastructure",
+            "Infrastructure",
+            "Parsing");
+        Assert.True(File.Exists(Path.Combine(
+            extractedParsing,
+            "LegacyListingLocationEnricher.cs")));
         Assert.True(File.Exists(Path.Combine(parsing, "LegacyListingPageParser.cs")));
         Assert.True(File.Exists(Path.Combine(parsing, "LegacyLocalAiListingParser.cs")));
         Assert.True(File.Exists(Path.Combine(parsing, "LegacyLocalAiTokenBudget.cs")));
