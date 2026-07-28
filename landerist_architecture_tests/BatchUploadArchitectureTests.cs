@@ -35,6 +35,20 @@ public sealed class BatchUploadArchitectureTests
             StringComparison.Ordinal);
     }
 
+    [Fact]
+    public void JsonlWriter_UsesListingInputPort()
+    {
+        string source = File.ReadAllText(Path.Combine(
+            FindRepositoryRoot(),
+            "landerist_library",
+            "Infrastructure",
+            "Parsing",
+            "JsonlBatchInputWriter.cs"));
+
+        Assert.Contains("IListingInputPreparer", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("GetListingParserInput", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("PageListingInputExtensions", source, StringComparison.Ordinal);
+    }
     private static string FindRepositoryRoot()
     {
         DirectoryInfo? directory = new(AppContext.BaseDirectory);

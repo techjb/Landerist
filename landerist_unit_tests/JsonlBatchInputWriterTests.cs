@@ -1,4 +1,5 @@
 using landerist_library.Application.Logging;
+using landerist_library.Application.Parsing;
 using landerist_library.Infrastructure.Parsing;
 using landerist_library.Pages;
 using landerist_library.Parse.ListingParser;
@@ -70,6 +71,7 @@ public sealed class JsonlBatchInputWriterTests
                 maxFileSize,
                 minPages),
             new StubProvider(),
+            new StubListingInputPreparer(),
             new FixedTimeProvider(
                 new DateTimeOffset(2026, 7, 27, 10, 0, 0, TimeSpan.Zero)),
             new NullApplicationLogger());
@@ -106,6 +108,12 @@ public sealed class JsonlBatchInputWriterTests
         {
         }
     }
+    private sealed class StubListingInputPreparer : IListingInputPreparer
+    {
+        public void Prepare(Page page) { }
+        public bool MatchesUnavailableRule(Page page) => false;
+    }
+
     private sealed class StubProvider : IListingBatchUploadProvider
     {
         public LLMProvider Provider => LLMProvider.OpenAI;

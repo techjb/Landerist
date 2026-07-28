@@ -286,6 +286,7 @@ internal static class LanderistServiceComposition
                 batchMaxFileSize,
                 Config.MIN_PAGES_PER_BATCH),
             batchUploadProvider,
+            new PageListingInputPreparer(),
             TimeProvider.System,
             logger);
         return new TasksService(

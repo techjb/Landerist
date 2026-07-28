@@ -1,4 +1,5 @@
 using landerist_library.Application.Logging;
+using landerist_library.Application.Parsing;
 using landerist_library.Pages;
 
 namespace landerist_library.Infrastructure.Parsing;
@@ -15,17 +16,20 @@ public sealed class JsonlBatchInputWriter : IBatchInputWriter
 
     private readonly BatchInputWriterOptions _options;
     private readonly IListingBatchUploadProvider _provider;
+    private readonly IListingInputPreparer _listingInput;
     private readonly TimeProvider _timeProvider;
     private readonly IApplicationLogger _logger;
 
     public JsonlBatchInputWriter(
         BatchInputWriterOptions options,
         IListingBatchUploadProvider provider,
+        IListingInputPreparer listingInput,
         TimeProvider timeProvider,
         IApplicationLogger logger)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(provider);
+        ArgumentNullException.ThrowIfNull(listingInput);
         ArgumentNullException.ThrowIfNull(timeProvider);
         ArgumentNullException.ThrowIfNull(logger);
         if (string.IsNullOrWhiteSpace(options.Directory))
@@ -41,6 +45,7 @@ public sealed class JsonlBatchInputWriter : IBatchInputWriter
 
         _options = options;
         _provider = provider;
+        _listingInput = listingInput;
         _timeProvider = timeProvider;
         _logger = logger;
     }
@@ -104,7 +109,8 @@ public sealed class JsonlBatchInputWriter : IBatchInputWriter
         try
         {
             page.SetResponseBodyFromZipped();
-            string? userInput = page.GetListingParserInput();
+            _listingInput.Prepare(page);
+            string? userInput = page.ListingParserInput;
             page.RemoveResponseBody();
             if (string.IsNullOrEmpty(userInput))
                 return WriteResult.Invalid;
