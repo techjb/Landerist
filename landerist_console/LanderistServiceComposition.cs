@@ -15,7 +15,6 @@ using landerist_library.Application.Persistence;
 using landerist_library.Application.Scraping;
 using landerist_library.Application.Tasks;
 using landerist_library.Application.Websites;
-using landerist_library.Database;
 using landerist_library.Infrastructure.Administration;
 using landerist_library.Infrastructure.Backup;
 using landerist_library.Infrastructure.Distribution;
@@ -31,44 +30,43 @@ using landerist_library.Infrastructure.Tasks;
 using landerist_library.Infrastructure.WebsiteServices;
 using landerist_library.Logs;
 using landerist_library.Application.Statistics;
+using landerist_library.Infrastructure.Runtime;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace landerist_console;
 
 internal static class LanderistServiceComposition
 {
-    public static TasksService CreateTasksService()
+    public static TasksService CreateTasksService(
+        LanderistRuntimeOptions runtimeOptions,
+        SqlDatabaseFactory databaseFactory,
+        IServiceProvider services)
     {
-        SqlDatabaseFactory databaseFactory = new(
-            new SqlDatabaseOptions(
-                Config.DATASOURCE
-                    ?? throw new InvalidOperationException("Database data source is not configured."),
-                Config.DATABASE_USER,
-                Config.DATABASE_PW,
-                Config.DATABASE_NAME,
-                Config.DATABASE_ENCRYPT,
-                Config.DATABASE_TRUST_SERVER_CERTIFICATE));
-        LegacyDatabase.Configure(databaseFactory);
+        ArgumentNullException.ThrowIfNull(runtimeOptions);
+        ArgumentNullException.ThrowIfNull(databaseFactory);
+        ArgumentNullException.ThrowIfNull(services);
+        runtimeOptions.Validate();
         LanderistSettings settings = LanderistSettings.Current;
         HttpClientTransportFactory httpClients = new(
             new HttpTransportOptions(
-                settings.GetString("PROXY_HOST"),
-                settings.GetInt32("PROXY_PORT"),
-                settings.GetBoolean("PROXY_RANDOMIZE_STICKY_PORTS"),
-                settings.GetInt32("PROXY_STICKY_PORT_MIN"),
-                settings.GetInt32("PROXY_STICKY_PORT_MAX"),
-                settings.GetString("PROXY_USERNAME"),
-                settings.GetString("PROXY_PASSWORD")));
+                runtimeOptions.Proxy.Host,
+                runtimeOptions.Proxy.Port,
+                runtimeOptions.Proxy.RandomizeStickyPorts,
+                runtimeOptions.Proxy.StickyPortMin,
+                runtimeOptions.Proxy.StickyPortMax,
+                runtimeOptions.Proxy.Username,
+                runtimeOptions.Proxy.Password));
         PuppeteerBrowserOptions browserOptions = new(
-            Config.HEADLESS_BROWSER,
-            Config.IsConfigurationLocal(),
-            Config.HTTPCLIENT_SECONDS_TIMEOUT * 1000,
-            settings.GetString("PROXY_HOST"),
-            settings.GetInt32("PROXY_PORT"),
-            settings.GetBoolean("PROXY_RANDOMIZE_STICKY_PORTS"),
-            settings.GetInt32("PROXY_STICKY_PORT_MIN"),
-            settings.GetInt32("PROXY_STICKY_PORT_MAX"),
-            settings.GetString("PROXY_USERNAME"),
-            settings.GetString("PROXY_PASSWORD"));
+            runtimeOptions.Browser.Headless,
+            runtimeOptions.Browser.IsLocal,
+            runtimeOptions.Browser.TimeoutMilliseconds,
+            runtimeOptions.Proxy.Host,
+            runtimeOptions.Proxy.Port,
+            runtimeOptions.Proxy.RandomizeStickyPorts,
+            runtimeOptions.Proxy.StickyPortMin,
+            runtimeOptions.Proxy.StickyPortMax,
+            runtimeOptions.Proxy.Username,
+            runtimeOptions.Proxy.Password);
         DownloadersPool downloaders = new(
             Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
             new PuppeteerDownloaderFactory(browserOptions));
@@ -76,8 +74,8 @@ internal static class LanderistServiceComposition
         LegacyDownloadersPoolAdapter downloaderPool = new(downloaders);
         ChromeMaintenanceService chrome = new(
             new ChromeMaintenanceOptions(
-                ProcessCleanupEnabled: Config.IsConfigurationProduction(),
-                UseTaskKillFallback: Config.IsPrincipalMachine()),
+                runtimeOptions.Browser.ProcessCleanupEnabled,
+                runtimeOptions.Browser.UseTaskKillFallback),
             new SystemChromeProcessController(logger),
             new PuppeteerChromeBrowserInstaller());
         GoolzoomApi goolzoom = new(
@@ -89,46 +87,44 @@ internal static class LanderistServiceComposition
         WebsiteNetworkService websiteNetwork = new(
             httpClients,
             TimeProvider.System);
-        PagePersistenceService pagePersistence = new(new PageRepository(databaseFactory.Create()), logger);
-        WebsitePersistenceService websitePersistence = new(new WebsiteRepository(databaseFactory.Create()));
+        PagePersistenceService pagePersistence = new(services.GetRequiredService<PageRepository>(), logger);
+        WebsitePersistenceService websitePersistence = new(services.GetRequiredService<WebsiteRepository>());
         SqlListingStore listingStore = new(
             databaseFactory.Create(),
-            new GlobalStatisticsRepository(databaseFactory.Create()),
+            services.GetRequiredService<GlobalStatisticsRepository>(),
             logger);
         SqlListingQueryService listingQueries = new(
-            new ListingQueryRepository(databaseFactory.Create()),
-            new MediaRepository(databaseFactory.Create()),
-            new SourceRepository(databaseFactory.Create()));
+            services.GetRequiredService<ListingQueryRepository>(),
+            services.GetRequiredService<MediaRepository>(),
+            services.GetRequiredService<SourceRepository>());
         SqlListingMaintenanceService listingMaintenance = new(
-            new ListingRepository(databaseFactory.Create()),
-            new MediaRepository(databaseFactory.Create()),
-            new SourceRepository(databaseFactory.Create()));
+            services.GetRequiredService<ListingRepository>(),
+            services.GetRequiredService<MediaRepository>(),
+            services.GetRequiredService<SourceRepository>());
         SqlNotListingCacheService notListingCache = new(
             databaseFactory.Create(),
             Config.NOT_LISTING_CACHE_ENABLED);
-        PageQueryOptions pageQueryOptions = new(
-            Config.IsConfigurationLocal() ? null : Config.MACHINE_NAME,
-            Config.MAX_PAGES_PER_HOST_PER_SCRAPE);
+        PageQueryOptions pageQueryOptions = services.GetRequiredService<PageQueryOptions>();
         SqlPageCatalog pageCatalog = new(
-            new PageQueryRepository(databaseFactory.Create(), pageQueryOptions));
+            services.GetRequiredService<PageQueryRepository>());
         SqlPageQueryService pageQueries = new(
-            new PageQueryRepository(databaseFactory.Create(), pageQueryOptions));
+            services.GetRequiredService<PageQueryRepository>());
         SqlPageMaintenanceService pageMaintenance = new(
-            new PageMaintenanceRepository(databaseFactory.Create()));
+            services.GetRequiredService<PageMaintenanceRepository>());
         WebsiteDeletionService websiteDeletion = new(
             pageCatalog,
             new OrelsListingDeletionService(listingMaintenance),
-            new SqlPageDeletionService(new PageMaintenanceRepository(databaseFactory.Create())),
+            new SqlPageDeletionService(services.GetRequiredService<PageMaintenanceRepository>()),
             websitePersistence);
         SqlPageWaitingStatusService waitingStatus = new(
-            new PageMaintenanceRepository(databaseFactory.Create()));
-        PageStatisticsRepository pageStatistics = new(databaseFactory.Create());
-        WebsiteQueryRepository websiteQueries = new(databaseFactory.Create());
+            services.GetRequiredService<PageMaintenanceRepository>());
+        PageStatisticsRepository pageStatistics = services.GetRequiredService<PageStatisticsRepository>();
+        WebsiteQueryRepository websiteQueries = services.GetRequiredService<WebsiteQueryRepository>();
         SqlWebsiteCatalog websiteCatalog = new(websiteQueries);
         SqlWebsiteMaintenanceService websiteMaintenance = new(websiteQueries);
         WebsiteMetricsService websiteMetrics = new(
-            new WebsitePageMetricsRepository(databaseFactory.Create()),
-            new ListingStatisticsRepository(databaseFactory.Create()),
+            services.GetRequiredService<WebsitePageMetricsRepository>(),
+            services.GetRequiredService<ListingStatisticsRepository>(),
             Config.MAX_PAGES_PER_WEBSITE);
         WebsiteRobotsPolicy robotsPolicy = new();
         WebsiteAccessServices websiteAccess = new(robotsPolicy, httpClients);
@@ -159,15 +155,15 @@ internal static class LanderistServiceComposition
             listingParserClients,
             parsingServices);
         GlobalStatistics globalStatistics = new(
-            new GlobalStatisticsRepository(databaseFactory.Create()),
+            services.GetRequiredService<GlobalStatisticsRepository>(),
             persistenceEnabled: !Config.IsConfigurationLocal());
         HostStatistics hostStatistics = new(
-            new HostStatisticsRepository(databaseFactory.Create()),
+            services.GetRequiredService<HostStatisticsRepository>(),
             websiteCatalog,
             persistenceEnabled: !Config.IsConfigurationLocal());
         SqlPageLinkService pageLinks = new(
             pagePersistence,
-            new WebsitePageMetricsRepository(databaseFactory.Create()),
+            services.GetRequiredService<WebsitePageMetricsRepository>(),
             robotsPolicy,
             Config.MAX_PAGES_PER_WEBSITE);
         ListingLifecycleService listingLifecycle = new(
@@ -235,12 +231,16 @@ internal static class LanderistServiceComposition
             pageBatchSelector,
             batchScraping,
             new ConsoleScrapeProgressReporter());
-        TasksExecutionMode executionMode =
-            Config.IsLocalAIMachine() || Config.IsConfigurationLocal()
-                ? TasksExecutionMode.LocalAi
-                : Config.IsPrincipalMachine()
-                    ? TasksExecutionMode.Principal
-                    : TasksExecutionMode.Scraper;
+        TasksExecutionMode executionMode = runtimeOptions.Role switch
+        {
+            LanderistExecutionRole.LocalAi => TasksExecutionMode.LocalAi,
+            LanderistExecutionRole.Principal => TasksExecutionMode.Principal,
+            LanderistExecutionRole.Scraper => TasksExecutionMode.Scraper,
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(runtimeOptions),
+                runtimeOptions.Role,
+                "Unknown execution role.")
+        };
 
         Tokenizer batchTokenizer = new(
             TokenizerOptions.ForProvider(Config.LLM_PROVIDER));
@@ -360,11 +360,11 @@ internal static class LanderistServiceComposition
                     websiteCatalog,
                     websiteQueries,
                     new SqlListingAdministrationService(
-                        new ListingRepository(databaseFactory.Create()),
-                        new ListingQueryRepository(databaseFactory.Create()),
-                        new ListingStatisticsRepository(databaseFactory.Create()),
-                        new MediaRepository(databaseFactory.Create()),
-                        new SourceRepository(databaseFactory.Create()),
+                        services.GetRequiredService<ListingRepository>(),
+                        services.GetRequiredService<ListingQueryRepository>(),
+                        services.GetRequiredService<ListingStatisticsRepository>(),
+                        services.GetRequiredService<MediaRepository>(),
+                        services.GetRequiredService<SourceRepository>(),
                         logger)),
                 logger),
             TimeProvider.System);

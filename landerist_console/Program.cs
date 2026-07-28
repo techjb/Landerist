@@ -1,4 +1,3 @@
-using landerist_library.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -8,12 +7,10 @@ internal static class Program
 {
     public static async Task Main(string[] args)
     {
-        Config.SetToProduction();
-        Console.Title = "Landerist Console " + Config.VERSION;
+        Console.Title = "Landerist Console";
 
         HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
-        builder.Services.AddSingleton(_ =>
-            LanderistServiceComposition.CreateTasksService());
+        builder.Services.AddLanderist();
         builder.Services.AddHostedService<LanderistWorker>();
 
         using IHost host = builder.Build();

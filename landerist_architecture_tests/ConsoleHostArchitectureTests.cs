@@ -18,17 +18,39 @@ public sealed class ConsoleHostArchitectureTests
     public void Program_DelegatesObjectGraphConstructionToCompositionRoot()
     {
         string program = ReadConsoleSource("Program.cs");
+        string registrations = ReadConsoleSource(
+            "LanderistServiceCollectionExtensions.cs");
         string composition = ReadConsoleSource("LanderistServiceComposition.cs");
 
+        Assert.Contains("builder.Services.AddLanderist()", program);
         Assert.Contains(
-            "LanderistServiceComposition.CreateTasksService()",
-            program);
-        Assert.Contains("CreateTasksService()", composition);
+            "LanderistServiceComposition.CreateTasksService(",
+            registrations);
+        Assert.Contains("CreateTasksService(", composition);
         Assert.True(
             File.ReadLines(GetConsolePath("Program.cs")).Count() <= 30,
             "Program must remain a small host bootstrapper.");
     }
 
+    [Fact]
+    public void PersistenceRegistration_OwnsDatabaseFactoryConstruction()
+    {
+        string registrations = ReadConsoleSource(
+            "LanderistPersistenceServiceCollectionExtensions.cs");
+        string composition = ReadConsoleSource("LanderistServiceComposition.cs");
+
+        Assert.Contains("SqlDatabaseOptions databaseOptions = new(", registrations);
+        Assert.Contains("LegacyDatabase.Configure(databaseFactory)", registrations);
+        Assert.Contains("AddSingleton<IDatabaseFactory>", registrations);
+        Assert.DoesNotContain("SqlDatabaseOptions databaseOptions", composition);
+        Assert.DoesNotContain("LegacyDatabase.Configure", composition);
+        Assert.DoesNotContain("new PageRepository(", composition);
+        Assert.DoesNotContain("new WebsiteRepository(", composition);
+        Assert.DoesNotContain("new ListingRepository(", composition);
+        Assert.Contains("AddTransient(_ => new PageRepository(", registrations);
+        Assert.Contains("AddTransient(_ => new WebsiteRepository(", registrations);
+        Assert.Contains("AddTransient(_ => new ListingRepository(", registrations);
+    }
     private static string ReadConsoleSource(string fileName) =>
         File.ReadAllText(GetConsolePath(fileName));
 
