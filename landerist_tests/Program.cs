@@ -167,7 +167,8 @@ namespace landerist_tests
                     notListingCache,
                     new SqlPageClassificationMetrics(databaseFactory.Create()),
                     new LegacyListingPageParser(hostStatistics, listingParser),
-                    new LegacyPageTokenLimitPolicy(new Tokenizer(TokenizerOptions.ForProvider(Config.LLM_PROVIDER)))),
+                    new LegacyPageTokenLimitPolicy(new Tokenizer(TokenizerOptions.ForProvider(Config.LLM_PROVIDER))),
+                new HtmlPageContentInspector()),
                 new PageIndexingService(Config.INDEXER_ENABLED, pageLinks),
                 new SqlPageSchedulingService(listingStore),
                 Config.INDEXER_ENABLED);
@@ -239,7 +240,7 @@ namespace landerist_tests
                 if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0 &&
                     keyInfo.Key == ConsoleKey.D)
                 {
-                    Console.WriteLine("Ã‚Â¡Ctrl + D detectado!");
+                    Console.WriteLine("Ãƒâ€šÃ‚Â¡Ctrl + D detectado!");
                     ExitSignal.Set();
                 }
             };
