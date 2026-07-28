@@ -732,6 +732,40 @@ public sealed class InfrastructureProjectArchitectureTests
             forbidden,
             token => source.Contains(token, StringComparison.Ordinal));
     }
+
+    [Fact]
+    public void LegacyTaskAdapters_AreGroupedByCapability()
+    {
+        string root = FindRepositoryRoot();
+        Assert.False(Directory.Exists(Path.Combine(
+            root,
+            "landerist_library",
+            "Infrastructure",
+            "Tasks")));
+
+        string administration = Path.Combine(
+            root,
+            "landerist_library",
+            "Infrastructure",
+            "Administration");
+        Assert.True(File.Exists(Path.Combine(
+            administration,
+            "LegacyAddressDataMaintenance.cs")));
+
+        string parsing = Path.Combine(
+            root,
+            "landerist_library",
+            "Infrastructure",
+            "Parsing");
+        Assert.True(File.Exists(Path.Combine(parsing, "LegacyBatchListingResponseParser.cs")));
+        Assert.True(File.Exists(Path.Combine(parsing, "LegacyLocalAiListingParser.cs")));
+        Assert.True(File.Exists(Path.Combine(parsing, "LegacyLocalAiTokenBudget.cs")));
+        Assert.True(File.Exists(Path.Combine(
+            parsing,
+            "VertexAI",
+            "LegacyVertexAiBatchArtifactCleaner.cs")));
+    }
+
     [Fact]
     public void LegacyLibrary_ReferencesInfrastructureProject()
     {

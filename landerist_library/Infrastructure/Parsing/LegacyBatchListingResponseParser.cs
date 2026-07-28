@@ -1,9 +1,9 @@
-using landerist_library.Infrastructure.Parsing;
 using landerist_library.Pages;
 using landerist_library.Parse.ListingParser;
+using landerist_library.Infrastructure.Tasks;
 using landerist_orels.ES;
 
-namespace landerist_library.Infrastructure.Tasks;
+namespace landerist_library.Infrastructure.Parsing;
 
 public sealed class LegacyBatchListingResponseParser(ParseListing parser)
     : IBatchListingResponseParser

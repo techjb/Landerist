@@ -1,6 +1,7 @@
 using landerist_library.Database;
+using landerist_library.Infrastructure.Tasks;
 
-namespace landerist_library.Infrastructure.Tasks;
+namespace landerist_library.Infrastructure.Administration;
 
 public sealed class LegacyAddressDataMaintenance : IAddressDataMaintenance
 {

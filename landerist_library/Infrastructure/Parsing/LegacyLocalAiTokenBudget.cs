@@ -1,6 +1,7 @@
 using landerist_library.Parse.ListingParser;
+using landerist_library.Infrastructure.Tasks;
 
-namespace landerist_library.Infrastructure.Tasks;
+namespace landerist_library.Infrastructure.Parsing;
 
 public sealed class LegacyLocalAiTokenBudget(Tokenizer tokenizer)
     : ILocalAiTokenBudget
