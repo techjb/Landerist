@@ -1,9 +1,6 @@
 using landerist_library.Application.Listings;
 using landerist_library.Database;
 using landerist_library.Pages;
-using landerist_library.Infrastructure.Parsing;
-using landerist_library.Parse.Location.Providers.GoogleMaps;
-using landerist_library.Parse.Location.Providers.Goolzoom;
 using landerist_library.Websites;
 using landerist_orels.ES;
 using System.Data;
@@ -14,24 +11,21 @@ namespace landerist_library.Infrastructure.Listings;
 public sealed class SqlListingEnricher : IListingEnricher
 {
     private readonly IDatabase _database;
-    private readonly IGoolzoomClient _goolzoom;
+    private readonly IListingLocationEnricher _locationEnricher;
 
-    public SqlListingEnricher(IDatabase database, IGoolzoomClient goolzoom)
+    public SqlListingEnricher(
+        IDatabase database,
+        IListingLocationEnricher locationEnricher)
     {
         ArgumentNullException.ThrowIfNull(database);
-        ArgumentNullException.ThrowIfNull(goolzoom);
+        ArgumentNullException.ThrowIfNull(locationEnricher);
         _database = database;
-        _goolzoom = goolzoom;
+        _locationEnricher = locationEnricher;
     }
 
     public void Enrich(Page page, Listing listing)
     {
-        new LocationParser(
-            page,
-            listing,
-            new GoogleMapsApi(_database),
-            new AddressToCadastralReference(_database, _goolzoom),
-            _goolzoom).SetLocation();
+        _locationEnricher.EnrichLocation(page, listing);
         SetAdministrativeArea(page.Website.CountryCode, listing);
     }
 

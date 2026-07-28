@@ -172,7 +172,11 @@ internal static class LanderistServiceComposition
             listingStore,
             notListingCache,
             pageLinks,
-            new SqlListingEnricher(databaseFactory.Create(), goolzoom),
+            new SqlListingEnricher(
+                databaseFactory.Create(),
+                new LegacyListingLocationEnricher(
+                    databaseFactory.Create(),
+                    goolzoom)),
             new LegacyListingUnpublishPolicy(listingQueries),
             logger,
             new HtmlPageContentInspector());
