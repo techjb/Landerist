@@ -116,10 +116,6 @@ internal static class LanderistServiceComposition
             services.GetRequiredService<WebsiteRobotsPolicy>();
         WebsiteAccessServices websiteAccess =
             services.GetRequiredService<WebsiteAccessServices>();
-        ListingParsingServices parsingServices = new(
-            ListingMaterializationRules.Default,
-            websiteAccess,
-            TimeProvider.System);
         WebsiteSitemapService websiteSitemaps = new(
             runtimeOptions.Scraping.IndexerEnabled,
             robotsPolicy,
@@ -130,55 +126,9 @@ internal static class LanderistServiceComposition
                 pagePersistence,
                 websiteMetrics),
             logger);
-        ListingParserClientCatalog listingParserClients = new(
-        [
-            new OpenAIListingParserClient(
-                new OpenAIListingParserOptions(runtimeOptions.Ai.OpenAiApiKey),
-                SystemPrompt.Text,
-                StructuredOutputSchema.GetJsonSchemaString(),
-                logger),
-            new VertexListingParserClient(
-                new VertexListingParserOptions(
-                    runtimeOptions.Ai.VertexCredential,
-                    runtimeOptions.Ai.VertexProjectId,
-                    runtimeOptions.Ai.VertexLocation,
-                    runtimeOptions.Ai.VertexPublisher,
-                    runtimeOptions.Ai.VertexListingModel),
-                SystemPrompt.Text,
-                VertexAIResponseSchema.ResponseSchema,
-                logger),
-            new LocalAIListingParserClient(
-                    new LocalAIListingParserOptions(
-                        runtimeOptions.Ai.LocalAiHost,
-                        ResolveHost: runtimeOptions.Ai.ResolveLocalAiHost),
-                    SystemPrompt.Text,
-                    StructuredOutputSchema.GetJsonSchemaString(),
-                    ListingImageUrlPlaceholderCodec.ReplaceImageUrls,
-                    logger)
-        ]);
-        ParseListing listingParser = new(
-            new ListingParserOrchestrationOptions(
-                runtimeOptions.Batch.Enabled,
-                runtimeOptions.Ai.Provider),
-            listingParserClients,
-            parsingServices,
-            new StructuredOutputMaterializationOperations(
-                landerist_library.Tools.Strings.Clean,
-                landerist_library.Tools.Strings.RemoveSpaces,
-                landerist_library.Tools.Validate.Phone,
-                landerist_library.Tools.Validate.Email,
-                landerist_library.Tools.Validate.CadastralReference,
-                (listing, page, websiteAccess, images) =>
-                    new MediaParser(
-                            page,
-                            websiteAccess,
-                            new ImageValidationCacheOperations(
-                                landerist_library.Database.ValidInvalidImages.IsValid,
-                                landerist_library.Database.ValidInvalidImages.IsInvalid,
-                                landerist_library.Database.ValidInvalidImages.InsertValid,
-                                landerist_library.Database.ValidInvalidImages.InsertInvalid))
-                        .AddMediaImages(listing, images),
-                (source, uri, exception) => logger.WriteError(source, uri + Environment.NewLine + exception)),
+        ParseListing listingParser = LanderistAiComposition.CreateListingParser(
+            runtimeOptions,
+            websiteAccess,
             logger);
         GlobalStatistics globalStatistics = new(
             services.GetRequiredService<GlobalStatisticsRepository>(),
@@ -199,7 +149,7 @@ internal static class LanderistServiceComposition
             databaseAdapters.CreateListingEnricher(
                 goolzoom,
                 runtimeOptions.Integrations.GoogleCloudLanderistApiKey,
-                CreateVertexAddressSelectorOptions(runtimeOptions),
+                LanderistAiComposition.CreateAddressSelectorOptions(runtimeOptions.Ai),
                 logger),
             new LegacyListingUnpublishPolicy(listingQueries),
             logger,
@@ -230,65 +180,16 @@ internal static class LanderistServiceComposition
                 "Unknown execution role.")
         };
 
-        Tokenizer batchTokenizer = new(
-            TokenizerOptions.ForProvider(runtimeOptions.Ai.Provider));
-        int batchMaxInputTokens =
-            TokenizerOptions.ForProvider(runtimeOptions.Ai.Provider).MaxContextWindow -
-            batchTokenizer.CountSystemTokens();
-        BatchProvider batchProvider = runtimeOptions.Ai.Provider switch
-        {
-            LLMProvider.OpenAI => BatchProvider.OpenAI,
-            LLMProvider.VertexAI => BatchProvider.VertexAI,
-            _ => throw new InvalidOperationException(
-                $"Batch upload is not supported for {runtimeOptions.Ai.Provider}.")
-        };
-        BatchUploadOptions batchUploadOptions = new(
-            batchProvider,
-            runtimeOptions.Batch.MaxPages,
-            runtimeOptions.Batch.MinPages,
-            batchMaxInputTokens,
-            updateWaitingResponse: runtimeOptions.Batch.UpdateWaitingResponse,
-            statusUpdateParallelism:
-                runtimeOptions.Batch.StatusUpdateParallelism);
-        VertexBatchOptions vertexBatchOptions = new(
-            runtimeOptions.Ai.VertexCredential,
-            runtimeOptions.Ai.VertexProjectId,
-            runtimeOptions.Ai.VertexLocation,
-            runtimeOptions.Ai.VertexListingModel,
-            runtimeOptions.Batch.VertexBucketName,
-            runtimeOptions.Batch.Directory);
-        VertexBatchJobClient vertexBatchJobs = new(vertexBatchOptions, logger);
-        VertexCloudStorageClient vertexStorage = new(vertexBatchOptions, logger);
-        OpenAIBatchOptions openAIBatchOptions = new(
-            runtimeOptions.Ai.OpenAiApiKey,
-            OpenAIListingParserOptions.DefaultModel,
-            runtimeOptions.Batch.Directory);
-        OpenAIBatchClient openAIBatchClient = new(openAIBatchOptions, logger);
-        OpenAIBatchUpload openAIBatchUpload = new(
-            openAIBatchOptions,
-            SystemPrompt.Text,
-            StructuredOutputSchema.GetJsonSchemaString());
-        ListingBatchUploadProviderCatalog batchUploadProviders = new(
-        [
-            new OpenAIBatchUploadProvider(openAIBatchUpload, openAIBatchClient),
-            new VertexAIBatchUploadProvider(
-                SystemPrompt.Text,
-                OpenApiSchemaSerializer.Serialize(VertexAIResponseSchema.ResponseSchema),
-                vertexStorage.Upload,
-                vertexBatchJobs.Create)
-        ]);
-        IListingBatchUploadProvider batchUploadProvider =
-            batchUploadProviders.GetRequired(batchProvider);
-        IBatchInputWriter batchInputWriter = new JsonlBatchInputWriter(
-            new BatchInputWriterOptions(
-                batchProvider,
-                runtimeOptions.Batch.Directory,
-                runtimeOptions.Batch.MaxFileSizeBytes,
-                runtimeOptions.Batch.MinPages),
-            batchUploadProvider,
-            new PageListingInputPreparer(logger),
-            TimeProvider.System,
-            logger);
+        LanderistBatchTasks batchTasks = LanderistBatchComposition.Create(
+            runtimeOptions,
+            databaseAdapters,
+            logger,
+            parsedClassification,
+            globalStatistics,
+            pageCatalog,
+            pagePersistence,
+            waitingStatus,
+            listingParser);
         return new TasksService(
             new TasksServiceOptions(executionMode),
             new SystemRecurringTaskScheduler(),
@@ -309,75 +210,25 @@ internal static class LanderistServiceComposition
                 new LegacyLocalAiTokenBudget(
                     new Tokenizer(TokenizerOptions.ForProvider(LLMProvider.LocalAI))),
                 logger)),
-            new TenMinuteTaskJob(
-                new TaskBatchDownload(
-                    parsedClassification,
-                    databaseAdapters.CreateBatchStore(),
-                    globalStatistics,
-                    pageCatalog,
-                    pagePersistence,
-                    new BatchDownloadProviderCatalog(
-                    [
-                        new BatchDownloadProvider(
-                            BatchProvider.OpenAI,
-                            new OpenAIBatchDownload(openAIBatchClient, logger)),
-                        new BatchDownloadProvider(BatchProvider.VertexAI, new VertexAIBatchDownload(
-                            vertexBatchJobs,
-                            vertexStorage,
-                            logger))
-                    ]),
-                    new LegacyBatchListingResponseParser(listingParser),
-                    new BatchDownloadOptions(
-                        runtimeOptions.Batch.StatusUpdateParallelism),
-                    logger),
-                new TaskBatchUpload(
-                    databaseAdapters.CreateBatchRegistrationStore(),
-                    waitingStatus,
-                    pagePersistence,
-                    batchUploadOptions,
-                    batchUploadProviders,
-                    batchInputWriter,
-                    logger)),
+            batchTasks.TenMinute,
             new HourlyTaskJob(
-                new WebsiteRefreshService(websiteCatalog, websitePersistence, websiteNetwork, websiteSitemaps),
-                new TaskBatchCleaner(
-                    databaseAdapters.CreateBatchStore(),
-                    new BatchCleanupOptions(runtimeOptions.Batch.Directory),
-                    new VertexBatchArtifactCleaner(
-                        vertexBatchJobs,
-                        vertexStorage,
-                        runtimeOptions.Batch.CleanupAfterDays,
-                        TimeProvider.System))),
-            new DailyTaskJob(
-                databaseAdapters.CreateAddressDataMaintenance(),
+                new WebsiteRefreshService(
+                    websiteCatalog,
+                    websitePersistence,
+                    websiteNetwork,
+                    websiteSitemaps),
+                batchTasks.Cleaner),
+            LanderistDistributionComposition.CreateDailyJob(
+                databaseAdapters,
                 notListingCache,
-                databaseAdapters.CreateDatabaseBackupService(),
                 globalStatistics,
                 hostStatistics,
-                new DistributionPublisher(
-                    globalStatistics,
-                    hostStatistics,
-                    pageStatistics,
-                    websiteMetrics,
-                    websiteCatalog,
-                    websiteQueries,
-                    new SqlListingAdministrationService(
-                        services.GetRequiredService<ListingRepository>(),
-                        services.GetRequiredService<ListingQueryRepository>(),
-                        services.GetRequiredService<ListingStatisticsRepository>(),
-                        services.GetRequiredService<MediaRepository>(),
-                        services.GetRequiredService<SourceRepository>(),
-                        logger)),
+                pageStatistics,
+                websiteMetrics,
+                websiteCatalog,
+                websiteQueries,
+                services,
                 logger),
             TimeProvider.System);
     }
-    private static VertexAddressSelectorOptions CreateVertexAddressSelectorOptions(
-        LanderistRuntimeOptions runtimeOptions) =>
-        new(
-            runtimeOptions.Ai.VertexCredential,
-            runtimeOptions.Ai.VertexProjectId,
-            runtimeOptions.Ai.VertexLocation,
-            runtimeOptions.Ai.VertexPublisher,
-            runtimeOptions.Ai.VertexAddressModel);
-
 }

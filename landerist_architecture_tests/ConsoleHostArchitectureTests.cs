@@ -173,6 +173,26 @@ public sealed class ConsoleHostArchitectureTests
             }
         }
     }
+    [Fact]
+    public void ServiceComposition_DelegatesSpecializedObjectGraphsToModules()
+    {
+        string composition = ReadConsoleSource("LanderistServiceComposition.cs");
+
+        Assert.Contains("LanderistAiComposition.CreateListingParser(", composition);
+        Assert.Contains("LanderistBatchComposition.Create(", composition);
+        Assert.Contains(
+            "LanderistDistributionComposition.CreateDailyJob(",
+            composition);
+        Assert.DoesNotContain("OpenAIListingParserClient", composition);
+        Assert.DoesNotContain("VertexListingParserClient", composition);
+        Assert.DoesNotContain("LocalAIListingParserClient", composition);
+        Assert.DoesNotContain("TaskBatchUpload", composition);
+        Assert.DoesNotContain("TaskBatchDownload", composition);
+        Assert.DoesNotContain("DistributionPublisher", composition);
+        Assert.True(
+            File.ReadLines(GetConsolePath("LanderistServiceComposition.cs")).Count() <= 250,
+            "The composition root must delegate specialized object graphs.");
+    }
     private static string ReadConsoleSource(string fileName) =>
         File.ReadAllText(GetConsolePath(fileName));
 
