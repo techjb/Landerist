@@ -68,6 +68,38 @@ public sealed class ListingLifecycleService : IListingLifecycleService
         }
     }
 
+    public async Task ApplyAsync(
+        Page page,
+        Listing? listing,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(page);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (page.IsListing())
+        {
+            Publish(page, listing);
+            return;
+        }
+
+        if (page.IsNotListingByParser())
+        {
+            await _notListingCache
+                .InsertAsync(page, cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        if (IsMovedListing(page))
+        {
+            HandleMovedListing(page, listing);
+        }
+
+        ListingUnpublishDecision decision = _unpublishPolicy.Evaluate(page);
+        if (decision.ShouldUnpublish)
+        {
+            Unpublish(page, listing, decision);
+        }
+    }
     private bool IsMovedListing(Page page)
     {
         if (!page.IsNotCanonical() && !page.IsRedirectToAnotherUrl())

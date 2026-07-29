@@ -191,6 +191,7 @@ public sealed class PageScraperPipelineTests
 
         public int Calls { get; private set; }
 
+
         public PageClassificationResult Classify(Page page)
         {
             Calls++;
@@ -246,6 +247,8 @@ public sealed class PageScraperPipelineTests
     {
         public int Calls { get; private set; }
 
+        public int AsyncCalls { get; private set; }
+
         public Listing? LastListing { get; private set; }
 
         public void Apply(Page page, Listing? listing)
@@ -253,11 +256,22 @@ public sealed class PageScraperPipelineTests
             Calls++;
             LastListing = listing;
         }
+        public Task ApplyAsync(
+            Page page,
+            Listing? listing,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            AsyncCalls++;
+            LastListing = listing;
+            return Task.CompletedTask;
+        }
     }
 
     private sealed class RecordingPageIndexingService : IPageIndexingService
     {
         public int Calls { get; private set; }
+
 
         public void Index(Page page) => Calls++;
     }

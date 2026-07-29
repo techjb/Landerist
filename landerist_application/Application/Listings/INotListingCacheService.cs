@@ -6,5 +6,9 @@ public interface INotListingCacheService
 {
     bool Insert(Page page);
 
+    Task<bool> InsertAsync(
+        Page page,
+        CancellationToken cancellationToken = default);
+
     bool Contains(Page page);
 }

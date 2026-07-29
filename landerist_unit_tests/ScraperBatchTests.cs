@@ -450,6 +450,15 @@ public sealed class ScraperBatchTests
         public void Apply(Page page, Listing? listing)
         {
         }
+        public Task ApplyAsync(
+            Page page,
+            Listing? listing,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            Apply(page, listing);
+            return Task.CompletedTask;
+        }
     }
 
     private sealed class NullPageIndexingService : IPageIndexingService

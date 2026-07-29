@@ -44,6 +44,20 @@ public sealed class ListingLifecycleServiceTests
     }
 
     [Fact]
+    public async Task ApplyAsync_WhenParserRejectsPage_UsesAsyncNotListingCache()
+    {
+        Page page = CreatePage("https://example.com/listing/1");
+        page.SetPageType(PageType.NotListingByParser);
+        TestContext context = new();
+
+        await context.Service.ApplyAsync(page, listing: null, CancellationToken.None);
+
+        Assert.Equal(0, context.Cache.InsertCalls);
+        Assert.Equal(1, context.Cache.InsertAsyncCalls);
+        Assert.Same(page, context.Cache.LastPage);
+        Assert.Empty(context.Store.Upserts);
+    }
+    [Fact]
     public void Apply_WhenPolicyRequiresUnpublish_UnpublishesAndPassesDecision()
     {
         Page page = CreatePage("https://example.com/listing/1");
@@ -196,6 +210,8 @@ public sealed class ListingLifecycleServiceTests
     {
         public int InsertCalls { get; private set; }
 
+        public int InsertAsyncCalls { get; private set; }
+
         public Page? LastPage { get; private set; }
 
         public bool Contains(Page page) => false;
@@ -206,8 +222,17 @@ public sealed class ListingLifecycleServiceTests
             LastPage = page;
             return true;
         }
-    }
 
+        public Task<bool> InsertAsync(
+            Page page,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            InsertAsyncCalls++;
+            LastPage = page;
+            return Task.FromResult(true);
+        }
+    }
     private sealed class RecordingPageLinkService : IPageLinkService
     {
         public Uri? ResolveResult { get; set; }

@@ -93,7 +93,10 @@ namespace landerist_library.Application.Scraping
                 return false;
             }
 
-            UpdatePageTypeAndListing(pageType, null);
+            await UpdatePageTypeAndListingAsync(
+                pageType,
+                null,
+                cancellationToken).ConfigureAwait(false);
             _scheduling.SetNextScrapeFromNow(page);
             return await _pagePersistence
                 .UpdateAsync(page, cancellationToken)
@@ -137,7 +140,10 @@ namespace landerist_library.Application.Scraping
                 page.SetWaitingStatusAIRequest();
             }
 
-            UpdatePageTypeAndListing(newPageType, newListing);
+            await UpdatePageTypeAndListingAsync(
+                newPageType,
+                newListing,
+                cancellationToken).ConfigureAwait(false);
             page.SetLastScrape();
             _scheduling.SetNextScrape(page);
             return await _pagePersistence
@@ -147,6 +153,16 @@ namespace landerist_library.Application.Scraping
         public bool ApplyParsedClassificationAfterParsing(PageType newPageType, Listing? listing) =>
             _parsedClassification.Apply(page, newPageType, listing);
 
+        private async Task UpdatePageTypeAndListingAsync(
+            PageType? newPageType,
+            Listing? newListing,
+            CancellationToken cancellationToken)
+        {
+            page.SetPageType(newPageType);
+            await _listingLifecycle
+                .ApplyAsync(page, newListing, cancellationToken)
+                .ConfigureAwait(false);
+        }
         private void UpdatePageTypeAndListing(PageType? newPageType, Listing? newListing)
         {
             page.SetPageType(newPageType);

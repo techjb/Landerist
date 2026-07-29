@@ -256,6 +256,15 @@ public sealed class PageClassificationServiceTests
             LastPage = page;
             LastListing = listing;
         }
+        public Task ApplyAsync(
+            Page page,
+            Listing? listing,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            Apply(page, listing);
+            return Task.CompletedTask;
+        }
     }
 
     private sealed class NullPageAcquisitionService : IPageAcquisitionService

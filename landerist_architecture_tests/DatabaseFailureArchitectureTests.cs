@@ -167,6 +167,21 @@ public sealed class DatabaseFailureArchitectureTests
         Assert.Contains(".UpdateAsync(page, cancellationToken)", persistence);
         Assert.Contains("_database.QueryAsync(", repository);
     }
+    [Fact]
+    public void AsyncNotListingLifecycle_PropagatesCacheInsertToQueryAsync()
+    {
+        string root = FindRepositoryRoot();
+        string classification = File.ReadAllText(
+            Path.Combine(root, "landerist_application", "Application", "Scraping", "PageClassificationService.cs"));
+        string lifecycle = File.ReadAllText(
+            Path.Combine(root, "landerist_application", "Application", "Listings", "ListingLifecycleService.cs"));
+        string cache = File.ReadAllText(
+            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Listings", "SqlNotListingCacheService.cs"));
+
+        Assert.Contains(".ApplyAsync(page, newListing, cancellationToken)", classification);
+        Assert.Contains(".InsertAsync(page, cancellationToken)", lifecycle);
+        Assert.Contains("_database.QueryAsync(", cache);
+    }
     private static int CountOccurrences(string source, string value) =>
         source.Split(value, StringSplitOptions.None).Length - 1;
 

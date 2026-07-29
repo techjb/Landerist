@@ -6,4 +6,9 @@ namespace landerist_library.Application.Listings;
 public interface IListingLifecycleService
 {
     void Apply(Page page, Listing? listing);
+
+    Task ApplyAsync(
+        Page page,
+        Listing? listing,
+        CancellationToken cancellationToken = default);
 }

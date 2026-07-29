@@ -113,5 +113,14 @@ public sealed class ParsedPageClassificationServiceTests
             LastPage = page;
             LastListing = listing;
         }
+        public Task ApplyAsync(
+            Page page,
+            Listing? listing,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            Apply(page, listing);
+            return Task.CompletedTask;
+        }
     }
 }

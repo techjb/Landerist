@@ -94,6 +94,20 @@ public sealed class SqlPersistenceAdaptersTests
     }
 
     [Fact]
+    public async Task NotListingCache_InsertAsync_UsesAsyncDatabaseExecution()
+    {
+        RecordingDatabase database = new() { QueryResult = true };
+        SqlNotListingCacheService cache = new(database, enabled: true);
+        Page page = CreatePage();
+        page.ListingParserInputHash = "content-hash";
+
+        bool inserted = await cache.InsertAsync(page, CancellationToken.None);
+
+        Assert.True(inserted);
+        Assert.Equal(1, database.QueryAsyncCalls);
+        Assert.Equal("content-hash", database.LastParameters!["ListingParserInputHash"]);
+    }
+    [Fact]
     public void NotListingCache_WhenDisabled_DoesNotAccessDatabase()
     {
         RecordingDatabase database = new();
