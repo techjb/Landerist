@@ -258,6 +258,7 @@ public sealed class ConsoleHostArchitectureTests
                 "LanderistTaskServiceCollectionExtensions.cs")).Count() <= 25,
             "Task composition coordinator must remain small.");
 
+        Assert.Contains("AddSingleton<LanderistListingParserProviderComposition>()", parsing);
         Assert.Contains("AddSingleton<LanderistAiComposition>()", parsing);
         Assert.Contains("AddSingleton<ParseListing>", parsing);
         Assert.Contains("AddSingleton<LanderistBatchProviderComposition>()", scraping);
@@ -336,6 +337,30 @@ public sealed class ConsoleHostArchitectureTests
         Assert.DoesNotContain(
             "GetRequiredService<LanderistAiComposition>()",
             scraping);
+    }
+
+    [Fact]
+    public void ListingParserComposition_SeparatesProvidersFromMaterialization()
+    {
+        string parser = ReadConsoleSource("LanderistAiComposition.cs");
+        string providers = ReadConsoleSource(
+            "LanderistListingParserProviderComposition.cs");
+
+        Assert.Contains("providerComposition.Create()", parser);
+        Assert.Contains("ListingParsingServices", parser);
+        Assert.Contains("StructuredOutputMaterializationOperations", parser);
+        Assert.DoesNotContain("OpenAIListingParserClient", parser);
+        Assert.DoesNotContain("VertexListingParserClient", parser);
+        Assert.DoesNotContain("LocalAIListingParserClient", parser);
+
+        Assert.Contains("ListingParserClientCatalog", providers);
+        Assert.Contains("OpenAIListingParserClient", providers);
+        Assert.Contains("VertexListingParserClient", providers);
+        Assert.Contains("LocalAIListingParserClient", providers);
+        Assert.DoesNotContain("ListingParsingServices", providers);
+        Assert.DoesNotContain(
+            "StructuredOutputMaterializationOperations",
+            providers);
     }
 
     private static string ReadConsoleSource(string fileName) =>

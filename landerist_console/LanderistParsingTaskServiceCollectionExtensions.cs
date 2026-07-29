@@ -8,6 +8,7 @@ internal static class LanderistParsingTaskServiceCollectionExtensions
     public static IServiceCollection AddLanderistParsingTasks(
         this IServiceCollection services)
     {
+        services.AddSingleton<LanderistListingParserProviderComposition>();
         services.AddSingleton<LanderistAiComposition>();
         services.AddSingleton<ParseListing>(serviceProvider =>
             serviceProvider.GetRequiredService<LanderistAiComposition>()
