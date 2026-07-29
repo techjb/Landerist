@@ -7,6 +7,7 @@ using landerist_library.Configuration;
 using landerist_library.Infrastructure.Listings;
 using landerist_library.Infrastructure.Logging;
 using landerist_library.Infrastructure.Parsing;
+using landerist_library.Infrastructure.Parsing.UserInput;
 using landerist_library.Infrastructure.Scraping;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Infrastructure.WebsiteServices;
@@ -53,7 +54,7 @@ internal sealed class LanderistScrapingPipelineFactory(
                     new Tokenizer(
                         TokenizerOptions.ForProvider(Config.LLM_PROVIDER))),
                 new HtmlPageContentInspector(),
-                new PageListingInputPreparer()),
+                new PageListingInputPreparer(logger)),
             new PageIndexingService(
                 Config.INDEXER_ENABLED,
                 pageLinks,

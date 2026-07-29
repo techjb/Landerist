@@ -1,7 +1,7 @@
 using HtmlAgilityPack;
 using System.Text;
 
-namespace landerist_library.Parse.ListingParser.UserInput
+namespace landerist_library.Infrastructure.Parsing.UserInput
 {
     internal static class ListingVisibleTextExtractor
     {

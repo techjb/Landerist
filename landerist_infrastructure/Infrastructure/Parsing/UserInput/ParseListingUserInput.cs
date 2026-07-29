@@ -1,18 +1,19 @@
 using landerist_domain.Parsing.UserInput;
+using landerist_library.Application.Logging;
 using HtmlAgilityPack;
 using landerist_library.Pages;
 using landerist_library.Websites;
 
-namespace landerist_library.Parse.ListingParser.UserInput
+namespace landerist_library.Infrastructure.Parsing.UserInput
 {
-    public class ParseListingUserInput
+    public sealed class ParseListingUserInput(IApplicationLogger logger)
     {
-        public static string? GetHtml(string responseBody)
+        public string? GetHtml(string responseBody)
         {
             return GetText(responseBody, true);
         }
 
-        public static string? GetText(string responseBody, bool html)
+        public string? GetText(string responseBody, bool html)
         {
             if (string.IsNullOrWhiteSpace(responseBody))
             {
@@ -30,7 +31,7 @@ namespace landerist_library.Parse.ListingParser.UserInput
             return GetText(htmlDocument, null, null);
         }
 
-        public static string? GetText(Page page)
+        public string? GetText(Page page)
         {
             try
             {
@@ -48,7 +49,7 @@ namespace landerist_library.Parse.ListingParser.UserInput
             return null;
         }
 
-        public static string? GetHtml(Page page)
+        public string? GetHtml(Page page)
         {
             try
             {
@@ -67,7 +68,7 @@ namespace landerist_library.Parse.ListingParser.UserInput
             return null;
         }
 
-        private static string? GetHtml(HtmlDocument htmlDocument, Website? website, string? context = null)
+        private string? GetHtml(HtmlDocument htmlDocument, Website? website, string? context = null)
         {
             string? text = null;
             try
@@ -76,7 +77,7 @@ namespace landerist_library.Parse.ListingParser.UserInput
                 string? structuredData = ListingStructuredDataExtractor.Extract(workingDocument);
                 ListingHtmlNodeRemover.RemoveBaseNoise(workingDocument);
                 ListingHtmlNoiseRemover.Remove(workingDocument);
-                ListingWebsiteHtmlNodeRemover.Remove(workingDocument, website, context);
+                ListingWebsiteHtmlNodeRemover.Remove(workingDocument, website, context, logger);
                 ListingHiddenContentRemover.Remove(workingDocument, preserveMediaNodes: true);
                 ListingStructuredDataInjector.Prepend(workingDocument, structuredData);
                 ListingHtmlAttributeCleaner.Clean(workingDocument);
@@ -92,12 +93,12 @@ namespace landerist_library.Parse.ListingParser.UserInput
             return text;
         }
 
-        public static string? GetText(HtmlDocument htmlDocument)
+        public string? GetText(HtmlDocument htmlDocument)
         {
             return GetText(htmlDocument, null, null);
         }
 
-        private static string? GetText(HtmlDocument htmlDocument, Website? website, string? context)
+        private string? GetText(HtmlDocument htmlDocument, Website? website, string? context)
         {
             try
             {
@@ -105,7 +106,7 @@ namespace landerist_library.Parse.ListingParser.UserInput
                 string? structuredData = ListingStructuredDataExtractor.Extract(workingDocument);
                 ListingHtmlNodeRemover.RemoveBaseNoise(workingDocument);
                 ListingHtmlNoiseRemover.RemoveTags(workingDocument);
-                ListingWebsiteHtmlNodeRemover.Remove(workingDocument, website, context);
+                ListingWebsiteHtmlNodeRemover.Remove(workingDocument, website, context, logger);
                 ListingHiddenContentRemover.Remove(workingDocument, preserveMediaNodes: false);
 
                 string text = ListingVisibleTextExtractor.GetText(workingDocument);
@@ -131,7 +132,7 @@ namespace landerist_library.Parse.ListingParser.UserInput
             return clone;
         }
 
-        private static void LogError(string phase, string? context, Exception exception)
+        private void LogError(string phase, string? context, Exception exception)
         {
             string source = "ParseListingUserInput " + phase;
             if (!string.IsNullOrWhiteSpace(context))
@@ -139,7 +140,7 @@ namespace landerist_library.Parse.ListingParser.UserInput
                 source += " " + context;
             }
 
-            Logs.Log.WriteError(source, exception);
+            logger.WriteError(source, exception.ToString());
         }
     }
 }

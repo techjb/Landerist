@@ -1,4 +1,4 @@
-using landerist_library.Parse.ListingParser.UserInput;
+using landerist_library.Infrastructure.Parsing.UserInput;
 using landerist_library.Parse.Media;
 using landerist_library.Infrastructure.Ai.StructuredOutputs;
 using landerist_library.Infrastructure.Ai.Vertex;
@@ -59,7 +59,7 @@ namespace landerist_library.Infrastructure.Parsing
                 return (PageType.MayBeListing, null, true);
             }
 
-            var text = page.GetListingParserInput();
+            var text = page.ListingParserInput;
             if (string.IsNullOrWhiteSpace(text))
             {
                 return (PageType.ResponseBodyTooShort, null, false);

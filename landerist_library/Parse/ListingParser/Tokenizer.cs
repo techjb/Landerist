@@ -20,7 +20,7 @@ public sealed class Tokenizer
     public (int PageTokens, int SystemTokens) CountPageAndSystemTokens(Page page)
     {
         ArgumentNullException.ThrowIfNull(page);
-        string? userInput = page.GetListingParserInput();
+        string? userInput = page.ListingParserInput;
         int pageTokens = string.IsNullOrWhiteSpace(userInput)
             ? 0
             : _encoding.CountTokens(userInput);

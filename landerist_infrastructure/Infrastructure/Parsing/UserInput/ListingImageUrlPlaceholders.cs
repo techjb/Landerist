@@ -4,7 +4,7 @@ using landerist_library.Pages;
 using System.Net;
 using System.Text.RegularExpressions;
 
-namespace landerist_library.Parse.ListingParser.UserInput;
+namespace landerist_library.Infrastructure.Parsing.UserInput;
 
 public static class ListingImageUrlPlaceholders
 {

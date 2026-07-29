@@ -1,3 +1,5 @@
+using landerist_library.Application.Logging;
+using landerist_library.Infrastructure.Parsing.UserInput;
 using landerist_library.Pages;
 using landerist_library.Websites;
 
@@ -34,7 +36,7 @@ public sealed class PageListingInputExtensionsTests
         Page page = CreatePage(
             "<html><body><h1>Flat for sale</h1><p>Madrid</p></body></html>");
 
-        page.SetListingParserInput();
+        new PageListingInputPreparer(new NullLogger()).Prepare(page);
 
         Assert.False(string.IsNullOrWhiteSpace(page.ListingParserInput));
         Assert.NotNull(page.ListingParserInputHash);
@@ -48,7 +50,7 @@ public sealed class PageListingInputExtensionsTests
             ListingParserInputNotChanged = true
         };
 
-        page.SetListingParserInput();
+        new PageListingInputPreparer(new NullLogger()).Prepare(page);
 
         Assert.False(page.ListingParserInputNotChanged);
         Assert.Null(page.ListingParserInputNotChangedCounter);
@@ -66,7 +68,13 @@ public sealed class PageListingInputExtensionsTests
             ListingParserInput = "<div>unavailable</div>"
         };
 
-        Assert.True(page.MatchesWebsiteListingUnavailableRule());
+        Assert.True(new PageListingInputPreparer(new NullLogger()).MatchesUnavailableRule(page));
+    }
+
+    private sealed class NullLogger : IApplicationLogger
+    {
+        public void WriteError(string source, string message) { }
+        public void WriteInfo(string source, string message) { }
     }
 
     private static Page CreatePage(string content)

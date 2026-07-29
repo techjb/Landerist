@@ -1,12 +1,12 @@
-using landerist_domain.Parsing.UserInput;
+using landerist_library.Application.Logging;
 using HtmlAgilityPack;
 using landerist_library.Websites;
 
-namespace landerist_library.Parse.ListingParser.UserInput
+namespace landerist_library.Infrastructure.Parsing.UserInput
 {
     internal static class ListingWebsiteHtmlNodeRemover
     {
-        public static void Remove(HtmlDocument htmlDocument, Website? website, string? context)
+        public static void Remove(HtmlDocument htmlDocument, Website? website, string? context, IApplicationLogger logger)
         {
             string? removeXPath = website?.ListingHtmlRemoveXPath;
             if (string.IsNullOrWhiteSpace(removeXPath))
@@ -28,7 +28,7 @@ namespace landerist_library.Parse.ListingParser.UserInput
                 }
 
                 text += " " + removeXPath;
-                Logs.Log.WriteError(source, text, exception);
+                logger.WriteError(source, text + Environment.NewLine + exception);
             }
         }
     }

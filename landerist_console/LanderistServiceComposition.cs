@@ -16,6 +16,7 @@ using landerist_library.Websites;
 using landerist_library.Infrastructure.Statistics;
 using landerist_library.Infrastructure.Ai.OpenAI.Batch;
 using landerist_library.Infrastructure.Parsing;
+using landerist_library.Infrastructure.Parsing.UserInput;
 using landerist_library.Configuration;
 using landerist_library.Application.Listings;
 using landerist_library.Application.Logging;
@@ -275,7 +276,7 @@ internal static class LanderistServiceComposition
                 batchMaxFileSize,
                 Config.MIN_PAGES_PER_BATCH),
             batchUploadProvider,
-            new PageListingInputPreparer(),
+            new PageListingInputPreparer(logger),
             TimeProvider.System,
             logger);
         return new TasksService(
@@ -290,7 +291,7 @@ internal static class LanderistServiceComposition
                 pageCatalog,
                 pagePersistence,
                 new LegacyLocalAiListingParser(listingParser, hostStatistics),
-                new PageListingInputPreparer(),
+                new PageListingInputPreparer(logger),
                 new LocalAiParsingTaskOptions(
                     modelMaxTokens: Config.LOCAL_AI_MAX_MODEL_LEN,
                     runSequentially: Config.IsConfigurationLocal(),

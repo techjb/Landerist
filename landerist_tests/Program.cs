@@ -16,6 +16,7 @@ using landerist_library.Infrastructure.Location.Providers.GoogleMaps;
 using landerist_library.Websites;
 using landerist_library.Infrastructure.Statistics;
 using landerist_library.Infrastructure.Parsing;
+using landerist_library.Infrastructure.Parsing.UserInput;
 using landerist_library.Configuration;
 using landerist_library.Application;
 using landerist_library.Application.Listings;
@@ -233,7 +234,7 @@ namespace landerist_tests
                     new LegacyListingPageParser(hostStatistics, listingParser),
                     new LegacyPageTokenLimitPolicy(new Tokenizer(TokenizerOptions.ForProvider(Config.LLM_PROVIDER))),
                 new HtmlPageContentInspector(),
-                new PageListingInputPreparer()),
+                new PageListingInputPreparer(logger)),
                 new PageIndexingService(
                 Config.INDEXER_ENABLED,
                 pageLinks,

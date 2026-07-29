@@ -2,7 +2,7 @@ using HtmlAgilityPack;
 using System.Text.RegularExpressions;
 using System.Web;
 
-namespace landerist_library.Parse.ListingParser.UserInput
+namespace landerist_library.Infrastructure.Parsing.UserInput
 {
     internal static partial class ListingHiddenContentRemover
     {
