@@ -13,7 +13,7 @@ namespace landerist_library.Infrastructure.Administration
         public void Start()
         {
             string file = AppConfig.INSERT_DIRECTORY + @"basededatosempresas.net\Inmobiliarias.csv";
-            DataTable dataTable = Csv.ToDataTable(file);
+            DataTable dataTable = Tools.Csv.ToDataTable(file);
             var uris = ToList(dataTable, "Website");
             Insert(uris);
         }

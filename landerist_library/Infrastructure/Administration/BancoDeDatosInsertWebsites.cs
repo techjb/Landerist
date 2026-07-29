@@ -12,7 +12,7 @@ namespace landerist_library.Infrastructure.Administration
         public void Start()
         {
             string file = AppConfig.INSERT_DIRECTORY + @"bancodedatos.es\Excel\Pedido_completo.csv";
-            DataTable dataTable = Csv.ToDataTable(file);
+            DataTable dataTable = Tools.Csv.ToDataTable(file);
             var uris = ToList(dataTable, "SITIO WEB");
             Insert(uris);
         }

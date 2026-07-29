@@ -13,7 +13,7 @@ namespace landerist_library.Infrastructure.Administration
         public void Start()
         {
             string file = AppConfig.INSERT_DIRECTORY + @"FtAgencies\ListingExamples.csv";
-            DataTable dataTable = Csv.ToDataTable(file);
+            DataTable dataTable = Tools.Csv.ToDataTable(file);
             dataTable.Columns[0].ColumnName = "ListingExample";
             var uris = ToList(dataTable, "ListingExample");
             Insert(uris);
