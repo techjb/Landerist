@@ -1,3 +1,4 @@
+using landerist_library.Infrastructure.Indexing;
 using landerist_library.Application.Listings;
 using landerist_library.Application.Persistence;
 using landerist_library.Infrastructure.Listings;
@@ -39,6 +40,15 @@ internal static class LanderistScrapingServiceCollectionExtensions
                 runtimeOptions.Proxy.StickyPortMax,
                 runtimeOptions.Proxy.Username,
                 runtimeOptions.Proxy.Password));
+        landerist_library.Tools.ScrapingBee.Configure(
+            runtimeOptions.Integrations.ScrapingBeeApiKey,
+            httpClients);
+        landerist_library.Export.S3.Configure(
+            new landerist_library.Export.S3Options(
+                runtimeOptions.Integrations.AwsAccessKeyId,
+                runtimeOptions.Integrations.AwsSecretAccessKey,
+                runtimeOptions.Integrations.AwsDownloadsBucket,
+                runtimeOptions.Integrations.AwsWebsiteBucket));
         PuppeteerBrowserOptions browserOptions = new(
             runtimeOptions.Browser.Headless,
             runtimeOptions.Browser.IsLocal,
@@ -96,6 +106,16 @@ internal static class LanderistScrapingServiceCollectionExtensions
         services.AddSingleton(goolzoom);
         services.AddSingleton(new WebsiteNetworkService(httpClients, TimeProvider.System));
         services.AddSingleton(new WebsiteAccessServices(robotsPolicy, httpClients));
+        services.AddSingleton<WebsiteSitemapService>(serviceProvider => new(
+            runtimeOptions.Scraping.IndexerEnabled,
+            robotsPolicy,
+            TimeProvider.System,
+            new LegacyWebsiteSitemapIndexerFactory(
+                robotsPolicy,
+                httpClients,
+                serviceProvider.GetRequiredService<PagePersistenceService>(),
+                serviceProvider.GetRequiredService<WebsiteMetricsService>()),
+            serviceProvider.GetRequiredService<IApplicationLogger>()));
         services.AddSingleton<PooledPageDownloader>(serviceProvider =>
             new PooledPageDownloader(
                 serviceProvider.GetRequiredService<IDownloaderPool>()));

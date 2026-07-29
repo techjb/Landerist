@@ -15,44 +15,44 @@ public sealed class ConsoleHostArchitectureTests
     }
 
     [Fact]
-    public void Program_DelegatesObjectGraphConstructionToCompositionRoot()
+    public void Program_DelegatesObjectGraphConstructionToServiceRegistrations()
     {
         string program = ReadConsoleSource("Program.cs");
         string registrations = ReadConsoleSource(
             "LanderistServiceCollectionExtensions.cs");
-        string composition = ReadConsoleSource("LanderistServiceComposition.cs");
+        string taskRegistrations = ReadConsoleSource(
+            "LanderistTaskServiceCollectionExtensions.cs");
 
         Assert.Contains("builder.Services.AddLanderist()", program);
-        Assert.Contains(
-            "LanderistServiceComposition.CreateTasksService(",
-            registrations);
-        Assert.Contains("CreateTasksService(", composition);
+        Assert.Contains(".AddLanderistTasks(runtimeOptions)", registrations);
+        Assert.Contains("AddSingleton<TasksService>", taskRegistrations);
+        Assert.False(File.Exists(GetConsolePath("LanderistServiceComposition.cs")));
         Assert.True(
             File.ReadLines(GetConsolePath("Program.cs")).Count() <= 30,
             "Program must remain a small host bootstrapper.");
     }
-
     [Fact]
     public void PersistenceRegistration_OwnsDatabaseFactoryConstruction()
     {
         string registrations = ReadConsoleSource(
             "LanderistPersistenceServiceCollectionExtensions.cs");
-        string composition = ReadConsoleSource("LanderistServiceComposition.cs");
+        string taskRegistrations = ReadConsoleSource(
+            "LanderistTaskServiceCollectionExtensions.cs");
         string adapterFactory = ReadConsoleSource(
             "LanderistDatabaseAdapterFactory.cs");
 
         Assert.Contains("SqlDatabaseOptions databaseOptions = new(", registrations);
         Assert.Contains("LegacyDatabase.Configure(databaseFactory)", registrations);
         Assert.Contains("AddSingleton<IDatabaseFactory>", registrations);
-        Assert.DoesNotContain("SqlDatabaseOptions databaseOptions", composition);
-        Assert.DoesNotContain("LegacyDatabase.Configure", composition);
-        Assert.DoesNotContain("new PageRepository(", composition);
-        Assert.DoesNotContain("new WebsiteRepository(", composition);
-        Assert.DoesNotContain("new ListingRepository(", composition);
+        Assert.DoesNotContain("SqlDatabaseOptions databaseOptions", taskRegistrations);
+        Assert.DoesNotContain("LegacyDatabase.Configure", taskRegistrations);
+        Assert.DoesNotContain("new PageRepository(", taskRegistrations);
+        Assert.DoesNotContain("new WebsiteRepository(", taskRegistrations);
+        Assert.DoesNotContain("new ListingRepository(", taskRegistrations);
         Assert.Contains("AddTransient(_ => new PageRepository(", registrations);
         Assert.Contains("AddTransient(_ => new WebsiteRepository(", registrations);
         Assert.Contains("AddTransient(_ => new ListingRepository(", registrations);
-        Assert.DoesNotContain("databaseFactory.Create()", composition);
+        Assert.DoesNotContain("databaseFactory.Create()", taskRegistrations);
         Assert.Contains("IDatabaseFactory databaseFactory", adapterFactory);
         Assert.Contains("databaseFactory.Create()", adapterFactory);
         Assert.Contains("AddSingleton<PagePersistenceService>()", registrations);
@@ -60,17 +60,18 @@ public sealed class ConsoleHostArchitectureTests
         Assert.Contains("AddSingleton<SqlListingQueryService>()", registrations);
         Assert.Contains("AddSingleton<SqlPageCatalog>()", registrations);
         Assert.Contains("AddSingleton<SqlWebsiteCatalog>()", registrations);
-        Assert.DoesNotContain("new PagePersistenceService(", composition);
-        Assert.DoesNotContain("new WebsitePersistenceService(", composition);
-        Assert.DoesNotContain("new SqlListingQueryService(", composition);
-        Assert.DoesNotContain("new WebsiteDeletionService(", composition);
+        Assert.DoesNotContain("new PagePersistenceService(", taskRegistrations);
+        Assert.DoesNotContain("new WebsitePersistenceService(", taskRegistrations);
+        Assert.DoesNotContain("new SqlListingQueryService(", taskRegistrations);
+        Assert.DoesNotContain("new WebsiteDeletionService(", taskRegistrations);
     }
     [Fact]
     public void ScrapingRegistration_OwnsSharedBrowserInfrastructure()
     {
         string registrations = ReadConsoleSource(
             "LanderistScrapingServiceCollectionExtensions.cs");
-        string composition = ReadConsoleSource("LanderistServiceComposition.cs");
+        string taskRegistrations = ReadConsoleSource(
+            "LanderistTaskServiceCollectionExtensions.cs");
         string pipelineFactory = ReadConsoleSource(
             "LanderistScrapingPipelineFactory.cs");
 
@@ -78,18 +79,18 @@ public sealed class ConsoleHostArchitectureTests
         Assert.Contains("PuppeteerBrowserOptions browserOptions = new(", registrations);
         Assert.Contains("AddSingleton<ChromeMaintenanceService>", registrations);
         Assert.Contains("services.AddSingleton<IWebsiteRobotsPolicy>", registrations);
-        Assert.DoesNotContain("new HttpClientTransportFactory(", composition);
-        Assert.DoesNotContain("new PuppeteerBrowserOptions(", composition);
-        Assert.DoesNotContain("new ChromeMaintenanceService(", composition);
-        Assert.DoesNotContain("WebsiteRobotsPolicy robotsPolicy = new", composition);
+        Assert.DoesNotContain("new HttpClientTransportFactory(", taskRegistrations);
+        Assert.DoesNotContain("new PuppeteerBrowserOptions(", taskRegistrations);
+        Assert.DoesNotContain("new ChromeMaintenanceService(", taskRegistrations);
+        Assert.DoesNotContain("WebsiteRobotsPolicy robotsPolicy = new", taskRegistrations);
         Assert.Contains("new PageAcquisitionService(", pipelineFactory);
         Assert.Contains("new PageContentClassifier(", pipelineFactory);
         Assert.Contains("new PageIndexingService(", pipelineFactory);
         Assert.Contains("PageBatchSelector pageBatchSelector = new(", pipelineFactory);
-        Assert.DoesNotContain("new PageAcquisitionService(", composition);
-        Assert.DoesNotContain("new PageContentClassifier(", composition);
-        Assert.DoesNotContain("new PageIndexingService(", composition);
-        Assert.DoesNotContain("new PageBatchSelector(", composition);
+        Assert.DoesNotContain("new PageAcquisitionService(", taskRegistrations);
+        Assert.DoesNotContain("new PageContentClassifier(", taskRegistrations);
+        Assert.DoesNotContain("new PageIndexingService(", taskRegistrations);
+        Assert.DoesNotContain("new PageBatchSelector(", taskRegistrations);
     }
     [Fact]
     public void LoggingAdapters_AreOwnedByInfrastructureProject()
@@ -183,32 +184,26 @@ public sealed class ConsoleHostArchitectureTests
         }
     }
     [Fact]
-    public void ServiceComposition_DelegatesSpecializedObjectGraphsToModules()
+    public void TaskRegistration_DelegatesSpecializedObjectGraphsToModules()
     {
-        string composition = ReadConsoleSource("LanderistServiceComposition.cs");
         string registrations = ReadConsoleSource(
-            "LanderistServiceCollectionExtensions.cs");
+            "LanderistTaskServiceCollectionExtensions.cs");
 
         Assert.Contains("AddSingleton<LanderistAiComposition>()", registrations);
         Assert.Contains("AddSingleton<ParseListing>", registrations);
         Assert.Contains("AddSingleton<LanderistBatchComposition>()", registrations);
-        Assert.Contains(
-            "AddSingleton<LanderistDistributionComposition>()",
-            registrations);
-        Assert.Contains("GetRequiredService<ParseListing>()", composition);
-        Assert.Contains("GetRequiredService<LanderistBatchComposition>()", composition);
-        Assert.Contains(
-            "GetRequiredService<LanderistDistributionComposition>()",
-            composition);
-        Assert.DoesNotContain("OpenAIListingParserClient", composition);
-        Assert.DoesNotContain("VertexListingParserClient", composition);
-        Assert.DoesNotContain("LocalAIListingParserClient", composition);
-        Assert.DoesNotContain("TaskBatchUpload", composition);
-        Assert.DoesNotContain("TaskBatchDownload", composition);
-        Assert.DoesNotContain("DistributionPublisher", composition);
-        Assert.True(
-            File.ReadLines(GetConsolePath("LanderistServiceComposition.cs")).Count() <= 250,
-            "The composition root must delegate specialized object graphs.");
+        Assert.Contains("AddSingleton<LanderistDistributionComposition>()", registrations);
+        Assert.Contains("AddSingleton<LanderistScrapingPipeline>", registrations);
+        Assert.Contains("AddSingleton<ScrapeTaskJob>", registrations);
+        Assert.Contains("AddSingleton<LocalAiTaskJob>", registrations);
+        Assert.Contains("AddSingleton<HourlyTaskJob>", registrations);
+        Assert.Contains("AddSingleton<DailyTaskJob>", registrations);
+        Assert.Contains("AddSingleton<TasksService>", registrations);
+        Assert.DoesNotContain("OpenAIListingParserClient", registrations);
+        Assert.DoesNotContain("VertexListingParserClient", registrations);
+        Assert.DoesNotContain("TaskBatchUpload", registrations);
+        Assert.DoesNotContain("TaskBatchDownload", registrations);
+        Assert.DoesNotContain("DistributionPublisher", registrations);
     }
     private static string ReadConsoleSource(string fileName) =>
         File.ReadAllText(GetConsolePath(fileName));

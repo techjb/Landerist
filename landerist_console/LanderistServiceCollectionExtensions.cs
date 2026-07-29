@@ -29,7 +29,7 @@ internal static class LanderistServiceCollectionExtensions
             .AddLanderistRuntime(runtimeOptions)
             .AddLanderistPersistence(runtimeOptions)
             .AddLanderistScraping(runtimeOptions)
-            .AddLanderistTasks();
+            .AddLanderistTasks(runtimeOptions);
     }
 
     private static IServiceCollection AddLanderistRuntime(
@@ -45,19 +45,4 @@ internal static class LanderistServiceCollectionExtensions
         return services;
     }
 
-    private static IServiceCollection AddLanderistTasks(
-        this IServiceCollection services)
-    {
-        services.AddSingleton<LanderistAiComposition>();
-        services.AddSingleton<ParseListing>(serviceProvider =>
-            serviceProvider.GetRequiredService<LanderistAiComposition>()
-                .CreateListingParser());
-        services.AddSingleton<LanderistBatchComposition>();
-        services.AddSingleton<LanderistDistributionComposition>();
-        services.AddSingleton<TasksService>(serviceProvider =>
-            LanderistServiceComposition.CreateTasksService(
-                serviceProvider.GetRequiredService<LanderistRuntimeOptions>(),
-                serviceProvider));
-        return services;
-    }
 }

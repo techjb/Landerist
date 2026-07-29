@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace landerist_unit_tests;
 
-public sealed class LanderistServiceCompositionTests
+public sealed class LanderistServiceRegistrationTests
 {
     [Theory]
     [InlineData(LanderistExecutionRole.Principal)]
@@ -41,6 +41,7 @@ public sealed class LanderistServiceCompositionTests
                 ValidateScopes = true
             });
 
+        Assert.NotNull(provider.GetRequiredService<TasksService>());
         Assert.Same(
             provider.GetRequiredService<ParseListing>(),
             provider.GetRequiredService<ParseListing>());
@@ -83,6 +84,6 @@ public sealed class LanderistServiceCompositionTests
                 "localhost",
                 false),
             Batch = new BatchRuntimeOptions(
-                false, "batch", 100, 1, 1024, 1, false, 30, string.Empty)
+                false, "batch", 100, 1, 1024, 1, false, 30, "test-bucket")
         };
 }
