@@ -2,7 +2,7 @@ using landerist_domain.Parsing.StructuredOutputs;
 using OpenAI;
 using System.Text.Json.Nodes;
 
-namespace landerist_library.Parse.ListingParser.OpenAI
+namespace landerist_library.Infrastructure.Ai.OpenAI
 {
     public class OpenAITools : StructuredOutputEsJson
     {

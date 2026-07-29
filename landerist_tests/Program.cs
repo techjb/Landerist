@@ -1,3 +1,4 @@
+using landerist_library.Infrastructure.Ai.OpenAI;
 using landerist_library.Application.Parsing;
 using landerist_domain.Parsing.StructuredOutputs;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
@@ -152,7 +153,11 @@ namespace landerist_tests
                 TimeProvider.System);
             ListingParserClientCatalog listingParserClients = new(
             [
-                new OpenAIListingParserClient(),
+                new OpenAIListingParserClient(
+                    new OpenAIListingParserOptions(LanderistSettings.Current.GetString("OPENAI_API_KEY")),
+                    SystemPrompt.Text,
+                    StructuredOutputSchema.GetJsonSchemaString(),
+                    logger),
                 new VertexListingParserClient(
                 new VertexListingParserOptions(
                     LanderistSettings.Current.GetString("GOOGLE_CLOUD_VERTEX_AI_CREDENTIAL"),

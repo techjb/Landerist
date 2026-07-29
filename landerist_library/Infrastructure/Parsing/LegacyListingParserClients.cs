@@ -2,24 +2,10 @@ using landerist_library.Parsing;
 using landerist_library.Application.Parsing;
 using landerist_library.Pages;
 using landerist_library.Parse.ListingParser.LocalAI;
-using landerist_library.Parse.ListingParser.OpenAI;
 using landerist_library.Parse.ListingParser.UserInput;
 
 namespace landerist_library.Infrastructure.Parsing
 {
-    public sealed class OpenAIListingParserClient : IListingParserClient
-    {
-        public LLMProvider Provider => LLMProvider.OpenAI;
-
-        public ListingParserClientResult GetResponse(Page page, string userInput)
-        {
-            var response = OpenAIRequest.GetChatResponse(userInput);
-            return response?.FirstChoice == null
-                ? new ListingParserClientResult(null, true)
-                : new ListingParserClientResult(response.FirstChoice, false);
-        }
-    }
-
     public sealed class LocalAIListingParserClient : IListingParserClient
     {
         public LLMProvider Provider => LLMProvider.LocalAI;
