@@ -48,6 +48,8 @@ internal static class LanderistListingScrapingServiceCollectionExtensions
                 logger,
                 new HtmlPageContentInspector());
         });
+        services.AddSingleton<LanderistPageScrapingComposition>();
+        services.AddSingleton<LanderistScrapeExecutionComposition>();
         services.AddSingleton<LanderistScrapingPipelineFactory>();
         return services;
     }

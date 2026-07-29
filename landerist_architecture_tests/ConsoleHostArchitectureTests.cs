@@ -98,6 +98,10 @@ public sealed class ConsoleHostArchitectureTests
             "LanderistTaskServiceCollectionExtensions.cs");
         string pipelineFactory = ReadConsoleSource(
             "LanderistScrapingPipelineFactory.cs");
+        string pageComposition = ReadConsoleSource(
+            "LanderistPageScrapingComposition.cs");
+        string executionComposition = ReadConsoleSource(
+            "LanderistScrapeExecutionComposition.cs");
 
         Assert.Contains(
             ".AddLanderistScrapingInfrastructure(runtimeOptions)",
@@ -123,14 +127,23 @@ public sealed class ConsoleHostArchitectureTests
         Assert.Contains("AddSingleton<PooledPageDownloader>", websites);
         Assert.Contains("AddSingleton<ScrapeBrowserManager>", websites);
         Assert.Contains("AddSingleton<ListingLifecycleService>", listings);
+        Assert.Contains("AddSingleton<LanderistPageScrapingComposition>", listings);
+        Assert.Contains("AddSingleton<LanderistScrapeExecutionComposition>", listings);
         Assert.Contains("AddSingleton<LanderistScrapingPipelineFactory>", listings);
 
         Assert.DoesNotContain("new HttpClientTransportFactory(", taskRegistrations);
         Assert.DoesNotContain("new PuppeteerBrowserOptions(", taskRegistrations);
-        Assert.Contains("new PageAcquisitionService(", pipelineFactory);
-        Assert.Contains("new PageContentClassifier(", pipelineFactory);
-        Assert.Contains("new PageIndexingService(", pipelineFactory);
-        Assert.Contains("PageBatchSelector pageBatchSelector = new(", pipelineFactory);
+        Assert.Contains("new PageAcquisitionService(", pageComposition);
+        Assert.Contains("new PageContentClassifier(", pageComposition);
+        Assert.Contains("new PageIndexingService(", pageComposition);
+        Assert.Contains("PageBatchSelector pageBatchSelector = new(", executionComposition);
+        Assert.Contains("ScrapeBatchServices batchServices = new(", executionComposition);
+        Assert.Contains("pageComposition.Create(", pipelineFactory);
+        Assert.Contains("executionComposition.Create(", pipelineFactory);
+        Assert.DoesNotContain("new PageAcquisitionService(", pipelineFactory);
+        Assert.DoesNotContain("new PageContentClassifier(", pipelineFactory);
+        Assert.DoesNotContain("new PageIndexingService(", pipelineFactory);
+        Assert.DoesNotContain("new PageBatchSelector(", pipelineFactory);
     }    [Fact]
     public void LoggingAdapters_AreOwnedByInfrastructureProject()
     {
