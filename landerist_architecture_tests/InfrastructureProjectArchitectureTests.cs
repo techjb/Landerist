@@ -490,7 +490,7 @@ public sealed class InfrastructureProjectArchitectureTests
 
         string administration = File.ReadAllText(Path.Combine(
             root,
-            "landerist_library",
+            "landerist_infrastructure",
             "Infrastructure",
             "Administration",
             "PageAdministrationService.Delete.cs"));
@@ -746,7 +746,7 @@ public sealed class InfrastructureProjectArchitectureTests
 
         string administration = Path.Combine(
             root,
-            "landerist_library",
+            "landerist_infrastructure",
             "Infrastructure",
             "Administration");
         Assert.True(File.Exists(Path.Combine(

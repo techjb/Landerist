@@ -302,8 +302,6 @@ namespace landerist_library.Infrastructure.Administration
                     website.Dispose();
                 }
             });
-
-            //Logs.Log.WriteLogInfo("service", "Updated Robots.txt " + counter + "/" + websites.Count);
         }
 
         private HashSet<Website> GetNeedToUpdateRobotsTxt()
@@ -339,8 +337,6 @@ namespace landerist_library.Infrastructure.Administration
                     website.Dispose();
                 }
             });
-
-            //Logs.Log.WriteLogInfo("service", "Updated Sitemaps " + counter + "/" + websites.Count);
         }
 
         private HashSet<Website> GetNeedToUpdateSitemaps()
@@ -376,8 +372,6 @@ namespace landerist_library.Infrastructure.Administration
                     website.Dispose();
                 }
             });
-
-            //Logs.Log.WriteLogInfo("service", "Updated IpAddress " + counter + "/" + websites.Count);
         }
 
         private HashSet<Website> GetNeedToUpdateIpAddress()
