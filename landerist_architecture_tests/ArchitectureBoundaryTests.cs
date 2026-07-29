@@ -178,10 +178,12 @@ public sealed partial class ArchitectureBoundaryTests
     }
 
     private static IEnumerable<string> GetSourceFiles(string root) =>
-        Directory.EnumerateFiles(root, "*.cs", SearchOption.AllDirectories)
-            .Where(file =>
-                !file.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase) &&
-                !file.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase));
+        Directory.Exists(root)
+            ? Directory.EnumerateFiles(root, "*.cs", SearchOption.AllDirectories)
+                .Where(file =>
+                    !file.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase) &&
+                    !file.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase))
+            : [];
 
     private static bool IsWithin(string file, string directory)
     {
