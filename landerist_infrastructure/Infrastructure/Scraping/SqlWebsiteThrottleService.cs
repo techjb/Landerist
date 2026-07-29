@@ -16,6 +16,9 @@ public sealed class SqlWebsiteThrottleService : IWebsiteThrottleService
 
     public bool Clean() => _throttle.Clean();
 
+    public Task<bool> CleanAsync(CancellationToken cancellationToken = default) =>
+        _throttle.CleanAsync(cancellationToken);
+
     public bool IsBlocked(Website website) => _throttle.IsBlocked(website);
 
     public bool TryAcquire(Website website) => _throttle.Block(website);

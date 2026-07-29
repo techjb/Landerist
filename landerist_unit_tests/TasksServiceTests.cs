@@ -35,7 +35,7 @@ public sealed class TasksServiceTests
     }
 
     [Fact]
-    public void Start_InScraperMode_PreparesResourcesAndSchedulesScraping()
+    public async Task Start_InScraperMode_PreparesResourcesAndSchedulesScraping()
     {
         TestContext context = CreateContext(TasksExecutionMode.Scraper);
 
@@ -44,8 +44,8 @@ public sealed class TasksServiceTests
         Assert.Equal(1, context.Scrape.PrepareCalls);
         RecordingSchedule schedule = Assert.Single(context.Scheduler.Schedules);
         Assert.Equal("UpdateAndScrape", schedule.Name);
-        schedule.Callback();
-        Assert.Equal(1, context.Scrape.RunCalls);
+        await schedule.AsyncCallback(CancellationToken.None);
+        Assert.Equal(1, context.Scrape.RunAsyncCalls);
     }
 
     [Fact]
@@ -238,32 +238,68 @@ public sealed class TasksServiceTests
             Schedules.Add(schedule);
             return schedule;
         }
+
+        public IDisposable ScheduleAsync(
+            string name,
+            Func<CancellationToken, Task> callback,
+            TimeSpan dueTime,
+            TimeSpan interval)
+        {
+            RecordingSchedule schedule = new(name, callback, dueTime, interval);
+            Schedules.Add(schedule);
+            return schedule;
+        }
     }
 
-    private sealed class RecordingSchedule(
-        string name,
-        Action callback,
-        TimeSpan dueTime,
-        TimeSpan interval) : IDisposable
+    private sealed class RecordingSchedule : IDisposable
     {
-        public string Name { get; } = name;
+        public RecordingSchedule(
+            string name,
+            Action callback,
+            TimeSpan dueTime,
+            TimeSpan interval)
+        {
+            Name = name;
+            Callback = callback;
+            AsyncCallback = _ => Task.CompletedTask;
+            DueTime = dueTime;
+            Interval = interval;
+        }
 
-        public Action Callback { get; } = callback;
+        public RecordingSchedule(
+            string name,
+            Func<CancellationToken, Task> callback,
+            TimeSpan dueTime,
+            TimeSpan interval)
+        {
+            Name = name;
+            Callback = () => { };
+            AsyncCallback = callback;
+            DueTime = dueTime;
+            Interval = interval;
+        }
 
-        public TimeSpan DueTime { get; } = dueTime;
+        public string Name { get; }
 
-        public TimeSpan Interval { get; } = interval;
+        public Action Callback { get; }
+
+        public Func<CancellationToken, Task> AsyncCallback { get; }
+
+        public TimeSpan DueTime { get; }
+
+        public TimeSpan Interval { get; }
 
         public bool Disposed { get; private set; }
 
         public void Dispose() => Disposed = true;
     }
-
     private sealed class RecordingScrapeTaskJob : IScrapeTaskJob
     {
         public int PrepareCalls { get; private set; }
 
         public int RunCalls { get; private set; }
+
+        public int RunAsyncCalls { get; private set; }
 
         public int StopCalls { get; private set; }
 
@@ -272,6 +308,13 @@ public sealed class TasksServiceTests
         public void Prepare() => PrepareCalls++;
 
         public void Run() => RunCalls++;
+
+        public Task RunAsync(CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            RunAsyncCalls++;
+            return Task.CompletedTask;
+        }
 
         public void Stop() => StopCalls++;
 
@@ -287,9 +330,18 @@ public sealed class TasksServiceTests
     {
         public int RunCalls { get; private set; }
 
+        public int RunAsyncCalls { get; private set; }
+
         public int StopCalls { get; private set; }
 
         public void Run() => RunCalls++;
+
+        public Task RunAsync(CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            RunAsyncCalls++;
+            return Task.CompletedTask;
+        }
 
         public void Stop() => StopCalls++;
 

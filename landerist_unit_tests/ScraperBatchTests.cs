@@ -28,6 +28,18 @@ public sealed class ScraperBatchTests
     }
 
     [Fact]
+    public async Task RunBatchAsync_CleansThrottleAsynchronously()
+    {
+        TestContext context = CreateContext();
+
+        bool result = await context.Scraper.RunBatchAsync(CancellationToken.None);
+
+        Assert.True(result);
+        Assert.Equal(0, context.Throttle.CleanCalls);
+        Assert.Equal(1, context.Throttle.CleanAsyncCalls);
+        Assert.Single(context.Metrics.Records);
+    }
+    [Fact]
     public void Stop_ReleasesBrowserResourcesAndCleansPageLocks()
     {
         TestContext context = CreateContext();
@@ -36,6 +48,34 @@ public sealed class ScraperBatchTests
 
         Assert.Equal(1, context.Resources.ClearDownloadersCalls);
         Assert.Equal(1, context.Resources.CleanPageLocksCalls);
+        Assert.Equal(1, context.Resources.KillChromeCalls);
+    }
+    [Fact]
+    public async Task StopAsync_CleansPageLocksAsynchronouslyAndReleasesBrowserResources()
+    {
+        TestContext context = CreateContext();
+
+        await context.Scraper.StopAsync(CancellationToken.None);
+
+        Assert.Equal(1, context.Resources.ClearDownloadersCalls);
+        Assert.Equal(0, context.Resources.CleanPageLocksCalls);
+        Assert.Equal(1, context.Resources.CleanPageLocksAsyncCalls);
+        Assert.Equal(1, context.Resources.KillChromeCalls);
+    }
+
+    [Fact]
+    public async Task StopAsync_WhenPageLockCleanupFails_StillKillsChrome()
+    {
+        TestContext context = CreateContext();
+        context.Resources.CleanPageLocksAsyncException =
+            new InvalidOperationException("cleanup failed");
+
+        InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(
+            () => context.Scraper.StopAsync(CancellationToken.None));
+
+        Assert.Equal("cleanup failed", exception.Message);
+        Assert.Equal(1, context.Resources.ClearDownloadersCalls);
+        Assert.Equal(1, context.Resources.CleanPageLocksAsyncCalls);
         Assert.Equal(1, context.Resources.KillChromeCalls);
     }
     [Fact]
@@ -187,6 +227,8 @@ public sealed class ScraperBatchTests
 
         public int CleanCalls { get; private set; }
 
+        public int CleanAsyncCalls { get; private set; }
+
         public int AcquireCalls { get; private set; }
 
         public int ReportForbiddenCalls { get; private set; }
@@ -197,6 +239,13 @@ public sealed class ScraperBatchTests
         {
             CleanCalls++;
             return true;
+        }
+
+        public Task<bool> CleanAsync(CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            CleanAsyncCalls++;
+            return Task.FromResult(true);
         }
 
         public bool IsBlocked(Website website) => Blocked;
@@ -228,6 +277,10 @@ public sealed class ScraperBatchTests
 
         public int CleanPageLocksCalls { get; private set; }
 
+        public int CleanPageLocksAsyncCalls { get; private set; }
+
+        public Exception? CleanPageLocksAsyncException { get; set; }
+
         public void ClearDownloaders() => ClearDownloadersCalls++;
 
         public void CleanPageLocks() => CleanPageLocksCalls++;
@@ -236,8 +289,10 @@ public sealed class ScraperBatchTests
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            CleanPageLocks();
-            return Task.CompletedTask;
+            CleanPageLocksAsyncCalls++;
+            return CleanPageLocksAsyncException is null
+                ? Task.CompletedTask
+                : Task.FromException(CleanPageLocksAsyncException);
         }
 
         public void KillChrome() => KillChromeCalls++;

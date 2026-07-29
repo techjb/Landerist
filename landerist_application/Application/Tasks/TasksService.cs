@@ -94,9 +94,9 @@ public sealed class TasksService : IDisposable
 
                     case TasksExecutionMode.Scraper:
                         _scrapeJob.Prepare();
-                        AddSchedule(
+                        AddAsyncSchedule(
                             "UpdateAndScrape",
-                            _scrapeJob.Run,
+                            _scrapeJob.RunAsync,
                             _options.ScraperDueTime,
                             _options.ScraperInterval);
                         break;
@@ -231,6 +231,56 @@ public sealed class TasksService : IDisposable
         _schedules.Add(schedule);
     }
 
+    private void AddAsyncSchedule(
+        string name,
+        Func<CancellationToken, Task> action,
+        TimeSpan dueTime,
+        TimeSpan interval)
+    {
+        int running = 0;
+        IDisposable schedule = _scheduler.ScheduleAsync(
+            name,
+            async cancellationToken =>
+            {
+                if (Interlocked.Exchange(ref running, 1) == 1)
+                {
+                    return;
+                }
+
+                try
+                {
+                    await RunSafelyAsync(name, action, cancellationToken)
+                        .ConfigureAwait(false);
+                }
+                finally
+                {
+                    Interlocked.Exchange(ref running, 0);
+                }
+            },
+            dueTime,
+            interval);
+        _schedules.Add(schedule);
+    }
+
+    private async Task RunSafelyAsync(
+        string name,
+        Func<CancellationToken, Task> action,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await action(cancellationToken).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+        }
+        catch (Exception exception)
+        {
+            _logger.WriteError(
+                "ServiceTasks " + name,
+                exception.ToString());
+        }
+    }
     private void RunSafely(string name, Action action)
     {
         try

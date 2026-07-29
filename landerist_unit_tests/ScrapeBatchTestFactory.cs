@@ -24,6 +24,9 @@ internal static class ScrapeBatchTestFactory
     {
         public bool Clean() => true;
 
+        public Task<bool> CleanAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult(true);
+
         public bool IsBlocked(Website website) => false;
 
         public bool TryAcquire(Website website) => true;

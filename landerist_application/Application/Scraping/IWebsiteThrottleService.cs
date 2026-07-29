@@ -6,6 +6,8 @@ public interface IWebsiteThrottleService
 {
     bool Clean();
 
+    Task<bool> CleanAsync(CancellationToken cancellationToken = default);
+
     bool IsBlocked(Website website);
 
     bool TryAcquire(Website website);

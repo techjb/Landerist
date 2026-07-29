@@ -54,6 +54,25 @@ public sealed class DatabaseFailureArchitectureTests
         Assert.Contains("_scraper.StopAsync(cancellationToken)", job);
         Assert.Contains(".CleanPageLocksAsync(cancellationToken)", scraper);
     }
+    [Fact]
+    public void ScheduledScraping_PropagatesAsyncExecutionToDatabase()
+    {
+        string root = FindRepositoryRoot();
+        string tasks = File.ReadAllText(
+            Path.Combine(root, "landerist_application", "Application", "Tasks", "TasksService.cs"));
+        string job = File.ReadAllText(
+            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Tasks", "ScrapeTaskJob.cs"));
+        string scraper = File.ReadAllText(
+            Path.Combine(root, "landerist_application", "Application", "Scraping", "Scraper.cs"));
+        string throttle = File.ReadAllText(
+            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Scraping", "WebsitesThrottle.cs"));
+
+        Assert.Contains("AddAsyncSchedule(", tasks);
+        Assert.Contains("_scrapeJob.RunAsync", tasks);
+        Assert.Contains("_scraper.RunBatchAsync(cancellationToken)", job);
+        Assert.Contains(".CleanAsync(cancellationToken)", scraper);
+        Assert.Contains("_database.QueryAsync(", throttle);
+    }
     private static int CountOccurrences(string source, string value) =>
         source.Split(value, StringSplitOptions.None).Length - 1;
 

@@ -207,15 +207,18 @@ namespace landerist_library.Infrastructure.Scraping
             });
         }
 
-        public bool Clean()
-        {
-            string query =
-                "DELETE FROM " + WEBSITES_THROTTLE + " " +
-                "WHERE BlockUntil < GETDATE() " +
-                "AND ISNULL(ForbiddenBackoffLevel, 0) = 0 " +
-                "AND ISNULL(ForbiddenCounter, 0) = 0";
-            return _database.Query(query);
-        }
+        public bool Clean() => _database.Query(GetCleanQuery());
+
+        public Task<bool> CleanAsync(CancellationToken cancellationToken = default) =>
+            _database.QueryAsync(
+                GetCleanQuery(),
+                cancellationToken: cancellationToken);
+
+        private static string GetCleanQuery() =>
+            "DELETE FROM " + WEBSITES_THROTTLE + " " +
+            "WHERE BlockUntil < GETDATE() " +
+            "AND ISNULL(ForbiddenBackoffLevel, 0) = 0 " +
+            "AND ISNULL(ForbiddenCounter, 0) = 0";
 
         private int CalculateHostBlockDelayMilliseconds(Website website)
         {

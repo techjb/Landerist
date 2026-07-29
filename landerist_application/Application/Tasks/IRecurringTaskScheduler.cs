@@ -7,4 +7,10 @@ public interface IRecurringTaskScheduler
         Action callback,
         TimeSpan dueTime,
         TimeSpan interval);
+
+    IDisposable ScheduleAsync(
+        string name,
+        Func<CancellationToken, Task> callback,
+        TimeSpan dueTime,
+        TimeSpan interval);
 }

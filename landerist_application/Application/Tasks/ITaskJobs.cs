@@ -6,6 +6,8 @@ public interface IScrapeTaskJob
 
     void Run();
 
+    Task RunAsync(CancellationToken cancellationToken = default);
+
     void Stop();
 
     Task StopAsync(CancellationToken cancellationToken = default);

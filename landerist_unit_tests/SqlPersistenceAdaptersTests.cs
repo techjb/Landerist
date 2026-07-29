@@ -31,6 +31,18 @@ public sealed class SqlPersistenceAdaptersTests
     }
 
     [Fact]
+    public async Task WebsiteThrottle_CleanAsync_UsesAsyncDatabaseExecution()
+    {
+        RecordingDatabase database = new() { QueryResult = true };
+        WebsitesThrottle throttle = new(database, new StubWebsiteRobotsPolicy());
+
+        bool cleaned = await throttle.CleanAsync(CancellationToken.None);
+
+        Assert.True(cleaned);
+        Assert.Equal(1, database.QueryAsyncCalls);
+        Assert.Contains("DELETE FROM [WEBSITES_THROTTLE]", database.LastQuery);
+    }
+    [Fact]
     public void NotListingCache_WhenEnabled_InsertsThroughInjectedDatabase()
     {
         RecordingDatabase database = new() { QueryResult = true };

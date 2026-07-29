@@ -14,6 +14,7 @@ internal sealed class RecordingDatabase : IDatabase
     public bool QueryBoolResult { get; init; }
     public string? QueryStringResult { get; init; }
     public int? TimeoutSeconds { get; private set; }
+    public int QueryAsyncCalls { get; private set; }
     public DataTable TableResult { get; } = new();
     public List<string> ListStringResult { get; } = [];
     public bool QueryExistsResult { get; init; }
@@ -35,6 +36,7 @@ internal sealed class RecordingDatabase : IDatabase
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        QueryAsyncCalls++;
         Record(query, parameters);
         return Task.FromResult(QueryResult);
     }

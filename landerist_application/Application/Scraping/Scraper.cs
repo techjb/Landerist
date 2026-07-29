@@ -81,6 +81,20 @@ namespace landerist_library.Application.Scraping
         {
             ResetCancellationTokenSource();
             _batchServices.WebsiteThrottle.Clean();
+            return SelectAndScrapeBatch();
+        }
+
+        public async Task<bool> RunBatchAsync(CancellationToken cancellationToken = default)
+        {
+            ResetCancellationTokenSource();
+            await _batchServices.WebsiteThrottle
+                .CleanAsync(cancellationToken)
+                .ConfigureAwait(false);
+            return SelectAndScrapeBatch();
+        }
+
+        private bool SelectAndScrapeBatch()
+        {
             _batchServices.Browser.ClearDownloaders();
             _pageQueue = [.. _pageBatchSelector.Select()];
             return ScrapeBatch();
