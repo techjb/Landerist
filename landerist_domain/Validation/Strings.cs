@@ -1,4 +1,3 @@
-using Newtonsoft.Json;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
@@ -178,10 +177,10 @@ namespace landerist_library.Tools
         {
             if (string.IsNullOrEmpty(input))
             {
-                return JsonConvert.SerializeObject(string.Empty);
+                return System.Text.Json.JsonSerializer.Serialize(string.Empty);
             }
 
-            return JsonConvert.SerializeObject(input);
+            return System.Text.Json.JsonSerializer.Serialize(input);
         }
     }
 }
