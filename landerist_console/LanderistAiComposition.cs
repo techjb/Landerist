@@ -81,10 +81,4 @@ internal sealed class LanderistAiComposition(
             logger);
     }
 
-    public VertexAddressSelectorOptions CreateAddressSelectorOptions() => new(
-            runtimeOptions.Ai.VertexCredential,
-            runtimeOptions.Ai.VertexProjectId,
-            runtimeOptions.Ai.VertexLocation,
-            runtimeOptions.Ai.VertexPublisher,
-            runtimeOptions.Ai.VertexAddressModel);
 }

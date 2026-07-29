@@ -5,6 +5,7 @@ using landerist_library.Infrastructure.Listings;
 using landerist_library.Infrastructure.Parsing;
 using landerist_library.Infrastructure.Sql;using landerist_library.Application.Logging;
 using landerist_library.Application.Scraping;
+using landerist_library.Infrastructure.Ai;
 using landerist_library.Infrastructure.Browser;
 using landerist_library.Infrastructure.Downloaders;
 using landerist_library.Infrastructure.Http;
@@ -71,6 +72,12 @@ internal static class LanderistScrapingServiceCollectionExtensions
         services.AddSingleton(httpClients);
         services.AddSingleton<IHttpClientTransportFactory>(httpClients);
         services.AddSingleton(browserOptions);
+        services.AddSingleton(new VertexAddressSelectorOptions(
+            runtimeOptions.Ai.VertexCredential,
+            runtimeOptions.Ai.VertexProjectId,
+            runtimeOptions.Ai.VertexLocation,
+            runtimeOptions.Ai.VertexPublisher,
+            runtimeOptions.Ai.VertexAddressModel));
         ApplicationLoggerOptions loggerOptions = new(
             runtimeOptions.Execution.LogsEnabled,
             runtimeOptions.Execution.LogErrorsToConsole,
@@ -142,8 +149,7 @@ internal static class LanderistScrapingServiceCollectionExtensions
                     .CreateListingEnricher(
                         serviceProvider.GetRequiredService<GoolzoomApi>(),
                         runtimeOptions.Integrations.GoogleCloudLanderistApiKey,
-                        serviceProvider.GetRequiredService<LanderistAiComposition>()
-                            .CreateAddressSelectorOptions(),
+                        serviceProvider.GetRequiredService<VertexAddressSelectorOptions>(),
                         logger),
                 new LegacyListingUnpublishPolicy(
                     serviceProvider.GetRequiredService<SqlListingQueryService>()),

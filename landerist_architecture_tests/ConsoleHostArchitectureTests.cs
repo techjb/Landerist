@@ -269,6 +269,26 @@ public sealed class ConsoleHostArchitectureTests
             distribution);
     }
 
+    [Fact]
+    public void AddressSelectionOptions_AreOwnedByScrapingComposition()
+    {
+        string parsing = ReadConsoleSource("LanderistAiComposition.cs");
+        string scraping = ReadConsoleSource(
+            "LanderistScrapingServiceCollectionExtensions.cs");
+
+        Assert.DoesNotContain("CreateAddressSelectorOptions", parsing);
+        Assert.DoesNotContain("VertexAddressSelectorOptions", parsing);
+        Assert.Contains(
+            "services.AddSingleton(new VertexAddressSelectorOptions(",
+            scraping);
+        Assert.Contains(
+            "GetRequiredService<VertexAddressSelectorOptions>()",
+            scraping);
+        Assert.DoesNotContain(
+            "GetRequiredService<LanderistAiComposition>()",
+            scraping);
+    }
+
     private static string ReadConsoleSource(string fileName) =>
         File.ReadAllText(GetConsolePath(fileName));
 
