@@ -1,7 +1,6 @@
 using AI.Dev.OpenAI.GPT;
 using landerist_library.Configuration;
 using landerist_library.Pages;
-using landerist_library.Parse.ListingParser.LocalAI;
 
 namespace landerist_library.Parse.ListingParser
 {

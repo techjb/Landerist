@@ -1,3 +1,5 @@
+using landerist_library.Parse.ListingParser.UserInput;
+using landerist_library.Infrastructure.Ai.LocalAI;
 using landerist_library.Infrastructure.Ai.OpenAI;
 using landerist_library.Parsing;
 using landerist_library.Application.Parsing;
@@ -133,7 +135,14 @@ internal static class LanderistServiceComposition
                 SystemPrompt.Text,
                 VertexAIResponseSchema.ResponseSchema,
                 logger),
-            new LocalAIListingParserClient()
+            new LocalAIListingParserClient(
+                    new LocalAIListingParserOptions(
+                        Config.IsConfigurationLocal() ? LanderistSettings.Current.GetString("MACHINE_NAME_LANDERIST_03") : "localhost",
+                        ResolveHost: Config.IsConfigurationLocal()),
+                    SystemPrompt.Text,
+                    StructuredOutputSchema.GetJsonSchemaString(),
+                    ListingImageUrlPlaceholders.ReplaceImageUrls,
+                    logger)
         ]);
         ParseListing listingParser = new(
             new ListingParserOrchestrationOptions(

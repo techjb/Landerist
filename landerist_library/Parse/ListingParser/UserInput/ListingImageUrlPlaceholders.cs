@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace landerist_library.Parse.ListingParser.UserInput
 {
-    internal static class ListingImageUrlPlaceholders
+    public static class ListingImageUrlPlaceholders
     {
         private const string PlaceholderPrefix = "LANDERIST_IMAGE_";
         private const int HashHexLength = 16;

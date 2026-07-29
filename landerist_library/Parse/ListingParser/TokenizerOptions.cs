@@ -1,5 +1,4 @@
 using landerist_library.Parsing;
-using landerist_library.Parse.ListingParser.LocalAI;
 
 namespace landerist_library.Parse.ListingParser;
 
@@ -31,7 +30,7 @@ public sealed record TokenizerOptions
         {
             LLMProvider.OpenAI => 128000,
             LLMProvider.VertexAI => 128000,
-            LLMProvider.LocalAI => LocalAIRequest.MAX_CONTEXT_WINDOW,
+            LLMProvider.LocalAI => 48000,
             _ => DefaultMaxContextWindow
         });
 }
