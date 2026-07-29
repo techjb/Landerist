@@ -26,6 +26,8 @@ public sealed class LanderistServiceRegistrationTests
         Assert.Contains(services, descriptor =>
             descriptor.ServiceType == typeof(LanderistAiComposition));
         Assert.Contains(services, descriptor =>
+            descriptor.ServiceType == typeof(LanderistBatchProviderComposition));
+        Assert.Contains(services, descriptor =>
             descriptor.ServiceType == typeof(LanderistBatchComposition));
         Assert.Contains(services, descriptor =>
             descriptor.ServiceType == typeof(LanderistDistributionComposition));

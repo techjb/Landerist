@@ -211,6 +211,7 @@ public sealed class ConsoleHostArchitectureTests
 
         Assert.Contains("AddSingleton<LanderistAiComposition>()", parsing);
         Assert.Contains("AddSingleton<ParseListing>", parsing);
+        Assert.Contains("AddSingleton<LanderistBatchProviderComposition>()", scraping);
         Assert.Contains("AddSingleton<LanderistBatchComposition>()", scraping);
         Assert.Contains("AddSingleton<LanderistScrapingPipeline>", scraping);
         Assert.Contains("AddSingleton<ScrapeTaskJob>", scraping);
@@ -224,7 +225,27 @@ public sealed class ConsoleHostArchitectureTests
         Assert.DoesNotContain("OpenAIListingParserClient", coordinator);
         Assert.DoesNotContain("TaskBatchUpload", coordinator);
         Assert.DoesNotContain("DistributionPublisher", coordinator);
-    }    private static string ReadConsoleSource(string fileName) =>
+    }    [Fact]
+    public void BatchComposition_SeparatesProviderConfigurationFromJobAssembly()
+    {
+        string jobs = ReadConsoleSource("LanderistBatchComposition.cs");
+        string providers = ReadConsoleSource(
+            "LanderistBatchProviderComposition.cs");
+
+        Assert.Contains("LanderistBatchProviderComposition", jobs);
+        Assert.Contains("providerComposition.Create()", jobs);
+        Assert.DoesNotContain("OpenAIBatchClient", jobs);
+        Assert.DoesNotContain("VertexBatchJobClient", jobs);
+        Assert.DoesNotContain("StructuredOutputSchema", jobs);
+
+        Assert.Contains("OpenAIBatchClient", providers);
+        Assert.Contains("VertexBatchJobClient", providers);
+        Assert.Contains("ListingBatchUploadProviderCatalog", providers);
+        Assert.Contains("BatchDownloadProviderCatalog", providers);
+        Assert.Contains("IBatchArtifactCleaner", providers);
+    }
+
+    private static string ReadConsoleSource(string fileName) =>
         File.ReadAllText(GetConsolePath(fileName));
 
     private static string GetConsolePath(string fileName) =>

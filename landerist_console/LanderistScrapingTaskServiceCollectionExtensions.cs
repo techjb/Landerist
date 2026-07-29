@@ -18,6 +18,7 @@ internal static class LanderistScrapingTaskServiceCollectionExtensions
     public static IServiceCollection AddLanderistScrapingTasks(
         this IServiceCollection services)
     {
+        services.AddSingleton<LanderistBatchProviderComposition>();
         services.AddSingleton<LanderistBatchComposition>();
         services.AddSingleton<LanderistScrapingPipeline>(serviceProvider =>
             serviceProvider.GetRequiredService<LanderistScrapingPipelineFactory>()
