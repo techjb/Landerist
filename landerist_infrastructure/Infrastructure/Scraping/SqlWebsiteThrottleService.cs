@@ -21,7 +21,17 @@ public sealed class SqlWebsiteThrottleService : IWebsiteThrottleService
 
     public bool IsBlocked(Website website) => _throttle.IsBlocked(website);
 
+    public Task<bool> IsBlockedAsync(
+        Website website,
+        CancellationToken cancellationToken = default) =>
+        _throttle.IsBlockedAsync(website, cancellationToken);
+
     public bool TryAcquire(Website website) => _throttle.Block(website);
+
+    public Task<bool> TryAcquireAsync(
+        Website website,
+        CancellationToken cancellationToken = default) =>
+        _throttle.BlockAsync(website, cancellationToken);
 
     public bool ReportForbidden(Website website) => _throttle.ReportForbidden(website);
 

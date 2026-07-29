@@ -23,6 +23,11 @@ public interface IDatabase
         string query,
         IDictionary<string, object?>? parameters = null);
 
+    Task<bool> QueryBoolAsync(
+        string query,
+        IDictionary<string, object?>? parameters = null,
+        CancellationToken cancellationToken = default);
+
     bool QueryExists(
         string querySelect1,
         IDictionary<string, object?>? parameters = null);

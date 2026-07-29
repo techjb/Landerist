@@ -43,6 +43,22 @@ public sealed class SqlPersistenceAdaptersTests
         Assert.Contains("DELETE FROM [WEBSITES_THROTTLE]", database.LastQuery);
     }
     [Fact]
+    public async Task WebsiteThrottle_AcquisitionAsync_UsesAsyncScalarQueries()
+    {
+        RecordingDatabase database = new() { QueryBoolResult = true };
+        WebsitesThrottle throttle = new(database, new StubWebsiteRobotsPolicy());
+        Website website = new(new Uri("https://example.com"));
+
+        bool blocked = await throttle.IsBlockedAsync(website, CancellationToken.None);
+        bool acquired = await throttle.BlockAsync(website, CancellationToken.None);
+
+        Assert.True(blocked);
+        Assert.True(acquired);
+        Assert.Equal(2, database.QueryBoolAsyncCalls);
+        Assert.Equal("example.com", database.LastParameters!["Host"]);
+        Assert.Contains("SELECT @Acquired", database.LastQuery);
+    }
+    [Fact]
     public void NotListingCache_WhenEnabled_InsertsThroughInjectedDatabase()
     {
         RecordingDatabase database = new() { QueryResult = true };

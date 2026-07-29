@@ -10,7 +10,15 @@ public interface IWebsiteThrottleService
 
     bool IsBlocked(Website website);
 
+    Task<bool> IsBlockedAsync(
+        Website website,
+        CancellationToken cancellationToken = default);
+
     bool TryAcquire(Website website);
+
+    Task<bool> TryAcquireAsync(
+        Website website,
+        CancellationToken cancellationToken = default);
 
     bool ReportForbidden(Website website);
 

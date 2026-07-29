@@ -151,6 +151,24 @@ namespace landerist_library.Database
                 value => Convert.ToBoolean(value, CultureInfo.InvariantCulture));
         }
 
+        public Task<bool> QueryBoolAsync(
+            string query,
+            IDictionary<string, object?>? parameters = null,
+            CancellationToken cancellationToken = default) =>
+            ExecuteAsync(
+                operationName: nameof(QueryBoolAsync),
+                query,
+                parameters,
+                async (command, token) =>
+                {
+                    object? value = await command
+                        .ExecuteScalarAsync(token)
+                        .ConfigureAwait(false);
+                    return value is not null &&
+                        value != DBNull.Value &&
+                        Convert.ToBoolean(value, CultureInfo.InvariantCulture);
+                },
+                cancellationToken);
         public bool QueryExists(
             string querySelect1,
             IDictionary<string, object?>? parameters = null)

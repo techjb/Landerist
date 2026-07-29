@@ -31,8 +31,10 @@ public sealed class DatabaseFailureArchitectureTests
         string contract = File.ReadAllText(GetDatabasePath("IDatabase.cs"));
 
         Assert.Contains("Task<bool> QueryAsync(", contract);
+        Assert.Contains("Task<bool> QueryBoolAsync(", contract);
         Assert.Contains("connection.OpenAsync(cancellationToken)", source);
         Assert.Contains("command.ExecuteNonQueryAsync(token)", source);
+        Assert.Contains("ExecuteScalarAsync(token)", source);
         Assert.Contains("catch (OperationCanceledException)", source);
         Assert.DoesNotContain("Task.FromResult", source);
     }
@@ -70,8 +72,12 @@ public sealed class DatabaseFailureArchitectureTests
         Assert.Contains("AddAsyncSchedule(", tasks);
         Assert.Contains("_scrapeJob.RunAsync", tasks);
         Assert.Contains("_scraper.RunBatchAsync(cancellationToken)", job);
-        Assert.Contains(".CleanAsync(cancellationToken)", scraper);
+        Assert.Contains(".CleanAsync(linkedCancellation.Token)", scraper);
+        Assert.Contains("Parallel.ForEachAsync(", scraper);
+        Assert.Contains(".IsBlockedAsync(page.Website, cancellationToken)", scraper);
+        Assert.Contains(".TryAcquireAsync(page.Website, cancellationToken)", scraper);
         Assert.Contains("_database.QueryAsync(", throttle);
+        Assert.Contains("_database.QueryBoolAsync(", throttle);
     }
     private static int CountOccurrences(string source, string value) =>
         source.Split(value, StringSplitOptions.None).Length - 1;

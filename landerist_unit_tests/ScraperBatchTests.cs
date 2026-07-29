@@ -37,7 +37,25 @@ public sealed class ScraperBatchTests
         Assert.True(result);
         Assert.Equal(0, context.Throttle.CleanCalls);
         Assert.Equal(1, context.Throttle.CleanAsyncCalls);
+        Assert.Equal(0, context.Throttle.AcquireCalls);
+        Assert.Equal(1, context.Throttle.IsBlockedAsyncCalls);
+        Assert.Equal(1, context.Throttle.AcquireAsyncCalls);
         Assert.Single(context.Metrics.Records);
+    }
+    [Fact]
+    public async Task RunBatchAsync_WhenAlreadyCancelled_DoesNotSelectOrScrapePages()
+    {
+        TestContext context = CreateContext();
+        using CancellationTokenSource cancellation = new();
+        cancellation.Cancel();
+
+        bool result = await context.Scraper.RunBatchAsync(cancellation.Token);
+
+        Assert.False(result);
+        Assert.Equal(0, context.Throttle.CleanAsyncCalls);
+        Assert.Equal(0, context.Throttle.IsBlockedAsyncCalls);
+        Assert.Equal(0, context.Throttle.AcquireAsyncCalls);
+        Assert.Empty(context.Metrics.Records);
     }
     [Fact]
     public void Stop_ReleasesBrowserResourcesAndCleansPageLocks()
@@ -231,6 +249,10 @@ public sealed class ScraperBatchTests
 
         public int AcquireCalls { get; private set; }
 
+        public int IsBlockedAsyncCalls { get; private set; }
+
+        public int AcquireAsyncCalls { get; private set; }
+
         public int ReportForbiddenCalls { get; private set; }
 
         public int ReportSuccessCalls { get; private set; }
@@ -250,10 +272,28 @@ public sealed class ScraperBatchTests
 
         public bool IsBlocked(Website website) => Blocked;
 
+        public Task<bool> IsBlockedAsync(
+            Website website,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            IsBlockedAsyncCalls++;
+            return Task.FromResult(Blocked);
+        }
+
         public bool TryAcquire(Website website)
         {
             AcquireCalls++;
             return CanAcquire;
+        }
+
+        public Task<bool> TryAcquireAsync(
+            Website website,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            AcquireAsyncCalls++;
+            return Task.FromResult(CanAcquire);
         }
 
         public bool ReportForbidden(Website website)

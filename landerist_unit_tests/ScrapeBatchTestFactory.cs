@@ -29,7 +29,17 @@ internal static class ScrapeBatchTestFactory
 
         public bool IsBlocked(Website website) => false;
 
+        public Task<bool> IsBlockedAsync(
+            Website website,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(false);
+
         public bool TryAcquire(Website website) => true;
+
+        public Task<bool> TryAcquireAsync(
+            Website website,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(true);
 
         public bool ReportForbidden(Website website) => true;
 

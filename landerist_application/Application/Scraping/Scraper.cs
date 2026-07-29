@@ -87,10 +87,22 @@ namespace landerist_library.Application.Scraping
         public async Task<bool> RunBatchAsync(CancellationToken cancellationToken = default)
         {
             ResetCancellationTokenSource();
-            await _batchServices.WebsiteThrottle
-                .CleanAsync(cancellationToken)
-                .ConfigureAwait(false);
-            return SelectAndScrapeBatch();
+            using CancellationTokenSource linkedCancellation =
+                CancellationTokenSource.CreateLinkedTokenSource(
+                    cancellationToken,
+                    _cancellation.Token);
+            try
+            {
+                await _batchServices.WebsiteThrottle
+                    .CleanAsync(linkedCancellation.Token)
+                    .ConfigureAwait(false);
+                return await SelectAndScrapeBatchAsync(linkedCancellation.Token)
+                    .ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (linkedCancellation.IsCancellationRequested)
+            {
+                return false;
+            }
         }
 
         private bool SelectAndScrapeBatch()
@@ -100,6 +112,13 @@ namespace landerist_library.Application.Scraping
             return ScrapeBatch();
         }
 
+        private async Task<bool> SelectAndScrapeBatchAsync(
+            CancellationToken cancellationToken)
+        {
+            _batchServices.Browser.ClearDownloaders();
+            _pageQueue = [.. _pageBatchSelector.Select()];
+            return await ScrapeBatchAsync(cancellationToken).ConfigureAwait(false);
+        }
         public void Stop()
         {
             if (!_cancellation.IsCancellationRequested)
@@ -176,6 +195,55 @@ namespace landerist_library.Application.Scraping
                 _pageQueue.Clear();
             }
 
+            return CompleteScrapeBatch();
+        }
+
+        private async Task<bool> ScrapeBatchAsync(CancellationToken cancellationToken)
+        {
+            if (_pageQueue.Count == 0)
+            {
+                return false;
+            }
+
+            _state.Reset(_pageQueue.Count);
+            _scraperLog.WriteStart(_pageQueue.Count);
+            _pageQueue = PageBatchOrderer.SpreadByHost(_pageQueue);
+
+            try
+            {
+                await Parallel.ForEachAsync(
+                    _pageQueue,
+                    new ParallelOptions
+                    {
+                        MaxDegreeOfParallelism = _batchServices.Parallelism.Calculate(_pageQueue),
+                        CancellationToken = cancellationToken
+                    },
+                    async (page, token) =>
+                    {
+                        try
+                        {
+                            await ProcessThreadAsync(page, token).ConfigureAwait(false);
+                            _scraperLog.WritePage(_state.GetCurrent(), page);
+                        }
+                        finally
+                        {
+                            page.Dispose();
+                        }
+                    }).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+            }
+            finally
+            {
+                _pageQueue.Clear();
+            }
+
+            return CompleteScrapeBatch();
+        }
+
+        private bool CompleteScrapeBatch()
+        {
             ScrapeBatchCounters current = _state.GetCurrent();
             ScrapeBatchCounters totals = _state.AccumulateTotals();
             _scraperLog.WriteTotals(totals);
@@ -219,6 +287,44 @@ namespace landerist_library.Application.Scraping
             Scrape(page, page.Website.UseProxy);
         }
 
+        private async Task ProcessThreadAsync(
+            Page page,
+            CancellationToken cancellationToken)
+        {
+            if (!_batchServices.Robots.IsAllowed(page.Website, page.Uri))
+            {
+                page.SetPageType(PageType.BlockedByRobotsTxt);
+                _pageScraping.Scheduling.SetNextScrapeFromNow(page);
+                _pagePersistence.Update(page);
+                _state.IncrementSkippedByRobotsTxt();
+                return;
+            }
+
+            if (_batchServices.Robots.IsCrawlDelayTooBig(page.Website))
+            {
+                page.SetPageType(PageType.CrawlDelayTooBig);
+                _pageScraping.Scheduling.SetNextScrapeFromNow(page);
+                _pagePersistence.Update(page);
+                _state.IncrementSkippedByCrawlDelay();
+                return;
+            }
+
+            if (TryApplyPreClassificationBeforeDownload(page))
+            {
+                return;
+            }
+
+            if (await _batchServices.WebsiteThrottle
+                .IsBlockedAsync(page.Website, cancellationToken)
+                .ConfigureAwait(false))
+            {
+                _state.IncrementSkippedByBlockedWebsite();
+                return;
+            }
+
+            await ScrapeAsync(page, page.Website.UseProxy, cancellationToken)
+                .ConfigureAwait(false);
+        }
         public bool TryApplyPreClassificationBeforeDownload(Page page)
         {
             var success = new PageScraper(
@@ -290,6 +396,76 @@ namespace landerist_library.Application.Scraping
             _state.IncrementCrashed();
         }
 
+        private async Task ScrapeAsync(
+            Page page,
+            bool useProxy,
+            CancellationToken cancellationToken)
+        {
+            ScrapeAttemptResult result = await ScrapeAttemptAsync(
+                page,
+                useProxy,
+                cancellationToken).ConfigureAwait(false);
+            HandleScrapeResult(page, result);
+        }
+
+        private void HandleScrapeResult(Page page, ScrapeAttemptResult result)
+        {
+            if (result == ScrapeAttemptResult.Blocked)
+            {
+                _state.IncrementSkippedByBlockedWebsite();
+                return;
+            }
+
+            _state.IncrementProcessed();
+
+            if (result == ScrapeAttemptResult.Success)
+            {
+                if (page.IsHttpStatusCodeForbidden())
+                {
+                    _batchServices.WebsiteThrottle.ReportForbidden(page.Website);
+                }
+                else if (!page.IsHttpStatusCodeNotOK() && !page.IsResponseBodyNullOrEmpty())
+                {
+                    _batchServices.WebsiteThrottle.ReportSuccess(page.Website);
+                }
+
+                if (page.IsHttpStatusCodeNotOK())
+                {
+                    _state.IncrementDownloadErrors();
+                    return;
+                }
+
+                _state.IncrementScrapedSuccess();
+                return;
+            }
+
+            _state.IncrementCrashed();
+        }
+
+        private async Task<ScrapeAttemptResult> ScrapeAttemptAsync(
+            Page page,
+            bool useProxy,
+            CancellationToken cancellationToken)
+        {
+            bool acquired = await _batchServices.WebsiteThrottle
+                .TryAcquireAsync(page.Website, cancellationToken)
+                .ConfigureAwait(false);
+            if (!acquired && _batchServices.Options.IsProduction)
+            {
+                return ScrapeAttemptResult.Blocked;
+            }
+
+            var pageScraper = new PageScraper(
+                page,
+                useProxy,
+                _pagePersistence,
+                _logger,
+                _listingLifecycle,
+                _pageScraping);
+            return pageScraper.Scrape()
+                ? ScrapeAttemptResult.Success
+                : ScrapeAttemptResult.Crashed;
+        }
         private ScrapeAttemptResult ScrapeAttempt(Page page, bool useProxy)
         {
             var acquired = _batchServices.WebsiteThrottle.TryAcquire(page.Website);

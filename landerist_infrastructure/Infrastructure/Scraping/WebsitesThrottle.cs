@@ -30,31 +30,32 @@ namespace landerist_library.Infrastructure.Scraping
             _robots = robots;
         }
 
-        public bool IsBlocked(Website website)
-        {
-            string query =
-                "SELECT " +
-                "   CAST(" +
-                "      CASE " +
-                "           WHEN MAX(BlockUntil) > GETDATE() THEN 1 " +
-                "           ELSE 0 " +
-                "       END " +
-                "   AS BIT) AS IsBlocked " +
-                "FROM " + WEBSITES_THROTTLE + " " +
-                "WHERE Host = @Host";
+        public bool IsBlocked(Website website) =>
+            _database.QueryBool(GetIsBlockedQuery(), GetHostParameters(website));
 
-            return _database.QueryBool(query, new Dictionary<string, object?>()
-            {
-                {"Host", website.Host}
-            });
-        }
+        public Task<bool> IsBlockedAsync(
+            Website website,
+            CancellationToken cancellationToken = default) =>
+            _database.QueryBoolAsync(
+                GetIsBlockedQuery(),
+                GetHostParameters(website),
+                cancellationToken);
 
         public bool Block(Website website)
         {
-            var hostBlockDelayMilliseconds = CalculateHostBlockDelayMilliseconds(website);
-            return Block(website, hostBlockDelayMilliseconds);
+            int delayMilliseconds = CalculateHostBlockDelayMilliseconds(website);
+            return Block(website, delayMilliseconds);
         }
 
+        public Task<bool> BlockAsync(
+            Website website,
+            CancellationToken cancellationToken = default)
+        {
+            int delayMilliseconds = CalculateHostBlockDelayMilliseconds(website);
+            (string query, Dictionary<string, object?> parameters) =
+                GetBlockCommand(website, delayMilliseconds);
+            return _database.QueryBoolAsync(query, parameters, cancellationToken);
+        }
         public bool ReportForbidden(Website website)
         {
             string query =
@@ -170,6 +171,15 @@ namespace landerist_library.Infrastructure.Scraping
 
         private bool Block(Website website, int hostBlockDelayMilliseconds)
         {
+            (string query, Dictionary<string, object?> parameters) =
+                GetBlockCommand(website, hostBlockDelayMilliseconds);
+            return _database.QueryBool(query, parameters);
+        }
+
+        private static (string Query, Dictionary<string, object?> Parameters) GetBlockCommand(
+            Website website,
+            int hostBlockDelayMilliseconds)
+        {
             string query =
                 "SET XACT_ABORT ON; " +
                 "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE; " +
@@ -200,13 +210,26 @@ namespace landerist_library.Infrastructure.Scraping
                 "COMMIT TRANSACTION; " +
                 "SELECT @Acquired";
 
-            return _database.QueryBool(query, new Dictionary<string, object?>()
+            return (query, new Dictionary<string, object?>
             {
                 {"Host", website.Host},
                 {"HostBlockDelayMilliseconds", hostBlockDelayMilliseconds},
             });
         }
 
+        private static string GetIsBlockedQuery() =>
+            "SELECT " +
+            "   CAST(" +
+            "      CASE " +
+            "           WHEN MAX(BlockUntil) > GETDATE() THEN 1 " +
+            "           ELSE 0 " +
+            "       END " +
+            "   AS BIT) AS IsBlocked " +
+            "FROM " + WEBSITES_THROTTLE + " " +
+            "WHERE Host = @Host";
+
+        private static Dictionary<string, object?> GetHostParameters(Website website) =>
+            new() { ["Host"] = website.Host };
         public bool Clean() => _database.Query(GetCleanQuery());
 
         public Task<bool> CleanAsync(CancellationToken cancellationToken = default) =>

@@ -15,6 +15,7 @@ internal sealed class RecordingDatabase : IDatabase
     public string? QueryStringResult { get; init; }
     public int? TimeoutSeconds { get; private set; }
     public int QueryAsyncCalls { get; private set; }
+    public int QueryBoolAsyncCalls { get; private set; }
     public DataTable TableResult { get; } = new();
     public List<string> ListStringResult { get; } = [];
     public bool QueryExistsResult { get; init; }
@@ -58,6 +59,16 @@ internal sealed class RecordingDatabase : IDatabase
         return QueryBoolResult;
     }
 
+    public Task<bool> QueryBoolAsync(
+        string query,
+        IDictionary<string, object?>? parameters = null,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        QueryBoolAsyncCalls++;
+        Record(query, parameters);
+        return Task.FromResult(QueryBoolResult);
+    }
     public bool QueryExists(
         string query,
         IDictionary<string, object?>? parameters = null)
