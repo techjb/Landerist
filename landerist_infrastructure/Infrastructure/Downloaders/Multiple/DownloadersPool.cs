@@ -25,6 +25,9 @@ namespace landerist_library.Infrastructure.Downloaders.Multiple
             Logger = logger;
         }
         private readonly List<SingleDownloader> Downloaders = [];
+        private int CreatingDownloaders;
+        private int Generation;
+        private int NextDownloaderId;
 
         private readonly Lock Sync = new();
 
@@ -47,7 +50,9 @@ namespace landerist_library.Infrastructure.Downloaders.Multiple
         {
             ArgumentNullException.ThrowIfNull(page);
             cancellationToken.ThrowIfCancellationRequested();
-            SingleDownloader? downloader = GetDownloader(useProxy);
+            SingleDownloader? downloader = await GetDownloaderAsync(
+                useProxy,
+                cancellationToken).ConfigureAwait(false);
             if (downloader is null)
             {
                 Logger.WriteError("MultipleDownloader DownloadAsync", "Downloader not found");
@@ -57,6 +62,65 @@ namespace landerist_library.Infrastructure.Downloaders.Multiple
             return await downloader
                 .DownloadAsync(page, cancellationToken)
                 .ConfigureAwait(false);
+        }
+        private async Task<SingleDownloader?> GetDownloaderAsync(
+            bool useProxy,
+            CancellationToken cancellationToken)
+        {
+            int generation;
+            lock (Sync)
+            {
+                foreach (SingleDownloader downloader in
+                    Downloaders.OrderBy(static _ => Random.Shared.Next()))
+                {
+                    if (downloader.TryReserve(useProxy))
+                    {
+                        return downloader;
+                    }
+                }
+
+                if (Downloaders.Count + CreatingDownloaders >= MaxDownloaders)
+                {
+                    Logger.WriteInfo(
+                        "MultipleDownloader GetDownloaderAsync",
+                        $"Max downloaders reached: {MaxDownloaders}");
+                    return null;
+                }
+
+                CreatingDownloaders++;
+                generation = Generation;
+            }
+
+            SingleDownloader created;
+            try
+            {
+                created = await SingleDownloader.CreateAsync(
+                    useProxy,
+                    SessionFactory,
+                    cancellationToken).ConfigureAwait(false);
+            }
+            finally
+            {
+                lock (Sync)
+                {
+                    CreatingDownloaders--;
+                }
+            }
+
+            bool discard;
+            lock (Sync)
+            {
+                discard = generation != Generation;
+                if (!discard && created.TryReserve(useProxy))
+                {
+                    created.Id = ++NextDownloaderId;
+                    Downloaders.Add(created);
+                    return created;
+                }
+            }
+
+            await created.CloseBrowserAsync().ConfigureAwait(false);
+            return null;
         }
         private SingleDownloader? GetDownloader(bool useProxy)
         {
@@ -77,7 +141,7 @@ namespace landerist_library.Infrastructure.Downloaders.Multiple
                     return null;
                 }
 
-                int id = Downloaders.Count + 1;
+                int id = ++NextDownloaderId;
                 SingleDownloader newSingleDownloader = new(useProxy, SessionFactory) { Id = id };
                 if (newSingleDownloader.TryReserve(useProxy))
                 {
@@ -103,6 +167,22 @@ namespace landerist_library.Infrastructure.Downloaders.Multiple
                 singleDownloader.CloseBrowser());
         }
 
+        public async Task ClearAsync(CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            SingleDownloader[] toClear;
+            lock (Sync)
+            {
+                Generation++;
+                toClear = [.. Downloaders];
+                Downloaders.Clear();
+            }
+
+            await Task.WhenAll(toClear.Select(
+                static downloader => downloader.CloseBrowserAsync()))
+                .WaitAsync(cancellationToken)
+                .ConfigureAwait(false);
+        }
         public void Print()
         {
             lock (Sync)

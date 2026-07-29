@@ -62,6 +62,10 @@ internal static class ScrapeBatchTestFactory
         {
         }
 
+        public Task ClearDownloadersAsync(
+            CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
+
         public void CleanPageLocks()
         {
         }

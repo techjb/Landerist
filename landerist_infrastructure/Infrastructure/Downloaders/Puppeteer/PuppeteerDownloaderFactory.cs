@@ -11,5 +11,17 @@ namespace landerist_library.Infrastructure.Downloaders.Puppeteer
         {
             return new PuppeteerDownloader(useProxy, options, logger);
         }
+        public async Task<IDownloaderSession> CreateAsync(
+            bool useProxy,
+            CancellationToken cancellationToken = default)
+        {
+            var downloader = new PuppeteerDownloader(
+                useProxy,
+                options,
+                logger,
+                initializeSynchronously: false);
+            await downloader.InitializeAsync(cancellationToken).ConfigureAwait(false);
+            return downloader;
+        }
     }
 }

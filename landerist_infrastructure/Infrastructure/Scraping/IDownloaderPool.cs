@@ -12,4 +12,6 @@ public interface IDownloaderPool
         CancellationToken cancellationToken = default);
 
     void Clear();
+
+    Task ClearAsync(CancellationToken cancellationToken = default);
 }

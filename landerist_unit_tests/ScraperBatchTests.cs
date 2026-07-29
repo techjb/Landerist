@@ -40,6 +40,7 @@ public sealed class ScraperBatchTests
         Assert.Equal(0, context.Throttle.AcquireCalls);
         Assert.Equal(1, context.Throttle.IsBlockedAsyncCalls);
         Assert.Equal(1, context.Throttle.AcquireAsyncCalls);
+        Assert.Equal(2, context.Resources.ClearDownloadersAsyncCalls);
         Assert.Equal(0, context.Acquisition.Calls);
         Assert.Equal(1, context.Acquisition.AsyncCalls);
         Assert.Single(context.Metrics.Records);
@@ -77,7 +78,8 @@ public sealed class ScraperBatchTests
 
         await context.Scraper.StopAsync(CancellationToken.None);
 
-        Assert.Equal(1, context.Resources.ClearDownloadersCalls);
+        Assert.Equal(0, context.Resources.ClearDownloadersCalls);
+        Assert.Equal(1, context.Resources.ClearDownloadersAsyncCalls);
         Assert.Equal(0, context.Resources.CleanPageLocksCalls);
         Assert.Equal(1, context.Resources.CleanPageLocksAsyncCalls);
         Assert.Equal(1, context.Resources.KillChromeCalls);
@@ -94,7 +96,8 @@ public sealed class ScraperBatchTests
             () => context.Scraper.StopAsync(CancellationToken.None));
 
         Assert.Equal("cleanup failed", exception.Message);
-        Assert.Equal(1, context.Resources.ClearDownloadersCalls);
+        Assert.Equal(0, context.Resources.ClearDownloadersCalls);
+        Assert.Equal(1, context.Resources.ClearDownloadersAsyncCalls);
         Assert.Equal(1, context.Resources.CleanPageLocksAsyncCalls);
         Assert.Equal(1, context.Resources.KillChromeCalls);
     }
@@ -364,6 +367,8 @@ public sealed class ScraperBatchTests
     {
         public int ClearDownloadersCalls { get; private set; }
 
+        public int ClearDownloadersAsyncCalls { get; private set; }
+
         public int KillChromeCalls { get; private set; }
 
         public int CleanPageLocksCalls { get; private set; }
@@ -373,6 +378,14 @@ public sealed class ScraperBatchTests
         public Exception? CleanPageLocksAsyncException { get; set; }
 
         public void ClearDownloaders() => ClearDownloadersCalls++;
+
+        public Task ClearDownloadersAsync(
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ClearDownloadersAsyncCalls++;
+            return Task.CompletedTask;
+        }
 
         public void CleanPageLocks() => CleanPageLocksCalls++;
 

@@ -10,6 +10,8 @@ namespace landerist_library.Infrastructure.Downloaders
 
         public void CloseBrowser();
 
+        public Task CloseBrowserAsync();
+
         public void Download(Page page);
 
         public Task DownloadAsync(

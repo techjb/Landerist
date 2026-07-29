@@ -124,6 +124,28 @@ public sealed class DatabaseFailureArchitectureTests
         Assert.Contains("Task.Delay(delay + 1000, cancellationToken)", puppeteer);
         Assert.Contains("await ClosePageAsync()", puppeteer);
     }
+    [Fact]
+    public void AsyncPuppeteerLifecycle_DoesNotLeakCancelledBrowserLaunches()
+    {
+        string root = FindRepositoryRoot();
+        string pool = File.ReadAllText(
+            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Downloaders", "Multiple", "DownloadersPool.cs"));
+        string single = File.ReadAllText(
+            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Downloaders", "Multiple", "SingleDownloader.cs"));
+        string puppeteer = File.ReadAllText(
+            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Downloaders", "Puppeteer", "PuppeteerDownloader.cs"));
+        string scraper = File.ReadAllText(
+            Path.Combine(root, "landerist_application", "Application", "Scraping", "Scraper.cs"));
+
+        Assert.Contains("SingleDownloader.CreateAsync(", pool);
+        Assert.Contains("Downloaders.Count + CreatingDownloaders", pool);
+        Assert.Contains("Generation++", pool);
+        Assert.Contains("downloader.CloseBrowserAsync()", pool);
+        Assert.Contains("RestartBrowserAsync(cancellationToken)", single);
+        Assert.Contains("CloseCancelledLaunchAsync(launch)", puppeteer);
+        Assert.Contains("await browser.CloseAsync()", puppeteer);
+        Assert.Contains(".ClearDownloadersAsync(cancellationToken)", scraper);
+    }
     private static int CountOccurrences(string source, string value) =>
         source.Split(value, StringSplitOptions.None).Length - 1;
 

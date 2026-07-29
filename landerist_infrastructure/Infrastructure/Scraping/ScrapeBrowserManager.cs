@@ -11,6 +11,9 @@ public sealed class ScrapeBrowserManager(
 {
     public void ClearDownloaders() => pool.Clear();
 
+    public Task ClearDownloadersAsync(CancellationToken cancellationToken = default) =>
+        pool.ClearAsync(cancellationToken);
+
     public void KillChrome() => chrome.KillChrome();
 
     public void UpdateChrome() => logger.WriteInfo(

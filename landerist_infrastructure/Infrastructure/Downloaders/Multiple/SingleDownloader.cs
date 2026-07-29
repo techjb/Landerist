@@ -22,6 +22,31 @@ namespace landerist_library.Infrastructure.Downloaders.Multiple
             Available = Downloader.BrowserInitialized();
         }
 
+        private SingleDownloader(
+            bool useProxy,
+            IDownloaderSessionFactory downloaderSessionFactory,
+            IDownloaderSession downloader)
+        {
+            UseProxy = useProxy;
+            DownloaderSessionFactory = downloaderSessionFactory;
+            Downloader = downloader;
+            Available = Downloader.BrowserInitialized();
+        }
+
+        public static async Task<SingleDownloader> CreateAsync(
+            bool useProxy,
+            IDownloaderSessionFactory downloaderSessionFactory,
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(downloaderSessionFactory);
+            IDownloaderSession downloader = await downloaderSessionFactory
+                .CreateAsync(useProxy, cancellationToken)
+                .ConfigureAwait(false);
+            return new SingleDownloader(
+                useProxy,
+                downloaderSessionFactory,
+                downloader);
+        }
         public bool TryReserve(bool useProxy)
         {
             if (!Available || useProxy != UseProxy)
@@ -97,8 +122,9 @@ namespace landerist_library.Infrastructure.Downloaders.Multiple
                 if (BrowserHasChrashed())
                 {
                     Chrashes++;
-                    RestartBrowser();
                     restartedBrowser = true;
+                    await RestartBrowserAsync(cancellationToken)
+                        .ConfigureAwait(false);
                     return false;
                 }
 
@@ -111,8 +137,9 @@ namespace landerist_library.Infrastructure.Downloaders.Multiple
             catch
             {
                 Chrashes++;
-                RestartBrowser();
                 restartedBrowser = true;
+                await RestartBrowserAsync(cancellationToken)
+                    .ConfigureAwait(false);
                 return false;
             }
             finally
@@ -129,6 +156,21 @@ namespace landerist_library.Infrastructure.Downloaders.Multiple
             Available = false;
         }
 
+        public async Task CloseBrowserAsync()
+        {
+            await Downloader.CloseBrowserAsync().ConfigureAwait(false);
+            Available = false;
+        }
+
+        public async Task RestartBrowserAsync(
+            CancellationToken cancellationToken = default)
+        {
+            await CloseBrowserAsync().ConfigureAwait(false);
+            Downloader = await DownloaderSessionFactory
+                .CreateAsync(UseProxy, cancellationToken)
+                .ConfigureAwait(false);
+            Available = Downloader.BrowserInitialized();
+        }
         public bool BrowserHasChrashed()
         {
             return Downloader.BrowserHasChrashed();

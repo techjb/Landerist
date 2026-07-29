@@ -115,7 +115,9 @@ namespace landerist_library.Application.Scraping
         private async Task<bool> SelectAndScrapeBatchAsync(
             CancellationToken cancellationToken)
         {
-            _batchServices.Browser.ClearDownloaders();
+            await _batchServices.Browser
+                .ClearDownloadersAsync(cancellationToken)
+                .ConfigureAwait(false);
             _pageQueue = [.. _pageBatchSelector.Select()];
             return await ScrapeBatchAsync(cancellationToken).ConfigureAwait(false);
         }
@@ -138,9 +140,11 @@ namespace landerist_library.Application.Scraping
                 await _cancellation.CancelAsync().ConfigureAwait(false);
             }
 
-            _batchServices.Browser.ClearDownloaders();
             try
             {
+                await _batchServices.Browser
+                    .ClearDownloadersAsync(cancellationToken)
+                    .ConfigureAwait(false);
                 await _batchServices.PageLocks
                     .CleanPageLocksAsync(cancellationToken)
                     .ConfigureAwait(false);
@@ -239,7 +243,28 @@ namespace landerist_library.Application.Scraping
                 _pageQueue.Clear();
             }
 
-            return CompleteScrapeBatch();
+            return await CompleteScrapeBatchAsync(cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        private async Task<bool> CompleteScrapeBatchAsync(
+            CancellationToken cancellationToken)
+        {
+            ScrapeBatchCounters current = _state.GetCurrent();
+            ScrapeBatchCounters totals = _state.AccumulateTotals();
+            _scraperLog.WriteTotals(totals);
+            _batchServices.Metrics.Record(current);
+            try
+            {
+                await _batchServices.Browser
+                    .ClearDownloadersAsync(cancellationToken)
+                    .ConfigureAwait(false);
+                return true;
+            }
+            finally
+            {
+                _batchServices.Browser.KillChrome();
+            }
         }
 
         private bool CompleteScrapeBatch()

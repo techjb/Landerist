@@ -28,14 +28,48 @@ public sealed class SingleDownloaderTests
         Assert.True(downloader.TryReserve(useProxy: false));
     }
 
+    [Fact]
+    public async Task CreateAndCloseAsync_UseAsyncSessionLifecycle()
+    {
+        RecordingDownloaderSession session = new();
+        StubDownloaderSessionFactory factory = new(session);
+
+        SingleDownloader downloader = await SingleDownloader.CreateAsync(
+            useProxy: false,
+            factory,
+            CancellationToken.None);
+        await downloader.CloseBrowserAsync();
+
+        Assert.Equal(0, factory.SyncCreateCalls);
+        Assert.Equal(1, factory.AsyncCreateCalls);
+        Assert.Equal(1, session.CloseBrowserAsyncCalls);
+    }
     private sealed class StubDownloaderSessionFactory(IDownloaderSession session)
         : IDownloaderSessionFactory
     {
-        public IDownloaderSession Create(bool useProxy) => session;
-    }
+        public int SyncCreateCalls { get; private set; }
 
+        public int AsyncCreateCalls { get; private set; }
+
+        public IDownloaderSession Create(bool useProxy)
+        {
+            SyncCreateCalls++;
+            return session;
+        }
+
+        public Task<IDownloaderSession> CreateAsync(
+            bool useProxy,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            AsyncCreateCalls++;
+            return Task.FromResult(session);
+        }
+    }
     private sealed class RecordingDownloaderSession : IDownloaderSession
     {
+        public int CloseBrowserAsyncCalls { get; private set; }
+
         public TaskCompletionSource Entered { get; } = new(
             TaskCreationOptions.RunContinuationsAsynchronously);
 
@@ -45,6 +79,12 @@ public sealed class SingleDownloaderTests
 
         public void CloseBrowser()
         {
+        }
+
+        public Task CloseBrowserAsync()
+        {
+            CloseBrowserAsyncCalls++;
+            return Task.CompletedTask;
         }
 
         public void Download(Page page)

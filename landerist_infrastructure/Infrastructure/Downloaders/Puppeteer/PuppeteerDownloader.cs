@@ -39,7 +39,8 @@ namespace landerist_library.Infrastructure.Downloaders.Puppeteer
         public PuppeteerDownloader(
             bool useProxy,
             PuppeteerBrowserOptions options,
-            IApplicationLogger logger)
+            IApplicationLogger logger,
+            bool initializeSynchronously = true)
         {
             ArgumentNullException.ThrowIfNull(options);
             ArgumentNullException.ThrowIfNull(logger);
@@ -56,7 +57,10 @@ namespace landerist_library.Infrastructure.Downloaders.Puppeteer
             }
 
             launchOptions = PuppeteerLaunchOptionsFactory.Create(UseProxy, options);
-            Browser = LaunchAsync().GetAwaiter().GetResult();
+            if (initializeSynchronously)
+            {
+                Browser = LaunchAsync(CancellationToken.None).GetAwaiter().GetResult();
+            }
         }
 
         public bool BrowserInitialized()
@@ -79,11 +83,25 @@ namespace landerist_library.Infrastructure.Downloaders.Puppeteer
             return BrowserInitialized() && PageInitialized();
         }
 
-        private async Task<IBrowser?> LaunchAsync()
+        internal async Task InitializeAsync(CancellationToken cancellationToken = default)
         {
+            Browser = await LaunchAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        private async Task<IBrowser?> LaunchAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            Task<IBrowser> launch = PuppeteerSharp.Puppeteer.LaunchAsync(launchOptions);
             try
             {
-                return await PuppeteerSharp.Puppeteer.LaunchAsync(launchOptions);
+                return await launch
+                    .WaitAsync(cancellationToken)
+                    .ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                _ = CloseCancelledLaunchAsync(launch);
+                throw;
             }
             catch (Exception exception)
             {
@@ -93,12 +111,24 @@ namespace landerist_library.Infrastructure.Downloaders.Puppeteer
             return null;
         }
 
+        private static async Task CloseCancelledLaunchAsync(Task<IBrowser> launch)
+        {
+            try
+            {
+                IBrowser browser = await launch.ConfigureAwait(false);
+                await browser.CloseAsync().ConfigureAwait(false);
+                await browser.DisposeAsync().ConfigureAwait(false);
+            }
+            catch
+            {
+            }
+        }
         public void CloseBrowser()
         {
             CloseBrowserAsync().GetAwaiter().GetResult();
         }
 
-        private async Task CloseBrowserAsync()
+        public async Task CloseBrowserAsync()
         {
             if (!BrowserInitialized())
             {

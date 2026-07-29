@@ -15,4 +15,7 @@ public sealed class LegacyDownloadersPoolAdapter(DownloadersPool pool) : IDownlo
         pool.DownloadAsync(page, useProxy, cancellationToken);
 
     public void Clear() => pool.Clear();
+
+    public Task ClearAsync(CancellationToken cancellationToken = default) =>
+        pool.ClearAsync(cancellationToken);
 }
