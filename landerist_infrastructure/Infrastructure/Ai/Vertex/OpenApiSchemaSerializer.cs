@@ -1,6 +1,6 @@
-﻿using Google.Cloud.AIPlatform.V1;
+using Google.Cloud.AIPlatform.V1;
 
-namespace landerist_library.Parse.ListingParser.StructuredOutputs
+namespace landerist_library.Infrastructure.Ai.Vertex
 {
     public class OpenApiSchemaSerializer
     {

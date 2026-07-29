@@ -1,4 +1,4 @@
-namespace landerist_library.Parse.ListingParser.StructuredOutputs;
+namespace landerist_domain.Parsing.Materialization;
 
 public sealed record ListingMaterializationRules(
     int MaxPublishedAgeYears,
