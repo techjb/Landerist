@@ -83,7 +83,7 @@ public sealed class LanderistSettings
 
 }
 
-internal static class AppConfig
+public static class AppConfig
 {
     private static LanderistSettings Settings => LanderistSettings.Current;
     public static string OPENAI_API_KEY => Settings["OPENAI_API_KEY"];
