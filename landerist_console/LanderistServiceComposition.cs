@@ -65,6 +65,11 @@ internal static class LanderistServiceComposition
         landerist_library.Tools.ScrapingBee.Configure(
             LanderistSettings.Current["SCRAPPINGBEE_APIKEY"],
             httpClients);
+        landerist_library.Export.S3.Configure(new landerist_library.Export.S3Options(
+            LanderistSettings.Current["AWS_ACESSKEYID"],
+            LanderistSettings.Current["AWS_SECRETACCESSKEY"],
+            LanderistSettings.Current["AWS_S3_DOWNLOADS_BUCKET"],
+            LanderistSettings.Current["AWS_S3_WEBSITE_BUCKET"]));
         IApplicationLogger logger =
             services.GetRequiredService<IApplicationLogger>();
         GoolzoomApi goolzoom = services.GetRequiredService<GoolzoomApi>();

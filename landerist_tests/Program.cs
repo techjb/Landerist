@@ -98,6 +98,11 @@ namespace landerist_tests
             landerist_library.Tools.ScrapingBee.Configure(
                 settings.GetString("SCRAPPINGBEE_APIKEY"),
                 httpClients);
+            landerist_library.Export.S3.Configure(new landerist_library.Export.S3Options(
+                settings.GetString("AWS_ACESSKEYID"),
+                settings.GetString("AWS_SECRETACCESSKEY"),
+                settings.GetString("AWS_S3_DOWNLOADS_BUCKET"),
+                settings.GetString("AWS_S3_WEBSITE_BUCKET")));
             PuppeteerBrowserOptions browserOptions = new(
                 Config.HEADLESS_BROWSER,
                 Config.IsConfigurationLocal(),

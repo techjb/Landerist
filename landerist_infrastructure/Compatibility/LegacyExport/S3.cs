@@ -1,21 +1,39 @@
-﻿using Amazon;
+using Amazon;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using Grpc.Core;
-using landerist_library.Configuration;
 using landerist_library.Logs;
 using System.Net;
 
 namespace landerist_library.Export
 {
+    public sealed record S3Options(
+        string AccessKeyId,
+        string SecretAccessKey,
+        string DownloadsBucket,
+        string WebsiteBucket);
+
     public class S3
     {
+        private static S3Options? ConfiguredOptions;
         private readonly AmazonS3Client AmazonS3Client;
+        private readonly S3Options _options;
+
+        public static void Configure(S3Options options)
+        {
+            ArgumentNullException.ThrowIfNull(options);
+            ConfiguredOptions = options;
+        }
 
         public S3()
         {
-            AmazonS3Client = new AmazonS3Client(AppConfig.AWS_ACESSKEYID, AppConfig.AWS_SECRETACCESSKEY, RegionEndpoint.EUWest3);
+            _options = ConfiguredOptions
+                ?? throw new InvalidOperationException("S3 is not configured.");
+            AmazonS3Client = new AmazonS3Client(
+                _options.AccessKeyId,
+                _options.SecretAccessKey,
+                RegionEndpoint.EUWest3);
         }
 
 
@@ -26,12 +44,12 @@ namespace landerist_library.Export
             List<(string, string)>? metadata = null,
             string? contentDisposition = null)
         {
-            return UploadFile(file, key, AppConfig.AWS_S3_DOWNLOADS_BUCKET, subdirectoryInBucket, metadata, contentDisposition);
+            return UploadFile(file, key, _options.DownloadsBucket, subdirectoryInBucket, metadata, contentDisposition);
         }
 
         public bool UploadToWebsiteBucket(string file, string key, string subdirectoryInBucket)
         {
-            return UploadFile(file, key, AppConfig.AWS_S3_WEBSITE_BUCKET, subdirectoryInBucket);
+            return UploadFile(file, key, _options.WebsiteBucket, subdirectoryInBucket);
         }
 
         public bool UploadFile(string file, string key, string bucketName)
