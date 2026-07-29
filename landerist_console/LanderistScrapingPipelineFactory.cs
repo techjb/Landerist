@@ -1,3 +1,5 @@
+using landerist_library.Infrastructure.Parsing.Tokenization;
+using landerist_domain.Parsing.Tokenization;
 using landerist_library.Application.Listings;
 using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
@@ -11,7 +13,6 @@ using landerist_library.Infrastructure.Parsing.UserInput;
 using landerist_library.Infrastructure.Scraping;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Infrastructure.WebsiteServices;
-using landerist_library.Parse.ListingParser;
 using landerist_library.Websites;
 
 namespace landerist_console;

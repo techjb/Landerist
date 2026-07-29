@@ -1,6 +1,6 @@
 using landerist_library.Parsing;
 
-namespace landerist_library.Parse.ListingParser;
+namespace landerist_domain.Parsing.Tokenization;
 
 public sealed record TokenizerOptions
 {

@@ -1,8 +1,5 @@
-using AI.Dev.OpenAI.GPT;
-using landerist_library.Configuration;
-using landerist_library.Pages;
 
-namespace landerist_library.Parse.ListingParser
+namespace landerist_domain.Parsing.Prompt
 {
     public class SystemPrompt
     {

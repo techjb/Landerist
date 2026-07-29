@@ -1,8 +1,7 @@
 using landerist_library.Application.Parsing;
 using landerist_library.Pages;
-using landerist_library.Parse.ListingParser;
 
-namespace landerist_library.Infrastructure.Parsing;
+namespace landerist_library.Infrastructure.Parsing.Tokenization;
 
 public sealed class LegacyPageTokenLimitPolicy(Tokenizer tokenizer) : IPageTokenLimitPolicy
 {

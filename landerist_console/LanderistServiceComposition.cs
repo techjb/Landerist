@@ -1,3 +1,6 @@
+using landerist_library.Infrastructure.Parsing.Tokenization;
+using landerist_domain.Parsing.Tokenization;
+using landerist_domain.Parsing.Prompt;
 using landerist_library.Parse.Media;
 using landerist_library.Infrastructure.Ai.StructuredOutputs;
 using landerist_domain.Parsing.Materialization;
@@ -7,7 +10,6 @@ using landerist_library.Infrastructure.Ai.OpenAI;
 using landerist_library.Parsing;
 using landerist_library.Application.Parsing;
 using landerist_domain.Parsing.StructuredOutputs;
-using landerist_library.Parse.ListingParser;
 using landerist_library.Infrastructure.Ai.Vertex;
 using landerist_library.Infrastructure.Browser;
 using landerist_library.Infrastructure.Downloaders.Puppeteer;

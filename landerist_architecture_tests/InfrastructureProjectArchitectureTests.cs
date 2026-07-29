@@ -27,7 +27,7 @@ public sealed class InfrastructureProjectArchitectureTests
 
         Assert.Equal(
             ["Com.Bekijkhet.RobotsTxt", "HtmlAgilityPack", "Google.Cloud.AIPlatform.V1", "Google.Cloud.Storage.V1", "Louw.SitemapParser", "Microsoft.Data.SqlClient",
-            "OpenAI-DotNet", "Newtonsoft.Json", "Newtonsoft.Json.Schema", "NetTopologySuite", "NetTopologySuite.IO.GeoJSON", "System.Drawing.Common", "PuppeteerSharp"],
+            "OpenAI-DotNet", "Newtonsoft.Json", "Newtonsoft.Json.Schema", "NetTopologySuite", "NetTopologySuite.IO.GeoJSON", "System.Drawing.Common", "PuppeteerSharp", "SharpToken"],
             packages);
         Assert.Equal(
             [
@@ -769,8 +769,8 @@ public sealed class InfrastructureProjectArchitectureTests
             "LegacyListingLocationEnricher.cs")));
         Assert.True(File.Exists(Path.Combine(extractedParsing, "LegacyListingPageParser.cs")));
         Assert.True(File.Exists(Path.Combine(extractedParsing, "LegacyLocalAiListingParser.cs")));
-        Assert.True(File.Exists(Path.Combine(parsing, "LegacyLocalAiTokenBudget.cs")));
-        Assert.True(File.Exists(Path.Combine(parsing, "LegacyPageTokenLimitPolicy.cs")));
+        Assert.True(File.Exists(Path.Combine(extractedParsing, "Tokenization", "LegacyLocalAiTokenBudget.cs")));
+        Assert.True(File.Exists(Path.Combine(extractedParsing, "Tokenization", "LegacyPageTokenLimitPolicy.cs")));
         Assert.True(File.Exists(Path.Combine(
             root,
             "landerist_infrastructure",

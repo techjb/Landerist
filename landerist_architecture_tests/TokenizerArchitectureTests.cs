@@ -3,7 +3,7 @@ namespace landerist_architecture_tests;
 public sealed class TokenizerArchitectureTests
 {
     [Theory]
-    [InlineData("landerist_library", "Parse", "ListingParser", "Tokenizer.cs")]
+    [InlineData("landerist_infrastructure", "Infrastructure", "Parsing\\Tokenization", "Tokenizer.cs")]
     [InlineData("landerist_infrastructure", "Infrastructure", "Tasks", "TaskLocalAIParsing.cs")]
     public void TokenizationAndLocalAiTask_DoNotReadOrMutateGlobalConfiguration(
         string project,

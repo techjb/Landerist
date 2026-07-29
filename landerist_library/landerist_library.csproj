@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AI.Dev.OpenAI.GPT" Version="1.0.2" />
     <PackageReference Include="AWSSDK.CloudFront" Version="4.0.13.5" />
     <PackageReference Include="AWSSDK.S3" Version="4.0.21.1" />
     <PackageReference Include="Com.Bekijkhet.RobotsTxt" Version="1.0.0" />
@@ -20,7 +19,6 @@
     <PackageReference Include="OpenCvSharp4" Version="4.13.0.20260330" />
     <PackageReference Include="OpenCvSharp4.Extensions" Version="4.13.0.20260330" />
     <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.13.0.20260302" />
-    <PackageReference Include="SharpToken" Version="2.0.6" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,7 +1,9 @@
+using landerist_domain.Parsing.Prompt;
+using landerist_domain.Parsing.Tokenization;
 using landerist_library.Pages;
 using SharpToken;
 
-namespace landerist_library.Parse.ListingParser;
+namespace landerist_library.Infrastructure.Parsing.Tokenization;
 
 public sealed class Tokenizer
 {
