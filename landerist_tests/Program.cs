@@ -1,3 +1,4 @@
+using landerist_library.Parse.Media;
 using landerist_library.Infrastructure.Ai.StructuredOutputs;
 using landerist_domain.Parsing.Materialization;
 using landerist_domain.Parsing.UserInput;
@@ -186,7 +187,17 @@ namespace landerist_tests
                     Config.BATCH_ENABLED,
                     Config.LLM_PROVIDER),
                 listingParserClients,
-                parsingServices);
+                parsingServices,
+                new StructuredOutputMaterializationOperations(
+                    landerist_library.Tools.Strings.Clean,
+                    landerist_library.Tools.Strings.RemoveSpaces,
+                    landerist_library.Tools.Validate.Phone,
+                    landerist_library.Tools.Validate.Email,
+                    landerist_library.Tools.Validate.CadastralReference,
+                    (listing, page, websiteAccess, images) =>
+                        new MediaParser(page, websiteAccess).AddMediaImages(listing, images),
+                    (source, uri, exception) => logger.WriteError(source, uri + Environment.NewLine + exception)),
+                logger);
             SqlPageLinkService pageLinks = new(
                 pagePersistence,
                 new WebsitePageMetricsRepository(databaseFactory.Create()),

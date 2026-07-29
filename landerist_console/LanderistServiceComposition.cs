@@ -1,3 +1,4 @@
+using landerist_library.Parse.Media;
 using landerist_library.Infrastructure.Ai.StructuredOutputs;
 using landerist_domain.Parsing.Materialization;
 using landerist_domain.Parsing.UserInput;
@@ -151,7 +152,17 @@ internal static class LanderistServiceComposition
                 Config.BATCH_ENABLED,
                 Config.LLM_PROVIDER),
             listingParserClients,
-            parsingServices);
+            parsingServices,
+            new StructuredOutputMaterializationOperations(
+                landerist_library.Tools.Strings.Clean,
+                landerist_library.Tools.Strings.RemoveSpaces,
+                landerist_library.Tools.Validate.Phone,
+                landerist_library.Tools.Validate.Email,
+                landerist_library.Tools.Validate.CadastralReference,
+                (listing, page, websiteAccess, images) =>
+                    new MediaParser(page, websiteAccess).AddMediaImages(listing, images),
+                (source, uri, exception) => logger.WriteError(source, uri + Environment.NewLine + exception)),
+            logger);
         GlobalStatistics globalStatistics = new(
             services.GetRequiredService<GlobalStatisticsRepository>(),
             persistenceEnabled: !Config.IsConfigurationLocal());

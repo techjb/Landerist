@@ -1,7 +1,7 @@
 using landerist_domain.Parsing.StructuredOutputs;
 using landerist_library.Websites;
 
-namespace landerist_library.Parse.ListingParser;
+namespace landerist_domain.Parsing.Materialization;
 
 public sealed record ListingParsingServices
 {

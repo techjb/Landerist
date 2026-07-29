@@ -1,11 +1,11 @@
+using landerist_library.Application.Logging;
+using landerist_domain.Parsing.Materialization;
 using landerist_library.Infrastructure.Parsing.UserInput;
-using landerist_library.Parse.Media;
 using landerist_library.Infrastructure.Ai.StructuredOutputs;
 using landerist_library.Infrastructure.Ai.Vertex;
 using landerist_library.Parsing;
 using landerist_library.Application.Parsing;
 using landerist_library.Websites;
-using landerist_library.Parse.ListingParser;
 using landerist_library.Pages;
 using landerist_domain.Parsing.StructuredOutputs;
 using landerist_domain.Parsing.UserInput;
@@ -18,16 +18,6 @@ namespace landerist_library.Infrastructure.Parsing
 {
     public class ParseListing
     {
-        private static readonly StructuredOutputMaterializationOperations MaterializationOperations = new(
-            Tools.Strings.Clean,
-            Tools.Strings.RemoveSpaces,
-            Tools.Validate.Phone,
-            Tools.Validate.Email,
-            Tools.Validate.CadastralReference,
-            (listing, page, websiteAccess, images) =>
-                new MediaParser(page, websiteAccess).AddMediaImages(listing, images),
-            (source, uri, exception) => Logs.Log.WriteError(source, uri, exception));
-
         private static readonly JsonSerializerSettings JsonSerializerSettings = new()
         {
             MissingMemberHandling = MissingMemberHandling.Ignore,
@@ -37,11 +27,15 @@ namespace landerist_library.Infrastructure.Parsing
         private readonly ListingParserOrchestrationOptions Options;
         private readonly ListingParserClientCatalog Clients;
         private readonly ListingParsingServices ParsingServices;
+        private readonly StructuredOutputMaterializationOperations MaterializationOperations;
+        private readonly IApplicationLogger Logger;
 
         public ParseListing(
             ListingParserOrchestrationOptions options,
             ListingParserClientCatalog clients,
-            ListingParsingServices parsingServices)
+            ListingParsingServices parsingServices,
+            StructuredOutputMaterializationOperations materializationOperations,
+            IApplicationLogger logger)
         {
             ArgumentNullException.ThrowIfNull(options);
             ArgumentNullException.ThrowIfNull(clients);
@@ -49,6 +43,8 @@ namespace landerist_library.Infrastructure.Parsing
             Options = options;
             Clients = clients;
             ParsingServices = parsingServices;
+            MaterializationOperations = materializationOperations ?? throw new ArgumentNullException(nameof(materializationOperations));
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
         public (PageType pageType, Listing? listing, bool waitingAIRequest) Parse(Page page, HostStatistics statistics)
         {
@@ -103,11 +99,11 @@ namespace landerist_library.Infrastructure.Parsing
             }, statistics);
         }
 
-        private static void WriteLocalAIDiagnostic(IListingParserClient client, string? diagnostic)
+        private void WriteLocalAIDiagnostic(IListingParserClient client, string? diagnostic)
         {
             if (client.Provider == LLMProvider.LocalAI && !string.IsNullOrWhiteSpace(diagnostic))
             {
-                Console.WriteLine("ParseListing ParseLocalAI " + diagnostic);
+                Logger.WriteInfo(nameof(ParseListing), diagnostic);
             }
         }
 
@@ -137,7 +133,7 @@ namespace landerist_library.Infrastructure.Parsing
             return ParseResponse(page, text, provider ?? Options.Provider, ParsingServices);
         }
 
-        private static (PageType pageType, Listing? listing) ParseResponse(Page page, string? text, LLMProvider provider, ListingParsingServices parsingServices)
+        private (PageType pageType, Listing? listing) ParseResponse(Page page, string? text, LLMProvider provider, ListingParsingServices parsingServices)
         {
             if (string.IsNullOrWhiteSpace(text))
             {
@@ -162,7 +158,7 @@ namespace landerist_library.Infrastructure.Parsing
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteError("ParseListing ParseResponse", exception.Message);
+                Logger.WriteError("ParseListing.ParseResponse", exception.ToString());
                 return (PageType.MayBeListing, null);
             }
         }

@@ -758,17 +758,17 @@ public sealed class InfrastructureProjectArchitectureTests
             "landerist_library",
             "Infrastructure",
             "Parsing");
-        Assert.True(File.Exists(Path.Combine(parsing, "LegacyBatchListingResponseParser.cs")));
         string extractedParsing = Path.Combine(
             root,
             "landerist_infrastructure",
             "Infrastructure",
             "Parsing");
+        Assert.True(File.Exists(Path.Combine(extractedParsing, "LegacyBatchListingResponseParser.cs")));
         Assert.True(File.Exists(Path.Combine(
             extractedParsing,
             "LegacyListingLocationEnricher.cs")));
-        Assert.True(File.Exists(Path.Combine(parsing, "LegacyListingPageParser.cs")));
-        Assert.True(File.Exists(Path.Combine(parsing, "LegacyLocalAiListingParser.cs")));
+        Assert.True(File.Exists(Path.Combine(extractedParsing, "LegacyListingPageParser.cs")));
+        Assert.True(File.Exists(Path.Combine(extractedParsing, "LegacyLocalAiListingParser.cs")));
         Assert.True(File.Exists(Path.Combine(parsing, "LegacyLocalAiTokenBudget.cs")));
         Assert.True(File.Exists(Path.Combine(parsing, "LegacyPageTokenLimitPolicy.cs")));
         Assert.True(File.Exists(Path.Combine(

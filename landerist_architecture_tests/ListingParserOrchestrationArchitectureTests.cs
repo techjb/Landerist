@@ -7,7 +7,7 @@ public sealed class ListingParserOrchestrationArchitectureTests
     {
         string parserFile = Path.Combine(
             FindRepositoryRoot(),
-            "landerist_library",
+            "landerist_infrastructure",
             "Infrastructure",
             "Parsing",
             "ParseListing.cs");
