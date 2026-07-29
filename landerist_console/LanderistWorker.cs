@@ -43,12 +43,12 @@ internal sealed class LanderistWorker : IHostedService
         return Task.CompletedTask;
     }
 
-    public Task StopAsync(CancellationToken cancellationToken)
+    public async Task StopAsync(CancellationToken cancellationToken)
     {
         Log.WriteInfo(
             "landerist_console",
             "Stopping Version: " + _runtimeOptions.Execution.Version + " ..");
-        _tasks.Stop();
+        await _tasks.StopAsync(cancellationToken).ConfigureAwait(false);
 
         if (_startedAt is not null)
         {
@@ -59,8 +59,6 @@ internal sealed class LanderistWorker : IHostedService
                 "Stopped. Version: " + _runtimeOptions.Execution.Version +
                 " Duration: " + duration);
         }
-
-        return Task.CompletedTask;
     }
 
     private void StartKeyboardListener()

@@ -7,6 +7,8 @@ public interface IScrapeTaskJob
     void Run();
 
     void Stop();
+
+    Task StopAsync(CancellationToken cancellationToken = default);
 }
 
 public interface ILocalAiTaskJob

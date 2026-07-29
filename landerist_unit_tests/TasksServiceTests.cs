@@ -125,6 +125,33 @@ public sealed class TasksServiceTests
     }
 
     [Fact]
+    public async Task StopAsync_DisposesSchedulesAndStopsLongRunningJobs()
+    {
+        TestContext context = CreateContext(TasksExecutionMode.Scraper);
+        context.Service.Start();
+
+        await context.Service.StopAsync(CancellationToken.None);
+
+        Assert.All(context.Scheduler.Schedules, schedule => Assert.True(schedule.Disposed));
+        Assert.Equal(1, context.Scrape.StopAsyncCalls);
+        Assert.Equal(1, context.LocalAi.StopCalls);
+    }
+
+    [Fact]
+    public async Task StopAsync_WhenCancelled_StillStopsLocalAiJob()
+    {
+        TestContext context = CreateContext(TasksExecutionMode.Scraper);
+        context.Service.Start();
+        using CancellationTokenSource cancellation = new();
+        cancellation.Cancel();
+
+        await Assert.ThrowsAsync<OperationCanceledException>(() =>
+            context.Service.StopAsync(cancellation.Token));
+
+        Assert.Equal(0, context.Scrape.StopAsyncCalls);
+        Assert.Equal(1, context.LocalAi.StopCalls);
+    }
+    [Fact]
     public void Dispose_BeforeStart_DoesNotStopJobs()
     {
         TestContext context = CreateContext(TasksExecutionMode.Scraper);
@@ -240,11 +267,20 @@ public sealed class TasksServiceTests
 
         public int StopCalls { get; private set; }
 
+        public int StopAsyncCalls { get; private set; }
+
         public void Prepare() => PrepareCalls++;
 
         public void Run() => RunCalls++;
 
         public void Stop() => StopCalls++;
+
+        public Task StopAsync(CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            StopAsyncCalls++;
+            return Task.CompletedTask;
+        }
     }
 
     private sealed class RecordingLocalAiTaskJob : ILocalAiTaskJob
@@ -256,6 +292,8 @@ public sealed class TasksServiceTests
         public void Run() => RunCalls++;
 
         public void Stop() => StopCalls++;
+
+
     }
 
     private sealed class RecordingRecurringTaskJob : IRecurringTaskJob

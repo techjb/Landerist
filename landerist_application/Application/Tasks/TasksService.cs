@@ -136,15 +136,9 @@ public sealed class TasksService : IDisposable
 
     public void Stop()
     {
-        lock (_lifecycleSync)
+        if (!TryBeginStop())
         {
-            if (_disposed || !_started)
-            {
-                return;
-            }
-
-            DisposeSchedules();
-            _started = false;
+            return;
         }
 
         try
@@ -157,6 +151,22 @@ public sealed class TasksService : IDisposable
         }
     }
 
+    public async Task StopAsync(CancellationToken cancellationToken = default)
+    {
+        if (!TryBeginStop())
+        {
+            return;
+        }
+
+        try
+        {
+            await _scrapeJob.StopAsync(cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            _localAiJob.Stop();
+        }
+    }
     public void Dispose()
     {
         lock (_lifecycleSync)
@@ -177,6 +187,20 @@ public sealed class TasksService : IDisposable
         GC.SuppressFinalize(this);
     }
 
+    private bool TryBeginStop()
+    {
+        lock (_lifecycleSync)
+        {
+            if (_disposed || !_started)
+            {
+                return false;
+            }
+
+            DisposeSchedules();
+            _started = false;
+            return true;
+        }
+    }
     private void AddSchedule(
         string name,
         Action action,

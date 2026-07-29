@@ -36,6 +36,24 @@ public sealed class DatabaseFailureArchitectureTests
         Assert.Contains("catch (OperationCanceledException)", source);
         Assert.DoesNotContain("Task.FromResult", source);
     }
+    [Fact]
+    public void HostShutdown_PropagatesAsyncCleanupToPageLocks()
+    {
+        string root = FindRepositoryRoot();
+        string worker = File.ReadAllText(
+            Path.Combine(root, "landerist_console", "LanderistWorker.cs"));
+        string tasks = File.ReadAllText(
+            Path.Combine(root, "landerist_application", "Application", "Tasks", "TasksService.cs"));
+        string job = File.ReadAllText(
+            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Tasks", "ScrapeTaskJob.cs"));
+        string scraper = File.ReadAllText(
+            Path.Combine(root, "landerist_application", "Application", "Scraping", "Scraper.cs"));
+
+        Assert.Contains("await _tasks.StopAsync(cancellationToken)", worker);
+        Assert.Contains("await _scrapeJob.StopAsync(cancellationToken)", tasks);
+        Assert.Contains("_scraper.StopAsync(cancellationToken)", job);
+        Assert.Contains(".CleanPageLocksAsync(cancellationToken)", scraper);
+    }
     private static int CountOccurrences(string source, string value) =>
         source.Split(value, StringSplitOptions.None).Length - 1;
 

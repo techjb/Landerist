@@ -23,4 +23,7 @@ public sealed class ScrapeTaskJob : IScrapeTaskJob
     public void Run() => _scraper.RunBatch();
 
     public void Stop() => _scraper.Stop();
+
+    public Task StopAsync(CancellationToken cancellationToken = default) =>
+        _scraper.StopAsync(cancellationToken);
 }

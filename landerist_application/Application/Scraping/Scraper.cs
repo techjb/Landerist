@@ -98,6 +98,25 @@ namespace landerist_library.Application.Scraping
             _batchServices.Browser.KillChrome();
         }
 
+        public async Task StopAsync(CancellationToken cancellationToken = default)
+        {
+            if (!_cancellation.IsCancellationRequested)
+            {
+                await _cancellation.CancelAsync().ConfigureAwait(false);
+            }
+
+            _batchServices.Browser.ClearDownloaders();
+            try
+            {
+                await _batchServices.PageLocks
+                    .CleanPageLocksAsync(cancellationToken)
+                    .ConfigureAwait(false);
+            }
+            finally
+            {
+                _batchServices.Browser.KillChrome();
+            }
+        }
         public bool Scrape(Website website)
         {
             _pageQueue = [.. _batchServices.Pages.GetPages(website)];
