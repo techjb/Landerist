@@ -35,40 +35,55 @@ public sealed class ConsoleHostArchitectureTests
             "Program must remain a small host bootstrapper.");
     }
     [Fact]
-    public void PersistenceRegistration_OwnsDatabaseFactoryConstruction()
+    public void PersistenceRegistration_DelegatesToDatabaseRepositoryAndServiceModules()
     {
-        string registrations = ReadConsoleSource(
+        string coordinator = ReadConsoleSource(
             "LanderistPersistenceServiceCollectionExtensions.cs");
+        string database = ReadConsoleSource(
+            "LanderistDatabaseServiceCollectionExtensions.cs");
+        string repositories = ReadConsoleSource(
+            "LanderistRepositoryServiceCollectionExtensions.cs");
+        string persistenceServices = ReadConsoleSource(
+            "LanderistPersistenceAdapterServiceCollectionExtensions.cs");
         string taskRegistrations = ReadConsoleSource(
             "LanderistTaskServiceCollectionExtensions.cs");
         string adapterFactory = ReadConsoleSource(
             "LanderistDatabaseAdapterFactory.cs");
 
-        Assert.Contains("SqlDatabaseOptions databaseOptions = new(", registrations);
-        Assert.Contains("LegacyDatabase.Configure(databaseFactory)", registrations);
-        Assert.Contains("AddSingleton<IDatabaseFactory>", registrations);
-        Assert.DoesNotContain("SqlDatabaseOptions databaseOptions", taskRegistrations);
-        Assert.DoesNotContain("LegacyDatabase.Configure", taskRegistrations);
-        Assert.DoesNotContain("new PageRepository(", taskRegistrations);
-        Assert.DoesNotContain("new WebsiteRepository(", taskRegistrations);
-        Assert.DoesNotContain("new ListingRepository(", taskRegistrations);
-        Assert.Contains("AddTransient(_ => new PageRepository(", registrations);
-        Assert.Contains("AddTransient(_ => new WebsiteRepository(", registrations);
-        Assert.Contains("AddTransient(_ => new ListingRepository(", registrations);
+        Assert.Contains(".AddLanderistDatabase(runtimeOptions)", coordinator);
+        Assert.Contains(".AddLanderistRepositories(runtimeOptions)", coordinator);
+        Assert.Contains(
+            ".AddLanderistPersistenceServices(runtimeOptions)",
+            coordinator);
+        Assert.True(
+            File.ReadLines(GetConsolePath(
+                "LanderistPersistenceServiceCollectionExtensions.cs")).Count() <= 25,
+            "Persistence composition coordinator must remain small.");
+        Assert.DoesNotContain("AddSingleton<", coordinator);
+        Assert.DoesNotContain("AddTransient", coordinator);
+
+        Assert.Contains("SqlDatabaseOptions databaseOptions = new(", database);
+        Assert.Contains("LegacyDatabase.Configure(databaseFactory)", database);
+        Assert.Contains("AddSingleton<IDatabaseFactory>", database);
+        Assert.Contains("CsvExportService.Configure", database);
+        Assert.Contains("Log.Configure", database);
+
+        Assert.Contains("CreateDatabase(serviceProvider)", repositories);
+        Assert.Contains("GetRequiredService<IDatabaseFactory>()", repositories);
+        Assert.Contains("AddTransient", repositories);
+        Assert.DoesNotContain("LegacyDatabase.Configure", repositories);
+
+        Assert.Contains("AddSingleton<PagePersistenceService>()", persistenceServices);
+        Assert.Contains("AddSingleton<WebsitePersistenceService>()", persistenceServices);
+        Assert.Contains("AddSingleton<SqlListingQueryService>()", persistenceServices);
+        Assert.Contains("AddSingleton<SqlPageCatalog>()", persistenceServices);
+        Assert.Contains("AddSingleton<SqlWebsiteCatalog>()", persistenceServices);
+        Assert.DoesNotContain("new PageRepository(", persistenceServices);
+
         Assert.DoesNotContain("databaseFactory.Create()", taskRegistrations);
         Assert.Contains("IDatabaseFactory databaseFactory", adapterFactory);
         Assert.Contains("databaseFactory.Create()", adapterFactory);
-        Assert.Contains("AddSingleton<PagePersistenceService>()", registrations);
-        Assert.Contains("AddSingleton<WebsitePersistenceService>()", registrations);
-        Assert.Contains("AddSingleton<SqlListingQueryService>()", registrations);
-        Assert.Contains("AddSingleton<SqlPageCatalog>()", registrations);
-        Assert.Contains("AddSingleton<SqlWebsiteCatalog>()", registrations);
-        Assert.DoesNotContain("new PagePersistenceService(", taskRegistrations);
-        Assert.DoesNotContain("new WebsitePersistenceService(", taskRegistrations);
-        Assert.DoesNotContain("new SqlListingQueryService(", taskRegistrations);
-        Assert.DoesNotContain("new WebsiteDeletionService(", taskRegistrations);
-    }
-    [Fact]
+    }    [Fact]
     public void ScrapingRegistration_DelegatesToCohesiveModules()
     {
         string coordinator = ReadConsoleSource(
@@ -270,7 +285,7 @@ public sealed class ConsoleHostArchitectureTests
     public void DistributionComposition_DependsOnExplicitAdministrationPort()
     {
         string persistence = ReadConsoleSource(
-            "LanderistPersistenceServiceCollectionExtensions.cs");
+            "LanderistPersistenceAdapterServiceCollectionExtensions.cs");
         string distribution = ReadConsoleSource(
             "LanderistDistributionComposition.cs");
 
