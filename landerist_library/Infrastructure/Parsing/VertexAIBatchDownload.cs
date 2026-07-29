@@ -1,3 +1,4 @@
+using landerist_library.Infrastructure.Ai.Batch;
 using landerist_library.Application.Parsing;
 using landerist_library.Parse.ListingParser.VertexAI.Batch;
 using Google.Cloud.AIPlatform.V1;
@@ -136,7 +137,7 @@ namespace landerist_library.Infrastructure.Parsing.VertexAI
                 var labels = vertexAIBatchResponse.Request.labels;
                 if (labels.TryGetValue(VertexAIBatchUpload.LABEL_URIHASH, out string? uriHash))
                 {
-                    return pages.GetByHash(uriHash);
+                    return pages.GetByHash(uriHash!);
                 }
             }
             return null;

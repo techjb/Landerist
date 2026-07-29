@@ -1,4 +1,4 @@
-﻿namespace landerist_library.Parse.ListingParser.VertexAI.Batch
+namespace landerist_library.Infrastructure.Ai.Batch
 {
 
 #pragma warning disable CS8618

@@ -1,11 +1,9 @@
 using Google.Cloud.AIPlatform.V1;
 using landerist_library.Pages;
-using landerist_library.Parse.ListingParser.OpenAI.Batch;
-using landerist_library.Parse.ListingParser.StructuredOutputs;
 using System.Text.Json;
 using static Google.Cloud.AIPlatform.V1.SafetySetting.Types;
 
-namespace landerist_library.Parse.ListingParser.VertexAI.Batch
+namespace landerist_library.Infrastructure.Ai.Batch
 {
     public class VertexAIBatchUpload
     {
@@ -15,7 +13,11 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
         {
             WriteIndented = false
         };
-        public static string? GetJson(Page page, string userInput)
+        public static string? GetJson(
+            Page page,
+            string userInput,
+            string systemPrompt,
+            object responseSchema)
         {
             VertexAIBatchRequest structuredRequestData = new()
             {
@@ -41,7 +43,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                         [
                             new Part
                             {
-                                text = SystemPrompt.Text
+                                text = systemPrompt
                             }
                         ]
                     },
@@ -49,7 +51,7 @@ namespace landerist_library.Parse.ListingParser.VertexAI.Batch
                     {
                         temperature = 0.2f,
                         response_mime_type = "application/json",
-                        response_schema = OpenApiSchemaSerializer.Serialize(VertexAIResponseSchema.ResponseSchema),
+                        response_schema = responseSchema,
                         thinking_config = new ThinkingConfig
                         {
                             thinking_budget = 0,

@@ -3,6 +3,7 @@ using landerist_library.Application.Parsing;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
 using landerist_library.Parse.ListingParser;
 using landerist_library.Parse.ListingParser.VertexAI;
+using landerist_library.Parse.ListingParser.VertexAI.Batch;
 using landerist_library.Infrastructure.Browser;
 using landerist_library.Infrastructure.Downloaders.Puppeteer;
 using landerist_library.Infrastructure.Downloaders.Multiple;
@@ -21,6 +22,7 @@ using landerist_library.Application.Tasks;
 using landerist_library.Application.Websites;
 using landerist_library.Infrastructure.Administration;
 using landerist_library.Infrastructure.Ai;
+using landerist_library.Infrastructure.Ai.Batch;
 using landerist_library.Infrastructure.Backup;
 using landerist_library.Infrastructure.Distribution;
 using landerist_library.Infrastructure.Downloaders;
@@ -224,7 +226,11 @@ internal static class LanderistServiceComposition
         ListingBatchUploadProviderCatalog batchUploadProviders = new(
         [
             new OpenAIBatchUploadProvider(),
-            new VertexAIBatchUploadProvider()
+            new VertexAIBatchUploadProvider(
+                SystemPrompt.Text,
+                OpenApiSchemaSerializer.Serialize(VertexAIResponseSchema.ResponseSchema),
+                CloudStorage.UploadFile,
+                BatchPredictions.CreateBatch)
         ]);
         IListingBatchUploadProvider batchUploadProvider =
             batchUploadProviders.GetRequired(batchProvider);
