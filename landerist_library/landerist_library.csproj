@@ -7,15 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Com.Bekijkhet.RobotsTxt" Version="1.0.0" />
-    <PackageReference Include="Google.Apis.CustomSearchAPI.v1" Version="1.68.0.3520" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
-    <PackageReference Include="Louw.SitemapParser" Version="0.0.2" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.0" />
-    
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\landerist_application\landerist_application.csproj" />
     <ProjectReference Include="..\landerist_infrastructure\landerist_infrastructure.csproj" />
     <ProjectReference Include="..\landerist_domain\landerist_domain.csproj" />
