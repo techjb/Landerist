@@ -1,6 +1,6 @@
-﻿using OpenAI;
+using OpenAI;
 
-namespace landerist_library.Parse.ListingParser.OpenAI.Batch
+namespace landerist_library.Infrastructure.Ai.OpenAI.Batch
 {
 
 #pragma warning disable CS8618
