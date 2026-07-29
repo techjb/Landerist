@@ -1,5 +1,5 @@
 using landerist_library.Pages;
-using landerist_library.Parse.ListingParser.StructuredOutputs;
+using landerist_domain.Parsing.StructuredOutputs;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;

@@ -1,7 +1,6 @@
 using landerist_library.Parsing;
 using landerist_library.Parse.ListingParser.LocalAI;
 using landerist_library.Parse.ListingParser.OpenAI;
-using landerist_library.Parse.ListingParser.VertexAI;
 
 namespace landerist_library.Parse.ListingParser;
 

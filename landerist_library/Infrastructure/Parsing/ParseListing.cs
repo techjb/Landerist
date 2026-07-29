@@ -3,7 +3,7 @@ using landerist_library.Application.Parsing;
 using landerist_library.Websites;
 using landerist_library.Parse.ListingParser;
 using landerist_library.Pages;
-using landerist_library.Parse.ListingParser.StructuredOutputs;
+using landerist_domain.Parsing.StructuredOutputs;
 using landerist_library.Parse.ListingParser.UserInput;
 using landerist_library.Application.Statistics;
 using landerist_library.Application.Websites;

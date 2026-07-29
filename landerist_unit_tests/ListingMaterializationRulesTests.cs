@@ -1,4 +1,5 @@
 using landerist_library.Pages;
+using landerist_domain.Parsing.StructuredOutputs;
 using landerist_library.Parse.ListingParser.StructuredOutputs;
 using landerist_library.Websites;
 

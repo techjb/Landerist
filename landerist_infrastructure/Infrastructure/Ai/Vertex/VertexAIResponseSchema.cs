@@ -1,10 +1,9 @@
-﻿using Google.Cloud.AIPlatform.V1;
+using Google.Cloud.AIPlatform.V1;
 using Google.Protobuf.Collections;
-using landerist_library.Parse.ListingParser.StructuredOutputs;
-using static landerist_library.Parse.ListingParser.StructuredOutputs.Anuncio;
+using landerist_domain.Parsing.StructuredOutputs;
 
 
-namespace landerist_library.Parse.ListingParser.VertexAI
+namespace landerist_library.Infrastructure.Ai.Vertex
 {
     public class VertexAIResponseSchema
     {
@@ -31,26 +30,26 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
-                            Enum = { GetEnumValues(typeof(EstadosDePublicación)) },
+                            Enum = { GetEnumValues(StructuredOutputEsJson.EstadosDePublicación) },
                             Description = StructuredOutputEsJson.EstadoDePublicaciónDescription,
                         },
                         [nameof(StructuredOutputEsJson.tipo_de_operación)] = new()
                         {
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
-                            Enum = { GetEnumValues(typeof(TiposDeOperacion)) },
+                            Enum = { GetEnumValues(StructuredOutputEsJson.TiposDeOperación) },
                             Description = StructuredOutputEsJson.TipoDeOperaciónDescription,
                         },
                         [nameof(StructuredOutputEsJson.tipo_de_inmueble)] = new()
                         {
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
-                            Enum = { GetEnumValues(typeof(TiposDeInmueble)) },
+                            Enum = { GetEnumValues(StructuredOutputEsJson.TiposDeInmueble) },
                             Description = StructuredOutputEsJson.TipoDeInmuebleDescription,
                         },
                         [nameof(StructuredOutputEsJson.subtipo_de_inmueble)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
-                            Enum = { GetEnumValues(typeof(SubtiposDeInmueble)) },
+                            Enum = { GetEnumValues(StructuredOutputEsJson.SubtiposDeInmueble) },
                             Description =  StructuredOutputEsJson.SubtipoDeInmuebleDescription,
                         },
                         [nameof(StructuredOutputEsJson.precio_del_anuncio)] = new()
@@ -126,14 +125,14 @@ namespace landerist_library.Parse.ListingParser.VertexAI
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
-                            Enum =  { GetEnumValues(typeof(EstadosDeLaConstrucción)) },
+                            Enum =  { GetEnumValues(StructuredOutputEsJson.EstadosDeLaConstrucción) },
                             Description = StructuredOutputEsJson.EstadoDeLaConstrucciónDescription,
                         },
                         [nameof(StructuredOutputEsJson.calificación_energética)] = new()
                         {
                             Nullable = true,
                             Type = Google.Cloud.AIPlatform.V1.Type.String,
-                            Enum =  { GetEnumValues(typeof(CalificacionesDeEficienciaEnergetica)) },
+                            Enum =  { GetEnumValues(StructuredOutputEsJson.CalificacionesEnergéticas) },
                             Description = StructuredOutputEsJson.CalificaciónEnergéticaDescription,
                         },
                         [nameof(StructuredOutputEsJson.plantas_del_edificio)] = new()
@@ -282,10 +281,10 @@ namespace landerist_library.Parse.ListingParser.VertexAI
             Required = { StructuredOutputEsJson.FunctionNameListing }
         };
 
-        public static RepeatedField<string> GetEnumValues(System.Type enumType)
+        public static RepeatedField<string> GetEnumValues(System.Text.Json.Nodes.JsonArray values)
         {
             var repeatedField = new RepeatedField<string>();
-            repeatedField.AddRange(Enum.GetNames(enumType));
+            repeatedField.AddRange(values.Select(value => value!.GetValue<string>()));
             return repeatedField;
         }
     }

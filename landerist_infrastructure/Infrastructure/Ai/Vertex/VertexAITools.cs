@@ -1,9 +1,9 @@
-﻿using Google.Cloud.AIPlatform.V1;
+using Google.Cloud.AIPlatform.V1;
 using Google.Protobuf.Collections;
-using landerist_library.Parse.ListingParser.StructuredOutputs;
+using landerist_domain.Parsing.StructuredOutputs;
 using System.Text.Json.Nodes;
 
-namespace landerist_library.Parse.ListingParser.VertexAI
+namespace landerist_library.Infrastructure.Ai.Vertex
 {
     public class VertexAITools : StructuredOutputEsJson
     {

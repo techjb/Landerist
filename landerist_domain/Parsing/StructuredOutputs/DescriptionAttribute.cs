@@ -1,8 +1,8 @@
-﻿namespace landerist_library.Parse.ListingParser.StructuredOutputs
+namespace landerist_domain.Parsing.StructuredOutputs
 {
 
     [AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
-    sealed class DescriptionAttribute(string description) : Attribute
+    internal sealed class DescriptionAttribute(string description) : Attribute
     {
         public string Description { get; } = description;
     }

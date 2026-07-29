@@ -1,5 +1,5 @@
-﻿using landerist_library.Configuration;
-using landerist_library.Parse.ListingParser.StructuredOutputs;
+using landerist_library.Configuration;
+using landerist_domain.Parsing.StructuredOutputs;
 using Newtonsoft.Json.Schema;
 using OpenAI;
 using OpenAI.Chat;

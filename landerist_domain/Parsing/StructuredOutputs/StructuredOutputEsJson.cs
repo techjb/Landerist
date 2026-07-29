@@ -1,7 +1,7 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Text.Json.Nodes;
 
-namespace landerist_library.Parse.ListingParser.StructuredOutputs
+namespace landerist_domain.Parsing.StructuredOutputs
 {
     public class StructuredOutputEsJson
     {
@@ -318,14 +318,14 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         protected const string ESTADO_DE_PUBLICACIÓN_DESPUBLICADO = "despublicado";
 
 
-        protected readonly JsonArray TiposDeOperación =
+        public static readonly JsonArray TiposDeOperación =
         [
             OPERACION_VENTA,
             OPERACION_ALQUILER
         ];
 
 
-        protected readonly JsonArray TiposDeInmueble =
+        public static readonly JsonArray TiposDeInmueble =
         [
             TIPO_DE_INMUEBLE_VIVIENDA,
             TIPO_DE_INMUEBLE_DORMITORIO,
@@ -339,7 +339,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         ];
 
 
-        protected readonly JsonArray SubtiposDeInmueble =
+        public static readonly JsonArray SubtiposDeInmueble =
         [
             SUBTIPO_DE_INMUEBLE_PISO,
             SUBTIPO_DE_INMUEBLE_APARTAMENTO,
@@ -355,7 +355,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
         ];
 
 
-        protected readonly JsonArray EstadosDeLaConstrucción =
+        public static readonly JsonArray EstadosDeLaConstrucción =
         [
             ESTADO_DE_LA_CONSTRUCCIÓN_OBRA_NUEVA,
             ESTADO_DE_LA_CONSTRUCCIÓN_BUENO,
@@ -363,7 +363,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             ESTADO_DE_LA_CONSTRUCCIÓN_EN_RUINAS
         ];
 
-        protected readonly JsonArray CalificacionesEnergéticas =
+        public static readonly JsonArray CalificacionesEnergéticas =
         [
             CALIFICACIÓN_ENERGÉTICA_A,
             CALIFICACIÓN_ENERGÉTICA_B,
@@ -374,7 +374,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             CALIFICACIÓN_ENERGÉTICA_G
         ];
 
-        protected readonly JsonArray EstadosDePublicación =
+        public static readonly JsonArray EstadosDePublicación =
         [
             ESTADO_DE_PUBLICACIÓN_PUBLICADO,
             ESTADO_DE_PUBLICACIÓN_DESPUBLICADO
