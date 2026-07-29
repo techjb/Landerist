@@ -73,6 +73,8 @@ internal static class LanderistPersistenceServiceCollectionExtensions
             serviceProvider.GetRequiredService<PageRepository>());
         services.AddTransient<IWebsiteRepository>(serviceProvider =>
             serviceProvider.GetRequiredService<WebsiteRepository>());
+        services.AddTransient<IListingRecordRepository>(serviceProvider =>
+            serviceProvider.GetRequiredService<ListingRepository>());
         services.AddTransient<IListingMediaRepository>(serviceProvider =>
             serviceProvider.GetRequiredService<MediaRepository>());
         services.AddTransient<IListingSourceRepository>(serviceProvider =>
@@ -84,6 +86,8 @@ internal static class LanderistPersistenceServiceCollectionExtensions
         services.AddSingleton<PagePersistenceService>();
         services.AddSingleton<WebsitePersistenceService>();
         services.AddSingleton<SqlListingQueryService>();
+        services.AddSingleton<IListingAdministrationService,
+            SqlListingAdministrationService>();
         services.AddSingleton<SqlPageCatalog>();
         services.AddSingleton<SqlPageWaitingStatusService>();
         services.AddSingleton<SqlWebsiteCatalog>();

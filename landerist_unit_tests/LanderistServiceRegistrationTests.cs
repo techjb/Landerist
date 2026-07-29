@@ -1,4 +1,5 @@
 using landerist_console;
+using landerist_library.Application.Listings;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Tasks;
 using landerist_library.Infrastructure.Parsing;
@@ -44,6 +45,8 @@ public sealed class LanderistServiceRegistrationTests
             });
 
         Assert.NotNull(provider.GetRequiredService<TasksService>());
+        Assert.NotNull(
+            provider.GetRequiredService<IListingAdministrationService>());
         Assert.Same(
             provider.GetRequiredService<ParseListing>(),
             provider.GetRequiredService<ParseListing>());

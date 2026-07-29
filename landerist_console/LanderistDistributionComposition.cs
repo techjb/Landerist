@@ -1,19 +1,18 @@
+using landerist_library.Application.Listings;
 using landerist_library.Application.Logging;
 using landerist_library.Application.Statistics;
-using landerist_library.Infrastructure.Administration;
 using landerist_library.Infrastructure.Distribution;
 using landerist_library.Infrastructure.Listings;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Infrastructure.Statistics;
 using landerist_library.Infrastructure.Tasks;
 using landerist_library.Infrastructure.WebsiteServices;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace landerist_console;
 
 internal sealed class LanderistDistributionComposition(
     LanderistDatabaseAdapterFactory databaseAdapters,
-    IServiceProvider services,
+    IListingAdministrationService listingAdministration,
     IApplicationLogger logger)
 {
     public DailyTaskJob CreateDailyJob(
@@ -36,12 +35,6 @@ internal sealed class LanderistDistributionComposition(
                 websiteMetrics,
                 websiteCatalog,
                 websiteQueries,
-                new SqlListingAdministrationService(
-                    services.GetRequiredService<ListingRepository>(),
-                    services.GetRequiredService<ListingQueryRepository>(),
-                    services.GetRequiredService<ListingStatisticsRepository>(),
-                    services.GetRequiredService<MediaRepository>(),
-                    services.GetRequiredService<SourceRepository>(),
-                    logger)),
+                listingAdministration),
             logger);
 }

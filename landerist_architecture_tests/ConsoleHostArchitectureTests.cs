@@ -245,6 +245,30 @@ public sealed class ConsoleHostArchitectureTests
         Assert.Contains("IBatchArtifactCleaner", providers);
     }
 
+    [Fact]
+    public void DistributionComposition_DependsOnExplicitAdministrationPort()
+    {
+        string persistence = ReadConsoleSource(
+            "LanderistPersistenceServiceCollectionExtensions.cs");
+        string distribution = ReadConsoleSource(
+            "LanderistDistributionComposition.cs");
+
+        Assert.Contains(
+            "AddSingleton<IListingAdministrationService,",
+            persistence);
+        Assert.Contains(
+            "IListingAdministrationService listingAdministration",
+            distribution);
+        Assert.DoesNotContain("IServiceProvider", distribution);
+        Assert.DoesNotContain("GetRequiredService", distribution);
+        Assert.DoesNotContain("ListingRepository", distribution);
+        Assert.DoesNotContain("MediaRepository", distribution);
+        Assert.DoesNotContain("SourceRepository", distribution);
+        Assert.DoesNotContain(
+            "new SqlListingAdministrationService",
+            distribution);
+    }
+
     private static string ReadConsoleSource(string fileName) =>
         File.ReadAllText(GetConsolePath(fileName));
 
