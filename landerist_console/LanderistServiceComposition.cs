@@ -126,10 +126,7 @@ internal static class LanderistServiceComposition
                 pagePersistence,
                 websiteMetrics),
             logger);
-        ParseListing listingParser = LanderistAiComposition.CreateListingParser(
-            runtimeOptions,
-            websiteAccess,
-            logger);
+        ParseListing listingParser = services.GetRequiredService<ParseListing>();
         GlobalStatistics globalStatistics = new(
             services.GetRequiredService<GlobalStatisticsRepository>(),
             persistenceEnabled: !runtimeOptions.Execution.IsLocal);
@@ -149,7 +146,8 @@ internal static class LanderistServiceComposition
             databaseAdapters.CreateListingEnricher(
                 goolzoom,
                 runtimeOptions.Integrations.GoogleCloudLanderistApiKey,
-                LanderistAiComposition.CreateAddressSelectorOptions(runtimeOptions.Ai),
+                services.GetRequiredService<LanderistAiComposition>()
+                    .CreateAddressSelectorOptions(),
                 logger),
             new LegacyListingUnpublishPolicy(listingQueries),
             logger,
@@ -180,10 +178,9 @@ internal static class LanderistServiceComposition
                 "Unknown execution role.")
         };
 
-        LanderistBatchTasks batchTasks = LanderistBatchComposition.Create(
-            runtimeOptions,
-            databaseAdapters,
-            logger,
+        LanderistBatchTasks batchTasks = services
+            .GetRequiredService<LanderistBatchComposition>()
+            .Create(
             parsedClassification,
             globalStatistics,
             pageCatalog,
@@ -218,17 +215,15 @@ internal static class LanderistServiceComposition
                     websiteNetwork,
                     websiteSitemaps),
                 batchTasks.Cleaner),
-            LanderistDistributionComposition.CreateDailyJob(
-                databaseAdapters,
+            services.GetRequiredService<LanderistDistributionComposition>()
+                .CreateDailyJob(
                 notListingCache,
                 globalStatistics,
                 hostStatistics,
                 pageStatistics,
                 websiteMetrics,
                 websiteCatalog,
-                websiteQueries,
-                services,
-                logger),
+                websiteQueries),
             TimeProvider.System);
     }
 }

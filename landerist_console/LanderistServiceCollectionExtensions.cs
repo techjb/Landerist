@@ -1,4 +1,6 @@
+using landerist_library.Application.Parsing;
 using landerist_library.Application.Tasks;
+using landerist_library.Infrastructure.Parsing;
 using landerist_library.Infrastructure.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -46,6 +48,12 @@ internal static class LanderistServiceCollectionExtensions
     private static IServiceCollection AddLanderistTasks(
         this IServiceCollection services)
     {
+        services.AddSingleton<LanderistAiComposition>();
+        services.AddSingleton<ParseListing>(serviceProvider =>
+            serviceProvider.GetRequiredService<LanderistAiComposition>()
+                .CreateListingParser());
+        services.AddSingleton<LanderistBatchComposition>();
+        services.AddSingleton<LanderistDistributionComposition>();
         services.AddSingleton<TasksService>(serviceProvider =>
             LanderistServiceComposition.CreateTasksService(
                 serviceProvider.GetRequiredService<LanderistRuntimeOptions>(),

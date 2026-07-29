@@ -177,11 +177,19 @@ public sealed class ConsoleHostArchitectureTests
     public void ServiceComposition_DelegatesSpecializedObjectGraphsToModules()
     {
         string composition = ReadConsoleSource("LanderistServiceComposition.cs");
+        string registrations = ReadConsoleSource(
+            "LanderistServiceCollectionExtensions.cs");
 
-        Assert.Contains("LanderistAiComposition.CreateListingParser(", composition);
-        Assert.Contains("LanderistBatchComposition.Create(", composition);
+        Assert.Contains("AddSingleton<LanderistAiComposition>()", registrations);
+        Assert.Contains("AddSingleton<ParseListing>", registrations);
+        Assert.Contains("AddSingleton<LanderistBatchComposition>()", registrations);
         Assert.Contains(
-            "LanderistDistributionComposition.CreateDailyJob(",
+            "AddSingleton<LanderistDistributionComposition>()",
+            registrations);
+        Assert.Contains("GetRequiredService<ParseListing>()", composition);
+        Assert.Contains("GetRequiredService<LanderistBatchComposition>()", composition);
+        Assert.Contains(
+            "GetRequiredService<LanderistDistributionComposition>()",
             composition);
         Assert.DoesNotContain("OpenAIListingParserClient", composition);
         Assert.DoesNotContain("VertexListingParserClient", composition);

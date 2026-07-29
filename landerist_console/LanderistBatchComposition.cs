@@ -26,12 +26,12 @@ internal sealed record LanderistBatchTasks(
     TenMinuteTaskJob TenMinute,
     TaskBatchCleaner Cleaner);
 
-internal static class LanderistBatchComposition
+internal sealed class LanderistBatchComposition(
+    LanderistRuntimeOptions runtimeOptions,
+    LanderistDatabaseAdapterFactory databaseAdapters,
+    IApplicationLogger logger)
 {
-    public static LanderistBatchTasks Create(
-        LanderistRuntimeOptions runtimeOptions,
-        LanderistDatabaseAdapterFactory databaseAdapters,
-        IApplicationLogger logger,
+    public LanderistBatchTasks Create(
         ParsedPageClassificationService parsedClassification,
         GlobalStatistics globalStatistics,
         SqlPageCatalog pageCatalog,

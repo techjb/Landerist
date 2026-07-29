@@ -1,5 +1,6 @@
 using landerist_console;
 using landerist_library.Application.Tasks;
+using landerist_library.Infrastructure.Parsing;
 using landerist_library.Infrastructure.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,6 +20,14 @@ public sealed class LanderistServiceCompositionTests
         services.AddLanderist(CreateOptions(role));
         Assert.Contains(services, descriptor =>
             descriptor.ServiceType == typeof(TasksService));
+        Assert.Contains(services, descriptor =>
+            descriptor.ServiceType == typeof(ParseListing));
+        Assert.Contains(services, descriptor =>
+            descriptor.ServiceType == typeof(LanderistAiComposition));
+        Assert.Contains(services, descriptor =>
+            descriptor.ServiceType == typeof(LanderistBatchComposition));
+        Assert.Contains(services, descriptor =>
+            descriptor.ServiceType == typeof(LanderistDistributionComposition));
 
         using ServiceProvider provider = services.BuildServiceProvider(
             new ServiceProviderOptions
@@ -27,6 +36,9 @@ public sealed class LanderistServiceCompositionTests
                 ValidateScopes = true
             });
 
+        Assert.Same(
+            provider.GetRequiredService<ParseListing>(),
+            provider.GetRequiredService<ParseListing>());
         Assert.Equal(role, provider.GetRequiredService<LanderistRuntimeOptions>().Role);
         Assert.Same(
             provider.GetRequiredService<LanderistRuntimeOptions>().Ai,
@@ -55,10 +67,16 @@ public sealed class LanderistServiceCompositionTests
             new BrowserRuntimeOptions(
                 true, false, 10_000, false, false),
             role)
-        {
-            Ai = new AiRuntimeOptions(
-                string.Empty, string.Empty, string.Empty, string.Empty,
-                "google", string.Empty, string.Empty, "localhost", false),
+        {            Ai = new AiRuntimeOptions(
+                "sk-test-not-a-real-key",
+                "test-vertex-credential",
+                "test-project",
+                "europe-west1",
+                "google",
+                "test-listing-model",
+                "test-address-model",
+                "localhost",
+                false),
             Batch = new BatchRuntimeOptions(
                 false, "batch", 100, 1, 1024, 1, false, 30, string.Empty)
         };

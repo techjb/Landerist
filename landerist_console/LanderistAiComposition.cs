@@ -16,12 +16,12 @@ using landerist_library.Websites;
 
 namespace landerist_console;
 
-internal static class LanderistAiComposition
+internal sealed class LanderistAiComposition(
+    LanderistRuntimeOptions runtimeOptions,
+    WebsiteAccessServices websiteAccess,
+    IApplicationLogger logger)
 {
-    public static ParseListing CreateListingParser(
-        LanderistRuntimeOptions runtimeOptions,
-        WebsiteAccessServices websiteAccess,
-        IApplicationLogger logger)
+    public ParseListing CreateListingParser()
     {
         ListingParserClientCatalog clients = new(
         [
@@ -81,11 +81,10 @@ internal static class LanderistAiComposition
             logger);
     }
 
-    public static VertexAddressSelectorOptions CreateAddressSelectorOptions(
-        AiRuntimeOptions options) => new(
-            options.VertexCredential,
-            options.VertexProjectId,
-            options.VertexLocation,
-            options.VertexPublisher,
-            options.VertexAddressModel);
+    public VertexAddressSelectorOptions CreateAddressSelectorOptions() => new(
+            runtimeOptions.Ai.VertexCredential,
+            runtimeOptions.Ai.VertexProjectId,
+            runtimeOptions.Ai.VertexLocation,
+            runtimeOptions.Ai.VertexPublisher,
+            runtimeOptions.Ai.VertexAddressModel);
 }

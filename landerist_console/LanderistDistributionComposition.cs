@@ -11,19 +11,19 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace landerist_console;
 
-internal static class LanderistDistributionComposition
+internal sealed class LanderistDistributionComposition(
+    LanderistDatabaseAdapterFactory databaseAdapters,
+    IServiceProvider services,
+    IApplicationLogger logger)
 {
-    public static DailyTaskJob CreateDailyJob(
-        LanderistDatabaseAdapterFactory databaseAdapters,
+    public DailyTaskJob CreateDailyJob(
         SqlNotListingCacheService notListingCache,
         GlobalStatistics globalStatistics,
         HostStatistics hostStatistics,
         PageStatisticsRepository pageStatistics,
         WebsiteMetricsService websiteMetrics,
         SqlWebsiteCatalog websiteCatalog,
-        WebsiteQueryRepository websiteQueries,
-        IServiceProvider services,
-        IApplicationLogger logger) => new(
+        WebsiteQueryRepository websiteQueries) => new(
             databaseAdapters.CreateAddressDataMaintenance(),
             notListingCache,
             databaseAdapters.CreateDatabaseBackupService(),
