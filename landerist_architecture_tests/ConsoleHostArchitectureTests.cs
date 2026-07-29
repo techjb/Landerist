@@ -22,10 +22,13 @@ public sealed class ConsoleHostArchitectureTests
             "LanderistServiceCollectionExtensions.cs");
         string taskRegistrations = ReadConsoleSource(
             "LanderistTaskServiceCollectionExtensions.cs");
+        string recurringRegistrations = ReadConsoleSource(
+            "LanderistRecurringTaskServiceCollectionExtensions.cs");
 
         Assert.Contains("builder.Services.AddLanderist()", program);
         Assert.Contains(".AddLanderistTasks(runtimeOptions)", registrations);
-        Assert.Contains("AddSingleton<TasksService>", taskRegistrations);
+        Assert.Contains(".AddLanderistRecurringTasks(runtimeOptions)", taskRegistrations);
+        Assert.Contains("AddSingleton<TasksService>", recurringRegistrations);
         Assert.False(File.Exists(GetConsolePath("LanderistServiceComposition.cs")));
         Assert.True(
             File.ReadLines(GetConsolePath("Program.cs")).Count() <= 30,
@@ -186,26 +189,42 @@ public sealed class ConsoleHostArchitectureTests
     [Fact]
     public void TaskRegistration_DelegatesSpecializedObjectGraphsToModules()
     {
-        string registrations = ReadConsoleSource(
+        string coordinator = ReadConsoleSource(
             "LanderistTaskServiceCollectionExtensions.cs");
+        string parsing = ReadConsoleSource(
+            "LanderistParsingTaskServiceCollectionExtensions.cs");
+        string scraping = ReadConsoleSource(
+            "LanderistScrapingTaskServiceCollectionExtensions.cs");
+        string localAi = ReadConsoleSource(
+            "LanderistLocalAiTaskServiceCollectionExtensions.cs");
+        string recurring = ReadConsoleSource(
+            "LanderistRecurringTaskServiceCollectionExtensions.cs");
 
-        Assert.Contains("AddSingleton<LanderistAiComposition>()", registrations);
-        Assert.Contains("AddSingleton<ParseListing>", registrations);
-        Assert.Contains("AddSingleton<LanderistBatchComposition>()", registrations);
-        Assert.Contains("AddSingleton<LanderistDistributionComposition>()", registrations);
-        Assert.Contains("AddSingleton<LanderistScrapingPipeline>", registrations);
-        Assert.Contains("AddSingleton<ScrapeTaskJob>", registrations);
-        Assert.Contains("AddSingleton<LocalAiTaskJob>", registrations);
-        Assert.Contains("AddSingleton<HourlyTaskJob>", registrations);
-        Assert.Contains("AddSingleton<DailyTaskJob>", registrations);
-        Assert.Contains("AddSingleton<TasksService>", registrations);
-        Assert.DoesNotContain("OpenAIListingParserClient", registrations);
-        Assert.DoesNotContain("VertexListingParserClient", registrations);
-        Assert.DoesNotContain("TaskBatchUpload", registrations);
-        Assert.DoesNotContain("TaskBatchDownload", registrations);
-        Assert.DoesNotContain("DistributionPublisher", registrations);
-    }
-    private static string ReadConsoleSource(string fileName) =>
+        Assert.Contains(".AddLanderistParsingTasks()", coordinator);
+        Assert.Contains(".AddLanderistScrapingTasks()", coordinator);
+        Assert.Contains(".AddLanderistLocalAiTasks(runtimeOptions)", coordinator);
+        Assert.Contains(".AddLanderistRecurringTasks(runtimeOptions)", coordinator);
+        Assert.True(
+            File.ReadLines(GetConsolePath(
+                "LanderistTaskServiceCollectionExtensions.cs")).Count() <= 25,
+            "Task composition coordinator must remain small.");
+
+        Assert.Contains("AddSingleton<LanderistAiComposition>()", parsing);
+        Assert.Contains("AddSingleton<ParseListing>", parsing);
+        Assert.Contains("AddSingleton<LanderistBatchComposition>()", scraping);
+        Assert.Contains("AddSingleton<LanderistScrapingPipeline>", scraping);
+        Assert.Contains("AddSingleton<ScrapeTaskJob>", scraping);
+        Assert.Contains("AddSingleton<LocalAiTaskJob>", localAi);
+        Assert.Contains("AddSingleton<LanderistDistributionComposition>()", recurring);
+        Assert.Contains("AddSingleton<HourlyTaskJob>", recurring);
+        Assert.Contains("AddSingleton<DailyTaskJob>", recurring);
+        Assert.Contains("AddSingleton<TasksService>", recurring);
+
+        Assert.DoesNotContain("AddSingleton<", coordinator);
+        Assert.DoesNotContain("OpenAIListingParserClient", coordinator);
+        Assert.DoesNotContain("TaskBatchUpload", coordinator);
+        Assert.DoesNotContain("DistributionPublisher", coordinator);
+    }    private static string ReadConsoleSource(string fileName) =>
         File.ReadAllText(GetConsolePath(fileName));
 
     private static string GetConsolePath(string fileName) =>
