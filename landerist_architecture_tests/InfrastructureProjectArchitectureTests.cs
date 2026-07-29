@@ -27,7 +27,7 @@ public sealed class InfrastructureProjectArchitectureTests
 
         Assert.Equal(
             ["Com.Bekijkhet.RobotsTxt", "HtmlAgilityPack", "Google.Cloud.AIPlatform.V1", "Google.Cloud.Storage.V1", "Louw.SitemapParser", "Microsoft.Data.SqlClient",
-            "OpenAI-DotNet", "NetTopologySuite", "NetTopologySuite.IO.GeoJSON", "System.Drawing.Common", "PuppeteerSharp"],
+            "OpenAI-DotNet", "Newtonsoft.Json", "Newtonsoft.Json.Schema", "NetTopologySuite", "NetTopologySuite.IO.GeoJSON", "System.Drawing.Common", "PuppeteerSharp"],
             packages);
         Assert.Equal(
             [

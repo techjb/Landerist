@@ -1,6 +1,7 @@
-﻿using Newtonsoft.Json;
+using landerist_domain.Parsing.StructuredOutputs;
+using Newtonsoft.Json;
 
-namespace landerist_library.Parse.ListingParser.StructuredOutputs
+namespace landerist_library.Infrastructure.Ai.Vertex
 {
     public class StructuredOutputVertexAIEs
     {

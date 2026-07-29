@@ -1,11 +1,12 @@
-﻿using Newtonsoft.Json;
+using landerist_domain.Parsing.StructuredOutputs;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
 using Newtonsoft.Json.Schema.Generation;
 using System.ComponentModel.DataAnnotations;
 
 
-namespace landerist_library.Parse.ListingParser.StructuredOutputs
+namespace landerist_library.Infrastructure.Ai.StructuredOutputs
 {
     public class StructuredOutputSchema
     {
