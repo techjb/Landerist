@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -19,7 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\landerist_library\landerist_library.csproj" />
+    <ProjectReference Include="..\landerist_application\landerist_application.csproj" />
+    <ProjectReference Include="..\landerist_domain\landerist_domain.csproj" />
+    <ProjectReference Include="..\landerist_infrastructure\landerist_infrastructure.csproj" />
+    <ProjectReference Include="..\landerist_orels\landerist_orels.csproj" />
   </ItemGroup>
 
 </Project>

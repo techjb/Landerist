@@ -781,16 +781,15 @@ public sealed class InfrastructureProjectArchitectureTests
     }
 
     [Fact]
-    public void LegacyLibrary_ReferencesInfrastructureProject()
+    public void LegacyLibraryProject_DoesNotExist()
     {
-        string project = File.ReadAllText(Path.Combine(
-            FindRepositoryRoot(),
-            "landerist_library",
-            "landerist_library.csproj"));
+        string root = FindRepositoryRoot();
 
-        Assert.Contains(
-            "..\\landerist_infrastructure\\landerist_infrastructure.csproj",
-            project);
+        Assert.False(Directory.Exists(Path.Combine(root, "landerist_library")));
+        Assert.DoesNotContain(
+            "landerist_library\\landerist_library.csproj",
+            File.ReadAllText(Path.Combine(root, "Landerist.sln")),
+            StringComparison.OrdinalIgnoreCase);
     }
 
     private static string FindRepositoryRoot()

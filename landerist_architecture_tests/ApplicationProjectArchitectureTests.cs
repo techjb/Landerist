@@ -44,16 +44,15 @@ public sealed class ApplicationProjectArchitectureTests
     }
 
     [Fact]
-    public void LegacyLibrary_ReferencesApplicationProject()
+    public void LegacyLibraryProject_DoesNotExist()
     {
-        string project = File.ReadAllText(Path.Combine(
-            FindRepositoryRoot(),
-            "landerist_library",
-            "landerist_library.csproj"));
+        string root = FindRepositoryRoot();
 
-        Assert.Contains(
-            "..\\landerist_application\\landerist_application.csproj",
-            project);
+        Assert.False(Directory.Exists(Path.Combine(root, "landerist_library")));
+        Assert.DoesNotContain(
+            "landerist_library\\landerist_library.csproj",
+            File.ReadAllText(Path.Combine(root, "Landerist.sln")),
+            StringComparison.OrdinalIgnoreCase);
     }
 
     private static string FindRepositoryRoot()

@@ -34,17 +34,15 @@ public sealed class DomainProjectArchitectureTests
     }
 
     [Fact]
-    public void LegacyLibrary_ReferencesDomainProject()
+    public void LegacyLibraryProject_DoesNotExist()
     {
-        string projectPath = Path.Combine(
-            FindRepositoryRoot(),
-            "landerist_library",
-            "landerist_library.csproj");
-        string project = File.ReadAllText(projectPath);
+        string root = FindRepositoryRoot();
 
-        Assert.Contains(
-            "..\\landerist_domain\\landerist_domain.csproj",
-            project);
+        Assert.False(Directory.Exists(Path.Combine(root, "landerist_library")));
+        Assert.DoesNotContain(
+            "landerist_library\\landerist_library.csproj",
+            File.ReadAllText(Path.Combine(root, "Landerist.sln")),
+            StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
