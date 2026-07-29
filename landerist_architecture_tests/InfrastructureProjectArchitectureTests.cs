@@ -26,7 +26,7 @@ public sealed class InfrastructureProjectArchitectureTests
             .ToArray();
 
         Assert.Equal(
-            ["Com.Bekijkhet.RobotsTxt", "HtmlAgilityPack", "Google.Cloud.AIPlatform.V1", "Louw.SitemapParser", "Microsoft.Data.SqlClient", "NetTopologySuite", "NetTopologySuite.IO.GeoJSON", "System.Drawing.Common", "PuppeteerSharp"],
+            ["Com.Bekijkhet.RobotsTxt", "HtmlAgilityPack", "Google.Cloud.AIPlatform.V1", "Google.Cloud.Storage.V1", "Louw.SitemapParser", "Microsoft.Data.SqlClient", "NetTopologySuite", "NetTopologySuite.IO.GeoJSON", "System.Drawing.Common", "PuppeteerSharp"],
             packages);
         Assert.Equal(
             [
@@ -771,9 +771,12 @@ public sealed class InfrastructureProjectArchitectureTests
         Assert.True(File.Exists(Path.Combine(parsing, "LegacyLocalAiTokenBudget.cs")));
         Assert.True(File.Exists(Path.Combine(parsing, "LegacyPageTokenLimitPolicy.cs")));
         Assert.True(File.Exists(Path.Combine(
-            parsing,
-            "VertexAI",
-            "LegacyVertexAiBatchArtifactCleaner.cs")));
+            root,
+            "landerist_infrastructure",
+            "Infrastructure",
+            "Ai",
+            "Batch",
+            "VertexBatchArtifactCleaner.cs")));
     }
 
     [Fact]
