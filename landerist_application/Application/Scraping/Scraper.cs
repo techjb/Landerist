@@ -405,9 +405,50 @@ namespace landerist_library.Application.Scraping
                 page,
                 useProxy,
                 cancellationToken).ConfigureAwait(false);
-            HandleScrapeResult(page, result);
+            await HandleScrapeResultAsync(page, result, cancellationToken)
+                .ConfigureAwait(false);
         }
 
+        private async Task HandleScrapeResultAsync(
+            Page page,
+            ScrapeAttemptResult result,
+            CancellationToken cancellationToken)
+        {
+            if (result == ScrapeAttemptResult.Blocked)
+            {
+                _state.IncrementSkippedByBlockedWebsite();
+                return;
+            }
+
+            _state.IncrementProcessed();
+
+            if (result == ScrapeAttemptResult.Success)
+            {
+                if (page.IsHttpStatusCodeForbidden())
+                {
+                    await _batchServices.WebsiteThrottle
+                        .ReportForbiddenAsync(page.Website, cancellationToken)
+                        .ConfigureAwait(false);
+                }
+                else if (!page.IsHttpStatusCodeNotOK() && !page.IsResponseBodyNullOrEmpty())
+                {
+                    await _batchServices.WebsiteThrottle
+                        .ReportSuccessAsync(page.Website, cancellationToken)
+                        .ConfigureAwait(false);
+                }
+
+                if (page.IsHttpStatusCodeNotOK())
+                {
+                    _state.IncrementDownloadErrors();
+                    return;
+                }
+
+                _state.IncrementScrapedSuccess();
+                return;
+            }
+
+            _state.IncrementCrashed();
+        }
         private void HandleScrapeResult(Page page, ScrapeAttemptResult result)
         {
             if (result == ScrapeAttemptResult.Blocked)

@@ -43,7 +43,17 @@ internal static class ScrapeBatchTestFactory
 
         public bool ReportForbidden(Website website) => true;
 
+        public Task<bool> ReportForbiddenAsync(
+            Website website,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(true);
+
         public bool ReportSuccess(Website website) => true;
+
+        public Task<bool> ReportSuccessAsync(
+            Website website,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(true);
     }
 
     private sealed class NullScrapeResourceManager : IScrapeBrowserManager, IPageLockManager

@@ -155,6 +155,21 @@ public sealed class ScraperBatchTests
         Assert.Equal(0, context.Throttle.ReportSuccessCalls);
     }
 
+    [Fact]
+    public async Task RunBatchAsync_WhenResponseIsForbidden_ReportsThrottleAsynchronously()
+    {
+        TestContext context = CreateContext();
+        context.Acquisition.OnAcquire = page => page.HttpStatusCode = 403;
+        context.Classifier.PageType = PageType.HttpStatusCodeOtherNotOK;
+
+        await context.Scraper.RunBatchAsync(CancellationToken.None);
+
+        ScrapeBatchCounters counters = Assert.Single(context.Metrics.Records);
+        Assert.Equal(1, counters.DownloadErrors);
+        Assert.Equal(0, context.Throttle.ReportForbiddenCalls);
+        Assert.Equal(1, context.Throttle.ReportForbiddenAsyncCalls);
+        Assert.Equal(0, context.Throttle.ReportSuccessAsyncCalls);
+    }
     private static TestContext CreateContext(bool isProduction = false)
     {
         Page page = new(
@@ -257,6 +272,10 @@ public sealed class ScraperBatchTests
 
         public int ReportSuccessCalls { get; private set; }
 
+        public int ReportForbiddenAsyncCalls { get; private set; }
+
+        public int ReportSuccessAsyncCalls { get; private set; }
+
         public bool Clean()
         {
             CleanCalls++;
@@ -302,10 +321,28 @@ public sealed class ScraperBatchTests
             return true;
         }
 
+        public Task<bool> ReportForbiddenAsync(
+            Website website,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ReportForbiddenAsyncCalls++;
+            return Task.FromResult(true);
+        }
+
         public bool ReportSuccess(Website website)
         {
             ReportSuccessCalls++;
             return true;
+        }
+
+        public Task<bool> ReportSuccessAsync(
+            Website website,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ReportSuccessAsyncCalls++;
+            return Task.FromResult(true);
         }
     }
 

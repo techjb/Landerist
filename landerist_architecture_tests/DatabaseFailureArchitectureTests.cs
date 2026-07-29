@@ -76,6 +76,8 @@ public sealed class DatabaseFailureArchitectureTests
         Assert.Contains("Parallel.ForEachAsync(", scraper);
         Assert.Contains(".IsBlockedAsync(page.Website, cancellationToken)", scraper);
         Assert.Contains(".TryAcquireAsync(page.Website, cancellationToken)", scraper);
+        Assert.Contains(".ReportForbiddenAsync(page.Website, cancellationToken)", scraper);
+        Assert.Contains(".ReportSuccessAsync(page.Website, cancellationToken)", scraper);
         Assert.Contains("_database.QueryAsync(", throttle);
         Assert.Contains("_database.QueryBoolAsync(", throttle);
     }

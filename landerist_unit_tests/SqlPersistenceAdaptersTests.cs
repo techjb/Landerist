@@ -59,6 +59,26 @@ public sealed class SqlPersistenceAdaptersTests
         Assert.Contains("SELECT @Acquired", database.LastQuery);
     }
     [Fact]
+    public async Task WebsiteThrottle_ReportsAsync_UseAsyncDatabaseExecution()
+    {
+        RecordingDatabase database = new() { QueryResult = true };
+        WebsitesThrottle throttle = new(database, new StubWebsiteRobotsPolicy());
+        Website website = new(new Uri("https://example.com"));
+
+        bool forbidden = await throttle.ReportForbiddenAsync(
+            website,
+            CancellationToken.None);
+        bool success = await throttle.ReportSuccessAsync(
+            website,
+            CancellationToken.None);
+
+        Assert.True(forbidden);
+        Assert.True(success);
+        Assert.Equal(2, database.QueryAsyncCalls);
+        Assert.Equal("example.com", database.LastParameters!["Host"]);
+        Assert.Contains("SuccessCounterAfterForbidden", database.LastQuery);
+    }
+    [Fact]
     public void NotListingCache_WhenEnabled_InsertsThroughInjectedDatabase()
     {
         RecordingDatabase database = new() { QueryResult = true };

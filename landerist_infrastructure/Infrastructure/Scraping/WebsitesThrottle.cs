@@ -58,6 +58,23 @@ namespace landerist_library.Infrastructure.Scraping
         }
         public bool ReportForbidden(Website website)
         {
+            (string query, Dictionary<string, object?> parameters) =
+                GetReportForbiddenCommand(website);
+            return _database.Query(query, parameters);
+        }
+
+        public Task<bool> ReportForbiddenAsync(
+            Website website,
+            CancellationToken cancellationToken = default)
+        {
+            (string query, Dictionary<string, object?> parameters) =
+                GetReportForbiddenCommand(website);
+            return _database.QueryAsync(query, parameters, cancellationToken);
+        }
+
+        private static (string Query, Dictionary<string, object?> Parameters)
+            GetReportForbiddenCommand(Website website)
+        {
             string query =
                 "SET XACT_ABORT ON; " +
                 "BEGIN TRANSACTION; " +
@@ -110,7 +127,7 @@ namespace landerist_library.Infrastructure.Scraping
                 "END; " +
                 "COMMIT TRANSACTION";
 
-            return _database.Query(query, new Dictionary<string, object?>()
+            return (query, new Dictionary<string, object?>
             {
                 {"Host", website.Host},
                 {"MaxForbiddenBackoffLevel", MAX_FORBIDDEN_BACKOFF_LEVEL},
@@ -120,6 +137,23 @@ namespace landerist_library.Infrastructure.Scraping
         }
 
         public bool ReportSuccess(Website website)
+        {
+            (string query, Dictionary<string, object?> parameters) =
+                GetReportSuccessCommand(website);
+            return _database.Query(query, parameters);
+        }
+
+        public Task<bool> ReportSuccessAsync(
+            Website website,
+            CancellationToken cancellationToken = default)
+        {
+            (string query, Dictionary<string, object?> parameters) =
+                GetReportSuccessCommand(website);
+            return _database.QueryAsync(query, parameters, cancellationToken);
+        }
+
+        private static (string Query, Dictionary<string, object?> Parameters)
+            GetReportSuccessCommand(Website website)
         {
             string query =
                 "SET XACT_ABORT ON; " +
@@ -161,7 +195,7 @@ namespace landerist_library.Infrastructure.Scraping
                 "END; " +
                 "COMMIT TRANSACTION";
 
-            return _database.Query(query, new Dictionary<string, object?>()
+            return (query, new Dictionary<string, object?>
             {
                 {"Host", website.Host},
                 {"SuccessesToDecreaseForbiddenBackoff", SUCCESSES_TO_DECREASE_FORBIDDEN_BACKOFF},

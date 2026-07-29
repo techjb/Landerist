@@ -22,5 +22,13 @@ public interface IWebsiteThrottleService
 
     bool ReportForbidden(Website website);
 
+    Task<bool> ReportForbiddenAsync(
+        Website website,
+        CancellationToken cancellationToken = default);
+
     bool ReportSuccess(Website website);
+
+    Task<bool> ReportSuccessAsync(
+        Website website,
+        CancellationToken cancellationToken = default);
 }

@@ -35,5 +35,15 @@ public sealed class SqlWebsiteThrottleService : IWebsiteThrottleService
 
     public bool ReportForbidden(Website website) => _throttle.ReportForbidden(website);
 
+    public Task<bool> ReportForbiddenAsync(
+        Website website,
+        CancellationToken cancellationToken = default) =>
+        _throttle.ReportForbiddenAsync(website, cancellationToken);
+
     public bool ReportSuccess(Website website) => _throttle.ReportSuccess(website);
+
+    public Task<bool> ReportSuccessAsync(
+        Website website,
+        CancellationToken cancellationToken = default) =>
+        _throttle.ReportSuccessAsync(website, cancellationToken);
 }
