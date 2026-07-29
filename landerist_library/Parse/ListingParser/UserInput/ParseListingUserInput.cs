@@ -1,3 +1,4 @@
+using landerist_domain.Parsing.UserInput;
 using HtmlAgilityPack;
 using landerist_library.Pages;
 using landerist_library.Websites;
@@ -81,7 +82,7 @@ namespace landerist_library.Parse.ListingParser.UserInput
                 ListingHtmlAttributeCleaner.Clean(workingDocument);
                 ListingEmptyElementRemover.Remove(workingDocument);
                 text = ListingInputCleaner.Clean(workingDocument);
-                return ListingImageUrlPlaceholders.ReplaceImageUrls(text);
+                return ListingImageUrlPlaceholderCodec.ReplaceImageUrls(text);
             }
             catch (Exception exception)
             {
@@ -113,7 +114,7 @@ namespace landerist_library.Parse.ListingParser.UserInput
                     text = structuredData + Environment.NewLine + text;
                 }
 
-                return ListingImageUrlPlaceholders.ReplaceImageUrls(ListingInputCleaner.Clean(text));
+                return ListingImageUrlPlaceholderCodec.ReplaceImageUrls(ListingInputCleaner.Clean(text));
             }
             catch (Exception exception)
             {

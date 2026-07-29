@@ -1,136 +1,64 @@
-using landerist_library.Pages;
 using landerist_domain.Parsing.StructuredOutputs;
+using landerist_domain.Parsing.UserInput;
+using landerist_library.Pages;
 using System.Net;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.RegularExpressions;
 
-namespace landerist_library.Parse.ListingParser.UserInput
+namespace landerist_library.Parse.ListingParser.UserInput;
+
+public static class ListingImageUrlPlaceholders
 {
-    public static class ListingImageUrlPlaceholders
+    private static readonly Regex UrlRegex = new(
+        "https?://[^\\s\"'<>\\\\]+",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+
+    public static void Resolve(Page page, StructuredOutputEs? output)
     {
-        private const string PlaceholderPrefix = "LANDERIST_IMAGE_";
-        private const int HashHexLength = 16;
-
-        private static readonly Regex UrlRegex = new(
-            "https?://[^\\s\"'<>\\\\]+",
-            RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-
-        private static readonly Regex PlaceholderRegex = new(
-            PlaceholderPrefix + "[0-9A-F]{" + HashHexLength + "}",
-            RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-
-        public static string ReplaceImageUrls(string text)
+        var images = output?.Anuncio?.ImagenesDelAnuncio;
+        if (images is null || images.Count == 0)
         {
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return text;
-            }
-
-            return UrlRegex.Replace(text, match =>
-            {
-                var url = match.Value;
-                return IsImageUrl(url) ? GetPlaceholder(url) : url;
-            });
+            return;
         }
 
-        public static void Resolve(Page page, StructuredOutputEs? structuredOutputEs)
+        Dictionary<string, string> urls = GetImageUrlsByPlaceholder(page);
+        foreach (var image in images.Where(image => image?.Url is not null))
         {
-            var images = structuredOutputEs?.Anuncio?.ImagenesDelAnuncio;
-            if (images == null || images.Count == 0)
-            {
-                return;
-            }
-
-            var urlByPlaceholder = GetImageUrlsByPlaceholder(page);
-            if (urlByPlaceholder.Count == 0)
-            {
-                return;
-            }
-
-            foreach (var image in images)
-            {
-                if (image?.Url == null)
-                {
-                    continue;
-                }
-
-                image.Url = Resolve(image.Url, urlByPlaceholder);
-            }
+            image!.Url = ListingImageUrlPlaceholderCodec.Resolve(image.Url!, urls);
         }
+    }
 
-        private static string Resolve(string value, Dictionary<string, string> urlByPlaceholder)
+    private static Dictionary<string, string> GetImageUrlsByPlaceholder(Page page)
+    {
+        var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        string? source = GetSource(page);
+        if (string.IsNullOrWhiteSpace(source))
         {
-            var trimmed = value.Trim();
-            if (urlByPlaceholder.TryGetValue(trimmed, out var url))
-            {
-                return url;
-            }
-
-            var match = PlaceholderRegex.Match(trimmed);
-            if (match.Success && urlByPlaceholder.TryGetValue(match.Value, out url))
-            {
-                return url;
-            }
-
-            return value;
-        }
-
-        private static Dictionary<string, string> GetImageUrlsByPlaceholder(Page page)
-        {
-            var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            var source = GetSource(page);
-            if (string.IsNullOrWhiteSpace(source))
-            {
-                return result;
-            }
-
-            foreach (Match match in UrlRegex.Matches(source))
-            {
-                var url = match.Value;
-                if (!IsImageUrl(url))
-                {
-                    continue;
-                }
-
-                result.TryAdd(GetPlaceholder(url), WebUtility.HtmlDecode(url));
-            }
-
             return result;
         }
 
-        private static string? GetSource(Page page)
+        foreach (Match match in UrlRegex.Matches(source))
         {
-            var htmlDocument = page.GetHtmlDocument();
-            if (htmlDocument?.DocumentNode == null)
+            string url = match.Value;
+            if (ListingImageUrlPlaceholderCodec.IsImageUrl(url))
             {
-                page.SetResponseBodyFromZipped();
-                htmlDocument = page.GetHtmlDocument();
+                result.TryAdd(
+                    ListingImageUrlPlaceholderCodec.GetPlaceholder(url),
+                    WebUtility.HtmlDecode(url));
             }
-
-            return htmlDocument?.DocumentNode?.OuterHtml;
         }
 
-        private static string GetPlaceholder(string url)
+        return result;
+    }
+
+    private static string? GetSource(Page page)
+    {
+        var document = page.GetHtmlDocument();
+        if (document?.DocumentNode is null)
         {
-            var normalizedUrl = WebUtility.HtmlDecode(url);
-            var hash = SHA256.HashData(Encoding.UTF8.GetBytes(normalizedUrl));
-            return PlaceholderPrefix + Convert.ToHexString(hash)[..HashHexLength];
+            page.SetResponseBodyFromZipped();
+            document = page.GetHtmlDocument();
         }
 
-        private static bool IsImageUrl(string url)
-        {
-            if (!Uri.TryCreate(WebUtility.HtmlDecode(url), UriKind.Absolute, out var uri))
-            {
-                return false;
-            }
-
-            var extension = Path.GetExtension(uri.AbsolutePath);
-            return extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase) ||
-                extension.Equals(".jpeg", StringComparison.OrdinalIgnoreCase) ||
-                extension.Equals(".png", StringComparison.OrdinalIgnoreCase) ||
-                extension.Equals(".webp", StringComparison.OrdinalIgnoreCase) ||
-                extension.Equals(".gif", StringComparison.OrdinalIgnoreCase);
-        }
+        return document?.DocumentNode?.OuterHtml;
     }
 }

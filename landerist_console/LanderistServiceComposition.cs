@@ -1,6 +1,6 @@
 using landerist_library.Infrastructure.Ai.StructuredOutputs;
 using landerist_domain.Parsing.Materialization;
-using landerist_library.Parse.ListingParser.UserInput;
+using landerist_domain.Parsing.UserInput;
 using landerist_library.Infrastructure.Ai.LocalAI;
 using landerist_library.Infrastructure.Ai.OpenAI;
 using landerist_library.Parsing;
@@ -142,7 +142,7 @@ internal static class LanderistServiceComposition
                         ResolveHost: Config.IsConfigurationLocal()),
                     SystemPrompt.Text,
                     StructuredOutputSchema.GetJsonSchemaString(),
-                    ListingImageUrlPlaceholders.ReplaceImageUrls,
+                    ListingImageUrlPlaceholderCodec.ReplaceImageUrls,
                     logger)
         ]);
         ParseListing listingParser = new(

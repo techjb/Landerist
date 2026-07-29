@@ -1,3 +1,4 @@
+using landerist_domain.Parsing.UserInput;
 using HtmlAgilityPack;
 using landerist_library.Websites;
 

@@ -1,3 +1,4 @@
+using landerist_library.Parse.ListingParser.UserInput;
 using landerist_library.Parse.Media;
 using landerist_library.Infrastructure.Ai.StructuredOutputs;
 using landerist_library.Infrastructure.Ai.Vertex;
@@ -7,7 +8,7 @@ using landerist_library.Websites;
 using landerist_library.Parse.ListingParser;
 using landerist_library.Pages;
 using landerist_domain.Parsing.StructuredOutputs;
-using landerist_library.Parse.ListingParser.UserInput;
+using landerist_domain.Parsing.UserInput;
 using landerist_library.Application.Statistics;
 using landerist_library.Application.Websites;
 using landerist_orels.ES;
