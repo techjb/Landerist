@@ -28,11 +28,32 @@ public sealed class PagePersistenceService : IPagePersistenceService
         bool updated = _repository.Update(page, out Exception? exception);
         if (!updated && exception is not null)
         {
-            _logger.WriteError(nameof(PagePersistenceService), $"Failed to update page: {page.Uri}. Message: {exception.Message}");
+            LogUpdateFailure(page, exception);
         }
         return updated;
     }
 
+    public async Task<bool> UpdateAsync(
+        Page page,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(page);
+        try
+        {
+            return await _repository
+                .UpdateAsync(page, cancellationToken)
+                .ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception exception)
+        {
+            LogUpdateFailure(page, exception);
+            return false;
+        }
+    }
     public bool UpdateNextScrape(Page page)
     {
         ArgumentNullException.ThrowIfNull(page);
@@ -45,6 +66,10 @@ public sealed class PagePersistenceService : IPagePersistenceService
         return _repository.Delete(page.UriHash);
     }
 
+    private void LogUpdateFailure(Page page, Exception exception) =>
+        _logger.WriteError(
+            nameof(PagePersistenceService),
+            $"Failed to update page: {page.Uri}. Message: {exception.Message}");
     public bool ListingParserInputExistsOnAnotherListing(Page page)
     {
         ArgumentNullException.ThrowIfNull(page);

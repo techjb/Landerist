@@ -33,28 +33,41 @@ public sealed class PageRepository : IPageRepository
     public bool Update(Page page, out Exception? exception)
     {
         ArgumentNullException.ThrowIfNull(page);
-        string query =
-            "UPDATE " + Pages.Pages.PAGES + " SET " +
-            "[LastScrape] = @LastScrape, " +
-            "[LastParseListing] = @LastParseListing, " +
-            "[NextScrape] = @NextScrape, " +
-            "[HttpStatusCode] = @HttpStatusCode, " +
-            "[Etag] = @Etag, " +
-            "[LastModified] = @LastModified, " +
-            "[PageType] = @PageType, " +
-            "[PageTypeCounter] = @PageTypeCounter, " +
-            "[LockedBy] = @LockedBy, " +
-            "[WaitingStatus] = @WaitingStatus, " +
-            "[ListingParserInputHash] = @ListingParserInputHash, " +
-            "[ListingParserInputNotChangedCounter] = @ListingParserInputNotChangedCounter, " +
-            "[TransientErrorCounter] = @TransientErrorCounter, " +
-            "[ResponseBodyZipped] = CASE WHEN @ResponseBodyZipped IS NULL THEN NULL ELSE CONVERT(varbinary(max), @ResponseBodyZipped) END, " +
-            "[TokenCount] = @TokenCount " +
-            "WHERE [UriHash] = @UriHash";
-
-        return _database.Query(query, GetParameters(page), out exception);
+        return _database.Query(
+            GetUpdateQuery(),
+            GetParameters(page),
+            out exception);
     }
 
+    public Task<bool> UpdateAsync(
+        Page page,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(page);
+        return _database.QueryAsync(
+            GetUpdateQuery(),
+            GetParameters(page),
+            cancellationToken);
+    }
+
+    private static string GetUpdateQuery() =>
+        "UPDATE " + Pages.Pages.PAGES + " SET " +
+        "[LastScrape] = @LastScrape, " +
+        "[LastParseListing] = @LastParseListing, " +
+        "[NextScrape] = @NextScrape, " +
+        "[HttpStatusCode] = @HttpStatusCode, " +
+        "[Etag] = @Etag, " +
+        "[LastModified] = @LastModified, " +
+        "[PageType] = @PageType, " +
+        "[PageTypeCounter] = @PageTypeCounter, " +
+        "[LockedBy] = @LockedBy, " +
+        "[WaitingStatus] = @WaitingStatus, " +
+        "[ListingParserInputHash] = @ListingParserInputHash, " +
+        "[ListingParserInputNotChangedCounter] = @ListingParserInputNotChangedCounter, " +
+        "[TransientErrorCounter] = @TransientErrorCounter, " +
+        "[ResponseBodyZipped] = CASE WHEN @ResponseBodyZipped IS NULL THEN NULL ELSE CONVERT(varbinary(max), @ResponseBodyZipped) END, " +
+        "[TokenCount] = @TokenCount " +
+        "WHERE [UriHash] = @UriHash";
     public bool UpdateNextScrape(string uriHash, DateTime? nextScrape)
     {
         string query =

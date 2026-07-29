@@ -62,7 +62,42 @@ namespace landerist_library.Application.Scraping
             PageAcquisitionStatus status = await _pipeline.Acquisition
                 .AcquireAsync(_page, _useProxy, cancellationToken)
                 .ConfigureAwait(false);
-            return ProcessAcquisitionResult(status);
+            return await ProcessAcquisitionResultAsync(status, cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        private async Task<bool> ProcessAcquisitionResultAsync(
+            PageAcquisitionStatus acquisitionStatus,
+            CancellationToken cancellationToken)
+        {
+            if (acquisitionStatus == PageAcquisitionStatus.DownloadFailed)
+            {
+                return false;
+            }
+
+            if (acquisitionStatus == PageAcquisitionStatus.NotModified)
+            {
+                return await ApplyClassificationResultAfterDownloadAsync(
+                    _page.PageType,
+                    null,
+                    false,
+                    cancellationToken).ConfigureAwait(false);
+            }
+
+            PageClassificationResult classification =
+                _pipeline.Classifier.Classify(_page);
+            bool success = await ApplyClassificationResultAfterDownloadAsync(
+                classification.PageType,
+                classification.Listing,
+                classification.WaitingAiRequest,
+                cancellationToken).ConfigureAwait(false);
+
+            if (success)
+            {
+                _pipeline.Indexing.Index(_page);
+            }
+
+            return success;
         }
 
         private bool ProcessAcquisitionResult(PageAcquisitionStatus acquisitionStatus)
@@ -91,6 +126,10 @@ namespace landerist_library.Application.Scraping
             return success;
         }
 
+        public Task<bool> TryApplyPreClassificationBeforeDownloadAsync(
+            CancellationToken cancellationToken = default) =>
+            _classificationService.TryApplyPreClassificationBeforeDownloadAsync(
+                cancellationToken);
         public bool TryApplyPreClassificationBeforeDownload()
         {
             return _classificationService.TryApplyPreClassificationBeforeDownload();
@@ -101,6 +140,16 @@ namespace landerist_library.Application.Scraping
             return _classificationService.ApplyClassificationResultAfterDownload(newPageType, newListing, waitingAIRequest);
         }
 
+        public Task<bool> ApplyClassificationResultAfterDownloadAsync(
+            PageType? newPageType,
+            Listing? newListing,
+            bool waitingAIRequest,
+            CancellationToken cancellationToken = default) =>
+            _classificationService.ApplyClassificationResultAfterDownloadAsync(
+                newPageType,
+                newListing,
+                waitingAIRequest,
+                cancellationToken);
         public bool ApplyParsedClassificationAfterParsing(PageType newPageType, Listing? listing)
         {
             return _classificationService.ApplyParsedClassificationAfterParsing(newPageType, listing);

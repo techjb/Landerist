@@ -146,6 +146,27 @@ public sealed class DatabaseFailureArchitectureTests
         Assert.Contains("await browser.CloseAsync()", puppeteer);
         Assert.Contains(".ClearDownloadersAsync(cancellationToken)", scraper);
     }
+    [Fact]
+    public void AsyncPageClassification_PropagatesPersistenceToQueryAsync()
+    {
+        string root = FindRepositoryRoot();
+        string scraper = File.ReadAllText(
+            Path.Combine(root, "landerist_application", "Application", "Scraping", "Scraper.cs"));
+        string pageScraper = File.ReadAllText(
+            Path.Combine(root, "landerist_application", "Application", "Scraping", "PageScraper.cs"));
+        string classification = File.ReadAllText(
+            Path.Combine(root, "landerist_application", "Application", "Scraping", "PageClassificationService.cs"));
+        string persistence = File.ReadAllText(
+            Path.Combine(root, "landerist_application", "Application", "Persistence", "PagePersistenceService.cs"));
+        string repository = File.ReadAllText(
+            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Sql", "PageRepository.cs"));
+
+        Assert.Contains("TryApplyPreClassificationBeforeDownloadAsync(", scraper);
+        Assert.Contains("ProcessAcquisitionResultAsync(status, cancellationToken)", pageScraper);
+        Assert.Contains(".UpdateAsync(page, cancellationToken)", classification);
+        Assert.Contains(".UpdateAsync(page, cancellationToken)", persistence);
+        Assert.Contains("_database.QueryAsync(", repository);
+    }
     private static int CountOccurrences(string source, string value) =>
         source.Split(value, StringSplitOptions.None).Length - 1;
 

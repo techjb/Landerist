@@ -320,7 +320,9 @@ namespace landerist_library.Application.Scraping
             {
                 page.SetPageType(PageType.BlockedByRobotsTxt);
                 _pageScraping.Scheduling.SetNextScrapeFromNow(page);
-                _pagePersistence.Update(page);
+                await _pagePersistence
+                    .UpdateAsync(page, cancellationToken)
+                    .ConfigureAwait(false);
                 _state.IncrementSkippedByRobotsTxt();
                 return;
             }
@@ -329,12 +331,16 @@ namespace landerist_library.Application.Scraping
             {
                 page.SetPageType(PageType.CrawlDelayTooBig);
                 _pageScraping.Scheduling.SetNextScrapeFromNow(page);
-                _pagePersistence.Update(page);
+                await _pagePersistence
+                    .UpdateAsync(page, cancellationToken)
+                    .ConfigureAwait(false);
                 _state.IncrementSkippedByCrawlDelay();
                 return;
             }
 
-            if (TryApplyPreClassificationBeforeDownload(page))
+            if (await TryApplyPreClassificationBeforeDownloadAsync(
+                page,
+                cancellationToken).ConfigureAwait(false))
             {
                 return;
             }
@@ -349,6 +355,26 @@ namespace landerist_library.Application.Scraping
 
             await ScrapeAsync(page, page.Website.UseProxy, cancellationToken)
                 .ConfigureAwait(false);
+        }
+        private async Task<bool> TryApplyPreClassificationBeforeDownloadAsync(
+            Page page,
+            CancellationToken cancellationToken)
+        {
+            bool success = await new PageScraper(
+                page,
+                _pagePersistence,
+                _logger,
+                _listingLifecycle,
+                _pageScraping).TryApplyPreClassificationBeforeDownloadAsync(
+                    cancellationToken).ConfigureAwait(false);
+            if (!success)
+            {
+                return false;
+            }
+
+            _state.IncrementProcessed();
+            _state.IncrementScrapedSuccess();
+            return true;
         }
         public bool TryApplyPreClassificationBeforeDownload(Page page)
         {

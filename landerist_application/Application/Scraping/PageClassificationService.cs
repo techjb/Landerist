@@ -70,6 +70,35 @@ namespace landerist_library.Application.Scraping
             return _pagePersistence.Update(page);
         }
 
+        public async Task<bool> TryApplyPreClassificationBeforeDownloadAsync(
+            CancellationToken cancellationToken = default)
+        {
+            if (page.Website.HtmlIndexingEnabled && _indexerEnabled)
+            {
+                return false;
+            }
+
+            PageType? pageType = null;
+            if (page.IsMainPage())
+            {
+                pageType = PageType.MainPage;
+            }
+            else if (page.Website.IsDiscardedByListingUrlRegex(page.Uri))
+            {
+                pageType = PageType.DiscardedByListingUrlRegex;
+            }
+
+            if (pageType is null)
+            {
+                return false;
+            }
+
+            UpdatePageTypeAndListing(pageType, null);
+            _scheduling.SetNextScrapeFromNow(page);
+            return await _pagePersistence
+                .UpdateAsync(page, cancellationToken)
+                .ConfigureAwait(false);
+        }
         public bool ApplyClassificationResultAfterDownload(PageType? newPageType, Listing? newListing, bool waitingAIRequest)
         {
             if (waitingAIRequest)
@@ -89,6 +118,32 @@ namespace landerist_library.Application.Scraping
             return _pagePersistence.Update(page);
         }
 
+        public async Task<bool> ApplyClassificationResultAfterDownloadAsync(
+            PageType? newPageType,
+            Listing? newListing,
+            bool waitingAIRequest,
+            CancellationToken cancellationToken = default)
+        {
+            if (waitingAIRequest)
+            {
+                if (!page.SetResponseBodyZipped())
+                {
+                    _logger.WriteError(
+                        "PageScraper SetPageType",
+                        "Failed to set response body zipped");
+                    return false;
+                }
+
+                page.SetWaitingStatusAIRequest();
+            }
+
+            UpdatePageTypeAndListing(newPageType, newListing);
+            page.SetLastScrape();
+            _scheduling.SetNextScrape(page);
+            return await _pagePersistence
+                .UpdateAsync(page, cancellationToken)
+                .ConfigureAwait(false);
+        }
         public bool ApplyParsedClassificationAfterParsing(PageType newPageType, Listing? listing) =>
             _parsedClassification.Apply(page, newPageType, listing);
 

@@ -8,6 +8,10 @@ public interface IPagePersistenceService
 
     bool Update(Page page);
 
+    Task<bool> UpdateAsync(
+        Page page,
+        CancellationToken cancellationToken = default);
+
     bool UpdateNextScrape(Page page);
 
     bool Delete(Page page);

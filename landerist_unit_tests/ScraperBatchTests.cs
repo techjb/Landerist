@@ -419,6 +419,14 @@ public sealed class ScraperBatchTests
 
         public bool Update(Page page) => true;
 
+        public Task<bool> UpdateAsync(
+            Page page,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.FromResult(Update(page));
+        }
+
         public bool UpdateNextScrape(Page page) => true;
 
         public bool Delete(Page page) => true;

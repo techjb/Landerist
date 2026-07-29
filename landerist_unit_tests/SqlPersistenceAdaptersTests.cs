@@ -118,6 +118,20 @@ public sealed class SqlPersistenceAdaptersTests
         Assert.Contains("NOT_LISTINGS_CACHE", database.LastQuery);
     }
     [Fact]
+    public async Task PageRepository_UpdateAsync_UsesAsyncDatabaseExecution()
+    {
+        RecordingDatabase database = new() { QueryResult = true };
+        PageRepository repository = new(database);
+        Page page = CreatePage();
+
+        bool updated = await repository.UpdateAsync(page, CancellationToken.None);
+
+        Assert.True(updated);
+        Assert.Equal(1, database.QueryAsyncCalls);
+        Assert.Contains("UPDATE [PAGES] SET", database.LastQuery);
+        Assert.Equal(page.UriHash, database.LastParameters!["UriHash"]);
+    }
+    [Fact]
     public void PageSelection_MapsRowsAndCleansLocksThroughInjectedDatabase()
     {
         RecordingDatabase database = new();

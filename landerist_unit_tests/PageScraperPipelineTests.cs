@@ -57,9 +57,11 @@ public sealed class PageScraperPipelineTests
         Assert.Equal(0, context.Acquisition.SyncCalls);
         Assert.Equal(1, context.Acquisition.AsyncCalls);
         Assert.Equal(1, context.Classifier.Calls);
-        Assert.Equal(1, context.Persistence.UpdateCalls);
+        Assert.Equal(0, context.Persistence.UpdateCalls);
+        Assert.Equal(1, context.Persistence.UpdateAsyncCalls);
         Assert.Equal(1, context.Indexing.Calls);
     }
+
     [Fact]
     public void Scrape_WhenPersistenceFails_DoesNotIndex()
     {
@@ -202,12 +204,23 @@ public sealed class PageScraperPipelineTests
 
         public int UpdateCalls { get; private set; }
 
+        public int UpdateAsyncCalls { get; private set; }
+
         public bool Insert(Page page) => true;
 
         public bool Update(Page page)
         {
             UpdateCalls++;
             return UpdateResult;
+        }
+
+        public Task<bool> UpdateAsync(
+            Page page,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            UpdateAsyncCalls++;
+            return Task.FromResult(UpdateResult);
         }
 
         public bool UpdateNextScrape(Page page) => true;
