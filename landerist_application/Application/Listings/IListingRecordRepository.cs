@@ -28,6 +28,9 @@ public interface IListingMediaRepository
     bool Delete(string guid);
     bool DeleteAll();
     DataTable GetMedia(Listing listing);
+    Task<DataTable> GetMediaAsync(
+        Listing listing,
+        CancellationToken cancellationToken = default);
 }
 
 public interface IListingSourceRepository
@@ -36,5 +39,8 @@ public interface IListingSourceRepository
     bool Delete(string guid);
     bool DeleteAll();
     DataTable GetSources(Listing listing);
+    Task<DataTable> GetSourcesAsync(
+        Listing listing,
+        CancellationToken cancellationToken = default);
     DataTable GetListingsWithoutSourcePages();
 }

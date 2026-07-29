@@ -42,6 +42,19 @@ public sealed class SqlListingStore : IListingStore
         return _queries.Get(page, loadMedia, loadSources);
     }
 
+    public Task<Listing?> GetAsync(
+        Page page,
+        bool loadMedia,
+        bool loadSources,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(page);
+        return _queries.GetAsync(
+            page,
+            loadMedia,
+            loadSources,
+            cancellationToken);
+    }
     public void Upsert(
         Page page,
         Listing listing,

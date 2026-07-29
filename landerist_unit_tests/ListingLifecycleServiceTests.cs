@@ -133,6 +133,21 @@ public sealed class ListingLifecycleServiceTests
         Assert.Equal(ListingStatus.unpublished, sourceListing.listingStatus);
     }
     [Fact]
+    public async Task ApplyAsync_WhenPublishedListingMustBeLoaded_UsesAsyncStoreRead()
+    {
+        Page page = CreatePage("https://example.com/listing/1");
+        page.SetPageType(PageType.Listing);
+        Listing listing = new() { guid = page.UriHash };
+        TestContext context = new();
+        context.Store.ListingsByUri[page.Uri] = listing;
+
+        await context.Service.ApplyAsync(page, listing: null, CancellationToken.None);
+
+        Assert.Equal(0, context.Store.SyncGetCalls);
+        Assert.Equal(1, context.Store.AsyncGetCalls);
+        Assert.Single(context.Store.Upserts);
+    }
+    [Fact]
     public void Apply_WhenPublishedListingCannotBeLoaded_LogsErrorWithoutUpsert()
     {
         Page page = CreatePage("https://example.com/listing/1");
@@ -194,10 +209,28 @@ public sealed class ListingLifecycleServiceTests
     {
         public Dictionary<Uri, Listing> ListingsByUri { get; } = [];
 
+        public int SyncGetCalls { get; private set; }
+
+        public int AsyncGetCalls { get; private set; }
+
         public List<(Page Page, Listing Listing, ListingUnpublishDecision? Decision)> Upserts { get; } = [];
 
-        public Listing? Get(Page page, bool loadMedia, bool loadSources) =>
-            ListingsByUri.GetValueOrDefault(page.Uri);
+        public Listing? Get(Page page, bool loadMedia, bool loadSources)
+        {
+            SyncGetCalls++;
+            return ListingsByUri.GetValueOrDefault(page.Uri);
+        }
+
+        public Task<Listing?> GetAsync(
+            Page page,
+            bool loadMedia,
+            bool loadSources,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            AsyncGetCalls++;
+            return Task.FromResult(ListingsByUri.GetValueOrDefault(page.Uri));
+        }
 
         public void Upsert(
             Page page,

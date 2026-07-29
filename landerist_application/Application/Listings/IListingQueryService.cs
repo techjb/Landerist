@@ -6,6 +6,11 @@ namespace landerist_library.Application.Listings;
 public interface IListingQueryService
 {
     Listing? Get(Page page, bool loadMedia, bool loadSources);
+    Task<Listing?> GetAsync(
+        Page page,
+        bool loadMedia,
+        bool loadSources,
+        CancellationToken cancellationToken = default);
     IReadOnlyCollection<Listing> GetUnpublishedBefore(DateTime unlistingDate);
 }
 

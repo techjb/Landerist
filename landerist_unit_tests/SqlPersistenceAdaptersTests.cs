@@ -132,6 +132,20 @@ public sealed class SqlPersistenceAdaptersTests
         Assert.Contains("NOT_LISTINGS_CACHE", database.LastQuery);
     }
     [Fact]
+    public async Task ListingQueryRepository_GetAsync_UsesAsyncTableExecution()
+    {
+        RecordingDatabase database = new();
+        ListingQueryRepository repository = new(database);
+
+        DataTable rows = await repository.GetListingAsync(
+            "listing-guid",
+            CancellationToken.None);
+
+        Assert.Same(database.TableResult, rows);
+        Assert.Equal(1, database.QueryTableAsyncCalls);
+        Assert.Equal("listing-guid", database.LastParameters!["Guid"]);
+    }
+    [Fact]
     public async Task PageRepository_UpdateAsync_UsesAsyncDatabaseExecution()
     {
         RecordingDatabase database = new() { QueryResult = true };
@@ -413,6 +427,16 @@ public sealed class SqlPersistenceAdaptersTests
             return Result;
         }
 
+        public Task<Listing?> GetAsync(
+            Page page,
+            bool loadMedia,
+            bool loadSources,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            GetCalls++;
+            return Task.FromResult(Result);
+        }
         public void Upsert(
             Page page,
             Listing listing,

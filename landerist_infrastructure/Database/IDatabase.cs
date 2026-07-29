@@ -43,6 +43,10 @@ public interface IDatabase
         IDictionary<string, object?>? parameters = null,
         SqlParameter[]? sqlParameters = null);
 
+    Task<DataTable> QueryTableAsync(
+        string query,
+        IDictionary<string, object?>? parameters = null,
+        CancellationToken cancellationToken = default);
     List<string> QueryListString(
         string query,
         IDictionary<string, object?>? parameters = null,

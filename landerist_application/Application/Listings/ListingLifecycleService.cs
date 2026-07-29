@@ -78,7 +78,8 @@ public sealed class ListingLifecycleService : IListingLifecycleService
 
         if (page.IsListing())
         {
-            Publish(page, listing);
+            await PublishAsync(page, listing, cancellationToken)
+                .ConfigureAwait(false);
             return;
         }
 
@@ -89,16 +90,111 @@ public sealed class ListingLifecycleService : IListingLifecycleService
                 .ConfigureAwait(false);
         }
 
-        if (IsMovedListing(page))
+        if (await IsMovedListingAsync(page, cancellationToken)
+            .ConfigureAwait(false))
         {
-            HandleMovedListing(page, listing);
+            await HandleMovedListingAsync(page, listing, cancellationToken)
+                .ConfigureAwait(false);
         }
 
         ListingUnpublishDecision decision = _unpublishPolicy.Evaluate(page);
         if (decision.ShouldUnpublish)
         {
-            Unpublish(page, listing, decision);
+            await UnpublishAsync(page, listing, decision, cancellationToken)
+                .ConfigureAwait(false);
         }
+    }
+    private async Task<bool> IsMovedListingAsync(
+        Page page,
+        CancellationToken cancellationToken)
+    {
+        if (!page.IsNotCanonical() && !page.IsRedirectToAnotherUrl())
+        {
+            return false;
+        }
+
+        return await _listingStore
+            .GetAsync(page, loadMedia: false, loadSources: false, cancellationToken)
+            .ConfigureAwait(false) is not null;
+    }
+
+    private async Task HandleMovedListingAsync(
+        Page page,
+        Listing? listing,
+        CancellationToken cancellationToken)
+    {
+        Uri? destinationUri = GetDestinationUri(page);
+        if (destinationUri is null)
+        {
+            _logger.WriteError(
+                "PageScraper HandleMovedListing",
+                "Destination uri is null");
+            return;
+        }
+
+        _pageLinks.Index(page, destinationUri);
+        using var destinationPage = new Page(page.Website, destinationUri);
+        Listing? destinationListing = await _listingStore.GetAsync(
+            destinationPage,
+            loadMedia: false,
+            loadSources: false,
+            cancellationToken).ConfigureAwait(false);
+        if (destinationListing?.listingStatus != ListingStatus.published)
+        {
+            return;
+        }
+
+        await UnpublishAsync(
+            page,
+            listing,
+            CreateMovedListingUnpublishDecision(page),
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task PublishAsync(
+        Page page,
+        Listing? listing,
+        CancellationToken cancellationToken)
+    {
+        listing ??= await _listingStore.GetAsync(
+            page,
+            loadMedia: true,
+            loadSources: true,
+            cancellationToken).ConfigureAwait(false);
+        if (listing is null)
+        {
+            _logger.WriteError(
+                "PageScraper HandlePublishedListing",
+                "NewListing is null");
+            return;
+        }
+
+        listing.SetPublished();
+        _listingEnricher.Enrich(page, listing);
+        _listingStore.Upsert(page, listing);
+    }
+
+    private async Task UnpublishAsync(
+        Page page,
+        Listing? listing,
+        ListingUnpublishDecision decision,
+        CancellationToken cancellationToken)
+    {
+        listing ??= await _listingStore.GetAsync(
+            page,
+            loadMedia: true,
+            loadSources: true,
+            cancellationToken).ConfigureAwait(false);
+        if (listing is null)
+        {
+            _logger.WriteError(
+                "PageScraper HandleUnpublishedListing",
+                "NewListing is null");
+            return;
+        }
+
+        listing.SetUnpublished();
+        _listingStore.Upsert(page, listing, decision);
     }
     private bool IsMovedListing(Page page)
     {

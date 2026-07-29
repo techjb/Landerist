@@ -57,6 +57,19 @@ namespace landerist_library.Infrastructure.Sql
             return Database.Query("DELETE FROM " + TableEsSources);
         }
 
+        public Task<DataTable> GetSourcesAsync(
+            Listing listing,
+            CancellationToken cancellationToken = default)
+        {
+            const string query =
+                "SELECT * " +
+                "FROM " + TableEsSources + " " +
+                "WHERE [listingGuid] = @listingGuid";
+            return Database.QueryTableAsync(
+                query,
+                new Dictionary<string, object?> { ["listingGuid"] = listing.guid },
+                cancellationToken);
+        }
         public DataTable GetSources(Listing listing)
         {
             string query =

@@ -36,6 +36,40 @@ public sealed class SqlListingQueryService : IListingQueryService
             : null;
     }
 
+    public async Task<Listing?> GetAsync(
+        Page page,
+        bool loadMedia,
+        bool loadSources,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(page);
+        DataTable rows = await _listings
+            .GetListingAsync(page.UriHash, cancellationToken)
+            .ConfigureAwait(false);
+        if (rows.Rows.Count != 1)
+        {
+            return null;
+        }
+
+        Listing listing = ListingDataMapper.Map(rows.Rows[0]);
+        Task<DataTable>? media = loadMedia
+            ? _media.GetMediaAsync(listing, cancellationToken)
+            : null;
+        Task<DataTable>? sources = loadSources
+            ? _sources.GetSourcesAsync(listing, cancellationToken)
+            : null;
+
+        if (media is not null)
+        {
+            listing.SetMedia(MapMedia(await media.ConfigureAwait(false)));
+        }
+        if (sources is not null)
+        {
+            listing.SetSources(MapSources(await sources.ConfigureAwait(false)));
+        }
+
+        return listing;
+    }
     public IReadOnlyCollection<Listing> GetUnpublishedBefore(DateTime unlistingDate) =>
         Map(_listings.GetUnpublishedListings(unlistingDate), loadMedia: false, loadSources: true);
 
@@ -66,6 +100,33 @@ public sealed class SqlListingQueryService : IListingQueryService
         return listing;
     }
 
+    private static SortedSet<Media> MapMedia(DataTable rows)
+    {
+        SortedSet<Media> result = new(new MediaComparer());
+        foreach (DataRow row in rows.Rows)
+        {
+            Media? media = MediaDataMapper.Map(row);
+            if (media is not null)
+            {
+                result.Add(media);
+            }
+        }
+        return result;
+    }
+
+    private static SortedSet<Source> MapSources(DataTable rows)
+    {
+        SortedSet<Source> result = new(new SourceComparer());
+        foreach (DataRow row in rows.Rows)
+        {
+            Source? source = SourceDataMapper.Map(row);
+            if (source is not null)
+            {
+                result.Add(source);
+            }
+        }
+        return result;
+    }
     private SortedSet<Media> ReadMedia(Listing listing)
     {
         SortedSet<Media> result = new(new MediaComparer());

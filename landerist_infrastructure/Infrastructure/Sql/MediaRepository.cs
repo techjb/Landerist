@@ -56,6 +56,19 @@ namespace landerist_library.Infrastructure.Sql
             return Database.Query("DELETE FROM " + SqlTableNames.Media);
         }
 
+        public Task<DataTable> GetMediaAsync(
+            Listing listing,
+            CancellationToken cancellationToken = default)
+        {
+            const string query =
+                "SELECT * " +
+                "FROM " + SqlTableNames.Media + " " +
+                "WHERE [listingGuid] = @listingGuid";
+            return Database.QueryTableAsync(
+                query,
+                new Dictionary<string, object?> { ["listingGuid"] = listing.guid },
+                cancellationToken);
+        }
         public DataTable GetMedia(Listing listing)
         {
             string query =

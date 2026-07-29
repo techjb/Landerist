@@ -7,5 +7,11 @@ public interface IListingStore
 {
     Listing? Get(Page page, bool loadMedia, bool loadSources);
 
+    Task<Listing?> GetAsync(
+        Page page,
+        bool loadMedia,
+        bool loadSources,
+        CancellationToken cancellationToken = default);
+
     void Upsert(Page page, Listing listing, ListingUnpublishDecision? unpublishDecision = null);
 }

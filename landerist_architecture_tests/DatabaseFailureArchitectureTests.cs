@@ -35,6 +35,8 @@ public sealed class DatabaseFailureArchitectureTests
         Assert.Contains("connection.OpenAsync(cancellationToken)", source);
         Assert.Contains("command.ExecuteNonQueryAsync(token)", source);
         Assert.Contains("ExecuteScalarAsync(token)", source);
+        Assert.Contains("ExecuteReaderAsync(token)", source);
+        Assert.Contains("reader.ReadAsync(token)", source);
         Assert.Contains("catch (OperationCanceledException)", source);
         Assert.DoesNotContain("Task.FromResult", source);
     }
@@ -181,6 +183,32 @@ public sealed class DatabaseFailureArchitectureTests
         Assert.Contains(".ApplyAsync(page, newListing, cancellationToken)", classification);
         Assert.Contains(".InsertAsync(page, cancellationToken)", lifecycle);
         Assert.Contains("_database.QueryAsync(", cache);
+    }
+    [Fact]
+    public void AsyncListingLifecycle_LoadsAggregateThroughAsyncTableQueries()
+    {
+        string root = FindRepositoryRoot();
+        string lifecycle = File.ReadAllText(
+            Path.Combine(root, "landerist_application", "Application", "Listings", "ListingLifecycleService.cs"));
+        string store = File.ReadAllText(
+            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Listings", "SqlListingStore.cs"));
+        string queries = File.ReadAllText(
+            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Listings", "SqlListingQueryService.cs"));
+        string listingRepository = File.ReadAllText(
+            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Sql", "ListingQueryRepository.cs"));
+        string mediaRepository = File.ReadAllText(
+            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Sql", "MediaRepository.cs"));
+        string sourceRepository = File.ReadAllText(
+            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Sql", "SourceRepository.cs"));
+
+        Assert.Contains("_listingStore.GetAsync(", lifecycle);
+        Assert.Contains("_queries.GetAsync(", store);
+        Assert.Contains(".GetListingAsync(page.UriHash, cancellationToken)", queries);
+        Assert.Contains("_media.GetMediaAsync(listing, cancellationToken)", queries);
+        Assert.Contains("_sources.GetSourcesAsync(listing, cancellationToken)", queries);
+        Assert.Contains("Database.QueryTableAsync(", listingRepository);
+        Assert.Contains("Database.QueryTableAsync(", mediaRepository);
+        Assert.Contains("Database.QueryTableAsync(", sourceRepository);
     }
     private static int CountOccurrences(string source, string value) =>
         source.Split(value, StringSplitOptions.None).Length - 1;

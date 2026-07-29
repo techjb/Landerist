@@ -254,6 +254,35 @@ namespace landerist_library.Database
                 out _);
         }
 
+        public Task<DataTable> QueryTableAsync(
+            string query,
+            IDictionary<string, object?>? parameters = null,
+            CancellationToken cancellationToken = default) =>
+            ExecuteAsync(
+                operationName: nameof(QueryTableAsync),
+                query,
+                parameters,
+                async (command, token) =>
+                {
+                    await using SqlDataReader reader = await command
+                        .ExecuteReaderAsync(token)
+                        .ConfigureAwait(false);
+                    DataTable table = new();
+                    for (int index = 0; index < reader.FieldCount; index++)
+                    {
+                        table.Columns.Add(reader.GetName(index), reader.GetFieldType(index));
+                    }
+
+                    object[] values = new object[reader.FieldCount];
+                    while (await reader.ReadAsync(token).ConfigureAwait(false))
+                    {
+                        reader.GetValues(values);
+                        table.Rows.Add((object[])values.Clone());
+                    }
+
+                    return table;
+                },
+                cancellationToken);
         public DataSet QueryDataSet(
             string query,
             IDictionary<string, object?>? parameters = null,

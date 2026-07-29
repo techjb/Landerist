@@ -163,6 +163,19 @@ public sealed class ListingQueryRepository
             });
     }
 
+    public Task<DataTable> GetListingAsync(
+        string guid,
+        CancellationToken cancellationToken = default)
+    {
+        const string query =
+            "SELECT * " +
+            "FROM " + SqlTableNames.Listings + " " +
+            "WHERE [Guid] = @Guid";
+        return Database.QueryTableAsync(
+            query,
+            new Dictionary<string, object?> { ["Guid"] = guid },
+            cancellationToken);
+    }
     public DataTable GetListing(string guid)
     {
         string query =
