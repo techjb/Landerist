@@ -95,6 +95,9 @@ namespace landerist_tests
                     settings.GetInt32("PROXY_STICKY_PORT_MAX"),
                     settings.GetString("PROXY_USERNAME"),
                     settings.GetString("PROXY_PASSWORD")));
+            landerist_library.Tools.ScrapingBee.Configure(
+                settings.GetString("SCRAPPINGBEE_APIKEY"),
+                httpClients);
             PuppeteerBrowserOptions browserOptions = new(
                 Config.HEADLESS_BROWSER,
                 Config.IsConfigurationLocal(),

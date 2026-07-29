@@ -62,6 +62,9 @@ internal static class LanderistServiceComposition
             services.GetRequiredService<LanderistDatabaseAdapterFactory>();
         HttpClientTransportFactory httpClients =
             services.GetRequiredService<HttpClientTransportFactory>();
+        landerist_library.Tools.ScrapingBee.Configure(
+            LanderistSettings.Current["SCRAPPINGBEE_APIKEY"],
+            httpClients);
         IApplicationLogger logger =
             services.GetRequiredService<IApplicationLogger>();
         GoolzoomApi goolzoom = services.GetRequiredService<GoolzoomApi>();
