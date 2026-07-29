@@ -40,6 +40,24 @@ namespace landerist_library.Infrastructure.Downloaders.Multiple
             return downloader.Download(page);
         }
 
+        public async Task<bool> DownloadAsync(
+            Page page,
+            bool useProxy = false,
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(page);
+            cancellationToken.ThrowIfCancellationRequested();
+            SingleDownloader? downloader = GetDownloader(useProxy);
+            if (downloader is null)
+            {
+                Logger.WriteError("MultipleDownloader DownloadAsync", "Downloader not found");
+                return false;
+            }
+
+            return await downloader
+                .DownloadAsync(page, cancellationToken)
+                .ConfigureAwait(false);
+        }
         private SingleDownloader? GetDownloader(bool useProxy)
         {
             lock (Sync)

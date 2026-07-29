@@ -68,8 +68,10 @@ public sealed class PageAcquisitionService : IPageAcquisitionService
             }
         }
 
-        cancellationToken.ThrowIfCancellationRequested();
-        return _downloader.Download(page, useProxy)
+        bool downloaded = await _downloader
+            .DownloadAsync(page, useProxy, cancellationToken)
+            .ConfigureAwait(false);
+        return downloaded
             ? PageAcquisitionStatus.Downloaded
             : PageAcquisitionStatus.DownloadFailed;
     }

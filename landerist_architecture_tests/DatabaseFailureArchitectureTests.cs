@@ -101,6 +101,29 @@ public sealed class DatabaseFailureArchitectureTests
         Assert.Contains("cancellationToken)", checker);
         Assert.DoesNotContain("CheckAsync(page).GetAwaiter().GetResult()", checker);
     }
+    [Fact]
+    public void AsyncPageDownload_PropagatesCancellationToPuppeteerSession()
+    {
+        string root = FindRepositoryRoot();
+        string acquisition = File.ReadAllText(
+            Path.Combine(root, "landerist_application", "Application", "Scraping", "PageAcquisitionService.cs"));
+        string pooled = File.ReadAllText(
+            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Scraping", "PooledPageDownloader.cs"));
+        string pool = File.ReadAllText(
+            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Downloaders", "Multiple", "DownloadersPool.cs"));
+        string single = File.ReadAllText(
+            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Downloaders", "Multiple", "SingleDownloader.cs"));
+        string puppeteer = File.ReadAllText(
+            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Downloaders", "Puppeteer", "PuppeteerDownloader.cs"));
+
+        Assert.Contains(".DownloadAsync(page, useProxy, cancellationToken)", acquisition);
+        Assert.Contains("pool.DownloadAsync(page, useProxy, cancellationToken)", pooled);
+        Assert.Contains(".DownloadAsync(page, cancellationToken)", pool);
+        Assert.Contains("Downloader.DownloadAsync(page, cancellationToken)", single);
+        Assert.Contains("await Task.WhenAny(download, timeout)", puppeteer);
+        Assert.Contains("Task.Delay(delay + 1000, cancellationToken)", puppeteer);
+        Assert.Contains("await ClosePageAsync()", puppeteer);
+    }
     private static int CountOccurrences(string source, string value) =>
         source.Split(value, StringSplitOptions.None).Length - 1;
 

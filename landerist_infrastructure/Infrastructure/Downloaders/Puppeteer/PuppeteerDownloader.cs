@@ -215,9 +215,36 @@ namespace landerist_library.Infrastructure.Downloaders.Puppeteer
             }
         }
 
-        public void SetContentAndScrenshot(Pages.Page page)
+        public async Task DownloadAsync(
+            Pages.Page page,
+            CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(page);
+
+            await SetContentAndScreenshotAsync(page, cancellationToken)
+                .ConfigureAwait(false);
+            if (PageInitialized() && !BrowserHasChrashed())
+            {
+                page.SetDownloadedData(new PageDownloadResult(
+                    Content,
+                    Screenshot,
+                    HttpStatusCode,
+                    RedirectUrl,
+                    Etag,
+                    LastModified));
+            }
+        }
+        public void SetContentAndScrenshot(Pages.Page page) =>
+            SetContentAndScreenshotAsync(page, CancellationToken.None)
+                .GetAwaiter()
+                .GetResult();
+
+        public async Task SetContentAndScreenshotAsync(
+            Pages.Page page,
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(page);
+            cancellationToken.ThrowIfCancellationRequested();
 
             Content = null;
             Screenshot = null;
@@ -227,33 +254,46 @@ namespace landerist_library.Infrastructure.Downloaders.Puppeteer
             LastModified = null;
             Page = page;
 
-            var delay = GetTimeout(UseProxy);
-
+            int delay = GetTimeout(UseProxy);
             var stopwatch = Stopwatch.StartNew();
             SetExecutionStep("Starting download");
 
             try
             {
-                var taskGetAsync = GetAsync();
-                var taskDelay = Task.Delay(delay + 1000);
-                var completedTask = Task.WhenAny(taskGetAsync, taskDelay).GetAwaiter().GetResult();
+                Task<string?> download = GetAsync();
+                Task timeout = Task.Delay(delay + 1000, cancellationToken);
+                Task completed = await Task.WhenAny(download, timeout)
+                    .ConfigureAwait(false);
 
-                if (completedTask == taskGetAsync)
+                if (completed == download)
                 {
-                    Content = taskGetAsync.GetAwaiter().GetResult();
+                    Content = await download.ConfigureAwait(false);
+                    return;
                 }
-                else
-                {
-                    SetBrowserChrashed(BuildExecutionMessage("Timeout reached", taskGetAsync, delay, stopwatch.ElapsedMilliseconds));
-                    ClosePage();
-                }
+
+                cancellationToken.ThrowIfCancellationRequested();
+                SetBrowserChrashed(BuildExecutionMessage(
+                    "Timeout reached",
+                    download,
+                    delay,
+                    stopwatch.ElapsedMilliseconds));
+                await ClosePageAsync().ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                await ClosePageAsync().ConfigureAwait(false);
+                throw;
             }
             catch (Exception exception)
             {
-                SetBrowserChrashed(BuildExecutionMessage("Exception occurred", null, delay, stopwatch.ElapsedMilliseconds, exception));
+                SetBrowserChrashed(BuildExecutionMessage(
+                    "Exception occurred",
+                    null,
+                    delay,
+                    stopwatch.ElapsedMilliseconds,
+                    exception));
             }
         }
-
         private async Task<string?> GetAsync()
         {
             string? content = null;

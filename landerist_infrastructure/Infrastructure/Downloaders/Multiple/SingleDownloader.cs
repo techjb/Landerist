@@ -80,6 +80,49 @@ namespace landerist_library.Infrastructure.Downloaders.Multiple
             }
         }
 
+        public async Task<bool> DownloadAsync(
+            Page page,
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(page);
+            bool restartedBrowser = false;
+
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                await Downloader.DownloadAsync(page, cancellationToken)
+                    .ConfigureAwait(false);
+                Scraped++;
+
+                if (BrowserHasChrashed())
+                {
+                    Chrashes++;
+                    RestartBrowser();
+                    restartedBrowser = true;
+                    return false;
+                }
+
+                return true;
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
+            catch
+            {
+                Chrashes++;
+                RestartBrowser();
+                restartedBrowser = true;
+                return false;
+            }
+            finally
+            {
+                if (!restartedBrowser)
+                {
+                    Release();
+                }
+            }
+        }
         public void CloseBrowser()
         {
             Downloader.CloseBrowser();

@@ -109,6 +109,27 @@ public sealed class PageAcquisitionServiceTests
     }
 
     [Fact]
+    public async Task AcquireAsync_WithoutConditionalMetadata_UsesAsyncDownloader()
+    {
+        Page page = CreatePage();
+        RecordingPageDownloader downloader = new() { Result = true };
+        PageAcquisitionService service = new(
+            downloader,
+            new RecordingConditionalHeaders(),
+            new RecordingScrapeMetrics(),
+            conditionalHeadersEnabled: true);
+
+        PageAcquisitionStatus result = await service.AcquireAsync(
+            page,
+            useProxy: true,
+            CancellationToken.None);
+
+        Assert.Equal(PageAcquisitionStatus.Downloaded, result);
+        Assert.Equal(0, downloader.Calls);
+        Assert.Equal(1, downloader.AsyncCalls);
+        Assert.True(downloader.LastUseProxy);
+    }
+    [Fact]
     public async Task AcquireAsync_WhenConditionalResponseIsNotModified_SkipsDownloader()
     {
         Page page = CreatePage();
@@ -170,6 +191,8 @@ public sealed class PageAcquisitionServiceTests
 
         public int Calls { get; private set; }
 
+        public int AsyncCalls { get; private set; }
+
         public bool LastUseProxy { get; private set; }
 
         public bool Download(Page page, bool useProxy)
@@ -177,6 +200,17 @@ public sealed class PageAcquisitionServiceTests
             Calls++;
             LastUseProxy = useProxy;
             return Result;
+        }
+
+        public Task<bool> DownloadAsync(
+            Page page,
+            bool useProxy,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            AsyncCalls++;
+            LastUseProxy = useProxy;
+            return Task.FromResult(Result);
         }
     }
 

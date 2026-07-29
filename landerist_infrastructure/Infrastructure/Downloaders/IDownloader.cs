@@ -18,5 +18,9 @@ namespace landerist_library.Infrastructure.Downloaders
 
         public void Download(Page page);
 
+        public Task DownloadAsync(
+            Page page,
+            CancellationToken cancellationToken = default);
+
     }
 }
