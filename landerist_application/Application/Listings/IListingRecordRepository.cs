@@ -11,7 +11,16 @@ public interface IListingRecordRepository
         string host,
         ListingUnpublishDecision? unpublishDecision,
         out Exception? exception);
+    Task<bool> InsertAsync(
+        Listing listing,
+        string host,
+        ListingUnpublishDecision? unpublishDecision,
+        CancellationToken cancellationToken = default);
     bool Update(Listing listing, ListingUnpublishDecision? unpublishDecision = null);
+    Task<bool> UpdateAsync(
+        Listing listing,
+        ListingUnpublishDecision? unpublishDecision = null,
+        CancellationToken cancellationToken = default);
     bool Delete(string guid);
     bool DeleteAll();
     bool UpdateAddress(
@@ -25,7 +34,9 @@ public interface IListingRecordRepository
 public interface IListingMediaRepository
 {
     void Insert(Listing listing);
+    Task InsertAsync(Listing listing, CancellationToken cancellationToken = default);
     bool Delete(string guid);
+    Task<bool> DeleteAsync(string guid, CancellationToken cancellationToken = default);
     bool DeleteAll();
     DataTable GetMedia(Listing listing);
     Task<DataTable> GetMediaAsync(
@@ -36,7 +47,9 @@ public interface IListingMediaRepository
 public interface IListingSourceRepository
 {
     void Insert(Listing listing);
+    Task InsertAsync(Listing listing, CancellationToken cancellationToken = default);
     bool Delete(string guid);
+    Task<bool> DeleteAsync(string guid, CancellationToken cancellationToken = default);
     bool DeleteAll();
     DataTable GetSources(Listing listing);
     Task<DataTable> GetSourcesAsync(

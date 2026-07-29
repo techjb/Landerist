@@ -14,4 +14,10 @@ public interface IListingStore
         CancellationToken cancellationToken = default);
 
     void Upsert(Page page, Listing listing, ListingUnpublishDecision? unpublishDecision = null);
+
+    Task UpsertAsync(
+        Page page,
+        Listing listing,
+        ListingUnpublishDecision? unpublishDecision = null,
+        CancellationToken cancellationToken = default);
 }

@@ -39,6 +39,27 @@ namespace landerist_library.Infrastructure.Sql
             }
         }
 
+        public async Task InsertAsync(Listing listing, CancellationToken cancellationToken = default)
+        {
+            if (listing.media is null)
+            {
+                return;
+            }
+
+            foreach (var item in listing.media)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                string query = "INSERT INTO " + SqlTableNames.Media + " VALUES(@ListingGuid ,@MediaType ,@Title ,@Url)";
+                await Database.QueryAsync(query, new Dictionary<string, object?>
+                {
+                    ["listingGuid"] = listing.guid,
+                    ["mediaType"] = item.mediaType?.ToString(),
+                    ["title"] = item.title,
+                    ["url"] = item.url.ToString()
+                }, cancellationToken).ConfigureAwait(false);
+            }
+        }
+
         public bool Delete(string guid)
         {
             string query =
@@ -49,6 +70,17 @@ namespace landerist_library.Infrastructure.Sql
             {
                 { "listingGuid", guid }
             });
+        }
+
+        public Task<bool> DeleteAsync(string guid, CancellationToken cancellationToken = default)
+        {
+            string query =
+                "DELETE FROM " + SqlTableNames.Media + " " +
+                "WHERE [listingGuid] = @listingGuid";
+            return Database.QueryAsync(
+                query,
+                new Dictionary<string, object?> { ["listingGuid"] = guid },
+                cancellationToken);
         }
 
         public bool DeleteAll()

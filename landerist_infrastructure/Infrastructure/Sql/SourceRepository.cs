@@ -40,6 +40,27 @@ namespace landerist_library.Infrastructure.Sql
             }
         }
 
+        public async Task InsertAsync(Listing listing, CancellationToken cancellationToken = default)
+        {
+            if (listing.sources is null)
+            {
+                return;
+            }
+
+            foreach (var item in listing.sources)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                string query = "INSERT INTO " + TableEsSources + " VALUES(@ListingGuid ,@SourceName ,@SourceUrl ,@SourceGuid)";
+                await Database.QueryAsync(query, new Dictionary<string, object?>
+                {
+                    ["ListingGuid"] = listing.guid,
+                    ["SourceName"] = item.sourceName?.ToString(),
+                    ["SourceUrl"] = item.sourceUrl.ToString(),
+                    ["SourceGuid"] = item.sourceGuid?.ToString()
+                }, cancellationToken).ConfigureAwait(false);
+            }
+        }
+
         public bool Delete(string guid)
         {
             string query =
@@ -50,6 +71,17 @@ namespace landerist_library.Infrastructure.Sql
             {
                 { "listingGuid", guid }
             });
+        }
+
+        public Task<bool> DeleteAsync(string guid, CancellationToken cancellationToken = default)
+        {
+            string query =
+                "DELETE FROM " + TableEsSources + " " +
+                "WHERE [listingGuid] = @listingGuid";
+            return Database.QueryAsync(
+                query,
+                new Dictionary<string, object?> { ["listingGuid"] = guid },
+                cancellationToken);
         }
 
         public bool DeleteAll()

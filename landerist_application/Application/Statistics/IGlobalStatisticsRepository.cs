@@ -23,6 +23,10 @@ public interface IGlobalStatisticsRepository
     bool DeleteByKeyPrefixAndDate(DateTime date, string keyPrefix);
     bool Insert(DateTime date, string key, int counter);
     bool InsertDailyCounter(string key, int counter);
+    Task<bool> InsertDailyCounterAsync(
+        string key,
+        int counter,
+        CancellationToken cancellationToken = default);
     DataTable GetStatisticsKeys();
     DataTable GetStatistics(string key, int months);
     DataTable GetLatestStatistics(string statisticsKey, int top);

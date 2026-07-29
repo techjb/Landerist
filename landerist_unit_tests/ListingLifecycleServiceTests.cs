@@ -145,6 +145,7 @@ public sealed class ListingLifecycleServiceTests
 
         Assert.Equal(0, context.Store.SyncGetCalls);
         Assert.Equal(1, context.Store.AsyncGetCalls);
+        Assert.Equal(1, context.Store.AsyncUpsertCalls);
         Assert.Single(context.Store.Upserts);
     }
     [Fact]
@@ -213,6 +214,8 @@ public sealed class ListingLifecycleServiceTests
 
         public int AsyncGetCalls { get; private set; }
 
+        public int AsyncUpsertCalls { get; private set; }
+
         public List<(Page Page, Listing Listing, ListingUnpublishDecision? Decision)> Upserts { get; } = [];
 
         public Listing? Get(Page page, bool loadMedia, bool loadSources)
@@ -237,6 +240,18 @@ public sealed class ListingLifecycleServiceTests
             Listing listing,
             ListingUnpublishDecision? unpublishDecision = null) =>
             Upserts.Add((page, listing, unpublishDecision));
+
+        public Task UpsertAsync(
+            Page page,
+            Listing listing,
+            ListingUnpublishDecision? unpublishDecision = null,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            AsyncUpsertCalls++;
+            Upserts.Add((page, listing, unpublishDecision));
+            return Task.CompletedTask;
+        }
     }
 
     private sealed class RecordingNotListingCache : INotListingCacheService

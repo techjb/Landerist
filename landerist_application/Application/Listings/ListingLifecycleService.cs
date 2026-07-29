@@ -171,7 +171,7 @@ public sealed class ListingLifecycleService : IListingLifecycleService
 
         listing.SetPublished();
         _listingEnricher.Enrich(page, listing);
-        _listingStore.Upsert(page, listing);
+        await _listingStore.UpsertAsync(page, listing, cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
     private async Task UnpublishAsync(
@@ -194,7 +194,7 @@ public sealed class ListingLifecycleService : IListingLifecycleService
         }
 
         listing.SetUnpublished();
-        _listingStore.Upsert(page, listing, decision);
+        await _listingStore.UpsertAsync(page, listing, decision, cancellationToken).ConfigureAwait(false);
     }
     private bool IsMovedListing(Page page)
     {

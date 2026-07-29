@@ -27,6 +27,32 @@ public sealed class ListingRepositoryTests
     }
 
     [Fact]
+    public async Task InsertAsync_UsesAsyncDatabaseWrite()
+    {
+        RecordingDatabase database = new() { QueryResult = true };
+        ListingRepository repository = new(database);
+
+        bool result = await repository.InsertAsync(CreateListing(), "example.com", null);
+
+        Assert.True(result);
+        Assert.Equal(1, database.QueryAsyncCalls);
+        Assert.Contains("INSERT INTO", database.LastQuery);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_UsesAsyncDatabaseWrite()
+    {
+        RecordingDatabase database = new() { QueryResult = true };
+        ListingRepository repository = new(database);
+
+        bool result = await repository.UpdateAsync(CreateListing());
+
+        Assert.True(result);
+        Assert.Equal(1, database.QueryAsyncCalls);
+        Assert.Contains("UPDATE", database.LastQuery);
+    }
+
+    [Fact]
     public void Update_DelegatesListingParameters()
     {
         RecordingDatabase database = new() { QueryResult = true };

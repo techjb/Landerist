@@ -76,6 +76,71 @@ public sealed class SqlListingStore : IListingStore
         }
     }
 
+    public async Task UpsertAsync(
+        Page page,
+        Listing listing,
+        ListingUnpublishDecision? unpublishDecision = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(page);
+        ArgumentNullException.ThrowIfNull(listing);
+
+        Listing? existing = await GetAsync(page, loadMedia: true, loadSources: true, cancellationToken).ConfigureAwait(false);
+        if (existing is null)
+        {
+            await InsertAsync(page, listing, unpublishDecision, cancellationToken).ConfigureAwait(false);
+            return;
+        }
+
+        if (!existing.Equals(listing))
+        {
+            await UpdateAsync(existing, listing, unpublishDecision, cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    private async Task InsertAsync(
+        Page page,
+        Listing listing,
+        ListingUnpublishDecision? unpublishDecision,
+        CancellationToken cancellationToken)
+    {
+        bool inserted = await _listings.InsertAsync(listing, page.Website.Host, unpublishDecision, cancellationToken).ConfigureAwait(false);
+        if (!inserted)
+        {
+            _logger.WriteError("SqlListingStore InsertAsync", $"Could not insert listing {listing.guid}." );
+            return;
+        }
+
+        await _media.InsertAsync(listing, cancellationToken).ConfigureAwait(false);
+        await _sources.InsertAsync(listing, cancellationToken).ConfigureAwait(false);
+        await _statistics.InsertDailyCounterAsync(StatisticsKey.ListingInsert.ToString(), 1, cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task UpdateAsync(
+        Listing existing,
+        Listing listing,
+        ListingUnpublishDecision? unpublishDecision,
+        CancellationToken cancellationToken)
+    {
+        if (!await _listings.UpdateAsync(listing, unpublishDecision, cancellationToken).ConfigureAwait(false))
+        {
+            _logger.WriteError("SqlListingStore UpdateAsync", $"Could not update listing {listing.guid}." );
+            return;
+        }
+
+        if (!SetEquals(existing.media, listing.media))
+        {
+            await _media.DeleteAsync(listing.guid, cancellationToken).ConfigureAwait(false);
+            await _media.InsertAsync(listing, cancellationToken).ConfigureAwait(false);
+        }
+        if (!SetEquals(existing.sources, listing.sources) &&
+            await _sources.DeleteAsync(listing.guid, cancellationToken).ConfigureAwait(false))
+        {
+            await _sources.InsertAsync(listing, cancellationToken).ConfigureAwait(false);
+        }
+        await _statistics.InsertDailyCounterAsync(StatisticsKey.ListingUpdate.ToString(), 1, cancellationToken).ConfigureAwait(false);
+    }
+
     private void Insert(
         Page page,
         Listing listing,

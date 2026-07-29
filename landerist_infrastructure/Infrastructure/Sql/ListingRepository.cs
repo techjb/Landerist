@@ -20,6 +20,17 @@ namespace landerist_library.Infrastructure.Sql
 
         public bool Insert(Listing listing, string host, ListingUnpublishDecision? unpublishDecision, out Exception? exception)
         {
+            Exception? queryException = null;
+            bool result = InsertCore(listing, host, unpublishDecision, (query, parameters) => Database.Query(query, parameters, out queryException));
+            exception = queryException;
+            return result;
+        }
+
+        public Task<bool> InsertAsync(Listing listing, string host, ListingUnpublishDecision? unpublishDecision, CancellationToken cancellationToken = default) =>
+            InsertCore(listing, host, unpublishDecision, (query, parameters) => Database.QueryAsync(query, parameters, cancellationToken));
+
+        private TResult InsertCore<TResult>(Listing listing, string host, ListingUnpublishDecision? unpublishDecision, Func<string, IDictionary<string, object?>, TResult> execute)
+        {
             string query =
                 "INSERT INTO " + SqlTableNames.Listings + " " +
                 "([guid], [listingStatus], [listingDate], [updated], [unlistingDate], [unlistingReason], [unlistingPageType], " +
@@ -43,10 +54,16 @@ namespace landerist_library.Infrastructure.Sql
 
             var queryParameters = GetQueryParameters(listing, unpublishDecision);
             queryParameters.Add("host", host);
-            return Database.Query(query, queryParameters, out exception);
+            return execute(query, queryParameters);
         }
 
-        public bool Update(Listing listing, ListingUnpublishDecision? unpublishDecision = null)
+        public bool Update(Listing listing, ListingUnpublishDecision? unpublishDecision = null) =>
+            UpdateCore(listing, unpublishDecision, Database.Query);
+
+        public Task<bool> UpdateAsync(Listing listing, ListingUnpublishDecision? unpublishDecision = null, CancellationToken cancellationToken = default) =>
+            UpdateCore(listing, unpublishDecision, (query, parameters) => Database.QueryAsync(query, parameters, cancellationToken));
+
+        private TResult UpdateCore<TResult>(Listing listing, ListingUnpublishDecision? unpublishDecision, Func<string, IDictionary<string, object?>, TResult> execute)
         {
             string query =
                 "UPDATE " + SqlTableNames.Listings + " SET " +
@@ -104,7 +121,7 @@ namespace landerist_library.Infrastructure.Sql
                 "WHERE [guid] = @guid";
 
             var queryParameters = GetQueryParameters(listing, unpublishDecision);
-            return Database.Query(query, queryParameters);
+            return execute(query, queryParameters);
         }
 
 

@@ -443,5 +443,15 @@ public sealed class SqlPersistenceAdaptersTests
             ListingUnpublishDecision? unpublishDecision = null)
         {
         }
+
+        public Task UpsertAsync(
+            Page page,
+            Listing listing,
+            ListingUnpublishDecision? unpublishDecision = null,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.CompletedTask;
+        }
     }
 }

@@ -210,6 +210,29 @@ public sealed class DatabaseFailureArchitectureTests
         Assert.Contains("Database.QueryTableAsync(", mediaRepository);
         Assert.Contains("Database.QueryTableAsync(", sourceRepository);
     }
+    [Fact]
+    public void AsyncListingLifecycle_PersistsAggregateThroughAsyncQueries()
+    {
+        string root = FindRepositoryRoot();
+        string lifecycle = File.ReadAllText(Path.Combine(root, "landerist_application", "Application", "Listings", "ListingLifecycleService.cs"));
+        string store = File.ReadAllText(Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Listings", "SqlListingStore.cs"));
+        string listingRepository = File.ReadAllText(Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Sql", "ListingRepository.cs"));
+        string mediaRepository = File.ReadAllText(Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Sql", "MediaRepository.cs"));
+        string sourceRepository = File.ReadAllText(Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Sql", "SourceRepository.cs"));
+        string statisticsRepository = File.ReadAllText(Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Statistics", "GlobalStatisticsRepository.cs"));
+
+        Assert.Contains("_listingStore.UpsertAsync(", lifecycle);
+        Assert.Contains("_listings.InsertAsync(", store);
+        Assert.Contains("_listings.UpdateAsync(", store);
+        Assert.Contains("_media.InsertAsync(", store);
+        Assert.Contains("_sources.InsertAsync(", store);
+        Assert.Contains("_statistics.InsertDailyCounterAsync(", store);
+        Assert.Contains("Database.QueryAsync(", listingRepository);
+        Assert.Contains("Database.QueryAsync(", mediaRepository);
+        Assert.Contains("Database.QueryAsync(", sourceRepository);
+        Assert.Contains("Database.QueryAsync(", statisticsRepository);
+    }
+
     private static int CountOccurrences(string source, string value) =>
         source.Split(value, StringSplitOptions.None).Length - 1;
 

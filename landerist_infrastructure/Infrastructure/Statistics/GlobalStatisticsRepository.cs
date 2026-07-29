@@ -197,7 +197,13 @@ namespace landerist_library.Infrastructure.Statistics
             });
         }
 
-        public bool InsertDailyCounter(string key, int counter)
+        public bool InsertDailyCounter(string key, int counter) =>
+            InsertDailyCounterCore(key, counter, Database.Query);
+
+        public Task<bool> InsertDailyCounterAsync(string key, int counter, CancellationToken cancellationToken = default) =>
+            InsertDailyCounterCore(key, counter, (query, parameters) => Database.QueryAsync(query, parameters, cancellationToken));
+
+        private TResult InsertDailyCounterCore<TResult>(string key, int counter, Func<string, IDictionary<string, object?>, TResult> execute)
         {
             string query =
                 "MERGE " + GlobalStatisticsTable + " AS target " +
@@ -216,7 +222,7 @@ namespace landerist_library.Infrastructure.Statistics
                 "   INSERT ([Date], [Key], [Counter]) " +
                 "   VALUES (source.DateOnly, source.[Key], source.[Counter]);";
 
-            return Database.Query(query, new Dictionary<string, object?>
+            return execute(query, new Dictionary<string, object?>
             {
                 { "Date", DateTime.Now },
                 { "Key", key },
