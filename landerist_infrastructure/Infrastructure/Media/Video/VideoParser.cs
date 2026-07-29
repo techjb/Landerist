@@ -1,10 +1,10 @@
-﻿using HtmlAgilityPack;
+using HtmlAgilityPack;
 using landerist_orels.ES;
 using landerist_orels;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace landerist_library.Parse.Media.Video
+namespace landerist_library.Infrastructure.ListingMedia.Video
 {
     public partial class VideoParser(MediaParser mediaParser)
     {

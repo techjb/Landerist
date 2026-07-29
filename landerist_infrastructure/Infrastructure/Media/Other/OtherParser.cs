@@ -1,7 +1,7 @@
-﻿using HtmlAgilityPack;
+using HtmlAgilityPack;
 using landerist_orels;
 
-namespace landerist_library.Parse.Media.Other
+namespace landerist_library.Infrastructure.ListingMedia.Other
 {
     public class OtherParser(MediaParser mediaParser)
     {

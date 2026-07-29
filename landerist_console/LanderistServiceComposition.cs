@@ -1,7 +1,7 @@
 using landerist_library.Infrastructure.Parsing.Tokenization;
 using landerist_domain.Parsing.Tokenization;
 using landerist_domain.Parsing.Prompt;
-using landerist_library.Parse.Media;
+using landerist_library.Infrastructure.ListingMedia;
 using landerist_library.Infrastructure.Ai.StructuredOutputs;
 using landerist_domain.Parsing.Materialization;
 using landerist_domain.Parsing.UserInput;
@@ -162,7 +162,15 @@ internal static class LanderistServiceComposition
                 landerist_library.Tools.Validate.Email,
                 landerist_library.Tools.Validate.CadastralReference,
                 (listing, page, websiteAccess, images) =>
-                    new MediaParser(page, websiteAccess).AddMediaImages(listing, images),
+                    new MediaParser(
+                            page,
+                            websiteAccess,
+                            new ImageValidationCacheOperations(
+                                landerist_library.Database.ValidInvalidImages.IsValid,
+                                landerist_library.Database.ValidInvalidImages.IsInvalid,
+                                landerist_library.Database.ValidInvalidImages.InsertValid,
+                                landerist_library.Database.ValidInvalidImages.InsertInvalid))
+                        .AddMediaImages(listing, images),
                 (source, uri, exception) => logger.WriteError(source, uri + Environment.NewLine + exception)),
             logger);
         GlobalStatistics globalStatistics = new(

@@ -1,6 +1,6 @@
-﻿using OpenCvSharp;
+using OpenCvSharp;
 
-namespace landerist_library.Parse.Media.Image
+namespace landerist_library.Infrastructure.ListingMedia.Image
 {
     public class DuplicatesRemover(ImageParser imageParser)
     {

@@ -16,7 +16,7 @@ public sealed class HttpTransportArchitectureTests
             "Infrastructure/WebsiteServices/WebsiteNetworkService.cs",
             "Infrastructure/Indexing/GzipAwareSitemapFetcher.cs",
             "Infrastructure/Scraping/ConditionalPageHeaderChecker.cs",
-            "Parse/Media/Image/ImageDownloader.cs"
+            "Infrastructure/Media/Image/ImageDownloader.cs"
         ];
         string[] forbiddenTokens =
         [
@@ -33,7 +33,8 @@ public sealed class HttpTransportArchitectureTests
                     Path.Combine(
                         (relative.EndsWith("WebsiteNetworkService.cs", StringComparison.Ordinal) ||
                             relative.EndsWith("ConditionalPageHeaderChecker.cs", StringComparison.Ordinal) ||
-                            relative.EndsWith("GzipAwareSitemapFetcher.cs", StringComparison.Ordinal))
+                            relative.EndsWith("GzipAwareSitemapFetcher.cs", StringComparison.Ordinal) ||
+                            relative.EndsWith("ImageDownloader.cs", StringComparison.Ordinal))
                             ? infrastructureRoot
                             : libraryRoot,
                         relative.Replace('/', Path.DirectorySeparatorChar)));

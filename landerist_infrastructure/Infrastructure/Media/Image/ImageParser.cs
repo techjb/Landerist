@@ -1,10 +1,9 @@
-﻿using HtmlAgilityPack;
-using landerist_library.Database;
+using HtmlAgilityPack;
 using landerist_orels;
 using OpenCvSharp;
 using System.Text.RegularExpressions;
 
-namespace landerist_library.Parse.Media.Image
+namespace landerist_library.Infrastructure.ListingMedia.Image
 {
     /// <summary>
     /// In Linux need to add another package. See:
@@ -225,7 +224,7 @@ namespace landerist_library.Parse.Media.Image
                 UnknowIsValidImages.Remove(image);
                 if (addToDiscarded)
                 {
-                    ValidInvalidImages.InsertInvalid(image.url);
+                    MediaParser.ImageValidationCache.InsertInvalid(image.url);
                 }
             }
 
@@ -236,7 +235,7 @@ namespace landerist_library.Parse.Media.Image
         {
             foreach (var image in MediaImages)
             {
-                if (ValidInvalidImages.IsInvalid(image.url))
+                if (MediaParser.ImageValidationCache.IsInvalid(image.url))
                 {
                     MediaToRemove.Add(image);
                 }
@@ -249,7 +248,7 @@ namespace landerist_library.Parse.Media.Image
         {
             foreach (var image in MediaImages)
             {
-                if (!ValidInvalidImages.IsValid(image.url))
+                if (!MediaParser.ImageValidationCache.IsValid(image.url))
                 {
                     UnknowIsValidImages.Add(image);
                 }
@@ -278,7 +277,7 @@ namespace landerist_library.Parse.Media.Image
         {
             foreach (var image in UnknowIsValidImages)
             {
-                ValidInvalidImages.InsertValid(image.url);
+                MediaParser.ImageValidationCache.InsertValid(image.url);
             }
         }
 

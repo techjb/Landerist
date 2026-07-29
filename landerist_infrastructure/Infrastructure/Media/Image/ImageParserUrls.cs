@@ -1,6 +1,6 @@
-﻿using landerist_orels;
+using landerist_orels;
 
-namespace landerist_library.Parse.Media.Image
+namespace landerist_library.Infrastructure.ListingMedia.Image
 {
     internal class ImageParserUrls(MediaParser mediaParser) : ImageParser(mediaParser)
     {

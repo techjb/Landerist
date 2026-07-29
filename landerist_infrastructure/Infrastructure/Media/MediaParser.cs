@@ -1,28 +1,38 @@
 using HtmlAgilityPack;
 using landerist_library.Websites;
 using landerist_library.Pages;
-using landerist_library.Parse.Media.Image;
+using landerist_library.Infrastructure.ListingMedia.Image;
 using landerist_orels;
 using landerist_orels.ES;
 
-namespace landerist_library.Parse.Media
+namespace landerist_library.Infrastructure.ListingMedia
 {
+    public sealed record ImageValidationCacheOperations(
+        Func<Uri, bool> IsValid,
+        Func<Uri, bool> IsInvalid,
+        Func<Uri, bool> InsertValid,
+        Func<Uri, bool> InsertInvalid);
     public class MediaParser
     {
         public readonly Page Page;
         public WebsiteAccessServices WebsiteAccess { get; }
+        public ImageValidationCacheOperations ImageValidationCache { get; }
 
         private readonly SortedSet<landerist_orels.Media> _media = new(new MediaComparer());
 
         public HtmlDocument? HtmlDocument { get; private set; }
 
-        public MediaParser(Page page, WebsiteAccessServices websiteAccess)
+        public MediaParser(
+            Page page,
+            WebsiteAccessServices websiteAccess,
+            ImageValidationCacheOperations imageValidationCache)
         {
             ArgumentNullException.ThrowIfNull(page);
             ArgumentNullException.ThrowIfNull(websiteAccess);
 
             Page = page;
             WebsiteAccess = websiteAccess;
+            ImageValidationCache = imageValidationCache ?? throw new ArgumentNullException(nameof(imageValidationCache));
             InitHtmlDocument();
         }
 

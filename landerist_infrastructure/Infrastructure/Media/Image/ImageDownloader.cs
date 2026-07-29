@@ -1,7 +1,7 @@
 using landerist_library.Websites;
 using OpenCvSharp;
 
-namespace landerist_library.Parse.Media.Image
+namespace landerist_library.Infrastructure.ListingMedia.Image
 {
     public class ImageDownloader(ImageParser imageParser)
     {

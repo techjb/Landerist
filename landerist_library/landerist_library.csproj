@@ -16,9 +16,6 @@
     <PackageReference Include="Louw.SitemapParser" Version="0.0.2" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.0" />
     
-    <PackageReference Include="OpenCvSharp4" Version="4.13.0.20260330" />
-    <PackageReference Include="OpenCvSharp4.Extensions" Version="4.13.0.20260330" />
-    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.13.0.20260302" />
   </ItemGroup>
 
   <ItemGroup>
