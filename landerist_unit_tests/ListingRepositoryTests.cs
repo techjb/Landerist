@@ -102,6 +102,21 @@ public sealed class ListingRepositoryTests
     }
 
     [Fact]
+    public async Task UpdateAddressAsync_UsesAsyncDatabaseWrite()
+    {
+        RecordingDatabase database = new() { QueryResult = true };
+        ListingRepository repository = new(database);
+
+        bool result = await repository.UpdateAddressAsync(
+            "listing-guid", 40.4, -3.7, true, "test-resolver", CancellationToken.None);
+
+        Assert.True(result);
+        Assert.Equal(1, database.QueryAsyncCalls);
+        Assert.Equal("listing-guid", database.LastParameters!["guid"]);
+        Assert.Equal("test-resolver", database.LastParameters["locationResolver"]);
+    }
+
+        [Fact]
     public void GetListingsByHost_AddsOptionalStatusFilter()
     {
         RecordingDatabase database = new();

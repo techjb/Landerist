@@ -88,6 +88,9 @@ namespace landerist_library.Infrastructure.Sql
             return Database.Query("DELETE FROM " + SqlTableNames.Media);
         }
 
+        public Task<bool> DeleteAllAsync(CancellationToken cancellationToken = default) =>
+            Database.QueryAsync("DELETE FROM " + SqlTableNames.Media, cancellationToken: cancellationToken);
+
         public Task<DataTable> GetMediaAsync(
             Listing listing,
             CancellationToken cancellationToken = default)

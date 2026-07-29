@@ -22,13 +22,22 @@ public interface IListingRecordRepository
         ListingUnpublishDecision? unpublishDecision = null,
         CancellationToken cancellationToken = default);
     bool Delete(string guid);
+    Task<bool> DeleteAsync(string guid, CancellationToken cancellationToken = default);
     bool DeleteAll();
+    Task<bool> DeleteAllAsync(CancellationToken cancellationToken = default);
     bool UpdateAddress(
         string guid,
         double? latitude,
         double? longitude,
         bool? locationIsAccurate,
         string? locationResolver = null);
+    Task<bool> UpdateAddressAsync(
+        string guid,
+        double? latitude,
+        double? longitude,
+        bool? locationIsAccurate,
+        string? locationResolver = null,
+        CancellationToken cancellationToken = default);
 }
 
 public interface IListingMediaRepository
@@ -38,6 +47,7 @@ public interface IListingMediaRepository
     bool Delete(string guid);
     Task<bool> DeleteAsync(string guid, CancellationToken cancellationToken = default);
     bool DeleteAll();
+    Task<bool> DeleteAllAsync(CancellationToken cancellationToken = default);
     DataTable GetMedia(Listing listing);
     Task<DataTable> GetMediaAsync(
         Listing listing,
@@ -51,6 +61,7 @@ public interface IListingSourceRepository
     bool Delete(string guid);
     Task<bool> DeleteAsync(string guid, CancellationToken cancellationToken = default);
     bool DeleteAll();
+    Task<bool> DeleteAllAsync(CancellationToken cancellationToken = default);
     DataTable GetSources(Listing listing);
     Task<DataTable> GetSourcesAsync(
         Listing listing,

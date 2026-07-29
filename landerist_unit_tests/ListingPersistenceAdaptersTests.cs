@@ -59,6 +59,40 @@ public sealed class ListingPersistenceAdaptersTests
             Assert.Equal("listing-guid", call.Parameters!.Values.Single()));
     }
 
+    [Fact]
+    public async Task ListingMaintenanceService_DeletesWholeAggregateAsync()
+    {
+        RecordingDatabase database = new() { QueryResult = true };
+        SqlListingMaintenanceService maintenance = new(
+            new ListingRepository(database),
+            new MediaRepository(database),
+            new SourceRepository(database));
+
+        bool deleted = await maintenance.DeleteAsync("listing-guid", CancellationToken.None);
+
+        Assert.True(deleted);
+        Assert.Equal(3, database.QueryAsyncCalls);
+        Assert.Contains("[ES_LISTINGS]", database.Calls[0].Query);
+        Assert.Contains("[ES_MEDIA]", database.Calls[1].Query);
+        Assert.Contains("[ES_SOURCES]", database.Calls[2].Query);
+    }
+
+    [Fact]
+    public async Task ListingMaintenanceService_DeleteAllAsync_AttemptsEveryTable()
+    {
+        RecordingDatabase database = new() { QueryResult = true };
+        SqlListingMaintenanceService maintenance = new(
+            new ListingRepository(database),
+            new MediaRepository(database),
+            new SourceRepository(database));
+
+        bool deleted = await maintenance.DeleteAllAsync(CancellationToken.None);
+
+        Assert.True(deleted);
+        Assert.Equal(3, database.QueryAsyncCalls);
+        Assert.All(database.Calls, call => Assert.Null(call.Parameters));
+    }
+
     private static Page CreatePage()
     {
         Website website = new(new Uri("https://example.com"));

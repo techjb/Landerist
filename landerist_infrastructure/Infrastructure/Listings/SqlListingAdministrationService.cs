@@ -154,6 +154,9 @@ namespace landerist_library.Infrastructure.Listings
             return Repository.Update(listing, unpublishDecision);
         }
 
+        public Task<bool> UpdateAsync(Listing listing, ListingUnpublishDecision? unpublishDecision = null, CancellationToken cancellationToken = default) =>
+            Repository.UpdateAsync(listing, unpublishDecision, cancellationToken);
+
         public SortedSet<Listing> GetAll(bool loadMedia, bool loadSources)
         {
             return GetAll(QueryRepository.GetAll(), loadMedia, loadSources);
@@ -307,10 +310,16 @@ namespace landerist_library.Infrastructure.Listings
             return Repository.Delete(guid);
         }
 
+        public Task<bool> DeleteAsync(string guid, CancellationToken cancellationToken = default) =>
+            Repository.DeleteAsync(guid, cancellationToken);
+
         public bool DeleteAll()
         {
             return Repository.DeleteAll();
         }
+
+        public Task<bool> DeleteAllAsync(CancellationToken cancellationToken = default) =>
+            Repository.DeleteAllAsync(cancellationToken);
 
         public void RepairListingsWithoutSources()
         {
@@ -346,5 +355,8 @@ namespace landerist_library.Infrastructure.Listings
         {
             return Repository.UpdateAddress(guid, latitude, longitude, locationIsAccurate, locationResolver);
         }
+
+        public Task<bool> UpdateAddressAsync(string guid, double? latitude, double? longitude, bool? locationIsAccurate, string? locationResolver = null, CancellationToken cancellationToken = default) =>
+            Repository.UpdateAddressAsync(guid, latitude, longitude, locationIsAccurate, locationResolver, cancellationToken);
     }
 }

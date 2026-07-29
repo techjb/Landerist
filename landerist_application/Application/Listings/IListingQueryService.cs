@@ -17,6 +17,9 @@ public interface IListingQueryService
 public interface IListingMaintenanceService
 {
     bool Update(Listing listing, ListingUnpublishDecision? unpublishDecision = null);
+    Task<bool> UpdateAsync(Listing listing, ListingUnpublishDecision? unpublishDecision = null, CancellationToken cancellationToken = default);
     bool Delete(string guid);
+    Task<bool> DeleteAsync(string guid, CancellationToken cancellationToken = default);
     bool DeleteAll();
+    Task<bool> DeleteAllAsync(CancellationToken cancellationToken = default);
 }

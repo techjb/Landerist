@@ -233,6 +233,22 @@ public sealed class DatabaseFailureArchitectureTests
         Assert.Contains("Database.QueryAsync(", statisticsRepository);
     }
 
+    [Fact]
+    public void AsyncListingAdministration_PropagatesMaintenanceWritesToQueryAsync()
+    {
+        string root = FindRepositoryRoot();
+        string contract = File.ReadAllText(Path.Combine(root, "landerist_application", "Application", "Listings", "IListingQueryService.cs"));
+        string maintenance = File.ReadAllText(Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Listings", "SqlListingMaintenanceService.cs"));
+        string repository = File.ReadAllText(Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Sql", "ListingRepository.cs"));
+
+        Assert.Contains("DeleteAsync(string guid", contract);
+        Assert.Contains("DeleteAllAsync(", contract);
+        Assert.Contains("_listings.DeleteAsync(", maintenance);
+        Assert.Contains("_media.DeleteAsync(", maintenance);
+        Assert.Contains("_sources.DeleteAsync(", maintenance);
+        Assert.Contains("Database.QueryAsync(", repository);
+    }
+
     private static int CountOccurrences(string source, string value) =>
         source.Split(value, StringSplitOptions.None).Length - 1;
 

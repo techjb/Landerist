@@ -89,6 +89,9 @@ namespace landerist_library.Infrastructure.Sql
             return Database.Query("DELETE FROM " + TableEsSources);
         }
 
+        public Task<bool> DeleteAllAsync(CancellationToken cancellationToken = default) =>
+            Database.QueryAsync("DELETE FROM " + TableEsSources, cancellationToken: cancellationToken);
+
         public Task<DataTable> GetSourcesAsync(
             Listing listing,
             CancellationToken cancellationToken = default)

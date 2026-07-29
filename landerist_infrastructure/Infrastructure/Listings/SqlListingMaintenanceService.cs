@@ -32,6 +32,15 @@ public sealed class SqlListingMaintenanceService : IListingMaintenanceService
         return _listings.Update(listing, unpublishDecision);
     }
 
+    public Task<bool> UpdateAsync(
+        Listing listing,
+        ListingUnpublishDecision? unpublishDecision = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(listing);
+        return _listings.UpdateAsync(listing, unpublishDecision, cancellationToken);
+    }
+
     public bool Delete(string guid)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(guid);
@@ -40,11 +49,27 @@ public sealed class SqlListingMaintenanceService : IListingMaintenanceService
             _sources.Delete(guid);
     }
 
+    public async Task<bool> DeleteAsync(string guid, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(guid);
+        return await _listings.DeleteAsync(guid, cancellationToken).ConfigureAwait(false) &&
+            await _media.DeleteAsync(guid, cancellationToken).ConfigureAwait(false) &&
+            await _sources.DeleteAsync(guid, cancellationToken).ConfigureAwait(false);
+    }
+
     public bool DeleteAll()
     {
         bool listingsDeleted = _listings.DeleteAll();
         bool mediaDeleted = _media.DeleteAll();
         bool sourcesDeleted = _sources.DeleteAll();
+        return listingsDeleted && mediaDeleted && sourcesDeleted;
+    }
+
+    public async Task<bool> DeleteAllAsync(CancellationToken cancellationToken = default)
+    {
+        bool listingsDeleted = await _listings.DeleteAllAsync(cancellationToken).ConfigureAwait(false);
+        bool mediaDeleted = await _media.DeleteAllAsync(cancellationToken).ConfigureAwait(false);
+        bool sourcesDeleted = await _sources.DeleteAllAsync(cancellationToken).ConfigureAwait(false);
         return listingsDeleted && mediaDeleted && sourcesDeleted;
     }
 }

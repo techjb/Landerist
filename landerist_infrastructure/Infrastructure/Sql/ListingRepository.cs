@@ -136,10 +136,24 @@ namespace landerist_library.Infrastructure.Sql
             });
         }
 
+        public Task<bool> DeleteAsync(string guid, CancellationToken cancellationToken = default)
+        {
+            string query =
+                "DELETE FROM " + SqlTableNames.Listings + " " +
+                "WHERE [guid] = @guid";
+            return Database.QueryAsync(
+                query,
+                new Dictionary<string, object?> { ["guid"] = guid },
+                cancellationToken);
+        }
+
         public bool DeleteAll()
         {
             return Database.Query("DELETE FROM " + SqlTableNames.Listings);
         }
+
+        public Task<bool> DeleteAllAsync(CancellationToken cancellationToken = default) =>
+            Database.QueryAsync("DELETE FROM " + SqlTableNames.Listings, cancellationToken: cancellationToken);
 
         public bool UpdateAddress(string guid, double? latitude, double? longitude, bool? locationIsAccurate, string? locationResolver = null)
         {
@@ -158,6 +172,31 @@ namespace landerist_library.Infrastructure.Sql
                 {"locationIsAccurate", locationIsAccurate },
                 {"locationResolver", locationResolver }
             });
+        }
+
+        public Task<bool> UpdateAddressAsync(
+            string guid,
+            double? latitude,
+            double? longitude,
+            bool? locationIsAccurate,
+            string? locationResolver = null,
+            CancellationToken cancellationToken = default)
+        {
+            const string query =
+                "UPDATE " + SqlTableNames.Listings + " SET " +
+                "[latitude] = @latitude, " +
+                "[longitude] = @longitude, " +
+                "[locationIsAccurate] = @locationIsAccurate, " +
+                "[locationResolver] = @locationResolver " +
+                "WHERE [guid] = @guid";
+            return Database.QueryAsync(query, new Dictionary<string, object?>
+            {
+                ["guid"] = guid,
+                ["latitude"] = latitude,
+                ["longitude"] = longitude,
+                ["locationIsAccurate"] = locationIsAccurate,
+                ["locationResolver"] = locationResolver
+            }, cancellationToken);
         }
 
         private static Dictionary<string, object?> GetQueryParameters(Listing listing, ListingUnpublishDecision? unpublishDecision = null)

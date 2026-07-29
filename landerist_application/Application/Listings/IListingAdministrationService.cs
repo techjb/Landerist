@@ -8,7 +8,9 @@ public interface IListingAdministrationService
 {
     void Upsert(Website website, Listing listing, ListingUnpublishDecision? unpublishDecision = null);
     bool Update(Listing listing, ListingUnpublishDecision? unpublishDecision = null);
+    Task<bool> UpdateAsync(Listing listing, ListingUnpublishDecision? unpublishDecision = null, CancellationToken cancellationToken = default);
     bool UpdateAddress(string guid, double? latitude, double? longitude, bool? locationIsAccurate, string? locationResolver = null);
+    Task<bool> UpdateAddressAsync(string guid, double? latitude, double? longitude, bool? locationIsAccurate, string? locationResolver = null, CancellationToken cancellationToken = default);
     Listing? Get(Page page, bool loadMedia, bool loadSources);
     Listing? Get(string guid, bool loadMedia = false, bool loadSources = false);
     SortedSet<Listing> GetAll(bool loadMedia, bool loadSources);
@@ -33,6 +35,8 @@ public interface IListingAdministrationService
     SortedSet<Listing> GetWithoutCadastralReferenceAndAccurateLocation();
     SortedSet<Listing> GetAccurateLocationWithoutCadastralReference();
     bool Delete(string guid);
+    Task<bool> DeleteAsync(string guid, CancellationToken cancellationToken = default);
     bool DeleteAll();
+    Task<bool> DeleteAllAsync(CancellationToken cancellationToken = default);
     void RepairListingsWithoutSources();
 }
