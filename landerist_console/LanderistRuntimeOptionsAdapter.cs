@@ -118,7 +118,7 @@ internal static class LanderistRuntimeOptionsAdapter
             maxFileSizeBytes,
             Config.PARALLELOPTIONS1INLOCAL.MaxDegreeOfParallelism,
             !Config.IsConfigurationLocal(),
-            Config.DAYS_TO_REMOVE_BATCH_FILES,
+            Math.Abs(Config.DAYS_TO_REMOVE_BATCH_FILES),
             LanderistSettings.Current.GetString("GOOGLE_CLOUD_BUCKET_NAME"));
     }
 }

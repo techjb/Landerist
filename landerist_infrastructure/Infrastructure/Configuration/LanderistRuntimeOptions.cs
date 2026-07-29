@@ -157,7 +157,7 @@ public sealed record BatchRuntimeOptions(
     string VertexBucketName)
 {
     public static BatchRuntimeOptions Disabled { get; } = new(
-        false, string.Empty, 1, 1, 1, 1, false, -1, string.Empty);
+        false, string.Empty, 1, 1, 1, 1, false, 1, string.Empty);
 
     public void Validate()
     {
@@ -171,13 +171,7 @@ public sealed record BatchRuntimeOptions(
                 StatusUpdateParallelism,
                 "Parallelism must be -1 (unbounded) or a positive value.");
         }
-        if (CleanupAfterDays >= 0)
-        {
-            throw new ArgumentOutOfRangeException(
-                nameof(CleanupAfterDays),
-                CleanupAfterDays,
-                "Cleanup day offset must be negative.");
-        }
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(CleanupAfterDays);
 
         if (MinPages > MaxPages)
         {

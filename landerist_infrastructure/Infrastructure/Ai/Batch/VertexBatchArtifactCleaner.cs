@@ -8,11 +8,15 @@ public sealed class VertexBatchArtifactCleaner(
     int retentionDays,
     TimeProvider timeProvider) : IBatchArtifactCleaner
 {
+    private readonly int _retentionDays = retentionDays > 0
+        ? retentionDays
+        : throw new ArgumentOutOfRangeException(nameof(retentionDays));
+
     public void Clean()
     {
         DateTime cutoff = timeProvider.GetLocalNow()
             .DateTime
-            .AddDays(retentionDays);
+            .AddDays(-_retentionDays);
         jobs.DeleteCompletedBefore(cutoff);
         storage.DeleteBefore(cutoff);
     }

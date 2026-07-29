@@ -81,7 +81,7 @@ public sealed class LanderistRuntimeOptionsTests
     }
 
     [Fact]
-    public void Validate_AcceptsLegacyBatchSentinelValues()
+    public void Validate_AcceptsNormalizedBatchValues()
     {
         LanderistRuntimeOptions options = CreateOptions() with
         {
@@ -93,7 +93,7 @@ public sealed class LanderistRuntimeOptionsTests
                 1024,
                 StatusUpdateParallelism: -1,
                 UpdateWaitingResponse: true,
-                CleanupAfterDays: -30,
+                CleanupAfterDays: 30,
                 VertexBucketName: "bucket")
         };
 
@@ -118,8 +118,8 @@ public sealed class LanderistRuntimeOptionsTests
 
     [Theory]
     [InlineData(0)]
-    [InlineData(30)]
-    public void Validate_RejectsNonNegativeBatchCleanupOffset(int cleanupDays)
+    [InlineData(-30)]
+    public void Validate_RejectsNonPositiveBatchCleanupAge(int cleanupDays)
     {
         LanderistRuntimeOptions options = CreateOptions() with
         {
