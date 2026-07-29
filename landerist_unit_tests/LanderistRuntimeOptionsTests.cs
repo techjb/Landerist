@@ -81,6 +81,58 @@ public sealed class LanderistRuntimeOptionsTests
     }
 
     [Fact]
+    public void Validate_AcceptsLegacyBatchSentinelValues()
+    {
+        LanderistRuntimeOptions options = CreateOptions() with
+        {
+            Batch = new BatchRuntimeOptions(
+                true,
+                "batch",
+                100,
+                1,
+                1024,
+                StatusUpdateParallelism: -1,
+                UpdateWaitingResponse: true,
+                CleanupAfterDays: -30,
+                VertexBucketName: "bucket")
+        };
+
+        options.Validate();
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-2)]
+    public void Validate_RejectsInvalidBatchParallelism(int parallelism)
+    {
+        LanderistRuntimeOptions options = CreateOptions() with
+        {
+            Batch = BatchRuntimeOptions.Disabled with
+            {
+                StatusUpdateParallelism = parallelism
+            }
+        };
+
+        Assert.Throws<ArgumentOutOfRangeException>(options.Validate);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(30)]
+    public void Validate_RejectsNonNegativeBatchCleanupOffset(int cleanupDays)
+    {
+        LanderistRuntimeOptions options = CreateOptions() with
+        {
+            Batch = BatchRuntimeOptions.Disabled with
+            {
+                CleanupAfterDays = cleanupDays
+            }
+        };
+
+        Assert.Throws<ArgumentOutOfRangeException>(options.Validate);
+    }
+
+    [Fact]
     public void Validate_RejectsAmbiguousExecutionEnvironment()
     {
         LanderistRuntimeOptions options = CreateOptions() with
