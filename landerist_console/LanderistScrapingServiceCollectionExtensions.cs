@@ -1,4 +1,8 @@
-using landerist_library.Application.Logging;
+using landerist_library.Application.Listings;
+using landerist_library.Application.Persistence;
+using landerist_library.Infrastructure.Listings;
+using landerist_library.Infrastructure.Parsing;
+using landerist_library.Infrastructure.Sql;using landerist_library.Application.Logging;
 using landerist_library.Application.Scraping;
 using landerist_library.Infrastructure.Browser;
 using landerist_library.Infrastructure.Downloaders;
@@ -101,6 +105,31 @@ internal static class LanderistScrapingServiceCollectionExtensions
                 serviceProvider.GetRequiredService<IDownloaderPool>(),
                 serviceProvider.GetRequiredService<ChromeMaintenanceService>(),
                 serviceProvider.GetRequiredService<IApplicationLogger>()));
+        services.AddSingleton<SqlPageLinkService>(serviceProvider => new(
+            serviceProvider.GetRequiredService<PagePersistenceService>(),
+            serviceProvider.GetRequiredService<WebsitePageMetricsRepository>(),
+            serviceProvider.GetRequiredService<WebsiteRobotsPolicy>(),
+            runtimeOptions.Scraping.MaxPagesPerWebsite));
+        services.AddSingleton<ListingLifecycleService>(serviceProvider =>
+        {
+            IApplicationLogger logger =
+                serviceProvider.GetRequiredService<IApplicationLogger>();
+            return new ListingLifecycleService(
+                serviceProvider.GetRequiredService<SqlListingStore>(),
+                serviceProvider.GetRequiredService<SqlNotListingCacheService>(),
+                serviceProvider.GetRequiredService<SqlPageLinkService>(),
+                serviceProvider.GetRequiredService<LanderistDatabaseAdapterFactory>()
+                    .CreateListingEnricher(
+                        serviceProvider.GetRequiredService<GoolzoomApi>(),
+                        runtimeOptions.Integrations.GoogleCloudLanderistApiKey,
+                        serviceProvider.GetRequiredService<LanderistAiComposition>()
+                            .CreateAddressSelectorOptions(),
+                        logger),
+                new LegacyListingUnpublishPolicy(
+                    serviceProvider.GetRequiredService<SqlListingQueryService>()),
+                logger,
+                new HtmlPageContentInspector());
+        });
         services.AddSingleton<LanderistScrapingPipelineFactory>();
 
         return services;

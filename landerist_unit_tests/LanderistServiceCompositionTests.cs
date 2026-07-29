@@ -1,4 +1,5 @@
 using landerist_console;
+using landerist_library.Application.Persistence;
 using landerist_library.Application.Tasks;
 using landerist_library.Infrastructure.Parsing;
 using landerist_library.Infrastructure.Runtime;
@@ -28,6 +29,10 @@ public sealed class LanderistServiceCompositionTests
             descriptor.ServiceType == typeof(LanderistBatchComposition));
         Assert.Contains(services, descriptor =>
             descriptor.ServiceType == typeof(LanderistDistributionComposition));
+        Assert.Contains(services, descriptor =>
+            descriptor.ServiceType == typeof(PagePersistenceService));
+        Assert.Contains(services, descriptor =>
+            descriptor.ServiceType == typeof(WebsitePersistenceService));
 
         using ServiceProvider provider = services.BuildServiceProvider(
             new ServiceProviderOptions

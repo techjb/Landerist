@@ -74,45 +74,30 @@ internal static class LanderistServiceComposition
         GoolzoomApi goolzoom = services.GetRequiredService<GoolzoomApi>();
         WebsiteNetworkService websiteNetwork =
             services.GetRequiredService<WebsiteNetworkService>();
-        PagePersistenceService pagePersistence = new(services.GetRequiredService<PageRepository>(), logger);
-        WebsitePersistenceService websitePersistence = new(services.GetRequiredService<WebsiteRepository>());
-        SqlListingStore listingStore = databaseAdapters.CreateListingStore(
-            services.GetRequiredService<GlobalStatisticsRepository>(),
-            logger);
-        SqlListingQueryService listingQueries = new(
-            services.GetRequiredService<ListingQueryRepository>(),
-            services.GetRequiredService<MediaRepository>(),
-            services.GetRequiredService<SourceRepository>());
-        SqlListingMaintenanceService listingMaintenance = new(
-            services.GetRequiredService<ListingRepository>(),
-            services.GetRequiredService<MediaRepository>(),
-            services.GetRequiredService<SourceRepository>());
+PagePersistenceService pagePersistence =
+            services.GetRequiredService<PagePersistenceService>();
+        WebsitePersistenceService websitePersistence =
+            services.GetRequiredService<WebsitePersistenceService>();
+        SqlListingStore listingStore =
+            services.GetRequiredService<SqlListingStore>();
+        SqlListingQueryService listingQueries =
+            services.GetRequiredService<SqlListingQueryService>();
         SqlNotListingCacheService notListingCache =
-            databaseAdapters.CreateNotListingCache(
-                runtimeOptions.Scraping.NotListingCacheEnabled);
-        PageQueryOptions pageQueryOptions = services.GetRequiredService<PageQueryOptions>();
-        SqlPageCatalog pageCatalog = new(
-            services.GetRequiredService<PageQueryRepository>());
-        SqlPageQueryService pageQueries = new(
-            services.GetRequiredService<PageQueryRepository>());
-        SqlPageMaintenanceService pageMaintenance = new(
-            services.GetRequiredService<PageMaintenanceRepository>());
-        WebsiteDeletionService websiteDeletion = new(
-            pageCatalog,
-            new OrelsListingDeletionService(listingMaintenance),
-            new SqlPageDeletionService(services.GetRequiredService<PageMaintenanceRepository>()),
-            websitePersistence);
-        SqlPageWaitingStatusService waitingStatus = new(
-            services.GetRequiredService<PageMaintenanceRepository>());
-        PageStatisticsRepository pageStatistics = services.GetRequiredService<PageStatisticsRepository>();
-        WebsiteQueryRepository websiteQueries = services.GetRequiredService<WebsiteQueryRepository>();
-        SqlWebsiteCatalog websiteCatalog = new(websiteQueries);
-        SqlWebsiteMaintenanceService websiteMaintenance = new(websiteQueries);
-        WebsiteMetricsService websiteMetrics = new(
-            services.GetRequiredService<WebsitePageMetricsRepository>(),
-            services.GetRequiredService<ListingStatisticsRepository>(),
-            runtimeOptions.Scraping.MaxPagesPerWebsite);
-        WebsiteRobotsPolicy robotsPolicy =
+            services.GetRequiredService<SqlNotListingCacheService>();
+        PageQueryOptions pageQueryOptions =
+            services.GetRequiredService<PageQueryOptions>();
+        SqlPageCatalog pageCatalog =
+            services.GetRequiredService<SqlPageCatalog>();
+        SqlPageWaitingStatusService waitingStatus =
+            services.GetRequiredService<SqlPageWaitingStatusService>();
+        PageStatisticsRepository pageStatistics =
+            services.GetRequiredService<PageStatisticsRepository>();
+        WebsiteQueryRepository websiteQueries =
+            services.GetRequiredService<WebsiteQueryRepository>();
+        SqlWebsiteCatalog websiteCatalog =
+            services.GetRequiredService<SqlWebsiteCatalog>();
+        WebsiteMetricsService websiteMetrics =
+            services.GetRequiredService<WebsiteMetricsService>();        WebsiteRobotsPolicy robotsPolicy =
             services.GetRequiredService<WebsiteRobotsPolicy>();
         WebsiteAccessServices websiteAccess =
             services.GetRequiredService<WebsiteAccessServices>();
@@ -127,31 +112,14 @@ internal static class LanderistServiceComposition
                 websiteMetrics),
             logger);
         ParseListing listingParser = services.GetRequiredService<ParseListing>();
-        GlobalStatistics globalStatistics = new(
-            services.GetRequiredService<GlobalStatisticsRepository>(),
-            persistenceEnabled: !runtimeOptions.Execution.IsLocal);
-        HostStatistics hostStatistics = new(
-            services.GetRequiredService<HostStatisticsRepository>(),
-            websiteCatalog,
-            persistenceEnabled: !runtimeOptions.Execution.IsLocal);
-        SqlPageLinkService pageLinks = new(
-            pagePersistence,
-            services.GetRequiredService<WebsitePageMetricsRepository>(),
-            robotsPolicy,
-            runtimeOptions.Scraping.MaxPagesPerWebsite);
-        ListingLifecycleService listingLifecycle = new(
-            listingStore,
-            notListingCache,
-            pageLinks,
-            databaseAdapters.CreateListingEnricher(
-                goolzoom,
-                runtimeOptions.Integrations.GoogleCloudLanderistApiKey,
-                services.GetRequiredService<LanderistAiComposition>()
-                    .CreateAddressSelectorOptions(),
-                logger),
-            new LegacyListingUnpublishPolicy(listingQueries),
-            logger,
-            new HtmlPageContentInspector());
+        GlobalStatistics globalStatistics =
+            services.GetRequiredService<GlobalStatistics>();
+        HostStatistics hostStatistics =
+            services.GetRequiredService<HostStatistics>();
+        SqlPageLinkService pageLinks =
+            services.GetRequiredService<SqlPageLinkService>();
+        ListingLifecycleService listingLifecycle =
+            services.GetRequiredService<ListingLifecycleService>();
         LanderistScrapingPipeline scrapingPipeline = services
             .GetRequiredService<LanderistScrapingPipelineFactory>()
             .Create(

@@ -55,6 +55,15 @@ public sealed class ConsoleHostArchitectureTests
         Assert.DoesNotContain("databaseFactory.Create()", composition);
         Assert.Contains("IDatabaseFactory databaseFactory", adapterFactory);
         Assert.Contains("databaseFactory.Create()", adapterFactory);
+        Assert.Contains("AddSingleton<PagePersistenceService>()", registrations);
+        Assert.Contains("AddSingleton<WebsitePersistenceService>()", registrations);
+        Assert.Contains("AddSingleton<SqlListingQueryService>()", registrations);
+        Assert.Contains("AddSingleton<SqlPageCatalog>()", registrations);
+        Assert.Contains("AddSingleton<SqlWebsiteCatalog>()", registrations);
+        Assert.DoesNotContain("new PagePersistenceService(", composition);
+        Assert.DoesNotContain("new WebsitePersistenceService(", composition);
+        Assert.DoesNotContain("new SqlListingQueryService(", composition);
+        Assert.DoesNotContain("new WebsiteDeletionService(", composition);
     }
     [Fact]
     public void ScrapingRegistration_OwnsSharedBrowserInfrastructure()
