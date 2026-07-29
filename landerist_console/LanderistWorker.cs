@@ -1,5 +1,5 @@
 using landerist_library.Application.Tasks;
-using landerist_library.Configuration;
+using landerist_library.Infrastructure.Runtime;
 using landerist_library.Logs;
 using Microsoft.Extensions.Hosting;
 
@@ -9,19 +9,22 @@ internal sealed class LanderistWorker : IHostedService
 {
     private readonly TasksService _tasks;
     private readonly IHostApplicationLifetime _applicationLifetime;
+    private readonly LanderistRuntimeOptions _runtimeOptions;
     private DateTime? _startedAt;
 
     public LanderistWorker(
         TasksService tasks,
-        IHostApplicationLifetime applicationLifetime)
+        IHostApplicationLifetime applicationLifetime,
+        LanderistRuntimeOptions runtimeOptions)
     {
         _tasks = tasks;
         _applicationLifetime = applicationLifetime;
+        _runtimeOptions = runtimeOptions;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        if (Config.IsPrincipalMachine())
+        if (_runtimeOptions.Role == LanderistExecutionRole.Principal)
         {
             Console.WriteLine("Ctrl+D to run daily tasks.");
             _startedAt = DateTime.Now;
@@ -33,8 +36,8 @@ internal sealed class LanderistWorker : IHostedService
         Log.DeleteCurentMachineLogs();
         Log.WriteInfo(
             "landerist_console",
-            "Started. Machine: " + Config.MACHINE_NAME +
-            " Version: " + Config.VERSION);
+            "Started. Machine: " + _runtimeOptions.Execution.MachineName +
+            " Version: " + _runtimeOptions.Execution.Version);
 
         _tasks.Start();
         return Task.CompletedTask;
@@ -44,7 +47,7 @@ internal sealed class LanderistWorker : IHostedService
     {
         Log.WriteInfo(
             "landerist_console",
-            "Stopping Version: " + Config.VERSION + " ..");
+            "Stopping Version: " + _runtimeOptions.Execution.Version + " ..");
         _tasks.Stop();
 
         if (_startedAt is not null)
@@ -53,7 +56,7 @@ internal sealed class LanderistWorker : IHostedService
                 .ToString(@"dd\:hh\:mm\:ss\.fff");
             Log.WriteInfo(
                 "landerist_console",
-                "Stopped. Version: " + Config.VERSION +
+                "Stopped. Version: " + _runtimeOptions.Execution.Version +
                 " Duration: " + duration);
         }
 
@@ -62,7 +65,7 @@ internal sealed class LanderistWorker : IHostedService
 
     private void StartKeyboardListener()
     {
-        if (Config.IsLocalAIMachine() || Console.IsInputRedirected)
+        if (_runtimeOptions.Role == LanderistExecutionRole.LocalAi || Console.IsInputRedirected)
         {
             return;
         }

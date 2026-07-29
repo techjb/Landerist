@@ -1,5 +1,4 @@
 using landerist_library.Application.Tasks;
-using landerist_library.Configuration;
 using landerist_library.Infrastructure.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,8 +9,6 @@ internal static class LanderistServiceCollectionExtensions
     public static IServiceCollection AddLanderist(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);
-
-        Config.SetToProduction();
         LanderistRuntimeOptions runtimeOptions =
             LanderistRuntimeOptionsAdapter.FromLegacyConfiguration();
 
@@ -40,6 +37,9 @@ internal static class LanderistServiceCollectionExtensions
         services.AddSingleton(runtimeOptions);
         services.AddSingleton(runtimeOptions.Ai);
         services.AddSingleton(runtimeOptions.Batch);
+        services.AddSingleton(runtimeOptions.Scraping);
+        services.AddSingleton(runtimeOptions.Integrations);
+        services.AddSingleton(runtimeOptions.Execution);
         return services;
     }
 

@@ -1,4 +1,3 @@
-using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Infrastructure.Statistics;
 using landerist_library.Infrastructure.Logging;
@@ -36,10 +35,10 @@ internal static class LanderistPersistenceServiceCollectionExtensions
         Log.Configure(
             databaseFactory,
             new LegacyLogOptions(
-                Config.LOGS_ENABLED,
-                Config.LOGS_ERRORS_IN_CONSOLE,
-                Config.LOGS_INFO_IN_CONSOLE,
-                Config.MACHINE_NAME),
+                runtimeOptions.Execution.LogsEnabled,
+                runtimeOptions.Execution.LogErrorsToConsole,
+                runtimeOptions.Execution.LogInformationToConsole,
+                runtimeOptions.Execution.MachineName),
             TimeProvider.System);
         services.AddSingleton(databaseOptions);
         services.AddSingleton(databaseFactory);
@@ -47,8 +46,8 @@ internal static class LanderistPersistenceServiceCollectionExtensions
         services.AddSingleton<LanderistDatabaseAdapterFactory>();
 
         PageQueryOptions pageQueryOptions = new(
-            runtimeOptions.Browser.IsLocal ? null : Config.MACHINE_NAME,
-            Config.MAX_PAGES_PER_HOST_PER_SCRAPE);
+            runtimeOptions.Execution.IsLocal ? null : runtimeOptions.Execution.MachineName,
+            runtimeOptions.Scraping.MaxPagesPerHostPerScrape);
         services.AddSingleton(pageQueryOptions);
 
         services.AddTransient(_ => new PageRepository(databaseFactory.Create()));

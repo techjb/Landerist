@@ -1,5 +1,4 @@
 using landerist_library.Application.Logging;
-using landerist_library.Configuration;
 using landerist_library.Application.Scraping;
 using landerist_library.Infrastructure.Browser;
 using landerist_library.Infrastructure.Downloaders;
@@ -51,18 +50,18 @@ internal static class LanderistScrapingServiceCollectionExtensions
         GoolzoomApi goolzoom = new(
             httpClients,
             new GoolzoomOptions(
-                LanderistSettings.Current.GetString("GOOLZOOM_API"),
-                TimeSpan.FromSeconds(Config.HTTPCLIENT_SECONDS_TIMEOUT),
+                runtimeOptions.Integrations.GoolzoomApiKey,
+                TimeSpan.FromSeconds(runtimeOptions.Scraping.HttpTimeoutSeconds),
                 MaxRetryAttempts: 3));
 
         services.AddSingleton(httpClients);
         services.AddSingleton<IHttpClientTransportFactory>(httpClients);
         services.AddSingleton(browserOptions);
         ApplicationLoggerOptions loggerOptions = new(
-            Config.LOGS_ENABLED,
-            Config.LOGS_ERRORS_IN_CONSOLE,
-            Config.LOGS_INFO_IN_CONSOLE,
-            Config.MACHINE_NAME);
+            runtimeOptions.Execution.LogsEnabled,
+            runtimeOptions.Execution.LogErrorsToConsole,
+            runtimeOptions.Execution.LogInformationToConsole,
+            runtimeOptions.Execution.MachineName);
         services.AddSingleton(loggerOptions);
         services.AddSingleton(TimeProvider.System);
         services.AddSingleton<SqlApplicationLogger>();
@@ -70,7 +69,7 @@ internal static class LanderistScrapingServiceCollectionExtensions
             serviceProvider.GetRequiredService<SqlApplicationLogger>());
         services.AddSingleton<DownloadersPool>(serviceProvider =>
             new DownloadersPool(
-                Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
+                runtimeOptions.Scraping.MaxDegreeOfParallelism,
                 new PuppeteerDownloaderFactory(
                     browserOptions,
                     serviceProvider.GetRequiredService<IApplicationLogger>()),

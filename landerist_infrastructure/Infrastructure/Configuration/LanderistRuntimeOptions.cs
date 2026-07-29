@@ -1,3 +1,5 @@
+using landerist_library.Parsing;
+
 namespace landerist_library.Infrastructure.Runtime;
 
 public enum LanderistExecutionRole
@@ -17,6 +19,12 @@ public sealed record LanderistRuntimeOptions(
 
     public BatchRuntimeOptions Batch { get; init; } = BatchRuntimeOptions.Disabled;
 
+    public ScrapingRuntimeOptions Scraping { get; init; } = ScrapingRuntimeOptions.Default;
+
+    public IntegrationRuntimeOptions Integrations { get; init; } = IntegrationRuntimeOptions.Empty;
+
+    public ExecutionRuntimeOptions Execution { get; init; } = ExecutionRuntimeOptions.Default;
+
     public void Validate()
     {
         ArgumentNullException.ThrowIfNull(Database);
@@ -27,6 +35,9 @@ public sealed record LanderistRuntimeOptions(
         Browser.Validate();
         Ai.Validate();
         Batch.Validate();
+        Scraping.Validate();
+        Integrations.Validate();
+        Execution.Validate();
     }
 }
 
@@ -39,7 +50,8 @@ public sealed record AiRuntimeOptions(
     string VertexListingModel,
     string VertexAddressModel,
     string LocalAiHost,
-    bool ResolveLocalAiHost)
+    bool ResolveLocalAiHost,
+    LLMProvider Provider = LLMProvider.OpenAI)
 {
     public static AiRuntimeOptions Empty { get; } = new(
         string.Empty, string.Empty, string.Empty, string.Empty, "google",
@@ -52,6 +64,87 @@ public sealed record AiRuntimeOptions(
     }
 }
 
+public sealed record ScrapingRuntimeOptions(
+    bool NotListingCacheEnabled,
+    int MaxPagesPerWebsite,
+    bool IndexerEnabled,
+    int MaxPagesPerHostPerScrape,
+    int MaxPagesPerScrape,
+    int MinPagesPerScrape,
+    int MaxDegreeOfParallelism,
+    int HttpTimeoutSeconds)
+{
+    public static ScrapingRuntimeOptions Default { get; } = new(
+        false, 40_000, true, 2, 2_500, 10, 1, 100);
+
+    public void Validate()
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(MaxPagesPerWebsite);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(MaxPagesPerHostPerScrape);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(MaxPagesPerScrape);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(MinPagesPerScrape);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(MaxDegreeOfParallelism);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(HttpTimeoutSeconds);
+
+        if (MinPagesPerScrape > MaxPagesPerScrape)
+        {
+            throw new InvalidOperationException(
+                "The minimum scrape page count cannot exceed the maximum.");
+        }
+    }
+}
+
+public sealed record IntegrationRuntimeOptions(
+    string ScrapingBeeApiKey,
+    string AwsAccessKeyId,
+    string AwsSecretAccessKey,
+    string AwsDownloadsBucket,
+    string AwsWebsiteBucket,
+    string GoolzoomApiKey,
+    string GoogleCloudLanderistApiKey)
+{
+    public static IntegrationRuntimeOptions Empty { get; } = new(
+        string.Empty, string.Empty, string.Empty, string.Empty,
+        string.Empty, string.Empty, string.Empty);
+
+    public void Validate()
+    {
+        ArgumentNullException.ThrowIfNull(ScrapingBeeApiKey);
+        ArgumentNullException.ThrowIfNull(AwsAccessKeyId);
+        ArgumentNullException.ThrowIfNull(AwsSecretAccessKey);
+        ArgumentNullException.ThrowIfNull(AwsDownloadsBucket);
+        ArgumentNullException.ThrowIfNull(AwsWebsiteBucket);
+        ArgumentNullException.ThrowIfNull(GoolzoomApiKey);
+        ArgumentNullException.ThrowIfNull(GoogleCloudLanderistApiKey);
+    }
+}
+
+public sealed record ExecutionRuntimeOptions(
+    bool IsLocal,
+    bool IsProduction,
+    string MachineName,
+    bool LogsEnabled,
+    bool LogErrorsToConsole,
+    bool LogInformationToConsole,
+    int LocalAiMaxModelLength,
+    string Version)
+{
+    public static ExecutionRuntimeOptions Default { get; } = new(
+        false, true, Environment.MachineName, true, false, true, 30_000, "unknown");
+
+    public void Validate()
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(MachineName);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(LocalAiMaxModelLength);
+        ArgumentException.ThrowIfNullOrWhiteSpace(Version);
+
+        if (IsLocal == IsProduction)
+        {
+            throw new InvalidOperationException(
+                "Execution must be either local or production.");
+        }
+    }
+}
 public sealed record BatchRuntimeOptions(
     bool Enabled,
     string Directory,

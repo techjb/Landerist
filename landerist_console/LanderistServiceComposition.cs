@@ -20,7 +20,6 @@ using landerist_library.Infrastructure.Statistics;
 using landerist_library.Infrastructure.Ai.OpenAI.Batch;
 using landerist_library.Infrastructure.Parsing;
 using landerist_library.Infrastructure.Parsing.UserInput;
-using landerist_library.Configuration;
 using landerist_library.Application.Listings;
 using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
@@ -63,13 +62,13 @@ internal static class LanderistServiceComposition
         HttpClientTransportFactory httpClients =
             services.GetRequiredService<HttpClientTransportFactory>();
         landerist_library.Tools.ScrapingBee.Configure(
-            LanderistSettings.Current["SCRAPPINGBEE_APIKEY"],
+            runtimeOptions.Integrations.ScrapingBeeApiKey,
             httpClients);
         landerist_library.Export.S3.Configure(new landerist_library.Export.S3Options(
-            LanderistSettings.Current["AWS_ACESSKEYID"],
-            LanderistSettings.Current["AWS_SECRETACCESSKEY"],
-            LanderistSettings.Current["AWS_S3_DOWNLOADS_BUCKET"],
-            LanderistSettings.Current["AWS_S3_WEBSITE_BUCKET"]));
+            runtimeOptions.Integrations.AwsAccessKeyId,
+            runtimeOptions.Integrations.AwsSecretAccessKey,
+            runtimeOptions.Integrations.AwsDownloadsBucket,
+            runtimeOptions.Integrations.AwsWebsiteBucket));
         IApplicationLogger logger =
             services.GetRequiredService<IApplicationLogger>();
         GoolzoomApi goolzoom = services.GetRequiredService<GoolzoomApi>();
@@ -90,7 +89,7 @@ internal static class LanderistServiceComposition
             services.GetRequiredService<SourceRepository>());
         SqlNotListingCacheService notListingCache =
             databaseAdapters.CreateNotListingCache(
-                Config.NOT_LISTING_CACHE_ENABLED);
+                runtimeOptions.Scraping.NotListingCacheEnabled);
         PageQueryOptions pageQueryOptions = services.GetRequiredService<PageQueryOptions>();
         SqlPageCatalog pageCatalog = new(
             services.GetRequiredService<PageQueryRepository>());
@@ -112,7 +111,7 @@ internal static class LanderistServiceComposition
         WebsiteMetricsService websiteMetrics = new(
             services.GetRequiredService<WebsitePageMetricsRepository>(),
             services.GetRequiredService<ListingStatisticsRepository>(),
-            Config.MAX_PAGES_PER_WEBSITE);
+            runtimeOptions.Scraping.MaxPagesPerWebsite);
         WebsiteRobotsPolicy robotsPolicy =
             services.GetRequiredService<WebsiteRobotsPolicy>();
         WebsiteAccessServices websiteAccess =
@@ -122,7 +121,7 @@ internal static class LanderistServiceComposition
             websiteAccess,
             TimeProvider.System);
         WebsiteSitemapService websiteSitemaps = new(
-            Config.INDEXER_ENABLED,
+            runtimeOptions.Scraping.IndexerEnabled,
             robotsPolicy,
             TimeProvider.System,
             new LegacyWebsiteSitemapIndexerFactory(
@@ -160,7 +159,7 @@ internal static class LanderistServiceComposition
         ParseListing listingParser = new(
             new ListingParserOrchestrationOptions(
                 runtimeOptions.Batch.Enabled,
-                Config.LLM_PROVIDER),
+                runtimeOptions.Ai.Provider),
             listingParserClients,
             parsingServices,
             new StructuredOutputMaterializationOperations(
@@ -183,23 +182,23 @@ internal static class LanderistServiceComposition
             logger);
         GlobalStatistics globalStatistics = new(
             services.GetRequiredService<GlobalStatisticsRepository>(),
-            persistenceEnabled: !Config.IsConfigurationLocal());
+            persistenceEnabled: !runtimeOptions.Execution.IsLocal);
         HostStatistics hostStatistics = new(
             services.GetRequiredService<HostStatisticsRepository>(),
             websiteCatalog,
-            persistenceEnabled: !Config.IsConfigurationLocal());
+            persistenceEnabled: !runtimeOptions.Execution.IsLocal);
         SqlPageLinkService pageLinks = new(
             pagePersistence,
             services.GetRequiredService<WebsitePageMetricsRepository>(),
             robotsPolicy,
-            Config.MAX_PAGES_PER_WEBSITE);
+            runtimeOptions.Scraping.MaxPagesPerWebsite);
         ListingLifecycleService listingLifecycle = new(
             listingStore,
             notListingCache,
             pageLinks,
             databaseAdapters.CreateListingEnricher(
                 goolzoom,
-                LanderistSettings.Current.GetString("GOOGLE_CLOUD_LANDERIST_API_KEY"),
+                runtimeOptions.Integrations.GoogleCloudLanderistApiKey,
                 CreateVertexAddressSelectorOptions(runtimeOptions),
                 logger),
             new LegacyListingUnpublishPolicy(listingQueries),
@@ -232,16 +231,16 @@ internal static class LanderistServiceComposition
         };
 
         Tokenizer batchTokenizer = new(
-            TokenizerOptions.ForProvider(Config.LLM_PROVIDER));
+            TokenizerOptions.ForProvider(runtimeOptions.Ai.Provider));
         int batchMaxInputTokens =
-            TokenizerOptions.ForProvider(Config.LLM_PROVIDER).MaxContextWindow -
+            TokenizerOptions.ForProvider(runtimeOptions.Ai.Provider).MaxContextWindow -
             batchTokenizer.CountSystemTokens();
-        BatchProvider batchProvider = Config.LLM_PROVIDER switch
+        BatchProvider batchProvider = runtimeOptions.Ai.Provider switch
         {
             LLMProvider.OpenAI => BatchProvider.OpenAI,
             LLMProvider.VertexAI => BatchProvider.VertexAI,
             _ => throw new InvalidOperationException(
-                $"Batch upload is not supported for {Config.LLM_PROVIDER}.")
+                $"Batch upload is not supported for {runtimeOptions.Ai.Provider}.")
         };
         BatchUploadOptions batchUploadOptions = new(
             batchProvider,
@@ -257,8 +256,7 @@ internal static class LanderistServiceComposition
             runtimeOptions.Ai.VertexLocation,
             runtimeOptions.Ai.VertexListingModel,
             runtimeOptions.Batch.VertexBucketName,
-            Config.BATCH_DIRECTORY ?? throw new InvalidOperationException(
-                "Batch directory is not configured."));
+            runtimeOptions.Batch.Directory);
         VertexBatchJobClient vertexBatchJobs = new(vertexBatchOptions, logger);
         VertexCloudStorageClient vertexStorage = new(vertexBatchOptions, logger);
         OpenAIBatchOptions openAIBatchOptions = new(
@@ -284,8 +282,7 @@ internal static class LanderistServiceComposition
         IBatchInputWriter batchInputWriter = new JsonlBatchInputWriter(
             new BatchInputWriterOptions(
                 batchProvider,
-                Config.BATCH_DIRECTORY ?? throw new InvalidOperationException(
-                    "Batch directory is not configured."),
+                runtimeOptions.Batch.Directory,
                 runtimeOptions.Batch.MaxFileSizeBytes,
                 runtimeOptions.Batch.MinPages),
             batchUploadProvider,
@@ -306,9 +303,9 @@ internal static class LanderistServiceComposition
                 new LegacyLocalAiListingParser(listingParser, hostStatistics),
                 new PageListingInputPreparer(logger),
                 new LocalAiParsingTaskOptions(
-                    modelMaxTokens: Config.LOCAL_AI_MAX_MODEL_LEN,
-                    runSequentially: Config.IsConfigurationLocal(),
-                    updateWaitingStatusOnStart: Config.IsConfigurationProduction()),
+                    modelMaxTokens: runtimeOptions.Execution.LocalAiMaxModelLength,
+                    runSequentially: runtimeOptions.Execution.IsLocal,
+                    updateWaitingStatusOnStart: runtimeOptions.Execution.IsProduction),
                 new LegacyLocalAiTokenBudget(
                     new Tokenizer(TokenizerOptions.ForProvider(LLMProvider.LocalAI))),
                 logger)),

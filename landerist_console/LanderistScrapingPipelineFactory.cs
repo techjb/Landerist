@@ -5,7 +5,7 @@ using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Scraping;
 using landerist_library.Application.Statistics;
-using landerist_library.Configuration;
+using landerist_library.Infrastructure.Runtime;
 using landerist_library.Infrastructure.Listings;
 using landerist_library.Infrastructure.Logging;
 using landerist_library.Infrastructure.Parsing;
@@ -23,6 +23,7 @@ internal sealed record LanderistScrapingPipeline(
     ParsedPageClassificationService ParsedClassification);
 
 internal sealed class LanderistScrapingPipelineFactory(
+    LanderistRuntimeOptions runtimeOptions,
     LanderistDatabaseAdapterFactory databaseAdapters,
     PooledPageDownloader pageDownloader,
     HttpConditionalPageHeaderService conditionalHeaders,
@@ -45,43 +46,43 @@ internal sealed class LanderistScrapingPipelineFactory(
                 pageDownloader,
                 conditionalHeaders,
                 databaseAdapters.CreateScrapeMetrics(),
-                conditionalHeadersEnabled: !Config.IsConfigurationLocal()),
+                conditionalHeadersEnabled: !runtimeOptions.Execution.IsLocal),
             new PageContentClassifier(
-                Config.IsConfigurationProduction(),
+                runtimeOptions.Execution.IsProduction,
                 notListingCache,
                 databaseAdapters.CreatePageClassificationMetrics(),
                 new LegacyListingPageParser(hostStatistics, listingParser),
                 new LegacyPageTokenLimitPolicy(
                     new Tokenizer(
-                        TokenizerOptions.ForProvider(Config.LLM_PROVIDER))),
+                        TokenizerOptions.ForProvider(runtimeOptions.Ai.Provider))),
                 new HtmlPageContentInspector(),
                 new PageListingInputPreparer(logger)),
             new PageIndexingService(
-                Config.INDEXER_ENABLED,
+                runtimeOptions.Scraping.IndexerEnabled,
                 pageLinks,
                 new HtmlPageLinkExtractor()),
             new SqlPageSchedulingService(listingStore),
-            Config.INDEXER_ENABLED);
+            runtimeOptions.Scraping.IndexerEnabled);
         PageBatchSelector pageBatchSelector = new(
             databaseAdapters.CreatePageSelectionRepository(
-                Config.MACHINE_NAME,
+                runtimeOptions.Execution.MachineName,
                 pageQueryOptions),
             new PageSelectionOptions(
-                Config.MAX_PAGES_PER_SCRAPE,
-                Config.MAX_PAGES_PER_HOST_PER_SCRAPE,
-                Config.MIN_PAGES_PER_SCRAPE,
-                enforceMinimumPages: Config.IsConfigurationProduction()));
+                runtimeOptions.Scraping.MaxPagesPerScrape,
+                runtimeOptions.Scraping.MaxPagesPerHostPerScrape,
+                runtimeOptions.Scraping.MinPagesPerScrape,
+                enforceMinimumPages: runtimeOptions.Execution.IsProduction));
         ScrapeBatchServices batchServices = new(
             databaseAdapters.CreateWebsiteThrottle(robotsPolicy),
             browser,
-            databaseAdapters.CreatePageLockManager(Config.MACHINE_NAME),
+            databaseAdapters.CreatePageLockManager(runtimeOptions.Execution.MachineName),
             databaseAdapters.CreateScrapeBatchMetrics(),
             databaseAdapters.CreateScrapePageSource(listingStore),
             robotsPolicy,
             new ScraperExecutionOptions(
-                Config.IsConfigurationProduction(),
-                Config.IsConfigurationLocal(),
-                Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER));
+                runtimeOptions.Execution.IsProduction,
+                runtimeOptions.Execution.IsLocal,
+                runtimeOptions.Scraping.MaxDegreeOfParallelism));
         ParsedPageClassificationService parsedClassification = new(
             pagePersistence,
             listingLifecycle);

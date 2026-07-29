@@ -65,6 +65,36 @@ public sealed class LanderistRuntimeOptionsTests
         Assert.Throws<ArgumentOutOfRangeException>(options.Validate);
     }
 
+    [Fact]
+    public void Validate_RejectsScrapeMinimumAboveMaximum()
+    {
+        LanderistRuntimeOptions options = CreateOptions() with
+        {
+            Scraping = ScrapingRuntimeOptions.Default with
+            {
+                MaxPagesPerScrape = 10,
+                MinPagesPerScrape = 11
+            }
+        };
+
+        Assert.Throws<InvalidOperationException>(options.Validate);
+    }
+
+    [Fact]
+    public void Validate_RejectsAmbiguousExecutionEnvironment()
+    {
+        LanderistRuntimeOptions options = CreateOptions() with
+        {
+            Execution = ExecutionRuntimeOptions.Default with
+            {
+                IsLocal = true,
+                IsProduction = true
+            }
+        };
+
+        Assert.Throws<InvalidOperationException>(options.Validate);
+    }
+
     private static LanderistRuntimeOptions CreateOptions() => new(
         new DatabaseRuntimeOptions(
             "sql.example.test",

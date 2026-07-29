@@ -148,6 +148,31 @@ public sealed class ConsoleHostArchitectureTests
             "Infrastructure",
             "Downloaders")));
     }
+    [Fact]
+    public void ConsoleConfigurationGlobals_AreConfinedToLegacyAdapter()
+    {
+        string consoleDirectory = Path.Combine(FindRepositoryRoot(), "landerist_console");
+        string[] forbiddenTokens =
+        [
+            "landerist_library.Configuration",
+            "Config.",
+            "LanderistSettings"
+        ];
+
+        foreach (string path in Directory.EnumerateFiles(consoleDirectory, "*.cs"))
+        {
+            if (Path.GetFileName(path) == "LanderistRuntimeOptionsAdapter.cs")
+            {
+                continue;
+            }
+
+            string source = File.ReadAllText(path);
+            foreach (string token in forbiddenTokens)
+            {
+                Assert.DoesNotContain(token, source, StringComparison.Ordinal);
+            }
+        }
+    }
     private static string ReadConsoleSource(string fileName) =>
         File.ReadAllText(GetConsolePath(fileName));
 

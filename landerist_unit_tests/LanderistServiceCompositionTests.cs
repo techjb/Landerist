@@ -34,6 +34,15 @@ public sealed class LanderistServiceCompositionTests
         Assert.Same(
             provider.GetRequiredService<LanderistRuntimeOptions>().Batch,
             provider.GetRequiredService<BatchRuntimeOptions>());
+        Assert.Same(
+            provider.GetRequiredService<LanderistRuntimeOptions>().Scraping,
+            provider.GetRequiredService<ScrapingRuntimeOptions>());
+        Assert.Same(
+            provider.GetRequiredService<LanderistRuntimeOptions>().Integrations,
+            provider.GetRequiredService<IntegrationRuntimeOptions>());
+        Assert.Same(
+            provider.GetRequiredService<LanderistRuntimeOptions>().Execution,
+            provider.GetRequiredService<ExecutionRuntimeOptions>());
     }
 
     private static LanderistRuntimeOptions CreateOptions(

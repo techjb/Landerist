@@ -8,6 +8,7 @@ internal static class LanderistRuntimeOptionsAdapter
 {
     public static LanderistRuntimeOptions FromLegacyConfiguration()
     {
+        Config.SetToProduction();
         LanderistSettings settings = LanderistSettings.Current;
         LanderistExecutionRole role = Config.IsLocalAIMachine()
             ? LanderistExecutionRole.LocalAi
@@ -40,7 +41,33 @@ internal static class LanderistRuntimeOptionsAdapter
             role)
         {
             Ai = CreateAiOptions(),
-            Batch = CreateBatchOptions()
+            Batch = CreateBatchOptions(),
+            Scraping = new ScrapingRuntimeOptions(
+                Config.NOT_LISTING_CACHE_ENABLED,
+                Config.MAX_PAGES_PER_WEBSITE,
+                Config.INDEXER_ENABLED,
+                Config.MAX_PAGES_PER_HOST_PER_SCRAPE,
+                Config.MAX_PAGES_PER_SCRAPE,
+                Config.MIN_PAGES_PER_SCRAPE,
+                Config.MAX_DEGREE_OF_PARALLELISM_SCRAPER,
+                Config.HTTPCLIENT_SECONDS_TIMEOUT),
+            Integrations = new IntegrationRuntimeOptions(
+                settings.GetString("SCRAPPINGBEE_APIKEY"),
+                settings.GetString("AWS_ACESSKEYID"),
+                settings.GetString("AWS_SECRETACCESSKEY"),
+                settings.GetString("AWS_S3_DOWNLOADS_BUCKET"),
+                settings.GetString("AWS_S3_WEBSITE_BUCKET"),
+                settings.GetString("GOOLZOOM_API"),
+                settings.GetString("GOOGLE_CLOUD_LANDERIST_API_KEY")),
+            Execution = new ExecutionRuntimeOptions(
+                Config.IsConfigurationLocal(),
+                Config.IsConfigurationProduction(),
+                Config.MACHINE_NAME,
+                Config.LOGS_ENABLED,
+                Config.LOGS_ERRORS_IN_CONSOLE,
+                Config.LOGS_INFO_IN_CONSOLE,
+                Config.LOCAL_AI_MAX_MODEL_LEN,
+                Config.VERSION)
         };
 
         options.Validate();
@@ -60,7 +87,8 @@ internal static class LanderistRuntimeOptionsAdapter
             Config.IsConfigurationLocal()
                 ? settings.GetString("MACHINE_NAME_LANDERIST_03")
                 : "localhost",
-            Config.IsConfigurationLocal());
+            Config.IsConfigurationLocal(),
+            Config.LLM_PROVIDER);
     }
 
     private static BatchRuntimeOptions CreateBatchOptions()
