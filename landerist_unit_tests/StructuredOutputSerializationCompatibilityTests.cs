@@ -1,6 +1,5 @@
 using landerist_library.Infrastructure.Ai.StructuredOutputs;
 using landerist_domain.Parsing.StructuredOutputs;
-using landerist_library.Parse.ListingParser.StructuredOutputs;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 

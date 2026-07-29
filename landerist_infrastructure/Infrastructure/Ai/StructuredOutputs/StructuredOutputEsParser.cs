@@ -1,12 +1,26 @@
-using landerist_library.Parse.Media;
+using landerist_domain.Parsing.StructuredOutputs;
+using landerist_domain.Parsing.Materialization;
 using landerist_orels.ES;
 using landerist_orels;
 using landerist_library.Pages;
 using landerist_library.Websites;
 
-namespace landerist_library.Parse.ListingParser.StructuredOutputs
+namespace landerist_library.Infrastructure.Ai.StructuredOutputs
 {
-    public class StructuredOutputEsParser(StructuredOutputEs structuredOutputEs, ListingMaterializationRules rules, TimeProvider timeProvider)
+    public sealed record StructuredOutputMaterializationOperations(
+        Func<string, string> Clean,
+        Func<string, string> RemoveSpaces,
+        Func<string?, bool> ValidatePhone,
+        Func<string?, bool> ValidateEmail,
+        Func<string?, bool> ValidateCadastralReference,
+        Action<Listing, Page, WebsiteAccessServices, List<(string url, string? title)>> AddMediaImages,
+        Action<string, Uri, Exception> LogError);
+
+    public class StructuredOutputEsParser(
+        StructuredOutputEs structuredOutputEs,
+        ListingMaterializationRules rules,
+        TimeProvider timeProvider,
+        StructuredOutputMaterializationOperations operations)
     {
         public Anuncio? Anuncio = structuredOutputEs.Anuncio;
 
@@ -66,7 +80,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             }
             catch (Exception exception)
             {
-                Logs.Log.WriteError("OpenAIStructuredOutput ParseListing", page.Uri, exception);
+                operations.LogError("StructuredOutputEsParser.Parse", page.Uri, exception);
             }
             return (PageType.MayBeListing, null);
         }
@@ -99,7 +113,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             {
                 return string.Empty;
             }
-            return Tools.Strings.Clean(Anuncio.DescripciónDelAnuncio);
+            return operations.Clean(Anuncio.DescripciónDelAnuncio);
         }
 
         private Operation GetOperation()
@@ -179,7 +193,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             {
                 return null;
             }
-            return Tools.Strings.Clean(Anuncio!.ReferenciaDelAnuncio);
+            return operations.Clean(Anuncio!.ReferenciaDelAnuncio);
         }
 
         private static Uri GetSourceUrl(Page page)
@@ -193,7 +207,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             {
                 return null;
             }
-            var nombreDeContacto = Tools.Strings.Clean(Anuncio!.NombreDeContacto);
+            var nombreDeContacto = operations.Clean(Anuncio!.NombreDeContacto);
             if (string.IsNullOrEmpty(nombreDeContacto))
             {
                 return null;
@@ -207,8 +221,8 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             {
                 return null;
             }
-            var telefonoDeContacto = Tools.Strings.Clean(Anuncio!.TeléfonoDeContacto);
-            if (!Tools.Validate.Phone(telefonoDeContacto))
+            var telefonoDeContacto = operations.Clean(Anuncio!.TeléfonoDeContacto);
+            if (!operations.ValidatePhone(telefonoDeContacto))
             {
                 return null;
             }
@@ -221,9 +235,9 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             {
                 return null;
             }
-            var emailDeContacto = Tools.Strings.Clean(Anuncio!.EmailDeContacto);
-            emailDeContacto = Tools.Strings.RemoveSpaces(emailDeContacto);
-            if (!Tools.Validate.Email(emailDeContacto))
+            var emailDeContacto = operations.Clean(Anuncio!.EmailDeContacto);
+            emailDeContacto = operations.RemoveSpaces(emailDeContacto);
+            if (!operations.ValidateEmail(emailDeContacto))
             {
                 return null;
             }
@@ -237,7 +251,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
                 return null;
             }
             char[] trimChars = { '*', '-', ' ', ',', '.' };
-            var address = Tools.Strings.Clean(Anuncio!.DirecciónDelInmueble).Trim(trimChars);
+            var address = operations.Clean(Anuncio!.DirecciónDelInmueble).Trim(trimChars);
             if (string.IsNullOrEmpty(address))
             {
                 return null;
@@ -251,8 +265,8 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             {
                 return null;
             }
-            var referenciaCatastral = Tools.Strings.Clean(Anuncio!.ReferenciaDelAnuncio).ToUpper();
-            if (!Tools.Validate.CadastralReference(referenciaCatastral))
+            var referenciaCatastral = operations.Clean(Anuncio!.ReferenciaDelAnuncio).ToUpper();
+            if (!operations.ValidateCadastralReference(referenciaCatastral))
             {
                 return null;
             }
@@ -350,7 +364,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             {
                 return null;
             }
-            return Tools.Strings.Clean(Anuncio!.PlantaDelInmueble);
+            return operations.Clean(Anuncio!.PlantaDelInmueble);
         }
 
         private int? GetBedrooms()
@@ -397,7 +411,6 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
             {
                 return;
             }
-            MediaParser mediaParser = new(page, websiteAccess);
             var list = new List<(string url, string? title)>();
             foreach (var img in Anuncio!.ImagenesDelAnuncio.Take((int)StructuredOutputEsJson.MAX_URLS_DE_IMAGENES_DEL_ANUNCIO))
             {
@@ -409,7 +422,7 @@ namespace landerist_library.Parse.ListingParser.StructuredOutputs
                 list.Add((img.Url, img.Titulo));
             }
 
-            mediaParser.AddMediaImages(listing, list);
+            operations.AddMediaImages(listing, page, websiteAccess, list);
         }
 
         private void SetSource(Listing listing, Page page)

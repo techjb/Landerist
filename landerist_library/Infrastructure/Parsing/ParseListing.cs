@@ -1,3 +1,5 @@
+using landerist_library.Parse.Media;
+using landerist_library.Infrastructure.Ai.StructuredOutputs;
 using landerist_library.Infrastructure.Ai.Vertex;
 using landerist_library.Parsing;
 using landerist_library.Application.Parsing;
@@ -15,6 +17,16 @@ namespace landerist_library.Infrastructure.Parsing
 {
     public class ParseListing
     {
+        private static readonly StructuredOutputMaterializationOperations MaterializationOperations = new(
+            Tools.Strings.Clean,
+            Tools.Strings.RemoveSpaces,
+            Tools.Validate.Phone,
+            Tools.Validate.Email,
+            Tools.Validate.CadastralReference,
+            (listing, page, websiteAccess, images) =>
+                new MediaParser(page, websiteAccess).AddMediaImages(listing, images),
+            (source, uri, exception) => Logs.Log.WriteError(source, uri, exception));
+
         private static readonly JsonSerializerSettings JsonSerializerSettings = new()
         {
             MissingMemberHandling = MissingMemberHandling.Ignore,
@@ -143,7 +155,8 @@ namespace landerist_library.Infrastructure.Parsing
                 return new StructuredOutputEsParser(
                     structuredOutputEs,
                     parsingServices.MaterializationRules,
-                    parsingServices.TimeProvider)
+                    parsingServices.TimeProvider,
+                    MaterializationOperations)
                     .Parse(page, parsingServices.WebsiteAccess);
             }
             catch (Exception exception)

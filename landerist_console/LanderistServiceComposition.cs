@@ -6,7 +6,6 @@ using landerist_library.Infrastructure.Ai.OpenAI;
 using landerist_library.Parsing;
 using landerist_library.Application.Parsing;
 using landerist_domain.Parsing.StructuredOutputs;
-using landerist_library.Parse.ListingParser.StructuredOutputs;
 using landerist_library.Parse.ListingParser;
 using landerist_library.Infrastructure.Ai.Vertex;
 using landerist_library.Infrastructure.Browser;

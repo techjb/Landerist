@@ -7,9 +7,9 @@ public sealed class ListingMaterializationArchitectureTests
     {
         string parserFile = Path.Combine(
             FindRepositoryRoot(),
-            "landerist_library",
-            "Parse",
-            "ListingParser",
+            "landerist_infrastructure",
+            "Infrastructure",
+            "Ai",
             "StructuredOutputs",
             "StructuredOutputEsParser.cs");
         string source = File.ReadAllText(parserFile);

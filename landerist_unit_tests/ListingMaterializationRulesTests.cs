@@ -1,7 +1,7 @@
+using landerist_library.Infrastructure.Ai.StructuredOutputs;
 using landerist_domain.Parsing.Materialization;
 using landerist_library.Pages;
 using landerist_domain.Parsing.StructuredOutputs;
-using landerist_library.Parse.ListingParser.StructuredOutputs;
 using landerist_library.Websites;
 
 namespace landerist_unit_tests;
@@ -82,7 +82,15 @@ public sealed class ListingMaterializationRulesTests
                     12,
                     0,
                     0,
-                    TimeSpan.Zero)));
+                    TimeSpan.Zero)),
+            new StructuredOutputMaterializationOperations(
+                value => value.Trim(),
+                value => value.Replace(" ", string.Empty),
+                _ => true,
+                _ => true,
+                _ => true,
+                (_, _, _, _) => { },
+                (_, _, _) => { }));
         WebsiteAccessServices websiteAccess = new(
             new StubWebsiteRobotsPolicy(),
             new StubTransportFactory());
