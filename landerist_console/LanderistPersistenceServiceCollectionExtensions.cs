@@ -31,6 +31,8 @@ internal static class LanderistPersistenceServiceCollectionExtensions
         SqlDatabaseFactory databaseFactory = new(databaseOptions);
 
         LegacyDatabase.Configure(databaseFactory);
+        landerist_library.Infrastructure.Administration.CsvExportService.Configure(
+            databaseFactory.Create);
         Log.Configure(
             databaseFactory,
             new LegacyLogOptions(

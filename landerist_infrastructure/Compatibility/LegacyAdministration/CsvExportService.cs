@@ -8,6 +8,13 @@ namespace landerist_library.Infrastructure.Administration
 {
     public class CsvExportService
     {
+        private static Func<IDatabase>? DatabaseFactory;
+
+        public static void Configure(Func<IDatabase> databaseFactory)
+        {
+            ArgumentNullException.ThrowIfNull(databaseFactory);
+            DatabaseFactory = databaseFactory;
+        }
         private const string FILE_NAME_LISTINGS = "ES_LISTINGS.csv";
 
         private const string FILE_NAME_MEDIA = "ES_MEDIA.csv";
@@ -59,7 +66,9 @@ namespace landerist_library.Infrastructure.Administration
                "EXEC xp_cmdshell " +
                "'bcp \"SELECT * FROM " + tableName + ";\" queryout \"" + fileName + "\" -T -c -t,';  ";
 
-            return LegacyDatabase.Create().Query(query);
+            return (DatabaseFactory
+                ?? throw new InvalidOperationException("CsvExportService is not configured."))()
+                .Query(query);
         }
 
         public static void ExportHostsMainUri(IEnumerable<Website> websites)

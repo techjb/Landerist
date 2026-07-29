@@ -77,6 +77,8 @@ namespace landerist_tests
                     Config.DATABASE_ENCRYPT,
                     Config.DATABASE_TRUST_SERVER_CERTIFICATE));
             LegacyDatabase.Configure(databaseFactory);
+            landerist_library.Infrastructure.Administration.CsvExportService.Configure(
+                databaseFactory.Create);
             Log.Configure(
                 databaseFactory,
                 new LegacyLogOptions(

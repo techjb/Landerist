@@ -1,6 +1,6 @@
-﻿namespace landerist_library.Insert
+namespace landerist_library.Websites
 {
-    internal class BlockedDomains
+    public static class BlockedDomains
     {
         private static readonly HashSet<string> Domains =
         [
@@ -77,21 +77,5 @@
             string domain = parts[^2] + "." + parts[^1];
 
             return Domains.Contains(domain, StringComparer.OrdinalIgnoreCase);
-        }
-
-        //public static void DeleteBlockedWebsites()
-        //{
-        //    var websites = Websites.Websites.GetAll();
-        //    int counter = 0;
-        //    foreach (var website in websites)
-        //    {
-        //        if (IsBlocked(website.MainUri))
-        //        {
-        //            website.DeleteCurentMachineLogs();
-        //            counter++;
-        //        }
-        //    }
-        //    Console.WriteLine("Deleted: " + counter + " websites.");
-        //}
-    }
+        }    }
 }
