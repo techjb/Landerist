@@ -1,5 +1,6 @@
 using landerist_library.Configuration;
 using landerist_library.Infrastructure.Runtime;
+using landerist_library.Parsing;
 
 namespace landerist_console;
 
@@ -36,9 +37,60 @@ internal static class LanderistRuntimeOptionsAdapter
                 checked(Config.HTTPCLIENT_SECONDS_TIMEOUT * 1000),
                 ProcessCleanupEnabled: Config.IsConfigurationProduction(),
                 UseTaskKillFallback: Config.IsPrincipalMachine()),
-            role);
+            role)
+        {
+            Ai = CreateAiOptions(),
+            Batch = CreateBatchOptions()
+        };
 
         options.Validate();
         return options;
+    }
+    private static AiRuntimeOptions CreateAiOptions()
+    {
+        LanderistSettings settings = LanderistSettings.Current;
+        return new AiRuntimeOptions(
+            settings.GetString("OPENAI_API_KEY"),
+            settings.GetString("GOOGLE_CLOUD_VERTEX_AI_CREDENTIAL"),
+            settings.GetString("GOOGLE_CLOUD_VERTEX_AI_PROJECTID"),
+            settings.GetString("GOOGLE_CLOUD_VERTEX_AI_LOCATION"),
+            settings.GetString("GOOGLE_CLOUD_VERTEX_AI_PUBLISHER"),
+            Config.VERTEX_AI_MODEL_NAME_GEMINI_FLASH_LITE,
+            Config.VERTEX_AI_MODEL_NAME_GEMINI_FLASH,
+            Config.IsConfigurationLocal()
+                ? settings.GetString("MACHINE_NAME_LANDERIST_03")
+                : "localhost",
+            Config.IsConfigurationLocal());
+    }
+
+    private static BatchRuntimeOptions CreateBatchOptions()
+    {
+        int maxPages = Config.IsConfigurationLocal()
+            ? Config.MAX_PAGES_PER_BATCH_LOCAL
+            : Config.LLM_PROVIDER switch
+            {
+                LLMProvider.OpenAI => Config.MAX_PAGES_PER_BATCH_OPEN_AI,
+                LLMProvider.VertexAI => Config.MAX_PAGES_PER_BATCH_VERTEX_AI,
+                _ => throw new InvalidOperationException(
+                    $"Batch upload is not supported for {Config.LLM_PROVIDER}.")
+            };
+        long maxFileSizeBytes = Config.LLM_PROVIDER switch
+        {
+            LLMProvider.OpenAI => Config.MAX_BATCH_FILE_SIZE_OPEN_AI * 1024L * 1024L,
+            LLMProvider.VertexAI => Config.MAX_BATCH_FILE_SIZE_VERTEX_AI * 1024L * 1024L,
+            _ => throw new InvalidOperationException(
+                $"Batch upload is not supported for {Config.LLM_PROVIDER}.")
+        };
+
+        return new BatchRuntimeOptions(
+            Config.BATCH_ENABLED,
+            Config.BATCH_DIRECTORY ?? string.Empty,
+            maxPages,
+            Config.MIN_PAGES_PER_BATCH,
+            maxFileSizeBytes,
+            Config.PARALLELOPTIONS1INLOCAL.MaxDegreeOfParallelism,
+            !Config.IsConfigurationLocal(),
+            Config.DAYS_TO_REMOVE_BATCH_FILES,
+            LanderistSettings.Current.GetString("GOOGLE_CLOUD_BUCKET_NAME"));
     }
 }

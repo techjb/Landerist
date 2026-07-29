@@ -134,24 +134,24 @@ internal static class LanderistServiceComposition
         ListingParserClientCatalog listingParserClients = new(
         [
             new OpenAIListingParserClient(
-                new OpenAIListingParserOptions(LanderistSettings.Current.GetString("OPENAI_API_KEY")),
+                new OpenAIListingParserOptions(runtimeOptions.Ai.OpenAiApiKey),
                 SystemPrompt.Text,
                 StructuredOutputSchema.GetJsonSchemaString(),
                 logger),
             new VertexListingParserClient(
                 new VertexListingParserOptions(
-                    LanderistSettings.Current.GetString("GOOGLE_CLOUD_VERTEX_AI_CREDENTIAL"),
-                    LanderistSettings.Current.GetString("GOOGLE_CLOUD_VERTEX_AI_PROJECTID"),
-                    LanderistSettings.Current.GetString("GOOGLE_CLOUD_VERTEX_AI_LOCATION"),
-                    LanderistSettings.Current.GetString("GOOGLE_CLOUD_VERTEX_AI_PUBLISHER"),
-                    Config.VERTEX_AI_MODEL_NAME_GEMINI_FLASH_LITE),
+                    runtimeOptions.Ai.VertexCredential,
+                    runtimeOptions.Ai.VertexProjectId,
+                    runtimeOptions.Ai.VertexLocation,
+                    runtimeOptions.Ai.VertexPublisher,
+                    runtimeOptions.Ai.VertexListingModel),
                 SystemPrompt.Text,
                 VertexAIResponseSchema.ResponseSchema,
                 logger),
             new LocalAIListingParserClient(
                     new LocalAIListingParserOptions(
-                        Config.IsConfigurationLocal() ? LanderistSettings.Current.GetString("MACHINE_NAME_LANDERIST_03") : "localhost",
-                        ResolveHost: Config.IsConfigurationLocal()),
+                        runtimeOptions.Ai.LocalAiHost,
+                        ResolveHost: runtimeOptions.Ai.ResolveLocalAiHost),
                     SystemPrompt.Text,
                     StructuredOutputSchema.GetJsonSchemaString(),
                     ListingImageUrlPlaceholderCodec.ReplaceImageUrls,
@@ -159,7 +159,7 @@ internal static class LanderistServiceComposition
         ]);
         ParseListing listingParser = new(
             new ListingParserOrchestrationOptions(
-                Config.BATCH_ENABLED,
+                runtimeOptions.Batch.Enabled,
                 Config.LLM_PROVIDER),
             listingParserClients,
             parsingServices,
@@ -200,7 +200,7 @@ internal static class LanderistServiceComposition
             databaseAdapters.CreateListingEnricher(
                 goolzoom,
                 LanderistSettings.Current.GetString("GOOGLE_CLOUD_LANDERIST_API_KEY"),
-                CreateVertexAddressSelectorOptions(),
+                CreateVertexAddressSelectorOptions(runtimeOptions),
                 logger),
             new LegacyListingUnpublishPolicy(listingQueries),
             logger,
@@ -236,22 +236,6 @@ internal static class LanderistServiceComposition
         int batchMaxInputTokens =
             TokenizerOptions.ForProvider(Config.LLM_PROVIDER).MaxContextWindow -
             batchTokenizer.CountSystemTokens();
-        int batchMaxPages = Config.IsConfigurationLocal()
-            ? Config.MAX_PAGES_PER_BATCH_LOCAL
-            : Config.LLM_PROVIDER switch
-            {
-                LLMProvider.OpenAI => Config.MAX_PAGES_PER_BATCH_OPEN_AI,
-                LLMProvider.VertexAI => Config.MAX_PAGES_PER_BATCH_VERTEX_AI,
-                _ => throw new InvalidOperationException(
-                    $"Batch upload is not supported for {Config.LLM_PROVIDER}.")
-            };
-        long batchMaxFileSize = Config.LLM_PROVIDER switch
-        {
-            LLMProvider.OpenAI => Config.MAX_BATCH_FILE_SIZE_OPEN_AI * 1024L * 1024L,
-            LLMProvider.VertexAI => Config.MAX_BATCH_FILE_SIZE_VERTEX_AI * 1024L * 1024L,
-            _ => throw new InvalidOperationException(
-                $"Batch upload is not supported for {Config.LLM_PROVIDER}.")
-        };
         BatchProvider batchProvider = Config.LLM_PROVIDER switch
         {
             LLMProvider.OpenAI => BatchProvider.OpenAI,
@@ -261,26 +245,26 @@ internal static class LanderistServiceComposition
         };
         BatchUploadOptions batchUploadOptions = new(
             batchProvider,
-            batchMaxPages,
-            Config.MIN_PAGES_PER_BATCH,
+            runtimeOptions.Batch.MaxPages,
+            runtimeOptions.Batch.MinPages,
             batchMaxInputTokens,
-            updateWaitingResponse: !Config.IsConfigurationLocal(),
+            updateWaitingResponse: runtimeOptions.Batch.UpdateWaitingResponse,
             statusUpdateParallelism:
-                Config.PARALLELOPTIONS1INLOCAL.MaxDegreeOfParallelism);
+                runtimeOptions.Batch.StatusUpdateParallelism);
         VertexBatchOptions vertexBatchOptions = new(
-            LanderistSettings.Current.GetString("GOOGLE_CLOUD_VERTEX_AI_CREDENTIAL"),
-            LanderistSettings.Current.GetString("GOOGLE_CLOUD_VERTEX_AI_PROJECTID"),
-            LanderistSettings.Current.GetString("GOOGLE_CLOUD_VERTEX_AI_LOCATION"),
-            Config.VERTEX_AI_MODEL_NAME_GEMINI_FLASH_LITE,
-            LanderistSettings.Current.GetString("GOOGLE_CLOUD_BUCKET_NAME"),
+            runtimeOptions.Ai.VertexCredential,
+            runtimeOptions.Ai.VertexProjectId,
+            runtimeOptions.Ai.VertexLocation,
+            runtimeOptions.Ai.VertexListingModel,
+            runtimeOptions.Batch.VertexBucketName,
             Config.BATCH_DIRECTORY ?? throw new InvalidOperationException(
                 "Batch directory is not configured."));
         VertexBatchJobClient vertexBatchJobs = new(vertexBatchOptions, logger);
         VertexCloudStorageClient vertexStorage = new(vertexBatchOptions, logger);
         OpenAIBatchOptions openAIBatchOptions = new(
-            LanderistSettings.Current.GetString("OPENAI_API_KEY"),
+            runtimeOptions.Ai.OpenAiApiKey,
             OpenAIListingParserOptions.DefaultModel,
-            Config.BATCH_DIRECTORY);
+            runtimeOptions.Batch.Directory);
         OpenAIBatchClient openAIBatchClient = new(openAIBatchOptions, logger);
         OpenAIBatchUpload openAIBatchUpload = new(
             openAIBatchOptions,
@@ -302,8 +286,8 @@ internal static class LanderistServiceComposition
                 batchProvider,
                 Config.BATCH_DIRECTORY ?? throw new InvalidOperationException(
                     "Batch directory is not configured."),
-                batchMaxFileSize,
-                Config.MIN_PAGES_PER_BATCH),
+                runtimeOptions.Batch.MaxFileSizeBytes,
+                runtimeOptions.Batch.MinPages),
             batchUploadProvider,
             new PageListingInputPreparer(logger),
             TimeProvider.System,
@@ -347,7 +331,7 @@ internal static class LanderistServiceComposition
                     ]),
                     new LegacyBatchListingResponseParser(listingParser),
                     new BatchDownloadOptions(
-                        Config.PARALLELOPTIONS1INLOCAL.MaxDegreeOfParallelism),
+                        runtimeOptions.Batch.StatusUpdateParallelism),
                     logger),
                 new TaskBatchUpload(
                     databaseAdapters.CreateBatchRegistrationStore(),
@@ -361,11 +345,11 @@ internal static class LanderistServiceComposition
                 new WebsiteRefreshService(websiteCatalog, websitePersistence, websiteNetwork, websiteSitemaps),
                 new TaskBatchCleaner(
                     databaseAdapters.CreateBatchStore(),
-                    new BatchCleanupOptions(Config.BATCH_DIRECTORY),
+                    new BatchCleanupOptions(runtimeOptions.Batch.Directory),
                     new VertexBatchArtifactCleaner(
                         vertexBatchJobs,
                         vertexStorage,
-                        Config.DAYS_TO_REMOVE_BATCH_FILES,
+                        runtimeOptions.Batch.CleanupAfterDays,
                         TimeProvider.System))),
             new DailyTaskJob(
                 databaseAdapters.CreateAddressDataMaintenance(),
@@ -390,12 +374,13 @@ internal static class LanderistServiceComposition
                 logger),
             TimeProvider.System);
     }
-    private static VertexAddressSelectorOptions CreateVertexAddressSelectorOptions() =>
+    private static VertexAddressSelectorOptions CreateVertexAddressSelectorOptions(
+        LanderistRuntimeOptions runtimeOptions) =>
         new(
-            LanderistSettings.Current.GetString("GOOGLE_CLOUD_VERTEX_AI_CREDENTIAL"),
-            LanderistSettings.Current.GetString("GOOGLE_CLOUD_VERTEX_AI_PROJECTID"),
-            LanderistSettings.Current.GetString("GOOGLE_CLOUD_VERTEX_AI_LOCATION"),
-            LanderistSettings.Current.GetString("GOOGLE_CLOUD_VERTEX_AI_PUBLISHER"),
-            Config.VERTEX_AI_MODEL_NAME_GEMINI_FLASH);
+            runtimeOptions.Ai.VertexCredential,
+            runtimeOptions.Ai.VertexProjectId,
+            runtimeOptions.Ai.VertexLocation,
+            runtimeOptions.Ai.VertexPublisher,
+            runtimeOptions.Ai.VertexAddressModel);
 
 }
