@@ -18,4 +18,10 @@ public sealed class SqlPageLockManager : IPageLockManager
     }
 
     public void CleanPageLocks() => _pages.CleanLockedBy(_machineName);
+
+    public async Task CleanPageLocksAsync(
+        CancellationToken cancellationToken = default) =>
+        _ = await _pages.CleanLockedByAsync(
+            _machineName,
+            cancellationToken).ConfigureAwait(false);
 }

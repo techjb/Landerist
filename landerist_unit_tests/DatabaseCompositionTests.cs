@@ -99,6 +99,16 @@ public sealed class DatabaseCompositionTests
         Assert.False(succeeded);
         Assert.IsType<ArgumentException>(exception);
     }
+    [Fact]
+    public async Task QueryAsync_PropagatesCancellationWithoutWrapping()
+    {
+        DataBase database = new("not a valid connection string");
+        using CancellationTokenSource cancellation = new();
+        cancellation.Cancel();
+
+        await Assert.ThrowsAsync<OperationCanceledException>(() =>
+            database.QueryAsync("SELECT 1", cancellationToken: cancellation.Token));
+    }
     private sealed class RecordingDatabaseFactory(IDatabase database) : IDatabaseFactory
     {
         public int CreateCalls { get; private set; }

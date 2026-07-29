@@ -24,6 +24,18 @@ public sealed class DatabaseFailureArchitectureTests
         Assert.Contains("OperationName = operationName", source);
     }
 
+    [Fact]
+    public void DatabaseAsyncExecution_UsesAsyncIoAndPropagatesCancellation()
+    {
+        string source = File.ReadAllText(GetDatabasePath("DataBase.cs"));
+        string contract = File.ReadAllText(GetDatabasePath("IDatabase.cs"));
+
+        Assert.Contains("Task<bool> QueryAsync(", contract);
+        Assert.Contains("connection.OpenAsync(cancellationToken)", source);
+        Assert.Contains("command.ExecuteNonQueryAsync(token)", source);
+        Assert.Contains("catch (OperationCanceledException)", source);
+        Assert.DoesNotContain("Task.FromResult", source);
+    }
     private static int CountOccurrences(string source, string value) =>
         source.Split(value, StringSplitOptions.None).Length - 1;
 

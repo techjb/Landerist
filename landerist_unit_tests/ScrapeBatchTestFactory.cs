@@ -43,6 +43,13 @@ internal static class ScrapeBatchTestFactory
         {
         }
 
+        public Task CleanPageLocksAsync(
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.CompletedTask;
+        }
+
         public void KillChrome()
         {
         }

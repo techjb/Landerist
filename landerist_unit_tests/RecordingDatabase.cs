@@ -29,6 +29,15 @@ internal sealed class RecordingDatabase : IDatabase
         return QueryResult;
     }
 
+    public Task<bool> QueryAsync(
+        string query,
+        IDictionary<string, object?>? parameters = null,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        Record(query, parameters);
+        return Task.FromResult(QueryResult);
+    }
     public bool Query(
         string query,
         IDictionary<string, object?>? parameters,

@@ -60,6 +60,20 @@ namespace landerist_library.Database
                 out _);
         }
 
+        public Task<bool> QueryAsync(
+            string query,
+            IDictionary<string, object?>? parameters = null,
+            CancellationToken cancellationToken = default) =>
+            ExecuteAsync(
+                operationName: nameof(QueryAsync),
+                query,
+                parameters,
+                async (command, token) =>
+                {
+                    await command.ExecuteNonQueryAsync(token).ConfigureAwait(false);
+                    return true;
+                },
+                cancellationToken);
         public bool Query(string query, string parameterName, object parameterValue)
         {
             return Query(query, new Dictionary<string, object?>
@@ -437,6 +451,38 @@ namespace landerist_library.Database
             }
         }
 
+        private async Task<T> ExecuteAsync<T>(
+            string operationName,
+            string query,
+            IDictionary<string, object?>? parameters,
+            Func<SqlCommand, CancellationToken, Task<T>> operation,
+            CancellationToken cancellationToken)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(query);
+            ArgumentNullException.ThrowIfNull(operation);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            try
+            {
+                await using SqlConnection connection = new(_connectionString);
+                await using SqlCommand command = connection.CreateCommand();
+                command.CommandText = query;
+                command.CommandTimeout = _commandTimeout;
+                AddParameters(command, parameters, sqlParameters: null);
+
+                await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+                return await operation(command, cancellationToken).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Database operation {0} failed: {1}", operationName, ex);
+                throw new DatabaseOperationException(operationName, ex);
+            }
+        }
         private static void AddParameters(
             SqlCommand command,
             IDictionary<string, object?>? parameters,

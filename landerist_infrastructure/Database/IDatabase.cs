@@ -9,6 +9,11 @@ public interface IDatabase
 
     bool Query(string query, IDictionary<string, object?>? parameters = null);
 
+    Task<bool> QueryAsync(
+        string query,
+        IDictionary<string, object?>? parameters = null,
+        CancellationToken cancellationToken = default);
+
     bool Query(
         string query,
         IDictionary<string, object?>? parameters,

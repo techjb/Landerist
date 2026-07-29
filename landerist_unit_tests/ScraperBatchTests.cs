@@ -232,6 +232,14 @@ public sealed class ScraperBatchTests
 
         public void CleanPageLocks() => CleanPageLocksCalls++;
 
+        public Task CleanPageLocksAsync(
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            CleanPageLocks();
+            return Task.CompletedTask;
+        }
+
         public void KillChrome() => KillChromeCalls++;
 
         public void UpdateChrome()

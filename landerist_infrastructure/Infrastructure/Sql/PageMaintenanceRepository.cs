@@ -92,6 +92,20 @@ public sealed class PageMaintenanceRepository
         });
     }
 
+    public Task<bool> CleanLockedByAsync(
+        string lockedBy,
+        CancellationToken cancellationToken = default)
+    {
+        const string query =
+            "UPDATE " + Pages.Pages.PAGES + " " +
+            "SET [LockedBy] = NULL " +
+            "WHERE [LockedBy] = @LockedBy";
+
+        return Database.QueryAsync(
+            query,
+            new Dictionary<string, object?> { ["LockedBy"] = lockedBy },
+            cancellationToken);
+    }
     public bool DeleteByHost(string host)
     {
         const string query =
