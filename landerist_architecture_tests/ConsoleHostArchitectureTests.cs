@@ -69,33 +69,54 @@ public sealed class ConsoleHostArchitectureTests
         Assert.DoesNotContain("new WebsiteDeletionService(", taskRegistrations);
     }
     [Fact]
-    public void ScrapingRegistration_OwnsSharedBrowserInfrastructure()
+    public void ScrapingRegistration_DelegatesToCohesiveModules()
     {
-        string registrations = ReadConsoleSource(
+        string coordinator = ReadConsoleSource(
             "LanderistScrapingServiceCollectionExtensions.cs");
+        string infrastructure = ReadConsoleSource(
+            "LanderistScrapingInfrastructureServiceCollectionExtensions.cs");
+        string websites = ReadConsoleSource(
+            "LanderistWebsiteScrapingServiceCollectionExtensions.cs");
+        string listings = ReadConsoleSource(
+            "LanderistListingScrapingServiceCollectionExtensions.cs");
         string taskRegistrations = ReadConsoleSource(
             "LanderistTaskServiceCollectionExtensions.cs");
         string pipelineFactory = ReadConsoleSource(
             "LanderistScrapingPipelineFactory.cs");
 
-        Assert.Contains("HttpClientTransportFactory httpClients = new(", registrations);
-        Assert.Contains("PuppeteerBrowserOptions browserOptions = new(", registrations);
-        Assert.Contains("AddSingleton<ChromeMaintenanceService>", registrations);
-        Assert.Contains("services.AddSingleton<IWebsiteRobotsPolicy>", registrations);
+        Assert.Contains(
+            ".AddLanderistScrapingInfrastructure(runtimeOptions)",
+            coordinator);
+        Assert.Contains(
+            ".AddLanderistWebsiteScraping(runtimeOptions)",
+            coordinator);
+        Assert.Contains(
+            ".AddLanderistListingScraping(runtimeOptions)",
+            coordinator);
+        Assert.True(
+            File.ReadLines(GetConsolePath(
+                "LanderistScrapingServiceCollectionExtensions.cs")).Count() <= 25,
+            "Scraping composition coordinator must remain small.");
+        Assert.DoesNotContain("AddSingleton<", coordinator);
+        Assert.DoesNotContain("new HttpClientTransportFactory(", coordinator);
+
+        Assert.Contains("HttpClientTransportFactory httpClients = new(", infrastructure);
+        Assert.Contains("PuppeteerBrowserOptions browserOptions = new(", infrastructure);
+        Assert.Contains("AddSingleton<ChromeMaintenanceService>", infrastructure);
+        Assert.Contains("services.AddSingleton<IWebsiteRobotsPolicy>", infrastructure);
+        Assert.Contains("AddSingleton<WebsiteSitemapService>", websites);
+        Assert.Contains("AddSingleton<PooledPageDownloader>", websites);
+        Assert.Contains("AddSingleton<ScrapeBrowserManager>", websites);
+        Assert.Contains("AddSingleton<ListingLifecycleService>", listings);
+        Assert.Contains("AddSingleton<LanderistScrapingPipelineFactory>", listings);
+
         Assert.DoesNotContain("new HttpClientTransportFactory(", taskRegistrations);
         Assert.DoesNotContain("new PuppeteerBrowserOptions(", taskRegistrations);
-        Assert.DoesNotContain("new ChromeMaintenanceService(", taskRegistrations);
-        Assert.DoesNotContain("WebsiteRobotsPolicy robotsPolicy = new", taskRegistrations);
         Assert.Contains("new PageAcquisitionService(", pipelineFactory);
         Assert.Contains("new PageContentClassifier(", pipelineFactory);
         Assert.Contains("new PageIndexingService(", pipelineFactory);
         Assert.Contains("PageBatchSelector pageBatchSelector = new(", pipelineFactory);
-        Assert.DoesNotContain("new PageAcquisitionService(", taskRegistrations);
-        Assert.DoesNotContain("new PageContentClassifier(", taskRegistrations);
-        Assert.DoesNotContain("new PageIndexingService(", taskRegistrations);
-        Assert.DoesNotContain("new PageBatchSelector(", taskRegistrations);
-    }
-    [Fact]
+    }    [Fact]
     public void LoggingAdapters_AreOwnedByInfrastructureProject()
     {
         string root = FindRepositoryRoot();
@@ -274,7 +295,7 @@ public sealed class ConsoleHostArchitectureTests
     {
         string parsing = ReadConsoleSource("LanderistAiComposition.cs");
         string scraping = ReadConsoleSource(
-            "LanderistScrapingServiceCollectionExtensions.cs");
+            "LanderistListingScrapingServiceCollectionExtensions.cs");
 
         Assert.DoesNotContain("CreateAddressSelectorOptions", parsing);
         Assert.DoesNotContain("VertexAddressSelectorOptions", parsing);
