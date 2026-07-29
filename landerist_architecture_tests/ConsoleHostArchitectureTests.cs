@@ -363,6 +363,27 @@ public sealed class ConsoleHostArchitectureTests
             providers);
     }
 
+    [Fact]
+    public void ArchitectureDocument_DescribesCurrentModularCompositionRoot()
+    {
+        string architecture = File.ReadAllText(
+            Path.Combine(FindRepositoryRoot(), "ARCHITECTURE.md"));
+
+        Assert.Contains("`AddLanderist` is the public composition entry point", architecture);
+        Assert.Contains("Persistence: database and legacy bootstrap", architecture);
+        Assert.Contains("Scraping: HTTP/browser infrastructure", architecture);
+        Assert.Contains("Tasks: parsing, scrape/batch jobs", architecture);
+        Assert.Contains("LanderistListingParserProviderComposition", architecture);
+        Assert.Contains("LanderistBatchProviderComposition", architecture);
+        Assert.Contains("LanderistPageScrapingComposition", architecture);
+        Assert.Contains("LanderistScrapeExecutionComposition", architecture);
+        Assert.Contains("IListingAdministrationService", architecture);
+        Assert.Contains("IDatabaseFactory", architecture);
+        Assert.DoesNotContain(
+            "LanderistServiceComposition remains",
+            architecture);
+    }
+
     private static string ReadConsoleSource(string fileName) =>
         File.ReadAllText(GetConsolePath(fileName));
 
