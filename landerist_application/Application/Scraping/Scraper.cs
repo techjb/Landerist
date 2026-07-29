@@ -503,7 +503,8 @@ namespace landerist_library.Application.Scraping
                 _logger,
                 _listingLifecycle,
                 _pageScraping);
-            return pageScraper.Scrape()
+            return await pageScraper.ScrapeAsync(cancellationToken)
+                .ConfigureAwait(false)
                 ? ScrapeAttemptResult.Success
                 : ScrapeAttemptResult.Crashed;
         }

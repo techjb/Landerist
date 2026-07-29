@@ -9,10 +9,22 @@ public sealed class HttpConditionalPageHeaderService(IHttpClientTransportFactory
 {
     private readonly IHttpClientTransportFactory _httpClients =
         httpClients ?? throw new ArgumentNullException(nameof(httpClients));
-    public ConditionalPageHeaderResult Check(Page page, bool useProxy)
+    public ConditionalPageHeaderResult Check(Page page, bool useProxy) =>
+        Map(new ConditionalPageHeaderChecker(useProxy, _httpClients).Check(page));
+
+    public async Task<ConditionalPageHeaderResult> CheckAsync(
+        Page page,
+        bool useProxy,
+        CancellationToken cancellationToken = default)
     {
-        var result = new ConditionalPageHeaderChecker(useProxy, _httpClients).Check(page);
-        return new ConditionalPageHeaderResult
+        ConditionalHeaderCheckResult result = await new ConditionalPageHeaderChecker(
+            useProxy,
+            _httpClients).CheckAsync(page, cancellationToken).ConfigureAwait(false);
+        return Map(result);
+    }
+
+    private static ConditionalPageHeaderResult Map(ConditionalHeaderCheckResult result) =>
+        new()
         {
             NotModified = result.NotModified,
             HttpStatusCode = result.HttpStatusCode,
@@ -20,5 +32,4 @@ public sealed class HttpConditionalPageHeaderService(IHttpClientTransportFactory
             Etag = result.Etag,
             LastModified = result.LastModified
         };
-    }
 }

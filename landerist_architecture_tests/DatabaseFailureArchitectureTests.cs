@@ -81,6 +81,26 @@ public sealed class DatabaseFailureArchitectureTests
         Assert.Contains("_database.QueryAsync(", throttle);
         Assert.Contains("_database.QueryBoolAsync(", throttle);
     }
+    [Fact]
+    public void AsyncScraping_PropagatesCancellationToConditionalHttpRequest()
+    {
+        string root = FindRepositoryRoot();
+        string scraper = File.ReadAllText(
+            Path.Combine(root, "landerist_application", "Application", "Scraping", "Scraper.cs"));
+        string pageScraper = File.ReadAllText(
+            Path.Combine(root, "landerist_application", "Application", "Scraping", "PageScraper.cs"));
+        string acquisition = File.ReadAllText(
+            Path.Combine(root, "landerist_application", "Application", "Scraping", "PageAcquisitionService.cs"));
+        string checker = File.ReadAllText(
+            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Scraping", "ConditionalPageHeaderChecker.cs"));
+
+        Assert.Contains("pageScraper.ScrapeAsync(cancellationToken)", scraper);
+        Assert.Contains(".AcquireAsync(_page, _useProxy, cancellationToken)", pageScraper);
+        Assert.Contains(".CheckAsync(page, useProxy, cancellationToken)", acquisition);
+        Assert.Contains("HttpCompletionOption.ResponseHeadersRead,", checker);
+        Assert.Contains("cancellationToken)", checker);
+        Assert.DoesNotContain("CheckAsync(page).GetAwaiter().GetResult()", checker);
+    }
     private static int CountOccurrences(string source, string value) =>
         source.Split(value, StringSplitOptions.None).Length - 1;
 

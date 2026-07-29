@@ -46,6 +46,33 @@ public sealed class PageAcquisitionService : IPageAcquisitionService
             : PageAcquisitionStatus.DownloadFailed;
     }
 
+    public async Task<PageAcquisitionStatus> AcquireAsync(
+        Page page,
+        bool useProxy,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(page);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (CanCheckConditionalHeaders(page))
+        {
+            _metrics.RecordConditionalHeaderCheck();
+            ConditionalPageHeaderResult result = await _conditionalHeaders
+                .CheckAsync(page, useProxy, cancellationToken)
+                .ConfigureAwait(false);
+            if (result.NotModified)
+            {
+                ApplyConditionalHeaders(page, result);
+                _metrics.RecordPageNotModified(page);
+                return PageAcquisitionStatus.NotModified;
+            }
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+        return _downloader.Download(page, useProxy)
+            ? PageAcquisitionStatus.Downloaded
+            : PageAcquisitionStatus.DownloadFailed;
+    }
     private bool CanCheckConditionalHeaders(Page page) =>
         _conditionalHeadersEnabled &&
         page.PageType.HasValue &&

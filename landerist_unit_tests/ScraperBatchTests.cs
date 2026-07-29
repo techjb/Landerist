@@ -40,6 +40,8 @@ public sealed class ScraperBatchTests
         Assert.Equal(0, context.Throttle.AcquireCalls);
         Assert.Equal(1, context.Throttle.IsBlockedAsyncCalls);
         Assert.Equal(1, context.Throttle.AcquireAsyncCalls);
+        Assert.Equal(0, context.Acquisition.Calls);
+        Assert.Equal(1, context.Acquisition.AsyncCalls);
         Assert.Single(context.Metrics.Records);
     }
     [Fact]
@@ -236,14 +238,26 @@ public sealed class ScraperBatchTests
 
         public int Calls { get; private set; }
 
+        public int AsyncCalls { get; private set; }
+
         public PageAcquisitionStatus Acquire(Page page, bool useProxy)
         {
             Calls++;
             OnAcquire?.Invoke(page);
             return Status;
         }
-    }
 
+        public Task<PageAcquisitionStatus> AcquireAsync(
+            Page page,
+            bool useProxy,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            AsyncCalls++;
+            OnAcquire?.Invoke(page);
+            return Task.FromResult(Status);
+        }
+    }
     private sealed class RecordingPageContentClassifier : IPageContentClassifier
     {
         public PageType PageType { get; set; } = PageType.MainPage;

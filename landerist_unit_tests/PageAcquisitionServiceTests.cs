@@ -108,6 +108,57 @@ public sealed class PageAcquisitionServiceTests
         Assert.Equal(1, downloader.Calls);
     }
 
+    [Fact]
+    public async Task AcquireAsync_WhenConditionalResponseIsNotModified_SkipsDownloader()
+    {
+        Page page = CreatePage();
+        page.SetPageType(PageType.Listing);
+        page.Etag = "old-etag";
+        RecordingPageDownloader downloader = new() { Result = true };
+        RecordingConditionalHeaders conditionalHeaders = new()
+        {
+            Result = new ConditionalPageHeaderResult
+            {
+                NotModified = true,
+                Etag = "new-etag"
+            }
+        };
+        RecordingScrapeMetrics metrics = new();
+        PageAcquisitionService service = new(
+            downloader,
+            conditionalHeaders,
+            metrics,
+            conditionalHeadersEnabled: true);
+
+        PageAcquisitionStatus result = await service.AcquireAsync(
+            page,
+            useProxy: false,
+            CancellationToken.None);
+
+        Assert.Equal(PageAcquisitionStatus.NotModified, result);
+        Assert.Equal(1, conditionalHeaders.Calls);
+        Assert.Equal(0, downloader.Calls);
+        Assert.Equal("new-etag", page.Etag);
+    }
+
+    [Fact]
+    public async Task AcquireAsync_WhenCancelled_DoesNotStartDownloader()
+    {
+        Page page = CreatePage();
+        RecordingPageDownloader downloader = new() { Result = true };
+        PageAcquisitionService service = new(
+            downloader,
+            new RecordingConditionalHeaders(),
+            new RecordingScrapeMetrics(),
+            conditionalHeadersEnabled: false);
+        using CancellationTokenSource cancellation = new();
+        cancellation.Cancel();
+
+        await Assert.ThrowsAsync<OperationCanceledException>(() =>
+            service.AcquireAsync(page, useProxy: false, cancellation.Token));
+
+        Assert.Equal(0, downloader.Calls);
+    }
     private static Page CreatePage() =>
         new(
             new Website(new Uri("https://example.com")),
@@ -140,8 +191,17 @@ public sealed class PageAcquisitionServiceTests
             Calls++;
             return Result;
         }
-    }
 
+        public Task<ConditionalPageHeaderResult> CheckAsync(
+            Page page,
+            bool useProxy,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            Calls++;
+            return Task.FromResult(Result);
+        }
+    }
     private sealed class RecordingScrapeMetrics : IScrapeMetrics
     {
         public int ConditionalChecks { get; private set; }

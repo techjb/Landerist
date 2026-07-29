@@ -19,13 +19,23 @@ namespace landerist_library.Infrastructure.Scraping
             HttpClients = httpClients;
         }
 
-        public ConditionalHeaderCheckResult Check(Page page)
+        public ConditionalHeaderCheckResult Check(Page page) =>
+            CheckAsync(page, CancellationToken.None).GetAwaiter().GetResult();
+
+        public async Task<ConditionalHeaderCheckResult> CheckAsync(
+            Page page,
+            CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(page);
+            cancellationToken.ThrowIfCancellationRequested();
 
             try
             {
-                return CheckAsync(page).GetAwaiter().GetResult();
+                return await SendAsync(page, cancellationToken).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                throw;
             }
             catch
             {
@@ -33,12 +43,17 @@ namespace landerist_library.Infrastructure.Scraping
             }
         }
 
-        private async Task<ConditionalHeaderCheckResult> CheckAsync(Page page)
+        private async Task<ConditionalHeaderCheckResult> SendAsync(
+            Page page,
+            CancellationToken cancellationToken)
         {
             using var httpClient = CreateHttpClient(page);
             using var request = CreateRequest(page);
             using var response = await httpClient
-                .SendAsync(request, HttpCompletionOption.ResponseHeadersRead)
+                .SendAsync(
+                    request,
+                    HttpCompletionOption.ResponseHeadersRead,
+                    cancellationToken)
                 .ConfigureAwait(false);
 
             var result = new ConditionalHeaderCheckResult

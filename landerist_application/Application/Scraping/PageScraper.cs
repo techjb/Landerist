@@ -53,7 +53,20 @@ namespace landerist_library.Application.Scraping
 
         public bool Scrape()
         {
-            var acquisitionStatus = _pipeline.Acquisition.Acquire(_page, _useProxy);
+            PageAcquisitionStatus status = _pipeline.Acquisition.Acquire(_page, _useProxy);
+            return ProcessAcquisitionResult(status);
+        }
+
+        public async Task<bool> ScrapeAsync(CancellationToken cancellationToken = default)
+        {
+            PageAcquisitionStatus status = await _pipeline.Acquisition
+                .AcquireAsync(_page, _useProxy, cancellationToken)
+                .ConfigureAwait(false);
+            return ProcessAcquisitionResult(status);
+        }
+
+        private bool ProcessAcquisitionResult(PageAcquisitionStatus acquisitionStatus)
+        {
             if (acquisitionStatus == PageAcquisitionStatus.DownloadFailed)
             {
                 return false;

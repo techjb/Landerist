@@ -254,6 +254,12 @@ public sealed class PageClassificationServiceTests
     {
         public PageAcquisitionStatus Acquire(Page page, bool useProxy) =>
             PageAcquisitionStatus.DownloadFailed;
+
+        public Task<PageAcquisitionStatus> AcquireAsync(
+            Page page,
+            bool useProxy,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(PageAcquisitionStatus.DownloadFailed);
     }
 
     private sealed class NullPageContentClassifier : IPageContentClassifier

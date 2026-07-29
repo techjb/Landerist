@@ -47,6 +47,20 @@ public sealed class PageScraperPipelineTests
     }
 
     [Fact]
+    public async Task ScrapeAsync_WhenDownloaded_UsesAsyncAcquisitionAndProcessesPage()
+    {
+        TestContext context = new(PageAcquisitionStatus.Downloaded);
+
+        bool result = await context.Scraper.ScrapeAsync(CancellationToken.None);
+
+        Assert.True(result);
+        Assert.Equal(0, context.Acquisition.SyncCalls);
+        Assert.Equal(1, context.Acquisition.AsyncCalls);
+        Assert.Equal(1, context.Classifier.Calls);
+        Assert.Equal(1, context.Persistence.UpdateCalls);
+        Assert.Equal(1, context.Indexing.Calls);
+    }
+    [Fact]
     public void Scrape_WhenPersistenceFails_DoesNotIndex()
     {
         TestContext context = new(PageAcquisitionStatus.Downloaded);
@@ -147,7 +161,25 @@ public sealed class PageScraperPipelineTests
     {
         public PageAcquisitionStatus Status { get; set; }
 
-        public PageAcquisitionStatus Acquire(Page page, bool useProxy) => Status;
+        public int SyncCalls { get; private set; }
+
+        public int AsyncCalls { get; private set; }
+
+        public PageAcquisitionStatus Acquire(Page page, bool useProxy)
+        {
+            SyncCalls++;
+            return Status;
+        }
+
+        public Task<PageAcquisitionStatus> AcquireAsync(
+            Page page,
+            bool useProxy,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            AsyncCalls++;
+            return Task.FromResult(Status);
+        }
     }
 
     private sealed class RecordingPageContentClassifier : IPageContentClassifier
