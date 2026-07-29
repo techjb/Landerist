@@ -1,5 +1,6 @@
 using landerist_library.Parse.ListingParser.StructuredOutputs;
 using landerist_library.Parse.ListingParser;
+using landerist_library.Parse.ListingParser.VertexAI;
 using landerist_library.Infrastructure.Browser;
 using landerist_library.Infrastructure.Ai;
 using landerist_library.Infrastructure.Downloaders.Puppeteer;
@@ -150,7 +151,16 @@ namespace landerist_tests
             ListingParserClientCatalog listingParserClients = new(
             [
                 new OpenAIListingParserClient(),
-                new VertexAIListingParserClient(),
+                new VertexListingParserClient(
+                new VertexListingParserOptions(
+                    LanderistSettings.Current.GetString("GOOGLE_CLOUD_VERTEX_AI_CREDENTIAL"),
+                    LanderistSettings.Current.GetString("GOOGLE_CLOUD_VERTEX_AI_PROJECTID"),
+                    LanderistSettings.Current.GetString("GOOGLE_CLOUD_VERTEX_AI_LOCATION"),
+                    LanderistSettings.Current.GetString("GOOGLE_CLOUD_VERTEX_AI_PUBLISHER"),
+                    Config.VERTEX_AI_MODEL_NAME_GEMINI_FLASH_LITE),
+                SystemPrompt.Text,
+                VertexAIResponseSchema.ResponseSchema,
+                logger),
                 new LocalAIListingParserClient()
             ]);
             ParseListing listingParser = new(

@@ -8,7 +8,7 @@ public sealed partial class ArchitectureBoundaryTests
     private static readonly string LibraryRoot = Path.Combine(RepositoryRoot, "landerist_library");
     private static readonly string ApplicationRoot = Path.Combine(RepositoryRoot, "landerist_application", "Application");
     private static readonly HashSet<string> ApplicationAllowedDependencies =
-        new(StringComparer.Ordinal) { "Application", "Pages", "Websites" };
+        new(StringComparer.Ordinal) { "Application", "Pages", "Parsing", "Websites" };
 
     [Fact]
     public void Application_DoesNotDependOnOuterLayers()
@@ -35,7 +35,7 @@ public sealed partial class ArchitectureBoundaryTests
 
         Assert.True(
             violations.Count == 0,
-            "Application must only depend on Application, Pages and Websites." +
+            "Application must only depend on Application and domain namespaces." +
             Environment.NewLine +
             string.Join(Environment.NewLine, violations.Distinct().Order()));
     }

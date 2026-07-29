@@ -5,7 +5,6 @@ namespace landerist_tests
         public static void Run()
         {
             //Console.WriteLine(new landerist_library.Parse.ListingParser.LocalAI.LocalAIRequest().GetResponse(text).Result.GetResponseText());
-            //Console.WriteLine(VertexAIResponse.GetResponseText(VertexAIRequest.GetResponse(text).Result));
             //Console.WriteLine(landerist_library.Parse.ListingParser.OpenAI.OpenAIRequest.GetChatResponse(text).FirstChoice.ToString());
 
             //landerist_library.Parse.ListingParser.LocalAI.LocalAIRequest.PrintOutputSchema();

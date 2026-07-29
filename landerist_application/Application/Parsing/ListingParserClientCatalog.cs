@@ -1,5 +1,7 @@
+using landerist_library.Parsing;
+using landerist_library.Application.Parsing;
 using System.Diagnostics.CodeAnalysis;
-namespace landerist_library.Parse.ListingParser;
+namespace landerist_library.Application.Parsing;
 
 public sealed class ListingParserClientCatalog
 {

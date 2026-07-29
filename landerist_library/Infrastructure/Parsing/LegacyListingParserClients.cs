@@ -1,20 +1,12 @@
+using landerist_library.Parsing;
+using landerist_library.Application.Parsing;
 using landerist_library.Pages;
 using landerist_library.Parse.ListingParser.LocalAI;
 using landerist_library.Parse.ListingParser.OpenAI;
 using landerist_library.Parse.ListingParser.UserInput;
-using landerist_library.Parse.ListingParser.VertexAI;
 
-namespace landerist_library.Parse.ListingParser
+namespace landerist_library.Infrastructure.Parsing
 {
-    public sealed record ListingParserClientResult(string? ResponseText, bool WaitingAIRequest, string? Diagnostic = null);
-
-    public interface IListingParserClient
-    {
-        LLMProvider Provider { get; }
-
-        ListingParserClientResult GetResponse(Page page, string userInput);
-    }
-
     public sealed class OpenAIListingParserClient : IListingParserClient
     {
         public LLMProvider Provider => LLMProvider.OpenAI;
@@ -25,22 +17,6 @@ namespace landerist_library.Parse.ListingParser
             return response?.FirstChoice == null
                 ? new ListingParserClientResult(null, true)
                 : new ListingParserClientResult(response.FirstChoice, false);
-        }
-    }
-
-    public sealed class VertexAIListingParserClient : IListingParserClient
-    {
-        public LLMProvider Provider => LLMProvider.VertexAI;
-
-        public ListingParserClientResult GetResponse(Page page, string userInput)
-        {
-            var generateContentResponse = VertexAIRequest.GetResponse(page, userInput).GetAwaiter().GetResult();
-            if (generateContentResponse == null)
-            {
-                return new ListingParserClientResult(null, true);
-            }
-
-            return new ListingParserClientResult(VertexAIResponse.GetResponseText(generateContentResponse), false);
         }
     }
 
