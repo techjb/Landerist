@@ -100,7 +100,8 @@ namespace landerist_library.Database
                     return true;
                 },
                 failureResult: false,
-                out exception);
+                out exception,
+                returnFailureResult: true);
         }
 
         public bool Query(string query, List<SqlParameter> sqlParameters)
@@ -405,7 +406,8 @@ namespace landerist_library.Database
             SqlParameter[]? sqlParameters,
             Func<SqlCommand, T> operation,
             T failureResult,
-            out Exception? exception)
+            out Exception? exception,
+            bool returnFailureResult = false)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(query);
             ArgumentNullException.ThrowIfNull(operation);
@@ -426,7 +428,12 @@ namespace landerist_library.Database
             {
                 exception = ex;
                 Trace.TraceError("Database operation {0} failed: {1}", operationName, ex);
-                return failureResult;
+                if (returnFailureResult)
+                {
+                    return failureResult;
+                }
+
+                throw new DatabaseOperationException(operationName, ex);
             }
         }
 

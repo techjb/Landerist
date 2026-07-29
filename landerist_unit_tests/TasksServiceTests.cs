@@ -125,6 +125,16 @@ public sealed class TasksServiceTests
     }
 
     [Fact]
+    public void Dispose_BeforeStart_DoesNotStopJobs()
+    {
+        TestContext context = CreateContext(TasksExecutionMode.Scraper);
+
+        context.Service.Dispose();
+
+        Assert.Equal(0, context.Scrape.StopCalls);
+        Assert.Equal(0, context.LocalAi.StopCalls);
+    }
+    [Fact]
     public void Start_AfterDispose_ThrowsObjectDisposedException()
     {
         TestContext context = CreateContext(TasksExecutionMode.Scraper);

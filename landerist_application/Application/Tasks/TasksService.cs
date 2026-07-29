@@ -138,7 +138,7 @@ public sealed class TasksService : IDisposable
     {
         lock (_lifecycleSync)
         {
-            if (_disposed)
+            if (_disposed || !_started)
             {
                 return;
             }

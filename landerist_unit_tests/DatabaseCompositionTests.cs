@@ -73,6 +73,32 @@ public sealed class DatabaseCompositionTests
         Assert.Equal(1, factory.CreateCalls);
     }
 
+    [Fact]
+    public void Query_WrapsUnexpectedDatabaseFailures()
+    {
+        DataBase database = new("not a valid connection string");
+
+        DatabaseOperationException exception = Assert.Throws<DatabaseOperationException>(
+            () => database.Query("SELECT 1"));
+
+        Assert.Equal("Query", exception.OperationName);
+        Assert.IsType<ArgumentException>(exception.InnerException);
+        Assert.DoesNotContain("SELECT 1", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Query_WithExceptionResult_PreservesLegacyProbeSemantics()
+    {
+        DataBase database = new("not a valid connection string");
+
+        bool succeeded = database.Query(
+            "SELECT 1",
+            parameters: null,
+            out Exception? exception);
+
+        Assert.False(succeeded);
+        Assert.IsType<ArgumentException>(exception);
+    }
     private sealed class RecordingDatabaseFactory(IDatabase database) : IDatabaseFactory
     {
         public int CreateCalls { get; private set; }
