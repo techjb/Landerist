@@ -3,12 +3,12 @@ namespace landerist_architecture_tests;
 public sealed class RobotsMediaArchitectureTests
 {
     [Fact]
-    public void ParseMedia_DoesNotCallWebsiteRobotsMethods()
+    public void ListingMedia_DoesNotCallWebsiteRobotsMethods()
     {
         string mediaRoot = Path.Combine(
             FindRepositoryRoot(),
-            "landerist_library",
-            "Parse",
+            "landerist_infrastructure",
+            "Infrastructure",
             "Media");
         string[] forbiddenCalls =
         [
@@ -32,7 +32,7 @@ public sealed class RobotsMediaArchitectureTests
 
         Assert.True(
             violations.Length == 0,
-            "Parse/Media must use IWebsiteRobotsPolicy." +
+            "Infrastructure/Media must use IWebsiteRobotsPolicy." +
             Environment.NewLine +
             string.Join(Environment.NewLine, violations));
     }
