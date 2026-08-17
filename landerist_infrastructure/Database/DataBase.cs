@@ -1,8 +1,6 @@
 using Microsoft.Data.SqlClient;
 using System.Data;
-using System.Diagnostics;
 using System.Globalization;
-using System.Text;
 
 namespace landerist_library.Database
 {
@@ -10,11 +8,8 @@ namespace landerist_library.Database
     {
         private const int DefaultCommandTimeoutSeconds = 120;
 
-        private readonly StringBuilder _stackBuilder = new();
-        private readonly object _stackLock = new();
-        private readonly string _connectionString;
-        private int _stackCounter;
-        private int _commandTimeout;
+        private readonly SqlCommandExecutor _executor;
+        private readonly SqlQueryStack _queryStack = new();
 
 
         public DataBase(
@@ -23,8 +18,7 @@ namespace landerist_library.Database
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(connectionString);
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(commandTimeoutSeconds);
-            _connectionString = connectionString;
-            _commandTimeout = commandTimeoutSeconds;
+            _executor = new SqlCommandExecutor(connectionString, commandTimeoutSeconds);
         }
 
         /// <summary>
@@ -33,20 +27,20 @@ namespace landerist_library.Database
         public void SetTimeout(int timeOut)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(timeOut);
-            _commandTimeout = timeOut;
+            _executor.SetTimeout(timeOut);
         }
 
         public static List<SqlParameter> ParseParameters(Dictionary<string, object?> parameters)
         {
             ArgumentNullException.ThrowIfNull(parameters);
             return parameters
-                .Select(item => CreateParameter(item.Key, item.Value))
+                .Select(item => SqlParameterBinder.Create(item.Key, item.Value))
                 .ToList();
         }
 
         public bool Query(string query)
         {
-            return Execute(
+            return _executor.Execute(
                 operationName: nameof(Query),
                 query,
                 parameters: null,
@@ -64,7 +58,7 @@ namespace landerist_library.Database
             string query,
             IDictionary<string, object?>? parameters = null,
             CancellationToken cancellationToken = default) =>
-            ExecuteAsync(
+            _executor.ExecuteAsync(
                 operationName: nameof(QueryAsync),
                 query,
                 parameters,
@@ -84,7 +78,7 @@ namespace landerist_library.Database
 
         public bool Query(string query, IDictionary<string, object?>? parameters = null)
         {
-            return Execute(
+            return _executor.Execute(
                 operationName: nameof(Query),
                 query,
                 parameters,
@@ -103,7 +97,7 @@ namespace landerist_library.Database
             IDictionary<string, object?>? parameters,
             out Exception? exception)
         {
-            return Execute(
+            return _executor.Execute(
                 operationName: nameof(Query),
                 query,
                 parameters,
@@ -127,7 +121,7 @@ namespace landerist_library.Database
         public bool Query(string query, SqlParameter[] sqlParameters)
         {
             ArgumentNullException.ThrowIfNull(sqlParameters);
-            return Execute(
+            return _executor.Execute(
                 operationName: nameof(Query),
                 query,
                 parameters: null,
@@ -155,7 +149,7 @@ namespace landerist_library.Database
             string query,
             IDictionary<string, object?>? parameters = null,
             CancellationToken cancellationToken = default) =>
-            ExecuteAsync(
+            _executor.ExecuteAsync(
                 operationName: nameof(QueryBoolAsync),
                 query,
                 parameters,
@@ -238,7 +232,7 @@ namespace landerist_library.Database
             IDictionary<string, object?>? parameters = null,
             SqlParameter[]? sqlParameters = null)
         {
-            return Execute(
+            return _executor.Execute(
                 operationName: nameof(QueryTable),
                 query,
                 parameters,
@@ -258,37 +252,18 @@ namespace landerist_library.Database
             string query,
             IDictionary<string, object?>? parameters = null,
             CancellationToken cancellationToken = default) =>
-            ExecuteAsync(
+            _executor.ExecuteAsync(
                 operationName: nameof(QueryTableAsync),
                 query,
                 parameters,
-                async (command, token) =>
-                {
-                    await using SqlDataReader reader = await command
-                        .ExecuteReaderAsync(token)
-                        .ConfigureAwait(false);
-                    DataTable table = new();
-                    for (int index = 0; index < reader.FieldCount; index++)
-                    {
-                        table.Columns.Add(reader.GetName(index), reader.GetFieldType(index));
-                    }
-
-                    object[] values = new object[reader.FieldCount];
-                    while (await reader.ReadAsync(token).ConfigureAwait(false))
-                    {
-                        reader.GetValues(values);
-                        table.Rows.Add((object[])values.Clone());
-                    }
-
-                    return table;
-                },
+                SqlDataReaderMapper.ReadTableAsync,
                 cancellationToken);
         public DataSet QueryDataSet(
             string query,
             IDictionary<string, object?>? parameters = null,
             SqlParameter[]? sqlParameters = null)
         {
-            return Execute(
+            return _executor.Execute(
                 operationName: nameof(QueryDataSet),
                 query,
                 parameters,
@@ -370,46 +345,14 @@ namespace landerist_library.Database
 
         public bool StackQuery(string query, int maxQueries = 1000)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(query);
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxQueries);
-
-            string? queryToFlush = null;
-            lock (_stackLock)
-            {
-                _stackBuilder.Append(query).Append(' ');
-                _stackCounter++;
-
-                if (_stackCounter >= maxQueries)
-                {
-                    queryToFlush = TakeStackQuery();
-                }
-            }
-
+            string? queryToFlush = _queryStack.Append(query, maxQueries);
             return queryToFlush is null || Query(queryToFlush);
         }
 
         public bool StackFlush()
         {
-            string? query;
-            lock (_stackLock)
-            {
-                query = TakeStackQuery();
-            }
-
+            string? query = _queryStack.Take();
             return query is null || Query(query);
-        }
-
-        private string? TakeStackQuery()
-        {
-            if (_stackCounter == 0)
-            {
-                return null;
-            }
-
-            string query = _stackBuilder.ToString();
-            _stackBuilder.Clear();
-            _stackCounter = 0;
-            return query;
         }
 
         private T ExecuteScalar<T>(
@@ -419,7 +362,7 @@ namespace landerist_library.Database
             T defaultValue,
             Func<object, T> convert)
         {
-            return Execute(
+            return _executor.Execute(
                 operationName,
                 query,
                 parameters,
@@ -440,123 +383,14 @@ namespace landerist_library.Database
             SqlParameter[]? sqlParameters,
             Func<SqlDataReader, T> map)
         {
-            return Execute(
+            return _executor.Execute(
                 operationName,
                 query,
                 parameters,
                 sqlParameters,
-                command =>
-                {
-                    List<T> values = [];
-                    using SqlDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        values.Add(map(reader));
-                    }
-
-                    return values;
-                },
+                command => SqlDataReaderMapper.ReadList(command, map),
                 failureResult: [],
                 out _);
-        }
-
-        private T Execute<T>(
-            string operationName,
-            string query,
-            IDictionary<string, object?>? parameters,
-            SqlParameter[]? sqlParameters,
-            Func<SqlCommand, T> operation,
-            T failureResult,
-            out Exception? exception,
-            bool returnFailureResult = false)
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(query);
-            ArgumentNullException.ThrowIfNull(operation);
-
-            exception = null;
-            try
-            {
-                using SqlConnection connection = new(_connectionString);
-                using SqlCommand command = connection.CreateCommand();
-                command.CommandText = query;
-                command.CommandTimeout = _commandTimeout;
-                AddParameters(command, parameters, sqlParameters);
-
-                connection.Open();
-                return operation(command);
-            }
-            catch (Exception ex)
-            {
-                exception = ex;
-                Trace.TraceError("Database operation {0} failed: {1}", operationName, ex);
-                if (returnFailureResult)
-                {
-                    return failureResult;
-                }
-
-                throw new DatabaseOperationException(operationName, ex);
-            }
-        }
-
-        private async Task<T> ExecuteAsync<T>(
-            string operationName,
-            string query,
-            IDictionary<string, object?>? parameters,
-            Func<SqlCommand, CancellationToken, Task<T>> operation,
-            CancellationToken cancellationToken)
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(query);
-            ArgumentNullException.ThrowIfNull(operation);
-            cancellationToken.ThrowIfCancellationRequested();
-
-            try
-            {
-                await using SqlConnection connection = new(_connectionString);
-                await using SqlCommand command = connection.CreateCommand();
-                command.CommandText = query;
-                command.CommandTimeout = _commandTimeout;
-                AddParameters(command, parameters, sqlParameters: null);
-
-                await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
-                return await operation(command, cancellationToken).ConfigureAwait(false);
-            }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                Trace.TraceError("Database operation {0} failed: {1}", operationName, ex);
-                throw new DatabaseOperationException(operationName, ex);
-            }
-        }
-        private static void AddParameters(
-            SqlCommand command,
-            IDictionary<string, object?>? parameters,
-            SqlParameter[]? sqlParameters)
-        {
-            if (parameters is not null)
-            {
-                foreach (var item in parameters)
-                {
-                    command.Parameters.Add(CreateParameter(item.Key, item.Value));
-                }
-            }
-
-            if (sqlParameters is not null)
-            {
-                foreach (SqlParameter parameter in sqlParameters)
-                {
-                    command.Parameters.Add((SqlParameter)((ICloneable)parameter).Clone());
-                }
-            }
-        }
-
-        private static SqlParameter CreateParameter(string name, object? value)
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(name);
-            string parameterName = name.StartsWith('@') ? name : "@" + name;
-            return new SqlParameter(parameterName, value ?? DBNull.Value);
         }
     }
 }

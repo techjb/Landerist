@@ -5,12 +5,14 @@ public sealed class DatabaseFailureArchitectureTests
     [Fact]
     public void DatabaseExecutor_OnlyReturnsFallbackForExplicitExceptionProbe()
     {
-        string source = File.ReadAllText(GetDatabasePath("DataBase.cs"));
+        string facade = File.ReadAllText(GetDatabasePath("DataBase.cs"));
+        string executor = File.ReadAllText(GetDatabasePath("SqlCommandExecutor.cs"));
 
-        Assert.Contains("throw new DatabaseOperationException(operationName, ex)", source);
-        Assert.Contains("bool returnFailureResult = false", source);
-        Assert.Contains("returnFailureResult: true", source);
-        Assert.Equal(1, CountOccurrences(source, "return failureResult;"));
+        Assert.Contains("throw new DatabaseOperationException(operationName, ex)", executor);
+        Assert.Contains("bool returnFailureResult = false", executor);
+        Assert.Contains("returnFailureResult: true", facade);
+        Assert.Equal(1, CountOccurrences(executor, "return failureResult;"));
+        Assert.DoesNotContain("new SqlConnection", facade);
     }
 
     [Fact]
@@ -27,18 +29,21 @@ public sealed class DatabaseFailureArchitectureTests
     [Fact]
     public void DatabaseAsyncExecution_UsesAsyncIoAndPropagatesCancellation()
     {
-        string source = File.ReadAllText(GetDatabasePath("DataBase.cs"));
+        string facade = File.ReadAllText(GetDatabasePath("DataBase.cs"));
+        string executor = File.ReadAllText(GetDatabasePath("SqlCommandExecutor.cs"));
+        string mapper = File.ReadAllText(GetDatabasePath("SqlDataReaderMapper.cs"));
         string contract = File.ReadAllText(GetDatabasePath("IDatabase.cs"));
 
         Assert.Contains("Task<bool> QueryAsync(", contract);
         Assert.Contains("Task<bool> QueryBoolAsync(", contract);
-        Assert.Contains("connection.OpenAsync(cancellationToken)", source);
-        Assert.Contains("command.ExecuteNonQueryAsync(token)", source);
-        Assert.Contains("ExecuteScalarAsync(token)", source);
-        Assert.Contains("ExecuteReaderAsync(token)", source);
-        Assert.Contains("reader.ReadAsync(token)", source);
-        Assert.Contains("catch (OperationCanceledException)", source);
-        Assert.DoesNotContain("Task.FromResult", source);
+        Assert.Contains("connection.OpenAsync(cancellationToken)", executor);
+        Assert.Contains("command.ExecuteNonQueryAsync(token)", facade);
+        Assert.Contains("ExecuteScalarAsync(token)", facade);
+        Assert.Contains("ExecuteReaderAsync(cancellationToken)", mapper);
+        Assert.Contains("reader.ReadAsync(cancellationToken)", mapper);
+        Assert.Contains("catch (OperationCanceledException)", executor);
+        Assert.DoesNotContain("Task.FromResult", facade);
+        Assert.DoesNotContain("Task.FromResult", executor);
     }
     [Fact]
     public void HostShutdown_PropagatesAsyncCleanupToPageLocks()
