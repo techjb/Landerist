@@ -20,9 +20,6 @@ public sealed partial class WebsiteAdministrationService : IWebsiteAdministratio
     private readonly IListingMaintenanceService ListingMaintenance;
     private readonly IPagePersistenceService PagePersistence;
     private readonly IPageMaintenanceService PageMaintenance;
-    private readonly IWebsiteNetworkService Network;
-    private readonly IWebsiteSitemapService Sitemaps;
-    private readonly IWebsiteRobotsPolicy RobotsPolicy;
 
     public WebsiteAdministrationService(
         IWebsitePersistenceService persistence,
@@ -47,9 +44,9 @@ public sealed partial class WebsiteAdministrationService : IWebsiteAdministratio
         ListingMaintenance = listingMaintenance;
         PagePersistence = pagePersistence;
         PageMaintenance = pageMaintenance;
-        Network = network;
-        Sitemaps = sitemaps;
-        RobotsPolicy = robotsPolicy;
+        RefreshOperations = new WebsiteRefreshOperations(catalog, persistence, network, sitemaps);
+        Reporting = new WebsiteAdministrationReporting(catalog, robotsPolicy, pagePersistence);
+        FileCleanup = new WebsiteFileCleanup(catalog, metrics, deletion);
     }
 
     public bool Insert(Website website) => Persistence.Insert(website);
