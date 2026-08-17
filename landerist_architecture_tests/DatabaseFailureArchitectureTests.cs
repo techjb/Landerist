@@ -125,14 +125,17 @@ public sealed class DatabaseFailureArchitectureTests
             Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Downloaders", "Multiple", "SingleDownloader.cs"));
         string puppeteer = File.ReadAllText(
             Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Downloaders", "Puppeteer", "PuppeteerDownloader.cs"));
+        string execution = File.ReadAllText(
+            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Downloaders", "Puppeteer", "PuppeteerDownloadExecution.cs"));
 
         Assert.Contains(".DownloadAsync(page, useProxy, cancellationToken)", acquisition);
         Assert.Contains("pool.DownloadAsync(page, useProxy, cancellationToken)", pooled);
         Assert.Contains(".DownloadAsync(page, cancellationToken)", pool);
         Assert.Contains("Downloader.DownloadAsync(page, cancellationToken)", single);
-        Assert.Contains("await Task.WhenAny(download, timeout)", puppeteer);
-        Assert.Contains("Task.Delay(delay + 1000, cancellationToken)", puppeteer);
-        Assert.Contains("await ClosePageAsync()", puppeteer);
+        Assert.Contains("PuppeteerDownloadExecution.WaitAsync(", puppeteer);
+        Assert.Contains("Task.WhenAny(download, timeout)", execution);
+        Assert.Contains("Task.Delay(timeoutMilliseconds, cancellationToken)", execution);
+        Assert.Contains("await closePageAsync()", execution);
     }
     [Fact]
     public void AsyncPuppeteerLifecycle_DoesNotLeakCancelledBrowserLaunches()
@@ -144,6 +147,8 @@ public sealed class DatabaseFailureArchitectureTests
             Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Downloaders", "Multiple", "SingleDownloader.cs"));
         string puppeteer = File.ReadAllText(
             Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Downloaders", "Puppeteer", "PuppeteerDownloader.cs"));
+        string lifecycle = File.ReadAllText(
+            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Downloaders", "Puppeteer", "PuppeteerBrowserLifecycle.cs"));
         string scraper = File.ReadAllText(
             Path.Combine(root, "landerist_application", "Application", "Scraping", "Scraper.cs"));
 
@@ -152,8 +157,9 @@ public sealed class DatabaseFailureArchitectureTests
         Assert.Contains("Generation++", pool);
         Assert.Contains("downloader.CloseBrowserAsync()", pool);
         Assert.Contains("RestartBrowserAsync(cancellationToken)", single);
-        Assert.Contains("CloseCancelledLaunchAsync(launch)", puppeteer);
-        Assert.Contains("await browser.CloseAsync()", puppeteer);
+        Assert.Contains("PuppeteerBrowserLifecycle.LaunchAsync(", puppeteer);
+        Assert.Contains("CloseCancelledLaunchAsync(launch)", lifecycle);
+        Assert.Contains("await browser.CloseAsync()", lifecycle);
         Assert.Contains(".ClearDownloadersAsync(cancellationToken)", scraper);
     }
     [Fact]

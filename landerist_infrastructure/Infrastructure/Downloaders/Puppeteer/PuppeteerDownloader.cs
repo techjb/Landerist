@@ -1,4 +1,3 @@
-using HtmlAgilityPack;
 using landerist_library.Application.Logging;
 using landerist_library.Pages;
 using landerist_library.Websites;
@@ -89,40 +88,10 @@ namespace landerist_library.Infrastructure.Downloaders.Puppeteer
         }
 
         private async Task<IBrowser?> LaunchAsync(CancellationToken cancellationToken)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            Task<IBrowser> launch = PuppeteerSharp.Puppeteer.LaunchAsync(launchOptions);
-            try
-            {
-                return await launch
-                    .WaitAsync(cancellationToken)
-                    .ConfigureAwait(false);
-            }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-            {
-                _ = CloseCancelledLaunchAsync(launch);
-                throw;
-            }
-            catch (Exception exception)
-            {
-                Logger.WriteError("PuppeteerDownloader LaunchAsync", exception.ToString());
-            }
-
-            return null;
-        }
-
-        private static async Task CloseCancelledLaunchAsync(Task<IBrowser> launch)
-        {
-            try
-            {
-                IBrowser browser = await launch.ConfigureAwait(false);
-                await browser.CloseAsync().ConfigureAwait(false);
-                await browser.DisposeAsync().ConfigureAwait(false);
-            }
-            catch
-            {
-            }
-        }
+            => await PuppeteerBrowserLifecycle.LaunchAsync(
+                launchOptions,
+                Logger,
+                cancellationToken).ConfigureAwait(false);
         public void CloseBrowser()
         {
             CloseBrowserAsync().GetAwaiter().GetResult();
@@ -144,15 +113,8 @@ namespace landerist_library.Infrastructure.Downloaders.Puppeteer
                 return;
             }
 
-            try
-            {
-                await browser.CloseAsync();
-                await browser.DisposeAsync();
-            }
-            catch (Exception exception)
-            {
-                Logger.WriteError("PuppeteerDownloader CloseBrowserAsync", exception.ToString());
-            }
+            await PuppeteerBrowserLifecycle.CloseBrowserAsync(browser, Logger)
+                .ConfigureAwait(false);
         }
 
         public void ClosePage()
@@ -175,15 +137,8 @@ namespace landerist_library.Infrastructure.Downloaders.Puppeteer
                 return;
             }
 
-            try
-            {
-                await browserPage.CloseAsync();
-                await browserPage.DisposeAsync();
-            }
-            catch (Exception exception)
-            {
-                Logger.WriteError("PuppeteerDownloader ClosePageAsync", exception.ToString());
-            }
+            await PuppeteerBrowserLifecycle.ClosePageAsync(browserPage, Logger)
+                .ConfigureAwait(false);
         }
 
         public static void DoTest()
@@ -206,26 +161,6 @@ namespace landerist_library.Infrastructure.Downloaders.Puppeteer
             //var puppeteerDownloader = new PuppeteerDownloader(false);
             //Console.WriteLine(puppeteerDownloader.GetText(page1));
 
-        }
-
-        private string? GetText(Pages.Page page)
-        {
-            SetContentAndScrenshot(page);
-            if (Content != null)
-            {
-                HtmlDocument htmlDocument = new();
-                try
-                {
-                    htmlDocument.LoadHtml(Content);
-                    return landerist_library.Infrastructure.Html.HtmlToText.GetText(htmlDocument);
-                }
-                catch (Exception exception)
-                {
-                    Logger.WriteError("PuppeteerDownloader GetText", exception.ToString());
-                }
-            }
-
-            return null;
         }
 
         public void Download(Pages.Page page)
@@ -291,28 +226,21 @@ namespace landerist_library.Infrastructure.Downloaders.Puppeteer
             try
             {
                 Task<string?> download = GetAsync();
-                Task timeout = Task.Delay(delay + 1000, cancellationToken);
-                Task completed = await Task.WhenAny(download, timeout)
-                    .ConfigureAwait(false);
-
-                if (completed == download)
+                PuppeteerDownloadExecutionResult<string?> result =
+                    await PuppeteerDownloadExecution.WaitAsync(
+                        download,
+                        delay + 1000,
+                        cancellationToken,
+                        timedOutDownload => SetBrowserChrashed(BuildExecutionMessage(
+                            "Timeout reached",
+                            timedOutDownload,
+                            delay,
+                            stopwatch.ElapsedMilliseconds)),
+                        ClosePageAsync).ConfigureAwait(false);
+                if (!result.TimedOut)
                 {
-                    Content = await download.ConfigureAwait(false);
-                    return;
+                    Content = result.Value;
                 }
-
-                cancellationToken.ThrowIfCancellationRequested();
-                SetBrowserChrashed(BuildExecutionMessage(
-                    "Timeout reached",
-                    download,
-                    delay,
-                    stopwatch.ElapsedMilliseconds));
-                await ClosePageAsync().ConfigureAwait(false);
-            }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-            {
-                await ClosePageAsync().ConfigureAwait(false);
-                throw;
             }
             catch (Exception exception)
             {
@@ -360,7 +288,13 @@ namespace landerist_library.Infrastructure.Downloaders.Puppeteer
                 }
 
                 SetExecutionStep("Navigating");
-                var response = await NavigateWithTimeoutAsync(Page.Uri.ToString());
+                var response = await PuppeteerNavigation.NavigateAsync(
+                    BrowserPage!,
+                    Page.Uri.ToString(),
+                    Page.Website.NavigationWaitSelector,
+                    GetTimeout(UseProxy),
+                    SetExecutionStep,
+                    ClosePageAsync).ConfigureAwait(false);
                 if (response == null)
                 {
                     throw new NavigationException("Response is null.");
@@ -437,65 +371,6 @@ namespace landerist_library.Infrastructure.Downloaders.Puppeteer
             return content;
         }
 
-        private async Task<IResponse?> NavigateWithTimeoutAsync(string url)
-        {
-            var timeout = GetTimeout(UseProxy);
-            var navigationWaitSelector = Page?.Website.NavigationWaitSelector;
-
-            var navigationTask = string.IsNullOrWhiteSpace(navigationWaitSelector)
-                ? NavigateUntilNetworkIdleAsync(url, timeout)
-                : NavigateUntilSelectorAsync(url, navigationWaitSelector.Trim(), timeout);
-
-            var completedTask = await Task.WhenAny(navigationTask, Task.Delay(timeout));
-
-            if (completedTask == navigationTask)
-            {
-                return await navigationTask;
-            }
-
-            SetExecutionStep("Navigation timeout");
-            await ClosePageAsync();
-            throw new NavigationException($"Navigation timed out after {timeout} ms.");
-        }
-
-        private async Task<IResponse?> NavigateUntilNetworkIdleAsync(string url, int timeout)
-        {
-            NavigationOptions navigationOptions = new()
-            {
-                WaitUntil = [WaitUntilNavigation.Networkidle2],
-                Timeout = timeout
-            };
-
-            return await BrowserPage!.GoToAsync(url, navigationOptions);
-        }
-
-        private async Task<IResponse?> NavigateUntilSelectorAsync(string url, string selector, int timeout)
-        {
-            var stopwatch = Stopwatch.StartNew();
-
-            NavigationOptions navigationOptions = new()
-            {
-                WaitUntil = [WaitUntilNavigation.DOMContentLoaded],
-                Timeout = timeout
-            };
-
-            var response = await BrowserPage!.GoToAsync(url, navigationOptions);
-            var remainingTimeout = timeout - (int)Math.Min(stopwatch.ElapsedMilliseconds, timeout);
-            if (remainingTimeout <= 0)
-            {
-                throw new NavigationException($"Navigation timed out after {timeout} ms.");
-            }
-
-            SetExecutionStep("Waiting navigation selector");
-            await BrowserPage.WaitForSelectorAsync(selector, new WaitForSelectorOptions
-            {
-                Visible = true,
-                Timeout = remainingTimeout
-            });
-
-            return response;
-        }
-
         private async Task InitializePage()
         {
             FirstNavigationRequestReaded = false;
@@ -535,33 +410,13 @@ namespace landerist_library.Infrastructure.Downloaders.Puppeteer
                 return;
             }
 
-            BrowserPage.DefaultNavigationTimeout = GetTimeout(UseProxy);
             SetExecutionStep("Configuring browser page");
-            await SetExtraHttpHeadersAsync(BrowserPage, Page.Website);
-            await BrowserPage.SetUserAgentAsync(Page.Website.BrowserUserAgent);
-            await BrowserPage.SetCacheEnabledAsync(false);
-            await BrowserPage.SetRequestInterceptionAsync(true);
-            BrowserPage.Request += (_, e) => _ = HandleRequestAsync(e);
-            BrowserPage.Response += (_, e) => HandleResponseAsync(e);
-        }
-
-        private static async Task SetExtraHttpHeadersAsync(IPage browserPage, Website website)
-        {
-            Dictionary<string, string> extraHeaders = new(WebsiteHttpRequestProfile.From(website).Headers, StringComparer.OrdinalIgnoreCase);
-            extraHeaders.Remove("User-Agent");
-            switch (website.LanguageCode)
-            {
-                case LanguageCode.es:
-                    {
-                        extraHeaders.TryAdd("Accept-Language", "es-ES, es;q=0.9");
-                    }
-                    break;
-            }
-
-            if (extraHeaders.Count > 0)
-            {
-                await browserPage.SetExtraHttpHeadersAsync(extraHeaders);
-            }
+            await PuppeteerPageConfiguration.ConfigureAsync(
+                BrowserPage,
+                Page.Website,
+                GetTimeout(UseProxy),
+                (_, e) => _ = HandleRequestAsync(e),
+                (_, e) => HandleResponseAsync(e)).ConfigureAwait(false);
         }
 
         private async Task HandleRequestAsync(RequestEventArgs e)
