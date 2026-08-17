@@ -24,6 +24,34 @@ public sealed class ListingMaterializationArchitectureTests
         Assert.Contains("TimeProvider", source, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public void StructuredOutputParser_DelegatesFieldsAndRelations()
+    {
+        string directory = Path.Combine(
+            FindRepositoryRoot(),
+            "landerist_infrastructure",
+            "Infrastructure",
+            "Ai",
+            "StructuredOutputs");
+        string parser = File.ReadAllText(Path.Combine(
+            directory,
+            "StructuredOutputEsParser.cs"));
+        string mapper = File.ReadAllText(Path.Combine(
+            directory,
+            "StructuredOutputListingMapper.cs"));
+        string relations = File.ReadAllText(Path.Combine(
+            directory,
+            "StructuredOutputListingRelations.cs"));
+
+        Assert.Contains("StructuredOutputListingMapper", parser);
+        Assert.Contains("StructuredOutputListingRelations.Attach", parser);
+        Assert.DoesNotContain("new Listing", parser);
+        Assert.Contains("internal Listing Create(Page page)", mapper);
+        Assert.DoesNotContain("AddMediaImages", mapper);
+        Assert.Contains("AddMediaImages", relations);
+        Assert.Contains("listing.sources.Add", relations);
+    }
+
     private static string FindRepositoryRoot()
     {
         DirectoryInfo? directory = new(AppContext.BaseDirectory);

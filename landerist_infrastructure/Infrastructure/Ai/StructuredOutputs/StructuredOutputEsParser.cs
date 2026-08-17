@@ -1,439 +1,73 @@
-using landerist_domain.Parsing.StructuredOutputs;
 using landerist_domain.Parsing.Materialization;
-using landerist_orels.ES;
-using landerist_orels;
+using landerist_domain.Parsing.StructuredOutputs;
 using landerist_library.Pages;
 using landerist_library.Websites;
+using landerist_orels.ES;
 
-namespace landerist_library.Infrastructure.Ai.StructuredOutputs
+namespace landerist_library.Infrastructure.Ai.StructuredOutputs;
+
+public sealed record StructuredOutputMaterializationOperations(
+    Func<string, string> Clean,
+    Func<string, string> RemoveSpaces,
+    Func<string?, bool> ValidatePhone,
+    Func<string?, bool> ValidateEmail,
+    Func<string?, bool> ValidateCadastralReference,
+    Action<Listing, Page, WebsiteAccessServices, List<(string url, string? title)>> AddMediaImages,
+    Action<string, Uri, Exception> LogError);
+
+public class StructuredOutputEsParser
 {
-    public sealed record StructuredOutputMaterializationOperations(
-        Func<string, string> Clean,
-        Func<string, string> RemoveSpaces,
-        Func<string?, bool> ValidatePhone,
-        Func<string?, bool> ValidateEmail,
-        Func<string?, bool> ValidateCadastralReference,
-        Action<Listing, Page, WebsiteAccessServices, List<(string url, string? title)>> AddMediaImages,
-        Action<string, Uri, Exception> LogError);
+    private readonly ListingMaterializationRules Rules;
+    private readonly TimeProvider TimeProvider;
+    private readonly StructuredOutputMaterializationOperations Operations;
 
-    public class StructuredOutputEsParser(
+    public StructuredOutputEsParser(
         StructuredOutputEs structuredOutputEs,
         ListingMaterializationRules rules,
         TimeProvider timeProvider,
         StructuredOutputMaterializationOperations operations)
     {
-        public Anuncio? Anuncio = structuredOutputEs.Anuncio;
+        ArgumentNullException.ThrowIfNull(structuredOutputEs);
+        ArgumentNullException.ThrowIfNull(rules);
+        ArgumentNullException.ThrowIfNull(timeProvider);
+        ArgumentNullException.ThrowIfNull(operations);
+        Anuncio = structuredOutputEs.Anuncio;
+        Rules = rules;
+        TimeProvider = timeProvider;
+        Operations = operations;
+    }
 
-        public (PageType pageType, Listing? listing) Parse(Page page, WebsiteAccessServices websiteAccess)
+    public Anuncio? Anuncio { get; }
+
+    public (PageType pageType, Listing? listing) Parse(
+        Page page,
+        WebsiteAccessServices websiteAccess)
+    {
+        if (Anuncio is null)
         {
-            if (Anuncio == null)
-            {
-                return (PageType.NotListingByParser, null);
-            }
+            return (PageType.NotListingByParser, null);
+        }
 
-            try
-            {
-                var listing = new Listing
-                {
-                    guid = page.UriHash,
-                    listingStatus = GetListingStatus(),
-                    listingDate = GetListingDate(),
-                    operation = GetOperation(),
-                    propertyType = GetPropertyType(),
-                    propertySubtype = GetPropertySubtype(),
-                    price = GetPropertyPrice(),
-                    description = GetDescription(),
-                    contactName = GetContactName(),
-                    contactPhone = GetContactPhone(),
-                    contactEmail = GetContactEmail(),
-                    address = GetAddress(),
-                    cadastralReference = GetCadastralReference(),
-                    propertySize = GetPropertySize(),
-                    landSize = GetLandSize(),
-                    constructionYear = GetConstrunctionYear(),
-                    constructionStatus = GetConstructionStatus(),
-                    energyEfficiencyRating = GetEnergyEfficiencyRating(),
-                    floors = GetFloors(),
-                    floor = GetFloor(),
-                    bedrooms = GetBedrooms(),
-                    bathrooms = GetBathrooms(),
-                    parkings = GetParkings(),
-                    terrace = Anuncio.TieneTerraza,
-                    garden = Anuncio.TieneJardín,
-                    garage = Anuncio.TieneGaraje,
-                    motorbikeGarage = Anuncio.TieneParkingParaMoto,
-                    pool = Anuncio.TienePiscina,
-                    lift = Anuncio.TieneAscensor,
-                    disabledAccess = Anuncio.TieneAccesoParaDiscapacitados,
-                    storageRoom = Anuncio.TieneTrastero,
-                    furnished = Anuncio.EstaAmueblado,
-                    nonFurnished = Anuncio.NoEstaAmueblado,
-                    heating = Anuncio.TieneCalefacción,
-                    airConditioning = Anuncio.TieneAireAcondicionado,
-                    petsAllowed = Anuncio.PermiteMascotas,
-                    securitySystems = Anuncio.TieneSistemasDeSeguridad,
-                };
-
-                SetMedia(listing, page, websiteAccess);
-                SetSource(listing, page);
-                return (PageType.Listing, listing);
-            }
-            catch (Exception exception)
-            {
-                operations.LogError("StructuredOutputEsParser.Parse", page.Uri, exception);
-            }
+        try
+        {
+            Listing listing = new StructuredOutputListingMapper(
+                Anuncio,
+                Rules,
+                TimeProvider,
+                Operations).Create(page);
+            StructuredOutputListingRelations.Attach(
+                listing,
+                Anuncio,
+                page,
+                websiteAccess,
+                Rules,
+                Operations);
+            return (PageType.Listing, listing);
+        }
+        catch (Exception exception)
+        {
+            Operations.LogError("StructuredOutputEsParser.Parse", page.Uri, exception);
             return (PageType.MayBeListing, null);
-        }
-
-        private ListingStatus GetListingStatus()
-        {
-            return Anuncio!.EstadoDePublicación == EstadosDePublicación.despublicado
-                ? ListingStatus.unpublished
-                : ListingStatus.published;
-        }
-
-        private DateTime GetListingDate()
-        {
-            var now = timeProvider.GetLocalNow().DateTime;
-            if (DateTime.TryParse(Anuncio?.FechaDePublicación, out DateTime listingDateParsed))
-            {
-                var maxListingDate = now.AddDays(1);
-                var minListingDate = now.AddYears(-rules.MaxPublishedAgeYears);
-                if (listingDateParsed >= minListingDate && listingDateParsed <= maxListingDate)
-                {
-                    return listingDateParsed;
-                }
-            }
-            return now;
-        }
-
-        private string GetDescription()
-        {
-            if (Anuncio == null || string.IsNullOrEmpty(Anuncio.DescripciónDelAnuncio))
-            {
-                return string.Empty;
-            }
-            return operations.Clean(Anuncio.DescripciónDelAnuncio);
-        }
-
-        private Operation GetOperation()
-        {
-            return Anuncio!.TipoDeOperación switch
-            {
-                TiposDeOperacion.venta => Operation.sell,
-                TiposDeOperacion.alquiler => Operation.rent,
-                _ => Operation.sell,
-            };
-        }
-
-        private PropertyType GetPropertyType()
-        {
-            return Anuncio!.TipoDeInmueble switch
-            {
-                TiposDeInmueble.vivienda => PropertyType.home,
-                TiposDeInmueble.dormitorio => PropertyType.room,
-                TiposDeInmueble.local_comercial => PropertyType.premise,
-                TiposDeInmueble.nave_industrial => PropertyType.industrial,
-                TiposDeInmueble.garaje => PropertyType.garage,
-                TiposDeInmueble.trastero => PropertyType.storage,
-                TiposDeInmueble.oficina => PropertyType.office,
-                TiposDeInmueble.parcela => PropertyType.land,
-                TiposDeInmueble.edificio => PropertyType.building,
-                _ => PropertyType.home,
-            };
-        }
-
-        private PropertySubtype? GetPropertySubtype()
-        {
-            if (Anuncio!.SubtipoDeInmueble == null)
-            {
-                return null;
-            }
-
-            var propertyType = GetPropertyType();
-
-            return (propertyType, Anuncio!.SubtipoDeInmueble) switch
-            {
-                (PropertyType.home, SubtiposDeInmueble.piso) => (PropertySubtype?)PropertySubtype.flat,
-                (PropertyType.home, SubtiposDeInmueble.apartamento) => (PropertySubtype?)PropertySubtype.apartment,
-                (PropertyType.home, SubtiposDeInmueble.ático) => (PropertySubtype?)PropertySubtype.penthouse,
-                (PropertyType.home, SubtiposDeInmueble.bungalow) => (PropertySubtype?)PropertySubtype.bungalow,
-                (PropertyType.home, SubtiposDeInmueble.duplex) => (PropertySubtype?)PropertySubtype.duplex,
-                (PropertyType.home, SubtiposDeInmueble.chalet_independiente) => (PropertySubtype?)PropertySubtype.detached,
-                (PropertyType.home, SubtiposDeInmueble.chalet_pareado) => (PropertySubtype?)PropertySubtype.semi_detached,
-                (PropertyType.home, SubtiposDeInmueble.chalet_adosado) => (PropertySubtype?)PropertySubtype.terraced,
-                (PropertyType.land, SubtiposDeInmueble.parcela_urbana) => (PropertySubtype?)PropertySubtype.developed,
-                (PropertyType.land, SubtiposDeInmueble.parcela_urbanizable) => (PropertySubtype?)PropertySubtype.buildable,
-                (PropertyType.land, SubtiposDeInmueble.parcela_no_urbanizable) => (PropertySubtype?)PropertySubtype.non_building,
-                _ => null,
-            };
-        }
-
-        private Price? GetPropertyPrice()
-        {
-            if (Anuncio!.PrecioDelAnuncio.HasValue)
-            {
-                var price = (decimal)Anuncio!.PrecioDelAnuncio;
-                if (price > 0)
-                {
-                    return new Price(price, Currency.EUR);
-                }
-            }
-            return null;
-        }
-
-        private static string GetSourceName(Page page)
-        {
-            return page.Website.Host;
-        }
-
-        private string? GetSourceGuid()
-        {
-            if (string.IsNullOrEmpty(Anuncio!.ReferenciaDelAnuncio))
-            {
-                return null;
-            }
-            return operations.Clean(Anuncio!.ReferenciaDelAnuncio);
-        }
-
-        private static Uri GetSourceUrl(Page page)
-        {
-            return page.Uri;
-        }
-
-        private string? GetContactName()
-        {
-            if (string.IsNullOrEmpty(Anuncio!.NombreDeContacto))
-            {
-                return null;
-            }
-            var nombreDeContacto = operations.Clean(Anuncio!.NombreDeContacto);
-            if (string.IsNullOrEmpty(nombreDeContacto))
-            {
-                return null;
-            }
-            return nombreDeContacto;
-        }
-
-        private string? GetContactPhone()
-        {
-            if (string.IsNullOrEmpty(Anuncio!.TeléfonoDeContacto))
-            {
-                return null;
-            }
-            var telefonoDeContacto = operations.Clean(Anuncio!.TeléfonoDeContacto);
-            if (!operations.ValidatePhone(telefonoDeContacto))
-            {
-                return null;
-            }
-            return telefonoDeContacto;
-        }
-
-        private string? GetContactEmail()
-        {
-            if (string.IsNullOrEmpty(Anuncio!.EmailDeContacto))
-            {
-                return null;
-            }
-            var emailDeContacto = operations.Clean(Anuncio!.EmailDeContacto);
-            emailDeContacto = operations.RemoveSpaces(emailDeContacto);
-            if (!operations.ValidateEmail(emailDeContacto))
-            {
-                return null;
-            }
-            return emailDeContacto;
-        }
-
-        private string? GetAddress()
-        {
-            if (string.IsNullOrEmpty(Anuncio!.DirecciónDelInmueble))
-            {
-                return null;
-            }
-            char[] trimChars = { '*', '-', ' ', ',', '.' };
-            var address = operations.Clean(Anuncio!.DirecciónDelInmueble).Trim(trimChars);
-            if (string.IsNullOrEmpty(address))
-            {
-                return null;
-            }
-            return address;
-        }
-
-        private string? GetCadastralReference()
-        {
-            if (string.IsNullOrEmpty(Anuncio!.ReferenciaDelAnuncio))
-            {
-                return null;
-            }
-            var referenciaCatastral = operations.Clean(Anuncio!.ReferenciaDelAnuncio).ToUpper();
-            if (!operations.ValidateCadastralReference(referenciaCatastral))
-            {
-                return null;
-            }
-            return referenciaCatastral;
-        }
-
-        private double? GetPropertySize()
-        {
-            if (Anuncio!.TamañoDelInmueble.HasValue &&
-                Anuncio!.TamañoDelInmueble >= rules.MinPropertySize &&
-                Anuncio!.TamañoDelInmueble <= rules.MaxPropertySize)
-            {
-                return Anuncio!.TamañoDelInmueble;
-            }
-            return null;
-        }
-
-        private double? GetLandSize()
-        {
-            if (Anuncio!.TamañoDeLaParcela.HasValue &&
-                Anuncio!.TamañoDeLaParcela >= rules.MinLandSize &&
-                Anuncio!.TamañoDeLaParcela <= rules.MaxLandSize)
-            {
-                return Anuncio!.TamañoDeLaParcela;
-            }
-            return null;
-        }
-
-        private int? GetConstrunctionYear()
-        {
-            var constructionYear = Anuncio!.AñoDeConstrucción;
-            var maxConstructionYear = timeProvider.GetLocalNow().DateTime.AddYears(rules.MaxConstructionYearsFromNow).Year;
-
-            if (constructionYear.HasValue &&
-                constructionYear >= rules.MinConstructionYear &&
-                constructionYear <= maxConstructionYear)
-            {
-                return constructionYear;
-            }
-            return null;
-        }
-
-        private ConstructionStatus? GetConstructionStatus()
-        {
-            if (Anuncio!.EstadoDeLaConstrucción == null)
-            {
-                return null;
-            }
-
-            return Anuncio!.EstadoDeLaConstrucción switch
-            {
-                EstadosDeLaConstrucción.obra_nueva => (ConstructionStatus?)ConstructionStatus.@new,
-                EstadosDeLaConstrucción.buen_estado => (ConstructionStatus?)ConstructionStatus.good,
-                EstadosDeLaConstrucción.a_reformar => (ConstructionStatus?)ConstructionStatus.for_renovation,
-                EstadosDeLaConstrucción.en_ruinas => (ConstructionStatus?)ConstructionStatus.refurbished,
-                _ => null,
-            };
-        }
-
-        private EnergyEfficiencyRating? GetEnergyEfficiencyRating()
-        {
-            if (GetPropertyType() == PropertyType.land || Anuncio!.CalificaciónEnergética == null)
-            {
-                return null;
-            }
-
-            return Anuncio!.CalificaciónEnergética switch
-            {
-                CalificacionesDeEficienciaEnergetica.A => (EnergyEfficiencyRating?)EnergyEfficiencyRating.A,
-                CalificacionesDeEficienciaEnergetica.B => (EnergyEfficiencyRating?)EnergyEfficiencyRating.B,
-                CalificacionesDeEficienciaEnergetica.C => (EnergyEfficiencyRating?)EnergyEfficiencyRating.C,
-                CalificacionesDeEficienciaEnergetica.D => (EnergyEfficiencyRating?)EnergyEfficiencyRating.D,
-                CalificacionesDeEficienciaEnergetica.E => (EnergyEfficiencyRating?)EnergyEfficiencyRating.E,
-                CalificacionesDeEficienciaEnergetica.F => (EnergyEfficiencyRating?)EnergyEfficiencyRating.F,
-                CalificacionesDeEficienciaEnergetica.G => (EnergyEfficiencyRating?)EnergyEfficiencyRating.G,
-                _ => null,
-            };
-        }
-
-        private int? GetFloors()
-        {
-            var floors = Anuncio!.PlantasDelEdificio;
-            if (floors.HasValue &&
-                floors >= rules.MinFloors &&
-                floors <= rules.MaxFloors)
-            {
-                return floors;
-            }
-            return null;
-        }
-
-        private string? GetFloor()
-        {
-            if (string.IsNullOrEmpty(Anuncio!.PlantaDelInmueble))
-            {
-                return null;
-            }
-            return operations.Clean(Anuncio!.PlantaDelInmueble);
-        }
-
-        private int? GetBedrooms()
-        {
-            var bedrooms = Anuncio!.NúmeroDeDormitorios;
-            if (bedrooms.HasValue &&
-                bedrooms >= rules.MinBedrooms &&
-                bedrooms <= rules.MaxBedrooms)
-            {
-                return bedrooms;
-            }
-            return null;
-        }
-
-        private int? GetBathrooms()
-        {
-            var bathrooms = Anuncio!.NúmeroDeBaños;
-            if (bathrooms.HasValue &&
-                bathrooms >= rules.MinBathrooms &&
-                bathrooms <= rules.MaxBathrooms)
-            {
-                return bathrooms;
-            }
-            return null;
-        }
-
-        private int? GetParkings()
-        {
-            var parkings = Anuncio!.NúmeroDeParkings;
-            if (parkings.HasValue &&
-                parkings >= rules.MinParkings &&
-                parkings <= rules.MaxParkings)
-            {
-                return parkings;
-            }
-            return null;
-        }
-
-        private void SetMedia(Listing listing, Page page, WebsiteAccessServices websiteAccess)
-        {
-            if (Anuncio!.ImagenesDelAnuncio is null ||
-                Anuncio!.ImagenesDelAnuncio.Count.Equals(0) ||
-                !rules.MediaEnabled)
-            {
-                return;
-            }
-            var list = new List<(string url, string? title)>();
-            foreach (var img in Anuncio!.ImagenesDelAnuncio.Take((int)StructuredOutputEsJson.MAX_URLS_DE_IMAGENES_DEL_ANUNCIO))
-            {
-                if (img is null || string.IsNullOrWhiteSpace(img.Url))
-                {
-                    continue;
-                }
-
-                list.Add((img.Url, img.Titulo));
-            }
-
-            operations.AddMediaImages(listing, page, websiteAccess, list);
-        }
-
-        private void SetSource(Listing listing, Page page)
-        {
-            var source = new Source
-            {
-                sourceGuid = GetSourceGuid(),
-                sourceUrl = GetSourceUrl(page),
-                sourceName = GetSourceName(page),
-            };
-            listing.sources.Add(source);
         }
     }
 }
