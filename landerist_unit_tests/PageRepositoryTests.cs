@@ -106,6 +106,16 @@ public sealed class PageRepositoryTests
     }
 
     [Fact]
+    public void GetScrapePages_RejectsInvalidLimitBeforeExecutingSql()
+    {
+        RecordingDatabase database = new();
+        PageQueryRepository repository = new(database);
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => repository.GetScrapePages(0));
+        Assert.Empty(database.LastQuery);
+    }
+
+    [Fact]
     public void ListingParserInputExists_UsesInjectedDatabase()
     {
         RecordingDatabase database = new() { QueryExistsResult = true };
