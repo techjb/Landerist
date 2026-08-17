@@ -161,6 +161,17 @@ public sealed class LanderistRuntimeOptionsTests
         Assert.Throws<ArgumentException>(options.Validate);
     }
 
+    [Fact]
+    public void Validate_RejectsNonPositiveBackupRetention()
+    {
+        LanderistRuntimeOptions options = CreateOptions() with
+        {
+            Backup = DatabaseBackupOptions.Disabled with { RetentionDays = 0 }
+        };
+
+        Assert.Throws<ArgumentOutOfRangeException>(options.Validate);
+    }
+
     private static LanderistRuntimeOptions CreateOptions() => new(
         new DatabaseRuntimeOptions(
             "sql.example.test",

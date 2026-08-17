@@ -14,6 +14,7 @@ using landerist_library.Infrastructure.Statistics;
 using landerist_library.Infrastructure.Location.Providers.Goolzoom;
 using landerist_library.Infrastructure.Location.Providers.GoogleMaps;
 using landerist_library.Websites;
+using landerist_library.Infrastructure.Runtime;
 
 namespace landerist_console;
 
@@ -80,6 +81,8 @@ internal sealed class LanderistDatabaseAdapterFactory(
     public LegacyAddressDataMaintenance CreateAddressDataMaintenance() =>
         new(databaseFactory.Create());
 
-    public SqlDatabaseBackupService CreateDatabaseBackupService() =>
-        new(databaseFactory.Create());
+    public SqlDatabaseBackupService CreateDatabaseBackupService(
+        DatabaseBackupOptions options,
+        IApplicationLogger logger) =>
+        new(databaseFactory.Create(), options, logger);
 }

@@ -27,6 +27,8 @@ public sealed record LanderistRuntimeOptions(
 
     public DistributionOptions Distribution { get; init; } = DistributionOptions.Empty;
 
+    public DatabaseBackupOptions Backup { get; init; } = DatabaseBackupOptions.Disabled;
+
     public void Validate()
     {
         ArgumentNullException.ThrowIfNull(Database);
@@ -41,6 +43,25 @@ public sealed record LanderistRuntimeOptions(
         Integrations.Validate();
         Execution.Validate();
         Distribution.Validate();
+        Backup.Validate();
+    }
+}
+
+public sealed record DatabaseBackupOptions(
+    string DatabaseName,
+    string LocalDirectory,
+    string BucketName,
+    int RetentionDays)
+{
+    public static DatabaseBackupOptions Disabled { get; } = new(
+        "unconfigured", ".", "unconfigured", 60);
+
+    public void Validate()
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(DatabaseName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(LocalDirectory);
+        ArgumentException.ThrowIfNullOrWhiteSpace(BucketName);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(RetentionDays);
     }
 }
 

@@ -75,7 +75,12 @@ internal static class LanderistRuntimeOptionsAdapter
                 settings.GetString("AWS_S3_DOWNLOADS_BUCKET"),
                 settings.GetString("AWS_ACESSKEYID"),
                 settings.GetString("AWS_SECRETACCESSKEY"),
-                settings.GetString("AWS_CLOUDFRONT_DISTRIBUTION_ID_WEBSITE"))
+                settings.GetString("AWS_CLOUDFRONT_DISTRIBUTION_ID_WEBSITE")),
+            Backup = new DatabaseBackupOptions(
+                Config.DATABASE_NAME,
+                Config.BACKUPS_DIRECTORY ?? string.Empty,
+                settings.GetString("AWS_S3_BACKUPS_BUCKET"),
+                Config.DAYS_TO_DELETE_BACKUP)
         };
 
         options.Validate();

@@ -27,7 +27,9 @@ internal sealed class LanderistDistributionComposition(
         WebsiteQueryRepository websiteQueries) => new(
             databaseAdapters.CreateAddressDataMaintenance(),
             notListingCache,
-            databaseAdapters.CreateDatabaseBackupService(),
+            databaseAdapters.CreateDatabaseBackupService(
+                runtimeOptions.Backup,
+                logger),
             globalStatistics,
             hostStatistics,
             new DistributionPublisher(

@@ -1,99 +1,105 @@
+using landerist_library.Application.Logging;
 using landerist_library.Application.Tasks;
-using landerist_library.Configuration;
 using landerist_library.Database;
-using landerist_library.Export;
-using landerist_library.Logs;
+using landerist_library.Infrastructure.Runtime;
+using landerist_library.Infrastructure.DatabaseMaintenance;
+using System.Globalization;
 
 namespace landerist_library.Infrastructure.Backup;
 
 public sealed class SqlDatabaseBackupService : IDatabaseBackupService
 {
     private readonly IDatabase _database;
+    private readonly DatabaseBackupOptions _options;
+    private readonly IBackupStorage _storage;
+    private readonly IBackupFileSystem _files;
+    private readonly TimeProvider _timeProvider;
+    private readonly IApplicationLogger _logger;
 
-    public SqlDatabaseBackupService(IDatabase database)
+    public SqlDatabaseBackupService(
+        IDatabase database,
+        DatabaseBackupOptions options,
+        IApplicationLogger logger)
+        : this(
+            database,
+            options,
+            new S3BackupStorage(options.BucketName),
+            new SystemBackupFileSystem(),
+            TimeProvider.System,
+            logger)
+    {
+    }
+
+    internal SqlDatabaseBackupService(
+        IDatabase database,
+        DatabaseBackupOptions options,
+        IBackupStorage storage,
+        IBackupFileSystem files,
+        TimeProvider timeProvider,
+        IApplicationLogger logger)
     {
         ArgumentNullException.ThrowIfNull(database);
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(storage);
+        ArgumentNullException.ThrowIfNull(files);
+        ArgumentNullException.ThrowIfNull(timeProvider);
+        ArgumentNullException.ThrowIfNull(logger);
+        options.Validate();
         _database = database;
+        _options = options;
+        _storage = storage;
+        _files = files;
+        _timeProvider = timeProvider;
+        _logger = logger;
     }
 
     public void Update()
     {
         CreateNewBackup();
-        DeleteRemoteOldBackups();
-        DeleteLocalFiles();
+        DeleteExpiredRemoteBackups();
+        _files.DeleteAllFiles(_options.LocalDirectory);
     }
 
     private void CreateNewBackup()
     {
-        bool success = false;
-        string fileName = Config.DATABASE_NAME + DateTime.Now.ToString("yyyyMMdd") + ".bak";
-        string filePath = LocalBakAbsolutePath(fileName);
-
-        if (SaveBackup(filePath))
-        {
-            success = UploadBackup(fileName, filePath);
-        }
-        Log.WriteInfo("backup", fileName + " Success: " + success);
+        string fileName = _options.DatabaseName +
+            _timeProvider.GetLocalNow().ToString("yyyyMMdd", CultureInfo.InvariantCulture) +
+            ".bak";
+        string filePath = Path.Combine(_options.LocalDirectory, fileName);
+        bool success = SaveBackup(filePath) && UploadBackup(fileName, filePath);
+        _logger.WriteInfo("backup", fileName + " Success: " + success);
     }
 
     private bool SaveBackup(string filePath)
     {
-        Console.WriteLine("Creating backup " + filePath + " ..");
-
+        string escapedDatabaseName = _options.DatabaseName.Replace("]", "]]", StringComparison.Ordinal);
+        string escapedFilePath = filePath.Replace("'", "''", StringComparison.Ordinal);
         string query =
-            "BACKUP DATABASE [" + Config.DATABASE_NAME + "] TO " +
-            "DISK = N'" + filePath + "' WITH NOFORMAT, INIT, " +
-            "NAME = N'" + Config.DATABASE_NAME + "-Full Database Backup', SKIP, NOREWIND, NOUNLOAD, STATS = 10";
+            $"BACKUP DATABASE [{escapedDatabaseName}] TO " +
+            $"DISK = N'{escapedFilePath}' WITH NOFORMAT, INIT, " +
+            $"NAME = N'{escapedDatabaseName}-Full Database Backup', " +
+            "SKIP, NOREWIND, NOUNLOAD, STATS = 10";
 
         _database.SetTimeout(60 * 10);
         return _database.Query(query);
     }
 
-    private static bool UploadBackup(string fileName, string filePath)
-    {
-        Console.WriteLine("Uploading backup " + fileName + "..");
-        if (!File.Exists(filePath))
-        {
-            return false;
-        }
-        return new S3().UploadFile(filePath, fileName, AppConfig.AWS_S3_BACKUPS_BUCKET);
-    }
+    private bool UploadBackup(string fileName, string filePath) =>
+        _files.Exists(filePath) && _storage.Upload(filePath, fileName);
 
-    private static void DeleteRemoteOldBackups()
+    private void DeleteExpiredRemoteBackups()
     {
-        Console.WriteLine("Deleting old backups ..");
-        var s3Objects = new S3().ListObjects(AppConfig.AWS_S3_BACKUPS_BUCKET).Result;
-        List<string> toDelete = [];
-        DateTime dateToDelete = DateTime.Now.AddDays(-Config.DAYS_TO_DELETE_BACKUP);
-        foreach (var s3Object in s3Objects)
-        {
-            if (s3Object.LastModified < dateToDelete)
-            {
-                toDelete.Add(s3Object.Key);
-            }
-        }
-        if (toDelete.Count == 0)
-        {
-            return;
-        }
-        var deletedObjects = new S3().DeleteObjects(AppConfig.AWS_S3_BACKUPS_BUCKET, toDelete).Result;
-        Log.WriteInfo("backup", "DeleteOldBackups Deleted: " + deletedObjects.Count);
-    }
-
-    private static string LocalBakAbsolutePath(string fileName) =>
-        Config.BACKUPS_DIRECTORY + fileName;
-
-    private static void DeleteLocalFiles()
-    {
-        if (Config.BACKUPS_DIRECTORY is null)
+        DateTime threshold = _timeProvider.GetLocalNow().DateTime
+            .AddDays(-_options.RetentionDays);
+        string[] expiredKeys = [.. _storage.List()
+            .Where(item => item.LastModified < threshold)
+            .Select(item => item.Key)];
+        if (expiredKeys.Length == 0)
         {
             return;
         }
 
-        DirectoryInfo directoryInfo = new(Config.BACKUPS_DIRECTORY);
-        foreach (FileInfo fileInfo in directoryInfo.GetFiles())
-        {
-            fileInfo.Delete();
-        }
+        int deleted = _storage.Delete(expiredKeys);
+        _logger.WriteInfo("backup", "DeleteOldBackups Deleted: " + deleted);
     }
 }
