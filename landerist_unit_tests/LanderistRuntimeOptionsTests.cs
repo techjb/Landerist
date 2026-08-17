@@ -147,6 +147,20 @@ public sealed class LanderistRuntimeOptionsTests
         Assert.Throws<InvalidOperationException>(options.Validate);
     }
 
+    [Fact]
+    public void Validate_RejectsMissingDistributionDirectories()
+    {
+        LanderistRuntimeOptions options = CreateOptions() with
+        {
+            Distribution = DistributionOptions.Empty with
+            {
+                ExportDirectory = string.Empty
+            }
+        };
+
+        Assert.Throws<ArgumentException>(options.Validate);
+    }
+
     private static LanderistRuntimeOptions CreateOptions() => new(
         new DatabaseRuntimeOptions(
             "sql.example.test",

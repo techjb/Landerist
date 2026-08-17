@@ -2,12 +2,12 @@ using Amazon;
 using Amazon.CloudFront;
 using Amazon.CloudFront.Model;
 using landerist_library.Application.Websites;
-using landerist_library.Configuration;
 using landerist_library.Logs;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Infrastructure.WebsiteServices;
 using landerist_library.Application.Statistics;
 using landerist_library.Websites;
+using landerist_library.Infrastructure.Runtime;
 using landerist_orels.ES;
 using System.Globalization;
 
@@ -26,15 +26,24 @@ namespace landerist_library.Infrastructure.Distribution
 
     public class DistributionArtifacts
     {
+        protected readonly DistributionOptions? Options;
 
-        protected static string GetFilePath(string subdirectory)
+        protected DistributionArtifacts(DistributionOptions? options = null)
         {
-            return Config.EXPORT_DIRECTORY + subdirectory;
+            Options = options;
         }
-        protected static string GetFilePath(string subdirectory, string fileName)
+
+        protected string GetFilePath(string subdirectory)
         {
-            return Config.EXPORT_DIRECTORY + subdirectory + "\\" + fileName;
+            return Path.Combine(GetOptions().ExportDirectory, subdirectory);
         }
+        protected string GetFilePath(string subdirectory, string fileName)
+        {
+            return Path.Combine(GetOptions().ExportDirectory, subdirectory, fileName);
+        }
+
+        private DistributionOptions GetOptions() => Options
+            ?? throw new InvalidOperationException("Distribution options are required for filesystem operations.");
 
         protected static string GetLocalSubdirectory(CountryCode countryCode, ExportType exportType)
         {
@@ -145,35 +154,39 @@ namespace landerist_library.Infrastructure.Distribution
 
         public static void UpdateDownloadsPage(
             WebsiteMetricsService websiteMetrics,
-            IWebsiteCatalog websites)
+            IWebsiteCatalog websites,
+            DistributionOptions options)
         {
-            new DownloadsPage(websiteMetrics, websites).Update();
-            InvalidateCloudFront();
+            new DownloadsPage(websiteMetrics, websites, options).Update();
+            InvalidateCloudFront(options);
         }
 
         public static void UpdateStatisticsPage(
             GlobalStatistics globalStatistics,
-            PageStatisticsRepository pageStatistics)
+            PageStatisticsRepository pageStatistics,
+            DistributionOptions options)
         {
-            new StatisticsPage(globalStatistics, pageStatistics).UpdateCharts();
-            InvalidateCloudFront();
+            new StatisticsPage(globalStatistics, pageStatistics, options).UpdateCharts();
+            InvalidateCloudFront(options);
         }
 
         public static void UpdateHostStatisticsPage(
             HostStatistics hostStatistics,
             WebsiteMetricsService websiteMetrics,
-            IWebsiteCatalog websites)
+            IWebsiteCatalog websites,
+            DistributionOptions options)
         {
-            new HostStatisticsPage(hostStatistics, websiteMetrics, websites).Update();
-            InvalidateCloudFront();
+            new HostStatisticsPage(hostStatistics, websiteMetrics, websites, options).Update();
+            InvalidateCloudFront(options);
         }
 
         public static void UpdateHostsStatisticsPage(
             WebsiteMetricsService websiteMetrics,
-            IWebsiteCatalog websites)
+            IWebsiteCatalog websites,
+            DistributionOptions options)
         {
-            new HostsStatisticsPage(websiteMetrics, websites).Update();
-            InvalidateCloudFront();
+            new HostsStatisticsPage(websiteMetrics, websites, options).Update();
+            InvalidateCloudFront(options);
         }
 
         public static void UpdateAllPages(
@@ -181,18 +194,20 @@ namespace landerist_library.Infrastructure.Distribution
             HostStatistics hostStatistics,
             PageStatisticsRepository pageStatistics,
             WebsiteMetricsService websiteMetrics,
-            IWebsiteCatalog websites)
+            IWebsiteCatalog websites,
+            DistributionOptions options)
         {
-            new DownloadsPage(websiteMetrics, websites).Update();
-            new StatisticsPage(globalStatistics, pageStatistics).UpdateCharts();
-            new HostStatisticsPage(hostStatistics, websiteMetrics, websites).Update();
-            new HostsStatisticsPage(websiteMetrics, websites).Update();
-            InvalidateCloudFront();
+            new DownloadsPage(websiteMetrics, websites, options).Update();
+            new StatisticsPage(globalStatistics, pageStatistics, options).UpdateCharts();
+            new HostStatisticsPage(hostStatistics, websiteMetrics, websites, options).Update();
+            new HostsStatisticsPage(websiteMetrics, websites, options).Update();
+            InvalidateCloudFront(options);
         }
 
-        public static bool InvalidateCloudFront()
+        public static bool InvalidateCloudFront(DistributionOptions options)
         {
-            var client = new AmazonCloudFrontClient(AppConfig.AWS_ACESSKEYID, AppConfig.AWS_SECRETACCESSKEY, RegionEndpoint.EUWest3);
+            ArgumentNullException.ThrowIfNull(options);
+            var client = new AmazonCloudFrontClient(options.AwsAccessKeyId, options.AwsSecretAccessKey, RegionEndpoint.EUWest3);
             var invalidationBatch = new InvalidationBatch
             {
                 CallerReference = DateTime.UtcNow.Ticks.ToString(),
@@ -205,7 +220,7 @@ namespace landerist_library.Infrastructure.Distribution
 
             var request = new CreateInvalidationRequest
             {
-                DistributionId = AppConfig.AWS_CLOUDFRONT_DISTRIBUTION_ID_WEBSITE,
+                DistributionId = options.CloudFrontDistributionId,
                 InvalidationBatch = invalidationBatch
             };
 

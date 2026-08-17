@@ -2,11 +2,16 @@ using landerist_library.Export;
 using landerist_library.Logs;
 using landerist_orels.ES;
 using System.Data;
+using landerist_library.Infrastructure.Runtime;
 
 namespace landerist_library.Infrastructure.Distribution;
 
 internal sealed class DownloadsWorkspace : DistributionArtifacts
 {
+    public DownloadsWorkspace(DistributionOptions options) : base(options)
+    {
+    }
+
     public string EnsureSubdirectory(string subdirectory)
     {
         string directory = GetFilePath(subdirectory);

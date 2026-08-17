@@ -7,15 +7,18 @@ internal sealed class HistoricArtifactPublisher : DistributionArtifacts
     private readonly IDownloadsStorage _storage;
     private readonly IDistributionFileSystem _files;
     private readonly HistoricArtifactNaming _naming;
+    private readonly string _exportDirectory;
 
     public HistoricArtifactPublisher(
         IDownloadsStorage storage,
         IDistributionFileSystem files,
-        HistoricArtifactNaming naming)
+        HistoricArtifactNaming naming,
+        string exportDirectory)
     {
         _storage = storage;
         _files = files;
         _naming = naming;
+        _exportDirectory = exportDirectory;
     }
 
     public bool Upload(
@@ -34,7 +37,8 @@ internal sealed class HistoricArtifactPublisher : DistributionArtifacts
             dateFrom,
             dateTo,
             extension);
-        string historicPath = GetFilePath(
+        string historicPath = Path.Combine(
+            _exportDirectory,
             GetLocalSubdirectory(countryCode, exportType),
             fileName);
         try

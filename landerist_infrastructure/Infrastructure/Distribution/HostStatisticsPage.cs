@@ -1,5 +1,4 @@
 using landerist_library.Application.Websites;
-using landerist_library.Configuration;
 using landerist_library.Export;
 using landerist_library.Logs;
 using landerist_library.Infrastructure.WebsiteServices;
@@ -8,6 +7,7 @@ using System.Data;
 using System.Globalization;
 using System.Net;
 using System.Text.Json;
+using landerist_library.Infrastructure.Runtime;
 
 namespace landerist_library.Infrastructure.Distribution
 {
@@ -16,11 +16,14 @@ namespace landerist_library.Infrastructure.Distribution
         private readonly HostStatistics _statistics;
         private readonly WebsiteMetricsService _websiteMetrics;
         private readonly IWebsiteCatalog _websites;
+        private readonly string HostStatisticsTemplateHtmlFile;
+        private readonly string HostStatisticsHtmlFile;
 
         public HostStatisticsPage(
             HostStatistics statistics,
             WebsiteMetricsService websiteMetrics,
-            IWebsiteCatalog websites)
+            IWebsiteCatalog websites,
+            DistributionOptions options) : base(options)
         {
             ArgumentNullException.ThrowIfNull(statistics);
             ArgumentNullException.ThrowIfNull(websiteMetrics);
@@ -28,12 +31,9 @@ namespace landerist_library.Infrastructure.Distribution
             _statistics = statistics;
             _websiteMetrics = websiteMetrics;
             _websites = websites;
+            HostStatisticsTemplateHtmlFile = Path.Combine(options.TemplatesDirectory, "host-statistics", "host_statistics_template.html");
+            HostStatisticsHtmlFile = Path.Combine(options.OutputDirectory, "host_statistics.html");
         }
-        private readonly string HostStatisticsTemplateHtmlFile =
-            Path.Combine(Config.LANDERIST_COM_TEMPLATES!, "host-statistics", "host_statistics_template.html");
-
-        private readonly string HostStatisticsHtmlFile =
-            Path.Combine(Config.LANDERIST_COM_OUTPUT!, "host_statistics.html");
 
         private readonly JsonSerializerOptions JsonSerializerOptions = new()
         {

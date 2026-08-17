@@ -2,13 +2,13 @@ using System.Globalization;
 using System.Net;
 using System.Text;
 using landerist_library.Application.Websites;
-using landerist_library.Configuration;
 using landerist_library.Database;
 using landerist_library.Export;
 using landerist_library.Logs;
 using landerist_library.Infrastructure.WebsiteServices;
 using landerist_library.Websites;
 using landerist_orels.ES;
+using landerist_library.Infrastructure.Runtime;
 
 namespace landerist_library.Infrastructure.Distribution
 {
@@ -16,21 +16,23 @@ namespace landerist_library.Infrastructure.Distribution
     {
         private readonly WebsiteMetricsService _websiteMetrics;
         private readonly IWebsiteCatalog _websites;
+        private readonly DistributionOptions _options;
+        private readonly string DownloadsTemplateHtmlFile;
+        private readonly string DownloadsIndexHtmlFile;
 
         public DownloadsPage(
             WebsiteMetricsService websiteMetrics,
-            IWebsiteCatalog websites)
+            IWebsiteCatalog websites,
+            DistributionOptions options) : base(options)
         {
             ArgumentNullException.ThrowIfNull(websiteMetrics);
             ArgumentNullException.ThrowIfNull(websites);
             _websiteMetrics = websiteMetrics;
             _websites = websites;
+            _options = options;
+            DownloadsTemplateHtmlFile = Path.Combine(options.TemplatesDirectory, "downloads", "downloads_template.html");
+            DownloadsIndexHtmlFile = Path.Combine(options.TemplatesDirectory, "downloads", "index.html");
         }
-        private readonly string DownloadsTemplateHtmlFile =
-            Path.Combine(Config.LANDERIST_COM_TEMPLATES!, "downloads", "downloads_template.html");
-
-        private readonly string DownloadsIndexHtmlFile =
-            Path.Combine(Config.LANDERIST_COM_TEMPLATES!, "downloads", "index.html");
 
         private string DownloadsTemplate = string.Empty;
 
@@ -98,21 +100,21 @@ namespace landerist_library.Infrastructure.Distribution
             var s3 = new S3();
             string objectKey = GetObjectKey(countryCode, exportType, "json");
 
-            var (lastModified, contentLength) = s3.GetFileInfo(AppConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey);
+            var (lastModified, contentLength) = s3.GetFileInfo(_options.DownloadsBucket, objectKey);
             if (lastModified is null || contentLength is null)
             {
                 return;
             }
 
             var counter = s3.GetMetadataValue(
-                AppConfig.AWS_S3_DOWNLOADS_BUCKET,
+                _options.DownloadsBucket,
                 objectKey,
                 DownloadsUpdater.METADATA_KEY_COUNTER);
 
             string sizeString = FormatBytes((long)contentLength);
             Replace(Comment(countryCode, exportType, "Size"), sizeString);
 
-            var url = $"https://{AppConfig.AWS_S3_DOWNLOADS_BUCKET}.s3.amazonaws.com/{objectKey}";
+            var url = $"https://{_options.DownloadsBucket}.s3.amazonaws.com/{objectKey}";
             string fileName = GetFileName(countryCode, exportType, "json");
             string counterText = counter ?? "-";
             string counterHyperlink = $"<a title=\"Download\" href=\"{WebUtility.HtmlEncode(url)}\" download=\"{WebUtility.HtmlEncode(fileName)}\">{WebUtility.HtmlEncode(counterText)}</a>";
@@ -206,14 +208,14 @@ namespace landerist_library.Infrastructure.Distribution
             ListingStatus listingStatus)
         {
             string objectKey = GetListingsByOperationPropertyTypeObjectKey(countryCode, operation, propertyType, listingStatus, "json");
-            var (lastModified, contentLength) = new S3().GetFileInfo(AppConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey);
+            var (lastModified, contentLength) = new S3().GetFileInfo(_options.DownloadsBucket, objectKey);
 
             if (lastModified is null || contentLength is null)
             {
                 return null;
             }
 
-            return $"https://{AppConfig.AWS_S3_DOWNLOADS_BUCKET}.s3.amazonaws.com/{objectKey}";
+            return $"https://{_options.DownloadsBucket}.s3.amazonaws.com/{objectKey}";
         }
 
         private string GetListingsByOperationPropertyTypeObjectKey(
@@ -282,14 +284,14 @@ namespace landerist_library.Infrastructure.Distribution
         private string? GetHostDownloadUrl(CountryCode countryCode, string host, ListingStatus listingStatus, string extension)
         {
             string objectKey = GetHostObjectKey(countryCode, host, listingStatus, extension);
-            var (lastModified, contentLength) = new S3().GetFileInfo(AppConfig.AWS_S3_DOWNLOADS_BUCKET, objectKey);
+            var (lastModified, contentLength) = new S3().GetFileInfo(_options.DownloadsBucket, objectKey);
 
             if (lastModified is null || contentLength is null)
             {
                 return null;
             }
 
-            return $"https://{AppConfig.AWS_S3_DOWNLOADS_BUCKET}.s3.amazonaws.com/{objectKey}";
+            return $"https://{_options.DownloadsBucket}.s3.amazonaws.com/{objectKey}";
         }
 
         private string GetHostObjectKey(CountryCode countryCode, string host, ListingStatus listingStatus, string extension)
@@ -328,7 +330,7 @@ namespace landerist_library.Infrastructure.Distribution
 
         private string GetDownloadsHtmlFile(CountryCode countryCode)
         {
-            return Path.Combine(Config.LANDERIST_COM_OUTPUT!, GetDownloadsWebsiteDirectory(countryCode), "index.html");
+            return Path.Combine(_options.OutputDirectory, GetDownloadsWebsiteDirectory(countryCode), "index.html");
         }
 
         private string GetDownloadsWebsiteDirectory(CountryCode countryCode)

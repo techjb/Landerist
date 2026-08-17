@@ -7,13 +7,15 @@ using landerist_library.Infrastructure.Sql;
 using landerist_library.Infrastructure.Statistics;
 using landerist_library.Infrastructure.Tasks;
 using landerist_library.Infrastructure.WebsiteServices;
+using landerist_library.Infrastructure.Runtime;
 
 namespace landerist_console;
 
 internal sealed class LanderistDistributionComposition(
     LanderistDatabaseAdapterFactory databaseAdapters,
     IListingAdministrationService listingAdministration,
-    IApplicationLogger logger)
+    IApplicationLogger logger,
+    LanderistRuntimeOptions runtimeOptions)
 {
     public DailyTaskJob CreateDailyJob(
         SqlNotListingCacheService notListingCache,
@@ -35,6 +37,7 @@ internal sealed class LanderistDistributionComposition(
                 websiteMetrics,
                 websiteCatalog,
                 websiteQueries,
-                listingAdministration),
+                listingAdministration,
+                runtimeOptions.Distribution),
             logger);
 }

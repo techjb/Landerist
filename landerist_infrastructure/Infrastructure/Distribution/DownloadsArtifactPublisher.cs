@@ -1,6 +1,7 @@
 using landerist_library.Logs;
 using landerist_library.Websites;
 using landerist_orels.ES;
+using landerist_library.Infrastructure.Runtime;
 
 namespace landerist_library.Infrastructure.Distribution;
 
@@ -10,25 +11,29 @@ internal sealed class DownloadsArtifactPublisher : DistributionArtifacts
     private readonly HistoricArtifactPublisher _historic;
     private readonly DownloadUpdateDateResolver _dateResolver;
 
-    public DownloadsArtifactPublisher(Func<DateOnly> yesterday)
+    public DownloadsArtifactPublisher(
+        Func<DateOnly> yesterday,
+        DistributionOptions options)
         : this(
-            new S3DownloadsStorage(),
+            new S3DownloadsStorage(options.DownloadsBucket),
             new SystemDistributionFileSystem(),
-            yesterday)
+            yesterday,
+            options.ExportDirectory)
     {
     }
 
     internal DownloadsArtifactPublisher(
         IDownloadsStorage storage,
         IDistributionFileSystem files,
-        Func<DateOnly> yesterday)
+        Func<DateOnly> yesterday,
+        string exportDirectory = ".")
     {
         ArgumentNullException.ThrowIfNull(storage);
         ArgumentNullException.ThrowIfNull(files);
         ArgumentNullException.ThrowIfNull(yesterday);
         _storage = storage;
         var naming = new HistoricArtifactNaming(yesterday);
-        _historic = new HistoricArtifactPublisher(storage, files, naming);
+        _historic = new HistoricArtifactPublisher(storage, files, naming, exportDirectory);
         _dateResolver = new DownloadUpdateDateResolver(storage, yesterday);
     }
 

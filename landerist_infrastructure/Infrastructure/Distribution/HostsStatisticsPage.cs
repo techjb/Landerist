@@ -1,11 +1,11 @@
 using landerist_library.Application.Websites;
-using landerist_library.Configuration;
 using landerist_library.Export;
 using landerist_library.Logs;
 using landerist_library.Infrastructure.WebsiteServices;
 using System.Globalization;
 using System.Net;
 using System.Text;
+using landerist_library.Infrastructure.Runtime;
 
 namespace landerist_library.Infrastructure.Distribution
 {
@@ -13,21 +13,21 @@ namespace landerist_library.Infrastructure.Distribution
     {
         private readonly WebsiteMetricsService _websiteMetrics;
         private readonly IWebsiteCatalog _websites;
+        private readonly string HostsStatisticsTemplateHtmlFile;
+        private readonly string HostsStatisticsHtmlFile;
 
         public HostsStatisticsPage(
             WebsiteMetricsService websiteMetrics,
-            IWebsiteCatalog websites)
+            IWebsiteCatalog websites,
+            DistributionOptions options) : base(options)
         {
             ArgumentNullException.ThrowIfNull(websiteMetrics);
             ArgumentNullException.ThrowIfNull(websites);
             _websiteMetrics = websiteMetrics;
             _websites = websites;
+            HostsStatisticsTemplateHtmlFile = Path.Combine(options.TemplatesDirectory, "hosts-statistics", "hosts_statistics_template.html");
+            HostsStatisticsHtmlFile = Path.Combine(options.OutputDirectory, "hosts_statistics.html");
         }
-        private readonly string HostsStatisticsTemplateHtmlFile =
-            Path.Combine(Config.LANDERIST_COM_TEMPLATES!, "hosts-statistics", "hosts_statistics_template.html");
-
-        private readonly string HostsStatisticsHtmlFile =
-            Path.Combine(Config.LANDERIST_COM_OUTPUT!, "hosts_statistics.html");
 
         private readonly CultureInfo SummaryCulture = CultureInfo.GetCultureInfo("es-ES");
 

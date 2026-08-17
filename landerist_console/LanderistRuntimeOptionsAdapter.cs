@@ -67,7 +67,15 @@ internal static class LanderistRuntimeOptionsAdapter
                 Config.LOGS_ERRORS_IN_CONSOLE,
                 Config.LOGS_INFO_IN_CONSOLE,
                 Config.LOCAL_AI_MAX_MODEL_LEN,
-                Config.VERSION)
+                Config.VERSION),
+            Distribution = new DistributionOptions(
+                Config.EXPORT_DIRECTORY ?? string.Empty,
+                Config.LANDERIST_COM_TEMPLATES ?? string.Empty,
+                Config.LANDERIST_COM_OUTPUT ?? string.Empty,
+                settings.GetString("AWS_S3_DOWNLOADS_BUCKET"),
+                settings.GetString("AWS_ACESSKEYID"),
+                settings.GetString("AWS_SECRETACCESSKEY"),
+                settings.GetString("AWS_CLOUDFRONT_DISTRIBUTION_ID_WEBSITE"))
         };
 
         options.Validate();

@@ -4,6 +4,7 @@ using landerist_library.Infrastructure.Sql;
 using landerist_library.Logs;
 using landerist_library.Websites;
 using landerist_orels.ES;
+using landerist_library.Infrastructure.Runtime;
 
 namespace landerist_library.Infrastructure.Distribution;
 
@@ -18,12 +19,14 @@ public class DownloadsUpdater : DistributionArtifacts
     private readonly DownloadsArtifactPublisher _publisher;
     private readonly SegmentedListingsUpdater _segmentedListings;
 
-    public DownloadsUpdater(IListingAdministrationService listings)
+    public DownloadsUpdater(
+        IListingAdministrationService listings,
+        DistributionOptions options)
     {
         ArgumentNullException.ThrowIfNull(listings);
         _listings = listings;
-        _workspace = new DownloadsWorkspace();
-        _publisher = new DownloadsArtifactPublisher(Yesterday);
+        _workspace = new DownloadsWorkspace(options);
+        _publisher = new DownloadsArtifactPublisher(Yesterday, options);
         _segmentedListings = new SegmentedListingsUpdater(
             listings,
             _workspace,

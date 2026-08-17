@@ -1,6 +1,6 @@
 using landerist_library.Application.Statistics;
-using landerist_library.Configuration;
 using landerist_library.Infrastructure.Sql;
+using landerist_library.Infrastructure.Runtime;
 using landerist_library.Logs;
 
 namespace landerist_library.Infrastructure.Distribution;
@@ -13,7 +13,8 @@ public sealed class StatisticsPage
 
     public StatisticsPage(
         GlobalStatistics statistics,
-        PageStatisticsRepository pageStatistics)
+        PageStatisticsRepository pageStatistics,
+        DistributionOptions options)
     {
         ArgumentNullException.ThrowIfNull(statistics);
         ArgumentNullException.ThrowIfNull(pageStatistics);
@@ -22,10 +23,10 @@ public sealed class StatisticsPage
         _summary = new StatisticsSummaryTableBuilder(statistics);
         _renderer = new StatisticsPageRenderer(
             Path.Combine(
-                Config.LANDERIST_COM_TEMPLATES!,
+                options.TemplatesDirectory,
                 "statistics",
                 "statistics_template.html"),
-            Path.Combine(Config.LANDERIST_COM_OUTPUT!, "statistics.html"));
+            Path.Combine(options.OutputDirectory, "statistics.html"));
     }
 
     public void UpdateCharts()

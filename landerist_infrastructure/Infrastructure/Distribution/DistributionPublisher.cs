@@ -4,6 +4,7 @@ using landerist_library.Application.Websites;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Infrastructure.WebsiteServices;
 using landerist_library.Application.Statistics;
+using landerist_library.Infrastructure.Runtime;
 
 namespace landerist_library.Infrastructure.Distribution;
 
@@ -16,6 +17,7 @@ public sealed class DistributionPublisher : IDistributionPublisher
     private readonly IWebsiteCatalog _websites;
     private readonly WebsiteQueryRepository _websiteQueries;
     private readonly IListingAdministrationService _listings;
+    private readonly DistributionOptions _options;
 
     public DistributionPublisher(
         GlobalStatistics globalStatistics,
@@ -24,7 +26,8 @@ public sealed class DistributionPublisher : IDistributionPublisher
         WebsiteMetricsService websiteMetrics,
         IWebsiteCatalog websites,
         WebsiteQueryRepository websiteQueries,
-        IListingAdministrationService listings)
+        IListingAdministrationService listings,
+        DistributionOptions options)
     {
         ArgumentNullException.ThrowIfNull(globalStatistics);
         ArgumentNullException.ThrowIfNull(hostStatistics);
@@ -33,6 +36,7 @@ public sealed class DistributionPublisher : IDistributionPublisher
         ArgumentNullException.ThrowIfNull(websites);
         ArgumentNullException.ThrowIfNull(websiteQueries);
         ArgumentNullException.ThrowIfNull(listings);
+        ArgumentNullException.ThrowIfNull(options);
         _globalStatistics = globalStatistics;
         _hostStatistics = hostStatistics;
         _pageStatistics = pageStatistics;
@@ -40,16 +44,18 @@ public sealed class DistributionPublisher : IDistributionPublisher
         _websites = websites;
         _websiteQueries = websiteQueries;
         _listings = listings;
+        _options = options;
     }
 
     public void Publish()
     {
-        new DownloadsUpdater(_listings).Update(_websites, _websiteQueries);
+        new DownloadsUpdater(_listings, _options).Update(_websites, _websiteQueries);
         DistributionArtifacts.UpdateAllPages(
             _globalStatistics,
             _hostStatistics,
             _pageStatistics,
             _websiteMetrics,
-            _websites);
+            _websites,
+            _options);
     }
 }

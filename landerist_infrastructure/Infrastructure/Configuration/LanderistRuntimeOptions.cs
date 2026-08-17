@@ -25,6 +25,8 @@ public sealed record LanderistRuntimeOptions(
 
     public ExecutionRuntimeOptions Execution { get; init; } = ExecutionRuntimeOptions.Default;
 
+    public DistributionOptions Distribution { get; init; } = DistributionOptions.Empty;
+
     public void Validate()
     {
         ArgumentNullException.ThrowIfNull(Database);
@@ -38,6 +40,28 @@ public sealed record LanderistRuntimeOptions(
         Scraping.Validate();
         Integrations.Validate();
         Execution.Validate();
+        Distribution.Validate();
+    }
+}
+
+public sealed record DistributionOptions(
+    string ExportDirectory,
+    string TemplatesDirectory,
+    string OutputDirectory,
+    string DownloadsBucket,
+    string AwsAccessKeyId,
+    string AwsSecretAccessKey,
+    string CloudFrontDistributionId)
+{
+    public static DistributionOptions Empty { get; } = new(
+        ".", ".", ".", "unconfigured", string.Empty, string.Empty, string.Empty);
+
+    public void Validate()
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(ExportDirectory);
+        ArgumentException.ThrowIfNullOrWhiteSpace(TemplatesDirectory);
+        ArgumentException.ThrowIfNullOrWhiteSpace(OutputDirectory);
+        ArgumentException.ThrowIfNullOrWhiteSpace(DownloadsBucket);
     }
 }
 
