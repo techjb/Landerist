@@ -22,12 +22,15 @@ public sealed class DownloadsDistributionArchitectureTests
     {
         string workspace = ReadDistributionSource("DownloadsWorkspace.cs");
         string publisher = ReadDistributionSource("DownloadsArtifactPublisher.cs");
+        string storage = ReadDistributionSource("S3DownloadsStorage.cs");
         string segmented = ReadDistributionSource("SegmentedListingsUpdater.cs");
 
         Assert.Contains("Json.ExportListings", workspace);
         Assert.Contains("Tools.Csv.Write", workspace);
-        Assert.Contains("new S3", publisher);
-        Assert.Contains("UploadToDownloadsBucket", publisher);
+        Assert.DoesNotContain("landerist_library.Export", publisher);
+        Assert.DoesNotContain("File.", publisher);
+        Assert.Contains("private readonly S3", storage);
+        Assert.Contains("UploadToDownloadsBucket", storage);
         Assert.DoesNotContain("new S3", workspace);
         Assert.DoesNotContain("new S3", segmented);
     }
