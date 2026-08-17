@@ -5,578 +5,296 @@ using landerist_library.Pages;
 using landerist_library.Websites;
 using System.Collections.Concurrent;
 
-namespace landerist_library.Application.Scraping
+namespace landerist_library.Application.Scraping;
+
+public class Scraper
 {
-    public class Scraper
+    private readonly IPagePersistenceService _pagePersistence;
+    private readonly IApplicationLogger _logger;
+    private readonly IListingLifecycleService _listingLifecycle;
+    private readonly PageScrapePipelineServices _pageScraping;
+    private readonly IPageBatchSelector _pageBatchSelector;
+    private readonly ScrapeBatchServices _batchServices;
+    private readonly ScrapeBatchState _state = new();
+    private readonly ScraperLog _scraperLog;
+    private readonly ScrapePageProcessor _pageProcessor;
+    private CancellationTokenSource _cancellation = new();
+    private List<Page> _pageQueue = [];
+
+    public Scraper(
+        IPagePersistenceService pagePersistence,
+        IApplicationLogger logger,
+        IListingLifecycleService listingLifecycle,
+        PageScrapePipelineServices pageScraping,
+        IPageBatchSelector pageBatchSelector,
+        ScrapeBatchServices batchServices,
+        IScrapeProgressReporter progress)
     {
-        private enum ScrapeAttemptResult
+        ArgumentNullException.ThrowIfNull(pagePersistence);
+        ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(listingLifecycle);
+        ArgumentNullException.ThrowIfNull(pageScraping);
+        ArgumentNullException.ThrowIfNull(pageBatchSelector);
+        ArgumentNullException.ThrowIfNull(batchServices);
+        ArgumentNullException.ThrowIfNull(progress);
+
+        _pagePersistence = pagePersistence;
+        _logger = logger;
+        _listingLifecycle = listingLifecycle;
+        _pageScraping = pageScraping;
+        _pageBatchSelector = pageBatchSelector;
+        _batchServices = batchServices;
+        _scraperLog = new ScraperLog(
+            logger,
+            progress,
+            writePageProgress: !batchServices.Options.IsProduction);
+        _pageProcessor = new ScrapePageProcessor(
+            pagePersistence,
+            logger,
+            listingLifecycle,
+            pageScraping,
+            batchServices,
+            _state);
+    }
+
+    public void TestSinglePage()
+    {
+        _scraperLog.WriteTestStart();
+        _batchServices.Browser.UpdateChrome();
+        Page page = _batchServices.Pages.LoadOrCreate(
+            new Uri("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/"));
+        var pageScraper = new PageScraper(
+            page,
+            _pagePersistence,
+            _logger,
+            _listingLifecycle,
+            _pageScraping);
+        pageScraper.Scrape();
+        _scraperLog.WriteTestPageType(page);
+        var listing = _batchServices.Pages.GetListing(page, true, true);
+        _scraperLog.WriteTestListing(listing);
+        Stop();
+    }
+
+    public void Start() => RunBatch();
+
+    public bool RunBatch()
+    {
+        ResetCancellationTokenSource();
+        _batchServices.WebsiteThrottle.Clean();
+        _batchServices.Browser.ClearDownloaders();
+        _pageQueue = [.. _pageBatchSelector.Select()];
+        return ScrapeBatch();
+    }
+
+    public async Task<bool> RunBatchAsync(CancellationToken cancellationToken = default)
+    {
+        ResetCancellationTokenSource();
+        using CancellationTokenSource linkedCancellation =
+            CancellationTokenSource.CreateLinkedTokenSource(
+                cancellationToken,
+                _cancellation.Token);
+        try
         {
-            Blocked,
-            Crashed,
-            Success
-        }
-
-        private readonly IPagePersistenceService _pagePersistence;
-        private readonly IApplicationLogger _logger;
-        private readonly IListingLifecycleService _listingLifecycle;
-        private readonly PageScrapePipelineServices _pageScraping;
-        private readonly IPageBatchSelector _pageBatchSelector;
-        private readonly ScrapeBatchServices _batchServices;
-        private readonly ScrapeBatchState _state = new();
-        private readonly ScraperLog _scraperLog;
-        private CancellationTokenSource _cancellation = new();
-        private List<Page> _pageQueue = [];
-
-        public Scraper(
-            IPagePersistenceService pagePersistence,
-            IApplicationLogger logger,
-            IListingLifecycleService listingLifecycle,
-            PageScrapePipelineServices pageScraping,
-            IPageBatchSelector pageBatchSelector,
-            ScrapeBatchServices batchServices,
-            IScrapeProgressReporter progress)
-        {
-            ArgumentNullException.ThrowIfNull(pagePersistence);
-            ArgumentNullException.ThrowIfNull(logger);
-            ArgumentNullException.ThrowIfNull(listingLifecycle);
-            ArgumentNullException.ThrowIfNull(pageScraping);
-            ArgumentNullException.ThrowIfNull(pageBatchSelector);
-            ArgumentNullException.ThrowIfNull(batchServices);
-            ArgumentNullException.ThrowIfNull(progress);
-
-            _pagePersistence = pagePersistence;
-            _logger = logger;
-            _listingLifecycle = listingLifecycle;
-            _pageScraping = pageScraping;
-            _pageBatchSelector = pageBatchSelector;
-            _batchServices = batchServices;
-            _scraperLog = new ScraperLog(
-                logger,
-                progress,
-                writePageProgress: !batchServices.Options.IsProduction);
-        }
-
-        public void TestSinglePage()
-        {
-            _scraperLog.WriteTestStart();
-            _batchServices.Browser.UpdateChrome();
-            Page page = _batchServices.Pages.LoadOrCreate(
-                new Uri("https://buscopisos.es/inmueble/venta/piso/cordoba/cordoba/bp01-00250/"));
-            var pageScraper = new PageScraper(
-                page,
-                _pagePersistence,
-                _logger,
-                _listingLifecycle,
-                _pageScraping);
-            pageScraper.Scrape();
-            _scraperLog.WriteTestPageType(page);
-            var listing = _batchServices.Pages.GetListing(page, true, true);
-            _scraperLog.WriteTestListing(listing);
-            Stop();
-        }
-
-        public void Start() => RunBatch();
-
-        public bool RunBatch()
-        {
-            ResetCancellationTokenSource();
-            _batchServices.WebsiteThrottle.Clean();
-            return SelectAndScrapeBatch();
-        }
-
-        public async Task<bool> RunBatchAsync(CancellationToken cancellationToken = default)
-        {
-            ResetCancellationTokenSource();
-            using CancellationTokenSource linkedCancellation =
-                CancellationTokenSource.CreateLinkedTokenSource(
-                    cancellationToken,
-                    _cancellation.Token);
-            try
-            {
-                await _batchServices.WebsiteThrottle
-                    .CleanAsync(linkedCancellation.Token)
-                    .ConfigureAwait(false);
-                return await SelectAndScrapeBatchAsync(linkedCancellation.Token)
-                    .ConfigureAwait(false);
-            }
-            catch (OperationCanceledException) when (linkedCancellation.IsCancellationRequested)
-            {
-                return false;
-            }
-        }
-
-        private bool SelectAndScrapeBatch()
-        {
-            _batchServices.Browser.ClearDownloaders();
+            await _batchServices.WebsiteThrottle
+                .CleanAsync(linkedCancellation.Token).ConfigureAwait(false);
+            await _batchServices.Browser
+                .ClearDownloadersAsync(linkedCancellation.Token).ConfigureAwait(false);
             _pageQueue = [.. _pageBatchSelector.Select()];
-            return ScrapeBatch();
+            return await ScrapeBatchAsync(linkedCancellation.Token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (linkedCancellation.IsCancellationRequested)
+        {
+            return false;
+        }
+    }
+
+    public void Stop()
+    {
+        if (!_cancellation.IsCancellationRequested)
+        {
+            _cancellation.Cancel();
         }
 
-        private async Task<bool> SelectAndScrapeBatchAsync(
-            CancellationToken cancellationToken)
+        _batchServices.Browser.ClearDownloaders();
+        _batchServices.PageLocks.CleanPageLocks();
+        _batchServices.Browser.KillChrome();
+    }
+
+    public async Task StopAsync(CancellationToken cancellationToken = default)
+    {
+        if (!_cancellation.IsCancellationRequested)
+        {
+            await _cancellation.CancelAsync().ConfigureAwait(false);
+        }
+
+        try
         {
             await _batchServices.Browser
-                .ClearDownloadersAsync(cancellationToken)
-                .ConfigureAwait(false);
-            _pageQueue = [.. _pageBatchSelector.Select()];
-            return await ScrapeBatchAsync(cancellationToken).ConfigureAwait(false);
+                .ClearDownloadersAsync(cancellationToken).ConfigureAwait(false);
+            await _batchServices.PageLocks
+                .CleanPageLocksAsync(cancellationToken).ConfigureAwait(false);
         }
-        public void Stop()
+        finally
         {
-            if (!_cancellation.IsCancellationRequested)
-            {
-                _cancellation.Cancel();
-            }
-
-            _batchServices.Browser.ClearDownloaders();
-            _batchServices.PageLocks.CleanPageLocks();
             _batchServices.Browser.KillChrome();
         }
+    }
 
-        public async Task StopAsync(CancellationToken cancellationToken = default)
+    public bool Scrape(Website website)
+    {
+        _pageQueue = [.. _batchServices.Pages.GetPages(website)];
+        return ScrapeBatch();
+    }
+
+    public void Scrape(string url, bool useProxy)
+    {
+        Page page = _batchServices.Pages.LoadOrCreate(new Uri(url));
+        _pageProcessor.Scrape(page, useProxy);
+    }
+
+    public void Scrape(Page page, bool useProxy) =>
+        _pageProcessor.Scrape(page, useProxy);
+
+    public bool TryApplyPreClassificationBeforeDownload(Page page) =>
+        _pageProcessor.TryApplyPreClassificationBeforeDownload(page);
+
+    private bool ScrapeBatch()
+    {
+        ResetCancellationTokenSource();
+        if (!PrepareBatch())
         {
-            if (!_cancellation.IsCancellationRequested)
-            {
-                await _cancellation.CancelAsync().ConfigureAwait(false);
-            }
-
-            try
-            {
-                await _batchServices.Browser
-                    .ClearDownloadersAsync(cancellationToken)
-                    .ConfigureAwait(false);
-                await _batchServices.PageLocks
-                    .CleanPageLocksAsync(cancellationToken)
-                    .ConfigureAwait(false);
-            }
-            finally
-            {
-                _batchServices.Browser.KillChrome();
-            }
+            return false;
         }
-        public bool Scrape(Website website)
+
+        try
         {
-            _pageQueue = [.. _batchServices.Pages.GetPages(website)];
-            return ScrapeBatch();
-        }
-
-        private bool ScrapeBatch()
-        {
-            ResetCancellationTokenSource();
-            if (_pageQueue.Count == 0)
-            {
-                return false;
-            }
-
-            _state.Reset(_pageQueue.Count);
-            _scraperLog.WriteStart(_pageQueue.Count);
-            _pageQueue = PageBatchOrderer.SpreadByHost(_pageQueue);
-
-            try
-            {
-                var partitioner = Partitioner.Create(
-                    _pageQueue,
-                    EnumerablePartitionerOptions.NoBuffering);
-                Parallel.ForEach(
-                    partitioner,
-                    new ParallelOptions
+            var partitioner = Partitioner.Create(
+                _pageQueue,
+                EnumerablePartitionerOptions.NoBuffering);
+            Parallel.ForEach(
+                partitioner,
+                new ParallelOptions
+                {
+                    MaxDegreeOfParallelism = _batchServices.Parallelism.Calculate(_pageQueue),
+                    CancellationToken = _cancellation.Token
+                },
+                page =>
+                {
+                    try
                     {
-                        MaxDegreeOfParallelism = _batchServices.Parallelism.Calculate(_pageQueue),
-                        CancellationToken = _cancellation.Token
-                    },
-                    page =>
-                    {
-                        ProcessThread(page);
+                        _pageProcessor.Process(page);
                         _scraperLog.WritePage(_state.GetCurrent(), page);
+                    }
+                    finally
+                    {
                         page.Dispose();
-                    });
-            }
-            catch (OperationCanceledException)
-            {
-            }
-            finally
-            {
-                _pageQueue.Clear();
-            }
-
-            return CompleteScrapeBatch();
+                    }
+                });
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        finally
+        {
+            _pageQueue.Clear();
         }
 
-        private async Task<bool> ScrapeBatchAsync(CancellationToken cancellationToken)
+        return CompleteScrapeBatch();
+    }
+
+    private async Task<bool> ScrapeBatchAsync(CancellationToken cancellationToken)
+    {
+        if (!PrepareBatch())
         {
-            if (_pageQueue.Count == 0)
-            {
-                return false;
-            }
+            return false;
+        }
 
-            _state.Reset(_pageQueue.Count);
-            _scraperLog.WriteStart(_pageQueue.Count);
-            _pageQueue = PageBatchOrderer.SpreadByHost(_pageQueue);
-
-            try
-            {
-                await Parallel.ForEachAsync(
-                    _pageQueue,
-                    new ParallelOptions
+        try
+        {
+            await Parallel.ForEachAsync(
+                _pageQueue,
+                new ParallelOptions
+                {
+                    MaxDegreeOfParallelism = _batchServices.Parallelism.Calculate(_pageQueue),
+                    CancellationToken = cancellationToken
+                },
+                async (page, token) =>
+                {
+                    try
                     {
-                        MaxDegreeOfParallelism = _batchServices.Parallelism.Calculate(_pageQueue),
-                        CancellationToken = cancellationToken
-                    },
-                    async (page, token) =>
+                        await _pageProcessor.ProcessAsync(page, token).ConfigureAwait(false);
+                        _scraperLog.WritePage(_state.GetCurrent(), page);
+                    }
+                    finally
                     {
-                        try
-                        {
-                            await ProcessThreadAsync(page, token).ConfigureAwait(false);
-                            _scraperLog.WritePage(_state.GetCurrent(), page);
-                        }
-                        finally
-                        {
-                            page.Dispose();
-                        }
-                    }).ConfigureAwait(false);
-            }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-            {
-            }
-            finally
-            {
-                _pageQueue.Clear();
-            }
-
-            return await CompleteScrapeBatchAsync(cancellationToken)
-                .ConfigureAwait(false);
+                        page.Dispose();
+                    }
+                }).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+        }
+        finally
+        {
+            _pageQueue.Clear();
         }
 
-        private async Task<bool> CompleteScrapeBatchAsync(
-            CancellationToken cancellationToken)
+        return await CompleteScrapeBatchAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    private bool PrepareBatch()
+    {
+        if (_pageQueue.Count == 0)
         {
-            ScrapeBatchCounters current = _state.GetCurrent();
-            ScrapeBatchCounters totals = _state.AccumulateTotals();
-            _scraperLog.WriteTotals(totals);
-            _batchServices.Metrics.Record(current);
-            try
-            {
-                await _batchServices.Browser
-                    .ClearDownloadersAsync(cancellationToken)
-                    .ConfigureAwait(false);
-                return true;
-            }
-            finally
-            {
-                _batchServices.Browser.KillChrome();
-            }
+            return false;
         }
 
-        private bool CompleteScrapeBatch()
+        _state.Reset(_pageQueue.Count);
+        _scraperLog.WriteStart(_pageQueue.Count);
+        _pageQueue = PageBatchOrderer.SpreadByHost(_pageQueue);
+        return true;
+    }
+
+    private bool CompleteScrapeBatch()
+    {
+        RecordBatchCompletion();
+        _batchServices.Browser.ClearDownloaders();
+        _batchServices.Browser.KillChrome();
+        return true;
+    }
+
+    private async Task<bool> CompleteScrapeBatchAsync(CancellationToken cancellationToken)
+    {
+        RecordBatchCompletion();
+        try
         {
-            ScrapeBatchCounters current = _state.GetCurrent();
-            ScrapeBatchCounters totals = _state.AccumulateTotals();
-            _scraperLog.WriteTotals(totals);
-            _batchServices.Metrics.Record(current);
-            _batchServices.Browser.ClearDownloaders();
+            await _batchServices.Browser
+                .ClearDownloadersAsync(cancellationToken).ConfigureAwait(false);
+            return true;
+        }
+        finally
+        {
             _batchServices.Browser.KillChrome();
-            return true;
         }
+    }
 
-        private void ProcessThread(Page page)
+    private void RecordBatchCompletion()
+    {
+        ScrapeBatchCounters current = _state.GetCurrent();
+        ScrapeBatchCounters totals = _state.AccumulateTotals();
+        _scraperLog.WriteTotals(totals);
+        _batchServices.Metrics.Record(current);
+    }
+
+    private void ResetCancellationTokenSource()
+    {
+        if (!_cancellation.IsCancellationRequested)
         {
-            if (!_batchServices.Robots.IsAllowed(page.Website, page.Uri))
-            {
-                page.SetPageType(PageType.BlockedByRobotsTxt);
-                _pageScraping.Scheduling.SetNextScrapeFromNow(page);
-                _pagePersistence.Update(page);
-                _state.IncrementSkippedByRobotsTxt();
-                return;
-            }
-
-            if (_batchServices.Robots.IsCrawlDelayTooBig(page.Website))
-            {
-                page.SetPageType(PageType.CrawlDelayTooBig);
-                _pageScraping.Scheduling.SetNextScrapeFromNow(page);
-                _pagePersistence.Update(page);
-                _state.IncrementSkippedByCrawlDelay();
-                return;
-            }
-
-            if (TryApplyPreClassificationBeforeDownload(page))
-            {
-                return;
-            }
-
-            if (_batchServices.WebsiteThrottle.IsBlocked(page.Website))
-            {
-                _state.IncrementSkippedByBlockedWebsite();
-                return;
-            }
-
-            Scrape(page, page.Website.UseProxy);
+            return;
         }
 
-        private async Task ProcessThreadAsync(
-            Page page,
-            CancellationToken cancellationToken)
-        {
-            if (!_batchServices.Robots.IsAllowed(page.Website, page.Uri))
-            {
-                page.SetPageType(PageType.BlockedByRobotsTxt);
-                _pageScraping.Scheduling.SetNextScrapeFromNow(page);
-                await _pagePersistence
-                    .UpdateAsync(page, cancellationToken)
-                    .ConfigureAwait(false);
-                _state.IncrementSkippedByRobotsTxt();
-                return;
-            }
-
-            if (_batchServices.Robots.IsCrawlDelayTooBig(page.Website))
-            {
-                page.SetPageType(PageType.CrawlDelayTooBig);
-                _pageScraping.Scheduling.SetNextScrapeFromNow(page);
-                await _pagePersistence
-                    .UpdateAsync(page, cancellationToken)
-                    .ConfigureAwait(false);
-                _state.IncrementSkippedByCrawlDelay();
-                return;
-            }
-
-            if (await TryApplyPreClassificationBeforeDownloadAsync(
-                page,
-                cancellationToken).ConfigureAwait(false))
-            {
-                return;
-            }
-
-            if (await _batchServices.WebsiteThrottle
-                .IsBlockedAsync(page.Website, cancellationToken)
-                .ConfigureAwait(false))
-            {
-                _state.IncrementSkippedByBlockedWebsite();
-                return;
-            }
-
-            await ScrapeAsync(page, page.Website.UseProxy, cancellationToken)
-                .ConfigureAwait(false);
-        }
-        private async Task<bool> TryApplyPreClassificationBeforeDownloadAsync(
-            Page page,
-            CancellationToken cancellationToken)
-        {
-            bool success = await new PageScraper(
-                page,
-                _pagePersistence,
-                _logger,
-                _listingLifecycle,
-                _pageScraping).TryApplyPreClassificationBeforeDownloadAsync(
-                    cancellationToken).ConfigureAwait(false);
-            if (!success)
-            {
-                return false;
-            }
-
-            _state.IncrementProcessed();
-            _state.IncrementScrapedSuccess();
-            return true;
-        }
-        public bool TryApplyPreClassificationBeforeDownload(Page page)
-        {
-            var success = new PageScraper(
-                page,
-                _pagePersistence,
-                _logger,
-                _listingLifecycle,
-                _pageScraping).TryApplyPreClassificationBeforeDownload();
-            if (!success)
-            {
-                return false;
-            }
-
-            _state.IncrementProcessed();
-            _state.IncrementScrapedSuccess();
-            return true;
-        }
-
-        private void ResetCancellationTokenSource()
-        {
-            if (!_cancellation.IsCancellationRequested)
-            {
-                return;
-            }
-
-            _cancellation.Dispose();
-            _cancellation = new CancellationTokenSource();
-        }
-
-        public void Scrape(string url, bool useProxy)
-        {
-            Page page = _batchServices.Pages.LoadOrCreate(new Uri(url));
-            Scrape(page, useProxy);
-        }
-
-        public void Scrape(Page page, bool useProxy)
-        {
-            var result = ScrapeAttempt(page, useProxy);
-
-            if (result == ScrapeAttemptResult.Blocked)
-            {
-                _state.IncrementSkippedByBlockedWebsite();
-                return;
-            }
-
-            _state.IncrementProcessed();
-
-            if (result == ScrapeAttemptResult.Success)
-            {
-                if (page.IsHttpStatusCodeForbidden())
-                {
-                    _batchServices.WebsiteThrottle.ReportForbidden(page.Website);
-                }
-                else if (!page.IsHttpStatusCodeNotOK() && !page.IsResponseBodyNullOrEmpty())
-                {
-                    _batchServices.WebsiteThrottle.ReportSuccess(page.Website);
-                }
-
-                if (page.IsHttpStatusCodeNotOK())
-                {
-                    _state.IncrementDownloadErrors();
-                    return;
-                }
-
-                _state.IncrementScrapedSuccess();
-                return;
-            }
-
-            _state.IncrementCrashed();
-        }
-
-        private async Task ScrapeAsync(
-            Page page,
-            bool useProxy,
-            CancellationToken cancellationToken)
-        {
-            ScrapeAttemptResult result = await ScrapeAttemptAsync(
-                page,
-                useProxy,
-                cancellationToken).ConfigureAwait(false);
-            await HandleScrapeResultAsync(page, result, cancellationToken)
-                .ConfigureAwait(false);
-        }
-
-        private async Task HandleScrapeResultAsync(
-            Page page,
-            ScrapeAttemptResult result,
-            CancellationToken cancellationToken)
-        {
-            if (result == ScrapeAttemptResult.Blocked)
-            {
-                _state.IncrementSkippedByBlockedWebsite();
-                return;
-            }
-
-            _state.IncrementProcessed();
-
-            if (result == ScrapeAttemptResult.Success)
-            {
-                if (page.IsHttpStatusCodeForbidden())
-                {
-                    await _batchServices.WebsiteThrottle
-                        .ReportForbiddenAsync(page.Website, cancellationToken)
-                        .ConfigureAwait(false);
-                }
-                else if (!page.IsHttpStatusCodeNotOK() && !page.IsResponseBodyNullOrEmpty())
-                {
-                    await _batchServices.WebsiteThrottle
-                        .ReportSuccessAsync(page.Website, cancellationToken)
-                        .ConfigureAwait(false);
-                }
-
-                if (page.IsHttpStatusCodeNotOK())
-                {
-                    _state.IncrementDownloadErrors();
-                    return;
-                }
-
-                _state.IncrementScrapedSuccess();
-                return;
-            }
-
-            _state.IncrementCrashed();
-        }
-        private void HandleScrapeResult(Page page, ScrapeAttemptResult result)
-        {
-            if (result == ScrapeAttemptResult.Blocked)
-            {
-                _state.IncrementSkippedByBlockedWebsite();
-                return;
-            }
-
-            _state.IncrementProcessed();
-
-            if (result == ScrapeAttemptResult.Success)
-            {
-                if (page.IsHttpStatusCodeForbidden())
-                {
-                    _batchServices.WebsiteThrottle.ReportForbidden(page.Website);
-                }
-                else if (!page.IsHttpStatusCodeNotOK() && !page.IsResponseBodyNullOrEmpty())
-                {
-                    _batchServices.WebsiteThrottle.ReportSuccess(page.Website);
-                }
-
-                if (page.IsHttpStatusCodeNotOK())
-                {
-                    _state.IncrementDownloadErrors();
-                    return;
-                }
-
-                _state.IncrementScrapedSuccess();
-                return;
-            }
-
-            _state.IncrementCrashed();
-        }
-
-        private async Task<ScrapeAttemptResult> ScrapeAttemptAsync(
-            Page page,
-            bool useProxy,
-            CancellationToken cancellationToken)
-        {
-            bool acquired = await _batchServices.WebsiteThrottle
-                .TryAcquireAsync(page.Website, cancellationToken)
-                .ConfigureAwait(false);
-            if (!acquired && _batchServices.Options.IsProduction)
-            {
-                return ScrapeAttemptResult.Blocked;
-            }
-
-            var pageScraper = new PageScraper(
-                page,
-                useProxy,
-                _pagePersistence,
-                _logger,
-                _listingLifecycle,
-                _pageScraping);
-            return await pageScraper.ScrapeAsync(cancellationToken)
-                .ConfigureAwait(false)
-                ? ScrapeAttemptResult.Success
-                : ScrapeAttemptResult.Crashed;
-        }
-        private ScrapeAttemptResult ScrapeAttempt(Page page, bool useProxy)
-        {
-            var acquired = _batchServices.WebsiteThrottle.TryAcquire(page.Website);
-            if (!acquired && _batchServices.Options.IsProduction)
-            {
-                return ScrapeAttemptResult.Blocked;
-            }
-
-            var pageScraper = new PageScraper(
-                page,
-                useProxy,
-                _pagePersistence,
-                _logger,
-                _listingLifecycle,
-                _pageScraping);
-            return pageScraper.Scrape()
-                ? ScrapeAttemptResult.Success
-                : ScrapeAttemptResult.Crashed;
-        }
+        _cancellation.Dispose();
+        _cancellation = new CancellationTokenSource();
     }
 }

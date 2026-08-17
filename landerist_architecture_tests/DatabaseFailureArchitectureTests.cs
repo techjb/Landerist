@@ -68,6 +68,8 @@ public sealed class DatabaseFailureArchitectureTests
             Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Tasks", "ScrapeTaskJob.cs"));
         string scraper = File.ReadAllText(
             Path.Combine(root, "landerist_application", "Application", "Scraping", "Scraper.cs"));
+        string pageProcessor = File.ReadAllText(
+            Path.Combine(root, "landerist_application", "Application", "Scraping", "ScrapePageProcessor.cs"));
         string throttle = File.ReadAllText(
             Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Scraping", "WebsitesThrottle.cs"));
 
@@ -76,10 +78,11 @@ public sealed class DatabaseFailureArchitectureTests
         Assert.Contains("_scraper.RunBatchAsync(cancellationToken)", job);
         Assert.Contains(".CleanAsync(linkedCancellation.Token)", scraper);
         Assert.Contains("Parallel.ForEachAsync(", scraper);
-        Assert.Contains(".IsBlockedAsync(page.Website, cancellationToken)", scraper);
-        Assert.Contains(".TryAcquireAsync(page.Website, cancellationToken)", scraper);
-        Assert.Contains(".ReportForbiddenAsync(page.Website, cancellationToken)", scraper);
-        Assert.Contains(".ReportSuccessAsync(page.Website, cancellationToken)", scraper);
+        Assert.Contains("_pageProcessor.ProcessAsync(page, token)", scraper);
+        Assert.Contains(".IsBlockedAsync(page.Website, cancellationToken)", pageProcessor);
+        Assert.Contains(".TryAcquireAsync(page.Website, cancellationToken)", pageProcessor);
+        Assert.Contains(".ReportForbiddenAsync(page.Website, cancellationToken)", pageProcessor);
+        Assert.Contains(".ReportSuccessAsync(page.Website, cancellationToken)", pageProcessor);
         Assert.Contains("_database.QueryAsync(", throttle);
         Assert.Contains("_database.QueryBoolAsync(", throttle);
     }
@@ -87,8 +90,8 @@ public sealed class DatabaseFailureArchitectureTests
     public void AsyncScraping_PropagatesCancellationToConditionalHttpRequest()
     {
         string root = FindRepositoryRoot();
-        string scraper = File.ReadAllText(
-            Path.Combine(root, "landerist_application", "Application", "Scraping", "Scraper.cs"));
+        string pageProcessor = File.ReadAllText(
+            Path.Combine(root, "landerist_application", "Application", "Scraping", "ScrapePageProcessor.cs"));
         string pageScraper = File.ReadAllText(
             Path.Combine(root, "landerist_application", "Application", "Scraping", "PageScraper.cs"));
         string acquisition = File.ReadAllText(
@@ -96,7 +99,7 @@ public sealed class DatabaseFailureArchitectureTests
         string checker = File.ReadAllText(
             Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Scraping", "ConditionalPageHeaderChecker.cs"));
 
-        Assert.Contains("pageScraper.ScrapeAsync(cancellationToken)", scraper);
+        Assert.Contains(".ScrapeAsync(cancellationToken)", pageProcessor);
         Assert.Contains(".AcquireAsync(_page, _useProxy, cancellationToken)", pageScraper);
         Assert.Contains(".CheckAsync(page, useProxy, cancellationToken)", acquisition);
         Assert.Contains("HttpCompletionOption.ResponseHeadersRead,", checker);
@@ -152,8 +155,8 @@ public sealed class DatabaseFailureArchitectureTests
     public void AsyncPageClassification_PropagatesPersistenceToQueryAsync()
     {
         string root = FindRepositoryRoot();
-        string scraper = File.ReadAllText(
-            Path.Combine(root, "landerist_application", "Application", "Scraping", "Scraper.cs"));
+        string pageProcessor = File.ReadAllText(
+            Path.Combine(root, "landerist_application", "Application", "Scraping", "ScrapePageProcessor.cs"));
         string pageScraper = File.ReadAllText(
             Path.Combine(root, "landerist_application", "Application", "Scraping", "PageScraper.cs"));
         string classification = File.ReadAllText(
@@ -163,7 +166,7 @@ public sealed class DatabaseFailureArchitectureTests
         string repository = File.ReadAllText(
             Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Sql", "PageRepository.cs"));
 
-        Assert.Contains("TryApplyPreClassificationBeforeDownloadAsync(", scraper);
+        Assert.Contains("TryApplyPreClassificationBeforeDownloadAsync(", pageProcessor);
         Assert.Contains("ProcessAcquisitionResultAsync(status, cancellationToken)", pageScraper);
         Assert.Contains(".UpdateAsync(page, cancellationToken)", classification);
         Assert.Contains(".UpdateAsync(page, cancellationToken)", persistence);
