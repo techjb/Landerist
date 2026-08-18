@@ -54,7 +54,8 @@ public sealed partial class DistributionModuleArchitectureTests
         string[] forbidden =
         [
             "landerist_library.Infrastructure.Sql",
-            "landerist_library.Infrastructure.WebsiteServices"
+            "landerist_library.Infrastructure.WebsiteServices",
+            "landerist_library.Infrastructure.Runtime"
         ];
         string[] violations = Directory
             .GetFiles(GetDistributionDirectory(), "*.cs", SearchOption.AllDirectories)
@@ -80,6 +81,8 @@ public sealed partial class DistributionModuleArchitectureTests
             application, "Distribution", "IDistributionWebsiteMetrics.cs")));
         Assert.True(File.Exists(Path.Combine(
             application, "Distribution", "IWebsiteExportSource.cs")));
+        Assert.True(File.Exists(Path.Combine(
+            application, "Distribution", "DistributionOptions.cs")));
     }
 
     private static void AssertSubmoduleBoundary(string submodule)

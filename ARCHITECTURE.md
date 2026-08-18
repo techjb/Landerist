@@ -102,6 +102,10 @@ rows through Application-owned read ports. SQL repositories and website-service
 implementations satisfy those ports at composition time; Distribution cannot
 reference either implementation namespace directly.
 
+`DistributionOptions` is also owned by Application. The legacy/runtime
+configuration adapter creates it at the composition boundary, so Distribution
+does not depend on the broader `Infrastructure.Runtime` configuration model.
+
 ## Enforcement
 
 ```powershell
