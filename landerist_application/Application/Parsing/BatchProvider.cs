@@ -1,4 +1,4 @@
-namespace landerist_library.Infrastructure.Parsing;
+namespace landerist_library.Application.Parsing;
 
 public enum BatchProvider
 {

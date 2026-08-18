@@ -546,7 +546,6 @@ public sealed class InfrastructureProjectArchitectureTests
         string root = FindRepositoryRoot();
         string[] files =
         [
-            "BatchProvider.cs",
             "IBatchInputWriter.cs",
             "IListingBatchUploadProvider.cs",
             "JsonlBatchInputWriter.cs"
@@ -556,6 +555,19 @@ public sealed class InfrastructureProjectArchitectureTests
         {
             AssertMoved(root, "Parsing", file);
         }
+
+        Assert.True(File.Exists(Path.Combine(
+            root,
+            "landerist_application",
+            "Application",
+            "Parsing",
+            "BatchProvider.cs")));
+        Assert.False(File.Exists(Path.Combine(
+            root,
+            "landerist_infrastructure",
+            "Infrastructure",
+            "Parsing",
+            "BatchProvider.cs")));
 
         string writer = File.ReadAllText(Path.Combine(
             root,

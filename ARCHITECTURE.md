@@ -53,13 +53,38 @@ The composition rules are enforced by architecture tests: bootstrap and area coo
 
 Code outside `Application` and `Infrastructure` must not introduce new references to either boundary. Existing reverse references are migration debt recorded in `landerist_architecture_tests/ArchitectureBaseline.txt`.
 
+### Infrastructure modules
+
+`landerist_infrastructure/Infrastructure/Ai` is the first explicitly protected
+Infrastructure module. It owns external AI provider clients, provider-specific
+batch adapters, and structured-output serialization. Its implementations may
+depend on Domain models, Application ports, and provider SDKs, but must not
+depend directly on persistence, SQL, scraping, database-maintenance, or runtime
+configuration modules. Collaboration with those capabilities crosses
+Application ports and is assembled at the composition root.
+
+AI provider and batch construction remains split into focused composition
+classes under `landerist_console`; provider implementations do not construct or
+locate persistence and scraping services themselves. The same boundary pattern
+is also enforced for `Infrastructure/Sql`: repositories depend on Application
+ports and the low-level `Database` abstraction, never on sibling Infrastructure
+modules. Batch persistence contracts and `BatchProvider` are owned by
+Application so SQL, tasks, parsing and AI providers collaborate through an
+inward-facing contract instead of referencing one another. Scraping/Browser is
+split deliberately: `Infrastructure/Browser` is a protected lower-level module
+that depends only on Application logging ports and browser/process SDKs;
+Scraping may consume it, but Browser cannot reach back into Scraping or other
+Infrastructure modules. Scraping still contains SQL-specific adapters; moving
+those adapters under the SQL module is the next boundary extraction before
+deciding whether any module needs its own physical project.
+
 ## Enforcement
 
 ```powershell
 dotnet test .\landerist_architecture_tests\landerist_architecture_tests.csproj
 ```
 
-The tests verify that Application does not acquire outer-layer dependencies, folder namespaces match, `Pages` and `Websites` do not reach into `Infrastructure`, `Database` or `LegacyDatabase`, the legacy dependency baseline cannot grow and resolved dependencies are removed from that baseline.
+The tests verify that Application does not acquire outer-layer dependencies, folder namespaces match, `Pages` and `Websites` do not reach into `Infrastructure`, `Database` or `LegacyDatabase`, the AI module does not reach directly into persistence, SQL, scraping or configuration, the legacy dependency baseline cannot grow and resolved dependencies are removed from that baseline.
 
 CI also runs `landerist_integration_tests` against an ephemeral SQL Server 2022
 container. Integration configuration crosses the test boundary through explicit
