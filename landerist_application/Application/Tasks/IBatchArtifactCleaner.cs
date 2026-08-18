@@ -1,4 +1,4 @@
-namespace landerist_library.Infrastructure.Tasks;
+namespace landerist_library.Application.Tasks;
 
 public interface IBatchArtifactCleaner
 {

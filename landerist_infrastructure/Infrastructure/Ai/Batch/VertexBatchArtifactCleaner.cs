@@ -1,4 +1,4 @@
-using landerist_library.Infrastructure.Tasks;
+using landerist_library.Application.Tasks;
 
 namespace landerist_library.Infrastructure.Ai.Batch;
 

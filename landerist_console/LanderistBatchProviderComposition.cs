@@ -3,6 +3,7 @@ using landerist_domain.Parsing.StructuredOutputs;
 using landerist_domain.Parsing.Tokenization;
 using landerist_library.Application.Logging;
 using landerist_library.Application.Parsing;
+using landerist_library.Application.Tasks;
 using landerist_library.Infrastructure.Ai.Batch;
 using landerist_library.Infrastructure.Ai.OpenAI;
 using landerist_library.Infrastructure.Ai.OpenAI.Batch;

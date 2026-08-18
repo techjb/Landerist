@@ -81,6 +81,13 @@ statistics adapters live under `Infrastructure/Sql`; direct database access and
 These internal boundaries can now be observed before deciding whether any
 module needs its own physical project.
 
+`Infrastructure/Tasks` contains scheduler and background-job adapters, but its
+orchestration depends exclusively on Domain and Application ports. Shared batch
+ports for input writing, provider selection, response parsing, persistence and
+artifact cleanup are owned by Application; Parsing, AI, SQL and Tasks implement
+or consume those ports without direct sibling-module references. Typed options
+are supplied at composition time and global configuration access is forbidden.
+
 ## Enforcement
 
 ```powershell

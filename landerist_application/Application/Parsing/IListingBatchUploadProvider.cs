@@ -1,7 +1,6 @@
-using landerist_library.Application.Parsing;
 using landerist_library.Pages;
 
-namespace landerist_library.Infrastructure.Parsing;
+namespace landerist_library.Application.Parsing;
 
 public interface IListingBatchUploadProvider
 {
