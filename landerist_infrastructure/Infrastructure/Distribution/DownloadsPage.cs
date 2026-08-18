@@ -2,10 +2,10 @@ using System.Globalization;
 using System.Net;
 using System.Text;
 using landerist_library.Application.Websites;
+using landerist_library.Application.Distribution;
 using landerist_library.Database;
 using landerist_library.Export;
 using landerist_library.Logs;
-using landerist_library.Infrastructure.WebsiteServices;
 using landerist_library.Websites;
 using landerist_orels.ES;
 using landerist_library.Infrastructure.Runtime;
@@ -14,7 +14,7 @@ namespace landerist_library.Infrastructure.Distribution
 {
     public sealed class DownloadsPage : DistributionArtifacts
     {
-        private readonly WebsiteMetricsService _websiteMetrics;
+        private readonly IDistributionWebsiteMetrics _websiteMetrics;
         private readonly IWebsiteCatalog _websites;
         private readonly DistributionOptions _options;
         private readonly IWebsiteArtifactStorage _storage;
@@ -22,7 +22,7 @@ namespace landerist_library.Infrastructure.Distribution
         private readonly string DownloadsIndexHtmlFile;
 
         public DownloadsPage(
-            WebsiteMetricsService websiteMetrics,
+            IDistributionWebsiteMetrics websiteMetrics,
             IWebsiteCatalog websites,
             DistributionOptions options,
             IWebsiteArtifactStorage storage) : base(options)

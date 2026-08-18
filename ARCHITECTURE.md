@@ -97,6 +97,11 @@ Page generation and distribution orchestration consume
 `IWebsiteArtifactStorage` and `ICdnInvalidator`; architecture tests reject
 direct cloud-client construction anywhere else in Distribution.
 
+Distribution also consumes page statistics, website metrics and website export
+rows through Application-owned read ports. SQL repositories and website-service
+implementations satisfy those ports at composition time; Distribution cannot
+reference either implementation namespace directly.
+
 ## Enforcement
 
 ```powershell

@@ -1,7 +1,7 @@
 using landerist_library.Application.Listings;
+using landerist_library.Application.Distribution;
 using landerist_library.Application.Logging;
 using landerist_library.Application.Websites;
-using landerist_library.Infrastructure.Sql;
 using landerist_library.Websites;
 using landerist_orels.ES;
 using landerist_library.Infrastructure.Runtime;
@@ -39,7 +39,7 @@ public class DownloadsUpdater : DistributionArtifacts
 
     public void Update(
         IWebsiteCatalog websites,
-        WebsiteQueryRepository websiteQueries)
+        IWebsiteExportSource websiteQueries)
     {
         try
         {
@@ -109,7 +109,7 @@ public class DownloadsUpdater : DistributionArtifacts
         }
     }
 
-    public bool UpdateWebsites(WebsiteQueryRepository websiteQueries)
+    public bool UpdateWebsites(IWebsiteExportSource websiteQueries)
     {
         Console.WriteLine("Reading Websites ..");
         var websites = websiteQueries.GetAll();

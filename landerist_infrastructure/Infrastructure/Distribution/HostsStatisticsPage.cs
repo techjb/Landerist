@@ -1,7 +1,7 @@
 using landerist_library.Application.Websites;
+using landerist_library.Application.Distribution;
 using landerist_library.Export;
 using landerist_library.Logs;
-using landerist_library.Infrastructure.WebsiteServices;
 using System.Globalization;
 using System.Net;
 using System.Text;
@@ -11,14 +11,14 @@ namespace landerist_library.Infrastructure.Distribution
 {
     public sealed class HostsStatisticsPage : DistributionArtifacts
     {
-        private readonly WebsiteMetricsService _websiteMetrics;
+        private readonly IDistributionWebsiteMetrics _websiteMetrics;
         private readonly IWebsiteCatalog _websites;
         private readonly IWebsiteArtifactStorage _storage;
         private readonly string HostsStatisticsTemplateHtmlFile;
         private readonly string HostsStatisticsHtmlFile;
 
         public HostsStatisticsPage(
-            WebsiteMetricsService websiteMetrics,
+            IDistributionWebsiteMetrics websiteMetrics,
             IWebsiteCatalog websites,
             DistributionOptions options,
             IWebsiteArtifactStorage storage) : base(options)

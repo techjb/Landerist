@@ -1,5 +1,4 @@
 using landerist_library.Application.Statistics;
-using landerist_library.Infrastructure.Sql;
 using landerist_library.Infrastructure.Runtime;
 using landerist_library.Logs;
 
@@ -13,7 +12,7 @@ public sealed class StatisticsPage
 
     public StatisticsPage(
         GlobalStatistics statistics,
-        PageStatisticsRepository pageStatistics,
+        IPageStatisticsRepository pageStatistics,
         DistributionOptions options,
         IWebsiteArtifactStorage storage)
     {

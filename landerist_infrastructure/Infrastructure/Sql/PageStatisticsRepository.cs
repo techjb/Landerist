@@ -1,10 +1,11 @@
 using landerist_library.Database;
+using landerist_library.Application.Statistics;
 using landerist_library.Pages;
 using landerist_orels.ES;
 
 namespace landerist_library.Infrastructure.Sql;
 
-public sealed class PageStatisticsRepository
+public sealed class PageStatisticsRepository : IPageStatisticsRepository
 {
     private readonly IDatabase _database;
     public PageStatisticsRepository(IDatabase database)

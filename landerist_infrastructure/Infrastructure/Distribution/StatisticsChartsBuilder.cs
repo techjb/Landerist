@@ -1,5 +1,4 @@
 using landerist_library.Application.Statistics;
-using landerist_library.Infrastructure.Sql;
 using landerist_orels.ES;
 
 namespace landerist_library.Infrastructure.Distribution;
@@ -7,13 +6,13 @@ namespace landerist_library.Infrastructure.Distribution;
 internal sealed class StatisticsChartsBuilder
 {
     private readonly GlobalStatistics _statistics;
-    private readonly PageStatisticsRepository _pageStatistics;
+    private readonly IPageStatisticsRepository _pageStatistics;
     private readonly StatisticsChartFormatter _formatter;
     private readonly List<string> _charts = [];
 
     public StatisticsChartsBuilder(
         GlobalStatistics statistics,
-        PageStatisticsRepository pageStatistics)
+        IPageStatisticsRepository pageStatistics)
     {
         _statistics = statistics;
         _pageStatistics = pageStatistics;

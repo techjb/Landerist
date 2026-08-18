@@ -2,8 +2,6 @@ using landerist_library.Application.Distribution;
 using landerist_library.Application.Listings;
 using landerist_library.Application.Logging;
 using landerist_library.Application.Websites;
-using landerist_library.Infrastructure.Sql;
-using landerist_library.Infrastructure.WebsiteServices;
 using landerist_library.Application.Statistics;
 using landerist_library.Infrastructure.Runtime;
 
@@ -13,10 +11,10 @@ public sealed class DistributionPublisher : IDistributionPublisher
 {
     private readonly GlobalStatistics _globalStatistics;
     private readonly HostStatistics _hostStatistics;
-    private readonly PageStatisticsRepository _pageStatistics;
-    private readonly WebsiteMetricsService _websiteMetrics;
+    private readonly IPageStatisticsRepository _pageStatistics;
+    private readonly IDistributionWebsiteMetrics _websiteMetrics;
     private readonly IWebsiteCatalog _websites;
-    private readonly WebsiteQueryRepository _websiteQueries;
+    private readonly IWebsiteExportSource _websiteQueries;
     private readonly IListingAdministrationService _listings;
     private readonly DistributionOptions _options;
     private readonly IApplicationLogger _logger;
@@ -24,10 +22,10 @@ public sealed class DistributionPublisher : IDistributionPublisher
     public DistributionPublisher(
         GlobalStatistics globalStatistics,
         HostStatistics hostStatistics,
-        PageStatisticsRepository pageStatistics,
-        WebsiteMetricsService websiteMetrics,
+        IPageStatisticsRepository pageStatistics,
+        IDistributionWebsiteMetrics websiteMetrics,
         IWebsiteCatalog websites,
-        WebsiteQueryRepository websiteQueries,
+        IWebsiteExportSource websiteQueries,
         IListingAdministrationService listings,
         DistributionOptions options,
         IApplicationLogger logger)

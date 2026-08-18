@@ -1,9 +1,10 @@
 using landerist_library.Database;
+using landerist_library.Application.Distribution;
 using System.Data;
 
 namespace landerist_library.Infrastructure.Sql
 {
-    public class WebsiteQueryRepository
+    public class WebsiteQueryRepository : IWebsiteExportSource
     {
         private readonly IDatabase _database;
         public WebsiteQueryRepository(IDatabase database)

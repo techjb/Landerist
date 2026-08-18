@@ -48,6 +48,40 @@ public sealed partial class DistributionModuleArchitectureTests
         }
     }
 
+    [Fact]
+    public void Distribution_DoesNotDependOnSqlOrWebsiteServiceImplementations()
+    {
+        string[] forbidden =
+        [
+            "landerist_library.Infrastructure.Sql",
+            "landerist_library.Infrastructure.WebsiteServices"
+        ];
+        string[] violations = Directory
+            .GetFiles(GetDistributionDirectory(), "*.cs", SearchOption.AllDirectories)
+            .Where(path => forbidden.Any(item => File.ReadAllText(path).Contains(
+                item,
+                StringComparison.Ordinal)))
+            .Select(path => Path.GetRelativePath(FindRepositoryRoot(), path))
+            .Order(StringComparer.Ordinal)
+            .ToArray();
+
+        Assert.Empty(violations);
+    }
+
+    [Fact]
+    public void DistributionReadPorts_AreOwnedByApplication()
+    {
+        string application = Path.Combine(
+            FindRepositoryRoot(), "landerist_application", "Application");
+
+        Assert.True(File.Exists(Path.Combine(
+            application, "Statistics", "IPageStatisticsRepository.cs")));
+        Assert.True(File.Exists(Path.Combine(
+            application, "Distribution", "IDistributionWebsiteMetrics.cs")));
+        Assert.True(File.Exists(Path.Combine(
+            application, "Distribution", "IWebsiteExportSource.cs")));
+    }
+
     private static void AssertSubmoduleBoundary(string submodule)
     {
         string directory = Path.Combine(GetDistributionDirectory(), submodule);

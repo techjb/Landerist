@@ -1,7 +1,6 @@
 using landerist_library.Application.Websites;
+using landerist_library.Application.Distribution;
 using landerist_library.Infrastructure.Distribution.Cloud;
-using landerist_library.Infrastructure.Sql;
-using landerist_library.Infrastructure.WebsiteServices;
 using landerist_library.Application.Statistics;
 using landerist_library.Websites;
 using landerist_library.Infrastructure.Runtime;
@@ -150,7 +149,7 @@ namespace landerist_library.Infrastructure.Distribution
         }
 
         public static void UpdateDownloadsPage(
-            WebsiteMetricsService websiteMetrics,
+            IDistributionWebsiteMetrics websiteMetrics,
             IWebsiteCatalog websites,
             DistributionOptions options)
         {
@@ -160,7 +159,7 @@ namespace landerist_library.Infrastructure.Distribution
 
         public static void UpdateStatisticsPage(
             GlobalStatistics globalStatistics,
-            PageStatisticsRepository pageStatistics,
+            IPageStatisticsRepository pageStatistics,
             DistributionOptions options)
         {
             new StatisticsPage(globalStatistics, pageStatistics, options, CreateStorage()).UpdateCharts();
@@ -169,7 +168,7 @@ namespace landerist_library.Infrastructure.Distribution
 
         public static void UpdateHostStatisticsPage(
             HostStatistics hostStatistics,
-            WebsiteMetricsService websiteMetrics,
+            IDistributionWebsiteMetrics websiteMetrics,
             IWebsiteCatalog websites,
             DistributionOptions options)
         {
@@ -178,7 +177,7 @@ namespace landerist_library.Infrastructure.Distribution
         }
 
         public static void UpdateHostsStatisticsPage(
-            WebsiteMetricsService websiteMetrics,
+            IDistributionWebsiteMetrics websiteMetrics,
             IWebsiteCatalog websites,
             DistributionOptions options)
         {
@@ -189,8 +188,8 @@ namespace landerist_library.Infrastructure.Distribution
         public static void UpdateAllPages(
             GlobalStatistics globalStatistics,
             HostStatistics hostStatistics,
-            PageStatisticsRepository pageStatistics,
-            WebsiteMetricsService websiteMetrics,
+            IPageStatisticsRepository pageStatistics,
+            IDistributionWebsiteMetrics websiteMetrics,
             IWebsiteCatalog websites,
             DistributionOptions options)
         {

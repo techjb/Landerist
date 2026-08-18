@@ -1,11 +1,14 @@
 using landerist_library.Application.Websites;
+using landerist_library.Application.Distribution;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Websites;
 using landerist_orels.ES;
 
 namespace landerist_library.Infrastructure.WebsiteServices;
 
-public sealed class WebsiteMetricsService : IWebsiteMetricsService
+public sealed class WebsiteMetricsService :
+    IWebsiteMetricsService,
+    IDistributionWebsiteMetrics
 {
     private readonly WebsitePageMetricsRepository _pages;
     private readonly ListingStatisticsRepository _listings;
