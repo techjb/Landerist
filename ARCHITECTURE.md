@@ -88,6 +88,13 @@ artifact cleanup are owned by Application; Parsing, AI, SQL and Tasks implement
 or consume those ports without direct sibling-module references. Typed options
 are supplied at composition time and global configuration access is forbidden.
 
+`Infrastructure/Distribution` keeps storage and filesystem contracts neutral.
+The S3 downloads adapter lives in `Distribution/Cloud`, while the system file
+adapter lives in `Distribution/FileSystem`; neither may reach into unrelated
+Infrastructure modules. New distribution workflows must consume these ports.
+The remaining direct S3 and CloudFront construction is an explicit, tested
+legacy boundary that may shrink but cannot spread to additional files.
+
 ## Enforcement
 
 ```powershell

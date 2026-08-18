@@ -22,7 +22,7 @@ public sealed class DownloadsDistributionArchitectureTests
     {
         string workspace = ReadDistributionSource("DownloadsWorkspace.cs");
         string publisher = ReadDistributionSource("DownloadsArtifactPublisher.cs");
-        string storage = ReadDistributionSource("S3DownloadsStorage.cs");
+        string storage = ReadDistributionSource("Cloud", "S3DownloadsStorage.cs");
         string segmented = ReadDistributionSource("SegmentedListingsUpdater.cs");
 
         Assert.Contains("Json.ExportListings", workspace);
@@ -35,15 +35,16 @@ public sealed class DownloadsDistributionArchitectureTests
         Assert.DoesNotContain("new S3", segmented);
     }
 
-    private static string ReadDistributionSource(string fileName)
+    private static string ReadDistributionSource(params string[] pathSegments)
     {
         string root = FindRepositoryRoot();
-        return File.ReadAllText(Path.Combine(
+        string distribution = Path.Combine(
             root,
             "landerist_infrastructure",
             "Infrastructure",
-            "Distribution",
-            fileName));
+            "Distribution");
+        return File.ReadAllText(Path.Combine(
+            [distribution, .. pathSegments]));
     }
 
     private static string FindRepositoryRoot()

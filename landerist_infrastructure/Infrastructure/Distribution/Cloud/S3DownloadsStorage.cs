@@ -1,6 +1,6 @@
 using landerist_library.Export;
 
-namespace landerist_library.Infrastructure.Distribution;
+namespace landerist_library.Infrastructure.Distribution.Cloud;
 
 internal sealed class S3DownloadsStorage : IDownloadsStorage
 {
