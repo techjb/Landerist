@@ -5,10 +5,11 @@ using landerist_library.Application.Websites;
 using landerist_library.Websites;
 using landerist_library.Infrastructure.Distribution.FileSystem;
 using landerist_orels.ES;
+using static landerist_library.Infrastructure.Distribution.DistributionArtifactNaming;
 
 namespace landerist_library.Infrastructure.Distribution;
 
-public class DownloadsUpdater : DistributionArtifacts
+public class DownloadsUpdater
 {
     public const string METADATA_KEY_DATEFROM = "dateFrom";
     public const string METADATA_KEY_DATETO = "dateTo";

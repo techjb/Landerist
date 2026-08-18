@@ -8,10 +8,11 @@ using landerist_library.Export;
 using landerist_library.Logs;
 using landerist_library.Websites;
 using landerist_orels.ES;
+using static landerist_library.Infrastructure.Distribution.DistributionArtifactNaming;
 
 namespace landerist_library.Infrastructure.Distribution
 {
-    public sealed class DownloadsPage : DistributionArtifacts
+    public sealed class DownloadsPage
     {
         private readonly IDistributionWebsiteMetrics _websiteMetrics;
         private readonly IWebsiteCatalog _websites;
@@ -26,7 +27,7 @@ namespace landerist_library.Infrastructure.Distribution
             IWebsiteCatalog websites,
             DistributionOptions options,
             IWebsiteArtifactStorage storage,
-            IDistributionFileSystem files) : base(options)
+            IDistributionFileSystem files)
         {
             ArgumentNullException.ThrowIfNull(websiteMetrics);
             ArgumentNullException.ThrowIfNull(websites);

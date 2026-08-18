@@ -106,6 +106,28 @@ public sealed partial class DistributionModuleArchitectureTests
             application, "Distribution", "DistributionOptions.cs")));
     }
 
+    [Fact]
+    public void DistributionArtifacts_IsACompositionFacade_NotABaseClass()
+    {
+        string directory = GetDistributionDirectory();
+        string[] inheritedConsumers = Directory
+            .GetFiles(directory, "*.cs", SearchOption.AllDirectories)
+            .Where(path => File.ReadAllText(path).Contains(
+                ": DistributionArtifacts",
+                StringComparison.Ordinal))
+            .Select(path => Path.GetRelativePath(FindRepositoryRoot(), path))
+            .Order(StringComparer.Ordinal)
+            .ToArray();
+
+        Assert.Empty(inheritedConsumers);
+
+        string facade = File.ReadAllText(Path.Combine(directory, "DistributionArtifacts.cs"));
+        string naming = File.ReadAllText(Path.Combine(directory, "DistributionArtifactNaming.cs"));
+        Assert.Contains("public static class DistributionArtifacts", facade, StringComparison.Ordinal);
+        Assert.DoesNotContain("GetFileName(", facade, StringComparison.Ordinal);
+        Assert.Contains("internal static class DistributionArtifactNaming", naming, StringComparison.Ordinal);
+    }
+
     private static void AssertSubmoduleBoundary(string submodule)
     {
         string directory = Path.Combine(GetDistributionDirectory(), submodule);

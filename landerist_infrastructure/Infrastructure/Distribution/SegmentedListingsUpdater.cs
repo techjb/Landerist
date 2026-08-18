@@ -3,10 +3,11 @@ using landerist_library.Application.Websites;
 using landerist_library.Logs;
 using landerist_library.Websites;
 using landerist_orels.ES;
+using static landerist_library.Infrastructure.Distribution.DistributionArtifactNaming;
 
 namespace landerist_library.Infrastructure.Distribution;
 
-internal sealed class SegmentedListingsUpdater : DistributionArtifacts
+internal sealed class SegmentedListingsUpdater
 {
     private const string HostsSubdirectory = "ES\\Hosts";
     private const string OperationPropertyTypesSubdirectory =

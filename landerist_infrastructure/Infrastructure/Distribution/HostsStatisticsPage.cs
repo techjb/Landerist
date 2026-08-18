@@ -8,7 +8,7 @@ using System.Text;
 
 namespace landerist_library.Infrastructure.Distribution
 {
-    public sealed class HostsStatisticsPage : DistributionArtifacts
+    public sealed class HostsStatisticsPage
     {
         private readonly IDistributionWebsiteMetrics _websiteMetrics;
         private readonly IWebsiteCatalog _websites;
@@ -22,7 +22,7 @@ namespace landerist_library.Infrastructure.Distribution
             IWebsiteCatalog websites,
             DistributionOptions options,
             IWebsiteArtifactStorage storage,
-            IDistributionFileSystem files) : base(options)
+            IDistributionFileSystem files)
         {
             ArgumentNullException.ThrowIfNull(websiteMetrics);
             ArgumentNullException.ThrowIfNull(websites);

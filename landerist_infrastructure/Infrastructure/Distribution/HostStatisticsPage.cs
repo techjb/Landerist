@@ -10,7 +10,7 @@ using System.Text.Json;
 
 namespace landerist_library.Infrastructure.Distribution
 {
-    public sealed class HostStatisticsPage : DistributionArtifacts
+    public sealed class HostStatisticsPage
     {
         private readonly HostStatistics _statistics;
         private readonly IDistributionWebsiteMetrics _websiteMetrics;
@@ -26,7 +26,7 @@ namespace landerist_library.Infrastructure.Distribution
             IWebsiteCatalog websites,
             DistributionOptions options,
             IWebsiteArtifactStorage storage,
-            IDistributionFileSystem files) : base(options)
+            IDistributionFileSystem files)
         {
             ArgumentNullException.ThrowIfNull(statistics);
             ArgumentNullException.ThrowIfNull(websiteMetrics);

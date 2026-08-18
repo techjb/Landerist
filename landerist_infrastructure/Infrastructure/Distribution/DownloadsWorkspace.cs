@@ -6,20 +6,22 @@ using landerist_library.Application.Distribution;
 
 namespace landerist_library.Infrastructure.Distribution;
 
-internal sealed class DownloadsWorkspace : DistributionArtifacts
+internal sealed class DownloadsWorkspace
 {
     private readonly IDistributionFileSystem _files;
+    private readonly string _exportDirectory;
 
     public DownloadsWorkspace(
         DistributionOptions options,
-        IDistributionFileSystem files) : base(options)
+        IDistributionFileSystem files)
     {
         _files = files;
+        _exportDirectory = options.ExportDirectory;
     }
 
     public string EnsureSubdirectory(string subdirectory)
     {
-        string directory = GetFilePath(subdirectory);
+        string directory = Path.Combine(_exportDirectory, subdirectory);
         _files.CreateDirectory(directory);
         return directory;
     }
@@ -27,7 +29,7 @@ internal sealed class DownloadsWorkspace : DistributionArtifacts
     public string GetArtifactPath(string subdirectory, string fileName)
     {
         EnsureSubdirectory(subdirectory);
-        return GetFilePath(subdirectory, fileName);
+        return Path.Combine(_exportDirectory, subdirectory, fileName);
     }
 
     public bool WriteListings(

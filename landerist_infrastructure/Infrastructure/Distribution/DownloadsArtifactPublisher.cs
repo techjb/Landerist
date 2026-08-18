@@ -4,10 +4,11 @@ using landerist_library.Infrastructure.Distribution.FileSystem;
 using landerist_library.Websites;
 using landerist_orels.ES;
 using landerist_library.Application.Distribution;
+using static landerist_library.Infrastructure.Distribution.DistributionArtifactNaming;
 
 namespace landerist_library.Infrastructure.Distribution;
 
-internal sealed class DownloadsArtifactPublisher : DistributionArtifacts
+internal sealed class DownloadsArtifactPublisher
 {
     private readonly IDownloadsStorage _storage;
     private readonly IApplicationLogger _logger;

@@ -1,8 +1,9 @@
 using landerist_library.Websites;
+using static landerist_library.Infrastructure.Distribution.DistributionArtifactNaming;
 
 namespace landerist_library.Infrastructure.Distribution;
 
-internal sealed class HistoricArtifactNaming : DistributionArtifacts
+internal sealed class HistoricArtifactNaming
 {
     private readonly Func<DateOnly> _yesterday;
 
@@ -16,7 +17,7 @@ internal sealed class HistoricArtifactNaming : DistributionArtifacts
         DateOnly? dateTo,
         string extension)
     {
-        string prefix = DistributionArtifacts.GetFileName(countryCode, exportType);
+        string prefix = DistributionArtifactNaming.GetFileName(countryCode, exportType);
         if (exportType is ExportType.PublishedUpdates or ExportType.UnpublishedUpdates &&
             dateFrom.HasValue &&
             dateTo.HasValue)

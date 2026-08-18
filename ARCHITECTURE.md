@@ -99,6 +99,9 @@ All S3 and CloudFront SDK construction is confined to `Distribution/Cloud`.
 Page rendering and export workspaces access local files through
 `IDistributionFileSystem`; direct `System.IO.File` and `System.IO.Directory`
 calls are confined to `Distribution/FileSystem`.
+Artifact path and filename conventions live in `DistributionArtifactNaming`.
+`DistributionArtifacts` is only a compatibility composition facade and must
+not be used as a base class by distribution workflows.
 Page generation and distribution orchestration consume
 `IWebsiteArtifactStorage` and `ICdnInvalidator`; architecture tests reject
 direct cloud-client construction anywhere else in Distribution.

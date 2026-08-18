@@ -1,8 +1,9 @@
 using landerist_library.Websites;
+using static landerist_library.Infrastructure.Distribution.DistributionArtifactNaming;
 
 namespace landerist_library.Infrastructure.Distribution;
 
-internal sealed class HistoricArtifactPublisher : DistributionArtifacts
+internal sealed class HistoricArtifactPublisher
 {
     private readonly IDownloadsStorage _storage;
     private readonly IDistributionFileSystem _files;
