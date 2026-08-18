@@ -6,7 +6,7 @@ namespace landerist_integration_tests;
 public sealed class DatabaseIntegrationTests(SqlServerFixture fixture)
     : IClassFixture<SqlServerFixture>
 {
-    [Fact]
+    [SqlIntegrationFact]
     public void ConfiguredDatabase_CanBeReached()
     {
         bool connected = fixture.CreateDatabase()
@@ -15,7 +15,7 @@ public sealed class DatabaseIntegrationTests(SqlServerFixture fixture)
         Assert.True(connected, exception?.ToString() ?? "Database connection failed.");
     }
 
-    [Fact]
+    [SqlIntegrationFact]
     public void ConfiguredDatabase_SupportsIsolatedCrudOperations()
     {
         IDatabase database = fixture.CreateDatabase();
@@ -65,7 +65,7 @@ public sealed class DatabaseIntegrationTests(SqlServerFixture fixture)
         Assert.True(succeeded, exception?.ToString() ?? "Database CRUD test failed.");
     }
 
-    [Fact]
+    [SqlIntegrationFact]
     public void Factory_CreatesIndependentUsableExecutors()
     {
         IDatabase first = fixture.CreateDatabase();
@@ -79,15 +79,30 @@ public sealed class DatabaseIntegrationTests(SqlServerFixture fixture)
 
 public sealed class SqlServerFixture
 {
-    private readonly SqlDatabaseFactory _factory;
+    private readonly SqlDatabaseFactory? _factory;
 
     public SqlServerFixture()
     {
-        _factory = new SqlDatabaseFactory(SqlIntegrationEnvironment.ReadOptions());
+        if (!SqlIntegrationEnvironment.TryReadOptions(out SqlDatabaseOptions? options))
+        {
+            return;
+        }
+
+        _factory = new SqlDatabaseFactory(options!);
         WaitUntilAvailable();
     }
 
-    public IDatabase CreateDatabase() => _factory.Create();
+    public IDatabase CreateDatabase()
+    {
+        if (_factory is null)
+        {
+            throw new InvalidOperationException(
+                "SQL integration tests require LANDERIST_TEST_SQL_* environment variables. " +
+                "See landerist_integration_tests/README.md.");
+        }
+
+        return _factory.Create();
+    }
 
     private void WaitUntilAvailable()
     {
@@ -109,7 +124,26 @@ public sealed class SqlServerFixture
 
 internal static class SqlIntegrationEnvironment
 {
-    internal static SqlDatabaseOptions ReadOptions() => new(
+    private static readonly string[] RequiredNames =
+    [
+        "LANDERIST_TEST_SQL_DATASOURCE",
+        "LANDERIST_TEST_SQL_USER",
+        "LANDERIST_TEST_SQL_PASSWORD",
+        "LANDERIST_TEST_SQL_DATABASE"
+    ];
+
+    internal static bool HasAnyConfiguration() => RequiredNames.Any(name =>
+        !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(name)));
+
+    internal static bool TryReadOptions(out SqlDatabaseOptions? options)
+    {
+        if (!HasAnyConfiguration())
+        {
+            options = null;
+            return false;
+        }
+
+        options = new SqlDatabaseOptions(
         ReadRequired("LANDERIST_TEST_SQL_DATASOURCE"),
         ReadRequired("LANDERIST_TEST_SQL_USER"),
         ReadRequired("LANDERIST_TEST_SQL_PASSWORD"),
@@ -120,6 +154,8 @@ internal static class SqlIntegrationEnvironment
             true),
         connectionTimeoutSeconds: 2,
         commandTimeoutSeconds: 30);
+        return true;
+    }
 
     private static string ReadRequired(string name) =>
         Environment.GetEnvironmentVariable(name) is { Length: > 0 } value
@@ -131,4 +167,17 @@ internal static class SqlIntegrationEnvironment
         Environment.GetEnvironmentVariable(name) is { Length: > 0 } value
             ? bool.Parse(value)
             : defaultValue;
+}
+
+public sealed class SqlIntegrationFactAttribute : FactAttribute
+{
+    public SqlIntegrationFactAttribute()
+    {
+        if (!SqlIntegrationEnvironment.HasAnyConfiguration())
+        {
+            Skip =
+                "Requires LANDERIST_TEST_SQL_* environment variables; " +
+                "see landerist_integration_tests/README.md.";
+        }
+    }
 }

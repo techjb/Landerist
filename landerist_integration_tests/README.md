@@ -12,3 +12,5 @@ provided only through these environment variables:
 
 The tests use temporary SQL tables and do not modify permanent schema. CI starts a
 dedicated SQL Server 2022 container and supplies these variables automatically.
+When none of the required variables is present, local test runs report the three
+SQL tests as skipped. A partially configured environment is treated as an error.
