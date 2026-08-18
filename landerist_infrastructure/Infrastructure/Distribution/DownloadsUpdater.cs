@@ -1,7 +1,7 @@
 using landerist_library.Application.Listings;
+using landerist_library.Application.Logging;
 using landerist_library.Application.Websites;
 using landerist_library.Infrastructure.Sql;
-using landerist_library.Logs;
 using landerist_library.Websites;
 using landerist_orels.ES;
 using landerist_library.Infrastructure.Runtime;
@@ -15,18 +15,22 @@ public class DownloadsUpdater : DistributionArtifacts
     public const string METADATA_KEY_COUNTER = "counter";
 
     private readonly IListingAdministrationService _listings;
+    private readonly IApplicationLogger _logger;
     private readonly DownloadsWorkspace _workspace;
     private readonly DownloadsArtifactPublisher _publisher;
     private readonly SegmentedListingsUpdater _segmentedListings;
 
     public DownloadsUpdater(
         IListingAdministrationService listings,
-        DistributionOptions options)
+        DistributionOptions options,
+        IApplicationLogger logger)
     {
         ArgumentNullException.ThrowIfNull(listings);
+        ArgumentNullException.ThrowIfNull(logger);
         _listings = listings;
+        _logger = logger;
         _workspace = new DownloadsWorkspace(options);
-        _publisher = new DownloadsArtifactPublisher(Yesterday, options);
+        _publisher = new DownloadsArtifactPublisher(Yesterday, options, logger);
         _segmentedListings = new SegmentedListingsUpdater(
             listings,
             _workspace,
@@ -48,7 +52,7 @@ public class DownloadsUpdater : DistributionArtifacts
         }
         catch (Exception exception)
         {
-            Log.WriteError("Update", exception);
+            _logger.WriteError("Update", exception.ToString());
         }
     }
 
@@ -63,7 +67,7 @@ public class DownloadsUpdater : DistributionArtifacts
             null,
             null))
         {
-            Log.WriteError("filesupdater", "Error updating all listings");
+            _logger.WriteError("filesupdater", "Error updating all listings");
         }
     }
 
@@ -101,7 +105,7 @@ public class DownloadsUpdater : DistributionArtifacts
             null,
             null))
         {
-            Log.WriteError("filesupdater", "Error updating " + exportType);
+            _logger.WriteError("filesupdater", "Error updating " + exportType);
         }
     }
 
@@ -152,7 +156,7 @@ public class DownloadsUpdater : DistributionArtifacts
             dateFrom,
             dateTo))
         {
-            Log.WriteError("filesupdater", "Error updating " + exportType);
+            _logger.WriteError("filesupdater", "Error updating " + exportType);
         }
     }
 

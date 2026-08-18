@@ -40,6 +40,7 @@ internal sealed class LanderistDistributionComposition(
                 websiteCatalog,
                 websiteQueries,
                 listingAdministration,
-                runtimeOptions.Distribution),
+                runtimeOptions.Distribution,
+                logger),
             logger);
 }

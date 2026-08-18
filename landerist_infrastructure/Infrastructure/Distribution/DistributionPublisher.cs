@@ -1,5 +1,6 @@
 using landerist_library.Application.Distribution;
 using landerist_library.Application.Listings;
+using landerist_library.Application.Logging;
 using landerist_library.Application.Websites;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Infrastructure.WebsiteServices;
@@ -18,6 +19,7 @@ public sealed class DistributionPublisher : IDistributionPublisher
     private readonly WebsiteQueryRepository _websiteQueries;
     private readonly IListingAdministrationService _listings;
     private readonly DistributionOptions _options;
+    private readonly IApplicationLogger _logger;
 
     public DistributionPublisher(
         GlobalStatistics globalStatistics,
@@ -27,7 +29,8 @@ public sealed class DistributionPublisher : IDistributionPublisher
         IWebsiteCatalog websites,
         WebsiteQueryRepository websiteQueries,
         IListingAdministrationService listings,
-        DistributionOptions options)
+        DistributionOptions options,
+        IApplicationLogger logger)
     {
         ArgumentNullException.ThrowIfNull(globalStatistics);
         ArgumentNullException.ThrowIfNull(hostStatistics);
@@ -37,6 +40,7 @@ public sealed class DistributionPublisher : IDistributionPublisher
         ArgumentNullException.ThrowIfNull(websiteQueries);
         ArgumentNullException.ThrowIfNull(listings);
         ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(logger);
         _globalStatistics = globalStatistics;
         _hostStatistics = hostStatistics;
         _pageStatistics = pageStatistics;
@@ -45,11 +49,13 @@ public sealed class DistributionPublisher : IDistributionPublisher
         _websiteQueries = websiteQueries;
         _listings = listings;
         _options = options;
+        _logger = logger;
     }
 
     public void Publish()
     {
-        new DownloadsUpdater(_listings, _options).Update(_websites, _websiteQueries);
+        new DownloadsUpdater(_listings, _options, _logger)
+            .Update(_websites, _websiteQueries);
         DistributionArtifacts.UpdateAllPages(
             _globalStatistics,
             _hostStatistics,

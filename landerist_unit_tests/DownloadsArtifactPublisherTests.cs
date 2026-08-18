@@ -1,4 +1,5 @@
 using landerist_library.Infrastructure.Distribution;
+using landerist_library.Application.Logging;
 using landerist_library.Websites;
 
 namespace landerist_unit_tests;
@@ -12,7 +13,9 @@ public sealed class DownloadsArtifactPublisherTests
     {
         RecordingStorage storage = new();
         RecordingFileSystem files = new();
-        DownloadsArtifactPublisher publisher = new(storage, files, () => Yesterday);
+        RecordingLogger logger = new();
+        DownloadsArtifactPublisher publisher = new(
+            storage, files, () => Yesterday, logger);
 
         bool result = publisher.UploadListings(
             "current.json",
@@ -32,6 +35,9 @@ public sealed class DownloadsArtifactPublisherTests
         Assert.Contains((DownloadsUpdater.METADATA_KEY_COUNTER, "42"), storage.Uploads[0].Metadata);
         Assert.Single(files.Copies);
         Assert.Single(files.Deletes);
+        Assert.Equal(
+            [("filesupdater", "es-listings-published.json")],
+            logger.InfoEntries);
     }
 
     [Fact]
@@ -39,7 +45,8 @@ public sealed class DownloadsArtifactPublisherTests
     {
         RecordingStorage storage = new() { UploadResults = new Queue<bool>([false]) };
         RecordingFileSystem files = new();
-        DownloadsArtifactPublisher publisher = new(storage, files, () => Yesterday);
+        DownloadsArtifactPublisher publisher = new(
+            storage, files, () => Yesterday, new RecordingLogger());
 
         bool result = publisher.UploadListings(
             "current.json",
@@ -63,7 +70,8 @@ public sealed class DownloadsArtifactPublisherTests
             UploadResults = new Queue<bool>([true, false])
         };
         RecordingFileSystem files = new();
-        DownloadsArtifactPublisher publisher = new(storage, files, () => Yesterday);
+        DownloadsArtifactPublisher publisher = new(
+            storage, files, () => Yesterday, new RecordingLogger());
 
         bool result = publisher.UploadListings(
             "current.json",
@@ -91,7 +99,8 @@ public sealed class DownloadsArtifactPublisherTests
         DownloadsArtifactPublisher publisher = new(
             storage,
             new RecordingFileSystem(),
-            () => Yesterday);
+            () => Yesterday,
+            new RecordingLogger());
 
         DateOnly result = publisher.GetDateFrom(
             ExportType.PublishedUpdates,
@@ -149,6 +158,16 @@ public sealed class DownloadsArtifactPublisherTests
             Deletes.Add(path);
             _existing.Remove(path);
         }
+    }
+
+    private sealed class RecordingLogger : IApplicationLogger
+    {
+        public List<(string Source, string Message)> InfoEntries { get; } = [];
+
+        public void WriteError(string source, string message) { }
+
+        public void WriteInfo(string source, string message) =>
+            InfoEntries.Add((source, message));
     }
 
     private sealed record UploadRecord(

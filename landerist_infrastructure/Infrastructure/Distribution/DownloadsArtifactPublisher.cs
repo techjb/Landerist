@@ -1,4 +1,4 @@
-using landerist_library.Logs;
+using landerist_library.Application.Logging;
 using landerist_library.Websites;
 using landerist_orels.ES;
 using landerist_library.Infrastructure.Runtime;
@@ -8,16 +8,19 @@ namespace landerist_library.Infrastructure.Distribution;
 internal sealed class DownloadsArtifactPublisher : DistributionArtifacts
 {
     private readonly IDownloadsStorage _storage;
+    private readonly IApplicationLogger _logger;
     private readonly HistoricArtifactPublisher _historic;
     private readonly DownloadUpdateDateResolver _dateResolver;
 
     public DownloadsArtifactPublisher(
         Func<DateOnly> yesterday,
-        DistributionOptions options)
+        DistributionOptions options,
+        IApplicationLogger logger)
         : this(
             new S3DownloadsStorage(options.DownloadsBucket),
             new SystemDistributionFileSystem(),
             yesterday,
+            logger,
             options.ExportDirectory)
     {
     }
@@ -26,12 +29,15 @@ internal sealed class DownloadsArtifactPublisher : DistributionArtifacts
         IDownloadsStorage storage,
         IDistributionFileSystem files,
         Func<DateOnly> yesterday,
+        IApplicationLogger logger,
         string exportDirectory = ".")
     {
         ArgumentNullException.ThrowIfNull(storage);
         ArgumentNullException.ThrowIfNull(files);
         ArgumentNullException.ThrowIfNull(yesterday);
+        ArgumentNullException.ThrowIfNull(logger);
         _storage = storage;
+        _logger = logger;
         var naming = new HistoricArtifactNaming(yesterday);
         _historic = new HistoricArtifactPublisher(storage, files, naming, exportDirectory);
         _dateResolver = new DownloadUpdateDateResolver(storage, yesterday);
@@ -136,7 +142,7 @@ internal sealed class DownloadsArtifactPublisher : DistributionArtifacts
             extension);
         if (uploaded)
         {
-            Log.WriteInfo("filesupdater", fileName);
+            _logger.WriteInfo("filesupdater", fileName);
         }
 
         return uploaded;
@@ -151,7 +157,7 @@ internal sealed class DownloadsArtifactPublisher : DistributionArtifacts
         bool uploaded = UploadCurrent(filePath, fileName, subdirectory, metadata);
         if (uploaded)
         {
-            Log.WriteInfo("filesupdater", fileName);
+            _logger.WriteInfo("filesupdater", fileName);
         }
 
         return uploaded;
