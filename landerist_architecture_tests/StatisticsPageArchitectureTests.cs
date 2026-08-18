@@ -25,7 +25,9 @@ public sealed class StatisticsPageArchitectureTests
 
         Assert.Contains("File.ReadAllText", renderer);
         Assert.Contains("File.WriteAllText", renderer);
-        Assert.Contains("new S3", renderer);
+        Assert.Contains("IWebsiteArtifactStorage", renderer);
+        Assert.Contains("_storage.Upload", renderer);
+        Assert.DoesNotContain("new S3", renderer);
         Assert.DoesNotContain("File.", charts);
         Assert.DoesNotContain("new S3", charts);
         Assert.DoesNotContain("File.", formatter);

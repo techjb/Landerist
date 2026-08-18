@@ -1,8 +1,5 @@
-using Amazon;
-using Amazon.CloudFront;
-using Amazon.CloudFront.Model;
 using landerist_library.Application.Websites;
-using landerist_library.Logs;
+using landerist_library.Infrastructure.Distribution.Cloud;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Infrastructure.WebsiteServices;
 using landerist_library.Application.Statistics;
@@ -157,7 +154,7 @@ namespace landerist_library.Infrastructure.Distribution
             IWebsiteCatalog websites,
             DistributionOptions options)
         {
-            new DownloadsPage(websiteMetrics, websites, options).Update();
+            new DownloadsPage(websiteMetrics, websites, options, CreateStorage()).Update();
             InvalidateCloudFront(options);
         }
 
@@ -166,7 +163,7 @@ namespace landerist_library.Infrastructure.Distribution
             PageStatisticsRepository pageStatistics,
             DistributionOptions options)
         {
-            new StatisticsPage(globalStatistics, pageStatistics, options).UpdateCharts();
+            new StatisticsPage(globalStatistics, pageStatistics, options, CreateStorage()).UpdateCharts();
             InvalidateCloudFront(options);
         }
 
@@ -176,7 +173,7 @@ namespace landerist_library.Infrastructure.Distribution
             IWebsiteCatalog websites,
             DistributionOptions options)
         {
-            new HostStatisticsPage(hostStatistics, websiteMetrics, websites, options).Update();
+            new HostStatisticsPage(hostStatistics, websiteMetrics, websites, options, CreateStorage()).Update();
             InvalidateCloudFront(options);
         }
 
@@ -185,7 +182,7 @@ namespace landerist_library.Infrastructure.Distribution
             IWebsiteCatalog websites,
             DistributionOptions options)
         {
-            new HostsStatisticsPage(websiteMetrics, websites, options).Update();
+            new HostsStatisticsPage(websiteMetrics, websites, options, CreateStorage()).Update();
             InvalidateCloudFront(options);
         }
 
@@ -197,43 +194,24 @@ namespace landerist_library.Infrastructure.Distribution
             IWebsiteCatalog websites,
             DistributionOptions options)
         {
-            new DownloadsPage(websiteMetrics, websites, options).Update();
-            new StatisticsPage(globalStatistics, pageStatistics, options).UpdateCharts();
-            new HostStatisticsPage(hostStatistics, websiteMetrics, websites, options).Update();
-            new HostsStatisticsPage(websiteMetrics, websites, options).Update();
+            IWebsiteArtifactStorage storage = CreateStorage();
+            new DownloadsPage(websiteMetrics, websites, options, storage).Update();
+            new StatisticsPage(globalStatistics, pageStatistics, options, storage).UpdateCharts();
+            new HostStatisticsPage(hostStatistics, websiteMetrics, websites, options, storage).Update();
+            new HostsStatisticsPage(websiteMetrics, websites, options, storage).Update();
             InvalidateCloudFront(options);
         }
 
         public static bool InvalidateCloudFront(DistributionOptions options)
         {
             ArgumentNullException.ThrowIfNull(options);
-            var client = new AmazonCloudFrontClient(options.AwsAccessKeyId, options.AwsSecretAccessKey, RegionEndpoint.EUWest3);
-            var invalidationBatch = new InvalidationBatch
-            {
-                CallerReference = DateTime.UtcNow.Ticks.ToString(),
-                Paths = new Paths
-                {
-                    Quantity = 1,
-                    Items = ["/*"]
-                }
-            };
-
-            var request = new CreateInvalidationRequest
-            {
-                DistributionId = options.CloudFrontDistributionId,
-                InvalidationBatch = invalidationBatch
-            };
-
-            try
-            {
-                var response = client.CreateInvalidationAsync(request).Result;
-                return true;
-            }
-            catch (Exception exception)
-            {
-                Log.WriteError("InvalidateCloudFront", exception);
-            }
-            return false;
+            return new CloudFrontCdnInvalidator(
+                options.AwsAccessKeyId,
+                options.AwsSecretAccessKey,
+                options.CloudFrontDistributionId).InvalidateAll();
         }
+
+        private static IWebsiteArtifactStorage CreateStorage() =>
+            new S3WebsiteArtifactStorage();
     }
 }

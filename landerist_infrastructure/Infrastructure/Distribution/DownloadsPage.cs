@@ -17,19 +17,23 @@ namespace landerist_library.Infrastructure.Distribution
         private readonly WebsiteMetricsService _websiteMetrics;
         private readonly IWebsiteCatalog _websites;
         private readonly DistributionOptions _options;
+        private readonly IWebsiteArtifactStorage _storage;
         private readonly string DownloadsTemplateHtmlFile;
         private readonly string DownloadsIndexHtmlFile;
 
         public DownloadsPage(
             WebsiteMetricsService websiteMetrics,
             IWebsiteCatalog websites,
-            DistributionOptions options) : base(options)
+            DistributionOptions options,
+            IWebsiteArtifactStorage storage) : base(options)
         {
             ArgumentNullException.ThrowIfNull(websiteMetrics);
             ArgumentNullException.ThrowIfNull(websites);
+            ArgumentNullException.ThrowIfNull(storage);
             _websiteMetrics = websiteMetrics;
             _websites = websites;
             _options = options;
+            _storage = storage;
             DownloadsTemplateHtmlFile = Path.Combine(options.TemplatesDirectory, "downloads", "downloads_template.html");
             DownloadsIndexHtmlFile = Path.Combine(options.TemplatesDirectory, "downloads", "index.html");
         }
@@ -97,16 +101,15 @@ namespace landerist_library.Infrastructure.Distribution
 
         private void UpdateDownloadsTemplate(CountryCode countryCode, ExportType exportType)
         {
-            var s3 = new S3();
             string objectKey = GetObjectKey(countryCode, exportType, "json");
 
-            var (lastModified, contentLength) = s3.GetFileInfo(_options.DownloadsBucket, objectKey);
+            var (lastModified, contentLength) = _storage.GetFileInfo(_options.DownloadsBucket, objectKey);
             if (lastModified is null || contentLength is null)
             {
                 return;
             }
 
-            var counter = s3.GetMetadataValue(
+            var counter = _storage.GetMetadata(
                 _options.DownloadsBucket,
                 objectKey,
                 DownloadsUpdater.METADATA_KEY_COUNTER);
@@ -208,7 +211,7 @@ namespace landerist_library.Infrastructure.Distribution
             ListingStatus listingStatus)
         {
             string objectKey = GetListingsByOperationPropertyTypeObjectKey(countryCode, operation, propertyType, listingStatus, "json");
-            var (lastModified, contentLength) = new S3().GetFileInfo(_options.DownloadsBucket, objectKey);
+            var (lastModified, contentLength) = _storage.GetFileInfo(_options.DownloadsBucket, objectKey);
 
             if (lastModified is null || contentLength is null)
             {
@@ -284,7 +287,7 @@ namespace landerist_library.Infrastructure.Distribution
         private string? GetHostDownloadUrl(CountryCode countryCode, string host, ListingStatus listingStatus, string extension)
         {
             string objectKey = GetHostObjectKey(countryCode, host, listingStatus, extension);
-            var (lastModified, contentLength) = new S3().GetFileInfo(_options.DownloadsBucket, objectKey);
+            var (lastModified, contentLength) = _storage.GetFileInfo(_options.DownloadsBucket, objectKey);
 
             if (lastModified is null || contentLength is null)
             {
@@ -320,12 +323,12 @@ namespace landerist_library.Infrastructure.Distribution
             Directory.CreateDirectory(Path.GetDirectoryName(downloadsHtmlFile)!);
             File.WriteAllText(downloadsHtmlFile, DownloadsTemplate);
 
-            return new S3().UploadToWebsiteBucket(downloadsHtmlFile, "index.html", GetDownloadsWebsiteDirectory(countryCode));
+            return _storage.Upload(downloadsHtmlFile, "index.html", GetDownloadsWebsiteDirectory(countryCode));
         }
 
         private bool UploadDownloadsIndexFile()
         {
-            return new S3().UploadToWebsiteBucket(DownloadsIndexHtmlFile, "index.html", "downloads");
+            return _storage.Upload(DownloadsIndexHtmlFile, "index.html", "downloads");
         }
 
         private string GetDownloadsHtmlFile(CountryCode countryCode)

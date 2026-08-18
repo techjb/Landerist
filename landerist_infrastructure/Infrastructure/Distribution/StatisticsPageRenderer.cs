@@ -6,11 +6,16 @@ internal sealed class StatisticsPageRenderer
 {
     private readonly string _templatePath;
     private readonly string _outputPath;
+    private readonly IWebsiteArtifactStorage _storage;
 
-    public StatisticsPageRenderer(string templatePath, string outputPath)
+    public StatisticsPageRenderer(
+        string templatePath,
+        string outputPath,
+        IWebsiteArtifactStorage storage)
     {
         _templatePath = templatePath;
         _outputPath = outputPath;
+        _storage = storage;
     }
 
     public bool Render(string summaryTable, IReadOnlyList<string> charts)
@@ -21,6 +26,6 @@ internal sealed class StatisticsPageRenderer
             "/*CHARTS*/",
             string.Join("; " + Environment.NewLine, charts));
         File.WriteAllText(_outputPath, html);
-        return new S3().UploadToWebsiteBucket(_outputPath, "index.html", "statistics");
+        return _storage.Upload(_outputPath, "index.html", "statistics");
     }
 }

@@ -4,15 +4,6 @@ namespace landerist_architecture_tests;
 
 public sealed partial class DistributionModuleArchitectureTests
 {
-    private static readonly string[] LegacyDirectCloudConsumers =
-    [
-        "DistributionArtifacts.cs",
-        "DownloadsPage.cs",
-        "HostStatisticsPage.cs",
-        "HostsStatisticsPage.cs",
-        "StatisticsPageRenderer.cs"
-    ];
-
     [Fact]
     public void CloudAndFileSystemAdapters_AreIsolatedSubmodules()
     {
@@ -27,7 +18,7 @@ public sealed partial class DistributionModuleArchitectureTests
     }
 
     [Fact]
-    public void DirectCloudSdkUsage_CannotSpreadBeyondLegacyBoundary()
+    public void DirectCloudSdkUsage_IsConfinedToCloudSubmodule()
     {
         string distribution = GetDistributionDirectory();
         string[] directConsumers = Directory
@@ -42,9 +33,7 @@ public sealed partial class DistributionModuleArchitectureTests
             .Order(StringComparer.Ordinal)
             .ToArray()!;
 
-        Assert.Equal(
-            LegacyDirectCloudConsumers.Order(StringComparer.Ordinal),
-            directConsumers);
+        Assert.Empty(directConsumers);
     }
 
     [Fact]

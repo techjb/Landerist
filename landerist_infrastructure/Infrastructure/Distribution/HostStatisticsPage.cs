@@ -16,6 +16,7 @@ namespace landerist_library.Infrastructure.Distribution
         private readonly HostStatistics _statistics;
         private readonly WebsiteMetricsService _websiteMetrics;
         private readonly IWebsiteCatalog _websites;
+        private readonly IWebsiteArtifactStorage _storage;
         private readonly string HostStatisticsTemplateHtmlFile;
         private readonly string HostStatisticsHtmlFile;
 
@@ -23,14 +24,17 @@ namespace landerist_library.Infrastructure.Distribution
             HostStatistics statistics,
             WebsiteMetricsService websiteMetrics,
             IWebsiteCatalog websites,
-            DistributionOptions options) : base(options)
+            DistributionOptions options,
+            IWebsiteArtifactStorage storage) : base(options)
         {
             ArgumentNullException.ThrowIfNull(statistics);
             ArgumentNullException.ThrowIfNull(websiteMetrics);
             ArgumentNullException.ThrowIfNull(websites);
+            ArgumentNullException.ThrowIfNull(storage);
             _statistics = statistics;
             _websiteMetrics = websiteMetrics;
             _websites = websites;
+            _storage = storage;
             HostStatisticsTemplateHtmlFile = Path.Combine(options.TemplatesDirectory, "host-statistics", "host_statistics_template.html");
             HostStatisticsHtmlFile = Path.Combine(options.OutputDirectory, "host_statistics.html");
         }
@@ -55,7 +59,7 @@ namespace landerist_library.Infrastructure.Distribution
 
                 File.WriteAllText(HostStatisticsHtmlFile, template);
 
-                if (new S3().UploadToWebsiteBucket(HostStatisticsHtmlFile, "index.html", "host-statistics"))
+                if (_storage.Upload(HostStatisticsHtmlFile, "index.html", "host-statistics"))
                 {
                     Log.WriteInfo("HostStatisticsPage", "Updated host statistics page");
                 }

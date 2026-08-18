@@ -92,8 +92,10 @@ are supplied at composition time and global configuration access is forbidden.
 The S3 downloads adapter lives in `Distribution/Cloud`, while the system file
 adapter lives in `Distribution/FileSystem`; neither may reach into unrelated
 Infrastructure modules. New distribution workflows must consume these ports.
-The remaining direct S3 and CloudFront construction is an explicit, tested
-legacy boundary that may shrink but cannot spread to additional files.
+All S3 and CloudFront SDK construction is confined to `Distribution/Cloud`.
+Page generation and distribution orchestration consume
+`IWebsiteArtifactStorage` and `ICdnInvalidator`; architecture tests reject
+direct cloud-client construction anywhere else in Distribution.
 
 ## Enforcement
 

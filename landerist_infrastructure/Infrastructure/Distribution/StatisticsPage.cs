@@ -14,7 +14,8 @@ public sealed class StatisticsPage
     public StatisticsPage(
         GlobalStatistics statistics,
         PageStatisticsRepository pageStatistics,
-        DistributionOptions options)
+        DistributionOptions options,
+        IWebsiteArtifactStorage storage)
     {
         ArgumentNullException.ThrowIfNull(statistics);
         ArgumentNullException.ThrowIfNull(pageStatistics);
@@ -26,7 +27,8 @@ public sealed class StatisticsPage
                 options.TemplatesDirectory,
                 "statistics",
                 "statistics_template.html"),
-            Path.Combine(options.OutputDirectory, "statistics.html"));
+            Path.Combine(options.OutputDirectory, "statistics.html"),
+            storage);
     }
 
     public void UpdateCharts()
