@@ -61,6 +61,11 @@ dotnet test .\landerist_architecture_tests\landerist_architecture_tests.csproj
 
 The tests verify that Application does not acquire outer-layer dependencies, folder namespaces match, `Pages` and `Websites` do not reach into `Infrastructure`, `Database` or `LegacyDatabase`, the legacy dependency baseline cannot grow and resolved dependencies are removed from that baseline.
 
+CI also runs `landerist_integration_tests` against an ephemeral SQL Server 2022
+container. Integration configuration crosses the test boundary through explicit
+`LANDERIST_TEST_SQL_*` environment variables; the suite must not read legacy
+application configuration or depend on a developer database.
+
 The baseline is a ratchet, not an allow-list for new work. When a dependency is removed from source, remove its line from the baseline in the same change.
 
 ## Migration sequence

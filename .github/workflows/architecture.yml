@@ -40,3 +40,47 @@ jobs:
           --configuration Release
           --no-build
           --verbosity minimal
+
+  integration-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: "Y"
+          MSSQL_SA_PASSWORD: "Landerist_CI!2026_Strong"
+        ports:
+          - 1433:1433
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build integration suite
+        run: >-
+          dotnet build
+          ./landerist_integration_tests/landerist_integration_tests.csproj
+          --configuration Release
+          --verbosity minimal
+
+      - name: Test SQL integration
+        env:
+          LANDERIST_TEST_SQL_DATASOURCE: "localhost,1433"
+          LANDERIST_TEST_SQL_USER: "sa"
+          LANDERIST_TEST_SQL_PASSWORD: "Landerist_CI!2026_Strong"
+          LANDERIST_TEST_SQL_DATABASE: "master"
+          LANDERIST_TEST_SQL_ENCRYPT: "false"
+          LANDERIST_TEST_SQL_TRUST_SERVER_CERTIFICATE: "true"
+        run: >-
+          dotnet test
+          ./landerist_integration_tests/landerist_integration_tests.csproj
+          --configuration Release
+          --no-build
+          --verbosity minimal
