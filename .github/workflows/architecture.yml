@@ -30,7 +30,7 @@ jobs:
           dotnet test
           ./landerist_unit_tests/landerist_unit_tests.csproj
           --configuration Release
-          --no-build
+          --no-restore
           --verbosity minimal
 
       - name: Test architecture boundaries
@@ -38,7 +38,7 @@ jobs:
           dotnet test
           ./landerist_architecture_tests/landerist_architecture_tests.csproj
           --configuration Release
-          --no-build
+          --no-restore
           --verbosity minimal
 
   integration-test:
