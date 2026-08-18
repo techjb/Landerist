@@ -23,11 +23,13 @@ public sealed class StatisticsPageArchitectureTests
         string charts = ReadDistributionSource("StatisticsChartsBuilder.cs");
         string formatter = ReadDistributionSource("StatisticsChartFormatter.cs");
 
-        Assert.Contains("File.ReadAllText", renderer);
-        Assert.Contains("File.WriteAllText", renderer);
+        Assert.Contains("IDistributionFileSystem", renderer);
+        Assert.Contains("_files.ReadAllText", renderer);
+        Assert.Contains("_files.WriteAllText", renderer);
         Assert.Contains("IWebsiteArtifactStorage", renderer);
         Assert.Contains("_storage.Upload", renderer);
         Assert.DoesNotContain("new S3", renderer);
+        Assert.DoesNotContain("File.", renderer);
         Assert.DoesNotContain("File.", charts);
         Assert.DoesNotContain("new S3", charts);
         Assert.DoesNotContain("File.", formatter);

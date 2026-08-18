@@ -8,10 +8,7 @@ public sealed partial class AiModuleArchitectureTests
     [
         "landerist_library.Configuration",
         "landerist_library.Database",
-        "landerist_library.Infrastructure.Configuration",
-        "landerist_library.Infrastructure.DatabaseMaintenance",
-        "landerist_library.Infrastructure.Scraping",
-        "landerist_library.Infrastructure.Sql"
+        "landerist_library.Infrastructure.Configuration"
     ];
 
     private static readonly (string Name, string Pattern)[] ForbiddenLegacyConfigurationAccess =
@@ -22,7 +19,7 @@ public sealed partial class AiModuleArchitectureTests
     ];
 
     [Fact]
-    public void AiModule_DoesNotDependOnPersistenceScrapingOrConfigurationModules()
+    public void AiModule_DoesNotDependOnSiblingInfrastructureModules()
     {
         IReadOnlyList<string> violations = GetAiSourceFiles()
             .SelectMany(path => FindForbiddenDependencies(path))
@@ -32,7 +29,7 @@ public sealed partial class AiModuleArchitectureTests
         Assert.True(
             violations.Count == 0,
             "Infrastructure/Ai must communicate through Domain and Application ports; " +
-            "it must not depend directly on persistence, scraping or configuration modules." +
+            "it must not depend directly on sibling Infrastructure modules." +
             Environment.NewLine + string.Join(Environment.NewLine, violations));
     }
 
@@ -70,6 +67,17 @@ public sealed partial class AiModuleArchitectureTests
             if (source.Contains(prefix, StringComparison.Ordinal))
             {
                 yield return $"{relativePath}: references {prefix}";
+            }
+        }
+
+        foreach (Match match in InfrastructureNamespaceRegex().Matches(source))
+        {
+            string dependency = match.Groups["namespace"].Value;
+            if (!dependency.StartsWith(
+                "landerist_library.Infrastructure.Ai",
+                StringComparison.Ordinal))
+            {
+                yield return $"{relativePath}: references {dependency}";
             }
         }
 
@@ -112,4 +120,9 @@ public sealed partial class AiModuleArchitectureTests
         @"\bnamespace\s+(?<namespace>[A-Za-z_][A-Za-z0-9_.]*)",
         RegexOptions.CultureInvariant)]
     private static partial Regex NamespaceRegex();
+
+    [GeneratedRegex(
+        @"\b(?:using|global\s+using)\s+(?<namespace>landerist_library\.Infrastructure(?:\.[A-Za-z_][A-Za-z0-9_]*)+)",
+        RegexOptions.CultureInvariant)]
+    private static partial Regex InfrastructureNamespaceRegex();
 }

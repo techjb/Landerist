@@ -49,6 +49,27 @@ public sealed partial class DistributionModuleArchitectureTests
     }
 
     [Fact]
+    public void DirectFileSystemUsage_IsConfinedToFileSystemSubmodule()
+    {
+        string distribution = GetDistributionDirectory();
+        string fileSystem = Path.Combine(distribution, "FileSystem") + Path.DirectorySeparatorChar;
+        string[] violations = Directory
+            .GetFiles(distribution, "*.cs", SearchOption.AllDirectories)
+            .Where(path => !path.StartsWith(fileSystem, StringComparison.OrdinalIgnoreCase))
+            .Where(path =>
+            {
+                string source = File.ReadAllText(path);
+                return source.Contains("File.", StringComparison.Ordinal) ||
+                    source.Contains("Directory.", StringComparison.Ordinal);
+            })
+            .Select(path => Path.GetRelativePath(FindRepositoryRoot(), path))
+            .Order(StringComparer.Ordinal)
+            .ToArray();
+
+        Assert.Empty(violations);
+    }
+
+    [Fact]
     public void Distribution_DoesNotDependOnSqlOrWebsiteServiceImplementations()
     {
         string[] forbidden =

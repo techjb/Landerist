@@ -13,6 +13,7 @@ namespace landerist_library.Infrastructure.Distribution
         private readonly IDistributionWebsiteMetrics _websiteMetrics;
         private readonly IWebsiteCatalog _websites;
         private readonly IWebsiteArtifactStorage _storage;
+        private readonly IDistributionFileSystem _files;
         private readonly string HostsStatisticsTemplateHtmlFile;
         private readonly string HostsStatisticsHtmlFile;
 
@@ -20,14 +21,17 @@ namespace landerist_library.Infrastructure.Distribution
             IDistributionWebsiteMetrics websiteMetrics,
             IWebsiteCatalog websites,
             DistributionOptions options,
-            IWebsiteArtifactStorage storage) : base(options)
+            IWebsiteArtifactStorage storage,
+            IDistributionFileSystem files) : base(options)
         {
             ArgumentNullException.ThrowIfNull(websiteMetrics);
             ArgumentNullException.ThrowIfNull(websites);
             ArgumentNullException.ThrowIfNull(storage);
+            ArgumentNullException.ThrowIfNull(files);
             _websiteMetrics = websiteMetrics;
             _websites = websites;
             _storage = storage;
+            _files = files;
             HostsStatisticsTemplateHtmlFile = Path.Combine(options.TemplatesDirectory, "hosts-statistics", "hosts_statistics_template.html");
             HostsStatisticsHtmlFile = Path.Combine(options.OutputDirectory, "hosts_statistics.html");
         }
@@ -45,7 +49,7 @@ namespace landerist_library.Infrastructure.Distribution
         {
             try
             {
-                var template = File.ReadAllText(HostsStatisticsTemplateHtmlFile);
+                var template = _files.ReadAllText(HostsStatisticsTemplateHtmlFile);
                 var websites = _websites.GetAll()
                     .OrderBy(website => website.Host, StringComparer.OrdinalIgnoreCase)
                     .ToList();
@@ -53,7 +57,7 @@ namespace landerist_library.Infrastructure.Distribution
                 template = template.Replace("/*UPDATED_AT*/", DateTime.Now.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture));
                 template = template.Replace("/*HOSTS_STATISTICS_ROWS*/", GetHostsStatisticsRows(websites));
 
-                File.WriteAllText(HostsStatisticsHtmlFile, template);
+                _files.WriteAllText(HostsStatisticsHtmlFile, template);
 
                 if (_storage.Upload(HostsStatisticsHtmlFile, "index.html", "hosts-statistics"))
                 {

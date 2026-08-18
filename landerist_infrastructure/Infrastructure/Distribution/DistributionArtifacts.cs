@@ -1,6 +1,7 @@
 using landerist_library.Application.Websites;
 using landerist_library.Application.Distribution;
 using landerist_library.Infrastructure.Distribution.Cloud;
+using landerist_library.Infrastructure.Distribution.FileSystem;
 using landerist_library.Application.Statistics;
 using landerist_library.Websites;
 using landerist_orels.ES;
@@ -152,7 +153,7 @@ namespace landerist_library.Infrastructure.Distribution
             IWebsiteCatalog websites,
             DistributionOptions options)
         {
-            new DownloadsPage(websiteMetrics, websites, options, CreateStorage()).Update();
+            new DownloadsPage(websiteMetrics, websites, options, CreateStorage(), CreateFileSystem()).Update();
             InvalidateCloudFront(options);
         }
 
@@ -161,7 +162,7 @@ namespace landerist_library.Infrastructure.Distribution
             IPageStatisticsRepository pageStatistics,
             DistributionOptions options)
         {
-            new StatisticsPage(globalStatistics, pageStatistics, options, CreateStorage()).UpdateCharts();
+            new StatisticsPage(globalStatistics, pageStatistics, options, CreateStorage(), CreateFileSystem()).UpdateCharts();
             InvalidateCloudFront(options);
         }
 
@@ -171,7 +172,7 @@ namespace landerist_library.Infrastructure.Distribution
             IWebsiteCatalog websites,
             DistributionOptions options)
         {
-            new HostStatisticsPage(hostStatistics, websiteMetrics, websites, options, CreateStorage()).Update();
+            new HostStatisticsPage(hostStatistics, websiteMetrics, websites, options, CreateStorage(), CreateFileSystem()).Update();
             InvalidateCloudFront(options);
         }
 
@@ -180,7 +181,7 @@ namespace landerist_library.Infrastructure.Distribution
             IWebsiteCatalog websites,
             DistributionOptions options)
         {
-            new HostsStatisticsPage(websiteMetrics, websites, options, CreateStorage()).Update();
+            new HostsStatisticsPage(websiteMetrics, websites, options, CreateStorage(), CreateFileSystem()).Update();
             InvalidateCloudFront(options);
         }
 
@@ -193,10 +194,11 @@ namespace landerist_library.Infrastructure.Distribution
             DistributionOptions options)
         {
             IWebsiteArtifactStorage storage = CreateStorage();
-            new DownloadsPage(websiteMetrics, websites, options, storage).Update();
-            new StatisticsPage(globalStatistics, pageStatistics, options, storage).UpdateCharts();
-            new HostStatisticsPage(hostStatistics, websiteMetrics, websites, options, storage).Update();
-            new HostsStatisticsPage(websiteMetrics, websites, options, storage).Update();
+            IDistributionFileSystem files = CreateFileSystem();
+            new DownloadsPage(websiteMetrics, websites, options, storage, files).Update();
+            new StatisticsPage(globalStatistics, pageStatistics, options, storage, files).UpdateCharts();
+            new HostStatisticsPage(hostStatistics, websiteMetrics, websites, options, storage, files).Update();
+            new HostsStatisticsPage(websiteMetrics, websites, options, storage, files).Update();
             InvalidateCloudFront(options);
         }
 
@@ -211,5 +213,8 @@ namespace landerist_library.Infrastructure.Distribution
 
         private static IWebsiteArtifactStorage CreateStorage() =>
             new S3WebsiteArtifactStorage();
+
+        private static IDistributionFileSystem CreateFileSystem() =>
+            new SystemDistributionFileSystem();
     }
 }

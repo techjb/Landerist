@@ -17,6 +17,7 @@ namespace landerist_library.Infrastructure.Distribution
         private readonly IWebsiteCatalog _websites;
         private readonly DistributionOptions _options;
         private readonly IWebsiteArtifactStorage _storage;
+        private readonly IDistributionFileSystem _files;
         private readonly string DownloadsTemplateHtmlFile;
         private readonly string DownloadsIndexHtmlFile;
 
@@ -24,15 +25,18 @@ namespace landerist_library.Infrastructure.Distribution
             IDistributionWebsiteMetrics websiteMetrics,
             IWebsiteCatalog websites,
             DistributionOptions options,
-            IWebsiteArtifactStorage storage) : base(options)
+            IWebsiteArtifactStorage storage,
+            IDistributionFileSystem files) : base(options)
         {
             ArgumentNullException.ThrowIfNull(websiteMetrics);
             ArgumentNullException.ThrowIfNull(websites);
             ArgumentNullException.ThrowIfNull(storage);
+            ArgumentNullException.ThrowIfNull(files);
             _websiteMetrics = websiteMetrics;
             _websites = websites;
             _options = options;
             _storage = storage;
+            _files = files;
             DownloadsTemplateHtmlFile = Path.Combine(options.TemplatesDirectory, "downloads", "downloads_template.html");
             DownloadsIndexHtmlFile = Path.Combine(options.TemplatesDirectory, "downloads", "index.html");
         }
@@ -43,7 +47,7 @@ namespace landerist_library.Infrastructure.Distribution
         {
             try
             {
-                string downloadsTemplate = File.ReadAllText(DownloadsTemplateHtmlFile);
+                string downloadsTemplate = _files.ReadAllText(DownloadsTemplateHtmlFile);
 
                 if (UploadDownloadsIndexFile())
                 {
@@ -319,8 +323,8 @@ namespace landerist_library.Infrastructure.Distribution
         private bool UploadDownloadsFile(CountryCode countryCode)
         {
             string downloadsHtmlFile = GetDownloadsHtmlFile(countryCode);
-            Directory.CreateDirectory(Path.GetDirectoryName(downloadsHtmlFile)!);
-            File.WriteAllText(downloadsHtmlFile, DownloadsTemplate);
+            _files.CreateDirectory(Path.GetDirectoryName(downloadsHtmlFile)!);
+            _files.WriteAllText(downloadsHtmlFile, DownloadsTemplate);
 
             return _storage.Upload(downloadsHtmlFile, "index.html", GetDownloadsWebsiteDirectory(countryCode));
         }

@@ -8,14 +8,19 @@ namespace landerist_library.Infrastructure.Distribution;
 
 internal sealed class DownloadsWorkspace : DistributionArtifacts
 {
-    public DownloadsWorkspace(DistributionOptions options) : base(options)
+    private readonly IDistributionFileSystem _files;
+
+    public DownloadsWorkspace(
+        DistributionOptions options,
+        IDistributionFileSystem files) : base(options)
     {
+        _files = files;
     }
 
     public string EnsureSubdirectory(string subdirectory)
     {
         string directory = GetFilePath(subdirectory);
-        Directory.CreateDirectory(directory);
+        _files.CreateDirectory(directory);
         return directory;
     }
 

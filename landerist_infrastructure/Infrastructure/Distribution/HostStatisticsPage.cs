@@ -16,6 +16,7 @@ namespace landerist_library.Infrastructure.Distribution
         private readonly IDistributionWebsiteMetrics _websiteMetrics;
         private readonly IWebsiteCatalog _websites;
         private readonly IWebsiteArtifactStorage _storage;
+        private readonly IDistributionFileSystem _files;
         private readonly string HostStatisticsTemplateHtmlFile;
         private readonly string HostStatisticsHtmlFile;
 
@@ -24,16 +25,19 @@ namespace landerist_library.Infrastructure.Distribution
             IDistributionWebsiteMetrics websiteMetrics,
             IWebsiteCatalog websites,
             DistributionOptions options,
-            IWebsiteArtifactStorage storage) : base(options)
+            IWebsiteArtifactStorage storage,
+            IDistributionFileSystem files) : base(options)
         {
             ArgumentNullException.ThrowIfNull(statistics);
             ArgumentNullException.ThrowIfNull(websiteMetrics);
             ArgumentNullException.ThrowIfNull(websites);
             ArgumentNullException.ThrowIfNull(storage);
+            ArgumentNullException.ThrowIfNull(files);
             _statistics = statistics;
             _websiteMetrics = websiteMetrics;
             _websites = websites;
             _storage = storage;
+            _files = files;
             HostStatisticsTemplateHtmlFile = Path.Combine(options.TemplatesDirectory, "host-statistics", "host_statistics_template.html");
             HostStatisticsHtmlFile = Path.Combine(options.OutputDirectory, "host_statistics.html");
         }
@@ -47,7 +51,7 @@ namespace landerist_library.Infrastructure.Distribution
         {
             try
             {
-                var template = File.ReadAllText(HostStatisticsTemplateHtmlFile);
+                var template = _files.ReadAllText(HostStatisticsTemplateHtmlFile);
                 var websites = _websites.GetAll()
                     .OrderBy(website => website.Host, StringComparer.OrdinalIgnoreCase)
                     .ToList();
@@ -56,7 +60,7 @@ namespace landerist_library.Infrastructure.Distribution
                 template = template.Replace("/*HOST_OPTIONS*/", GetHostOptions(websites));
                 template = template.Replace("/*HOST_STATISTICS_DATA*/", JsonSerializer.Serialize(GetHostStatistics(websites), JsonSerializerOptions));
 
-                File.WriteAllText(HostStatisticsHtmlFile, template);
+                _files.WriteAllText(HostStatisticsHtmlFile, template);
 
                 if (_storage.Upload(HostStatisticsHtmlFile, "index.html", "host-statistics"))
                 {

@@ -63,6 +63,9 @@ depend directly on persistence, SQL, scraping, database-maintenance, or runtime
 configuration modules. Collaboration with those capabilities crosses
 Application ports and is assembled at the composition root.
 
+AI has no sibling Infrastructure dependencies: provider serialization, batch
+contracts and response models cross Domain or Application boundaries only.
+
 AI provider and batch construction remains split into focused composition
 classes under `landerist_console`; provider implementations do not construct or
 locate persistence and scraping services themselves. The same boundary pattern
@@ -93,6 +96,9 @@ The S3 downloads adapter lives in `Distribution/Cloud`, while the system file
 adapter lives in `Distribution/FileSystem`; neither may reach into unrelated
 Infrastructure modules. New distribution workflows must consume these ports.
 All S3 and CloudFront SDK construction is confined to `Distribution/Cloud`.
+Page rendering and export workspaces access local files through
+`IDistributionFileSystem`; direct `System.IO.File` and `System.IO.Directory`
+calls are confined to `Distribution/FileSystem`.
 Page generation and distribution orchestration consume
 `IWebsiteArtifactStorage` and `ICdnInvalidator`; architecture tests reject
 direct cloud-client construction anywhere else in Distribution.

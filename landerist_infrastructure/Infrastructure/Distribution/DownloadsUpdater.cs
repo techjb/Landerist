@@ -3,6 +3,7 @@ using landerist_library.Application.Distribution;
 using landerist_library.Application.Logging;
 using landerist_library.Application.Websites;
 using landerist_library.Websites;
+using landerist_library.Infrastructure.Distribution.FileSystem;
 using landerist_orels.ES;
 
 namespace landerist_library.Infrastructure.Distribution;
@@ -28,7 +29,7 @@ public class DownloadsUpdater : DistributionArtifacts
         ArgumentNullException.ThrowIfNull(logger);
         _listings = listings;
         _logger = logger;
-        _workspace = new DownloadsWorkspace(options);
+        _workspace = new DownloadsWorkspace(options, new SystemDistributionFileSystem());
         _publisher = new DownloadsArtifactPublisher(Yesterday, options, logger);
         _segmentedListings = new SegmentedListingsUpdater(
             listings,

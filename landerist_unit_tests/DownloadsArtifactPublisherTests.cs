@@ -158,6 +158,12 @@ public sealed class DownloadsArtifactPublisherTests
             Deletes.Add(path);
             _existing.Remove(path);
         }
+
+        public void CreateDirectory(string path) { }
+
+        public string ReadAllText(string path) => string.Empty;
+
+        public void WriteAllText(string path, string contents) { }
     }
 
     private sealed class RecordingLogger : IApplicationLogger
