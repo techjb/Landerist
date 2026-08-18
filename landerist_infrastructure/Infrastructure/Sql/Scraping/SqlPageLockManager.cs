@@ -2,7 +2,7 @@ using landerist_library.Application.Scraping;
 using landerist_library.Database;
 using landerist_library.Infrastructure.Sql;
 
-namespace landerist_library.Infrastructure.Scraping;
+namespace landerist_library.Infrastructure.Sql.Scraping;
 
 public sealed class SqlPageLockManager : IPageLockManager
 {

@@ -1,4 +1,4 @@
-using landerist_library.Infrastructure.Statistics;
+using landerist_library.Infrastructure.Sql.Statistics;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Application.Statistics;
 using System.Data;

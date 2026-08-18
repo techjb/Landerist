@@ -2,7 +2,7 @@ using landerist_library.Application.Listings;
 using landerist_library.Application.Persistence;
 using landerist_library.Database;
 using landerist_library.Infrastructure.Runtime;
-using landerist_library.Infrastructure.Statistics;
+using landerist_library.Infrastructure.Sql.Statistics;
 using landerist_library.Infrastructure.Sql;
 using Microsoft.Extensions.DependencyInjection;
 

@@ -3,7 +3,7 @@ using landerist_library.Database;
 using landerist_library.Websites;
 using System.Text;
 
-namespace landerist_library.Infrastructure.Scraping
+namespace landerist_library.Infrastructure.Sql.Scraping
 {
     public sealed class WebsitesThrottle
     {

@@ -2,7 +2,7 @@ using landerist_library.Application.Logging;
 using landerist_library.Application.Parsing;
 using landerist_library.Database;
 using landerist_library.Infrastructure.Location.Providers.Goolzoom;
-using landerist_library.Infrastructure.Statistics;
+using landerist_library.Infrastructure.Sql.Statistics;
 
 namespace landerist_unit_tests;
 

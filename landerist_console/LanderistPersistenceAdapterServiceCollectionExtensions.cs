@@ -6,7 +6,7 @@ using landerist_library.Infrastructure.Listings;
 using landerist_library.Infrastructure.PageServices;
 using landerist_library.Infrastructure.Runtime;
 using landerist_library.Infrastructure.Sql;
-using landerist_library.Infrastructure.Statistics;
+using landerist_library.Infrastructure.Sql.Statistics;
 using landerist_library.Infrastructure.WebsiteServices;
 using Microsoft.Extensions.DependencyInjection;
 

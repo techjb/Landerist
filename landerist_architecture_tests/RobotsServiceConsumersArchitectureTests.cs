@@ -8,9 +8,9 @@ public sealed class RobotsServiceConsumersArchitectureTests
         string root = FindRepositoryRoot();
         string[] files =
         [
-            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Scraping", "WebsitesThrottle.cs"),
+            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Sql", "Scraping", "WebsitesThrottle.cs"),
             Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Listings", "SqlPageLinkService.cs"),
-            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Scraping", "SqlWebsiteThrottleService.cs"),
+            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Sql", "Scraping", "SqlWebsiteThrottleService.cs"),
             Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Administration", "WebsiteAdministrationService.cs")
         ];
         string[] forbiddenTokens =

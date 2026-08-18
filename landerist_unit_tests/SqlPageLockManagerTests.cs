@@ -1,4 +1,5 @@
 using landerist_library.Infrastructure.Scraping;
+using landerist_library.Infrastructure.Sql.Scraping;
 
 namespace landerist_unit_tests;
 

@@ -76,7 +76,7 @@ public sealed class DatabaseFailureArchitectureTests
         string pageProcessor = File.ReadAllText(
             Path.Combine(root, "landerist_application", "Application", "Scraping", "ScrapePageProcessor.cs"));
         string throttle = File.ReadAllText(
-            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Scraping", "WebsitesThrottle.cs"));
+            Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Sql", "Scraping", "WebsitesThrottle.cs"));
 
         Assert.Contains("AddAsyncSchedule(", tasks);
         Assert.Contains("_scrapeJob.RunAsync", tasks);
@@ -233,7 +233,7 @@ public sealed class DatabaseFailureArchitectureTests
         string listingRepository = File.ReadAllText(Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Sql", "ListingRepository.cs"));
         string mediaRepository = File.ReadAllText(Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Sql", "MediaRepository.cs"));
         string sourceRepository = File.ReadAllText(Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Sql", "SourceRepository.cs"));
-        string statisticsRepository = File.ReadAllText(Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Statistics", "GlobalStatisticsRepository.cs"));
+        string statisticsRepository = File.ReadAllText(Path.Combine(root, "landerist_infrastructure", "Infrastructure", "Sql", "Statistics", "GlobalStatisticsRepository.cs"));
 
         Assert.Contains("_listingStore.UpsertAsync(", lifecycle);
         Assert.Contains("_listings.InsertAsync(", store);

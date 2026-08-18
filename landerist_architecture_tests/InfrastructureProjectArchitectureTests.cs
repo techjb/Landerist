@@ -385,7 +385,13 @@ public sealed class InfrastructureProjectArchitectureTests
         ];
         foreach (string file in statistics)
         {
-            AssertMoved(root, "Statistics", file);
+            string expected = Path.Combine(
+                root, "landerist_infrastructure", "Infrastructure",
+                "Sql", "Statistics", file);
+            Assert.True(File.Exists(expected), $"Expected SQL statistics adapter at {expected}");
+            Assert.False(File.Exists(Path.Combine(
+                root, "landerist_infrastructure", "Infrastructure",
+                "Statistics", file)));
         }
     }
     [Fact]
@@ -400,7 +406,10 @@ public sealed class InfrastructureProjectArchitectureTests
             "PageContentClassifier.cs",
             "PageIndexingService.cs",
             "PooledPageDownloader.cs",
-            "ScrapeBrowserManager.cs",
+            "ScrapeBrowserManager.cs"
+        ];
+        string[] sqlScrapingAdapters =
+        [
             "SqlPageClassificationMetrics.cs",
             "SqlPageLockManager.cs",
             "SqlPageSchedulingService.cs",
@@ -415,6 +424,24 @@ public sealed class InfrastructureProjectArchitectureTests
         foreach (string file in scrapingAdapters)
         {
             AssertMoved(root, "Scraping", file);
+        }
+
+        foreach (string file in sqlScrapingAdapters)
+        {
+            string expected = Path.Combine(
+                root,
+                "landerist_infrastructure",
+                "Infrastructure",
+                "Sql",
+                "Scraping",
+                file);
+            Assert.True(File.Exists(expected), $"Expected SQL scraping adapter at {expected}");
+            Assert.False(File.Exists(Path.Combine(
+                root,
+                "landerist_infrastructure",
+                "Infrastructure",
+                "Scraping",
+                file)));
         }
     }
 

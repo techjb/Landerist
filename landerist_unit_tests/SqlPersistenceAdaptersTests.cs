@@ -1,4 +1,4 @@
-using landerist_library.Infrastructure.Statistics;
+using landerist_library.Infrastructure.Sql.Statistics;
 using landerist_library.Application.Listings;
 using landerist_library.Database;
 using landerist_library.Infrastructure.Listings;
@@ -6,6 +6,7 @@ using landerist_library.Infrastructure.PageServices;
 using landerist_library.Infrastructure.WebsiteServices;
 using landerist_library.Infrastructure.Scraping;
 using landerist_library.Infrastructure.Sql;
+using landerist_library.Infrastructure.Sql.Scraping;
 using landerist_library.Application.Statistics;
 using landerist_library.Pages;
 using landerist_library.Websites;

@@ -3,7 +3,7 @@ using landerist_library.Application.Websites;
 using landerist_library.Database;
 using landerist_library.Websites;
 
-namespace landerist_library.Infrastructure.Scraping;
+namespace landerist_library.Infrastructure.Sql.Scraping;
 
 public sealed class SqlWebsiteThrottleService : IWebsiteThrottleService
 {

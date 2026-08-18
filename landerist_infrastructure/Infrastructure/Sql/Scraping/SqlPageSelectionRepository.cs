@@ -5,7 +5,7 @@ using landerist_library.Infrastructure.Sql.Mapping;
 using landerist_library.Pages;
 using System.Data;
 
-namespace landerist_library.Infrastructure.Scraping;
+namespace landerist_library.Infrastructure.Sql.Scraping;
 
 public sealed class SqlPageSelectionRepository : IPageSelectionRepository
 {

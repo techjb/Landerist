@@ -74,9 +74,12 @@ inward-facing contract instead of referencing one another. Scraping/Browser is
 split deliberately: `Infrastructure/Browser` is a protected lower-level module
 that depends only on Application logging ports and browser/process SDKs;
 Scraping may consume it, but Browser cannot reach back into Scraping or other
-Infrastructure modules. Scraping still contains SQL-specific adapters; moving
-those adapters under the SQL module is the next boundary extraction before
-deciding whether any module needs its own physical project.
+Infrastructure modules. Scraping orchestration depends only on Application
+ports and the lower-level Browser and HTTP modules. SQL-backed scraping and
+statistics adapters live under `Infrastructure/Sql`; direct database access and
+`Sql*` adapters are rejected from the Scraping module by architecture tests.
+These internal boundaries can now be observed before deciding whether any
+module needs its own physical project.
 
 ## Enforcement
 

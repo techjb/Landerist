@@ -5,7 +5,7 @@ using landerist_library.Application.Statistics;
 using landerist_orels.ES;
 using System.Data;
 
-namespace landerist_library.Infrastructure.Statistics
+namespace landerist_library.Infrastructure.Sql.Statistics
 {
     public sealed class GlobalStatisticsRepository : IGlobalStatisticsRepository
     {

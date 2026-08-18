@@ -1,10 +1,10 @@
-using landerist_library.Infrastructure.Statistics;
+using landerist_library.Infrastructure.Sql.Statistics;
 using landerist_library.Application.Scraping;
 using landerist_library.Database;
 using landerist_library.Infrastructure.Sql;
 using landerist_library.Application.Statistics;
 
-namespace landerist_library.Infrastructure.Scraping;
+namespace landerist_library.Infrastructure.Sql.Scraping;
 
 public sealed class SqlScrapeBatchMetrics : IScrapeBatchMetrics
 {

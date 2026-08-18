@@ -8,7 +8,7 @@ using landerist_library.Websites;
 using landerist_orels.ES;
 using System.Data;
 
-namespace landerist_library.Infrastructure.Scraping;
+namespace landerist_library.Infrastructure.Sql.Scraping;
 
 public sealed class SqlScrapePageSource : IScrapePageSource
 {

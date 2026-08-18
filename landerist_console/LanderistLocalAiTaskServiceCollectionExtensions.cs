@@ -8,7 +8,7 @@ using landerist_library.Infrastructure.Parsing;
 using landerist_library.Infrastructure.Parsing.Tokenization;
 using landerist_library.Infrastructure.Parsing.UserInput;
 using landerist_library.Infrastructure.Runtime;
-using landerist_library.Infrastructure.Statistics;
+using landerist_library.Infrastructure.Sql.Statistics;
 using landerist_library.Infrastructure.Tasks;
 using landerist_library.Parsing;
 using Microsoft.Extensions.DependencyInjection;
