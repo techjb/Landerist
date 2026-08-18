@@ -28,8 +28,30 @@ public sealed class WebsiteAdministrationArchitectureTests
         Assert.DoesNotContain("IWebsiteRobotsPolicy", refresh);
         Assert.Contains("IWebsiteRobotsPolicy", reporting);
         Assert.DoesNotContain("AppConfig.", reporting);
-        Assert.Contains("AppConfig.INSERT_DIRECTORY", cleanup);
+        Assert.Contains("AdministrationOptions options", cleanup);
+        Assert.Contains("IWebsiteCleanupFileReader", cleanup);
+        Assert.DoesNotContain("AppConfig.", cleanup);
         Assert.DoesNotContain("IWebsiteNetworkService", cleanup);
+    }
+
+    [Fact]
+    public void AdministrationModule_DoesNotReadGlobalConfiguration()
+    {
+        string directory = Path.Combine(
+            FindRepositoryRoot(),
+            "landerist_infrastructure",
+            "Infrastructure",
+            "Administration");
+        string[] forbidden = ["Config.", "AppConfig.", "LanderistSettings"];
+
+        string[] violations = Directory.GetFiles(directory, "*.cs")
+            .Where(path => forbidden.Any(token =>
+                File.ReadAllText(path).Contains(token, StringComparison.Ordinal)))
+            .Select(Path.GetFileName)
+            .OfType<string>()
+            .ToArray();
+
+        Assert.Empty(violations);
     }
 
     private static string ReadAdministrationFile(string fileName) =>

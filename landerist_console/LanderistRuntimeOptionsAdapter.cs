@@ -80,7 +80,10 @@ internal static class LanderistRuntimeOptionsAdapter
                 Config.DATABASE_NAME,
                 Config.BACKUPS_DIRECTORY ?? string.Empty,
                 settings.GetString("AWS_S3_BACKUPS_BUCKET"),
-                Config.DAYS_TO_DELETE_BACKUP)
+                Config.DAYS_TO_DELETE_BACKUP),
+            Administration = new AdministrationOptions(
+                Config.DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS,
+                Path.Combine(settings.GetString("INSERT_DIRECTORY"), "HostMainUri.csv"))
         };
 
         options.Validate();

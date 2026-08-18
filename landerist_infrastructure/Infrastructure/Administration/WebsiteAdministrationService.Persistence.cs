@@ -6,6 +6,7 @@ using landerist_library.Application.Listings;
 using landerist_library.Application.Pages;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Websites;
+using landerist_library.Infrastructure.Runtime;
 
 namespace landerist_library.Infrastructure.Administration;
 
@@ -33,7 +34,8 @@ public sealed partial class WebsiteAdministrationService : IWebsiteAdministratio
         IPageMaintenanceService pageMaintenance,
         IWebsiteNetworkService network,
         IWebsiteSitemapService sitemaps,
-        IWebsiteRobotsPolicy robotsPolicy)
+        IWebsiteRobotsPolicy robotsPolicy,
+        AdministrationOptions options)
     {
         Persistence = persistence;
         Deletion = deletion;
@@ -46,7 +48,14 @@ public sealed partial class WebsiteAdministrationService : IWebsiteAdministratio
         PageMaintenance = pageMaintenance;
         RefreshOperations = new WebsiteRefreshOperations(catalog, persistence, network, sitemaps);
         Reporting = new WebsiteAdministrationReporting(catalog, robotsPolicy, pagePersistence);
-        FileCleanup = new WebsiteFileCleanup(catalog, metrics, deletion);
+        ArgumentNullException.ThrowIfNull(options);
+        options.Validate();
+        FileCleanup = new WebsiteFileCleanup(
+            catalog,
+            metrics,
+            deletion,
+            options,
+            new WebsiteCleanupCsvReader());
     }
 
     public bool Insert(Website website) => Persistence.Insert(website);

@@ -1,27 +1,21 @@
 using landerist_library.Application.Administration;
 using landerist_library.Application.Websites;
-using landerist_library.Configuration;
 using landerist_library.Websites;
-using System.Data;
+using landerist_library.Infrastructure.Runtime;
 
 namespace landerist_library.Infrastructure.Administration;
 
 internal sealed class WebsiteFileCleanup(
     IWebsiteCatalog catalog,
     IWebsiteMetricsService metrics,
-    IWebsiteDeletionService deletion)
+    IWebsiteDeletionService deletion,
+    AdministrationOptions options,
+    IWebsiteCleanupFileReader fileReader)
 {
     internal void DeleteWebsitesWithoutListingUrl()
     {
-        string file = AppConfig.INSERT_DIRECTORY + "HostMainUri.csv";
-        DataTable dataTable = Tools.Csv.ToDataTable(file);
-        HashSet<string> hosts = [];
-        foreach (DataRow row in dataTable.Rows)
-        {
-            string host = (string)row[0];
-            string listingUrl = ((string)row[2]).Trim();
-            if (listingUrl.Length == 0) hosts.Add(host);
-        }
+        IReadOnlyCollection<string> hosts =
+            fileReader.ReadHostsWithoutListingUrl(options.WebsiteCleanupFilePath);
 
         int total = hosts.Count;
         int processed = 0;

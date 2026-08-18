@@ -1,5 +1,4 @@
 using landerist_library.Pages;
-using landerist_library.Configuration;
 using landerist_library.Websites;
 using landerist_orels.ES;
 using System.Collections.Concurrent;
@@ -86,7 +85,7 @@ public sealed partial class PageAdministrationService
 
     public void DeleteUnpublishedListings()
     {
-        DateTime unlistingDate = DateTime.Now.AddDays(-Config.DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS);
+        DateTime unlistingDate = UnpublishedRetention.GetThreshold();
         IReadOnlyCollection<Listing> listings =
             ListingQueries.GetUnpublishedBefore(unlistingDate);
         DeleteListings(listings);

@@ -6,6 +6,7 @@ using landerist_library.Application.Pages;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Websites;
 using landerist_orels.ES;
+using landerist_library.Infrastructure.Runtime;
 
 namespace landerist_library.Infrastructure.Administration;
 
@@ -19,6 +20,7 @@ public sealed partial class PageAdministrationService : IPageAdministrationServi
     private readonly IListingQueryService ListingQueries;
     private readonly IListingMaintenanceService ListingMaintenance;
     private readonly IPageLinkService PageLinks;
+    private readonly UnpublishedListingRetentionPolicy UnpublishedRetention;
 
     public PageAdministrationService(
         IPagePersistenceService persistence,
@@ -27,7 +29,9 @@ public sealed partial class PageAdministrationService : IPageAdministrationServi
         IWebsiteCatalog websiteCatalog,
         IListingQueryService listingQueries,
         IListingMaintenanceService listingMaintenance,
-        IPageLinkService pageLinks)
+        IPageLinkService pageLinks,
+        AdministrationOptions options,
+        TimeProvider timeProvider)
     {
         Persistence = persistence;
         Queries = queries;
@@ -37,6 +41,10 @@ public sealed partial class PageAdministrationService : IPageAdministrationServi
         ListingMaintenance = listingMaintenance;
         ArgumentNullException.ThrowIfNull(pageLinks);
         PageLinks = pageLinks;
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(timeProvider);
+        options.Validate();
+        UnpublishedRetention = new UnpublishedListingRetentionPolicy(options, timeProvider);
     }
 
     public bool Insert(Page page) => Persistence.Insert(page);

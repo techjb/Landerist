@@ -29,6 +29,8 @@ public sealed record LanderistRuntimeOptions(
 
     public DatabaseBackupOptions Backup { get; init; } = DatabaseBackupOptions.Disabled;
 
+    public AdministrationOptions Administration { get; init; } = AdministrationOptions.Default;
+
     public void Validate()
     {
         ArgumentNullException.ThrowIfNull(Database);
@@ -44,6 +46,20 @@ public sealed record LanderistRuntimeOptions(
         Execution.Validate();
         Distribution.Validate();
         Backup.Validate();
+        Administration.Validate();
+    }
+}
+
+public sealed record AdministrationOptions(
+    int UnpublishedListingRetentionDays,
+    string WebsiteCleanupFilePath)
+{
+    public static AdministrationOptions Default { get; } = new(180, "HostMainUri.csv");
+
+    public void Validate()
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(UnpublishedListingRetentionDays);
+        ArgumentException.ThrowIfNullOrWhiteSpace(WebsiteCleanupFilePath);
     }
 }
 
