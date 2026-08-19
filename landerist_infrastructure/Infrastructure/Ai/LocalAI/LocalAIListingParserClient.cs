@@ -102,8 +102,18 @@ public sealed class LocalAIListingParserClient : IListingParserClient
                     $"responseText is null or empty. Finish Reason: {finishReason} {usageDiagnostic} InputTokenCount: {page.TokenCount}");
             }
 
+            string normalizedResponseText = responseText.Trim();
             if (finishReason == "length")
             {
+                if (IsCompleteJson(normalizedResponseText))
+                {
+                    return new ListingParserClientResult(
+                        normalizedResponseText,
+                        false,
+                        $"response reached max_tokens after a complete JSON document. {usageDiagnostic} " +
+                        $"InputTokenCount: {page.TokenCount} ResponseLength: {responseText.Length} Uri: {page.Uri}");
+                }
+
                 return new ListingParserClientResult(
                     null,
                     true,
@@ -112,7 +122,7 @@ public sealed class LocalAIListingParserClient : IListingParserClient
             }
 
             return new ListingParserClientResult(
-                responseText,
+                normalizedResponseText,
                 false,
                 $"Finish Reason: {finishReason} {usageDiagnostic} InputTokenCount: {page.TokenCount} Uri: {page.Uri}");
         }
@@ -159,6 +169,19 @@ public sealed class LocalAIListingParserClient : IListingParserClient
             ? responseText
             : responseText[^maximumLength..];
         return JsonSerializer.Serialize(tail);
+    }
+
+    private static bool IsCompleteJson(string responseText)
+    {
+        try
+        {
+            using JsonDocument _ = JsonDocument.Parse(responseText);
+            return true;
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
     }
 
     private string ResolveHost(LocalAIListingParserOptions options)
