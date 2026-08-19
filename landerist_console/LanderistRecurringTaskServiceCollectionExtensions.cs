@@ -25,7 +25,10 @@ internal static class LanderistRecurringTaskServiceCollectionExtensions
         services.AddSingleton<ITaskHealthRegistry>(taskHealth);
         services.AddSingleton(new HealthPublisherOptions(
             runtimeOptions.Health.FilePath,
-            TimeSpan.FromSeconds(runtimeOptions.Health.IntervalSeconds)));
+            TimeSpan.FromSeconds(runtimeOptions.Health.IntervalSeconds),
+            string.IsNullOrWhiteSpace(runtimeOptions.Health.HealthchecksPingUrl)
+                ? null
+                : new Uri(runtimeOptions.Health.HealthchecksPingUrl)));
         services.AddHostedService<LanderistHealthWorker>();
         services.AddSingleton<LanderistDistributionComposition>();
         services.AddSingleton<HourlyTaskJob>(serviceProvider => new(

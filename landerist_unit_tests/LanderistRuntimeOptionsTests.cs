@@ -173,6 +173,34 @@ public sealed class LanderistRuntimeOptionsTests
         Assert.Throws<ArgumentOutOfRangeException>(options.Validate);
     }
 
+    [Fact]
+    public void Validate_AcceptsHttpsHealthchecksPingUrl()
+    {
+        LanderistRuntimeOptions options = CreateOptions() with
+        {
+            Health = new HealthRuntimeOptions(
+                "health.json",
+                60,
+                "https://hc-ping.com/test-id")
+        };
+
+        options.Validate();
+    }
+
+    [Fact]
+    public void Validate_RejectsInsecureHealthchecksPingUrl()
+    {
+        LanderistRuntimeOptions options = CreateOptions() with
+        {
+            Health = new HealthRuntimeOptions(
+                "health.json",
+                60,
+                "http://hc-ping.com/test-id")
+        };
+
+        Assert.Throws<InvalidOperationException>(options.Validate);
+    }
+
     private static LanderistRuntimeOptions CreateOptions() => new(
         new DatabaseRuntimeOptions(
             "sql.example.test",

@@ -93,7 +93,8 @@ internal static class LanderistRuntimeOptionsAdapter
                 settings.GetInt32("LOG_RETENTION_MAXIMUM_BATCHES", 100)),
             Health = new HealthRuntimeOptions(
                 settings.GetString("HEALTH_FILE_PATH", "landerist-health.json"),
-                settings.GetInt32("HEALTH_INTERVAL_SECONDS", 60))
+                settings.GetInt32("HEALTH_INTERVAL_SECONDS", 60),
+                settings.GetString("HEALTHCHECKS_PING_URL"))
         };
 
         options.Validate();

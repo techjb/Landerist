@@ -58,7 +58,10 @@ public sealed record LanderistRuntimeOptions(
     }
 }
 
-public sealed record HealthRuntimeOptions(string FilePath, int IntervalSeconds)
+public sealed record HealthRuntimeOptions(
+    string FilePath,
+    int IntervalSeconds,
+    string HealthchecksPingUrl = "")
 {
     public static HealthRuntimeOptions Default { get; } = new(
         "landerist-health.json", 60);
@@ -67,6 +70,14 @@ public sealed record HealthRuntimeOptions(string FilePath, int IntervalSeconds)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(FilePath);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(IntervalSeconds);
+        ArgumentNullException.ThrowIfNull(HealthchecksPingUrl);
+        if (!string.IsNullOrWhiteSpace(HealthchecksPingUrl) &&
+            (!Uri.TryCreate(HealthchecksPingUrl, UriKind.Absolute, out Uri? pingUri) ||
+             pingUri.Scheme != Uri.UriSchemeHttps))
+        {
+            throw new InvalidOperationException(
+                "The Healthchecks ping URL must be an absolute HTTPS URL.");
+        }
     }
 }
 
