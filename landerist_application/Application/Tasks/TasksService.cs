@@ -214,6 +214,9 @@ public sealed class TasksService : IDisposable
             {
                 if (Interlocked.Exchange(ref running, 1) == 1)
                 {
+                    _logger.WriteInfo(
+                        "ServiceTasks " + name,
+                        "Skipped because the previous execution is still running.");
                     return;
                 }
 
@@ -244,6 +247,9 @@ public sealed class TasksService : IDisposable
             {
                 if (Interlocked.Exchange(ref running, 1) == 1)
                 {
+                    _logger.WriteInfo(
+                        "ServiceTasks " + name,
+                        "Skipped because the previous execution is still running.");
                     return;
                 }
 

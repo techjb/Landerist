@@ -41,7 +41,9 @@ internal static class LanderistRecurringTaskServiceCollectionExtensions
                     serviceProvider.GetRequiredService<WebsiteQueryRepository>()));
         services.AddSingleton<TasksService>(serviceProvider => new(
             new TasksServiceOptions(GetExecutionMode(runtimeOptions.Role)),
-            new SystemRecurringTaskScheduler(),
+            new SystemRecurringTaskScheduler(
+                serviceProvider.GetRequiredService<IApplicationLogger>(),
+                TimeProvider.System),
             serviceProvider.GetRequiredService<IApplicationLogger>(),
             serviceProvider.GetRequiredService<ScrapeTaskJob>(),
             serviceProvider.GetRequiredService<LocalAiTaskJob>(),

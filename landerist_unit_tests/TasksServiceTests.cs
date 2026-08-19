@@ -112,6 +112,9 @@ public sealed class TasksServiceTests
         }
 
         Assert.Equal(1, context.TenMinute.RunCalls);
+        Assert.Contains(
+            context.Logger.Information,
+            entry => entry.Message.Contains("Skipped"));
     }
 
     [Fact]
@@ -365,11 +368,14 @@ public sealed class TasksServiceTests
     {
         public List<(string Source, string Message)> Errors { get; } = [];
 
+        public List<(string Source, string Message)> Information { get; } = [];
+
         public void WriteError(string source, string message) =>
             Errors.Add((source, message));
 
         public void WriteInfo(string source, string message)
         {
+            Information.Add((source, message));
         }
     }
 
