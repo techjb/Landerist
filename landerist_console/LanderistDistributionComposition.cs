@@ -8,11 +8,14 @@ using landerist_library.Infrastructure.Sql.Statistics;
 using landerist_library.Infrastructure.Tasks;
 using landerist_library.Infrastructure.WebsiteServices;
 using landerist_library.Infrastructure.Runtime;
+using landerist_library.Infrastructure.Logging;
+using landerist_library.Database;
 
 namespace landerist_console;
 
 internal sealed class LanderistDistributionComposition(
     LanderistDatabaseAdapterFactory databaseAdapters,
+    IDatabaseFactory databaseFactory,
     IListingAdministrationService listingAdministration,
     IApplicationLogger logger,
     LanderistRuntimeOptions runtimeOptions)
@@ -42,5 +45,9 @@ internal sealed class LanderistDistributionComposition(
                 listingAdministration,
                 runtimeOptions.Distribution,
                 logger),
+            new SqlLogRetentionService(
+                databaseFactory,
+                runtimeOptions.LogRetention,
+                TimeProvider.System),
             logger);
 }

@@ -14,6 +14,7 @@ public sealed class DailyTaskJob : IRecurringTaskJob
     private readonly GlobalStatistics _globalStatistics;
     private readonly HostStatistics _hostStatistics;
     private readonly IDistributionPublisher _distribution;
+    private readonly ILogRetentionService _logRetention;
     private readonly IApplicationLogger _logger;
 
     public DailyTaskJob(
@@ -23,6 +24,7 @@ public sealed class DailyTaskJob : IRecurringTaskJob
         GlobalStatistics globalStatistics,
         HostStatistics hostStatistics,
         IDistributionPublisher distribution,
+        ILogRetentionService logRetention,
         IApplicationLogger logger)
     {
         ArgumentNullException.ThrowIfNull(addresses);
@@ -31,6 +33,7 @@ public sealed class DailyTaskJob : IRecurringTaskJob
         ArgumentNullException.ThrowIfNull(globalStatistics);
         ArgumentNullException.ThrowIfNull(hostStatistics);
         ArgumentNullException.ThrowIfNull(distribution);
+        ArgumentNullException.ThrowIfNull(logRetention);
         ArgumentNullException.ThrowIfNull(logger);
         _addresses = addresses;
         _notListingCache = notListingCache;
@@ -38,6 +41,7 @@ public sealed class DailyTaskJob : IRecurringTaskJob
         _globalStatistics = globalStatistics;
         _hostStatistics = hostStatistics;
         _distribution = distribution;
+        _logRetention = logRetention;
         _logger = logger;
     }
 
@@ -52,6 +56,11 @@ public sealed class DailyTaskJob : IRecurringTaskJob
             _addresses.Clean();
             _notListingCache.Clean();
             _backup.Update();
+            LogRetentionResult retention = _logRetention.Clean();
+            _logger.WriteInfo(
+                nameof(DailyTaskJob),
+                $"Log retention deleted {retention.TotalDeleted} rows " +
+                $"(information: {retention.InformationDeleted}, errors: {retention.ErrorsDeleted})");
         }
         finally
         {

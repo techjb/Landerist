@@ -1,6 +1,7 @@
 using landerist_library.Configuration;
 using landerist_library.Application.Distribution;
 using landerist_library.Infrastructure.Runtime;
+using landerist_library.Infrastructure.Logging;
 using landerist_library.Parsing;
 
 namespace landerist_console;
@@ -84,7 +85,12 @@ internal static class LanderistRuntimeOptionsAdapter
                 Config.DAYS_TO_DELETE_BACKUP),
             Administration = new AdministrationOptions(
                 Config.DAYS_TO_REMOVE_UMPUBLISHED_LISTINGS,
-                Path.Combine(settings.GetString("INSERT_DIRECTORY"), "HostMainUri.csv"))
+                Path.Combine(settings.GetString("INSERT_DIRECTORY"), "HostMainUri.csv")),
+            LogRetention = new LogRetentionOptions(
+                settings.GetInt32("LOG_INFORMATION_RETENTION_DAYS", 90),
+                settings.GetInt32("LOG_ERROR_RETENTION_DAYS", 365),
+                settings.GetInt32("LOG_RETENTION_BATCH_SIZE", 1_000),
+                settings.GetInt32("LOG_RETENTION_MAXIMUM_BATCHES", 100))
         };
 
         options.Validate();

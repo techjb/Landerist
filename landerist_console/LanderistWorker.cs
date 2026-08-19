@@ -32,8 +32,6 @@ internal sealed class LanderistWorker : IHostedService
         }
 
         Console.WriteLine("Press Ctrl+C to exit.");
-        Console.WriteLine("Deleting logs..");
-        Log.DeleteCurentMachineLogs();
         Log.WriteInfo(
             "landerist_console",
             "Started. Machine: " + _runtimeOptions.Execution.MachineName +

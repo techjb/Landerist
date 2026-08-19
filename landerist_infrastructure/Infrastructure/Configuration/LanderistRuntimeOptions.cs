@@ -1,5 +1,6 @@
 using landerist_library.Parsing;
 using landerist_library.Application.Distribution;
+using landerist_library.Infrastructure.Logging;
 
 namespace landerist_library.Infrastructure.Runtime;
 
@@ -32,6 +33,8 @@ public sealed record LanderistRuntimeOptions(
 
     public AdministrationOptions Administration { get; init; } = AdministrationOptions.Default;
 
+    public LogRetentionOptions LogRetention { get; init; } = LogRetentionOptions.Default;
+
     public void Validate()
     {
         ArgumentNullException.ThrowIfNull(Database);
@@ -48,6 +51,7 @@ public sealed record LanderistRuntimeOptions(
         Distribution.Validate();
         Backup.Validate();
         Administration.Validate();
+        LogRetention.Validate();
     }
 }
 
