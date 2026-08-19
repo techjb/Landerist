@@ -14,8 +14,8 @@ public sealed record LocalAIListingParserOptions(
     string Host,
     int Port = 8000,
     string Model = LocalAIListingParserOptions.DefaultModel,
-    int MaxCompletionTokens = 12000,
-    int MaxContextWindow = 48000,
+    int MaxCompletionTokens = 4000,
+    int MaxContextWindow = 60000,
     TimeSpan? Timeout = null,
     bool ResolveHost = false)
 {
@@ -92,13 +92,14 @@ public sealed class LocalAIListingParserClient : IListingParserClient
             LocalAIResponse? parsed = JsonSerializer.Deserialize<LocalAIResponse>(result, SerializerOptions);
             string? responseText = parsed?.Choices.FirstOrDefault()?.Message.Content;
             string? finishReason = parsed?.Choices.FirstOrDefault()?.FinishReason;
+            string usageDiagnostic = FormatUsage(parsed?.Usage);
 
             if (string.IsNullOrWhiteSpace(responseText))
             {
                 return new ListingParserClientResult(
                     null,
                     true,
-                    $"responseText is null or empty. Finish Reason: {finishReason} TokenCount: {page.TokenCount}");
+                    $"responseText is null or empty. Finish Reason: {finishReason} {usageDiagnostic} InputTokenCount: {page.TokenCount}");
             }
 
             if (finishReason == "length")
@@ -106,13 +107,14 @@ public sealed class LocalAIListingParserClient : IListingParserClient
                 return new ListingParserClientResult(
                     null,
                     true,
-                    $"response was truncated by max_tokens. TokenCount: {page.TokenCount} Uri: {page.Uri}");
+                    $"response was truncated by max_tokens. {usageDiagnostic} InputTokenCount: {page.TokenCount} " +
+                    $"ResponseLength: {responseText.Length} ResponseTail: {GetDiagnosticTail(responseText)} Uri: {page.Uri}");
             }
 
             return new ListingParserClientResult(
                 responseText,
                 false,
-                $"Finish Reason: {finishReason} TokenCount {page.TokenCount} Uri: {page.Uri}");
+                $"Finish Reason: {finishReason} {usageDiagnostic} InputTokenCount: {page.TokenCount} Uri: {page.Uri}");
         }
         catch (Exception exception)
         {
@@ -146,6 +148,19 @@ public sealed class LocalAIListingParserClient : IListingParserClient
         }
     };
 
+    private static string FormatUsage(Usage? usage) => usage == null
+        ? "Usage: unavailable."
+        : $"PromptTokens: {usage.PromptTokens} CompletionTokens: {usage.CompletionTokens} TotalTokens: {usage.TotalTokens}.";
+
+    private static string GetDiagnosticTail(string responseText)
+    {
+        const int maximumLength = 2000;
+        string tail = responseText.Length <= maximumLength
+            ? responseText
+            : responseText[^maximumLength..];
+        return JsonSerializer.Serialize(tail);
+    }
+
     private string ResolveHost(LocalAIListingParserOptions options)
     {
         if (!options.ResolveHost)
@@ -170,6 +185,21 @@ public sealed class LocalAIListingParserClient : IListingParserClient
     {
         [JsonPropertyName("choices")]
         public List<Choice> Choices { get; init; } = [];
+
+        [JsonPropertyName("usage")]
+        public Usage? Usage { get; init; }
+    }
+
+    private sealed class Usage
+    {
+        [JsonPropertyName("prompt_tokens")]
+        public int PromptTokens { get; init; }
+
+        [JsonPropertyName("completion_tokens")]
+        public int CompletionTokens { get; init; }
+
+        [JsonPropertyName("total_tokens")]
+        public int TotalTokens { get; init; }
     }
 
     private sealed class Choice

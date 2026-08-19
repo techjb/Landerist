@@ -37,6 +37,8 @@ internal sealed class LanderistListingParserProviderComposition(
         new LocalAIListingParserClient(
             new LocalAIListingParserOptions(
                 runtimeOptions.Ai.LocalAiHost,
+                MaxCompletionTokens: 4000,
+                MaxContextWindow: runtimeOptions.Execution.LocalAiMaxModelLength,
                 ResolveHost: runtimeOptions.Ai.ResolveLocalAiHost),
             SystemPrompt.Text,
             StructuredOutputSchema.GetJsonSchemaString(),

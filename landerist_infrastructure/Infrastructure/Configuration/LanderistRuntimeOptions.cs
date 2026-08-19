@@ -201,7 +201,7 @@ public sealed record ExecutionRuntimeOptions(
     string Version)
 {
     public static ExecutionRuntimeOptions Default { get; } = new(
-        false, true, Environment.MachineName, true, false, true, 30_000, "unknown");
+        false, true, Environment.MachineName, true, false, true, 60_000, "unknown");
 
     public void Validate()
     {

@@ -45,4 +45,14 @@ public sealed class StructuredOutputSerializationCompatibilityTests
         Assert.Contains("precio_del_anuncio", names);
         Assert.Contains("número_de_dormitorios", names);
     }
+
+    [Fact]
+    public void GeneratedSchema_LimitsImageUrlLength()
+    {
+        JObject schema = JObject.Parse(StructuredOutputSchema.GetJsonSchemaString());
+        JToken? imageUrlSchema = schema.SelectToken("$..properties.url_de_la_imagen");
+
+        Assert.NotNull(imageUrlSchema);
+        Assert.Equal(500, imageUrlSchema!["maxLength"]?.Value<int>());
+    }
 }

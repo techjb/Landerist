@@ -38,6 +38,7 @@ internal static class LanderistLocalAiTaskServiceCollectionExtensions
                     serviceProvider.GetRequiredService<HostStatistics>()),
                 new PageListingInputPreparer(logger),
                 new LocalAiParsingTaskOptions(
+                    completionTokens: 4000,
                     modelMaxTokens: runtimeOptions.Execution.LocalAiMaxModelLength,
                     runSequentially: runtimeOptions.Execution.IsLocal,
                     updateWaitingStatusOnStart: runtimeOptions.Execution.IsProduction),

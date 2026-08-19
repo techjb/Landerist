@@ -30,7 +30,7 @@ namespace landerist_library.Infrastructure.Ai.StructuredOutputs
             [nameof(StructuredOutputEsJson.dirección_del_inmueble)] = 500,
             [nameof(StructuredOutputEsJson.referencia_catastral)] = 20,
             [nameof(StructuredOutputEsJson.planta_del_inmueble)] = 50,
-            [nameof(StructuredOutputEsJson.url_de_la_imagen)] = 2048,
+            [nameof(StructuredOutputEsJson.url_de_la_imagen)] = 500,
             [nameof(StructuredOutputEsJson.título_de_la_imagen)] = 200,
         };
 

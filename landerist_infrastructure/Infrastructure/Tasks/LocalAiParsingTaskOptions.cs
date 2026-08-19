@@ -4,8 +4,8 @@ public sealed record LocalAiParsingTaskOptions
 {
     public const int DefaultMaxPagesPerTask = 100;
     public const int DefaultMaxConcurrentSequences = 4;
-    public const int DefaultCompletionTokens = 7000;
-    public const int DefaultModelMaxTokens = 30000;
+    public const int DefaultCompletionTokens = 4000;
+    public const int DefaultModelMaxTokens = 60000;
 
     public LocalAiParsingTaskOptions(
         int maxPagesPerTask = DefaultMaxPagesPerTask,

@@ -11,7 +11,8 @@ public sealed class LocalAIListingParserOptionsTests
 
         Assert.Same(options, options.Validate());
         Assert.Equal(8000, options.Port);
-        Assert.Equal(48000, options.MaxContextWindow);
+        Assert.Equal(4000, options.MaxCompletionTokens);
+        Assert.Equal(60000, options.MaxContextWindow);
     }
 
     [Theory]

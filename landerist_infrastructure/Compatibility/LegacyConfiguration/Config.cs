@@ -127,7 +127,7 @@ public const int MAX_SCREENSHOT_SIZE = 5 * 1024 * 1024; // 5 MB
         public static readonly string VERTEX_AI_MODEL_NAME_GEMINI_FLASH_LITE = "gemini-2.5-flash-lite";
        
 
-        public const int LOCAL_AI_MAX_MODEL_LEN = 30000; 
+        public const int LOCAL_AI_MAX_MODEL_LEN = 60000;
 
         public const bool NOT_LISTING_CACHE_ENABLED = false;
 
