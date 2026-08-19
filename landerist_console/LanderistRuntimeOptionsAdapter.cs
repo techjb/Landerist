@@ -90,7 +90,10 @@ internal static class LanderistRuntimeOptionsAdapter
                 settings.GetInt32("LOG_INFORMATION_RETENTION_DAYS", 90),
                 settings.GetInt32("LOG_ERROR_RETENTION_DAYS", 365),
                 settings.GetInt32("LOG_RETENTION_BATCH_SIZE", 1_000),
-                settings.GetInt32("LOG_RETENTION_MAXIMUM_BATCHES", 100))
+                settings.GetInt32("LOG_RETENTION_MAXIMUM_BATCHES", 100)),
+            Health = new HealthRuntimeOptions(
+                settings.GetString("HEALTH_FILE_PATH", "landerist-health.json"),
+                settings.GetInt32("HEALTH_INTERVAL_SECONDS", 60))
         };
 
         options.Validate();

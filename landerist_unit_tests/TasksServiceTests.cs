@@ -73,13 +73,14 @@ public sealed class TasksServiceTests
     }
 
     [Fact]
-    public void ScheduledJob_WhenItThrows_IsLoggedWithoutEscapingCallback()
+    public void ScheduledJob_WhenItThrows_IsLoggedAndPropagatedToSchedulerBoundary()
     {
         TestContext context = CreateContext(TasksExecutionMode.Principal);
         context.TenMinute.OnRun = () => throw new InvalidOperationException("failure");
         context.Service.Start();
 
-        context.Scheduler.Schedules[0].Callback();
+        Assert.Throws<InvalidOperationException>(
+            context.Scheduler.Schedules[0].Callback);
 
         var error = Assert.Single(context.Logger.Errors);
         Assert.Equal("ServiceTasks TenMinutesTasks", error.Source);

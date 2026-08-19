@@ -7,15 +7,18 @@ public sealed class SystemRecurringTaskScheduler : IRecurringTaskScheduler
 {
     private readonly IApplicationLogger _logger;
     private readonly TimeProvider _timeProvider;
+    private readonly ITaskHealthRegistry _health;
 
     public SystemRecurringTaskScheduler(
         IApplicationLogger logger,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        ITaskHealthRegistry? health = null)
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(timeProvider);
         _logger = logger;
         _timeProvider = timeProvider;
+        _health = health ?? NullTaskHealthRegistry.Instance;
     }
 
     public IDisposable Schedule(
@@ -25,8 +28,9 @@ public sealed class SystemRecurringTaskScheduler : IRecurringTaskScheduler
         TimeSpan interval)
     {
         ValidateArguments(name, callback, dueTime, interval);
+        _health.Register(name, _timeProvider.GetLocalNow() + dueTime, interval);
         ScheduledOperation operation = new(
-            name, callback, interval, _logger, _timeProvider);
+            name, callback, interval, _logger, _timeProvider, _health);
         operation.Start(dueTime);
         return operation;
     }
@@ -38,8 +42,9 @@ public sealed class SystemRecurringTaskScheduler : IRecurringTaskScheduler
         TimeSpan interval)
     {
         ValidateArguments(name, callback, dueTime, interval);
+        _health.Register(name, _timeProvider.GetLocalNow() + dueTime, interval);
         AsyncScheduledOperation operation = new(
-            name, callback, interval, _logger, _timeProvider);
+            name, callback, interval, _logger, _timeProvider, _health);
         operation.Start(dueTime);
         return operation;
     }
@@ -70,6 +75,7 @@ public sealed class SystemRecurringTaskScheduler : IRecurringTaskScheduler
         private readonly Timer _timer;
         private readonly IApplicationLogger _logger;
         private readonly TimeProvider _timeProvider;
+        private readonly ITaskHealthRegistry _health;
         private bool _disposed;
 
         public ScheduledOperation(
@@ -77,13 +83,15 @@ public sealed class SystemRecurringTaskScheduler : IRecurringTaskScheduler
             Action callback,
             TimeSpan interval,
             IApplicationLogger logger,
-            TimeProvider timeProvider)
+            TimeProvider timeProvider,
+            ITaskHealthRegistry health)
         {
             _name = name;
             _callback = callback;
             _interval = interval;
             _logger = logger;
             _timeProvider = timeProvider;
+            _health = health;
             _timer = new Timer(Execute, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
         }
 
@@ -99,10 +107,16 @@ public sealed class SystemRecurringTaskScheduler : IRecurringTaskScheduler
         private void Execute(object? state)
         {
             long startedAt = _timeProvider.GetTimestamp();
+            DateTimeOffset startedOn = _timeProvider.GetLocalNow();
+            _health.Started(_name, startedOn);
             SafeInfo(_logger, _name, "Started");
             try
             {
                 _callback();
+                _health.Succeeded(
+                    _name,
+                    _timeProvider.GetLocalNow(),
+                    _timeProvider.GetElapsedTime(startedAt));
                 SafeInfo(
                     _logger,
                     _name,
@@ -110,6 +124,11 @@ public sealed class SystemRecurringTaskScheduler : IRecurringTaskScheduler
             }
             catch (Exception exception)
             {
+                _health.Failed(
+                    _name,
+                    _timeProvider.GetLocalNow(),
+                    _timeProvider.GetElapsedTime(startedAt),
+                    exception.Message);
                 SafeError(
                     _logger,
                     _name,
@@ -152,6 +171,7 @@ public sealed class SystemRecurringTaskScheduler : IRecurringTaskScheduler
         private readonly Timer _timer;
         private readonly IApplicationLogger _logger;
         private readonly TimeProvider _timeProvider;
+        private readonly ITaskHealthRegistry _health;
         private bool _disposed;
 
         public AsyncScheduledOperation(
@@ -159,13 +179,15 @@ public sealed class SystemRecurringTaskScheduler : IRecurringTaskScheduler
             Func<CancellationToken, Task> callback,
             TimeSpan interval,
             IApplicationLogger logger,
-            TimeProvider timeProvider)
+            TimeProvider timeProvider,
+            ITaskHealthRegistry health)
         {
             _name = name;
             _callback = callback;
             _interval = interval;
             _logger = logger;
             _timeProvider = timeProvider;
+            _health = health;
             _cancellationToken = _cancellation.Token;
             _timer = new Timer(Execute, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
         }
@@ -184,10 +206,15 @@ public sealed class SystemRecurringTaskScheduler : IRecurringTaskScheduler
         private async Task ExecuteAsync()
         {
             long startedAt = _timeProvider.GetTimestamp();
+            _health.Started(_name, _timeProvider.GetLocalNow());
             SafeInfo(_logger, _name, "Started");
             try
             {
                 await _callback(_cancellationToken).ConfigureAwait(false);
+                _health.Succeeded(
+                    _name,
+                    _timeProvider.GetLocalNow(),
+                    _timeProvider.GetElapsedTime(startedAt));
                 SafeInfo(
                     _logger,
                     _name,
@@ -195,6 +222,10 @@ public sealed class SystemRecurringTaskScheduler : IRecurringTaskScheduler
             }
             catch (OperationCanceledException) when (_cancellationToken.IsCancellationRequested)
             {
+                _health.Cancelled(
+                    _name,
+                    _timeProvider.GetLocalNow(),
+                    _timeProvider.GetElapsedTime(startedAt));
                 SafeInfo(
                     _logger,
                     _name,
@@ -202,6 +233,11 @@ public sealed class SystemRecurringTaskScheduler : IRecurringTaskScheduler
             }
             catch (Exception exception)
             {
+                _health.Failed(
+                    _name,
+                    _timeProvider.GetLocalNow(),
+                    _timeProvider.GetElapsedTime(startedAt),
+                    exception.Message);
                 SafeError(
                     _logger,
                     _name,
@@ -264,5 +300,16 @@ public sealed class SystemRecurringTaskScheduler : IRecurringTaskScheduler
         {
             // Observability must not affect scheduling reliability.
         }
+    }
+
+    private sealed class NullTaskHealthRegistry : ITaskHealthRegistry
+    {
+        public static NullTaskHealthRegistry Instance { get; } = new();
+        public void Register(string name, DateTimeOffset firstRun, TimeSpan interval) { }
+        public void Started(string name, DateTimeOffset at) { }
+        public void Succeeded(string name, DateTimeOffset at, TimeSpan duration) { }
+        public void Failed(string name, DateTimeOffset at, TimeSpan duration, string error) { }
+        public void Cancelled(string name, DateTimeOffset at, TimeSpan duration) { }
+        public IReadOnlyList<TaskHealthSnapshot> Snapshot(DateTimeOffset now) => [];
     }
 }

@@ -285,6 +285,7 @@ public sealed class TasksService : IDisposable
             _logger.WriteError(
                 "ServiceTasks " + name,
                 exception.ToString());
+            throw;
         }
     }
     private void RunSafely(string name, Action action)
@@ -298,6 +299,7 @@ public sealed class TasksService : IDisposable
             _logger.WriteError(
                 "ServiceTasks " + name,
                 exception.ToString());
+            throw;
         }
     }
 

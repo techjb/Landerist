@@ -21,6 +21,12 @@ internal static class LanderistRecurringTaskServiceCollectionExtensions
         this IServiceCollection services,
         LanderistRuntimeOptions runtimeOptions)
     {
+        InMemoryTaskHealthRegistry taskHealth = new();
+        services.AddSingleton<ITaskHealthRegistry>(taskHealth);
+        services.AddSingleton(new HealthPublisherOptions(
+            runtimeOptions.Health.FilePath,
+            TimeSpan.FromSeconds(runtimeOptions.Health.IntervalSeconds)));
+        services.AddHostedService<LanderistHealthWorker>();
         services.AddSingleton<LanderistDistributionComposition>();
         services.AddSingleton<HourlyTaskJob>(serviceProvider => new(
             new WebsiteRefreshService(
@@ -43,7 +49,8 @@ internal static class LanderistRecurringTaskServiceCollectionExtensions
             new TasksServiceOptions(GetExecutionMode(runtimeOptions.Role)),
             new SystemRecurringTaskScheduler(
                 serviceProvider.GetRequiredService<IApplicationLogger>(),
-                TimeProvider.System),
+                TimeProvider.System,
+                serviceProvider.GetRequiredService<ITaskHealthRegistry>()),
             serviceProvider.GetRequiredService<IApplicationLogger>(),
             serviceProvider.GetRequiredService<ScrapeTaskJob>(),
             serviceProvider.GetRequiredService<LocalAiTaskJob>(),

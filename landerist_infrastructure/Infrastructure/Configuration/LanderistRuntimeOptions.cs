@@ -35,6 +35,8 @@ public sealed record LanderistRuntimeOptions(
 
     public LogRetentionOptions LogRetention { get; init; } = LogRetentionOptions.Default;
 
+    public HealthRuntimeOptions Health { get; init; } = HealthRuntimeOptions.Default;
+
     public void Validate()
     {
         ArgumentNullException.ThrowIfNull(Database);
@@ -52,6 +54,19 @@ public sealed record LanderistRuntimeOptions(
         Backup.Validate();
         Administration.Validate();
         LogRetention.Validate();
+        Health.Validate();
+    }
+}
+
+public sealed record HealthRuntimeOptions(string FilePath, int IntervalSeconds)
+{
+    public static HealthRuntimeOptions Default { get; } = new(
+        "landerist-health.json", 60);
+
+    public void Validate()
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(FilePath);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(IntervalSeconds);
     }
 }
 
