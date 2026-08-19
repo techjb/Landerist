@@ -59,6 +59,50 @@ public sealed class SqlApplicationLoggerTests
         Assert.Throws<ArgumentException>(options.Validate);
     }
 
+    [Fact]
+    public void WriteError_AlwaysWritesStructuredFallbackBeforePersistence()
+    {
+        List<string> fallback = [];
+        SqlApplicationLogger logger = CreateLogger(
+            new StubDatabaseFactory(new RecordingDatabase()),
+            fallback.Add);
+
+        logger.WriteError("DailyTask", "database failed");
+
+        string entry = Assert.Single(fallback);
+        Assert.Contains("level=error", entry);
+        Assert.Contains("machine=worker-01", entry);
+        Assert.Contains("source=DailyTask", entry);
+        Assert.Contains("message=database failed", entry);
+    }
+
+    [Fact]
+    public void WriteError_WhenPersistenceThrows_ReportsFailureAndDoesNotThrow()
+    {
+        List<string> fallback = [];
+        SqlApplicationLogger logger = CreateLogger(
+            new ThrowingDatabaseFactory(new InvalidOperationException("SQL unavailable")),
+            fallback.Add);
+
+        Exception? exception = Record.Exception(() =>
+            logger.WriteError("ScrapeTask", "original failure"));
+
+        Assert.Null(exception);
+        Assert.Equal(2, fallback.Count);
+        Assert.Contains("level=error", fallback[0]);
+        Assert.Contains("original failure", fallback[0]);
+        Assert.Contains("level=logging-persistence-failure", fallback[1]);
+        Assert.Contains("SQL unavailable", fallback[1]);
+    }
+
+    private static SqlApplicationLogger CreateLogger(
+        IDatabaseFactory databaseFactory,
+        Action<string> fallback) => new(
+            databaseFactory,
+            new ApplicationLoggerOptions(true, false, false, "worker-01"),
+            TimeProvider.System,
+            fallback);
+
     private sealed class StubDatabaseFactory(IDatabase database)
         : IDatabaseFactory
     {
@@ -69,5 +113,11 @@ public sealed class SqlApplicationLoggerTests
             CreateCalls++;
             return database;
         }
+    }
+
+    private sealed class ThrowingDatabaseFactory(Exception exception)
+        : IDatabaseFactory
+    {
+        public IDatabase Create() => throw exception;
     }
 }

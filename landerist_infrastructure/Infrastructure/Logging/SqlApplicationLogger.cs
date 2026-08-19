@@ -9,30 +9,43 @@ public sealed class SqlApplicationLogger : IApplicationLogger
     private readonly IDatabaseFactory _databaseFactory;
     private readonly ApplicationLoggerOptions _options;
     private readonly TimeProvider _timeProvider;
+    private readonly Action<string> _writeStandardError;
 
     public SqlApplicationLogger(
         IDatabaseFactory databaseFactory,
         ApplicationLoggerOptions options,
         TimeProvider timeProvider)
+        : this(databaseFactory, options, timeProvider, Console.Error.WriteLine)
+    {
+    }
+
+    internal SqlApplicationLogger(
+        IDatabaseFactory databaseFactory,
+        ApplicationLoggerOptions options,
+        TimeProvider timeProvider,
+        Action<string> writeStandardError)
     {
         ArgumentNullException.ThrowIfNull(databaseFactory);
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(timeProvider);
+        ArgumentNullException.ThrowIfNull(writeStandardError);
         options.Validate();
 
         _databaseFactory = databaseFactory;
         _options = options;
         _timeProvider = timeProvider;
+        _writeStandardError = writeStandardError;
     }
 
     public void WriteError(string source, string message)
     {
+        WriteStandardError("error", source, message);
         if (_options.ErrorsInConsole)
         {
             WriteConsole(source, message);
         }
 
-        Write("error", source, message);
+        TryWrite("error", source, message);
     }
 
     public void WriteInfo(string source, string message)
@@ -42,7 +55,22 @@ public sealed class SqlApplicationLogger : IApplicationLogger
             WriteConsole(source, message);
         }
 
-        Write("info", source, message);
+        TryWrite("info", source, message);
+    }
+
+    private void TryWrite(string logKey, string source, string message)
+    {
+        try
+        {
+            Write(logKey, source, message);
+        }
+        catch (Exception exception)
+        {
+            WriteStandardError(
+                "logging-persistence-failure",
+                source,
+                $"Original level: {logKey}. Persistence error: {exception}");
+        }
     }
 
     private void Write(string logKey, string source, string message)
@@ -72,5 +100,20 @@ public sealed class SqlApplicationLogger : IApplicationLogger
     {
         DateTimeOffset now = _timeProvider.GetLocalNow();
         Console.WriteLine($"{now:HH\\:mm\\:ss} {source} {message}");
+    }
+
+    private void WriteStandardError(string level, string source, string message)
+    {
+        try
+        {
+            DateTimeOffset now = _timeProvider.GetLocalNow();
+            _writeStandardError(
+                $"{now:O} level={level} machine={_options.MachineName} " +
+                $"source={source ?? string.Empty} message={message ?? string.Empty}");
+        }
+        catch
+        {
+            // The emergency sink must never replace the original application failure.
+        }
     }
 }
