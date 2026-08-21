@@ -14,6 +14,7 @@ public class Scraper
     private readonly IListingLifecycleService _listingLifecycle;
     private readonly PageScrapePipelineServices _pageScraping;
     private readonly IPageBatchSelector _pageBatchSelector;
+    private readonly Action? _reportProgress;
     private readonly ScrapeBatchServices _batchServices;
     private readonly ScrapeBatchState _state = new();
     private readonly ScraperLog _scraperLog;
@@ -28,7 +29,8 @@ public class Scraper
         PageScrapePipelineServices pageScraping,
         IPageBatchSelector pageBatchSelector,
         ScrapeBatchServices batchServices,
-        IScrapeProgressReporter progress)
+        IScrapeProgressReporter progress,
+        Action? reportProgress = null)
     {
         ArgumentNullException.ThrowIfNull(pagePersistence);
         ArgumentNullException.ThrowIfNull(logger);
@@ -43,6 +45,7 @@ public class Scraper
         _listingLifecycle = listingLifecycle;
         _pageScraping = pageScraping;
         _pageBatchSelector = pageBatchSelector;
+        _reportProgress = reportProgress;
         _batchServices = batchServices;
         _scraperLog = new ScraperLog(
             logger,
@@ -184,6 +187,7 @@ public class Scraper
                     try
                     {
                         _pageProcessor.Process(page);
+                        _reportProgress?.Invoke();
                         _scraperLog.WritePage(_state.GetCurrent(), page);
                     }
                     finally
@@ -224,6 +228,7 @@ public class Scraper
                     try
                     {
                         await _pageProcessor.ProcessAsync(page, token).ConfigureAwait(false);
+                        _reportProgress?.Invoke();
                         _scraperLog.WritePage(_state.GetCurrent(), page);
                     }
                     finally

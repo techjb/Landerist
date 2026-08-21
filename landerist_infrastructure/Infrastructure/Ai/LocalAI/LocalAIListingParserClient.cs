@@ -137,6 +137,7 @@ public sealed class LocalAIListingParserClient : IListingParserClient
     {
         model = _options.Model,
         temperature = 0,
+        frequency_penalty = 0.2,
         max_tokens = _options.MaxCompletionTokens,
         top_p = 1.0,
         top_k = -1,
@@ -165,9 +166,10 @@ public sealed class LocalAIListingParserClient : IListingParserClient
     private static string GetDiagnosticTail(string responseText)
     {
         const int maximumLength = 2000;
-        string tail = responseText.Length <= maximumLength
-            ? responseText
-            : responseText[^maximumLength..];
+        string responseWithoutTrailingWhitespace = responseText.TrimEnd();
+        string tail = responseWithoutTrailingWhitespace.Length <= maximumLength
+            ? responseWithoutTrailingWhitespace
+            : responseWithoutTrailingWhitespace[^maximumLength..];
         return JsonSerializer.Serialize(tail);
     }
 

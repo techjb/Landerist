@@ -3,6 +3,7 @@ using landerist_library.Infrastructure.Ai.LocalAI;
 using landerist_library.Pages;
 using System.Net;
 using System.Text;
+using System.Text.Json;
 
 namespace landerist_unit_tests;
 
@@ -33,7 +34,7 @@ public sealed class LocalAIListingParserClientTests
         LocalAIListingParserClient client = CreateClient(
             """
             {
-              "choices": [{"finish_reason":"length","message":{"content":"{\"anuncio\":"}}],
+              "choices": [{"finish_reason":"length","message":{"content":"{\"anuncio\":   "}}],
               "usage": {"prompt_tokens":100,"completion_tokens":4000,"total_tokens":4100}
             }
             """);
@@ -43,11 +44,32 @@ public sealed class LocalAIListingParserClientTests
         Assert.True(result.WaitingAIRequest);
         Assert.Null(result.ResponseText);
         Assert.Contains("truncated by max_tokens", result.Diagnostic);
+        Assert.Contains("ResponseTail: \"{\\u0022anuncio\\u0022:\"", result.Diagnostic);
+    }
+
+    [Fact]
+    public void GetResponse_SendsFrequencyPenaltyToPreventWhitespaceLoops()
+    {
+        StubHandler handler = new(
+            """
+            {"choices":[{"finish_reason":"stop","message":{"content":"{\"anuncio\":null}"}}]}
+            """);
+        LocalAIListingParserClient client = CreateClient(handler);
+
+        client.GetResponse(CreatePage(), "listing input");
+
+        using JsonDocument request = JsonDocument.Parse(handler.RequestBody!);
+        Assert.Equal(0.2, request.RootElement.GetProperty("frequency_penalty").GetDouble());
     }
 
     private static LocalAIListingParserClient CreateClient(string responseBody)
     {
-        HttpClient httpClient = new(new StubHandler(responseBody));
+        return CreateClient(new StubHandler(responseBody));
+    }
+
+    private static LocalAIListingParserClient CreateClient(StubHandler handler)
+    {
+        HttpClient httpClient = new(handler);
         return new LocalAIListingParserClient(
             new LocalAIListingParserOptions("localhost"),
             "system prompt",
@@ -64,12 +86,18 @@ public sealed class LocalAIListingParserClientTests
 
     private sealed class StubHandler(string responseBody) : HttpMessageHandler
     {
-        protected override Task<HttpResponseMessage> SendAsync(
+        public string? RequestBody { get; private set; }
+
+        protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
-            CancellationToken cancellationToken) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            CancellationToken cancellationToken)
+        {
+            RequestBody = await request.Content!.ReadAsStringAsync(cancellationToken);
+            return new HttpResponseMessage(HttpStatusCode.OK)
             {
                 Content = new StringContent(responseBody, Encoding.UTF8, "application/json")
-            });
+            };
+        }
     }
 
     private sealed class NullLogger : IApplicationLogger

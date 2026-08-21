@@ -69,7 +69,8 @@ public sealed class TasksService : IDisposable
                             "LocalAIParsing",
                             _localAiJob.Run,
                             _options.LocalAiDueTime,
-                            _options.LocalAiInterval);
+                            _options.LocalAiInterval,
+                            _options.LocalAiMaxProgressSilence);
                         break;
 
                     case TasksExecutionMode.Principal:
@@ -98,7 +99,8 @@ public sealed class TasksService : IDisposable
                             "UpdateAndScrape",
                             _scrapeJob.RunAsync,
                             _options.ScraperDueTime,
-                            _options.ScraperInterval);
+                            _options.ScraperInterval,
+                            _options.ScraperMaxProgressSilence);
                         break;
 
                     default:
@@ -205,7 +207,8 @@ public sealed class TasksService : IDisposable
         string name,
         Action action,
         TimeSpan dueTime,
-        TimeSpan interval)
+        TimeSpan interval,
+        TimeSpan? maxProgressSilence = null)
     {
         int running = 0;
         IDisposable schedule = _scheduler.Schedule(
@@ -230,7 +233,8 @@ public sealed class TasksService : IDisposable
                 }
             },
             dueTime,
-            interval);
+            interval,
+            maxProgressSilence);
         _schedules.Add(schedule);
     }
 
@@ -238,7 +242,8 @@ public sealed class TasksService : IDisposable
         string name,
         Func<CancellationToken, Task> action,
         TimeSpan dueTime,
-        TimeSpan interval)
+        TimeSpan interval,
+        TimeSpan? maxProgressSilence = null)
     {
         int running = 0;
         IDisposable schedule = _scheduler.ScheduleAsync(
@@ -264,7 +269,8 @@ public sealed class TasksService : IDisposable
                 }
             },
             dueTime,
-            interval);
+            interval,
+            maxProgressSilence);
         _schedules.Add(schedule);
     }
 

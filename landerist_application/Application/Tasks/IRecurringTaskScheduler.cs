@@ -6,11 +6,13 @@ public interface IRecurringTaskScheduler
         string name,
         Action callback,
         TimeSpan dueTime,
-        TimeSpan interval);
+        TimeSpan interval,
+        TimeSpan? maxProgressSilence = null);
 
     IDisposable ScheduleAsync(
         string name,
         Func<CancellationToken, Task> callback,
         TimeSpan dueTime,
-        TimeSpan interval);
+        TimeSpan interval,
+        TimeSpan? maxProgressSilence = null);
 }

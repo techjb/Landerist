@@ -55,4 +55,44 @@ public sealed class InMemoryTaskHealthRegistryTests
         Assert.Equal("degraded", snapshot.Status);
         Assert.Contains("stuck", snapshot.LastError);
     }
+
+    [Fact]
+    public void Snapshot_LongRunningExecutionWithRecentProgress_IsHealthy()
+    {
+        InMemoryTaskHealthRegistry registry = new();
+        DateTimeOffset now = new(2026, 8, 19, 12, 0, 0, TimeSpan.Zero);
+        registry.Register(
+            "LocalAIParsing",
+            now,
+            TimeSpan.FromSeconds(2),
+            TimeSpan.FromMinutes(15));
+        registry.Started("LocalAIParsing", now);
+        registry.Progress("LocalAIParsing", now.AddMinutes(14));
+
+        TaskHealthSnapshot snapshot = Assert.Single(
+            registry.Snapshot(now.AddMinutes(20)));
+
+        Assert.Equal("healthy", snapshot.Status);
+        Assert.Equal(now.AddMinutes(14), snapshot.LastProgressAt);
+    }
+
+    [Fact]
+    public void Snapshot_LongRunningExecutionWithoutRecentProgress_IsDegraded()
+    {
+        InMemoryTaskHealthRegistry registry = new();
+        DateTimeOffset now = new(2026, 8, 19, 12, 0, 0, TimeSpan.Zero);
+        registry.Register(
+            "UpdateAndScrape",
+            now,
+            TimeSpan.FromSeconds(3),
+            TimeSpan.FromMinutes(10));
+        registry.Started("UpdateAndScrape", now);
+        registry.Progress("UpdateAndScrape", now.AddMinutes(4));
+
+        TaskHealthSnapshot snapshot = Assert.Single(
+            registry.Snapshot(now.AddMinutes(15)));
+
+        Assert.Equal("degraded", snapshot.Status);
+        Assert.Contains("stuck", snapshot.LastError);
+    }
 }

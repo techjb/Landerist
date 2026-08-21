@@ -18,7 +18,9 @@ public sealed class TasksServiceOptions
         TimeSpan? tenMinuteInterval = null,
         TimeSpan? hourlyInterval = null,
         TimeSpan? dailyInterval = null,
-        TimeOnly? dailyStartTime = null)
+        TimeOnly? dailyStartTime = null,
+        TimeSpan? localAiMaxProgressSilence = null,
+        TimeSpan? scraperMaxProgressSilence = null)
     {
         Mode = mode;
         LocalAiDueTime = ValidateNonNegative(
@@ -43,6 +45,12 @@ public sealed class TasksServiceOptions
             dailyInterval ?? TimeSpan.FromDays(1),
             nameof(dailyInterval));
         DailyStartTime = dailyStartTime ?? new TimeOnly(0, 0, 30);
+        LocalAiMaxProgressSilence = ValidatePositive(
+            localAiMaxProgressSilence ?? TimeSpan.FromMinutes(15),
+            nameof(localAiMaxProgressSilence));
+        ScraperMaxProgressSilence = ValidatePositive(
+            scraperMaxProgressSilence ?? TimeSpan.FromMinutes(10),
+            nameof(scraperMaxProgressSilence));
     }
 
     public TasksExecutionMode Mode { get; }
@@ -62,6 +70,10 @@ public sealed class TasksServiceOptions
     public TimeSpan DailyInterval { get; }
 
     public TimeOnly DailyStartTime { get; }
+
+    public TimeSpan LocalAiMaxProgressSilence { get; }
+
+    public TimeSpan ScraperMaxProgressSilence { get; }
 
     private static TimeSpan ValidateNonNegative(TimeSpan value, string parameterName)
     {

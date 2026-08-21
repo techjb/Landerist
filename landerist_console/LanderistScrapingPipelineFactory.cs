@@ -3,6 +3,7 @@ using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Scraping;
 using landerist_library.Application.Statistics;
+using landerist_library.Application.Tasks;
 using landerist_library.Infrastructure.Listings;
 using landerist_library.Infrastructure.Logging;
 using landerist_library.Infrastructure.Parsing;
@@ -18,7 +19,8 @@ internal sealed record LanderistScrapingPipeline(
 internal sealed class LanderistScrapingPipelineFactory(
     LanderistPageScrapingComposition pageComposition,
     LanderistScrapeExecutionComposition executionComposition,
-    IApplicationLogger logger)
+    IApplicationLogger logger,
+    ITaskHealthRegistry taskHealth)
 {
     public LanderistScrapingPipeline Create(
         PagePersistenceService pagePersistence,
@@ -49,7 +51,8 @@ internal sealed class LanderistScrapingPipelineFactory(
             pageScraping,
             execution.PageBatchSelector,
             execution.BatchServices,
-            new ConsoleScrapeProgressReporter());
+            new ConsoleScrapeProgressReporter(),
+            () => taskHealth.Progress("UpdateAndScrape", DateTimeOffset.Now));
 
         return new LanderistScrapingPipeline(
             scraper,

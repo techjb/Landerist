@@ -25,10 +25,15 @@ public sealed class SystemRecurringTaskScheduler : IRecurringTaskScheduler
         string name,
         Action callback,
         TimeSpan dueTime,
-        TimeSpan interval)
+        TimeSpan interval,
+        TimeSpan? maxProgressSilence = null)
     {
         ValidateArguments(name, callback, dueTime, interval);
-        _health.Register(name, _timeProvider.GetLocalNow() + dueTime, interval);
+        _health.Register(
+            name,
+            _timeProvider.GetLocalNow() + dueTime,
+            interval,
+            maxProgressSilence);
         ScheduledOperation operation = new(
             name, callback, interval, _logger, _timeProvider, _health);
         operation.Start(dueTime);
@@ -39,10 +44,15 @@ public sealed class SystemRecurringTaskScheduler : IRecurringTaskScheduler
         string name,
         Func<CancellationToken, Task> callback,
         TimeSpan dueTime,
-        TimeSpan interval)
+        TimeSpan interval,
+        TimeSpan? maxProgressSilence = null)
     {
         ValidateArguments(name, callback, dueTime, interval);
-        _health.Register(name, _timeProvider.GetLocalNow() + dueTime, interval);
+        _health.Register(
+            name,
+            _timeProvider.GetLocalNow() + dueTime,
+            interval,
+            maxProgressSilence);
         AsyncScheduledOperation operation = new(
             name, callback, interval, _logger, _timeProvider, _health);
         operation.Start(dueTime);
@@ -305,8 +315,9 @@ public sealed class SystemRecurringTaskScheduler : IRecurringTaskScheduler
     private sealed class NullTaskHealthRegistry : ITaskHealthRegistry
     {
         public static NullTaskHealthRegistry Instance { get; } = new();
-        public void Register(string name, DateTimeOffset firstRun, TimeSpan interval) { }
+        public void Register(string name, DateTimeOffset firstRun, TimeSpan interval, TimeSpan? maxProgressSilence = null) { }
         public void Started(string name, DateTimeOffset at) { }
+        public void Progress(string name, DateTimeOffset at) { }
         public void Succeeded(string name, DateTimeOffset at, TimeSpan duration) { }
         public void Failed(string name, DateTimeOffset at, TimeSpan duration, string error) { }
         public void Cancelled(string name, DateTimeOffset at, TimeSpan duration) { }

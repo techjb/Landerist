@@ -7,11 +7,20 @@ public sealed class InMemoryTaskHealthRegistry : ITaskHealthRegistry
     private readonly object _sync = new();
     private readonly Dictionary<string, State> _states = new(StringComparer.Ordinal);
 
-    public void Register(string name, DateTimeOffset firstRun, TimeSpan interval)
+    public void Register(
+        string name,
+        DateTimeOffset firstRun,
+        TimeSpan interval,
+        TimeSpan? maxProgressSilence = null)
     {
+        if (maxProgressSilence <= TimeSpan.Zero)
+        {
+            throw new ArgumentOutOfRangeException(nameof(maxProgressSilence));
+        }
+
         lock (_sync)
         {
-            _states[name] = new State(firstRun, interval);
+            _states[name] = new State(firstRun, interval, maxProgressSilence);
         }
     }
 
@@ -19,6 +28,15 @@ public sealed class InMemoryTaskHealthRegistry : ITaskHealthRegistry
     {
         state.Running = true;
         state.LastStartedAt = at;
+        state.LastProgressAt = at;
+    });
+
+    public void Progress(string name, DateTimeOffset at) => Update(name, state =>
+    {
+        if (state.Running)
+        {
+            state.LastProgressAt = at;
+        }
     });
 
     public void Succeeded(string name, DateTimeOffset at, TimeSpan duration) => Update(name, state =>
@@ -75,8 +93,10 @@ public sealed class InMemoryTaskHealthRegistry : ITaskHealthRegistry
         TimeSpan staleAfter = TimeSpan.FromTicks(Math.Max(
             TimeSpan.FromMinutes(5).Ticks,
             checked(state.Interval.Ticks * 2)));
-        bool stuck = state.Running && state.LastStartedAt is not null &&
-            now - state.LastStartedAt.Value > staleAfter;
+        TimeSpan maxProgressSilence = state.MaxProgressSilence ?? staleAfter;
+        DateTimeOffset? lastActivityAt = state.LastProgressAt ?? state.LastStartedAt;
+        bool stuck = state.Running && lastActivityAt is not null &&
+            now - lastActivityAt.Value > maxProgressSilence;
         DateTimeOffset expectedFrom = state.LastCompletedAt ?? state.FirstRun;
         bool overdue = !state.Running && now - expectedFrom > staleAfter;
         string status = stuck || overdue || state.ConsecutiveFailures > 0
@@ -86,6 +106,7 @@ public sealed class InMemoryTaskHealthRegistry : ITaskHealthRegistry
             name,
             status,
             state.LastStartedAt,
+            state.LastProgressAt,
             state.LastSucceededAt,
             state.LastFailedAt,
             state.LastDuration?.TotalMilliseconds,
@@ -93,12 +114,17 @@ public sealed class InMemoryTaskHealthRegistry : ITaskHealthRegistry
             stuck ? "Execution appears to be stuck." : overdue ? "Execution is overdue." : state.LastError);
     }
 
-    private sealed class State(DateTimeOffset firstRun, TimeSpan interval)
+    private sealed class State(
+        DateTimeOffset firstRun,
+        TimeSpan interval,
+        TimeSpan? maxProgressSilence)
     {
         public DateTimeOffset FirstRun { get; } = firstRun;
         public TimeSpan Interval { get; } = interval;
+        public TimeSpan? MaxProgressSilence { get; } = maxProgressSilence;
         public bool Running { get; set; }
         public DateTimeOffset? LastStartedAt { get; set; }
+        public DateTimeOffset? LastProgressAt { get; set; }
         public DateTimeOffset? LastSucceededAt { get; set; }
         public DateTimeOffset? LastFailedAt { get; set; }
         public DateTimeOffset? LastCompletedAt { get; set; }

@@ -16,6 +16,7 @@ public sealed class TasksServiceTests
         Assert.Equal("LocalAIParsing", schedule.Name);
         Assert.Equal(TimeSpan.FromSeconds(1), schedule.DueTime);
         Assert.Equal(TimeSpan.FromSeconds(2), schedule.Interval);
+        Assert.Equal(TimeSpan.FromMinutes(15), schedule.MaxProgressSilence);
         Assert.Equal(0, context.Scrape.PrepareCalls);
     }
 
@@ -44,6 +45,7 @@ public sealed class TasksServiceTests
         Assert.Equal(1, context.Scrape.PrepareCalls);
         RecordingSchedule schedule = Assert.Single(context.Scheduler.Schedules);
         Assert.Equal("UpdateAndScrape", schedule.Name);
+        Assert.Equal(TimeSpan.FromMinutes(10), schedule.MaxProgressSilence);
         await schedule.AsyncCallback(CancellationToken.None);
         Assert.Equal(1, context.Scrape.RunAsyncCalls);
     }
@@ -236,9 +238,15 @@ public sealed class TasksServiceTests
             string name,
             Action callback,
             TimeSpan dueTime,
-            TimeSpan interval)
+            TimeSpan interval,
+            TimeSpan? maxProgressSilence = null)
         {
-            RecordingSchedule schedule = new(name, callback, dueTime, interval);
+            RecordingSchedule schedule = new(
+                name,
+                callback,
+                dueTime,
+                interval,
+                maxProgressSilence);
             Schedules.Add(schedule);
             return schedule;
         }
@@ -247,9 +255,15 @@ public sealed class TasksServiceTests
             string name,
             Func<CancellationToken, Task> callback,
             TimeSpan dueTime,
-            TimeSpan interval)
+            TimeSpan interval,
+            TimeSpan? maxProgressSilence = null)
         {
-            RecordingSchedule schedule = new(name, callback, dueTime, interval);
+            RecordingSchedule schedule = new(
+                name,
+                callback,
+                dueTime,
+                interval,
+                maxProgressSilence);
             Schedules.Add(schedule);
             return schedule;
         }
@@ -261,26 +275,30 @@ public sealed class TasksServiceTests
             string name,
             Action callback,
             TimeSpan dueTime,
-            TimeSpan interval)
+            TimeSpan interval,
+            TimeSpan? maxProgressSilence)
         {
             Name = name;
             Callback = callback;
             AsyncCallback = _ => Task.CompletedTask;
             DueTime = dueTime;
             Interval = interval;
+            MaxProgressSilence = maxProgressSilence;
         }
 
         public RecordingSchedule(
             string name,
             Func<CancellationToken, Task> callback,
             TimeSpan dueTime,
-            TimeSpan interval)
+            TimeSpan interval,
+            TimeSpan? maxProgressSilence)
         {
             Name = name;
             Callback = () => { };
             AsyncCallback = callback;
             DueTime = dueTime;
             Interval = interval;
+            MaxProgressSilence = maxProgressSilence;
         }
 
         public string Name { get; }
@@ -292,6 +310,8 @@ public sealed class TasksServiceTests
         public TimeSpan DueTime { get; }
 
         public TimeSpan Interval { get; }
+
+        public TimeSpan? MaxProgressSilence { get; }
 
         public bool Disposed { get; private set; }
 

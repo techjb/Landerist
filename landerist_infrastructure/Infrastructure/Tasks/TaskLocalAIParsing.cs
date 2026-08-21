@@ -22,6 +22,7 @@ namespace landerist_library.Infrastructure.Tasks
         private readonly ILocalAiListingParser _listingParser;
         private readonly IListingInputPreparer _listingInput;
         private readonly IApplicationLogger _logger;
+        private readonly Action? _reportProgress;
 
         private int TotalProcessed = 0;
         private int TotalErrors = 0;
@@ -41,7 +42,8 @@ namespace landerist_library.Infrastructure.Tasks
             IListingInputPreparer listingInput,
             LocalAiParsingTaskOptions options,
             ILocalAiTokenBudget tokenBudget,
-            IApplicationLogger logger)
+            IApplicationLogger logger,
+            Action? reportProgress = null)
         {
             ArgumentNullException.ThrowIfNull(parsedClassification);
             ArgumentNullException.ThrowIfNull(globalStatistics);
@@ -61,6 +63,7 @@ namespace landerist_library.Infrastructure.Tasks
             _listingParser = listingParser;
             _listingInput = listingInput;
             _logger = logger;
+            _reportProgress = reportProgress;
             _options = options;
             _maxBlockingCollectionSize = options.MaxPagesPerTask * 10;
             if (options.UpdateWaitingStatusOnStart)
@@ -107,6 +110,7 @@ namespace landerist_library.Infrastructure.Tasks
                         }
 
                         int totalProcessed = Interlocked.Increment(ref TotalProcessed);
+                        _reportProgress?.Invoke();
                         if (totalProcessed % 10 == 0)
                         {
                             int totalErrors = Volatile.Read(ref TotalErrors);

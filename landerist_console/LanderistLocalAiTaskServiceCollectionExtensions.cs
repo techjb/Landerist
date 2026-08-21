@@ -44,7 +44,9 @@ internal static class LanderistLocalAiTaskServiceCollectionExtensions
                     updateWaitingStatusOnStart: runtimeOptions.Execution.IsProduction),
                 new LegacyLocalAiTokenBudget(
                     new Tokenizer(TokenizerOptions.ForProvider(LLMProvider.LocalAI))),
-                logger);
+                logger,
+                () => serviceProvider.GetRequiredService<ITaskHealthRegistry>()
+                    .Progress("LocalAIParsing", DateTimeOffset.Now));
         }));
         return services;
     }
