@@ -45,7 +45,7 @@ public sealed class TasksServiceTests
         Assert.Equal(1, context.Scrape.PrepareCalls);
         RecordingSchedule schedule = Assert.Single(context.Scheduler.Schedules);
         Assert.Equal("UpdateAndScrape", schedule.Name);
-        Assert.Equal(TimeSpan.FromMinutes(10), schedule.MaxProgressSilence);
+        Assert.Equal(TimeSpan.FromMinutes(30), schedule.MaxProgressSilence);
         await schedule.AsyncCallback(CancellationToken.None);
         Assert.Equal(1, context.Scrape.RunAsyncCalls);
     }

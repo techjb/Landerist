@@ -49,7 +49,7 @@ public sealed class TasksServiceOptions
             localAiMaxProgressSilence ?? TimeSpan.FromMinutes(15),
             nameof(localAiMaxProgressSilence));
         ScraperMaxProgressSilence = ValidatePositive(
-            scraperMaxProgressSilence ?? TimeSpan.FromMinutes(10),
+            scraperMaxProgressSilence ?? TimeSpan.FromMinutes(30),
             nameof(scraperMaxProgressSilence));
     }
 
