@@ -23,9 +23,12 @@ public sealed class PageRepository : IPageRepository
             "[Host], [Uri], [UriHash], [Inserted], [LastScrape], [LastParseListing], [NextScrape], [HttpStatusCode], [Etag], [LastModified], [PageType], " +
             "[PageTypeCounter], [LockedBy], [WaitingStatus], [ListingParserInputHash], " +
             "[ListingParserInputNotChangedCounter], [TransientErrorCounter], [ResponseBodyZipped], [TokenCount]) " +
-            "VALUES(@Host, @Uri, @UriHash, @Inserted, @LastScrape, @LastParseListing, @NextScrape, @HttpStatusCode, @Etag, @LastModified, @PageType, " +
+            "SELECT @Host, @Uri, @UriHash, @Inserted, @LastScrape, @LastParseListing, @NextScrape, @HttpStatusCode, @Etag, @LastModified, @PageType, " +
             "@PageTypeCounter, @LockedBy, @WaitingStatus, @ListingParserInputHash, " +
-            "@ListingParserInputNotChangedCounter, @TransientErrorCounter, CONVERT(varbinary(max), @ResponseBodyZipped), @TokenCount)";
+            "@ListingParserInputNotChangedCounter, @TransientErrorCounter, CONVERT(varbinary(max), @ResponseBodyZipped), @TokenCount " +
+            "WHERE NOT EXISTS (" +
+            "SELECT 1 FROM " + Pages.Pages.PAGES + " WITH (UPDLOCK, HOLDLOCK) " +
+            "WHERE [UriHash] = @UriHash)";
 
         return _database.Query(query, GetParameters(page));
     }

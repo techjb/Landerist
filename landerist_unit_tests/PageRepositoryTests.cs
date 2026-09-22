@@ -36,6 +36,8 @@ public sealed class PageRepositoryTests
         Assert.Equal(page.UriHash, database.LastParameters!["UriHash"]);
         Assert.Equal(page.Uri.ToString(), database.LastParameters["Uri"]);
         Assert.Contains("INSERT INTO", database.LastQuery);
+        Assert.Contains("WHERE NOT EXISTS", database.LastQuery);
+        Assert.Contains("WITH (UPDLOCK, HOLDLOCK)", database.LastQuery);
     }
 
     [Fact]
