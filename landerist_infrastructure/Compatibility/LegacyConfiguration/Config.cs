@@ -6,7 +6,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "5.98";
+        public static readonly string VERSION = "5.99";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -65,7 +65,7 @@ public const int MAX_SCREENSHOT_SIZE = 5 * 1024 * 1024; // 5 MB
         public const int MAX_SCREENSHOT_PIXELS_SIDE = 8000;
         public static string? CHROME_EXTENSIONS_DIRECTORY { get; set; }
 
-        public static readonly int DAYS_TO_DELETE_BACKUP = 60;
+        public static readonly int DAYS_TO_DELETE_BACKUP = 30;
 
         public const int MAX_YEARS_SINCE_PUBLISHED_LISTING = 5;
 

@@ -10,6 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\landerist_application\landerist_application.csproj" />
     <ProjectReference Include="..\landerist_domain\landerist_domain.csproj" />
     <ProjectReference Include="..\landerist_infrastructure\landerist_infrastructure.csproj" />
