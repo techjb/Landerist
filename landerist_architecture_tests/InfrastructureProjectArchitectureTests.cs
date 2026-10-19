@@ -27,7 +27,7 @@ public sealed class InfrastructureProjectArchitectureTests
 
         Assert.Equal(
             ["AWSSDK.CloudFront", "AWSSDK.S3", "Com.Bekijkhet.RobotsTxt", "CsvHelper", "HtmlAgilityPack", "Google.Apis.CustomSearchAPI.v1", "Google.Cloud.AIPlatform.V1", "Google.Cloud.Storage.V1", "Louw.SitemapParser", "Microsoft.Data.SqlClient",
-            "OpenAI-DotNet", "OpenCvSharp4", "OpenCvSharp4.Extensions", "OpenCvSharp4.runtime.win", "Newtonsoft.Json", "Newtonsoft.Json.Schema", "NetTopologySuite", "NetTopologySuite.IO.GeoJSON", "System.Drawing.Common", "PuppeteerSharp", "SharpToken"],
+            "OpenAI-DotNet", "OpenCvSharp4", "OpenCvSharp4.Extensions", "OpenCvSharp4.runtime.win", "Newtonsoft.Json", "Newtonsoft.Json.Schema", "NetTopologySuite", "NetTopologySuite.IO.GeoJSON", "System.Drawing.Common", "PuppeteerSharp", "SharpToken", "System.Security.Cryptography.Pkcs"],
             packages);
         Assert.Equal(
             [
