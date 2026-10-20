@@ -3,6 +3,7 @@ using landerist_library.Application.Parsing;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Scraping;
 using landerist_library.Application.Statistics;
+using landerist_library.Application.Tasks;
 using landerist_library.Infrastructure.PageServices;
 using landerist_library.Infrastructure.Parsing;
 using landerist_library.Infrastructure.Runtime;
@@ -12,8 +13,13 @@ using landerist_library.Parsing;
 namespace landerist_console;
 
 internal sealed record LanderistBatchTasks(
-    TenMinuteTaskJob TenMinute,
-    TaskBatchCleaner Cleaner);
+    IRecurringTaskJob TenMinute,
+    TaskBatchCleaner? Cleaner);
+
+internal sealed class DisabledBatchTaskJob : IRecurringTaskJob
+{
+    public void Run() { }
+}
 
 internal sealed class LanderistBatchComposition(
     LanderistRuntimeOptions runtimeOptions,
@@ -29,6 +35,11 @@ internal sealed class LanderistBatchComposition(
         SqlPageWaitingStatusService waitingStatus,
         ParseListing listingParser)
     {
+        if (!runtimeOptions.Batch.Enabled)
+        {
+            return new LanderistBatchTasks(new DisabledBatchTaskJob(), null);
+        }
+
         LanderistBatchProviderServices providers = providerComposition.Create();
         TenMinuteTaskJob tenMinute = new(
             new TaskBatchDownload(

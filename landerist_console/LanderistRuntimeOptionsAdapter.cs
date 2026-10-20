@@ -120,6 +120,11 @@ internal static class LanderistRuntimeOptionsAdapter
 
     private static BatchRuntimeOptions CreateBatchOptions()
     {
+        if (!Config.BATCH_ENABLED)
+        {
+            return BatchRuntimeOptions.Disabled;
+        }
+
         int maxPages = Config.IsConfigurationLocal()
             ? Config.MAX_PAGES_PER_BATCH_LOCAL
             : Config.LLM_PROVIDER switch

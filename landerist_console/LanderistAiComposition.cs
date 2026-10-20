@@ -7,6 +7,7 @@ using landerist_library.Infrastructure.Ai.StructuredOutputs;
 using landerist_library.Infrastructure.ListingMedia;
 using landerist_library.Infrastructure.Parsing;
 using landerist_library.Infrastructure.Runtime;
+using landerist_library.Parsing;
 using landerist_library.Websites;
 
 namespace landerist_console;
@@ -19,7 +20,9 @@ internal sealed class LanderistAiComposition(
 {
     public ParseListing CreateListingParser() => new(
         new ListingParserOrchestrationOptions(
-            runtimeOptions.Batch.Enabled,
+            runtimeOptions.Batch.Enabled ||
+                (runtimeOptions.Execution.IsProduction &&
+                 runtimeOptions.Ai.Provider == LLMProvider.LocalAI),
             runtimeOptions.Ai.Provider),
         providerComposition.Create(),
         new ListingParsingServices(

@@ -6,7 +6,7 @@ namespace landerist_library.Configuration
     {
         private static bool ConfigurationProduction = true;
 
-        public static readonly string VERSION = "5.99";
+        public static readonly string VERSION = "6.01";
 
         public static readonly bool INDEXER_ENABLED = true;
 
@@ -223,12 +223,10 @@ public const int MAX_SCREENSHOT_SIZE = 5 * 1024 * 1024; // 5 MB
 
             TIMERS_ENABLED = !ConfigurationProduction;
 
-            LLM_PROVIDER = ConfigurationProduction ?
-                LLMProvider.VertexAI :
-                LLMProvider.LocalAI;
+            LLM_PROVIDER = LLMProvider.LocalAI;
 
 
-            BATCH_ENABLED = ConfigurationProduction;
+            BATCH_ENABLED = false;
 
             MIN_PAGES_PER_BATCH = ConfigurationProduction ? 500 : 1;
 
