@@ -329,10 +329,10 @@ public sealed class ConsoleHostArchitectureTests
         Assert.DoesNotContain("CreateAddressSelectorOptions", parsing);
         Assert.DoesNotContain("VertexAddressSelectorOptions", parsing);
         Assert.Contains(
-            "services.AddSingleton(new VertexAddressSelectorOptions(",
+            "services.AddSingleton(new LocalAIListingParserOptions(",
             scraping);
         Assert.Contains(
-            "GetRequiredService<VertexAddressSelectorOptions>()",
+            "GetRequiredService<LocalAIListingParserOptions>()",
             scraping);
         Assert.DoesNotContain(
             "GetRequiredService<LanderistAiComposition>()",
@@ -354,8 +354,8 @@ public sealed class ConsoleHostArchitectureTests
         Assert.DoesNotContain("LocalAIListingParserClient", parser);
 
         Assert.Contains("ListingParserClientCatalog", providers);
-        Assert.Contains("OpenAIListingParserClient", providers);
-        Assert.Contains("VertexListingParserClient", providers);
+        Assert.DoesNotContain("OpenAIListingParserClient", providers);
+        Assert.DoesNotContain("VertexListingParserClient", providers);
         Assert.Contains("LocalAIListingParserClient", providers);
         Assert.DoesNotContain("ListingParsingServices", providers);
         Assert.DoesNotContain(

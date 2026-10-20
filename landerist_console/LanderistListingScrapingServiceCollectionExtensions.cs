@@ -1,7 +1,7 @@
 using landerist_library.Application.Listings;
 using landerist_library.Application.Logging;
 using landerist_library.Application.Persistence;
-using landerist_library.Infrastructure.Ai;
+using landerist_library.Infrastructure.Ai.LocalAI;
 using landerist_library.Infrastructure.Listings;
 using landerist_library.Infrastructure.Location.Providers.Goolzoom;
 using landerist_library.Infrastructure.Parsing;
@@ -18,12 +18,9 @@ internal static class LanderistListingScrapingServiceCollectionExtensions
         this IServiceCollection services,
         LanderistRuntimeOptions runtimeOptions)
     {
-        services.AddSingleton(new VertexAddressSelectorOptions(
-            runtimeOptions.Ai.VertexCredential,
-            runtimeOptions.Ai.VertexProjectId,
-            runtimeOptions.Ai.VertexLocation,
-            runtimeOptions.Ai.VertexPublisher,
-            runtimeOptions.Ai.VertexAddressModel));
+        services.AddSingleton(new LocalAIListingParserOptions(
+            runtimeOptions.Ai.LocalAiHost,
+            ResolveHost: runtimeOptions.Ai.ResolveLocalAiHost));
         services.AddSingleton<SqlPageLinkService>(serviceProvider => new(
             serviceProvider.GetRequiredService<PagePersistenceService>(),
             serviceProvider.GetRequiredService<WebsitePageMetricsRepository>(),
@@ -41,7 +38,7 @@ internal static class LanderistListingScrapingServiceCollectionExtensions
                     .CreateListingEnricher(
                         serviceProvider.GetRequiredService<GoolzoomApi>(),
                         runtimeOptions.Integrations.GoogleCloudLanderistApiKey,
-                        serviceProvider.GetRequiredService<VertexAddressSelectorOptions>(),
+                        serviceProvider.GetRequiredService<LocalAIListingParserOptions>(),
                         logger),
                 new LegacyListingUnpublishPolicy(
                     serviceProvider.GetRequiredService<SqlListingQueryService>()),

@@ -1,5 +1,10 @@
 # Integration tests
 
+Local Qwen address selection tests run when `LANDERIST_TEST_LOCALAI_HOST` is set
+to the inference server hostname (port 8000). They send six synthetic address
+queries through the production selector, without touching SQL or Google Cloud.
+Without that variable these tests are skipped.
+
 The integration suite requires an isolated SQL Server instance. Configuration is
 provided only through these environment variables:
 

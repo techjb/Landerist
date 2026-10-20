@@ -2,7 +2,7 @@ using landerist_console;
 using landerist_library.Application.Listings;
 using landerist_library.Application.Persistence;
 using landerist_library.Application.Tasks;
-using landerist_library.Infrastructure.Ai;
+using landerist_library.Infrastructure.Ai.LocalAI;
 using landerist_library.Infrastructure.Parsing;
 using landerist_library.Infrastructure.Runtime;
 using Microsoft.Extensions.DependencyInjection;
@@ -51,9 +51,9 @@ public sealed class LanderistServiceRegistrationTests
         Assert.NotNull(provider.GetRequiredService<TasksService>());
         Assert.NotNull(
             provider.GetRequiredService<IListingAdministrationService>());
-        VertexAddressSelectorOptions addressOptions =
-            provider.GetRequiredService<VertexAddressSelectorOptions>();
-        Assert.Equal("test-address-model", addressOptions.Model);
+        LocalAIListingParserOptions addressOptions =
+            provider.GetRequiredService<LocalAIListingParserOptions>();
+        Assert.Equal(LocalAIListingParserOptions.DefaultModel, addressOptions.Model);
         Assert.Same(
             provider.GetRequiredService<ParseListing>(),
             provider.GetRequiredService<ParseListing>());
