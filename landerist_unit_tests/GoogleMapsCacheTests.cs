@@ -24,7 +24,7 @@ public sealed class GoogleMapsCacheTests
         var handler = new Handler("ZERO_RESULTS");
         var api = new GoogleMapsApi(database, "test", httpClient: new HttpClient(handler), negativeCacheLifetimeDays: 3);
         Assert.Equal(GoogleMapsLatLngLookupStatus.NotFound, api.GetLatLngLookup("  Calle\t Pen\u0303a  12, Madrid ").Status);
-        Assert.Equal("Calle Peña 12, Madrid", database.LastParameters!["Address"]);
+        Assert.Equal("Calle Pe\u00f1a 12, Madrid", database.LastParameters!["Address"]);
         Assert.Equal(3, database.LastParameters["Days"]);
         Assert.Equal(1, handler.Calls);
     }
