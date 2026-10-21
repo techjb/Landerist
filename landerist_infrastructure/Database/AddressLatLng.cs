@@ -50,7 +50,23 @@ public sealed class AddressLatLng
             (bool)rows.Rows[0]["IsAccurate"]);
     }
 
-    public bool Clean() => _database.Query(
+    public bool IsNotFound(string address, string region) => _database.QueryExists(
+        "SELECT 1 FROM [ADDRESS_LAT_LNG_NOT_FOUND] WHERE Address = @Address AND Region = @Region " +
+        "AND ExpiresAt > GETUTCDATE()",
+        new Dictionary<string, object?> { { "Address", address }, { "Region", region } });
+
+    public bool InsertNotFound(string address, string region, int lifetimeDays) => _database.Query(
+        "SET XACT_ABORT ON; BEGIN TRANSACTION; UPDATE [ADDRESS_LAT_LNG_NOT_FOUND] WITH (UPDLOCK, SERIALIZABLE) " +
+        "SET ExpiresAt = DATEADD(DAY, @Days, GETUTCDATE()) WHERE Address = @Address AND Region = @Region; " +
+        "IF @@ROWCOUNT = 0 INSERT INTO [ADDRESS_LAT_LNG_NOT_FOUND] (Address, Region, ExpiresAt) " +
+        "VALUES (@Address, @Region, DATEADD(DAY, @Days, GETUTCDATE())); COMMIT;",
+        new Dictionary<string, object?> { { "Address", address }, { "Region", region }, { "Days", lifetimeDays } });
+
+    public bool Clean()
+    {
+        bool negativesCleaned = _database.Query("DELETE FROM [ADDRESS_LAT_LNG_NOT_FOUND] WHERE ExpiresAt <= GETUTCDATE()");
+        return _database.Query(
         "DELETE FROM " + TableName + " " +
-        "WHERE [DateInsert] < DATEADD(YEAR, -1, GETDATE())");
+        "WHERE [DateInsert] < DATEADD(YEAR, -1, GETDATE())") && negativesCleaned;
+    }
 }

@@ -109,7 +109,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [dbo].[ADDRESS_LAT_LNG](
 	[DateInsert] [datetime] NOT NULL,
-	[Address] [nvarchar](100) NOT NULL,
+	[Address] [nvarchar](400) NOT NULL,
 	[Region] [nvarchar](10) NOT NULL,
 	[Lat] [float] NOT NULL,
 	[Lng] [float] NOT NULL,
@@ -755,4 +755,12 @@ GO
 USE [master]
 GO
 ALTER DATABASE [Landerist] SET  READ_WRITE 
+GO
+
+CREATE TABLE [dbo].[ADDRESS_LAT_LNG_NOT_FOUND](
+    [Address] nvarchar(400) NOT NULL,
+    [Region] nvarchar(10) NOT NULL,
+    [ExpiresAt] datetime NOT NULL,
+    CONSTRAINT [PK_ADDRESS_LAT_LNG_NOT_FOUND] PRIMARY KEY CLUSTERED ([Address], [Region])
+);
 GO

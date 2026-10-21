@@ -19,13 +19,15 @@ namespace landerist_library.Infrastructure.Location.Providers.GoogleMaps
             IDatabase database,
             string apiKey,
             IApplicationLogger? logger = null,
-            HttpClient? httpClient = null)
+            HttpClient? httpClient = null,
+            int negativeCacheLifetimeDays = 30)
         {
             ArgumentNullException.ThrowIfNull(database);
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(negativeCacheLifetimeDays);
             this.apiKey = apiKey ?? string.Empty;
             this.logger = logger;
             this.httpClient = httpClient ?? new HttpClient { Timeout = TimeSpan.FromSeconds(20) };
-            latLngCache = new GoogleMapsLatLngCache(new AddressLatLng(database));
+            latLngCache = new GoogleMapsLatLngCache(new AddressLatLng(database), logger, negativeCacheLifetimeDays);
         }
 
         public GoogleMapsLatLngResult? GetLatLng(string address, CountryCode countryCode = CountryCode.ES)
