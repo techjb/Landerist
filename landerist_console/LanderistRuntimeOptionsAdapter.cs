@@ -111,7 +111,8 @@ internal static class LanderistRuntimeOptionsAdapter
             settings.GetString("GOOGLE_CLOUD_VERTEX_AI_PUBLISHER"),
             Config.VERTEX_AI_MODEL_NAME_GEMINI_FLASH_LITE,
             Config.VERTEX_AI_MODEL_NAME_GEMINI_FLASH,
-            settings.GetString("MACHINE_NAME_LANDERIST_03"),
+            settings.GetString("LOCAL_AI_HOST",
+                settings.GetString("MACHINE_NAME_LANDERIST_03")),
             Config.IsConfigurationLocal(),
             Config.LLM_PROVIDER);
     }
